@@ -63,25 +63,25 @@ typedef struct MasterNormalizer_TAG *MasterNormalizer_ptr;
 
   \todo Missing description
 */
-#define MASTER_NORMALIZER_CHECK_INSTANCE(self)                                 \
-  (nusmv_assert(MASTER_NORMALIZER(self) != MASTER_NORMALIZER(NULL)))
+#define MASTER_NORMALIZER_CHECK_INSTANCE(self) \
+	(nusmv_assert(MASTER_NORMALIZER(self) != MASTER_NORMALIZER(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MASTER_NORMALIZER_ASSERT_IS_NODE_NORMALIZED(self, node)                \
-  (nusmv_assert(node == MasterNormalizer_normalize_node(self, node)))
+#define MASTER_NORMALIZER_ASSERT_IS_NODE_NORMALIZED(self, node) \
+	(nusmv_assert(node == MasterNormalizer_normalize_node(self, node)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MASTER_NORMALIZER_ASSERT_IS_NODE_NOT_NORMALIZED(self, node)            \
-  (nusmv_assert(Nil == node ||                                                 \
-                node != MasterNormalizer_normalize_node(self, node)))
+#define MASTER_NORMALIZER_ASSERT_IS_NODE_NOT_NORMALIZED(self, node) \
+	(nusmv_assert(Nil == node ||                                \
+		      node != MasterNormalizer_normalize_node(self, node)))
 
 /**AutomaticStart*************************************************************/
 
@@ -128,7 +128,7 @@ node_ptr MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n);
   Inserts new data in the internal memoization cache.
 */
 void MasterNormalizer_insert_cache(MasterNormalizer_ptr self, node_ptr n,
-                                   node_ptr find);
+				   node_ptr find);
 
 /**AutomaticEnd***************************************************************/
 

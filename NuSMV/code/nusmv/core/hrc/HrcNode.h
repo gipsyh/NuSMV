@@ -74,8 +74,8 @@ typedef struct HrcNode_TAG *HrcNode_ptr;
 
   \todo Missing description
 */
-#define HRC_NODE_CHECK_INSTANCE(self)                                          \
-  (nusmv_assert(HRC_NODE(self) != HRC_NODE(NULL)))
+#define HRC_NODE_CHECK_INSTANCE(self) \
+	(nusmv_assert(HRC_NODE(self) != HRC_NODE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -124,7 +124,7 @@ HrcNode_ptr HrcNode_copy(const HrcNode_ptr self);
   \sa HrcNode_copy
 */
 HrcNode_ptr HrcNode_copy_rename(const HrcNode_ptr self,
-                                node_ptr new_module_name);
+				node_ptr new_module_name);
 
 /*!
   \methodof HrcNode
@@ -402,7 +402,7 @@ void HrcNode_add_formal_parameter(HrcNode_ptr self, node_ptr par);
 
 */
 node_ptr HrcNode_find_formal_parameter(const HrcNode_ptr self,
-                                       node_ptr par_name);
+				       node_ptr par_name);
 
 /*!
   \methodof HrcNode
@@ -1349,7 +1349,7 @@ Slist_ptr HrcNode_get_child_hrc_nodes(const HrcNode_ptr self);
                       can be declared
 */
 boolean HrcNode_can_declare_assign(HrcNode_ptr self, node_ptr symbol,
-                                   int assign_type);
+				   int assign_type);
 
 /*!
   \methodof HrcNode
@@ -1393,7 +1393,7 @@ boolean HrcNode_is_leaf(const HrcNode_ptr self);
   \sa optional
 */
 HrcNode_ptr HrcNode_find_hrc_node_by_mod_type(const HrcNode_ptr self,
-                                              node_ptr mod_type);
+					      node_ptr mod_type);
 
 /* The caller has to free returned list */
 
@@ -1411,7 +1411,7 @@ HrcNode_ptr HrcNode_find_hrc_node_by_mod_type(const HrcNode_ptr self,
   \sa optional
 */
 Olist_ptr HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
-                                             const node_ptr mod_type);
+					     const node_ptr mod_type);
 
 /* NULL if it does not exits */
 
@@ -1428,7 +1428,7 @@ Olist_ptr HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
   \sa optional
 */
 HrcNode_ptr HrcNode_find_hrc_node_by_instance_name(const HrcNode_ptr self,
-                                                   node_ptr name);
+						   node_ptr name);
 
 /* Find var_name of a given kind (state, frozen, input) in self node */
 

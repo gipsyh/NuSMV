@@ -54,16 +54,16 @@
 */
 
 typedef struct FormulaDependency_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(MasterNodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(MasterNodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } FormulaDependency;
 
@@ -96,9 +96,9 @@ typedef struct FormulaDependency_TAG {
 
 
 */
-#define IS_VALID_SET(set)                                                      \
-  (EMPTY_DEP_SET != set && BUILDING_DEP_SET != set && NO_DEP_SET != set &&     \
-   (Set_t)NULL != set)
+#define IS_VALID_SET(set)                                   \
+	(EMPTY_DEP_SET != set && BUILDING_DEP_SET != set && \
+	 NO_DEP_SET != set && (Set_t)NULL != set)
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -113,7 +113,7 @@ typedef struct FormulaDependency_TAG {
   \sa FormulaDependency_create
 */
 void formula_dependency_init(FormulaDependency_ptr self,
-                             const NuSMVEnv_ptr env);
+			     const NuSMVEnv_ptr env);
 
 /*!
   \methodof FormulaDependency
@@ -135,11 +135,11 @@ void formula_dependency_deinit(FormulaDependency_ptr self);
    FormulaDependency_GetDependenciesByType
 */
 Set_t formula_dependency_get_dependencies(FormulaDependency_ptr self,
-                                          SymbTable_ptr symb_table,
-                                          node_ptr formula, node_ptr context,
-                                          SymbFilterType filter,
-                                          boolean preserve_time, int time,
-                                          hash_ptr dependencies_hash);
+					  SymbTable_ptr symb_table,
+					  node_ptr formula, node_ptr context,
+					  SymbFilterType filter,
+					  boolean preserve_time, int time,
+					  hash_ptr dependencies_hash);
 
 /*!
   \methodof FormulaDependency
@@ -162,9 +162,9 @@ Set_t formula_dependency_get_dependencies(FormulaDependency_ptr self,
   \sa FormulaDependency_GetDependencies
 */
 Set_t formula_dependency_get_definition_dependencies(
-    FormulaDependency_ptr self, SymbTable_ptr symb_table, node_ptr formula,
-    SymbFilterType filter, boolean preserve_time, int time,
-    hash_ptr dependencies_hash);
+	FormulaDependency_ptr self, SymbTable_ptr symb_table, node_ptr formula,
+	SymbFilterType filter, boolean preserve_time, int time,
+	hash_ptr dependencies_hash);
 
 /*!
   \methodof FormulaDependency
@@ -174,7 +174,7 @@ Set_t formula_dependency_get_definition_dependencies(
 
 */
 hash_ptr formula_dependency_get_hash(FormulaDependency_ptr self,
-                                     SymbTable_ptr symb_table);
+				     SymbTable_ptr symb_table);
 
 /*!
   \brief Insertion function for dependencies_hash
@@ -184,7 +184,7 @@ hash_ptr formula_dependency_get_hash(FormulaDependency_ptr self,
    Assumes the key not be already in the table.
 */
 void formula_dependency_insert_hash(hash_ptr dep_hash, node_ptr key,
-                                    Set_t value);
+				    Set_t value);
 
 /*!
   \brief Insertion function for dependencies_hash
@@ -197,7 +197,7 @@ void formula_dependency_insert_hash(hash_ptr dep_hash, node_ptr key,
    valued in the hash.
 */
 void formula_dependency_close_define_hash(hash_ptr dep_hash, node_ptr key,
-                                          Set_t value);
+					  Set_t value);
 
 /*!
   \brief Lookup function for dependencies_hash
@@ -212,8 +212,8 @@ Set_t formula_dependency_lookup_hash(hash_ptr dep_hash, node_ptr key);
   The Tuple5 has to freed by the caller
 */
 void formula_dependency_mk_hash_key(node_ptr e, node_ptr c,
-                                    SymbFilterType filter,
-                                    boolean preserve_time, int time,
-                                    Tuple5_ptr key);
+				    SymbFilterType filter,
+				    boolean preserve_time, int time,
+				    Tuple5_ptr key);
 
 #endif /* __NUSMV_CORE_COMPILE_DEPENDENCY_FORMULA_DEPENDENCY_PRIVATE_H__ */

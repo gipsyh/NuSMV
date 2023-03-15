@@ -75,8 +75,8 @@ extern cmp_struct_ptr cmps;
   Trigger that sets the use_reachable_states flag if needed
 */
 boolean opt_set_reachable_states_trigger(OptsHandler_ptr opts, const char *opt,
-                                         const char *value,
-                                         Trigger_Action action, void *arg);
+					 const char *value,
+					 Trigger_Action action, void *arg);
 
 /*!
   \brief reordering method trigger: enables / disables dd_autodyn
@@ -84,8 +84,8 @@ boolean opt_set_reachable_states_trigger(OptsHandler_ptr opts, const char *opt,
   reordering method trigger: enables / disables dd_autodyn
 */
 boolean opt_reorder_method_trigger(OptsHandler_ptr opts, const char *opt,
-                                   const char *value, Trigger_Action action,
-                                   void *arg);
+				   const char *value, Trigger_Action action,
+				   void *arg);
 
 /*!
   \brief Trigger for the default_trace_plugin option.
@@ -94,8 +94,8 @@ boolean opt_reorder_method_trigger(OptsHandler_ptr opts, const char *opt,
    default plugin in the trace pkg.
 */
 boolean opt_trace_plugin_trigger(OptsHandler_ptr opts, const char *opt,
-                                 const char *value, Trigger_Action action,
-                                 void *arg);
+				 const char *value, Trigger_Action action,
+				 void *arg);
 
 /*!
   \brief Dynamic reordering trigger: enables / disables dd_autodyn
@@ -103,8 +103,8 @@ boolean opt_trace_plugin_trigger(OptsHandler_ptr opts, const char *opt,
   Dynamic reordering trigger: enables / disables dd_autodyn
 */
 boolean opt_dynamic_reorder_trigger(OptsHandler_ptr opts, const char *opt,
-                                    const char *value, Trigger_Action action,
-                                    void *arg);
+				    const char *value, Trigger_Action action,
+				    void *arg);
 
 /*!
   \brief Trigger function for the trans_order_file option
@@ -113,8 +113,8 @@ boolean opt_dynamic_reorder_trigger(OptsHandler_ptr opts, const char *opt,
    Enables/disables AFFINITY_CLUSTERING if needed
 */
 boolean opt_trans_order_file_trigger(OptsHandler_ptr opts, const char *opt,
-                                     const char *value, Trigger_Action action,
-                                     void *arg);
+				     const char *value, Trigger_Action action,
+				     void *arg);
 
 /*!
   \brief Trigger function for the run_cpp option
@@ -124,8 +124,8 @@ boolean opt_trans_order_file_trigger(OptsHandler_ptr opts, const char *opt,
    value will be performed
 */
 boolean opt_run_cpp_trigger(OptsHandler_ptr opts, const char *opt,
-                            const char *value, Trigger_Action action,
-                            void *arg);
+			    const char *value, Trigger_Action action,
+			    void *arg);
 
 /*!
   \brief Trigger function for the pp_list option
@@ -134,8 +134,8 @@ boolean opt_run_cpp_trigger(OptsHandler_ptr opts, const char *opt,
    the given list of preprocessors is valid or not
 */
 boolean opt_pp_list_trigger(OptsHandler_ptr opts, const char *opt,
-                            const char *value, Trigger_Action action,
-                            void *arg);
+			    const char *value, Trigger_Action action,
+			    void *arg);
 
 /*!
   \brief Trigger function for the run_cpp option
@@ -145,8 +145,8 @@ boolean opt_pp_list_trigger(OptsHandler_ptr opts, const char *opt,
    value will be performed
 */
 boolean opt_rbc_inlining_lazy_trigger(OptsHandler_ptr opts, const char *opt,
-                                      const char *value, Trigger_Action action,
-                                      void *arg);
+				      const char *value, Trigger_Action action,
+				      void *arg);
 
 /*!
   \brief
@@ -154,8 +154,8 @@ boolean opt_rbc_inlining_lazy_trigger(OptsHandler_ptr opts, const char *opt,
 
 */
 boolean opt_script_file_trigger(OptsHandler_ptr opts, const char *opt,
-                                const char *value, Trigger_Action action,
-                                void *arg);
+				const char *value, Trigger_Action action,
+				void *arg);
 
 /*!
   \brief
@@ -163,8 +163,8 @@ boolean opt_script_file_trigger(OptsHandler_ptr opts, const char *opt,
 
 */
 boolean opt_pp_cpp_path_trigger(OptsHandler_ptr opts, const char *opt,
-                                const char *value, Trigger_Action action,
-                                void *arg);
+				const char *value, Trigger_Action action,
+				void *arg);
 
 /*!
   \brief
@@ -172,8 +172,8 @@ boolean opt_pp_cpp_path_trigger(OptsHandler_ptr opts, const char *opt,
 
 */
 boolean opt_pp_m4_path_trigger(OptsHandler_ptr opts, const char *opt,
-                               const char *value, Trigger_Action action,
-                               void *arg);
+			       const char *value, Trigger_Action action,
+			       void *arg);
 
 #if NUSMV_HAVE_REGEX_H
 
@@ -185,8 +185,8 @@ boolean opt_pp_m4_path_trigger(OptsHandler_ptr opts, const char *opt,
    compilation fails.
 */
 boolean opt_traces_regexp_trigger(OptsHandler_ptr opts, const char *opt,
-                                  const char *value, Trigger_Action action,
-                                  void *arg);
+				  const char *value, Trigger_Action action,
+				  void *arg);
 #endif
 
 /* triggers end */

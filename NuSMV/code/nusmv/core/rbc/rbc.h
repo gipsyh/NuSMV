@@ -99,9 +99,9 @@
 */
 
 typedef enum _Rbc_2CnfAlgorithm {
-  RBC_INVALID_CONVERSION = 0,
-  RBC_TSEITIN_CONVERSION,
-  RBC_SHERIDAN_CONVERSION
+	RBC_INVALID_CONVERSION = 0,
+	RBC_TSEITIN_CONVERSION,
+	RBC_SHERIDAN_CONVERSION
 } Rbc_2CnfAlgorithm;
 
 /*!
@@ -111,8 +111,8 @@ typedef enum _Rbc_2CnfAlgorithm {
 */
 
 typedef enum Rbc_Bool {
-  RBC_FALSE = DAG_ANNOTATION_BIT,
-  RBC_TRUE = 0
+	RBC_FALSE = DAG_ANNOTATION_BIT,
+	RBC_TRUE = 0
 } Rbc_Bool_c;
 
 /*!
@@ -155,10 +155,10 @@ typedef int (*Rbc_IntPtr_t)(void);
 /* Structure declarations                                                     */
 /*---------------------------------------------------------------------------*/
 struct RbcDfsFunctions {
-  Rbc_IntPtr_t Set;
-  Rbc_ProcPtr_t FirstVisit;
-  Rbc_ProcPtr_t BackVisit;
-  Rbc_ProcPtr_t LastVisit;
+	Rbc_IntPtr_t Set;
+	Rbc_ProcPtr_t FirstVisit;
+	Rbc_ProcPtr_t BackVisit;
+	Rbc_ProcPtr_t LastVisit;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -211,10 +211,10 @@ void Rbc_pkg_quit(void);
   and is ignored if the simple algorithm is used.
 */
 int Rbc_Convert2Cnf(Rbc_Manager_t *rbcManager, Rbc_t *f, int polarity,
-                    Rbc_2CnfAlgorithm alg,
-                    /* outputs: */
-                    Slist_ptr clauses, Slist_ptr vars,
-                    int *literalAssignedToWholeFormula);
+		    Rbc_2CnfAlgorithm alg,
+		    /* outputs: */
+		    Slist_ptr clauses, Slist_ptr vars,
+		    int *literalAssignedToWholeFormula);
 
 /*!
   \brief Returns the RBC index corresponding to a particular CNF var
@@ -310,7 +310,7 @@ Rbc_t *Rbc_MakeNot(Rbc_Manager_t *rbcManager, Rbc_t *left);
   \se none
 */
 Rbc_t *Rbc_MakeAnd(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
-                   Rbc_Bool_c sign);
+		   Rbc_Bool_c sign);
 
 /*!
   \brief Makes the disjunction of two rbcs.
@@ -321,7 +321,7 @@ Rbc_t *Rbc_MakeAnd(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
   \se none
 */
 Rbc_t *Rbc_MakeOr(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
-                  Rbc_Bool_c sign);
+		  Rbc_Bool_c sign);
 
 /*!
   \brief Makes the coimplication of two rbcs.
@@ -342,7 +342,7 @@ Rbc_t *Rbc_MakeOr(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
   \se none
 */
 Rbc_t *Rbc_MakeIff(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
-                   Rbc_Bool_c sign);
+		   Rbc_Bool_c sign);
 
 /*!
   \brief Makes the exclusive disjunction of two rbcs.
@@ -353,7 +353,7 @@ Rbc_t *Rbc_MakeIff(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
   \se none
 */
 Rbc_t *Rbc_MakeXor(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
-                   Rbc_Bool_c sign);
+		   Rbc_Bool_c sign);
 
 /*!
   \brief Makes the if-then-else of three rbcs.
@@ -367,7 +367,7 @@ Rbc_t *Rbc_MakeXor(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
   \se none
 */
 Rbc_t *Rbc_MakeIte(Rbc_Manager_t *rbcManager, Rbc_t *c, Rbc_t *t, Rbc_t *e,
-                   Rbc_Bool_c sign);
+		   Rbc_Bool_c sign);
 
 /*!
   \brief Gets the left operand.
@@ -587,7 +587,7 @@ Rbc_t *Rbc_Subst(Rbc_Manager_t *rbcManager, Rbc_t *f, int *subst);
   \sa Rbc_Subst
 */
 Rbc_t *Rbc_LogicalSubst(Rbc_Manager_t *rbcManager, Rbc_t *f, int *subst,
-                        const int *log2phy, const int *phy2log);
+			const int *log2phy, const int *phy2log);
 
 /*!
   \brief Creates a fresh copy G(X') of the rbc F(X) by shifting
@@ -642,7 +642,7 @@ Rbc_t *Rbc_Shift(Rbc_Manager_t *rbcManager, Rbc_t *f, int shift);
   \se none
 */
 Rbc_t *Rbc_LogicalShift(Rbc_Manager_t *rbcManager, Rbc_t *f, int shift,
-                        const int *log2phy, const int *phy2log);
+			const int *log2phy, const int *phy2log);
 
 /*!
   \brief Creates a fresh copy G(S) of the rbc F(X) such
@@ -693,7 +693,7 @@ Rbc_t *Rbc_SubstRbc(Rbc_Manager_t *rbcManager, Rbc_t *f, Rbc_t **substRbc);
   \se none
 */
 Rbc_t *Rbc_LogicalSubstRbc(Rbc_Manager_t *rbcManager, Rbc_t *f,
-                           Rbc_t **substRbc, int *phy2log);
+			   Rbc_t **substRbc, int *phy2log);
 
 /*!
   \brief Prints various statistics.
@@ -712,7 +712,7 @@ void Rbc_PrintStats(Rbc_Manager_t *rbcManager, int clustSz, FILE *outFile);
   \se None
 */
 Slist_ptr RbcUtils_get_dependencies(Rbc_Manager_t *rbcManager, Rbc_t *f,
-                                    boolean reset_dag);
+				    boolean reset_dag);
 
 /*!
   \brief Calculates the inlining of the given formula
@@ -725,7 +725,7 @@ Slist_ptr RbcUtils_get_dependencies(Rbc_Manager_t *rbcManager, Rbc_t *f,
   \sa InlineResult
 */
 struct InlineResult_TAG *RbcInline_apply_inlining(Rbc_Manager_t *rbcm,
-                                                  Rbc_t *f);
+						  Rbc_t *f);
 
 /*!
   \brief Conversion from string to CNF conversion algorithm enumerative
@@ -798,7 +798,7 @@ RbcDfsFunctions_t *Rbc_ManagerGetDfsCleanFun(Rbc_Manager_t *rbcManager);
   \sa Dag_Dfs()
 */
 void Rbc_Dfs_exported(Rbc_t *dfsRoot, RbcDfsFunctions_t *dfsFun, void *dfsData,
-                      Rbc_Manager_t *manager);
+		      Rbc_Manager_t *manager);
 
 /*!
   \brief Calls the internal DFS clean

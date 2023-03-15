@@ -97,8 +97,8 @@ int CommandUtilsTestSset(NuSMVEnv_ptr env, int argc, char **argv);
   usage can be NULL
 */
 int Utils_check_non_option_args(NuSMVEnv_ptr env, int argc,
-                                unsigned int expected_args,
-                                int (*usage)(void *arg), void *arg);
+				unsigned int expected_args,
+				int (*usage)(void *arg), void *arg);
 
 /**AutomaticEnd***************************************************************/
 

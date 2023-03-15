@@ -102,6 +102,6 @@ extern size_t simulation_buffer_size;
   \sa optional
 */
 int Simulate_CmdPickOneState(NuSMVEnv_ptr, BddFsm_ptr, Simulation_Mode, int,
-                             bdd_ptr);
+			     bdd_ptr);
 
 #endif /* __NUSMV_CORE_SIMULATE_SIMULATE_INT_H__ */

@@ -60,31 +60,31 @@
 */
 
 typedef struct SexpFsm_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(Object);
+	/* this MUST stay on the top */
+	INHERITS_FROM(Object);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  SymbTable_ptr st;            /* the symbol table */
-  FlatHierarchy_ptr hierarchy; /* contains fsm data */
-  Set_t vars_set;
-  NodeList_ptr symbols;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	SymbTable_ptr st; /* the symbol table */
+	FlatHierarchy_ptr hierarchy; /* contains fsm data */
+	Set_t vars_set;
+	NodeList_ptr symbols;
 
-  hash_ptr hash_var_fsm;
-  node_ptr const_var_fsm;
+	hash_ptr hash_var_fsm;
+	node_ptr const_var_fsm;
 
-  int *family_counter; /* for reference counting */
+	int *family_counter; /* for reference counting */
 
-  /* flag controlling inlining operations */
-  boolean inlining;
+	/* flag controlling inlining operations */
+	boolean inlining;
 
-  /* flag to recognize boolean fsm from scalar */
-  boolean is_boolean;
+	/* flag to recognize boolean fsm from scalar */
+	boolean is_boolean;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } SexpFsm;
 
@@ -101,7 +101,7 @@ typedef struct SexpFsm_TAG {
   hierarchy must be empty
 */
 void sexp_fsm_init(SexpFsm_ptr self, const FlatHierarchy_ptr hierarchy,
-                   const Set_t vars_set);
+		   const Set_t vars_set);
 
 /*!
   \methodof SexpFsm

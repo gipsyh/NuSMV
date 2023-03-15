@@ -85,28 +85,29 @@
   It associates a flattener to the global environment.
 */
 
-void FlatteningPkg_init(NuSMVEnv_ptr env) {
-  MasterCompileFlattener_ptr flattener;
-  OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void FlatteningPkg_init(NuSMVEnv_ptr env)
+{
+	MasterCompileFlattener_ptr flattener;
+	OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 4)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Instantiating the Flattener instance "
-                       "within the given environment...\n");
-  }
+	if (opt_verbose_level_gt(opts, 4)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Instantiating the Flattener instance "
+				   "within the given environment...\n");
+	}
 
-  flattener = MasterCompileFlattener_create(env);
-  {
-    /* add core flatteners */
-    FlattenerBase_ptr core_flattener;
-    core_flattener =
-        FLATTENER_BASE(FlattenerCore_create(env, "Flattener core"));
-    MasterNodeWalker_register_walker(MASTER_NODE_WALKER(flattener),
-                                     NODE_WALKER(core_flattener));
-  }
+	flattener = MasterCompileFlattener_create(env);
+	{
+		/* add core flatteners */
+		FlattenerBase_ptr core_flattener;
+		core_flattener = FLATTENER_BASE(
+			FlattenerCore_create(env, "Flattener core"));
+		MasterNodeWalker_register_walker(MASTER_NODE_WALKER(flattener),
+						 NODE_WALKER(core_flattener));
+	}
 
-  NuSMVEnv_set_value(env, ENV_FLATTENER, flattener);
+	NuSMVEnv_set_value(env, ENV_FLATTENER, flattener);
 }
 
 /*!
@@ -115,19 +116,20 @@ void FlatteningPkg_init(NuSMVEnv_ptr env) {
 
 */
 
-void FlatteningPkg_quit(NuSMVEnv_ptr env) {
-  MasterCompileFlattener_ptr flattener =
-      MASTER_COMPILE_FLATTENER(NuSMVEnv_remove_value(env, ENV_FLATTENER));
-  OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void FlatteningPkg_quit(NuSMVEnv_ptr env)
+{
+	MasterCompileFlattener_ptr flattener = MASTER_COMPILE_FLATTENER(
+		NuSMVEnv_remove_value(env, ENV_FLATTENER));
+	OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 4)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Clearing the Flattener instance in "
-                       "the given environment...\n");
-  }
+	if (opt_verbose_level_gt(opts, 4)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Clearing the Flattener instance in "
+				   "the given environment...\n");
+	}
 
-  MasterCompileFlattener_destroy(flattener);
+	MasterCompileFlattener_destroy(flattener);
 }
 
 /*---------------------------------------------------------------------------*/

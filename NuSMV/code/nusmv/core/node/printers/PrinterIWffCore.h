@@ -61,8 +61,8 @@ typedef struct PrinterIWffCore_TAG *PrinterIWffCore_ptr;
 
   \todo Missing description
 */
-#define PRINTER_IWFF_CORE_CHECK_INSTANCE(self)                                 \
-  (nusmv_assert(PRINTER_IWFF_CORE(self) != PRINTER_IWFF_CORE(NULL)))
+#define PRINTER_IWFF_CORE_CHECK_INSTANCE(self) \
+	(nusmv_assert(PRINTER_IWFF_CORE(self) != PRINTER_IWFF_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,7 +79,7 @@ typedef struct PrinterIWffCore_TAG *PrinterIWffCore_ptr;
   \sa PrinterIWffCore_destroy
 */
 PrinterIWffCore_ptr PrinterIWffCore_create(const NuSMVEnv_ptr env,
-                                           const char *name);
+					   const char *name);
 
 /**AutomaticEnd***************************************************************/
 

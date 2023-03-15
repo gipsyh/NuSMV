@@ -34,8 +34,8 @@
 
 // used to import command help list from cmdHelp.c
 typedef struct command_item_TAG {
-  const char *command_name;
-  const char *command_description;
+	const char *command_name;
+	const char *command_description;
 } command_item;
 
 extern command_item command_help[];
@@ -75,7 +75,7 @@ char *cmd_help_get(NuSMVEnv_ptr env, char *command_name);
 
 */
 void cmd_help_add(NuSMVEnv_ptr env, const char *command_name,
-                  const char *command_description);
+		  const char *command_description);
 
 /*!
   \brief

@@ -77,18 +77,19 @@ static void partial_trace_executor_finalize(Object_ptr object, void *dummy);
 
 static Trace_ptr
 partial_trace_executor_execute(const PartialTraceExecutor_ptr self,
-                               const Trace_ptr trace, NodeList_ptr language,
-                               int *n_steps);
+			       const Trace_ptr trace, NodeList_ptr language,
+			       int *n_steps);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 Trace_ptr PartialTraceExecutor_execute(const PartialTraceExecutor_ptr self,
-                                       const Trace_ptr trace,
-                                       const NodeList_ptr language,
-                                       int *n_steps) {
-  return (*self->execute)(self, trace, language, n_steps);
+				       const Trace_ptr trace,
+				       const NodeList_ptr language,
+				       int *n_steps)
+{
+	return (*self->execute)(self, trace, language, n_steps);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -96,89 +97,94 @@ Trace_ptr PartialTraceExecutor_execute(const PartialTraceExecutor_ptr self,
 /*---------------------------------------------------------------------------*/
 
 void partial_trace_executor_init(PartialTraceExecutor_ptr self,
-                                 const NuSMVEnv_ptr env) {
-  /* base class initialization */
-  trace_executor_init(BASE_TRACE_EXECUTOR(self), env);
+				 const NuSMVEnv_ptr env)
+{
+	/* base class initialization */
+	trace_executor_init(BASE_TRACE_EXECUTOR(self), env);
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = partial_trace_executor_finalize;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = partial_trace_executor_finalize;
 
-  /* virtual abstract partial execution method */
-  OVERRIDE(PartialTraceExecutor, execute) = partial_trace_executor_execute;
+	/* virtual abstract partial execution method */
+	OVERRIDE(PartialTraceExecutor, execute) =
+		partial_trace_executor_execute;
 }
 
-void partial_trace_executor_deinit(PartialTraceExecutor_ptr self) {
-  /* members deinitialization */
+void partial_trace_executor_deinit(PartialTraceExecutor_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  trace_executor_deinit(BASE_TRACE_EXECUTOR(self));
+	/* base class deinitialization */
+	trace_executor_deinit(BASE_TRACE_EXECUTOR(self));
 }
 
 boolean
 partial_trace_executor_check_loopbacks(const PartialTraceExecutor_ptr self,
-                                       const Trace_ptr partial_trace,
-                                       const Trace_ptr complete_trace) {
-  boolean res = true;
+				       const Trace_ptr partial_trace,
+				       const Trace_ptr complete_trace)
+{
+	boolean res = true;
 
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  /* local reference to superclass */
-  const BaseTraceExecutor_ptr executor = BASE_TRACE_EXECUTOR(self);
-  TraceIter partial_step;
-  TraceIter complete_step;
+	/* local reference to superclass */
+	const BaseTraceExecutor_ptr executor = BASE_TRACE_EXECUTOR(self);
+	TraceIter partial_step;
+	TraceIter complete_step;
 
-  int i = 1;
+	int i = 1;
 
-  PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self);
-  TRACE_CHECK_INSTANCE(partial_trace);
-  TRACE_CHECK_INSTANCE(complete_trace);
+	PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self);
+	TRACE_CHECK_INSTANCE(partial_trace);
+	TRACE_CHECK_INSTANCE(complete_trace);
 
-  partial_step = trace_first_iter(partial_trace);
-  complete_step = trace_first_iter(complete_trace);
-  if (opt_verbose_level_ge(opts, 4)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "now checking loopbacks...\n");
-  }
-  while (TRACE_END_ITER != partial_step) {
-    if ((trace_step_is_loopback(partial_trace, partial_step)) &&
-        !trace_step_test_loopback(complete_trace, complete_step)) {
+	partial_step = trace_first_iter(partial_trace);
+	complete_step = trace_first_iter(complete_trace);
+	if (opt_verbose_level_ge(opts, 4)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "now checking loopbacks...\n");
+	}
+	while (TRACE_END_ITER != partial_step) {
+		if ((trace_step_is_loopback(partial_trace, partial_step)) &&
+		    !trace_step_test_loopback(complete_trace, complete_step)) {
+			fprintf(BaseTraceExecutor_get_error_stream(executor),
+				"*** Error ***\n"
+				"Inconsistent loopback information found at step %d.\n",
+				i);
 
-      fprintf(BaseTraceExecutor_get_error_stream(executor),
-              "*** Error ***\n"
-              "Inconsistent loopback information found at step %d.\n",
-              i);
+			res = false;
+			break; /*  continuing is pointless */
+		}
 
-      res = false;
-      break; /*  continuing is pointless */
-    }
+		++i;
+		partial_step = trace_iter_get_next(partial_step);
+		complete_step = trace_iter_get_next(complete_step);
+	} /* trace foreach */
 
-    ++i;
-    partial_step = trace_iter_get_next(partial_step);
-    complete_step = trace_iter_get_next(complete_step);
-  } /* trace foreach */
-
-  return res;
+	return res;
 }
 
 boolean
 partial_trace_executor_is_complete_state(const PartialTraceExecutor_ptr self,
-                                         const Trace_ptr trace,
-                                         const TraceIter step) {
-  TraceSymbolsIter iter;
-  node_ptr symb, val;
+					 const Trace_ptr trace,
+					 const TraceIter step)
+{
+	TraceSymbolsIter iter;
+	node_ptr symb, val;
 
-  PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self);
-  TRACE_CHECK_INSTANCE(trace);
+	PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self);
+	TRACE_CHECK_INSTANCE(trace);
 
-  TRACE_SYMBOLS_FOREACH(trace, TRACE_ITER_SF_VARS, iter, symb) {
-    val = Trace_step_get_value(trace, step, symb);
-    if (Nil == val)
-      return false;
-  }
+	TRACE_SYMBOLS_FOREACH(trace, TRACE_ITER_SF_VARS, iter, symb)
+	{
+		val = Trace_step_get_value(trace, step, symb);
+		if (Nil == val)
+			return false;
+	}
 
-  return true;
+	return true;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -190,11 +196,12 @@ partial_trace_executor_is_complete_state(const PartialTraceExecutor_ptr self,
 
   Called by the class destructor
 */
-static void partial_trace_executor_finalize(Object_ptr object, void *dummy) {
-  PartialTraceExecutor_ptr self = PARTIAL_TRACE_EXECUTOR(object);
+static void partial_trace_executor_finalize(Object_ptr object, void *dummy)
+{
+	PartialTraceExecutor_ptr self = PARTIAL_TRACE_EXECUTOR(object);
 
-  partial_trace_executor_deinit(self);
-  FREE(self);
+	partial_trace_executor_deinit(self);
+	FREE(self);
 }
 
 /*!
@@ -205,10 +212,11 @@ static void partial_trace_executor_finalize(Object_ptr object, void *dummy) {
 */
 
 Trace_ptr partial_trace_executor_execute(const PartialTraceExecutor_ptr self,
-                                         const Trace_ptr trace,
-                                         NodeList_ptr language, int *n_steps) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return 0;
+					 const Trace_ptr trace,
+					 NodeList_ptr language, int *n_steps)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return 0;
 }
 
 /**AutomaticEnd***************************************************************/

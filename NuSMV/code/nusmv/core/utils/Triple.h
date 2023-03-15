@@ -54,10 +54,10 @@ typedef struct Triple_TAG *Triple_ptr;
 */
 
 typedef struct Triple_TAG {
-  void *first;
-  void *second;
-  void *third;
-  boolean frozen;
+	void *first;
+	void *second;
+	void *third;
+	boolean frozen;
 } Triple;
 
 /*!

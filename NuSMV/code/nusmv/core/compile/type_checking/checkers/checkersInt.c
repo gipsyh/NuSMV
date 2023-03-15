@@ -67,8 +67,10 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-boolean TypeSystemViolation_is_valid(TypeSystemViolation violation) {
-  return (violation > TC_VIOLATION_FIRST) && (violation < TC_VIOLATION_LAST);
+boolean TypeSystemViolation_is_valid(TypeSystemViolation violation)
+{
+	return (violation > TC_VIOLATION_FIRST) &&
+	       (violation < TC_VIOLATION_LAST);
 }
 
 /*---------------------------------------------------------------------------*/

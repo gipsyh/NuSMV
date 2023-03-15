@@ -60,42 +60,42 @@
 typedef Prop_ptr (*Prop_Rewriter_rewrite_method)(Prop_Rewriter_ptr);
 
 typedef struct Prop_Rewriter_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  /* references */
-  Prop_ptr original;
-  WffRewriteMethod method;
-  WffRewriterExpectedProperty expprop;
-  SymbTable_ptr symb_table;
-  boolean is_status_consistent; /* this forces the developers to call
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	/* references */
+	Prop_ptr original;
+	WffRewriteMethod method;
+	WffRewriterExpectedProperty expprop;
+	SymbTable_ptr symb_table;
+	boolean is_status_consistent; /* this forces the developers to call
                                    update_original_property before destroy */
-  SymbLayer_ptr layer;
-  BddEnc_ptr bddenc;
-  FsmType fsm_type;
+	SymbLayer_ptr layer;
+	BddEnc_ptr bddenc;
+	FsmType fsm_type;
 
-  /* Whether the monitor variables will be visible in the traces or
+	/* Whether the monitor variables will be visible in the traces or
      not. By default they are not visible. */
-  boolean monitor_visible_in_traces;
-  /* When the WFF_REWRITE_METHOD_DEADLOCK_FREE is selected, then
+	boolean monitor_visible_in_traces;
+	/* When the WFF_REWRITE_METHOD_DEADLOCK_FREE is selected, then
      initialize_monitor_to_true control the value the monitor variable
      is initialized to. I.e. if true it is initialized to TRUE, else
      to FALSE. By default it is initialized to TRUE */
-  boolean monitor_variable_initialized_to_true;
+	boolean monitor_variable_initialized_to_true;
 
-  /* When true, the invariant for the property is negated before being
+	/* When true, the invariant for the property is negated before being
      converted */
-  boolean ltl2invar_negate_property;
-  /* owned */
-  Prop_ptr rewritten;
+	boolean ltl2invar_negate_property;
+	/* owned */
+	Prop_ptr rewritten;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  Prop_Rewriter_rewrite_method rewrite;
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	Prop_Rewriter_rewrite_method rewrite;
 
 } Prop_Rewriter;
 
@@ -112,9 +112,9 @@ typedef struct Prop_Rewriter_TAG {
   \sa Prop_Rewriter_create
 */
 void prop_rewriter_init(Prop_Rewriter_ptr self, NuSMVEnv_ptr env,
-                        Prop_ptr original, WffRewriteMethod method,
-                        WffRewriterExpectedProperty expprop, FsmType fsm_type,
-                        BddEnc_ptr enc, SymbLayer_ptr layer);
+			Prop_ptr original, WffRewriteMethod method,
+			WffRewriterExpectedProperty expprop, FsmType fsm_type,
+			BddEnc_ptr enc, SymbLayer_ptr layer);
 
 /*!
   \methodof Prop_Rewriter

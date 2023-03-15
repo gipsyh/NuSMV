@@ -49,22 +49,22 @@
 /*---------------------------------------------------------------------------*/
 
 enum var_type {
-  VAR_NONE = 0,
-  VAR_INT = 1,
-  VAR_CHAR = VAR_INT << 1,
-  VAR_STRING = VAR_INT << 2,
-  VAR_POINTER = VAR_INT << 3,
-  VAR_DOUBLE = VAR_INT << 4
+	VAR_NONE = 0,
+	VAR_INT = 1,
+	VAR_CHAR = VAR_INT << 1,
+	VAR_STRING = VAR_INT << 2,
+	VAR_POINTER = VAR_INT << 3,
+	VAR_DOUBLE = VAR_INT << 4
 };
 
 enum var_modifier {
-  MOD_NONE = VAR_INT << 6,
-  MOD_SIZE_T = VAR_INT << 7,
-  MOD_SHORT = VAR_INT << 8,
-  MOD_SHORT_SHORT = VAR_INT << 9,
-  MOD_LONG = VAR_INT << 10,
-  MOD_LONG_LONG = VAR_INT << 11,
-  MOD_LONG_DOUBLE = VAR_INT << 12
+	MOD_NONE = VAR_INT << 6,
+	MOD_SIZE_T = VAR_INT << 7,
+	MOD_SHORT = VAR_INT << 8,
+	MOD_SHORT_SHORT = VAR_INT << 9,
+	MOD_LONG = VAR_INT << 10,
+	MOD_LONG_LONG = VAR_INT << 11,
+	MOD_LONG_DOUBLE = VAR_INT << 12
 };
 
 /*!
@@ -80,7 +80,7 @@ enum var_modifier {
                uqual to the format length (e.g. '%.2f' will return 4)
 */
 int UtilsIO_get_param_len(const char *fmt, enum var_type *type,
-                          enum var_modifier *mod);
+			  enum var_modifier *mod);
 
 /*!
   \brief NuSMV custom fprintf function.
@@ -95,7 +95,7 @@ int UtilsIO_get_param_len(const char *fmt, enum var_type *type,
   \sa fprintf
 */
 int UtilsIO_node_fprintf(const MasterPrinter_ptr printer, FILE *output,
-                         const char *fmt, ...);
+			 const char *fmt, ...);
 
 /*!
   \brief NuSMV custom vfprintf function.
@@ -110,7 +110,7 @@ int UtilsIO_node_fprintf(const MasterPrinter_ptr printer, FILE *output,
   \sa vfprintf
 */
 int UtilsIO_node_vfprintf(const MasterPrinter_ptr printer, FILE *output,
-                          const char *fmt, va_list args);
+			  const char *fmt, va_list args);
 
 /*!
   \brief NuSMV custom vsnprintf function.
@@ -125,7 +125,7 @@ int UtilsIO_node_vfprintf(const MasterPrinter_ptr printer, FILE *output,
   \sa vsnprintf
 */
 int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer, char *output,
-                           size_t size, const char *fmt, va_list args);
+			   size_t size, const char *fmt, va_list args);
 
 /*!
   \brief NuSMV custom snprintf function.
@@ -140,6 +140,6 @@ int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer, char *output,
   \sa snprintf
 */
 int UtilsIO_node_snprintf(const MasterPrinter_ptr printer, char *output,
-                          size_t size, const char *fmt, ...);
+			  size_t size, const char *fmt, ...);
 
 #endif /* __NUSMV_CORE_UTILS_UTILS_IO_H__ */

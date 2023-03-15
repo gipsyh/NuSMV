@@ -62,8 +62,8 @@ typedef struct ResolveSymbol_TAG *ResolveSymbol_ptr;
 
   \todo Missing description
 */
-#define RESOLVE_SYMBOL_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(RESOLVE_SYMBOL(self) != RESOLVE_SYMBOL(NULL)))
+#define RESOLVE_SYMBOL_CHECK_INSTANCE(self) \
+	(nusmv_assert(RESOLVE_SYMBOL(self) != RESOLVE_SYMBOL(NULL)))
 
 /* Forward declaration of the SymbTable structure, in order to avoid
    circular dependency  (ST needs RS, RS needs ST) */
@@ -205,7 +205,7 @@ boolean ResolveSymbol_is_error(ResolveSymbol_ptr self);
                       The returned message has to be freed by the caller
 */
 char *ResolveSymbol_get_error_message(ResolveSymbol_ptr self,
-                                      MasterPrinter_ptr printer);
+				      MasterPrinter_ptr printer);
 
 /*!
   \methodof ResolveSymbol
@@ -215,7 +215,7 @@ char *ResolveSymbol_get_error_message(ResolveSymbol_ptr self,
                       if any error occurred.
 */
 void ResolveSymbol_print_error_message(ResolveSymbol_ptr self,
-                                       MasterPrinter_ptr printer, FILE *stream);
+				       MasterPrinter_ptr printer, FILE *stream);
 
 /*!
   \methodof ResolveSymbol
@@ -260,7 +260,7 @@ node_ptr ResolveSymbol_get_resolved_name(ResolveSymbol_ptr self);
   \sa ResolveSymbol_get_resolved_name
 */
 node_ptr ResolveSymbol_resolve(ResolveSymbol_ptr self, struct SymbTable_TAG *st,
-                               node_ptr name, node_ptr context);
+			       node_ptr name, node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

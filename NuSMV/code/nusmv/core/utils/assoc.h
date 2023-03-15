@@ -45,7 +45,7 @@
 #endif
 
 #include "cudd/st.h"
-#include "cudd/util.h"            /* for ARGS and EXTERN */
+#include "cudd/util.h" /* for ARGS and EXTERN */
 #include "nusmv/core/node/node.h" /* for node_ptr */
 
 /*---------------------------------------------------------------------------*/
@@ -94,8 +94,8 @@
 
   \todo Missing description
 */
-#define ASSOC_FOREACH(table, iter, key, value)                                 \
-  st_foreach_item(table, iter, key, value)
+#define ASSOC_FOREACH(table, iter, key, value) \
+	st_foreach_item(table, iter, key, value)
 
 /*!
   \brief Generates a new iterator for the given hash
@@ -178,8 +178,8 @@ typedef st_generator *assoc_iter;
 typedef ST_PFSR PF_STCPCPCP;
 
 typedef struct AssocAndDestroy_TAG {
-  hash_ptr assoc;
-  PF_STCPCPCP destroy_func;
+	hash_ptr assoc;
+	PF_STCPCPCP destroy_func;
 } AssocAndDestroy;
 
 /*!
@@ -301,7 +301,7 @@ node_ptr remove_assoc(hash_ptr hash, node_ptr key);
             ASSOC_FOREACH or assoc_foreach if possible
 */
 node_ptr assoc_get_keys(hash_ptr hash, NodeMgr_ptr nodemgr,
-                        boolean ignore_nils);
+			boolean ignore_nils);
 
 /* Miscellaneous **************************************************************/
 

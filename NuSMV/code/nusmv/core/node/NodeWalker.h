@@ -71,8 +71,8 @@ typedef struct NodeWalker_TAG *NodeWalker_ptr;
 
   \todo Missing description
 */
-#define NODE_WALKER_CHECK_INSTANCE(self)                                       \
-  (nusmv_assert(NODE_WALKER(self) != NODE_WALKER(NULL)))
+#define NODE_WALKER_CHECK_INSTANCE(self) \
+	(nusmv_assert(NODE_WALKER(self) != NODE_WALKER(NULL)))
 
 /*! This structure is used when calling add_node_transformation
   E.g a printer will call all transformation functions which has been
@@ -83,8 +83,8 @@ typedef struct NodeWalker_TAG *NodeWalker_ptr;
   \sa PrinterBase_print_node
  */
 typedef struct NodeTransformation_TAG {
-  node_ptr (*func)(const NodeWalker_ptr walker, node_ptr node, void *arg);
-  void *arg; /* the argument to be passed */
+	node_ptr (*func)(const NodeWalker_ptr walker, node_ptr node, void *arg);
+	void *arg; /* the argument to be passed */
 } NodeTransformation;
 
 /*---------------------------------------------------------------------------*/
@@ -131,7 +131,7 @@ const char *NodeWalker_get_name(const NodeWalker_ptr self);
   (i.e. are not partitions). Returns false if they are ok.
 */
 boolean NodeWalker_collides(const NodeWalker_ptr self,
-                            const NodeWalker_ptr other);
+			    const NodeWalker_ptr other);
 
 /*!
   \methodof NodeWalker
@@ -144,7 +144,7 @@ boolean NodeWalker_collides(const NodeWalker_ptr self,
   \sa NodeWalker_remove_node_transformation
 */
 int NodeWalker_add_node_transformation(NodeWalker_ptr self,
-                                       const NodeTransformation *nt);
+				       const NodeTransformation *nt);
 
 /*!
   \methodof NodeWalker
@@ -152,6 +152,6 @@ int NodeWalker_add_node_transformation(NodeWalker_ptr self,
   \sa NodeWalker_add_node_transformation
 */
 void NodeWalker_remove_node_transformation(NodeWalker_ptr self,
-                                           int tranf_handle);
+					   int tranf_handle);
 
 #endif /* __NUSMV_CORE_NODE_NODE_WALKER_H__ */

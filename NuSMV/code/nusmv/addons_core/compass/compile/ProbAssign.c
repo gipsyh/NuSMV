@@ -50,11 +50,11 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct ProbAssign_TAG {
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  node_ptr assigns;
-  node_ptr value;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	node_ptr assigns;
+	node_ptr value;
 
 } ProbAssign;
 
@@ -73,36 +73,40 @@ typedef struct ProbAssign_TAG {
 /*---------------------------------------------------------------------------*/
 
 static void prob_assign_init(ProbAssign_ptr self, node_ptr assigns,
-                             node_ptr value);
+			     node_ptr value);
 static void prob_assign_deinit(ProbAssign_ptr self);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-ProbAssign_ptr ProbAssign_create(node_ptr assigns, node_ptr value) {
-  ProbAssign_ptr self = ALLOC(ProbAssign, 1);
-  PROB_ASSIGN_CHECK_INSTANCE(self);
+ProbAssign_ptr ProbAssign_create(node_ptr assigns, node_ptr value)
+{
+	ProbAssign_ptr self = ALLOC(ProbAssign, 1);
+	PROB_ASSIGN_CHECK_INSTANCE(self);
 
-  prob_assign_init(self, assigns, value);
-  return self;
+	prob_assign_init(self, assigns, value);
+	return self;
 }
 
-void ProbAssign_destroy(ProbAssign_ptr self) {
-  PROB_ASSIGN_CHECK_INSTANCE(self);
+void ProbAssign_destroy(ProbAssign_ptr self)
+{
+	PROB_ASSIGN_CHECK_INSTANCE(self);
 
-  prob_assign_deinit(self);
-  FREE(self);
+	prob_assign_deinit(self);
+	FREE(self);
 }
 
-node_ptr ProbAssign_get_assigns_expr(const ProbAssign_ptr self) {
-  PROB_ASSIGN_CHECK_INSTANCE(self);
-  return self->assigns;
+node_ptr ProbAssign_get_assigns_expr(const ProbAssign_ptr self)
+{
+	PROB_ASSIGN_CHECK_INSTANCE(self);
+	return self->assigns;
 }
 
-node_ptr ProbAssign_get_prob(const ProbAssign_ptr self) {
-  PROB_ASSIGN_CHECK_INSTANCE(self);
-  return self->value;
+node_ptr ProbAssign_get_prob(const ProbAssign_ptr self)
+{
+	PROB_ASSIGN_CHECK_INSTANCE(self);
+	return self->value;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -121,10 +125,11 @@ node_ptr ProbAssign_get_prob(const ProbAssign_ptr self) {
   \sa ProbAssign_create
 */
 static void prob_assign_init(ProbAssign_ptr self, node_ptr assigns,
-                             node_ptr value) {
-  /* members initialization */
-  self->assigns = assigns;
-  self->value = value;
+			     node_ptr value)
+{
+	/* members initialization */
+	self->assigns = assigns;
+	self->value = value;
 }
 
 /*!
@@ -134,8 +139,9 @@ static void prob_assign_init(ProbAssign_ptr self, node_ptr assigns,
 
   \sa ProbAssign_destroy
 */
-static void prob_assign_deinit(ProbAssign_ptr self) {
-  /* members deinitialization */
+static void prob_assign_deinit(ProbAssign_ptr self)
+{
+	/* members deinitialization */
 }
 
 /**AutomaticEnd***************************************************************/

@@ -57,16 +57,16 @@
 */
 
 typedef struct PrinterIWffCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PrinterWffCore);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PrinterWffCore);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } PrinterIWffCore;
 
@@ -83,7 +83,7 @@ typedef struct PrinterIWffCore_TAG {
   \sa PrinterIWffCore_create
 */
 void printer_iwff_core_init(PrinterIWffCore_ptr self, const NuSMVEnv_ptr env,
-                            const char *name, int low, size_t num);
+			    const char *name, int low, size_t num);
 
 /*!
   \methodof PrinterIWffCore
@@ -103,6 +103,6 @@ void printer_iwff_core_deinit(PrinterIWffCore_ptr self);
 
 */
 int printer_iwff_core_print_node(PrinterBase_ptr self, node_ptr n,
-                                 int priority);
+				 int priority);
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_PRINTER_IWFF_CORE_PRIVATE_H__ */

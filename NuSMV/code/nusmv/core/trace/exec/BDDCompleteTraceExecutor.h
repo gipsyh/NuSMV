@@ -64,9 +64,9 @@ typedef struct BDDCompleteTraceExecutor_TAG *BDDCompleteTraceExecutor_ptr;
 
   \todo Missing description
 */
-#define BDD_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                       \
-  (nusmv_assert(BDD_COMPLETE_TRACE_EXECUTOR(self) !=                           \
-                BDD_COMPLETE_TRACE_EXECUTOR(NULL)))
+#define BDD_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)   \
+	(nusmv_assert(BDD_COMPLETE_TRACE_EXECUTOR(self) != \
+		      BDD_COMPLETE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 

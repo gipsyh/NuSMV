@@ -92,14 +92,14 @@
 ******************************************************************************/
 static const char *sat_solver_names[] = {
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-    ZCHAFF_NAME
+	ZCHAFF_NAME
 #endif
 #if NUSMV_HAVE_SOLVER_MINISAT
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-    ,
-    MINISAT_NAME
+	,
+	MINISAT_NAME
 #else
-        MINISAT_NAME
+		MINISAT_NAME
 #endif
 #endif
 };
@@ -125,205 +125,234 @@ static const char *sat_solver_names[] = {
 /*---------------------------------------------------------------------------*/
 
 SatSolver_ptr Sat_CreateNonIncSolver(const NuSMVEnv_ptr env,
-                                     const char *satSolver) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+				     const char *satSolver)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  SatSolver_ptr solver = SAT_SOLVER(NULL);
+	SatSolver_ptr solver = SAT_SOLVER(NULL);
 
-  nusmv_assert(satSolver != (char *)NULL);
+	nusmv_assert(satSolver != (char *)NULL);
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Creating a SAT solver instance '%s' ...\n", satSolver);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Creating a SAT solver instance '%s' ...\n",
+			   satSolver);
+	}
 
-  if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
+	if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-    solver = SAT_SOLVER(SatZchaff_create(env, ZCHAFF_NAME));
+		solver = SAT_SOLVER(SatZchaff_create(env, ZCHAFF_NAME));
 #endif
 
-  } else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
+	} else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_MINISAT
-    solver = SAT_SOLVER(
-        SatMinisat_create(env, MINISAT_NAME, false)); /* no proof logging */
+		solver = SAT_SOLVER(SatMinisat_create(
+			env, MINISAT_NAME, false)); /* no proof logging */
 #endif
-  }
+	}
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    if (solver != SAT_SOLVER(NULL)) {
-      Logger_log(logger, "Created an SAT solver instance '%s'\n", satSolver);
-    } else {
-      Logger_log(logger, "Failed: '%s' is not available\n", satSolver);
-    }
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		if (solver != SAT_SOLVER(NULL)) {
+			Logger_log(logger,
+				   "Created an SAT solver instance '%s'\n",
+				   satSolver);
+		} else {
+			Logger_log(logger, "Failed: '%s' is not available\n",
+				   satSolver);
+		}
+	}
 
-  return solver;
+	return solver;
 }
 
 SatSolver_ptr Sat_CreateNonIncProofSolver(const NuSMVEnv_ptr env,
-                                          const char *satSolver) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+					  const char *satSolver)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  SatSolver_ptr solver = SAT_SOLVER(NULL);
+	SatSolver_ptr solver = SAT_SOLVER(NULL);
 
-  nusmv_assert(satSolver != (char *)NULL);
+	nusmv_assert(satSolver != (char *)NULL);
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Creating a SAT solver instance '%s' ...\n", satSolver);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Creating a SAT solver instance '%s' ...\n",
+			   satSolver);
+	}
 
-  if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
+	if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-    const ErrorMgr_ptr errmgr =
-        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-    ErrorMgr_internal_error(errmgr,
-                            "Proof logging not supported when using the zchaff "
-                            " SAT Solver. Please retry using MiniSat");
-    solver = SAT_SOLVER(SatZchaff_create(env, ZCHAFF_NAME));
+		const ErrorMgr_ptr errmgr =
+			ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+		ErrorMgr_internal_error(
+			errmgr,
+			"Proof logging not supported when using the zchaff "
+			" SAT Solver. Please retry using MiniSat");
+		solver = SAT_SOLVER(SatZchaff_create(env, ZCHAFF_NAME));
 #endif
 
-  } else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
+	} else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_MINISAT
-    solver = SAT_SOLVER(SatMinisat_create(env, MINISAT_NAME, true));
+		solver = SAT_SOLVER(SatMinisat_create(env, MINISAT_NAME, true));
 #endif
-  }
+	}
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    if (solver != SAT_SOLVER(NULL)) {
-      Logger_log(logger, "Created an SAT solver instance '%s'\n", satSolver);
-    } else {
-      Logger_log(logger, "Failed: '%s' is not available\n", satSolver);
-    }
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		if (solver != SAT_SOLVER(NULL)) {
+			Logger_log(logger,
+				   "Created an SAT solver instance '%s'\n",
+				   satSolver);
+		} else {
+			Logger_log(logger, "Failed: '%s' is not available\n",
+				   satSolver);
+		}
+	}
 
-  return solver;
+	return solver;
 }
 
 SatIncSolver_ptr Sat_CreateIncSolver(const NuSMVEnv_ptr env,
-                                     const char *satSolver) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+				     const char *satSolver)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  SatIncSolver_ptr solver = SAT_INC_SOLVER(NULL);
+	SatIncSolver_ptr solver = SAT_INC_SOLVER(NULL);
 
-  nusmv_assert(satSolver != (char *)NULL);
+	nusmv_assert(satSolver != (char *)NULL);
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Creating an incremental SAT solver instance '%s'...\n",
-               satSolver);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(
+			logger,
+			"Creating an incremental SAT solver instance '%s'...\n",
+			satSolver);
+	}
 
-  if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
+	if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-    solver = SAT_INC_SOLVER(SatZchaff_create(env, ZCHAFF_NAME));
+		solver = SAT_INC_SOLVER(SatZchaff_create(env, ZCHAFF_NAME));
 #endif
-  } else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
+	} else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_MINISAT
-    solver = SAT_INC_SOLVER(SatMinisat_create(env, MINISAT_NAME, false));
+		solver = SAT_INC_SOLVER(
+			SatMinisat_create(env, MINISAT_NAME, false));
 #endif
-  }
+	}
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    if (solver != SAT_INC_SOLVER(NULL)) {
-      Logger_log(logger, "Created an incremental SAT solver instance '%s'\n",
-                 satSolver);
-    } else {
-      Logger_log(logger, "Failed: '%s' is not available\n", satSolver);
-    }
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		if (solver != SAT_INC_SOLVER(NULL)) {
+			Logger_log(
+				logger,
+				"Created an incremental SAT solver instance '%s'\n",
+				satSolver);
+		} else {
+			Logger_log(logger, "Failed: '%s' is not available\n",
+				   satSolver);
+		}
+	}
 
-  return solver;
+	return solver;
 }
 
 SatIncSolver_ptr Sat_CreateIncProofSolver(const NuSMVEnv_ptr env,
-                                          const char *satSolver) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+					  const char *satSolver)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  SatIncSolver_ptr solver = SAT_INC_SOLVER(NULL);
+	SatIncSolver_ptr solver = SAT_INC_SOLVER(NULL);
 
-  nusmv_assert(satSolver != (char *)NULL);
+	nusmv_assert(satSolver != (char *)NULL);
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Creating an incremental SAT solver instance '%s'...\n",
-               satSolver);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(
+			logger,
+			"Creating an incremental SAT solver instance '%s'...\n",
+			satSolver);
+	}
 
-  if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
+	if (strcasecmp(ZCHAFF_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-    const ErrorMgr_ptr errmgr =
-        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-    ErrorMgr_internal_error(errmgr,
-                            "Proof logging not supported when using the zchaff "
-                            " SAT Solver. Please retry using MiniSat");
+		const ErrorMgr_ptr errmgr =
+			ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+		ErrorMgr_internal_error(
+			errmgr,
+			"Proof logging not supported when using the zchaff "
+			" SAT Solver. Please retry using MiniSat");
 #endif
-  } else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
+	} else if (strcasecmp(MINISAT_NAME, satSolver) == 0) {
 #if NUSMV_HAVE_SOLVER_MINISAT
-    solver = SAT_INC_SOLVER(SatMinisat_create(env, MINISAT_NAME, true));
+		solver = SAT_INC_SOLVER(
+			SatMinisat_create(env, MINISAT_NAME, true));
 #endif
-  }
+	}
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    if (solver != SAT_INC_SOLVER(NULL)) {
-      Logger_log(logger, "Created an incremental SAT solver instance '%s'\n",
-                 satSolver);
-    } else {
-      Logger_log(logger, "Failed: '%s' is not available\n", satSolver);
-    }
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		if (solver != SAT_INC_SOLVER(NULL)) {
+			Logger_log(
+				logger,
+				"Created an incremental SAT solver instance '%s'\n",
+				satSolver);
+		} else {
+			Logger_log(logger, "Failed: '%s' is not available\n",
+				   satSolver);
+		}
+	}
 
-  return solver;
+	return solver;
 }
 
-const char *Sat_NormalizeSatSolverName(const char *solverName) {
-  unsigned int i;
-  for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
-    if (strcasecmp(solverName, sat_solver_names[i]) == 0) {
-      return sat_solver_names[i];
-    }
-  }
+const char *Sat_NormalizeSatSolverName(const char *solverName)
+{
+	unsigned int i;
+	for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
+		if (strcasecmp(solverName, sat_solver_names[i]) == 0) {
+			return sat_solver_names[i];
+		}
+	}
 
-  return (const char *)NULL;
+	return (const char *)NULL;
 }
 
-void Sat_PrintAvailableSolvers(FILE *file) {
-  int i;
-  fprintf(file, "The available SAT solvers are: ");
-  for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
-    fprintf(file, "%s ", sat_solver_names[i]);
-  }
-  fprintf(file, "\n");
+void Sat_PrintAvailableSolvers(FILE *file)
+{
+	int i;
+	fprintf(file, "The available SAT solvers are: ");
+	for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
+		fprintf(file, "%s ", sat_solver_names[i]);
+	}
+	fprintf(file, "\n");
 }
 
-char *Sat_GetAvailableSolversString() {
-  char *solvers;
-  int i;
-  int all = 1;
+char *Sat_GetAvailableSolversString()
+{
+	char *solvers;
+	int i;
+	int all = 1;
 
-  for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
-    all += strlen(sat_solver_names[i]) + 1;
-  }
+	for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
+		all += strlen(sat_solver_names[i]) + 1;
+	}
 
-  solvers = ALLOC(char, all);
-  *solvers = '\0';
+	solvers = ALLOC(char, all);
+	*solvers = '\0';
 
-  for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
-    char *tmp = ALLOC(char, strlen(solvers) + 1);
-    sprintf(tmp, "%s", solvers);
-    sprintf(solvers, "%s%s ", tmp, sat_solver_names[i]);
-    FREE(tmp);
-  }
+	for (i = 0; i < GET_ARRAY_LENGTH(sat_solver_names); ++i) {
+		char *tmp = ALLOC(char, strlen(solvers) + 1);
+		sprintf(tmp, "%s", solvers);
+		sprintf(solvers, "%s%s ", tmp, sat_solver_names[i]);
+		FREE(tmp);
+	}
 
-  return solvers;
+	return solvers;
 }
 
 /**AutomaticEnd***************************************************************/

@@ -69,9 +69,9 @@ typedef struct Ltl_StructCheckLtlSpec_TAG *Ltl_StructCheckLtlSpec_ptr;
   \todo Missing description
 */
 typedef node_ptr (*Ltl_StructCheckLtlSpec_oreg2smv)(NuSMVEnv_ptr, unsigned int,
-                                                    node_ptr);
+						    node_ptr);
 typedef node_ptr (*Ltl_StructCheckLtlSpec_ltl2smv)(NuSMVEnv_ptr, unsigned int,
-                                                   node_ptr);
+						   node_ptr);
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -89,8 +89,9 @@ typedef node_ptr (*Ltl_StructCheckLtlSpec_ltl2smv)(NuSMVEnv_ptr, unsigned int,
 
   \todo Missing description
 */
-#define LTL_STRUCTCHECKLTLSPEC_CHECK_INSTANCE(self)                            \
-  (nusmv_assert(LTL_STRUCTCHECKLTLSPEC(self) != LTL_STRUCTCHECKLTLSPEC(NULL)))
+#define LTL_STRUCTCHECKLTLSPEC_CHECK_INSTANCE(self)   \
+	(nusmv_assert(LTL_STRUCTCHECKLTLSPEC(self) != \
+		      LTL_STRUCTCHECKLTLSPEC(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -140,9 +141,9 @@ void Ltl_CheckLtlSpec(NuSMVEnv_ptr env, Prop_ptr prop);
   \se layer and outfh are expected to get changed
 */
 void Ltl_spec_to_hierarchy(NuSMVEnv_ptr env, Expr_ptr spec, node_ptr context,
-                           node_ptr (*what2smv)(NuSMVEnv_ptr env,
-                                                unsigned int id, node_ptr expr),
-                           SymbLayer_ptr layer, FlatHierarchy_ptr outfh);
+			   node_ptr (*what2smv)(NuSMVEnv_ptr env,
+						unsigned int id, node_ptr expr),
+			   SymbLayer_ptr layer, FlatHierarchy_ptr outfh);
 
 /*!
   \brief \todo Missing synopsis
@@ -150,8 +151,8 @@ void Ltl_spec_to_hierarchy(NuSMVEnv_ptr env, Expr_ptr spec, node_ptr context,
   \todo Missing description
 */
 Expr_ptr Ltl_apply_input_vars_rewriting(Expr_ptr spec, SymbTable_ptr st,
-                                        SymbLayer_ptr layer,
-                                        FlatHierarchy_ptr outfh);
+					SymbLayer_ptr layer,
+					FlatHierarchy_ptr outfh);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -160,7 +161,7 @@ Expr_ptr Ltl_apply_input_vars_rewriting(Expr_ptr spec, SymbTable_ptr st,
   Create an empty Ltl_StructCheckLtlSpec structure.
 */
 Ltl_StructCheckLtlSpec_ptr Ltl_StructCheckLtlSpec_create(NuSMVEnv_ptr env,
-                                                         Prop_ptr prop);
+							 Prop_ptr prop);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -177,7 +178,8 @@ void Ltl_StructCheckLtlSpec_destroy(Ltl_StructCheckLtlSpec_ptr self);
   Set the oreg2smv field of an Ltl_StructCheckLtlSpec structure
 */
 void Ltl_StructCheckLtlSpec_set_oreg2smv(
-    Ltl_StructCheckLtlSpec_ptr self, Ltl_StructCheckLtlSpec_oreg2smv oreg2smv);
+	Ltl_StructCheckLtlSpec_ptr self,
+	Ltl_StructCheckLtlSpec_oreg2smv oreg2smv);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -186,7 +188,7 @@ void Ltl_StructCheckLtlSpec_set_oreg2smv(
   Set the ltl2smv field of an Ltl_StructCheckLtlSpec structure
 */
 void Ltl_StructCheckLtlSpec_set_ltl2smv(Ltl_StructCheckLtlSpec_ptr self,
-                                        Ltl_StructCheckLtlSpec_ltl2smv ltl2smv);
+					Ltl_StructCheckLtlSpec_ltl2smv ltl2smv);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -195,7 +197,7 @@ void Ltl_StructCheckLtlSpec_set_ltl2smv(Ltl_StructCheckLtlSpec_ptr self,
   Set the negate_formula field of an Ltl_StructCheckLtlSpec structure
 */
 void Ltl_StructCheckLtlSpec_set_negate_formula(Ltl_StructCheckLtlSpec_ptr self,
-                                               boolean negate_formula);
+					       boolean negate_formula);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -206,7 +208,7 @@ void Ltl_StructCheckLtlSpec_set_negate_formula(Ltl_StructCheckLtlSpec_ptr self,
   structure
 */
 void Ltl_StructCheckLtlSpec_set_do_rewriting(Ltl_StructCheckLtlSpec_ptr self,
-                                             boolean do_rewriting);
+					     boolean do_rewriting);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -272,7 +274,7 @@ void Ltl_StructCheckLtlSpec_print_result(Ltl_StructCheckLtlSpec_ptr self);
 */
 Trace_ptr
 Ltl_StructCheckLtlSpec_build_counter_example(Ltl_StructCheckLtlSpec_ptr self,
-                                             NodeList_ptr symbols);
+					     NodeList_ptr symbols);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -284,6 +286,6 @@ Ltl_StructCheckLtlSpec_build_counter_example(Ltl_StructCheckLtlSpec_ptr self,
   invoked.
 */
 void Ltl_StructCheckLtlSpec_explain(Ltl_StructCheckLtlSpec_ptr self,
-                                    NodeList_ptr symbols);
+				    NodeList_ptr symbols);
 
 #endif /*  __NUSMV_CORE_LTL_LTL_H__ */

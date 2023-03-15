@@ -50,16 +50,16 @@
 */
 
 typedef struct FlattenerCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(FlattenerBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(FlattenerBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } FlattenerCore;
 
@@ -76,7 +76,7 @@ typedef struct FlattenerCore_TAG {
   \sa FlattenerCore_create
 */
 void flattener_core_init(FlattenerCore_ptr self, const NuSMVEnv_ptr env,
-                         const char *name, int low, size_t num);
+			 const char *name, int low, size_t num);
 
 /*!
   \methodof FlattenerCore
@@ -92,8 +92,8 @@ void flattener_core_deinit(FlattenerCore_ptr self);
 
 */
 node_ptr flattener_core_flatten(FlattenerBase_ptr self,
-                                SymbTable_ptr symb_table, hash_ptr def_hash,
-                                node_ptr sexp, node_ptr context,
-                                MasterCompileFlattener_def_mode mode);
+				SymbTable_ptr symb_table, hash_ptr def_hash,
+				node_ptr sexp, node_ptr context,
+				MasterCompileFlattener_def_mode mode);
 
 #endif /* __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_CORE_PRIVATE_H__ */

@@ -87,7 +87,7 @@ int Parser_read_model(NuSMVEnv_ptr env, char *ifile);
   The result of parsing is stored in <tt>pc</tt> to be used from the caller.
 */
 int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char **argv,
-                             const char *head, const char *tail, node_ptr *pc);
+			     const char *head, const char *tail, node_ptr *pc);
 
 /*!
   \brief Parse a simple expression from string
@@ -96,7 +96,7 @@ int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char **argv,
   parsing error occurs then return 1, else return 0.
 */
 int Parser_ReadSimpExprFromString(NuSMVEnv_ptr env, const char *str_expr,
-                                  node_ptr *res);
+				  node_ptr *res);
 
 /*!
   \brief Parse a command expression from file
@@ -105,7 +105,7 @@ int Parser_ReadSimpExprFromString(NuSMVEnv_ptr env, const char *str_expr,
   parsing error occurs then return 1, else return 0.
 */
 int Parser_ReadCmdFromFile(NuSMVEnv_ptr env, const char *filename,
-                           node_ptr *res);
+			   node_ptr *res);
 
 /*!
   \brief Parse SMV code from a given file.
@@ -134,7 +134,7 @@ int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char *filename);
   parse tree is returned through res. 1 is returned if an error occurred.
 */
 int Parser_read_psl_from_string(const NuSMVEnv_ptr env, int argc,
-                                const char **argv, node_ptr *res);
+				const char **argv, node_ptr *res);
 
 /*!
   \brief Parses a PSL expression from the given file.
@@ -143,7 +143,7 @@ int Parser_read_psl_from_string(const NuSMVEnv_ptr env, int argc,
   parse tree is returned through res. 1 is returned if an error occurred.
 */
 int Parser_read_psl_from_file(const NuSMVEnv_ptr env, const char *filename,
-                              node_ptr *res);
+			      node_ptr *res);
 
 /*!
   \brief Parse a next expression from string
@@ -152,7 +152,7 @@ int Parser_read_psl_from_file(const NuSMVEnv_ptr env, const char *filename,
   parsing error occurs then return 1, else return 0.
 */
 int Parser_ReadNextExprFromString(NuSMVEnv_ptr env, const char *str_expr,
-                                  node_ptr *res);
+				  node_ptr *res);
 
 /*!
   \brief Parse a type declaration from string
@@ -165,7 +165,7 @@ int Parser_ReadNextExprFromString(NuSMVEnv_ptr env, const char *str_expr,
   process and module instances.
 */
 int Parser_ReadTypeFromString(NuSMVEnv_ptr env, const char *str_type,
-                              node_ptr *res);
+			      node_ptr *res);
 
 /*!
   \brief Parse an identifier expression from string
@@ -174,7 +174,7 @@ int Parser_ReadTypeFromString(NuSMVEnv_ptr env, const char *str_type,
   parsing error occurs then return 1, else return 0.
 */
 int Parser_ReadIdentifierExprFromString(NuSMVEnv_ptr env, const char *str_expr,
-                                        node_ptr *res);
+					node_ptr *res);
 
 /*!
   \brief Parse a next expression from file
@@ -183,7 +183,7 @@ int Parser_ReadIdentifierExprFromString(NuSMVEnv_ptr env, const char *str_expr,
   parsing error occurs then return 1, else return 0.
 */
 int Parser_ReadNextExprFromFile(NuSMVEnv_ptr env, const char *filename,
-                                node_ptr *res);
+				node_ptr *res);
 
 /*!
   \brief Returns a list of SYNTAX_ERROR nodes
@@ -208,8 +208,8 @@ node_ptr Parser_get_syntax_errors_list(const NuSMVEnv_ptr env);
   \sa Parser_get_syntax_errors_list
 */
 void Parser_get_syntax_error(node_ptr node, const char **out_filename,
-                             int *out_lineno, const char **out_token,
-                             const char **out_message);
+			     int *out_lineno, const char **out_token,
+			     const char **out_message);
 
 /*!
   \brief Prints information contained in one node ot the list

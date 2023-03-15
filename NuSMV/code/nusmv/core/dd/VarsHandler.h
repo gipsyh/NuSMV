@@ -74,8 +74,8 @@ typedef struct GroupInfo_TAG *GroupInfo_ptr;
 
   \todo Missing description
 */
-#define VARS_HANDLER_CHECK_INSTANCE(self)                                      \
-  (nusmv_assert(VARS_HANDLER(self) != VARS_HANDLER(NULL)))
+#define VARS_HANDLER_CHECK_INSTANCE(self) \
+	(nusmv_assert(VARS_HANDLER(self) != VARS_HANDLER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -128,8 +128,8 @@ DDMgr_ptr VarsHandler_get_dd_manager(const VarsHandler_ptr self);
   VarsHandler_dissolve_group
 */
 GroupInfo_ptr VarsHandler_reserve_group(VarsHandler_ptr self, int from_lev,
-                                        int size, int chunk, boolean can_share,
-                                        int *lev_low);
+					int size, int chunk, boolean can_share,
+					int *lev_low);
 
 /*!
   \methodof VarsHandler
@@ -140,7 +140,7 @@ GroupInfo_ptr VarsHandler_reserve_group(VarsHandler_ptr self, int from_lev,
   created at given level.
 */
 boolean VarsHandler_can_group(const VarsHandler_ptr self, int from_lev,
-                              int size, int chunk);
+			      int size, int chunk);
 
 /*!
   \methodof VarsHandler

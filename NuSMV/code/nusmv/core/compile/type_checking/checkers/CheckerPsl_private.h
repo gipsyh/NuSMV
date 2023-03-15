@@ -54,16 +54,16 @@ version 2. Copyright (C) 2004 by FBK-irst.
 */
 
 typedef struct CheckerPsl_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(CheckerBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(CheckerBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } CheckerPsl;
 
@@ -76,13 +76,13 @@ typedef struct CheckerPsl_TAG {
 */
 
 #undef _THROW
-#define _THROW(exp, ctx)                                                       \
-  (NodeWalker_can_handle(NODE_WALKER(self), exp)                               \
-       ? CHECKER_BASE(self)->check_expr(self, exp, ctx)                        \
-       : type_checker_check_expression(                                        \
-             TYPE_CHECKER(NODE_WALKER(self)->master),                          \
-             PslNode_convert_to_node_ptr(exp),                                 \
-             PslNode_convert_to_node_ptr(ctx)))
+#define _THROW(exp, ctx)                                          \
+	(NodeWalker_can_handle(NODE_WALKER(self), exp) ?          \
+		 CHECKER_BASE(self)->check_expr(self, exp, ctx) : \
+		 type_checker_check_expression(                   \
+			 TYPE_CHECKER(NODE_WALKER(self)->master), \
+			 PslNode_convert_to_node_ptr(exp),        \
+			 PslNode_convert_to_node_ptr(ctx)))
 
 /*!
   \brief Short way of calling tc_set_expression_type
@@ -92,9 +92,9 @@ typedef struct CheckerPsl_TAG {
   can be used when expressions that are PslNode_ptr
 */
 
-#define _SET_TYPE(expr, type)                                                  \
-  tc_set_expression_type(TYPE_CHECKER(NODE_WALKER(self)->master),              \
-                         PslNode_convert_to_node_ptr(expr), type)
+#define _SET_TYPE(expr, type)                                           \
+	tc_set_expression_type(TYPE_CHECKER(NODE_WALKER(self)->master), \
+			       PslNode_convert_to_node_ptr(expr), type)
 
 /*!
   \brief Short way of calling tc_lookup_expr_type
@@ -104,9 +104,9 @@ typedef struct CheckerPsl_TAG {
   can be used when expressions that are PslNode_ptr
 */
 
-#define _GET_TYPE(expr)                                                        \
-  tc_lookup_expr_type(TYPE_CHECKER(NODE_WALKER(self)->master),                 \
-                      PslNode_convert_to_node_ptr(expr))
+#define _GET_TYPE(expr)                                              \
+	tc_lookup_expr_type(TYPE_CHECKER(NODE_WALKER(self)->master), \
+			    PslNode_convert_to_node_ptr(expr))
 
 /*!
   \brief Short way of calling checker_base_manage_violation
@@ -116,9 +116,9 @@ typedef struct CheckerPsl_TAG {
   can be used when expressions that are PslNode_ptr
 */
 
-#define _VIOLATION(viol_id, expr)                                              \
-  checker_base_manage_violation(CHECKER_BASE(self), viol_id,                   \
-                                PslNode_convert_to_node_ptr(expr))
+#define _VIOLATION(viol_id, expr)                                  \
+	checker_base_manage_violation(CHECKER_BASE(self), viol_id, \
+				      PslNode_convert_to_node_ptr(expr))
 
 /*!
   \brief Short way of calling type_checker_print_error_message
@@ -128,9 +128,10 @@ typedef struct CheckerPsl_TAG {
   can be used when expressions that are PslNode_ptr
 */
 
-#define _PRINT_ERROR_MSG(exp, is_error)                                        \
-  type_checker_print_error_message(TYPE_CHECKER(NODE_WALKER(self)->master),    \
-                                   PslNode_convert_to_node_ptr(exp), is_error)
+#define _PRINT_ERROR_MSG(exp, is_error)                  \
+	type_checker_print_error_message(                \
+		TYPE_CHECKER(NODE_WALKER(self)->master), \
+		PslNode_convert_to_node_ptr(exp), is_error)
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */

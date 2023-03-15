@@ -73,15 +73,17 @@ static void bool_enc_client_finalize(Object_ptr object, void *dummy);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void BoolEncClient_destroy(BoolEncClient_ptr self) {
-  BOOL_ENC_CLIENT_CHECK_INSTANCE(self);
+void BoolEncClient_destroy(BoolEncClient_ptr self)
+{
+	BOOL_ENC_CLIENT_CHECK_INSTANCE(self);
 
-  Object_destroy(OBJECT(self), NULL);
+	Object_destroy(OBJECT(self), NULL);
 }
 
-BoolEnc_ptr BoolEncClient_get_bool_enc(const BoolEncClient_ptr self) {
-  BOOL_ENC_CLIENT_CHECK_INSTANCE(self);
-  return self->bool_enc;
+BoolEnc_ptr BoolEncClient_get_bool_enc(const BoolEncClient_ptr self)
+{
+	BOOL_ENC_CLIENT_CHECK_INSTANCE(self);
+	return self->bool_enc;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -97,18 +99,19 @@ BoolEnc_ptr BoolEncClient_get_bool_enc(const BoolEncClient_ptr self) {
 */
 
 void bool_enc_client_init(BoolEncClient_ptr self, SymbTable_ptr symb_table,
-                          BoolEnc_ptr bool_enc) {
-  /* base class initialization */
-  base_enc_init(BASE_ENC(self), symb_table);
+			  BoolEnc_ptr bool_enc)
+{
+	/* base class initialization */
+	base_enc_init(BASE_ENC(self), symb_table);
 
-  /* members initialization */
-  self->bool_enc = bool_enc;
+	/* members initialization */
+	self->bool_enc = bool_enc;
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = bool_enc_client_finalize;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = bool_enc_client_finalize;
 
-  OVERRIDE(BaseEnc, commit_layer) = bool_enc_client_commit_layer;
-  OVERRIDE(BaseEnc, remove_layer) = bool_enc_client_remove_layer;
+	OVERRIDE(BaseEnc, commit_layer) = bool_enc_client_commit_layer;
+	OVERRIDE(BaseEnc, remove_layer) = bool_enc_client_remove_layer;
 }
 
 /*!
@@ -119,11 +122,12 @@ void bool_enc_client_init(BoolEncClient_ptr self, SymbTable_ptr symb_table,
   \sa BoolEncClient_destroy
 */
 
-void bool_enc_client_deinit(BoolEncClient_ptr self) {
-  /* members deinitialization */
+void bool_enc_client_deinit(BoolEncClient_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  base_enc_deinit(BASE_ENC(self));
+	/* base class deinitialization */
+	base_enc_deinit(BASE_ENC(self));
 }
 
 /*!
@@ -135,15 +139,16 @@ void bool_enc_client_deinit(BoolEncClient_ptr self) {
   \sa BoolEncClient_destroy
 */
 
-void bool_enc_client_commit_layer(BaseEnc_ptr base_enc,
-                                  const char *layer_name) {
-  BoolEncClient_ptr self;
+void bool_enc_client_commit_layer(BaseEnc_ptr base_enc, const char *layer_name)
+{
+	BoolEncClient_ptr self;
 
-  self = BOOL_ENC_CLIENT(base_enc);
+	self = BOOL_ENC_CLIENT(base_enc);
 
-  nusmv_assert(BaseEnc_layer_occurs(BASE_ENC(self->bool_enc), layer_name));
+	nusmv_assert(
+		BaseEnc_layer_occurs(BASE_ENC(self->bool_enc), layer_name));
 
-  base_enc_commit_layer(base_enc, layer_name);
+	base_enc_commit_layer(base_enc, layer_name);
 }
 
 /*!
@@ -155,9 +160,9 @@ void bool_enc_client_commit_layer(BaseEnc_ptr base_enc,
   \sa BoolEncClient_destroy
 */
 
-void bool_enc_client_remove_layer(BaseEnc_ptr base_enc,
-                                  const char *layer_name) {
-  base_enc_remove_layer(base_enc, layer_name);
+void bool_enc_client_remove_layer(BaseEnc_ptr base_enc, const char *layer_name)
+{
+	base_enc_remove_layer(base_enc, layer_name);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -169,11 +174,12 @@ void bool_enc_client_remove_layer(BaseEnc_ptr base_enc,
 
   Called by the class destructor
 */
-static void bool_enc_client_finalize(Object_ptr object, void *dummy) {
-  BoolEncClient_ptr self = BOOL_ENC_CLIENT(object);
+static void bool_enc_client_finalize(Object_ptr object, void *dummy)
+{
+	BoolEncClient_ptr self = BOOL_ENC_CLIENT(object);
 
-  bool_enc_client_deinit(self);
-  FREE(self);
+	bool_enc_client_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

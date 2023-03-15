@@ -70,9 +70,9 @@
 */
 
 typedef struct TraceTable_TAG {
-  INHERITS_FROM(TracePlugin);
+	INHERITS_FROM(TracePlugin);
 
-  TraceTableStyle style;
+	TraceTableStyle style;
 } TraceTable;
 
 /*---------------------------------------------------------------------------*/

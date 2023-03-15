@@ -65,8 +65,8 @@ typedef struct MasterNodeWalker_TAG *MasterNodeWalker_ptr;
 
   \todo Missing description
 */
-#define MASTER_NODE_WALKER_CHECK_INSTANCE(self)                                \
-  (nusmv_assert(MASTER_NODE_WALKER(self) != MASTER_NODE_WALKER(NULL)))
+#define MASTER_NODE_WALKER_CHECK_INSTANCE(self) \
+	(nusmv_assert(MASTER_NODE_WALKER(self) != MASTER_NODE_WALKER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -110,7 +110,7 @@ void MasterNodeWalker_destroy(MasterNodeWalker_ptr self);
   \sa unregister_walker
 */
 boolean MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
-                                         NodeWalker_ptr walker);
+					 NodeWalker_ptr walker);
 
 /*!
   \methodof MasterNodeWalker
@@ -124,7 +124,7 @@ boolean MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
   \sa register_walker
 */
 NodeWalker_ptr MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
-                                                  const char *name);
+						  const char *name);
 
 /*!
   \methodof MasterNodeWalker
@@ -134,7 +134,7 @@ NodeWalker_ptr MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
   NULL is returned and no error occurs
 */
 NodeWalker_ptr MasterNodeWalker_get_walker(MasterNodeWalker_ptr self,
-                                           const char *name);
+					   const char *name);
 
 /**AutomaticEnd***************************************************************/
 

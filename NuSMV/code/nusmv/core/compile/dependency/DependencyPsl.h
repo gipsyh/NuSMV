@@ -61,8 +61,8 @@ typedef struct DependencyPsl_TAG *DependencyPsl_ptr;
 
   \todo Missing description
 */
-#define DEPENDENCY_PSL_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(DEPENDENCY_PSL(self) != DEPENDENCY_PSL(NULL)))
+#define DEPENDENCY_PSL_CHECK_INSTANCE(self) \
+	(nusmv_assert(DEPENDENCY_PSL(self) != DEPENDENCY_PSL(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,7 +79,7 @@ typedef struct DependencyPsl_TAG *DependencyPsl_ptr;
   \sa DependencyPsl_destroy
 */
 DependencyPsl_ptr DependencyPsl_create(const NuSMVEnv_ptr env,
-                                       const char *name);
+				       const char *name);
 
 /**AutomaticEnd***************************************************************/
 

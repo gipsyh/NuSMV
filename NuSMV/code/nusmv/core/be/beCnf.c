@@ -59,14 +59,14 @@
 */
 
 typedef struct Be_Cnf_TAG {
-  be_ptr originalBe;    /* the original BE problem */
-  Slist_ptr cnfVars;    /* The list of CNF variables */
-  Slist_ptr cnfClauses; /* The list of CNF clauses */
-  int cnfMaxVarIdx;     /* The maximum CNF variable index */
+	be_ptr originalBe; /* the original BE problem */
+	Slist_ptr cnfVars; /* The list of CNF variables */
+	Slist_ptr cnfClauses; /* The list of CNF clauses */
+	int cnfMaxVarIdx; /* The maximum CNF variable index */
 
-  /* literal assigned to whole CNF formula. (It may be negative)
+	/* literal assigned to whole CNF formula. (It may be negative)
      If the formula is a constant, see Be_Cnf_ptr. */
-  int formulaLiteral;
+	int formulaLiteral;
 } Be_Cnf;
 
 /*---------------------------------------------------------------------------*/
@@ -96,132 +96,151 @@ static void _be_cnf_destroy_clause(void *data);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Be_Cnf_ptr Be_Cnf_Create(const be_ptr be) {
-  Be_Cnf_ptr self = ALLOC(Be_Cnf, 1);
-  nusmv_assert(self != NULL);
+Be_Cnf_ptr Be_Cnf_Create(const be_ptr be)
+{
+	Be_Cnf_ptr self = ALLOC(Be_Cnf, 1);
+	nusmv_assert(self != NULL);
 
-  self->originalBe = be;
-  self->cnfVars = Slist_create();
-  self->cnfClauses = Slist_create();
-  self->cnfMaxVarIdx = 0;
-  self->formulaLiteral = 0;
+	self->originalBe = be;
+	self->cnfVars = Slist_create();
+	self->cnfClauses = Slist_create();
+	self->cnfMaxVarIdx = 0;
+	self->formulaLiteral = 0;
 
-  return self;
+	return self;
 }
 
-void Be_Cnf_Delete(Be_Cnf_ptr self) {
-  nusmv_assert(self != NULL);
+void Be_Cnf_Delete(Be_Cnf_ptr self)
+{
+	nusmv_assert(self != NULL);
 
-  Slist_destroy_and_free_elements(self->cnfClauses, _be_cnf_destroy_clause);
-  Slist_destroy(self->cnfVars);
+	Slist_destroy_and_free_elements(self->cnfClauses,
+					_be_cnf_destroy_clause);
+	Slist_destroy(self->cnfVars);
 
-  FREE(self);
+	FREE(self);
 }
 
-void Be_Cnf_RemoveDuplicateLiterals(Be_Cnf_ptr self) {
-  int i, j;
-  Siter iter;
-  int *clause = (int *)NULL;
-  hash_ptr lits = (hash_ptr)NULL;
+void Be_Cnf_RemoveDuplicateLiterals(Be_Cnf_ptr self)
+{
+	int i, j;
+	Siter iter;
+	int *clause = (int *)NULL;
+	hash_ptr lits = (hash_ptr)NULL;
 
-  nusmv_assert(self != NULL);
+	nusmv_assert(self != NULL);
 
-  lits = new_assoc();
+	lits = new_assoc();
 
-  for (iter = Slist_first(Be_Cnf_GetClausesList(self)); !Siter_is_end(iter);
-       iter = Siter_next(iter)) {
+	for (iter = Slist_first(Be_Cnf_GetClausesList(self));
+	     !Siter_is_end(iter); iter = Siter_next(iter)) {
+		clause = (int *)Siter_element(iter);
 
-    clause = (int *)Siter_element(iter);
+		i = 0;
+		while (clause[i] != 0) {
+			if (Nil != find_assoc(lits, NODE_FROM_INT(clause[i]))) {
+				j = i + 1;
+				while (clause[j] != 0) {
+					clause[j - 1] = clause[j];
+					j++;
+				}
+			} else {
+				insert_assoc(lits, NODE_FROM_INT(clause[i]),
+					     NODE_FROM_INT(1));
+			}
+			i++;
+		}
 
-    i = 0;
-    while (clause[i] != 0) {
-      if (Nil != find_assoc(lits, NODE_FROM_INT(clause[i]))) {
-        j = i + 1;
-        while (clause[j] != 0) {
-          clause[j - 1] = clause[j];
-          j++;
-        }
-      } else {
-        insert_assoc(lits, NODE_FROM_INT(clause[i]), NODE_FROM_INT(1));
-      }
-      i++;
-    }
+		/* this clear the hash */
+		clear_assoc(lits);
+	}
 
-    /* this clear the hash */
-    clear_assoc(lits);
-  }
-
-  free_assoc(lits);
+	free_assoc(lits);
 }
 
-be_ptr Be_Cnf_GetOriginalProblem(const Be_Cnf_ptr self) {
-  return self->originalBe;
+be_ptr Be_Cnf_GetOriginalProblem(const Be_Cnf_ptr self)
+{
+	return self->originalBe;
 }
 
-int Be_Cnf_GetFormulaLiteral(const Be_Cnf_ptr self) {
-  return self->formulaLiteral;
+int Be_Cnf_GetFormulaLiteral(const Be_Cnf_ptr self)
+{
+	return self->formulaLiteral;
 }
 
-Slist_ptr Be_Cnf_GetVarsList(const Be_Cnf_ptr self) { return self->cnfVars; }
-
-Slist_ptr Be_Cnf_GetClausesList(const Be_Cnf_ptr self) {
-  return self->cnfClauses;
+Slist_ptr Be_Cnf_GetVarsList(const Be_Cnf_ptr self)
+{
+	return self->cnfVars;
 }
 
-int Be_Cnf_GetMaxVarIndex(const Be_Cnf_ptr self) { return self->cnfMaxVarIdx; }
-
-size_t Be_Cnf_GetVarsNumber(const Be_Cnf_ptr self) {
-  return Slist_get_size(Be_Cnf_GetVarsList(self));
+Slist_ptr Be_Cnf_GetClausesList(const Be_Cnf_ptr self)
+{
+	return self->cnfClauses;
 }
 
-size_t Be_Cnf_GetClausesNumber(const Be_Cnf_ptr self) {
-  return Slist_get_size(Be_Cnf_GetClausesList(self));
+int Be_Cnf_GetMaxVarIndex(const Be_Cnf_ptr self)
+{
+	return self->cnfMaxVarIdx;
 }
 
-void Be_Cnf_SetFormulaLiteral(Be_Cnf_ptr self, const int formula_literal) {
-  self->formulaLiteral = formula_literal;
+size_t Be_Cnf_GetVarsNumber(const Be_Cnf_ptr self)
+{
+	return Slist_get_size(Be_Cnf_GetVarsList(self));
 }
 
-void Be_Cnf_SetMaxVarIndex(Be_Cnf_ptr self, const int max_idx) {
-  self->cnfMaxVarIdx = max_idx;
+size_t Be_Cnf_GetClausesNumber(const Be_Cnf_ptr self)
+{
+	return Slist_get_size(Be_Cnf_GetClausesList(self));
 }
 
-void Be_Cnf_PrintStat(const Be_Cnf_ptr self, FILE *outFile, char *prefix) {
-  /* compute values */
-  int max_clause_size = 0;
-  float sum_clause_size = 0;
-  Siter cnf;
+void Be_Cnf_SetFormulaLiteral(Be_Cnf_ptr self, const int formula_literal)
+{
+	self->formulaLiteral = formula_literal;
+}
 
-  nusmv_assert(self != (Be_Cnf_ptr)NULL);
+void Be_Cnf_SetMaxVarIndex(Be_Cnf_ptr self, const int max_idx)
+{
+	self->cnfMaxVarIdx = max_idx;
+}
 
-  SLIST_FOREACH(Be_Cnf_GetClausesList(self), cnf) {
-    int *clause = (int *)Siter_element(cnf);
-    int clause_size;
+void Be_Cnf_PrintStat(const Be_Cnf_ptr self, FILE *outFile, char *prefix)
+{
+	/* compute values */
+	int max_clause_size = 0;
+	float sum_clause_size = 0;
+	Siter cnf;
 
-    SLIST_CHECK_INSTANCE(Be_Cnf_GetClausesList(self));
+	nusmv_assert(self != (Be_Cnf_ptr)NULL);
 
-    for (clause_size = 0; clause[clause_size] != 0; ++clause_size) {
-    }
+	SLIST_FOREACH(Be_Cnf_GetClausesList(self), cnf)
+	{
+		int *clause = (int *)Siter_element(cnf);
+		int clause_size;
 
-    sum_clause_size += clause_size;
-    if (clause_size > max_clause_size)
-      max_clause_size = clause_size;
-  }
+		SLIST_CHECK_INSTANCE(Be_Cnf_GetClausesList(self));
 
-  /* print out values */
-  fprintf(
-      outFile,
-      "%s Clause number: %i\n"
-      "%s Var number: %i\n"
-      "%s Max var index: %i\n"
-      "%s Average clause size: %.2f\n"
-      "%s Max clause size: %i\n",
-      prefix, (int)Be_Cnf_GetClausesNumber(self), prefix,
-      (int)Be_Cnf_GetVarsNumber(self), prefix, Be_Cnf_GetMaxVarIndex(self),
-      prefix,
-      /* the average clause size */
-      (double)(sum_clause_size / Slist_get_size(Be_Cnf_GetClausesList(self))),
-      prefix, max_clause_size);
+		for (clause_size = 0; clause[clause_size] != 0; ++clause_size) {
+		}
+
+		sum_clause_size += clause_size;
+		if (clause_size > max_clause_size)
+			max_clause_size = clause_size;
+	}
+
+	/* print out values */
+	fprintf(outFile,
+		"%s Clause number: %i\n"
+		"%s Var number: %i\n"
+		"%s Max var index: %i\n"
+		"%s Average clause size: %.2f\n"
+		"%s Max clause size: %i\n",
+		prefix, (int)Be_Cnf_GetClausesNumber(self), prefix,
+		(int)Be_Cnf_GetVarsNumber(self), prefix,
+		Be_Cnf_GetMaxVarIndex(self), prefix,
+		/* the average clause size */
+		(double)(sum_clause_size /
+			 Slist_get_size(Be_Cnf_GetClausesList(self))),
+		prefix, max_clause_size);
 }
 
 /*!
@@ -229,9 +248,10 @@ void Be_Cnf_PrintStat(const Be_Cnf_ptr self, FILE *outFile, char *prefix) {
 
 
 */
-static void _be_cnf_destroy_clause(void *data) {
-  int *_data = (int *)data;
+static void _be_cnf_destroy_clause(void *data)
+{
+	int *_data = (int *)data;
 
-  FREE(_data);
+	FREE(_data);
 }
 /**AutomaticEnd***************************************************************/

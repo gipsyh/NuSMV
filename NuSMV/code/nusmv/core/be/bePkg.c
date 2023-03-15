@@ -43,6 +43,12 @@
 /* Variable definitions                                                      */
 /*---------------------------------------------------------------------------*/
 
-void Be_Init() { Rbc_pkg_init(); }
+void Be_Init()
+{
+	Rbc_pkg_init();
+}
 
-void Be_Quit() { Rbc_pkg_quit(); }
+void Be_Quit()
+{
+	Rbc_pkg_quit();
+}

@@ -54,12 +54,12 @@ typedef struct Tuple5_TAG *Tuple5_ptr;
 */
 
 typedef struct Tuple5_TAG {
-  void *first;
-  void *second;
-  void *third;
-  void *forth;
-  void *fifth;
-  boolean frozen;
+	void *first;
+	void *second;
+	void *third;
+	void *forth;
+	void *fifth;
+	boolean frozen;
 } Tuple5;
 
 /*!
@@ -75,8 +75,8 @@ typedef struct Tuple5_TAG {
 
   \todo Missing description
 */
-#define TUPLE_5_CHECK_INSTANCE(self)                                           \
-  (nusmv_assert(TUPLE_5(self) != TUPLE_5(NULL)))
+#define TUPLE_5_CHECK_INSTANCE(self) \
+	(nusmv_assert(TUPLE_5(self) != TUPLE_5(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -93,7 +93,7 @@ typedef struct Tuple5_TAG {
   \sa Tuple5_destroy
 */
 Tuple5_ptr Tuple5_create(void *first, void *second, void *third, void *forth,
-                         void *fifth);
+			 void *fifth);
 
 /*!
   \methodof Tuple5
@@ -105,7 +105,7 @@ Tuple5_ptr Tuple5_create(void *first, void *second, void *third, void *forth,
   \sa Tuple5_create
 */
 void Tuple5_init(Tuple5_ptr self, void *first, void *second, void *third,
-                 void *forth, void *fifth);
+		 void *forth, void *fifth);
 
 /*!
   \methodof Tuple5
@@ -219,7 +219,7 @@ void Tuple5_set_fifth(Tuple5_ptr self, void *fifth);
                       The Tuple5 must not be frozen
 */
 void Tuple5_set_values(Tuple5_ptr self, void *first, void *second, void *third,
-                       void *forth, void *fifth);
+		       void *forth, void *fifth);
 
 /*!
   \methodof Tuple5

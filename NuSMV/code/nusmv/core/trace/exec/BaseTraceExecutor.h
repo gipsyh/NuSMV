@@ -61,8 +61,8 @@ typedef struct BaseTraceExecutor_TAG *BaseTraceExecutor_ptr;
 
   \todo Missing description
 */
-#define BASE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                               \
-  (nusmv_assert(BASE_TRACE_EXECUTOR(self) != BASE_TRACE_EXECUTOR(NULL)))
+#define BASE_TRACE_EXECUTOR_CHECK_INSTANCE(self) \
+	(nusmv_assert(BASE_TRACE_EXECUTOR(self) != BASE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -101,7 +101,7 @@ FILE *BaseTraceExecutor_get_output_stream(BaseTraceExecutor_ptr self);
 
 */
 void BaseTraceExecutor_set_output_stream(BaseTraceExecutor_ptr self,
-                                         FILE *error_stream);
+					 FILE *error_stream);
 
 /*!
   \methodof BaseTraceExecutor
@@ -118,7 +118,7 @@ FILE *BaseTraceExecutor_get_error_stream(BaseTraceExecutor_ptr self);
 
 */
 void BaseTraceExecutor_set_error_stream(BaseTraceExecutor_ptr self,
-                                        FILE *error_stream);
+					FILE *error_stream);
 
 /* virtual destructor */
 /*!

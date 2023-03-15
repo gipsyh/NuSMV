@@ -52,16 +52,16 @@
 */
 
 typedef struct GenericTrans_TAG {
-  INHERITS_FROM(EnvObject);
+	INHERITS_FROM(EnvObject);
 
-  /* ---------------------------------------------------------------------- */
-  /*     Private members                                                    */
-  /* ---------------------------------------------------------------------- */
-  TransType _type;
+	/* ---------------------------------------------------------------------- */
+	/*     Private members                                                    */
+	/* ---------------------------------------------------------------------- */
+	TransType _type;
 
-  /* ---------------------------------------------------------------------- */
-  /*     Virtual Methods                                                    */
-  /* ---------------------------------------------------------------------- */
+	/* ---------------------------------------------------------------------- */
+	/*     Virtual Methods                                                    */
+	/* ---------------------------------------------------------------------- */
 
 } GenericTrans;
 
@@ -70,7 +70,7 @@ typedef struct GenericTrans_TAG {
   \todo
 */
 void generic_trans_init(GenericTrans_ptr self, const NuSMVEnv_ptr env,
-                        const TransType trans_type);
+			const TransType trans_type);
 
 /*!
   \methodof GenericTrans

@@ -40,8 +40,8 @@ typedef struct TraceEmpty_TAG *TraceEmpty_ptr;
 
   \todo Missing description
 */
-#define TRACE_EMPTY_CHECK_INSTANCE(self)                                       \
-  (nusmv_assert(TRACE_EMPTY(self) != TRACE_EMPTY(NULL)))
+#define TRACE_EMPTY_CHECK_INSTANCE(self) \
+	(nusmv_assert(TRACE_EMPTY(self) != TRACE_EMPTY(NULL)))
 
 /**AutomaticStart*************************************************************/
 

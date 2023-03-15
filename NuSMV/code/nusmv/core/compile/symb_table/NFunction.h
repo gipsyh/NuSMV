@@ -66,8 +66,8 @@ f  instances of class NFunction
 
   \todo Missing description
 */
-#define N_FUNCTION_CHECK_INSTANCE(self)                                        \
-  (nusmv_assert(N_FUNCTION(self) != N_FUNCTION(NULL)))
+#define N_FUNCTION_CHECK_INSTANCE(self) \
+	(nusmv_assert(N_FUNCTION(self) != N_FUNCTION(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -84,7 +84,7 @@ f  instances of class NFunction
   \sa NFunction_destroy
 */
 NFunction_ptr NFunction_create_uninterpreted(int num_args, SymbType_ptr *args,
-                                             SymbType_ptr ret);
+					     SymbType_ptr ret);
 
 /*!
   \methodof NFunction
@@ -95,7 +95,7 @@ NFunction_ptr NFunction_create_uninterpreted(int num_args, SymbType_ptr *args,
   \sa NFunction_destroy
 */
 NFunction_ptr NFunction_create_interpreted(int num_args, SymbType_ptr *args,
-                                           SymbType_ptr ret, void *body);
+					   SymbType_ptr ret, void *body);
 
 /*!
   \methodof NFunction

@@ -69,8 +69,8 @@ typedef struct PropDb_TAG *PropDb_ptr;
 
   \todo Missing description
 */
-#define PROP_DB_CHECK_INSTANCE(self)                                           \
-  (nusmv_assert(PROP_DB(self) != PROP_DB(NULL)))
+#define PROP_DB_CHECK_INSTANCE(self) \
+	(nusmv_assert(PROP_DB(self) != PROP_DB(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -133,8 +133,8 @@ lsList PropDb_get_props_of_type(const PropDb_ptr self, const Prop_Type type);
   Returned list must be disposed by the caller.
 */
 lsList PropDb_get_ordered_props_of_type(const PropDb_ptr self,
-                                        const FlatHierarchy_ptr hierarchy,
-                                        const Prop_Type type);
+					const FlatHierarchy_ptr hierarchy,
+					const Prop_Type type);
 
 /*!
   \methodof PropDb
@@ -151,7 +151,7 @@ lsList PropDb_get_ordered_props_of_type(const PropDb_ptr self,
                       Note: here "cons" could be substituted by Pair
 */
 NodeList_ptr PropDb_get_ordered_properties(const PropDb_ptr self,
-                                           const FlatHierarchy_ptr hierarchy);
+					   const FlatHierarchy_ptr hierarchy);
 
 /*!
   \methodof PropDb
@@ -170,7 +170,7 @@ NodeList_ptr PropDb_get_ordered_properties(const PropDb_ptr self,
 */
 NodeList_ptr
 PropDb_get_coi_grouped_properties(const PropDb_ptr self,
-                                  const FlatHierarchy_ptr hierarchy);
+				  const FlatHierarchy_ptr hierarchy);
 
 /*!
   \methodof PropDb
@@ -218,8 +218,8 @@ Prop_ptr PropDb_get_prop_at_index(const PropDb_ptr self, int num);
   Returned set must be disposed by the caller
 */
 Set_t PropDb_get_props_at_indices(const PropDb_ptr self,
-                                  const ErrorMgr_ptr errmgr,
-                                  const char *indices);
+				  const ErrorMgr_ptr errmgr,
+				  const char *indices);
 
 /* ---------------------------------------------------------------------------*/
 /* Index ---------------------------------------------------------------------*/
@@ -251,7 +251,7 @@ int PropDb_get_prop_index_from_string(const PropDb_ptr self, const char *idx);
   -1 if no property is associated to the given trace.
 */
 int PropDb_get_prop_index_from_trace_index(const PropDb_ptr self,
-                                           const int trace_idx);
+					   const int trace_idx);
 /* ---------------------------------------------------------------------------*/
 
 /*!
@@ -286,7 +286,7 @@ int PropDb_prop_parse_name(const PropDb_ptr self, const char *str);
   \sa PropDb_get_print_fmt
 */
 PropDb_PrintFmt PropDb_set_print_fmt(const PropDb_ptr self,
-                                     PropDb_PrintFmt new_fmt);
+				     PropDb_PrintFmt new_fmt);
 
 /* Printing********************************************************************/
 
@@ -317,7 +317,7 @@ void PropDb_print_list_footer(const PropDb_ptr self, OStream_ptr file);
   \todo
 */
 int PropDb_print_prop_at_index(const PropDb_ptr self, OStream_ptr file,
-                               const int index);
+			       const int index);
 
 /*!
   \methodof PropDb
@@ -336,7 +336,7 @@ void PropDb_print_all(const PropDb_ptr self, OStream_ptr file);
   stored in the DB of properties whose type match the requested one.
 */
 void PropDb_print_all_type(const PropDb_ptr self, OStream_ptr file,
-                           Prop_Type type);
+			   Prop_Type type);
 
 /*!
   \methodof PropDb
@@ -346,7 +346,7 @@ void PropDb_print_all_type(const PropDb_ptr self, OStream_ptr file,
   stored in the DB of properties whose status match the requested one.
 */
 void PropDb_print_all_status(const PropDb_ptr self, OStream_ptr file,
-                             Prop_Status status);
+			     Prop_Status status);
 
 /*!
   \methodof PropDb
@@ -357,7 +357,7 @@ void PropDb_print_all_status(const PropDb_ptr self, OStream_ptr file,
   requested ones. Prop_NoStatus and Prop_NoType serve as wildcards.
 */
 void PropDb_print_all_status_type(const PropDb_ptr self, OStream_ptr file,
-                                  Prop_Status status, Prop_Type type);
+				  Prop_Status status, Prop_Type type);
 
 /* Verify**********************************************************************/
 
@@ -369,7 +369,7 @@ void PropDb_print_all_status_type(const PropDb_ptr self, OStream_ptr file,
   the proper ProbDb_verify_* function.
 */
 int PropDb_check_property(const PropDb_ptr self, const Prop_Type pt,
-                          const char *formula, const int prop_no);
+			  const char *formula, const int prop_no);
 
 /*!
   \methodof PropDb
@@ -401,7 +401,7 @@ void PropDb_verify_all_type(const PropDb_ptr self, Prop_Type);
   the COI size order (from smaller to bigger)
 */
 void PropDb_ordered_verify_all(const PropDb_ptr self,
-                               const FlatHierarchy_ptr hierarchy);
+			       const FlatHierarchy_ptr hierarchy);
 
 /*!
   \methodof PropDb
@@ -416,8 +416,8 @@ void PropDb_ordered_verify_all(const PropDb_ptr self,
   are checked
 */
 void PropDb_ordered_verify_all_type(const PropDb_ptr self,
-                                    const FlatHierarchy_ptr hierarchy,
-                                    const Prop_Type type);
+				    const FlatHierarchy_ptr hierarchy,
+				    const Prop_Type type);
 
 /*!
   \methodof PropDb
@@ -439,7 +439,7 @@ void PropDb_verify_prop_at_index(const PropDb_ptr self, const int index);
   opt_use_coi_size_sorting.
 */
 void PropDb_verify_all_type_wrapper(PropDb_ptr const self,
-                                    const Prop_Type type);
+				    const Prop_Type type);
 
 /* Miscellaneous **************************************************************/
 
@@ -455,8 +455,8 @@ void PropDb_verify_all_type_wrapper(PropDb_ptr const self,
   If expr_name is not NULL, it is set as the name of the property.
 */
 int PropDb_prop_parse_and_add(const PropDb_ptr self, SymbTable_ptr symb_table,
-                              const char *str, const Prop_Type type,
-                              const node_ptr expr_name);
+			      const char *str, const Prop_Type type,
+			      const node_ptr expr_name);
 
 /*!
   \methodof PropDb
@@ -477,7 +477,7 @@ PropDb_PrintFmt PropDb_get_print_fmt(const PropDb_ptr self);
   them. Returns 1 if an error occurred, 0 otherwise
 */
 int PropDb_fill(PropDb_ptr self, SymbTable_ptr symb_table, node_ptr, node_ptr,
-                node_ptr, node_ptr, node_ptr);
+		node_ptr, node_ptr, node_ptr);
 
 /*!
   \methodof PropDb
@@ -499,7 +499,7 @@ boolean PropDb_add(PropDb_ptr self, Prop_ptr);
 
 */
 int PropDb_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
-                               node_ptr, Prop_Type);
+			       node_ptr, Prop_Type);
 
 /*!
   \methodof PropDb
@@ -510,9 +510,9 @@ int PropDb_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
   If status is Prop_NoStatus, all status will be considered.
 */
 int PropDb_show_property(const PropDb_ptr self, const boolean print_props_num,
-                         const PropDb_PrintFmt fmt, const Prop_Type type,
-                         const Prop_Status status, const int prop_no,
-                         FILE *outstream);
+			 const PropDb_PrintFmt fmt, const Prop_Type type,
+			 const Prop_Status status, const int prop_no,
+			 FILE *outstream);
 
 /*!
   \methodof PropDb

@@ -52,16 +52,16 @@
 */
 
 typedef struct NormalizerCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NormalizerBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NormalizerBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } NormalizerCore;
 
@@ -78,7 +78,7 @@ typedef struct NormalizerCore_TAG {
   \sa NormalizerCore_create
 */
 void normalizer_core_init(NormalizerCore_ptr self, const NuSMVEnv_ptr env,
-                          const char *name, int low, size_t num);
+			  const char *name, int low, size_t num);
 
 /*!
   \methodof NormalizerCore

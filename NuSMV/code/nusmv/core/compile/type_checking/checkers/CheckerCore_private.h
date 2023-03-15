@@ -52,8 +52,9 @@ version 2. Copyright (C) 2006 by FBK-irst.
   can be used when expressions that are node_ptr
 */
 
-#define _SET_TYPE(expr, type)                                                  \
-  tc_set_expression_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr, type)
+#define _SET_TYPE(expr, type)                                                 \
+	tc_set_expression_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr, \
+			       type)
 
 /*!
   \brief Short way of calling tc_lookup_expr_type
@@ -63,8 +64,8 @@ version 2. Copyright (C) 2006 by FBK-irst.
   can be used when expressions that are node_ptr
 */
 
-#define _GET_TYPE(expr)                                                        \
-  tc_lookup_expr_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr)
+#define _GET_TYPE(expr) \
+	tc_lookup_expr_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr)
 
 /*!
   \brief Short way of calling checker_base_manage_violation
@@ -74,8 +75,8 @@ version 2. Copyright (C) 2006 by FBK-irst.
   can be used when expressions that are node_ptr
 */
 
-#define _VIOLATION(viol_id, expr)                                              \
-  checker_base_manage_violation(CHECKER_BASE(self), viol_id, expr)
+#define _VIOLATION(viol_id, expr) \
+	checker_base_manage_violation(CHECKER_BASE(self), viol_id, expr)
 
 /*!
   \brief Short way of calling type_checker_print_error_message
@@ -85,9 +86,9 @@ version 2. Copyright (C) 2006 by FBK-irst.
   can be used when expressions that are node_ptr
 */
 
-#define _PRINT_ERROR_MSG(exp, is_error)                                        \
-  type_checker_print_error_message(TYPE_CHECKER(NODE_WALKER(self)->master),    \
-                                   exp, is_error)
+#define _PRINT_ERROR_MSG(exp, is_error)   \
+	type_checker_print_error_message( \
+		TYPE_CHECKER(NODE_WALKER(self)->master), exp, is_error)
 
 /*!
   \brief CheckerCore class definition derived from
@@ -99,16 +100,16 @@ version 2. Copyright (C) 2006 by FBK-irst.
 */
 
 typedef struct CheckerCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(CheckerBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(CheckerBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } CheckerCore;
 
@@ -125,7 +126,7 @@ typedef struct CheckerCore_TAG {
   \sa CheckerCore_create
 */
 void checker_core_init(CheckerCore_ptr self, const NuSMVEnv_ptr env,
-                       const char *name, int low, size_t num);
+		       const char *name, int low, size_t num);
 
 /*!
   \methodof CheckerCore

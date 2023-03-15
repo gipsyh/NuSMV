@@ -98,16 +98,16 @@ typedef struct BeEnc_TAG *BeEnc_ptr;
 */
 
 typedef enum BeVarType_TAG {
-  BE_VAR_TYPE_CURR = 0x1 << 0,
-  BE_VAR_TYPE_FROZEN = 0x1 << 1,
-  BE_VAR_TYPE_INPUT = 0x1 << 2,
-  BE_VAR_TYPE_NEXT = 0x1 << 3,
+	BE_VAR_TYPE_CURR = 0x1 << 0,
+	BE_VAR_TYPE_FROZEN = 0x1 << 1,
+	BE_VAR_TYPE_INPUT = 0x1 << 2,
+	BE_VAR_TYPE_NEXT = 0x1 << 3,
 
-  /* a shorthand for all legal types */
-  BE_VAR_TYPE_ALL = BE_VAR_TYPE_CURR | BE_VAR_TYPE_FROZEN | BE_VAR_TYPE_INPUT |
-                    BE_VAR_TYPE_NEXT,
-  /* this value is used internally to represent erroneous situations */
-  BE_VAR_TYPE_ERROR = 0x1 << 4,
+	/* a shorthand for all legal types */
+	BE_VAR_TYPE_ALL = BE_VAR_TYPE_CURR | BE_VAR_TYPE_FROZEN |
+			  BE_VAR_TYPE_INPUT | BE_VAR_TYPE_NEXT,
+	/* this value is used internally to represent erroneous situations */
+	BE_VAR_TYPE_ERROR = 0x1 << 4,
 } BeVarType;
 
 /**AutomaticStart*************************************************************/
@@ -250,7 +250,7 @@ timed variables.
   \se None
 */
 be_ptr BeEnc_name_to_timed(const BeEnc_ptr self, const node_ptr name,
-                           const int time);
+			   const int time);
 
 /* Conversion of index to something */
 
@@ -294,7 +294,7 @@ variables are never instantiated.
   \se None
 */
 be_ptr BeEnc_index_to_timed(const BeEnc_ptr self, const int index,
-                            const int time);
+			    const int time);
 
 /*!
   \methodof BeEnc
@@ -364,7 +364,7 @@ NOTE: Frozen variables are returned untimed as they are always untimed.
   \se None
 */
 be_ptr BeEnc_var_to_timed(const BeEnc_ptr self, const be_ptr var,
-                          const int time);
+			  const int time);
 
 /*!
   \methodof BeEnc
@@ -425,7 +425,7 @@ argument 'exp' must contain only untimed variables, otherwise
 results will be unpredictible
 */
 be_ptr BeEnc_untimed_expr_to_timed(BeEnc_ptr self, const be_ptr exp,
-                                   const int time);
+				   const int time);
 
 /*!
   \methodof BeEnc
@@ -437,8 +437,8 @@ untimed vars to ftime, input untimed vars to itime, and untimed next
 state vars to ntime.
 */
 be_ptr BeEnc_untimed_expr_to_times(BeEnc_ptr self, const be_ptr exp,
-                                   const int ctime, const int ftime,
-                                   const int itime, const int ntime);
+				   const int ctime, const int ftime,
+				   const int itime, const int ntime);
 
 /*!
   \methodof BeEnc
@@ -448,7 +448,7 @@ be_ptr BeEnc_untimed_expr_to_times(BeEnc_ptr self, const be_ptr exp,
   Maximum time is extended if necessary.
 */
 be_ptr BeEnc_untimed_to_timed_and_interval(BeEnc_ptr self, const be_ptr exp,
-                                           const int from, const int to);
+					   const int from, const int to);
 
 /*!
   \methodof BeEnc
@@ -458,7 +458,7 @@ be_ptr BeEnc_untimed_to_timed_and_interval(BeEnc_ptr self, const be_ptr exp,
   Maximum time is extended if necessary.
 */
 be_ptr BeEnc_untimed_to_timed_or_interval(BeEnc_ptr self, const be_ptr exp,
-                                          const int from, const int to);
+					  const int from, const int to);
 
 /* Tests on type of be variables' indices */
 
@@ -534,7 +534,7 @@ current state variable, or an untimed frozen, or an untimed input variable
 
 */
 boolean BeEnc_is_index_untimed_curr_frozen_input(const BeEnc_ptr self,
-                                                 const int index);
+						 const int index);
 
 /*!
   \methodof BeEnc
@@ -583,7 +583,7 @@ is_var_index_valid to check the validity of the returned index.
 BeEnc_is_var_index_valid, BeEnc_get_var_index_with_offset
 */
 int BeEnc_get_next_var_index(const BeEnc_ptr self, int var_index,
-                             BeVarType type);
+			     BeVarType type);
 
 /*!
   \methodof BeEnc
@@ -602,7 +602,7 @@ the returned index.
 BeEnc_is_var_index_valid, BeEnc_get_next_var_index
 */
 int BeEnc_get_var_index_with_offset(const BeEnc_ptr self, int from_index,
-                                    int offset, BeVarType type);
+				    int offset, BeVarType type);
 
 /*!
   \methodof BeEnc

@@ -87,14 +87,14 @@ static void normalizer_psl_finalize(Object_ptr object, void *dummy);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-NormalizerPsl_ptr NormalizerPsl_create(const NuSMVEnv_ptr env,
-                                       const char *name) {
-  NormalizerPsl_ptr self = ALLOC(NormalizerPsl, 1);
-  NORMALIZER_PSL_CHECK_INSTANCE(self);
+NormalizerPsl_ptr NormalizerPsl_create(const NuSMVEnv_ptr env, const char *name)
+{
+	NormalizerPsl_ptr self = ALLOC(NormalizerPsl, 1);
+	NORMALIZER_PSL_CHECK_INSTANCE(self);
 
-  normalizer_psl_init(self, env, name, NUSMV_PSL_SYMBOL_FIRST,
-                      NUSMV_PSL_SYMBOL_LAST - NUSMV_PSL_SYMBOL_FIRST);
-  return self;
+	normalizer_psl_init(self, env, name, NUSMV_PSL_SYMBOL_FIRST,
+			    NUSMV_PSL_SYMBOL_LAST - NUSMV_PSL_SYMBOL_FIRST);
+	return self;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -102,34 +102,39 @@ NormalizerPsl_ptr NormalizerPsl_create(const NuSMVEnv_ptr env,
 /*---------------------------------------------------------------------------*/
 
 void normalizer_psl_init(NormalizerPsl_ptr self, const NuSMVEnv_ptr env,
-                         const char *name, int low, size_t num) {
-  /* base class initialization */
-  normalizer_base_init(NORMALIZER_BASE(self), env, name, low, num,
-                       true /*handles NULL*/);
+			 const char *name, int low, size_t num)
+{
+	/* base class initialization */
+	normalizer_base_init(NORMALIZER_BASE(self), env, name, low, num,
+			     true /*handles NULL*/);
 
-  /* members initialization */
+	/* members initialization */
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = normalizer_psl_finalize;
-  OVERRIDE(NormalizerBase, normalize_node) = normalizer_psl_normalize_node;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = normalizer_psl_finalize;
+	OVERRIDE(NormalizerBase, normalize_node) =
+		normalizer_psl_normalize_node;
 }
 
-void normalizer_psl_deinit(NormalizerPsl_ptr self) {
-  /* members deinitialization */
+void normalizer_psl_deinit(NormalizerPsl_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class initialization */
-  normalizer_base_deinit(NORMALIZER_BASE(self));
+	/* base class initialization */
+	normalizer_base_deinit(NORMALIZER_BASE(self));
 }
 
-node_ptr normalizer_psl_normalize_node(NormalizerBase_ptr self, node_ptr node) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+node_ptr normalizer_psl_normalize_node(NormalizerBase_ptr self, node_ptr node)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const NodeMgr_ptr nodemgr =
+		NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (Nil == node)
-    return Nil;
+	if (Nil == node)
+		return Nil;
 
-  return find_node(nodemgr, node_get_type(node), _THROW(car(node)),
-                   _THROW(cdr(node)));
+	return find_node(nodemgr, node_get_type(node), _THROW(car(node)),
+			 _THROW(cdr(node)));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -141,11 +146,12 @@ node_ptr normalizer_psl_normalize_node(NormalizerBase_ptr self, node_ptr node) {
 
   Called by the class destructor
 */
-static void normalizer_psl_finalize(Object_ptr object, void *dummy) {
-  NormalizerPsl_ptr self = NORMALIZER_PSL(object);
+static void normalizer_psl_finalize(Object_ptr object, void *dummy)
+{
+	NormalizerPsl_ptr self = NORMALIZER_PSL(object);
 
-  normalizer_psl_deinit(self);
-  FREE(self);
+	normalizer_psl_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

@@ -68,8 +68,8 @@ typedef node_ptr ClusterListIterator_ptr;
 
   \todo Missing description
 */
-#define CLUSTER_LIST_CHECK_INSTANCE(x)                                         \
-  (nusmv_assert(CLUSTER_LIST(x) != CLUSTER_LIST(NULL)))
+#define CLUSTER_LIST_CHECK_INSTANCE(x) \
+	(nusmv_assert(CLUSTER_LIST(x) != CLUSTER_LIST(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -156,7 +156,7 @@ DDMgr_ptr ClusterList_get_dd_manager(const ClusterList_ptr self);
   self keeps the ownership of the returned cluster
 */
 Cluster_ptr ClusterList_get_cluster(const ClusterList_ptr self,
-                                    const ClusterListIterator_ptr iter);
+				    const ClusterListIterator_ptr iter);
 
 /*!
   \methodof ClusterList
@@ -166,8 +166,8 @@ Cluster_ptr ClusterList_get_cluster(const ClusterList_ptr self,
 
 */
 void ClusterList_set_cluster(ClusterList_ptr self,
-                             const ClusterListIterator_ptr iter,
-                             Cluster_ptr cluster);
+			     const ClusterListIterator_ptr iter,
+			     Cluster_ptr cluster);
 
 /*!
   \methodof ClusterList
@@ -247,7 +247,7 @@ ClusterList_ptr ClusterList_apply_monolithic(const ClusterList_ptr self);
 */
 ClusterList_ptr
 ClusterList_apply_threshold(const ClusterList_ptr self,
-                            const ClusterOptions_ptr cl_options);
+			    const ClusterOptions_ptr cl_options);
 
 /*!
   \methodof ClusterList
@@ -267,9 +267,9 @@ ClusterList_apply_threshold(const ClusterList_ptr self,
   </ol>
 */
 ClusterList_ptr ClusterList_apply_iwls95_partition(
-    const ClusterList_ptr self, bdd_ptr state_vars_cube,
-    bdd_ptr input_vars_cube, bdd_ptr next_state_vars_cube,
-    const ClusterOptions_ptr cl_options);
+	const ClusterList_ptr self, bdd_ptr state_vars_cube,
+	bdd_ptr input_vars_cube, bdd_ptr next_state_vars_cube,
+	const ClusterOptions_ptr cl_options);
 
 /*!
   \methodof ClusterList
@@ -283,7 +283,7 @@ ClusterList_ptr ClusterList_apply_iwls95_partition(
   \se self will change
 */
 void ClusterList_apply_synchronous_product(ClusterList_ptr self,
-                                           const ClusterList_ptr other);
+					   const ClusterList_ptr other);
 
 /*!
   \methodof ClusterList
@@ -310,7 +310,7 @@ bdd_ptr ClusterList_get_clusters_cube(const ClusterList_ptr self);
 
 */
 void ClusterList_build_schedule(ClusterList_ptr self, bdd_ptr state_vars_cube,
-                                bdd_ptr input_vars_cube);
+				bdd_ptr input_vars_cube);
 
 /*!
   \methodof ClusterList
@@ -329,7 +329,7 @@ bdd_ptr ClusterList_get_image_state(const ClusterList_ptr self, bdd_ptr s);
   Returned bdd is referenced
 */
 bdd_ptr ClusterList_get_image_state_input(const ClusterList_ptr self,
-                                          bdd_ptr s);
+					  bdd_ptr s);
 
 /*!
   \methodof ClusterList
@@ -339,7 +339,7 @@ bdd_ptr ClusterList_get_image_state_input(const ClusterList_ptr self,
   Returned bdd is referenced
 */
 bdd_ptr ClusterList_get_k_image_state(const ClusterList_ptr self, bdd_ptr s,
-                                      int k);
+				      int k);
 
 /*!
   \methodof ClusterList
@@ -349,7 +349,7 @@ bdd_ptr ClusterList_get_k_image_state(const ClusterList_ptr self, bdd_ptr s,
   Returned bdd is referenced
 */
 bdd_ptr ClusterList_get_k_image_state_input(const ClusterList_ptr self,
-                                            bdd_ptr s, int k);
+					    bdd_ptr s, int k);
 
 /*!
   \methodof ClusterList
@@ -366,7 +366,7 @@ void ClusterList_print_short_info(const ClusterList_ptr self, FILE *file);
   It compares BDDs not Clusters.
 */
 boolean ClusterList_check_equality(const ClusterList_ptr self,
-                                   const ClusterList_ptr other);
+				   const ClusterList_ptr other);
 
 /*!
   \methodof ClusterList

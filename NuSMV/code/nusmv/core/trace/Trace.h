@@ -64,9 +64,9 @@ typedef struct TraceVarFrame_TAG *TraceIter;
 
   \sa none
 */
-#define TRACE_FOREACH(trace, iter)                                             \
-  for ((iter) = Trace_first_iter(trace); TRACE_END_ITER != (iter);             \
-       (iter) = TraceIter_get_next(iter))
+#define TRACE_FOREACH(trace, iter)                                       \
+	for ((iter) = Trace_first_iter(trace); TRACE_END_ITER != (iter); \
+	     (iter) = TraceIter_get_next(iter))
 
 /*!
   \brief Macro to iterate over trace step (vertical iterator)
@@ -78,9 +78,9 @@ typedef struct TraceVarFrame_TAG *TraceIter;
 
   \sa TRACE_SYMBOLS_FOREACH
 */
-#define TRACE_STEP_FOREACH(trace, step, type, iter, symbol, value)             \
-  iter = Trace_step_iter((trace), (step), (type));                             \
-  while (Trace_step_iter_fetch((&iter), (&symbol), (&value)))
+#define TRACE_STEP_FOREACH(trace, step, type, iter, symbol, value) \
+	iter = Trace_step_iter((trace), (step), (type));           \
+	while (Trace_step_iter_fetch((&iter), (&symbol), (&value)))
 
 /*!
   \brief Macro to iterate over symbols (vertical iterator)
@@ -91,9 +91,9 @@ typedef struct TraceVarFrame_TAG *TraceIter;
 
   \sa TRACE_STEP_FOREACH
 */
-#define TRACE_SYMBOLS_FOREACH(trace, type, iter, symbol)                       \
-  iter = Trace_symbols_iter((trace), (type));                                  \
-  while (Trace_symbols_iter_fetch((&iter), (&symbol)))
+#define TRACE_SYMBOLS_FOREACH(trace, type, iter, symbol) \
+	iter = Trace_symbols_iter((trace), (type));      \
+	while (Trace_symbols_iter_fetch((&iter), (&symbol)))
 
 /*!
   \brief Trace type enumeration
@@ -102,13 +102,13 @@ typedef struct TraceVarFrame_TAG *TraceIter;
 */
 
 typedef enum TraceType_TAG {
-  TRACE_TYPE_UNSPECIFIED = -1, /* reserved */
+	TRACE_TYPE_UNSPECIFIED = -1, /* reserved */
 
-  TRACE_TYPE_CNTEXAMPLE = 0,
-  TRACE_TYPE_SIMULATION,
-  TRACE_TYPE_EXECUTION,
+	TRACE_TYPE_CNTEXAMPLE = 0,
+	TRACE_TYPE_SIMULATION,
+	TRACE_TYPE_EXECUTION,
 
-  TRACE_TYPE_END,
+	TRACE_TYPE_END,
 } TraceType;
 
 /*!
@@ -122,39 +122,39 @@ typedef enum TraceType_TAG {
 
 typedef enum TraceIteratorType_TAG {
 
-  TRACE_ITER_NONE = 0,
+	TRACE_ITER_NONE = 0,
 
-  /* vars */
-  TRACE_ITER_F_VARS = 0x2,
-  TRACE_ITER_S_VARS = 0x4,
-  TRACE_ITER_I_VARS = 0x8,
+	/* vars */
+	TRACE_ITER_F_VARS = 0x2,
+	TRACE_ITER_S_VARS = 0x4,
+	TRACE_ITER_I_VARS = 0x8,
 
-  /* var groups */
-  TRACE_ITER_SF_VARS = 0x6,
-  TRACE_ITER_ALL_VARS = 0xe,
+	/* var groups */
+	TRACE_ITER_SF_VARS = 0x6,
+	TRACE_ITER_ALL_VARS = 0xe,
 
-  /* defines */
-  TRACE_ITER_S_DEFINES = 0x10,
-  TRACE_ITER_I_DEFINES = 0x20,
+	/* defines */
+	TRACE_ITER_S_DEFINES = 0x10,
+	TRACE_ITER_I_DEFINES = 0x20,
 
-  TRACE_ITER_SI_DEFINES = 0x40,
-  TRACE_ITER_N_DEFINES = 0x80,
-  TRACE_ITER_SN_DEFINES = 0x100,
-  TRACE_ITER_IN_DEFINES = 0x200,
-  TRACE_ITER_SIN_DEFINES = 0x400,
+	TRACE_ITER_SI_DEFINES = 0x40,
+	TRACE_ITER_N_DEFINES = 0x80,
+	TRACE_ITER_SN_DEFINES = 0x100,
+	TRACE_ITER_IN_DEFINES = 0x200,
+	TRACE_ITER_SIN_DEFINES = 0x400,
 
-  /* vars+defines groups */
-  TRACE_ITER_SF_SYMBOLS = 0x16,
-  TRACE_ITER_S_SYMBOLS = 0x14,
-  TRACE_ITER_I_SYMBOLS = 0x28,
+	/* vars+defines groups */
+	TRACE_ITER_SF_SYMBOLS = 0x16,
+	TRACE_ITER_S_SYMBOLS = 0x14,
+	TRACE_ITER_I_SYMBOLS = 0x28,
 
-  /* transitional groups: the following iterator types are used to
+	/* transitional groups: the following iterator types are used to
      describe defines across a transition: COMBINATORIAL holds all the
      defines which depend on (S, I), (N), (S, N), (I, N), (S, I, N).
      In addition to all the defines aforementioned, TRANSITIONAL
      contains INPUT defines as well. */
-  TRACE_ITER_COMBINATORIAL = 0x7c0,
-  TRACE_ITER_TRANSITIONAL = 0x07e0,
+	TRACE_ITER_COMBINATORIAL = 0x7c0,
+	TRACE_ITER_TRANSITIONAL = 0x07e0,
 
 } TraceIteratorType;
 
@@ -167,12 +167,12 @@ typedef enum TraceIteratorType_TAG {
 */
 
 typedef struct TraceStepIter_TAG {
-  Trace_ptr trace;
-  TraceIter step;
-  TraceIteratorType type;
+	Trace_ptr trace;
+	TraceIter step;
+	TraceIteratorType type;
 
-  unsigned section;
-  unsigned cursor;
+	unsigned section;
+	unsigned cursor;
 } TraceStepIter;
 
 /*!
@@ -184,11 +184,11 @@ typedef struct TraceStepIter_TAG {
 */
 
 typedef struct TraceSymbolsIter_TAG {
-  Trace_ptr trace;
-  TraceIteratorType type;
+	Trace_ptr trace;
+	TraceIteratorType type;
 
-  unsigned section;
-  unsigned cursor;
+	unsigned section;
+	unsigned cursor;
 } TraceSymbolsIter;
 
 /*---------------------------------------------------------------------------*/
@@ -221,8 +221,8 @@ typedef struct TraceSymbolsIter_TAG {
 
   \todo Missing description
 */
-#define TRACE_ITER_CHECK_INSTANCE(x)                                           \
-  (nusmv_assert(TRACE_ITER(x) != TRACE_ITER(NULL)))
+#define TRACE_ITER_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_ITER(x) != TRACE_ITER(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -236,8 +236,8 @@ typedef struct TraceSymbolsIter_TAG {
 
   \todo Missing description
 */
-#define TRACE_STEP_ITER_CHECK_INSTANCE(x)                                      \
-  (nusmv_assert(TRACE_STEP_ITER(x) != TRACE_STEP_ITER(NULL)))
+#define TRACE_STEP_ITER_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_STEP_ITER(x) != TRACE_STEP_ITER(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -251,8 +251,8 @@ typedef struct TraceSymbolsIter_TAG {
 
   \todo Missing description
 */
-#define TRACE_SYMBOLS_ITER_CHECK_INSTANCE(x)                                   \
-  (nusmv_assert(TRACE_SYMBOLS_ITER(x) != TRACE_SYMBOLS_ITER(NULL)))
+#define TRACE_SYMBOLS_ITER_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_SYMBOLS_ITER(x) != TRACE_SYMBOLS_ITER(NULL)))
 
 /*!
   \brief Iterator ends
@@ -327,7 +327,7 @@ typedef struct TraceSymbolsIter_TAG {
   \sa Trace_first_iter, Trace_append_step, Trace_destroy
 */
 Trace_ptr Trace_create(SymbTable_ptr st, const char *desc, const TraceType type,
-                       NodeList_ptr symbols, boolean is_volatile);
+		       NodeList_ptr symbols, boolean is_volatile);
 
 /*!
   \methodof Trace
@@ -364,8 +364,8 @@ Trace_ptr Trace_create(SymbTable_ptr st, const char *desc, const TraceType type,
   \sa Trace_first_iter, Trace_append_step, Trace_destroy
 */
 Trace_ptr Trace_create_allow_bits(SymbTable_ptr st, const char *desc,
-                                  const TraceType type, NodeList_ptr symbols,
-                                  boolean is_volatile);
+				  const TraceType type, NodeList_ptr symbols,
+				  boolean is_volatile);
 
 /*!
   \methodof Trace
@@ -409,7 +409,7 @@ Trace_ptr Trace_create_allow_bits(SymbTable_ptr st, const char *desc,
   \sa Trace_thaw, Trace_freeze, Trace_destroy
 */
 Trace_ptr Trace_copy(const Trace_ptr self, const TraceIter until_here,
-                     boolean is_volatile);
+		     boolean is_volatile);
 
 /*!
   \methodof Trace
@@ -737,7 +737,7 @@ void Trace_step_force_loopback(const Trace_ptr self, TraceIter step);
   \sa Trace_append_step, Trace_step_get_value
 */
 boolean Trace_step_put_value(Trace_ptr self, TraceIter step, node_ptr symb,
-                             node_ptr value);
+			     node_ptr value);
 
 /*!
   \methodof Trace
@@ -758,7 +758,7 @@ boolean Trace_step_put_value(Trace_ptr self, TraceIter step, node_ptr symb,
                Trace_step_get_iter, Trace_step_get_next_value
 */
 node_ptr Trace_step_get_value(const Trace_ptr self, TraceIter step,
-                              node_ptr symb);
+			      node_ptr symb);
 
 /* horizontal iterators, used to traverse a trace */
 
@@ -862,7 +862,7 @@ boolean TraceIter_is_end(const TraceIter iter);
   \sa TRACE_STEP_FOREACH
 */
 TraceStepIter Trace_step_iter(const Trace_ptr self, const TraceIter step,
-                              const TraceIteratorType iter_type);
+			      const TraceIteratorType iter_type);
 
 /*!
   \brief Step iterator next function
@@ -881,7 +881,7 @@ TraceStepIter Trace_step_iter(const Trace_ptr self, const TraceIter step,
   \sa Trace_step_get_iter
 */
 boolean Trace_step_iter_fetch(TraceStepIter *step_iter, node_ptr *symb,
-                              node_ptr *value);
+			      node_ptr *value);
 
 /*!
   \methodof Trace
@@ -896,7 +896,7 @@ boolean Trace_step_iter_fetch(TraceStepIter *step_iter, node_ptr *symb,
   \sa TRACE_SYMBOLS_FOREACH
 */
 TraceSymbolsIter Trace_symbols_iter(const Trace_ptr self,
-                                    const TraceIteratorType iter_type);
+				    const TraceIteratorType iter_type);
 
 /*!
   \brief Symbols iterator next function
@@ -915,7 +915,7 @@ TraceSymbolsIter Trace_symbols_iter(const Trace_ptr self,
   \sa Trace_symbols_get_iter
 */
 boolean Trace_symbols_iter_fetch(TraceSymbolsIter *symbols_iter,
-                                 node_ptr *symb);
+				 node_ptr *symb);
 
 /* language queries */
 

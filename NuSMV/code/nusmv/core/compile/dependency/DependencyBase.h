@@ -62,8 +62,8 @@ typedef struct DependencyBase_TAG *DependencyBase_ptr;
 
   \todo Missing description
 */
-#define DEPENDENCY_BASE_CHECK_INSTANCE(self)                                   \
-  (nusmv_assert(DEPENDENCY_BASE(self) != DEPENDENCY_BASE(NULL)))
+#define DEPENDENCY_BASE_CHECK_INSTANCE(self) \
+	(nusmv_assert(DEPENDENCY_BASE(self) != DEPENDENCY_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -81,9 +81,9 @@ typedef struct DependencyBase_TAG *DependencyBase_ptr;
   handle the expression.
 */
 VIRTUAL Set_t DependencyBase_get_dependencies(
-    DependencyBase_ptr self, SymbTable_ptr symb_table, node_ptr formula,
-    node_ptr context, SymbFilterType filter, boolean preserve_time, int time,
-    hash_ptr dependencies_hash);
+	DependencyBase_ptr self, SymbTable_ptr symb_table, node_ptr formula,
+	node_ptr context, SymbFilterType filter, boolean preserve_time,
+	int time, hash_ptr dependencies_hash);
 
 /**AutomaticEnd***************************************************************/
 

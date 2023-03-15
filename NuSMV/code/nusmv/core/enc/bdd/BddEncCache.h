@@ -65,8 +65,8 @@ typedef struct BddEncCache_TAG *BddEncCache_ptr;
 
   \todo Missing description
 */
-#define BDD_ENC_CACHE_CHECK_INSTANCE(x)                                        \
-  (nusmv_assert(BDD_ENC_CACHE(x) != BDD_ENC_CACHE(NULL)))
+#define BDD_ENC_CACHE_CHECK_INSTANCE(x) \
+	(nusmv_assert(BDD_ENC_CACHE(x) != BDD_ENC_CACHE(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Types                                                                  */
@@ -101,7 +101,7 @@ void BddEncCache_destroy(BddEncCache_ptr self);
   to be used when the constant is removed later.
 */
 void BddEncCache_new_constant(BddEncCache_ptr self, node_ptr constant,
-                              add_ptr constant_add);
+			      add_ptr constant_add);
 
 /*!
   \methodof BddEncCache
@@ -118,7 +118,7 @@ void BddEncCache_remove_constant(BddEncCache_ptr self, node_ptr constant);
 
 */
 boolean BddEncCache_is_constant_encoded(const BddEncCache_ptr self,
-                                        node_ptr constant);
+					node_ptr constant);
 
 /*!
   \methodof BddEncCache
@@ -129,7 +129,7 @@ boolean BddEncCache_is_constant_encoded(const BddEncCache_ptr self,
   constant is not currently encoded
 */
 add_ptr BddEncCache_lookup_constant(const BddEncCache_ptr self,
-                                    node_ptr constant);
+				    node_ptr constant);
 
 /*!
   \methodof BddEncCache
@@ -139,7 +139,7 @@ add_ptr BddEncCache_lookup_constant(const BddEncCache_ptr self,
 
 */
 void BddEncCache_new_boolean_var(BddEncCache_ptr self, node_ptr var_name,
-                                 add_ptr var_add);
+				 add_ptr var_add);
 
 /*!
   \methodof BddEncCache
@@ -157,7 +157,7 @@ void BddEncCache_remove_boolean_var(BddEncCache_ptr self, node_ptr var_name);
 
 */
 boolean BddEncCache_is_boolean_var_encoded(const BddEncCache_ptr self,
-                                           node_ptr var_name);
+					   node_ptr var_name);
 
 /*!
   \methodof BddEncCache
@@ -168,7 +168,7 @@ boolean BddEncCache_is_boolean_var_encoded(const BddEncCache_ptr self,
   variable is not encoded.
 */
 add_ptr BddEncCache_lookup_boolean_var(const BddEncCache_ptr self,
-                                       node_ptr var_name);
+				       node_ptr var_name);
 
 /*!
   \methodof BddEncCache
@@ -184,7 +184,7 @@ add_ptr BddEncCache_lookup_boolean_var(const BddEncCache_ptr self,
   result is kept and the provided add_array is immediately freed
 */
 void BddEncCache_set_evaluation(BddEncCache_ptr self, node_ptr expr,
-                                AddArray_ptr add_array);
+				AddArray_ptr add_array);
 
 /*!
   \methodof BddEncCache
@@ -223,7 +223,7 @@ AddArray_ptr BddEncCache_get_evaluation(BddEncCache_ptr self, node_ptr expr);
   begin removed and the cache has to be cleaned up
 */
 void BddEncCache_clean_evaluation_about(BddEncCache_ptr self,
-                                        NodeList_ptr symbs);
+					NodeList_ptr symbs);
 
 /*!
   \methodof BddEncCache

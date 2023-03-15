@@ -155,16 +155,16 @@ char *strncpy(char *, const char *, size_t);
 /* Stucture declarations                                                     */
 /*---------------------------------------------------------------------------*/
 typedef struct CmdAliasDescrStruct {
-  char *name;
-  int argc;
-  char **argv;
+	char *name;
+	int argc;
+	char **argv;
 } CmdAliasDescr_t;
 
 typedef struct CommandDescrStruct {
-  char *name;
-  PFI command_fp;
-  int changes_hmgr;
-  boolean reentrant;
+	char *name;
+	PFI command_fp;
+	int changes_hmgr;
+	boolean reentrant;
 } CommandDescr_t;
 
 /*---------------------------------------------------------------------------*/
@@ -225,7 +225,7 @@ CommandDescr_t *CmdCommandCopy(CommandDescr_t *value);
   is copyrighted by the Regents of the University of California.
 */
 char *CmdFgetsFilec(NuSMVEnv_ptr env, char *buf, unsigned int size,
-                    FILE *stream, char *prompt);
+		    FILE *stream, char *prompt);
 
 /*!
   \brief Simple history substitution routine.

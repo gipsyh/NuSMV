@@ -103,8 +103,8 @@ typedef struct ClusterIwls95_TAG *ClusterIwls95_ptr;
 
   \todo Missing description
 */
-#define CLUSTER_IWLS95_CHECK_INSTANCE(x)                                       \
-  (nusmv_assert(CLUSTER_IWLS95(x) != CLUSTER_IWLS95(NULL)))
+#define CLUSTER_IWLS95_CHECK_INSTANCE(x) \
+	(nusmv_assert(CLUSTER_IWLS95(x) != CLUSTER_IWLS95(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /*    Public interface                                                    */
@@ -166,7 +166,7 @@ bdd_ptr Cluster_get_quantification_state_input(const Cluster_ptr self);
   Given value will be referenced
 */
 void Cluster_set_quantification_state_input(Cluster_ptr self, DDMgr_ptr dd,
-                                            bdd_ptr new_val);
+					    bdd_ptr new_val);
 
 /*!
   \methodof Cluster
@@ -185,7 +185,7 @@ bdd_ptr Cluster_get_quantification_state(const Cluster_ptr self);
   Given value will be referenced
 */
 void Cluster_set_quantification_state(Cluster_ptr self, DDMgr_ptr dd,
-                                      bdd_ptr new_val);
+				      bdd_ptr new_val);
 
 /* ClusterIwls95 inherits from Cluster: */
 
@@ -202,11 +202,11 @@ void Cluster_set_quantification_state(Cluster_ptr self, DDMgr_ptr dd,
   \sa Cluster_destroy Cluster_create
 */
 ClusterIwls95_ptr ClusterIwls95_create(DDMgr_ptr dd,
-                                       const ClusterOptions_ptr trans_options,
-                                       const double v_c, const double w_c,
-                                       const double x_c, const double y_c,
-                                       const double z_c, const double min_c,
-                                       const double max_c);
+				       const ClusterOptions_ptr trans_options,
+				       const double v_c, const double w_c,
+				       const double x_c, const double y_c,
+				       const double z_c, const double min_c,
+				       const double max_c);
 
 /*!
   \methodof ClusterIwls95

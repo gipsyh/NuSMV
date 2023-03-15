@@ -58,9 +58,9 @@
 */
 
 typedef struct WordNumber_TAG {
-  WordNumberValue value; /* Words are unsigned */
-  int width;
-  string_ptr parsedString;
+	WordNumberValue value; /* Words are unsigned */
+	int width;
+	string_ptr parsedString;
 } WordNumber;
 
 /* ---------------------------------------------------------------------- */

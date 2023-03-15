@@ -117,34 +117,36 @@
 
   \todo Missing description
 */
-#define isPastOp(op)                                                           \
-  ((op) == OP_PREC) || ((op) == OP_NOTPRECNOT) || ((op) == OP_ONCE) ||         \
-      ((op) == OP_HISTORICAL) || ((op) == SINCE) || ((op) == TRIGGERED)
+#define isPastOp(op)                                                         \
+	((op) == OP_PREC) || ((op) == OP_NOTPRECNOT) || ((op) == OP_ONCE) || \
+		((op) == OP_HISTORICAL) || ((op) == SINCE) ||                \
+		((op) == TRIGGERED)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define isBinaryOp(op)                                                         \
-  ((op) == AND) || ((op) == OR) || ((op) == IFF) || ((op) == UNTIL) ||         \
-      ((op) == SINCE) || ((op) == RELEASES) || ((op) == TRIGGERED)
+#define isBinaryOp(op)                                                       \
+	((op) == AND) || ((op) == OR) || ((op) == IFF) || ((op) == UNTIL) || \
+		((op) == SINCE) || ((op) == RELEASES) || ((op) == TRIGGERED)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define getOpClass(op)                                                         \
-  ((op) == TRUEEXP) || ((op) == FALSEEXP)           ? CONSTANT_EXPR            \
-  : ((op) == DOT) || ((op) == BIT) || ((op) == NOT) ? LITERAL                  \
-  : ((op) == AND) || ((op) == OR) || ((op) == IFF)  ? PROP_CONNECTIVE          \
-  : ((op) == OP_PREC) || ((op) == OP_NEXT) || ((op) == OP_NOTPRECNOT) ||       \
-          ((op) == OP_ONCE) || ((op) == OP_FUTURE) ||                          \
-          ((op) == OP_HISTORICAL) || ((op) == OP_GLOBAL) || ((op) == SINCE) || \
-          ((op) == UNTIL) || ((op) == TRIGGERED) || ((op) == RELEASES)         \
-      ? TIME_OPERATOR                                                          \
-      : UNKNOWN_OP
+#define getOpClass(op)                                                       \
+	((op) == TRUEEXP) || ((op) == FALSEEXP)		? CONSTANT_EXPR :    \
+	((op) == DOT) || ((op) == BIT) || ((op) == NOT) ? LITERAL :          \
+	((op) == AND) || ((op) == OR) || ((op) == IFF)	? PROP_CONNECTIVE :  \
+	((op) == OP_PREC) || ((op) == OP_NEXT) || ((op) == OP_NOTPRECNOT) || \
+			((op) == OP_ONCE) || ((op) == OP_FUTURE) ||          \
+			((op) == OP_HISTORICAL) || ((op) == OP_GLOBAL) ||    \
+			((op) == SINCE) || ((op) == UNTIL) ||                \
+			((op) == TRIGGERED) || ((op) == RELEASES) ?          \
+							 TIME_OPERATOR :     \
+							 UNKNOWN_OP
 
 /**AutomaticStart*************************************************************/
 
@@ -166,8 +168,8 @@
   \sa Bmc_Utils_generate_cntexample Bmc_Utils_fill_cntexample
 */
 Trace_ptr Bmc_Utils_generate_and_print_cntexample(
-    BeEnc_ptr be_enc, TraceMgr_ptr tm, SatSolver_ptr solver, be_ptr be_prob,
-    const int k, const char *trace_name, NodeList_ptr symbols);
+	BeEnc_ptr be_enc, TraceMgr_ptr tm, SatSolver_ptr solver, be_ptr be_prob,
+	const int k, const char *trace_name, NodeList_ptr symbols);
 
 /*!
   \brief Given a problem, and a solver containing a model for that
@@ -181,9 +183,9 @@ Trace_ptr Bmc_Utils_generate_and_print_cntexample(
   \sa Bmc_Utils_generate_and_print_cntexample
 */
 Trace_ptr Bmc_Utils_generate_cntexample(BeEnc_ptr be_enc, SatSolver_ptr solver,
-                                        be_ptr be_prob, const int k,
-                                        const char *trace_name,
-                                        NodeList_ptr symbols);
+					be_ptr be_prob, const int k,
+					const char *trace_name,
+					NodeList_ptr symbols);
 
 /*!
   \brief Given a solver containing a model for a
@@ -194,7 +196,7 @@ Trace_ptr Bmc_Utils_generate_cntexample(BeEnc_ptr be_enc, SatSolver_ptr solver,
   \sa Bmc_fill_trace_from_cnf_model Bmc_Utils_generate_cntexample
 */
 Trace_ptr Bmc_Utils_fill_cntexample(BeEnc_ptr be_enc, SatSolver_ptr solver,
-                                    const int k, Trace_ptr trace);
+				    const int k, Trace_ptr trace);
 
 /*!
   \brief Returns true if l has the internally encoded "no loop"
@@ -326,7 +328,7 @@ int Bmc_Utils_ConvertLoopFromString(const char *strValue, Outcome *result);
   \sa Bmc_Utils_ConvertLoopFromString
 */
 void Bmc_Utils_ConvertLoopFromInteger(const int iLoopback, char *szLoopback,
-                                      const int _bufsize);
+				      const int _bufsize);
 
 /*!
   \brief Search into a given string any symbol which belongs to a
@@ -343,9 +345,9 @@ void Bmc_Utils_ConvertLoopFromInteger(const int iLoopback, char *szLoopback,
   \se filename_expanded string data will change
 */
 void Bmc_Utils_ExpandMacrosInFilename(const char *filename_to_be_expanded,
-                                      const SubstString *table_ptr,
-                                      const size_t table_len,
-                                      char *filename_expanded, size_t buf_len);
+				      const SubstString *table_ptr,
+				      const size_t table_len,
+				      char *filename_expanded, size_t buf_len);
 
 /*!
   \brief Applies inlining taking into account of current user
@@ -377,9 +379,9 @@ be_ptr Bmc_Utils_apply_inlining4inc(Be_Manager_ptr be_mgr, be_ptr f);
   \sa Bmc_Utils_next_costraint_from_string
 */
 be_ptr Bmc_Utils_simple_costraint_from_string(BeEnc_ptr be_enc,
-                                              BddEnc_ptr bdd_enc,
-                                              const char *str,
-                                              Expr_ptr *node_expr);
+					      BddEnc_ptr bdd_enc,
+					      const char *str,
+					      Expr_ptr *node_expr);
 
 /*!
   \brief Reads a next expression and builds the corresponding BE
@@ -395,8 +397,8 @@ be_ptr Bmc_Utils_simple_costraint_from_string(BeEnc_ptr be_enc,
   \sa Bmc_Utils_simple_costraint_from_string
 */
 be_ptr Bmc_Utils_next_costraint_from_string(BeEnc_ptr be_enc,
-                                            BddEnc_ptr bdd_enc, const char *str,
-                                            Expr_ptr *node_expr);
+					    BddEnc_ptr bdd_enc, const char *str,
+					    Expr_ptr *node_expr);
 
 /*!
   \brief Converts Be into CNF, and adds it into a group of a
@@ -407,9 +409,9 @@ be_ptr Bmc_Utils_next_costraint_from_string(BeEnc_ptr be_enc,
                  adding, setting polarity and destroying BE.
 */
 void Bmc_Utils_add_be_into_inc_solver_positively(SatIncSolver_ptr solver,
-                                                 SatSolverGroup group,
-                                                 be_ptr prob, BeEnc_ptr be_enc,
-                                                 Be_CnfAlgorithm cnf_alg);
+						 SatSolverGroup group,
+						 be_ptr prob, BeEnc_ptr be_enc,
+						 Be_CnfAlgorithm cnf_alg);
 
 /*!
   \brief Converts Be into CNF, and adds it into a group of a
@@ -420,9 +422,9 @@ void Bmc_Utils_add_be_into_inc_solver_positively(SatIncSolver_ptr solver,
                  adding, setting polarity and destroying BE.
 */
 void Bmc_Utils_add_be_into_non_inc_solver_positively(SatSolver_ptr solver,
-                                                     be_ptr prob,
-                                                     BeEnc_ptr be_enc,
-                                                     Be_CnfAlgorithm cnf_alg);
+						     be_ptr prob,
+						     BeEnc_ptr be_enc,
+						     Be_CnfAlgorithm cnf_alg);
 
 /**AutomaticEnd***************************************************************/
 

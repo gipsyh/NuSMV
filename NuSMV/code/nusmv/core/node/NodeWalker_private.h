@@ -55,20 +55,20 @@
 */
 
 typedef struct NodeWalker_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  char *name;
-  int low;
-  size_t num;
-  boolean can_handle_null;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	char *name;
+	int low;
+	size_t num;
+	boolean can_handle_null;
 
-  MasterNodeWalker_ptr master;
+	MasterNodeWalker_ptr master;
 
-  array_t *node_transformations;
+	array_t *node_transformations;
 
 } NodeWalker;
 
@@ -96,7 +96,7 @@ typedef struct NodeWalker_TAG {
   \sa NodeWalker_destroy
 */
 NodeWalker_ptr NodeWalker_create(const NuSMVEnv_ptr env, const char *name,
-                                 int low, size_t num, boolean can_handle_null);
+				 int low, size_t num, boolean can_handle_null);
 
 /*!
   \methodof NodeWalker
@@ -107,8 +107,8 @@ NodeWalker_ptr NodeWalker_create(const NuSMVEnv_ptr env, const char *name,
   \sa NodeWalker_create
 */
 void node_walker_init(NodeWalker_ptr self, const NuSMVEnv_ptr env,
-                      const char *name, int low, size_t num,
-                      boolean can_handle_null);
+		      const char *name, int low, size_t num,
+		      boolean can_handle_null);
 
 /*!
   \methodof NodeWalker
@@ -148,6 +148,6 @@ boolean node_walker_can_handle_null_node(const NodeWalker_ptr self);
   \sa NodeWalker_add_node_transformation
 */
 node_ptr node_walker_run_transformation_chain(const NodeWalker_ptr self,
-                                              node_ptr node);
+					      node_ptr node);
 
 #endif /* __NUSMV_CORE_NODE_NODE_WALKER_PRIVATE_H__ */

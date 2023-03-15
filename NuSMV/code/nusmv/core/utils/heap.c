@@ -87,9 +87,9 @@
 
   \todo Missing description
 */
-#define REALLOC(type, obj, num)                                                \
-  (obj) ? ((type *)realloc((char *)obj, sizeof(type) * (num)))                 \
-        : ((type *)malloc(sizeof(type) * (num)))
+#define REALLOC(type, obj, num)                                        \
+	(obj) ? ((type *)realloc((char *)obj, sizeof(type) * (num))) : \
+		((type *)malloc(sizeof(type) * (num)))
 #else
 #include "cudd/util.h"
 #include "nusmv/core/utils/defs.h"
@@ -103,14 +103,14 @@
 #define HEAP_MAXLENGTH_INIT 31
 
 struct heap_el {
-  float val;
-  void *el;
+	float val;
+	void *el;
 };
 
 struct heap_ {
-  int maxlength;
-  int length;
-  struct heap_el *array;
+	int maxlength;
+	int length;
+	struct heap_el *array;
 };
 
 /*!
@@ -122,166 +122,174 @@ typedef struct heap_el heap_el_struct;
 
 typedef struct heap_ heap_struct;
 
-heap heap_create(void) {
-  heap h = ALLOC(heap_struct, 1);
-  nusmv_assert(h);
+heap heap_create(void)
+{
+	heap h = ALLOC(heap_struct, 1);
+	nusmv_assert(h);
 
-  h->maxlength = HEAP_MAXLENGTH_INIT;
-  h->length = 0;
-  h->array = ALLOC(heap_el_struct, h->maxlength);
-  nusmv_assert(h->array);
+	h->maxlength = HEAP_MAXLENGTH_INIT;
+	h->length = 0;
+	h->array = ALLOC(heap_el_struct, h->maxlength);
+	nusmv_assert(h->array);
 
-  return h;
+	return h;
 }
 
-void heap_destroy(heap h) {
-  nusmv_assert(h);
-  nusmv_assert(h->length == 0);
+void heap_destroy(heap h)
+{
+	nusmv_assert(h);
+	nusmv_assert(h->length == 0);
 
-  FREE(h->array);
-  FREE(h);
+	FREE(h->array);
+	FREE(h);
 }
 
-static void heap_switch(heap h, int pos1, int pos2) {
-  float val = h->array[pos2].val;
-  void *el = h->array[pos2].el;
+static void heap_switch(heap h, int pos1, int pos2)
+{
+	float val = h->array[pos2].val;
+	void *el = h->array[pos2].el;
 
-  h->array[pos2].val = h->array[pos1].val;
-  h->array[pos2].el = h->array[pos1].el;
+	h->array[pos2].val = h->array[pos1].val;
+	h->array[pos2].el = h->array[pos1].el;
 
-  h->array[pos1].val = val;
-  h->array[pos1].el = el;
+	h->array[pos1].val = val;
+	h->array[pos1].el = el;
 }
 
-void heap_add(heap h, float val, void *el) {
-  nusmv_assert(h);
+void heap_add(heap h, float val, void *el)
+{
+	nusmv_assert(h);
 
-  if (h->length == h->maxlength) {
-    h->maxlength = h->maxlength * 2 + 1;
-    h->array = REALLOC(heap_el_struct, h->array, h->maxlength);
-    nusmv_assert(h->array);
-  }
+	if (h->length == h->maxlength) {
+		h->maxlength = h->maxlength * 2 + 1;
+		h->array = REALLOC(heap_el_struct, h->array, h->maxlength);
+		nusmv_assert(h->array);
+	}
 
-  {
-    int pos = h->length;
+	{
+		int pos = h->length;
 
-    h->length++;
+		h->length++;
 
-    h->array[pos].val = val;
-    h->array[pos].el = el;
+		h->array[pos].val = val;
+		h->array[pos].el = el;
 
-    while (pos > 0) {
-      int newpos = (pos - 1) / 2;
+		while (pos > 0) {
+			int newpos = (pos - 1) / 2;
 
-      if (h->array[pos].val > h->array[newpos].val) {
-        heap_switch(h, pos, newpos);
-        pos = newpos;
-      } else {
-        break;
-      }
-    }
-  }
+			if (h->array[pos].val > h->array[newpos].val) {
+				heap_switch(h, pos, newpos);
+				pos = newpos;
+			} else {
+				break;
+			}
+		}
+	}
 }
 
-int heap_isempty(heap h) {
-  nusmv_assert(h);
-  return (h->length == 0);
+int heap_isempty(heap h)
+{
+	nusmv_assert(h);
+	return (h->length == 0);
 }
 
-void *heap_getmax(heap h) {
-  void *el;
+void *heap_getmax(heap h)
+{
+	void *el;
 
-  nusmv_assert(h);
-  nusmv_assert(h->length > 0);
+	nusmv_assert(h);
+	nusmv_assert(h->length > 0);
 
-  el = h->array[0].el;
+	el = h->array[0].el;
 
-  h->length--;
+	h->length--;
 
-  if (h->length) {
-    int pos = 0;
+	if (h->length) {
+		int pos = 0;
 
-    h->array[0].val = h->array[h->length].val;
-    h->array[0].el = h->array[h->length].el;
+		h->array[0].val = h->array[h->length].val;
+		h->array[0].el = h->array[h->length].el;
 
-    while (2 * pos + 1 < h->length) {
+		while (2 * pos + 1 < h->length) {
+			int newpos = 2 * pos + 1;
 
-      int newpos = 2 * pos + 1;
-
-      if ((h->array[pos].val < h->array[newpos].val) ||
-          (h->array[pos].val < h->array[newpos + 1].val)) {
-        if (h->array[newpos].val >= h->array[newpos + 1].val) {
-          heap_switch(h, pos, newpos);
-          pos = newpos;
-        } else {
-          heap_switch(h, pos, newpos + 1);
-          pos = newpos + 1;
-        }
-      } else {
-        break;
-      }
-    }
-  }
-  return el;
+			if ((h->array[pos].val < h->array[newpos].val) ||
+			    (h->array[pos].val < h->array[newpos + 1].val)) {
+				if (h->array[newpos].val >=
+				    h->array[newpos + 1].val) {
+					heap_switch(h, pos, newpos);
+					pos = newpos;
+				} else {
+					heap_switch(h, pos, newpos + 1);
+					pos = newpos + 1;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+	return el;
 }
 
 #ifdef HEAP_TEST
 
-int main(int argc, char *argv[]) {
-  int length, num, c;
-  int *array;
-  heap h;
-  if (argc != 3) {
-    StreamMgr_print_error(streams, "Usage: %s <heap-length> <num-tests>\n",
-                          argv[0]);
-    return 1;
-  }
-  length = atoi(argv[1]);
-  num = atoi(argv[2]);
+int main(int argc, char *argv[])
+{
+	int length, num, c;
+	int *array;
+	heap h;
+	if (argc != 3) {
+		StreamMgr_print_error(streams,
+				      "Usage: %s <heap-length> <num-tests>\n",
+				      argv[0]);
+		return 1;
+	}
+	length = atoi(argv[1]);
+	num = atoi(argv[2]);
 
-  if (length <= 0) {
-    StreamMgr_print_error(streams, "Error: length <= 0\n");
-    return 1;
-  }
+	if (length <= 0) {
+		StreamMgr_print_error(streams, "Error: length <= 0\n");
+		return 1;
+	}
 
-  h = heap_create();
+	h = heap_create();
 
-  array = ALLOC(int, length);
-  nusmv_assert(array);
+	array = ALLOC(int, length);
+	nusmv_assert(array);
 
-  for (c = 1; c <= num; c++) {
-    int i, i1, i2;
-    StreamMgr_print_output(streams, "Test %2d:", c);
-    for (i = 0; i < length; i++) {
-      array[i] = i + 1;
-    }
-    for (i = 0; i < 4 * length; i++) {
-      i1 = utils_random() % length;
-      i2 = utils_random() % length;
-      if (i1 == i2)
-        continue;
-      array[i1] = array[i1] + array[i2];
-      array[i2] = array[i1] - array[i2];
-      array[i1] = array[i1] - array[i2];
-    }
-    for (i = 0; i < length; i++) {
-      StreamMgr_print_output(streams, " %d", array[i]);
-      heap_add(h, -array[i], (void *)array[i]);
-    }
-    StreamMgr_print_output(streams, "\n------->");
-    for (i = 0; i < length; i++) {
-      int val = (int)heap_getmax(h);
-      StreamMgr_print_output(streams, " %d", val);
-      nusmv_assert(val == i + 1);
-    }
-    StreamMgr_print_output(streams, "\n");
-    assert(heap_isempty(h));
-  }
+	for (c = 1; c <= num; c++) {
+		int i, i1, i2;
+		StreamMgr_print_output(streams, "Test %2d:", c);
+		for (i = 0; i < length; i++) {
+			array[i] = i + 1;
+		}
+		for (i = 0; i < 4 * length; i++) {
+			i1 = utils_random() % length;
+			i2 = utils_random() % length;
+			if (i1 == i2)
+				continue;
+			array[i1] = array[i1] + array[i2];
+			array[i2] = array[i1] - array[i2];
+			array[i1] = array[i1] - array[i2];
+		}
+		for (i = 0; i < length; i++) {
+			StreamMgr_print_output(streams, " %d", array[i]);
+			heap_add(h, -array[i], (void *)array[i]);
+		}
+		StreamMgr_print_output(streams, "\n------->");
+		for (i = 0; i < length; i++) {
+			int val = (int)heap_getmax(h);
+			StreamMgr_print_output(streams, " %d", val);
+			nusmv_assert(val == i + 1);
+		}
+		StreamMgr_print_output(streams, "\n");
+		assert(heap_isempty(h));
+	}
 
-  heap_destroy(h);
-  FREE(array);
+	heap_destroy(h);
+	FREE(array);
 
-  return 0;
+	return 0;
 }
 
 #endif

@@ -58,8 +58,8 @@
 */
 
 typedef struct shift_memoize_key_TAG {
-  be_ptr be;
-  int shift;
+	be_ptr be;
+	int shift;
 } shift_memoize_key;
 
 #endif /* __NUSMV_CORE_BE_BE_INT_H__ */

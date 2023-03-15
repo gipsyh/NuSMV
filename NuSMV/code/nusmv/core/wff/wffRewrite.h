@@ -37,20 +37,22 @@
 */
 
 enum WffRewriteFormulaKind_TAG {
-  WFF_REWRITE_FORMULA_KIND_FIRST = 0,
-  WFF_REWRITE_FORMULA_KIND_STATE = 1, /* non-temporal and without input vars or
+	WFF_REWRITE_FORMULA_KIND_FIRST = 0,
+	WFF_REWRITE_FORMULA_KIND_STATE =
+		1, /* non-temporal and without input vars or
                                       next operator */
-  WFF_REWRITE_FORMULA_KIND_INPUT = 1
-                                   << 1, /* non-temporal but with input vars */
-  WFF_REWRITE_FORMULA_KIND_NEXT =
-      1 << 2, /* non-temporal but with next operator */
-  WFF_REWRITE_FORMULA_KIND_INPUT_NEXT =
-      WFF_REWRITE_FORMULA_KIND_INPUT |
-      WFF_REWRITE_FORMULA_KIND_NEXT,      /* non-temporal but with input vars
+	WFF_REWRITE_FORMULA_KIND_INPUT =
+		1 << 1, /* non-temporal but with input vars */
+	WFF_REWRITE_FORMULA_KIND_NEXT =
+		1 << 2, /* non-temporal but with next operator */
+	WFF_REWRITE_FORMULA_KIND_INPUT_NEXT =
+		WFF_REWRITE_FORMULA_KIND_INPUT |
+		WFF_REWRITE_FORMULA_KIND_NEXT, /* non-temporal but with input vars
                                                     and next operator */
-  WFF_REWRITE_FORMULA_KIND_TEMP = 1 << 3, /* temporal (it must be without input
+	WFF_REWRITE_FORMULA_KIND_TEMP =
+		1 << 3, /* temporal (it must be without input
                                              vars or next operator) */
-  WFF_REWRITE_FORMULA_KIND_LAST = 1 << 4
+	WFF_REWRITE_FORMULA_KIND_LAST = 1 << 4
 };
 typedef enum WffRewriteFormulaKind_TAG WffRewriteFormulaKind;
 
@@ -114,8 +116,8 @@ typedef enum WffRewriteFormulaKind_TAG WffRewriteFormulaKind;
   TRANS next(sv) <-> (s < i);
 */
 typedef enum {
-  WFF_REWRITE_METHOD_STANDARD,
-  WFF_REWRITE_METHOD_DEADLOCK_FREE,
+	WFF_REWRITE_METHOD_STANDARD,
+	WFF_REWRITE_METHOD_DEADLOCK_FREE,
 } WffRewriteMethod;
 
 /*! \brief The type of expected input property.
@@ -127,8 +129,8 @@ typedef enum {
   of the transition system (e.g. p -> G q, .. G(p) -> G(q)), ....)
 */
 typedef enum {
-  WFF_REWRITER_REWRITE_INPUT_NEXT,
-  WFF_REWRITER_LTL_2_INVAR
+	WFF_REWRITER_REWRITE_INPUT_NEXT,
+	WFF_REWRITER_LTL_2_INVAR
 } WffRewriterExpectedProperty;
 
 /*---------------------------------------------------------------------------*/
@@ -161,10 +163,12 @@ typedef enum {
 
   \sa Prop_Rewriter_private.h
 */
-Pair_ptr Wff_Rewrite_rewrite_formula(
-    NuSMVEnv_ptr const env, const WffRewriteMethod method,
-    const WffRewriterExpectedProperty eproptype, SymbLayer_ptr layer,
-    FlatHierarchy_ptr outfh, node_ptr const spec, const short int spec_type);
+Pair_ptr
+Wff_Rewrite_rewrite_formula(NuSMVEnv_ptr const env,
+			    const WffRewriteMethod method,
+			    const WffRewriterExpectedProperty eproptype,
+			    SymbLayer_ptr layer, FlatHierarchy_ptr outfh,
+			    node_ptr const spec, const short int spec_type);
 
 /*!
   \brief Return an equivalent specification, without input vars
@@ -181,11 +185,11 @@ Pair_ptr Wff_Rewrite_rewrite_formula(
   \sa Prop_Rewriter_private.h
 */
 Pair_ptr Wff_Rewrite_rewrite_formula_generic(
-    NuSMVEnv_ptr const env, const WffRewriteMethod method,
-    const WffRewriterExpectedProperty eproptype, SymbLayer_ptr layer,
-    FlatHierarchy_ptr outfh, node_ptr const spec, const short int spec_type,
-    const boolean initialize_monitor_to_true,
-    const boolean ltl2invar_negate_property);
+	NuSMVEnv_ptr const env, const WffRewriteMethod method,
+	const WffRewriterExpectedProperty eproptype, SymbLayer_ptr layer,
+	FlatHierarchy_ptr outfh, node_ptr const spec, const short int spec_type,
+	const boolean initialize_monitor_to_true,
+	const boolean ltl2invar_negate_property);
 
 /*!
   \brief Checks if "wff" contains input variables or next
@@ -193,7 +197,7 @@ Pair_ptr Wff_Rewrite_rewrite_formula_generic(
 
 */
 boolean Wff_Rewrite_is_rewriting_needed(SymbTable_ptr st, node_ptr wff,
-                                        node_ptr context);
+					node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

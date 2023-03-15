@@ -71,8 +71,9 @@ typedef struct Sset_TAG *Sset_ptr;
 
   \todo Missing description
 */
-#define SSET_FOREACH(sset, iter)                                               \
-  for (iter = SSet_first(sset); SSiter_is_valid(iter); iter = SSiter_next(iter))
+#define SSET_FOREACH(sset, iter)                             \
+	for (iter = SSet_first(sset); SSiter_is_valid(iter); \
+	     iter = SSiter_next(iter))
 
 /* internal type. it cannot be used outside. */
 
@@ -101,7 +102,7 @@ typedef void *Sset_key;
    C type checker will be able to catch incorrect use of iterators.
    This does not influence the efficiency */
 typedef struct Ssiter_TAG {
-  Ssnode_ptr node;
+	Ssnode_ptr node;
 } Ssiter;
 
 /* ---------------------------------------------------------------------- */
@@ -150,7 +151,7 @@ Sset_ptr Sset_copy(const Sset_ptr self);
 
 */
 Sset_ptr Sset_copy_func(const Sset_ptr self, void *(*func)(void *, void *),
-                        void *arg);
+			void *arg);
 
 /*!
   \methodof Sset

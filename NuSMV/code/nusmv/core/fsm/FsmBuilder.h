@@ -71,8 +71,8 @@ typedef struct FsmBuilder_TAG *FsmBuilder_ptr;
 
   \todo Missing description
 */
-#define FSM_BUILDER_CHECK_INSTANCE(x)                                          \
-  (nusmv_assert(FSM_BUILDER(x) != FSM_BUILDER(NULL)))
+#define FSM_BUILDER_CHECK_INSTANCE(x) \
+	(nusmv_assert(FSM_BUILDER(x) != FSM_BUILDER(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -103,8 +103,8 @@ void FsmBuilder_destroy(FsmBuilder_ptr self);
   The caller becomes the owner of the returned object
 */
 SexpFsm_ptr FsmBuilder_create_scalar_sexp_fsm(const FsmBuilder_ptr self,
-                                              FlatHierarchy_ptr flat_hierarchy,
-                                              const Set_t vars_list);
+					      FlatHierarchy_ptr flat_hierarchy,
+					      const Set_t vars_list);
 
 /*!
   \methodof FsmBuilder
@@ -120,8 +120,8 @@ SexpFsm_ptr FsmBuilder_create_scalar_sexp_fsm(const FsmBuilder_ptr self,
                       while parsing it.
 */
 BoolSexpFsm_ptr FsmBuilder_create_boolean_sexp_fsm(
-    const FsmBuilder_ptr self, FlatHierarchy_ptr flat_hierarchy,
-    const Set_t vars, BddEnc_ptr bdd_enc, SymbLayer_ptr det_layer);
+	const FsmBuilder_ptr self, FlatHierarchy_ptr flat_hierarchy,
+	const Set_t vars, BddEnc_ptr bdd_enc, SymbLayer_ptr det_layer);
 
 /*!
   \methodof FsmBuilder
@@ -133,8 +133,8 @@ BoolSexpFsm_ptr FsmBuilder_create_boolean_sexp_fsm(
   into account.
 */
 BddFsm_ptr FsmBuilder_create_bdd_fsm(const FsmBuilder_ptr self, BddEnc_ptr enc,
-                                     const SexpFsm_ptr sexp_fsm,
-                                     const TransType trans_type);
+				     const SexpFsm_ptr sexp_fsm,
+				     const TransType trans_type);
 
 /*!
   \methodof FsmBuilder
@@ -146,9 +146,10 @@ BddFsm_ptr FsmBuilder_create_bdd_fsm(const FsmBuilder_ptr self, BddEnc_ptr enc,
   Note: The functions will take a copy of provided cubes.
 */
 BddFsm_ptr FsmBuilder_create_bdd_fsm_of_vars(
-    const FsmBuilder_ptr self, const SexpFsm_ptr sexp_fsm,
-    const TransType trans_type, BddEnc_ptr enc, BddVarSet_ptr state_vars_cube,
-    BddVarSet_ptr input_vars_cube, BddVarSet_ptr next_state_vars_cube);
+	const FsmBuilder_ptr self, const SexpFsm_ptr sexp_fsm,
+	const TransType trans_type, BddEnc_ptr enc,
+	BddVarSet_ptr state_vars_cube, BddVarSet_ptr input_vars_cube,
+	BddVarSet_ptr next_state_vars_cube);
 
 /*!
   \methodof FsmBuilder
@@ -162,6 +163,6 @@ BddFsm_ptr FsmBuilder_create_bdd_fsm_of_vars(
   list. Returned list should be destroyed by the caller.
 */
 ClusterList_ptr FsmBuilder_clusterize_expr(FsmBuilder_ptr self, BddEnc_ptr enc,
-                                           Expr_ptr expr);
+					   Expr_ptr expr);
 
 #endif /* __NUSMV_CORE_FSM_FSM_BUILDER_H__ */

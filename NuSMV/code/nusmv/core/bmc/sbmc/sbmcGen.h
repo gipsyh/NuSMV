@@ -59,7 +59,7 @@
 
 */
 be_ptr Bmc_Gen_SBMCProblem(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                           const int k, const int l);
+			   const int k, const int l);
 
 /*!
   \brief Top-level function for bmc of PSL properties
@@ -77,10 +77,10 @@ be_ptr Bmc_Gen_SBMCProblem(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
   \se None
 */
 int Sbmc_Gen_check_psl_property(NuSMVEnv_ptr env, Prop_ptr prop,
-                                boolean dump_prob, boolean inc_sat,
-                                boolean do_completeness_check,
-                                boolean do_virtual_unrolling,
-                                boolean single_prob, int k, int rel_loop);
+				boolean dump_prob, boolean inc_sat,
+				boolean do_completeness_check,
+				boolean do_virtual_unrolling,
+				boolean single_prob, int k, int rel_loop);
 
 /**AutomaticEnd***************************************************************/
 

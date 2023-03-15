@@ -74,10 +74,10 @@
 */
 
 typedef enum TransType_TAG {
-  TRANS_TYPE_INVALID = -1,
-  TRANS_TYPE_MONOLITHIC = 0,
-  TRANS_TYPE_THRESHOLD,
-  TRANS_TYPE_IWLS95
+	TRANS_TYPE_INVALID = -1,
+	TRANS_TYPE_MONOLITHIC = 0,
+	TRANS_TYPE_THRESHOLD,
+	TRANS_TYPE_IWLS95
 } TransType;
 
 /*---------------------------------------------------------------------------*/

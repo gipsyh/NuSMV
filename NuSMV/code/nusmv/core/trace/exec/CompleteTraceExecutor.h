@@ -63,8 +63,9 @@ typedef struct CompleteTraceExecutor_TAG *CompleteTraceExecutor_ptr;
 
   \todo Missing description
 */
-#define COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                           \
-  (nusmv_assert(COMPLETE_TRACE_EXECUTOR(self) != COMPLETE_TRACE_EXECUTOR(NULL)))
+#define COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)   \
+	(nusmv_assert(COMPLETE_TRACE_EXECUTOR(self) != \
+		      COMPLETE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -107,7 +108,7 @@ void CompleteTraceExecutor_destroy(CompleteTraceExecutor_ptr self);
   \sa PartialTraceExecutor_execute
 */
 boolean CompleteTraceExecutor_execute(const CompleteTraceExecutor_ptr self,
-                                      const Trace_ptr trace, int *n_steps);
+				      const Trace_ptr trace, int *n_steps);
 
 /**AutomaticEnd***************************************************************/
 

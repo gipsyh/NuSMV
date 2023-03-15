@@ -69,9 +69,9 @@ typedef struct Pair_TAG *Pair_ptr;
 */
 
 typedef struct Pair_TAG {
-  void *first;
-  void *second;
-  boolean frozen;
+	void *first;
+	void *second;
+	boolean frozen;
 } Pair;
 
 /**AutomaticStart*************************************************************/

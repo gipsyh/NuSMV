@@ -58,8 +58,8 @@ typedef struct ParserAp_TAG *ParserAp_ptr;
 
   \todo Missing description
 */
-#define PARSER_AP_CHECK_INSTANCE(x)                                            \
-  (nusmv_assert(PARSER_AP(x) != PARSER_AP(NULL)))
+#define PARSER_AP_CHECK_INSTANCE(x) \
+	(nusmv_assert(PARSER_AP(x) != PARSER_AP(NULL)))
 
 /*!
   \methodof ParserAp

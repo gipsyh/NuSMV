@@ -77,28 +77,27 @@
 typedef enum { DEF_STRUCT_HASH_PTR } DefStructType;
 
 typedef struct NuSMVEnvDefStruct_TAG {
-  DefStructType type;
-  void *instance;
+	DefStructType type;
+	void *instance;
 } NuSMVEnvDefStruct;
 
 typedef struct NuSMVEnv_TAG {
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-
-  /* Custom */
-  OAHash_ptr custom_values;
-  hash_ptr flag_values;
-  UStringMgr_ptr strmgr;
+	/* Custom */
+	OAHash_ptr custom_values;
+	hash_ptr flag_values;
+	UStringMgr_ptr strmgr;
 
 #ifdef NUSMV_ENV_DEBUG_MODE
-  size_t instance_id;
+	size_t instance_id;
 #endif
 
-  void *fast_values[FAST_ARRAY_SIZE];
+	void *fast_values[FAST_ARRAY_SIZE];
 
-  NodeList_ptr handled_structures;
+	NodeList_ptr handled_structures;
 
 } NuSMVEnv;
 
@@ -127,224 +126,244 @@ static void nusmv_env_deinit(NuSMVEnv_ptr self);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-NuSMVEnv_ptr NuSMVEnv_create(void) {
-  NuSMVEnv_ptr self = ALLOC(NuSMVEnv, 1);
-  NUSMV_ENV_CHECK_INSTANCE(self);
+NuSMVEnv_ptr NuSMVEnv_create(void)
+{
+	NuSMVEnv_ptr self = ALLOC(NuSMVEnv, 1);
+	NUSMV_ENV_CHECK_INSTANCE(self);
 
-  nusmv_env_init(self);
-  return self;
+	nusmv_env_init(self);
+	return self;
 }
 
-void NuSMVEnv_destroy(NuSMVEnv_ptr self) {
-  NUSMV_ENV_CHECK_INSTANCE(self);
+void NuSMVEnv_destroy(NuSMVEnv_ptr self)
+{
+	NUSMV_ENV_CHECK_INSTANCE(self);
 
-  nusmv_env_deinit(self);
-  FREE(self);
+	nusmv_env_deinit(self);
+	FREE(self);
 }
 
-void *NuSMVEnv_get_value(const NuSMVEnv_ptr self, const char *key) {
-  void *res = (void *)NULL;
+void *NuSMVEnv_get_value(const NuSMVEnv_ptr self, const char *key)
+{
+	void *res = (void *)NULL;
 
 #ifdef NUSMV_ENV_DEBUG_MODE
-  fprintf(stderr, "[NuSMVEnv %zu] Getting value for instance '%s'\n",
-          self->instance_id, key);
+	fprintf(stderr, "[NuSMVEnv %zu] Getting value for instance '%s'\n",
+		self->instance_id, key);
 #endif
 
-  if (key[0] == '+') {
-    res = self->fast_values[(short int)key[1] - 33];
-  } else {
-    string_ptr ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+	if (key[0] == '+') {
+		res = self->fast_values[(short int)key[1] - 33];
+	} else {
+		string_ptr ustring =
+			UStringMgr_find_string(self->strmgr, (char *)key);
 
-    nusmv_assert(OA_HASH(NULL) != self->custom_values);
+		nusmv_assert(OA_HASH(NULL) != self->custom_values);
 
-    res = (void *)OAHash_lookup(self->custom_values, ustring);
-  }
+		res = (void *)OAHash_lookup(self->custom_values, ustring);
+	}
 
-  nusmv_assert((void *)NULL != res);
+	nusmv_assert((void *)NULL != res);
 
-  return res;
+	return res;
 }
 
-boolean NuSMVEnv_has_value(const NuSMVEnv_ptr self, const char *key) {
-  string_ptr ustring;
+boolean NuSMVEnv_has_value(const NuSMVEnv_ptr self, const char *key)
+{
+	string_ptr ustring;
 
-  if (key[0] == '+') {
-    return ((void *)NULL != (self->fast_values[(short int)key[1] - 33]));
-  }
+	if (key[0] == '+') {
+		return ((void *)NULL !=
+			(self->fast_values[(short int)key[1] - 33]));
+	}
 
-  if (OA_HASH(NULL) == self->custom_values) {
-    return false;
-  }
+	if (OA_HASH(NULL) == self->custom_values) {
+		return false;
+	}
 
-  ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+	ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-  return (Nil != OAHash_lookup(self->custom_values, ustring));
+	return (Nil != OAHash_lookup(self->custom_values, ustring));
 }
 
-void NuSMVEnv_set_value(NuSMVEnv_ptr self, const char *key, void *instance) {
+void NuSMVEnv_set_value(NuSMVEnv_ptr self, const char *key, void *instance)
+{
 #ifdef NUSMV_ENV_DEBUG_MODE
-  fprintf(stderr, "[NuSMVEnv %zu] Setting value for instance '%s'\n",
-          self->instance_id, key);
+	fprintf(stderr, "[NuSMVEnv %zu] Setting value for instance '%s'\n",
+		self->instance_id, key);
 #endif
 
-  nusmv_assert(NULL != instance);
+	nusmv_assert(NULL != instance);
 
-  if (key[0] == '+') {
-    nusmv_assert((void *)NULL == self->fast_values[(short int)key[1] - 33]);
-    self->fast_values[(short int)key[1] - 33] = instance;
-  } else {
-    string_ptr ustring;
+	if (key[0] == '+') {
+		nusmv_assert((void *)NULL ==
+			     self->fast_values[(short int)key[1] - 33]);
+		self->fast_values[(short int)key[1] - 33] = instance;
+	} else {
+		string_ptr ustring;
 
-    if (OA_HASH(NULL) == self->custom_values) {
-      self->custom_values = OAHash_create(OAHash_pointer_eq_fun,
-                                          OAHash_pointer_hash_fun, NULL, NULL);
-    }
+		if (OA_HASH(NULL) == self->custom_values) {
+			self->custom_values = OAHash_create(
+				OAHash_pointer_eq_fun, OAHash_pointer_hash_fun,
+				NULL, NULL);
+		}
 
-    ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+		ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-    nusmv_assert(Nil == OAHash_lookup(self->custom_values, ustring));
+		nusmv_assert(Nil ==
+			     OAHash_lookup(self->custom_values, ustring));
 
-    OAHash_insert(self->custom_values, ustring, instance);
-  }
+		OAHash_insert(self->custom_values, ustring, instance);
+	}
 }
 
 void *NuSMVEnv_set_or_replace_value(NuSMVEnv_ptr self, const char *key,
-                                    void *instance) {
-  void *old_value = (void *)NULL;
+				    void *instance)
+{
+	void *old_value = (void *)NULL;
 
 #ifdef NUSMV_ENV_DEBUG_MODE
-  fprintf(stderr,
-          "[NuSMVEnv %zu] Setting or replacing value for instance '%s'\n",
-          self->instance_id, key);
+	fprintf(stderr,
+		"[NuSMVEnv %zu] Setting or replacing value for instance '%s'\n",
+		self->instance_id, key);
 #endif
 
-  if (key[0] == '+') {
-    old_value = self->fast_values[(short int)key[1] - 33];
-    self->fast_values[(short int)key[1] - 33] = instance;
-  } else {
-    string_ptr ustring;
+	if (key[0] == '+') {
+		old_value = self->fast_values[(short int)key[1] - 33];
+		self->fast_values[(short int)key[1] - 33] = instance;
+	} else {
+		string_ptr ustring;
 
-    if (OA_HASH(NULL) == self->custom_values) {
-      self->custom_values = OAHash_create(OAHash_pointer_eq_fun,
-                                          OAHash_pointer_hash_fun, NULL, NULL);
-    }
+		if (OA_HASH(NULL) == self->custom_values) {
+			self->custom_values = OAHash_create(
+				OAHash_pointer_eq_fun, OAHash_pointer_hash_fun,
+				NULL, NULL);
+		}
 
-    ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+		ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-    old_value = OAHash_lookup(self->custom_values, ustring);
+		old_value = OAHash_lookup(self->custom_values, ustring);
 
-    OAHash_insert(self->custom_values, ustring, instance);
-  }
+		OAHash_insert(self->custom_values, ustring, instance);
+	}
 
-  return old_value;
+	return old_value;
 }
 
-void *NuSMVEnv_remove_value(NuSMVEnv_ptr self, const char *key) {
-  string_ptr ustring;
-  void *res = (void *)NULL;
+void *NuSMVEnv_remove_value(NuSMVEnv_ptr self, const char *key)
+{
+	string_ptr ustring;
+	void *res = (void *)NULL;
 
 #ifdef NUSMV_ENV_DEBUG_MODE
-  fprintf(stderr, "[NuSMVEnv %zu] Removing value for instance '%s'\n",
-          self->instance_id, key);
+	fprintf(stderr, "[NuSMVEnv %zu] Removing value for instance '%s'\n",
+		self->instance_id, key);
 #endif
 
-  if (key[0] == '+') {
-    res = self->fast_values[(short int)key[1] - 33];
-    self->fast_values[(short int)key[1] - 33] = (void *)NULL;
-  } else {
-    if (OA_HASH(NULL) == self->custom_values) {
-      return (void *)NULL;
-    }
+	if (key[0] == '+') {
+		res = self->fast_values[(short int)key[1] - 33];
+		self->fast_values[(short int)key[1] - 33] = (void *)NULL;
+	} else {
+		if (OA_HASH(NULL) == self->custom_values) {
+			return (void *)NULL;
+		}
 
-    ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+		ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-    res = OAHash_lookup(self->custom_values, ustring);
-    OAHash_remove(self->custom_values, ustring);
+		res = OAHash_lookup(self->custom_values, ustring);
+		OAHash_remove(self->custom_values, ustring);
 
-    nusmv_assert((void *)NULL != res);
-  }
+		nusmv_assert((void *)NULL != res);
+	}
 
-  return res;
+	return res;
 }
 
-boolean NuSMVEnv_get_flag(const NuSMVEnv_ptr self, const char *key) {
-  string_ptr ustring;
+boolean NuSMVEnv_get_flag(const NuSMVEnv_ptr self, const char *key)
+{
+	string_ptr ustring;
 
-  if ((hash_ptr)NULL == self->flag_values) {
-    return false;
-  }
+	if ((hash_ptr)NULL == self->flag_values) {
+		return false;
+	}
 
-  ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+	ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-  return NODE_TO_INT(find_assoc(self->flag_values, NODE_PTR(ustring))) == 2
-             ? true
-             : false;
+	return NODE_TO_INT(find_assoc(self->flag_values, NODE_PTR(ustring))) ==
+			       2 ?
+		       true :
+		       false;
 }
 
-boolean NuSMVEnv_has_flag(const NuSMVEnv_ptr self, const char *key) {
-  string_ptr ustring;
+boolean NuSMVEnv_has_flag(const NuSMVEnv_ptr self, const char *key)
+{
+	string_ptr ustring;
 
-  if ((hash_ptr)NULL == self->flag_values) {
-    return false;
-  }
+	if ((hash_ptr)NULL == self->flag_values) {
+		return false;
+	}
 
-  ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+	ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-  return (Nil != find_assoc(self->flag_values, NODE_PTR(ustring)));
+	return (Nil != find_assoc(self->flag_values, NODE_PTR(ustring)));
 }
 
-void NuSMVEnv_set_flag(NuSMVEnv_ptr self, const char *key, boolean value) {
-  string_ptr ustring;
+void NuSMVEnv_set_flag(NuSMVEnv_ptr self, const char *key, boolean value)
+{
+	string_ptr ustring;
 
-  if ((hash_ptr)NULL == self->flag_values) {
-    self->flag_values = new_assoc();
-  }
+	if ((hash_ptr)NULL == self->flag_values) {
+		self->flag_values = new_assoc();
+	}
 
-  ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+	ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-  insert_assoc(self->flag_values, NODE_PTR(ustring),
-               (value ? NODE_FROM_INT(2) : NODE_FROM_INT(1)));
+	insert_assoc(self->flag_values, NODE_PTR(ustring),
+		     (value ? NODE_FROM_INT(2) : NODE_FROM_INT(1)));
 }
 
-boolean NuSMVEnv_remove_flag(NuSMVEnv_ptr self, const char *key) {
-  string_ptr ustring;
+boolean NuSMVEnv_remove_flag(NuSMVEnv_ptr self, const char *key)
+{
+	string_ptr ustring;
 
-  if ((hash_ptr)NULL == self->flag_values) {
-    return false;
-  }
+	if ((hash_ptr)NULL == self->flag_values) {
+		return false;
+	}
 
-  ustring = UStringMgr_find_string(self->strmgr, (char *)key);
+	ustring = UStringMgr_find_string(self->strmgr, (char *)key);
 
-  return NODE_TO_INT(remove_assoc(self->flag_values, NODE_PTR(ustring))) == 2
-             ? true
-             : false;
+	return NODE_TO_INT(remove_assoc(self->flag_values,
+					NODE_PTR(ustring))) == 2 ?
+		       true :
+		       false;
 }
 
-hash_ptr NuSMVEnv_get_handled_hash_ptr(NuSMVEnv_ptr self, const char *key) {
-  hash_ptr res;
+hash_ptr NuSMVEnv_get_handled_hash_ptr(NuSMVEnv_ptr self, const char *key)
+{
+	hash_ptr res;
 
-  NUSMV_ENV_CHECK_INSTANCE(self);
+	NUSMV_ENV_CHECK_INSTANCE(self);
 
-  if (NuSMVEnv_has_value(self, key)) {
-    res = (hash_ptr)NuSMVEnv_get_value(self, key);
-  } else {
-    NuSMVEnvDefStruct *neds = ALLOC(NuSMVEnvDefStruct, 1);
+	if (NuSMVEnv_has_value(self, key)) {
+		res = (hash_ptr)NuSMVEnv_get_value(self, key);
+	} else {
+		NuSMVEnvDefStruct *neds = ALLOC(NuSMVEnvDefStruct, 1);
 
-    res = new_assoc();
+		res = new_assoc();
 
-    NuSMVEnv_set_value(self, key, res);
+		NuSMVEnv_set_value(self, key, res);
 
-    if (NODE_LIST(NULL) == self->handled_structures) {
-      self->handled_structures = NodeList_create();
-    }
+		if (NODE_LIST(NULL) == self->handled_structures) {
+			self->handled_structures = NodeList_create();
+		}
 
-    neds->type = DEF_STRUCT_HASH_PTR;
-    neds->instance = res;
+		neds->type = DEF_STRUCT_HASH_PTR;
+		neds->instance = res;
 
-    NodeList_append(self->handled_structures, NODE_PTR(neds));
-  }
+		NodeList_append(self->handled_structures, NODE_PTR(neds));
+	}
 
-  return res;
+	return res;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -362,20 +381,21 @@ hash_ptr NuSMVEnv_get_handled_hash_ptr(NuSMVEnv_ptr self, const char *key) {
 
   \sa NuSMVEnv_create
 */
-static void nusmv_env_init(NuSMVEnv_ptr self) {
+static void nusmv_env_init(NuSMVEnv_ptr self)
+{
 #ifdef NUSMV_ENV_DEBUG_MODE
-  self->instance_id = nusmv_env_instance_count;
-  nusmv_env_instance_count++;
-  fprintf(stderr, "[NuSMVEnv %zu] Created instance\n", self->instance_id);
+	self->instance_id = nusmv_env_instance_count;
+	nusmv_env_instance_count++;
+	fprintf(stderr, "[NuSMVEnv %zu] Created instance\n", self->instance_id);
 #endif
 
-  /* members initialization */
-  self->custom_values = OA_HASH(NULL);
-  self->flag_values = (hash_ptr)NULL;
-  self->strmgr = UStringMgr_create();
-  self->handled_structures = NODE_LIST(NULL);
+	/* members initialization */
+	self->custom_values = OA_HASH(NULL);
+	self->flag_values = (hash_ptr)NULL;
+	self->strmgr = UStringMgr_create();
+	self->handled_structures = NODE_LIST(NULL);
 
-  memset(self->fast_values, 0, sizeof(void *) * FAST_ARRAY_SIZE);
+	memset(self->fast_values, 0, sizeof(void *) * FAST_ARRAY_SIZE);
 }
 
 /*!
@@ -385,42 +405,46 @@ static void nusmv_env_init(NuSMVEnv_ptr self) {
 
   \sa NuSMVEnv_destroy
 */
-static void nusmv_env_deinit(NuSMVEnv_ptr self) {
-
+static void nusmv_env_deinit(NuSMVEnv_ptr self)
+{
 #ifdef NUSMV_ENV_DEBUG_MODE
-  fprintf(stderr, "[NuSMVEnv %zu] Destroying instance\n", self->instance_id);
+	fprintf(stderr, "[NuSMVEnv %zu] Destroying instance\n",
+		self->instance_id);
 #endif
-  /* members deinitialization */
-  if (OA_HASH(NULL) != self->custom_values) {
-    OAHash_destroy(self->custom_values);
-  }
+	/* members deinitialization */
+	if (OA_HASH(NULL) != self->custom_values) {
+		OAHash_destroy(self->custom_values);
+	}
 
-  if ((hash_ptr)NULL != self->flag_values) {
-    free_assoc(self->flag_values);
-  }
+	if ((hash_ptr)NULL != self->flag_values) {
+		free_assoc(self->flag_values);
+	}
 
-  if (NODE_LIST(NULL) != self->handled_structures) {
-    ListIter_ptr iter;
+	if (NODE_LIST(NULL) != self->handled_structures) {
+		ListIter_ptr iter;
 
-    NODE_LIST_FOREACH(self->handled_structures, iter) {
-      NuSMVEnvDefStruct *neds = (NuSMVEnvDefStruct *)NodeList_get_elem_at(
-          self->handled_structures, iter);
+		NODE_LIST_FOREACH(self->handled_structures, iter)
+		{
+			NuSMVEnvDefStruct *neds =
+				(NuSMVEnvDefStruct *)NodeList_get_elem_at(
+					self->handled_structures, iter);
 
-      switch (neds->type) {
-      case DEF_STRUCT_HASH_PTR:
-        free_assoc((hash_ptr)neds->instance);
-        break;
-      default:
-        error_unreachable_code_msg("Unhandled structure type");
-      }
+			switch (neds->type) {
+			case DEF_STRUCT_HASH_PTR:
+				free_assoc((hash_ptr)neds->instance);
+				break;
+			default:
+				error_unreachable_code_msg(
+					"Unhandled structure type");
+			}
 
-      FREE(neds);
-    }
+			FREE(neds);
+		}
 
-    NodeList_destroy(self->handled_structures);
-  }
+		NodeList_destroy(self->handled_structures);
+	}
 
-  UStringMgr_destroy(self->strmgr);
+	UStringMgr_destroy(self->strmgr);
 }
 
 /**AutomaticEnd***************************************************************/

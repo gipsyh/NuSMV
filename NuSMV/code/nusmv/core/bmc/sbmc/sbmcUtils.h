@@ -127,7 +127,7 @@ void sbmc_increment_unique_id(const NuSMVEnv_ptr env);
   \se None
 */
 void sbmc_print_node(const NuSMVEnv_ptr env, FILE *out, const char *prefix,
-                     node_ptr node, const char *postfix);
+		     node_ptr node, const char *postfix);
 
 /*!
   \brief Prints a lsList of node_ptr
@@ -148,7 +148,7 @@ void sbmc_print_node_list(const NuSMVEnv_ptr env, FILE *out, lsList l);
   \se None
 */
 node_ptr sbmc_add_new_state_variable(const NuSMVEnv_ptr env,
-                                     SymbLayer_ptr layer, const char *name);
+				     SymbLayer_ptr layer, const char *name);
 
 /*!
   \brief Compute the variables that occur in the formula ltlspec.
@@ -170,7 +170,7 @@ lsList sbmc_find_formula_vars(const NuSMVEnv_ptr env, node_ptr ltlspec);
   \se None
 */
 void sbmc_print_varmap(const NuSMVEnv_ptr env, FILE *out, node_ptr node,
-                       sbmc_node_info *info);
+		       sbmc_node_info *info);
 
 /*!
   \brief Prints some of the information associated to a G
@@ -182,7 +182,7 @@ void sbmc_print_varmap(const NuSMVEnv_ptr env, FILE *out, node_ptr node,
   \se None
 */
 void sbmc_print_Gvarmap(const NuSMVEnv_ptr env, FILE *out, node_ptr var,
-                        node_ptr formula);
+			node_ptr formula);
 
 /*!
   \brief Prints some of the information associated to a F
@@ -194,7 +194,7 @@ void sbmc_print_Gvarmap(const NuSMVEnv_ptr env, FILE *out, node_ptr var,
   \se None
 */
 void sbmc_print_Fvarmap(const NuSMVEnv_ptr env, FILE *out, node_ptr var,
-                        node_ptr formula);
+			node_ptr formula);
 
 /*!
   \brief Creates a new fresh state variable.
@@ -206,7 +206,7 @@ void sbmc_print_Fvarmap(const NuSMVEnv_ptr env, FILE *out, node_ptr var,
   \se index is incremented by one.
 */
 node_ptr sbmc_1_fresh_state_var(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
-                                unsigned int *index);
+				unsigned int *index);
 
 /*!
   \brief Creates N new fresh state variables.
@@ -219,7 +219,7 @@ node_ptr sbmc_1_fresh_state_var(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
   \se index is incremented by N.
 */
 array_t *sbmc_n_fresh_state_vars(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
-                                 const unsigned int n, unsigned int *index);
+				 const unsigned int n, unsigned int *index);
 
 /*!
   \brief Creates info->pastdepth+1 new state variables
@@ -234,10 +234,10 @@ array_t *sbmc_n_fresh_state_vars(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
   state_vars_formula_pdx and new_var_index are updated accordingly.
 */
 void sbmc_allocate_trans_vars(const NuSMVEnv_ptr env, sbmc_node_info *info,
-                              SymbLayer_ptr layer,
-                              lsList state_vars_formula_pd0,
-                              lsList state_vars_formula_pdx,
-                              unsigned int *new_var_index);
+			      SymbLayer_ptr layer,
+			      lsList state_vars_formula_pd0,
+			      lsList state_vars_formula_pdx,
+			      unsigned int *new_var_index);
 
 /*!
   \brief Takes a property and return the negation of the
@@ -273,7 +273,7 @@ node_ptr sbmc_make_boolean_formula(BddEnc_ptr bdd_enc, Prop_ptr ltlprop);
   \se svs is modified to store retrieved information.
 */
 void sbmc_find_relevant_vars(state_vars_struct *svs, BeFsm_ptr be_fsm,
-                             node_ptr bltlspec);
+			     node_ptr bltlspec);
 
 /*!
   \brief Extracts a trace from a sat assignment.
@@ -287,10 +287,10 @@ void sbmc_find_relevant_vars(state_vars_struct *svs, BeFsm_ptr be_fsm,
                       Sbmc_Utils_fill_cntexample
 */
 Trace_ptr Sbmc_Utils_generate_cntexample(BeEnc_ptr be_enc,
-                                         sbmc_MetaSolver *solver,
-                                         node_ptr l_var, const int k,
-                                         const char *trace_name,
-                                         NodeList_ptr symbols);
+					 sbmc_MetaSolver *solver,
+					 node_ptr l_var, const int k,
+					 const char *trace_name,
+					 NodeList_ptr symbols);
 
 /*!
   \brief Extracts a trace from a sat assignment, and prints it.
@@ -304,9 +304,12 @@ Trace_ptr Sbmc_Utils_generate_cntexample(BeEnc_ptr be_enc,
                       Sbmc_Utils_generate_cntexample
                       Sbmc_Utils_fill_cntexample
 */
-Trace_ptr Sbmc_Utils_generate_and_print_cntexample(
-    BeEnc_ptr be_enc, TraceMgr_ptr tm, sbmc_MetaSolver *solver, node_ptr l_var,
-    const int k, const char *trace_name, NodeList_ptr symbols);
+Trace_ptr Sbmc_Utils_generate_and_print_cntexample(BeEnc_ptr be_enc,
+						   TraceMgr_ptr tm,
+						   sbmc_MetaSolver *solver,
+						   node_ptr l_var, const int k,
+						   const char *trace_name,
+						   NodeList_ptr symbols);
 
 /*!
   \brief Fills the given trace using the given sat assignment.
@@ -318,8 +321,8 @@ Trace_ptr Sbmc_Utils_generate_and_print_cntexample(
   \sa Bmc_Utils_generate_cntexample
 */
 Trace_ptr Sbmc_Utils_fill_cntexample(BeEnc_ptr be_enc, sbmc_MetaSolver *solver,
-                                     node_ptr l_var, const int k,
-                                     Trace_ptr trace);
+				     node_ptr l_var, const int k,
+				     Trace_ptr trace);
 
 /*!
   \brief Routines for the state indexing scheme
@@ -469,7 +472,7 @@ void sbmc_MS_goto_volatile_group(sbmc_MetaSolver *ms);
   \se None
 */
 void sbmc_MS_force_true(sbmc_MetaSolver *ms, be_ptr be_constraint,
-                        Be_CnfAlgorithm cnf_alg);
+			Be_CnfAlgorithm cnf_alg);
 
 /*!
   \brief Forces a list of BEs to be true in the solver.
@@ -483,7 +486,7 @@ void sbmc_MS_force_true(sbmc_MetaSolver *ms, be_ptr be_constraint,
   \sa sbmc_MS_force_true
 */
 void sbmc_MS_force_constraint_list(sbmc_MetaSolver *ms, lsList constraints,
-                                   Be_CnfAlgorithm cnf_alg);
+				   Be_CnfAlgorithm cnf_alg);
 
 /*!
   \brief Solves all groups belonging to the solver and
@@ -510,7 +513,7 @@ SatSolverResult sbmc_MS_solve(sbmc_MetaSolver *ms);
   \sa SatSolver_solve_all_groups_assume
 */
 SatSolverResult sbmc_MS_solve_assume(sbmc_MetaSolver *ms,
-                                     Slist_ptr assumptions);
+				     Slist_ptr assumptions);
 
 /*!
   \brief Returns the underlying solver

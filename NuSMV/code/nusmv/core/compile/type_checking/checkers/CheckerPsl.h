@@ -61,8 +61,8 @@ typedef struct CheckerPsl_TAG *CheckerPsl_ptr;
 
   \todo Missing description
 */
-#define CHECKER_PSL_CHECK_INSTANCE(self)                                       \
-  (nusmv_assert(CHECKER_PSL(self) != CHECKER_PSL(NULL)))
+#define CHECKER_PSL_CHECK_INSTANCE(self) \
+	(nusmv_assert(CHECKER_PSL(self) != CHECKER_PSL(NULL)))
 
 /**AutomaticStart*************************************************************/
 

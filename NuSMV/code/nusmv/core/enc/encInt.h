@@ -72,8 +72,8 @@ extern node_ptr boolean_range;
   caller's responsability to destroy it. order_filename can be NULL
 */
 OrdGroups_ptr enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
-                                            const char *order_filename,
-                                            const BoolEnc_ptr bool_enc);
+					    const char *order_filename,
+					    const BoolEnc_ptr bool_enc);
 
 /*!
   \brief Given a boolean variable or a bit the function inserts it
@@ -99,8 +99,8 @@ OrdGroups_ptr enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
 
 */
 void Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
-                                   NodeList_ptr sorted_list, node_ptr var,
-                                   node_ptr *sorting_cache);
+				   NodeList_ptr sorted_list, node_ptr var,
+				   node_ptr *sorting_cache);
 
 /*!
   \brief Given a list of variables representing a new variable ordering,
@@ -110,6 +110,6 @@ void Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
   caller's responsability to destroy it.
 */
 OrdGroups_ptr enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
-                                               NodeList_ptr vars);
+					       NodeList_ptr vars);
 
 #endif /* __NUSMV_CORE_ENC_ENC_INT_H__ */

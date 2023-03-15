@@ -105,7 +105,7 @@ typedef struct BeFsm_TAG *BeFsm_ptr;
   \sa BeFsm_destroy
 */
 BeFsm_ptr BeFsm_create(BeEnc_ptr be_enc, const be_ptr init, const be_ptr invar,
-                       const be_ptr trans, const node_ptr list_of_be_fairness);
+		       const be_ptr trans, const node_ptr list_of_be_fairness);
 
 /* should not be in FsmBuilder? */
 
@@ -119,7 +119,7 @@ BeFsm_ptr BeFsm_create(BeEnc_ptr be_enc, const be_ptr init, const be_ptr invar,
   \sa BeFsm_create, BeFsm_destroy
 */
 BeFsm_ptr BeFsm_create_from_sexp_fsm(BeEnc_ptr be_enc,
-                                     const BoolSexpFsm_ptr bfsm);
+				     const BoolSexpFsm_ptr bfsm);
 
 /*!
   \methodof BeFsm

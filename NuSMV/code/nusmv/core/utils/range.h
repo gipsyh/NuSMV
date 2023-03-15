@@ -48,7 +48,7 @@
   \se Utils_range_check
 */
 void Utils_set_data_for_range_check(const NuSMVEnv_ptr env, node_ptr var,
-                                    node_ptr range);
+				    node_ptr range);
 
 /*!
   \brief Called before using Utils_range_check callback function

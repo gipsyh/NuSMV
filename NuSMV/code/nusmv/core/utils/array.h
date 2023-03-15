@@ -57,13 +57,13 @@
 #define ARRAY_OUT_OF_MEM -10000
 
 typedef struct array_t {
-  char *space;
-  int num;      /* number of array elements.            */
-  int n_size;   /* size of 'data' array (in objects)    */
-  int obj_size; /* size of each array object.           */
-  int index;    /* combined index and locking flag.     */
-  unsigned int e_index;
-  int e_insert;
+	char *space;
+	int num; /* number of array elements.            */
+	int n_size; /* size of 'data' array (in objects)    */
+	int obj_size; /* size of each array object.           */
+	int index; /* combined index and locking flag.     */
+	unsigned int e_index;
+	int e_insert;
 } array_t;
 
 /*!
@@ -118,7 +118,7 @@ void array_sort(array_t *, int (*)(const void *, const void *));
 
 */
 void array_uniq(array_t *array, int (*compare)(char **, char **),
-                void (*free_func)(char *));
+		void (*free_func)(char *));
 
 /*!
   \brief
@@ -155,28 +155,30 @@ char *array_do_data(array_t *);
 
   Documentation needed!
 */
-#define array_insert(type, a, i, datum)                                        \
-  (-(a)->index != sizeof(type) ? array_abort((a), 4) : 0, (a)->index = (i),    \
-   (a)->index < 0 ? array_abort((a), 0) : 0,                                   \
-   (a)->index >= (a)->n_size                                                   \
-       ? ((array_t *)a)->e_insert = array_resize(a, (a)->index + 1)            \
-       : 0,                                                                    \
-   (a)->e_insert != ARRAY_OUT_OF_MEM                                           \
-       ? *((type *)((a)->space + (a)->index * (a)->obj_size)) = datum          \
-       : datum,                                                                \
-   (a)->e_insert != ARRAY_OUT_OF_MEM                                           \
-       ? ((a)->index >= (a)->num ? (a)->num = (a)->index + 1 : 0)              \
-       : 0,                                                                    \
-   (a)->e_insert != ARRAY_OUT_OF_MEM ? ((a)->index = -(int)sizeof(type))       \
-                                     : ARRAY_OUT_OF_MEM)
+#define array_insert(type, a, i, datum)                                       \
+	(-(a)->index != sizeof(type) ? array_abort((a), 4) : 0,               \
+	 (a)->index = (i), (a)->index < 0 ? array_abort((a), 0) : 0,          \
+	 (a)->index >= (a)->n_size ?                                          \
+		 ((array_t *)a)->e_insert = array_resize(a, (a)->index + 1) : \
+		 0,                                                           \
+	 (a)->e_insert != ARRAY_OUT_OF_MEM ?                                  \
+		 *((type *)((a)->space + (a)->index * (a)->obj_size)) =       \
+			 datum :                                              \
+		 datum,                                                       \
+	 (a)->e_insert != ARRAY_OUT_OF_MEM ?                                  \
+		 ((a)->index >= (a)->num ? (a)->num = (a)->index + 1 : 0) :   \
+		 0,                                                           \
+	 (a)->e_insert != ARRAY_OUT_OF_MEM ?                                  \
+		 ((a)->index = -(int)sizeof(type)) :                          \
+		 ARRAY_OUT_OF_MEM)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define array_insert_last(type, array, datum)                                  \
-  array_insert(type, array, (array)->num, datum)
+#define array_insert_last(type, array, datum) \
+	array_insert(type, array, (array)->num, datum)
 
 /* added an assert to catch an eventual conversion of a->num (int) to unsigned
    int */
@@ -186,36 +188,36 @@ char *array_do_data(array_t *);
 
   \todo Missing description
 */
-#define array_fetch(type, a, i)                                                \
-  (((array_t *)a)->e_index = (i), nusmv_assert((a)->num >= 0),                 \
-   (((a)->e_index) >= (a)->num) ? array_abort((a), 1) : 0,                     \
-   *((type *)((a)->space + (a)->e_index * (a)->obj_size)))
+#define array_fetch(type, a, i)                                      \
+	(((array_t *)a)->e_index = (i), nusmv_assert((a)->num >= 0), \
+	 (((a)->e_index) >= (a)->num) ? array_abort((a), 1) : 0,     \
+	 *((type *)((a)->space + (a)->e_index * (a)->obj_size)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define array_fetch_p(type, a, i)                                              \
-  (((array_t *)a)->e_index = (i),                                              \
-   ((a)->e_index >= (a)->num) ? array_abort((a), 1) : 0,                       \
-   ((type *)((a)->space + (a)->e_index * (a)->obj_size)))
+#define array_fetch_p(type, a, i)                              \
+	(((array_t *)a)->e_index = (i),                        \
+	 ((a)->e_index >= (a)->num) ? array_abort((a), 1) : 0, \
+	 ((type *)((a)->space + (a)->e_index * (a)->obj_size)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define array_fetch_last(type, array)                                          \
-  array_fetch(type, array, ((array)->num) - 1)
+#define array_fetch_last(type, array) \
+	array_fetch(type, array, ((array)->num) - 1)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define array_fetch_last_p(type, array)                                        \
-  array_fetch_p(type, array, ((array)->num) - 1)
+#define array_fetch_last_p(type, array) \
+	array_fetch_p(type, array, ((array)->num) - 1)
 
 /*!
   \brief \todo Missing synopsis
@@ -236,27 +238,27 @@ char *array_do_data(array_t *);
 
   \todo Missing description
 */
-#define arrayForEachItem(type,  /* type of object stored in array */           \
-                         array, /* array to iterate */                         \
-                         i,     /* int, local variable for iterator */         \
-                         data   /* object of type */                           \
-)                                                                              \
-  for ((i) = 0; (((i) < array_n((array))) &&                                   \
-                 (((data) = array_fetch(type, (array), (i))), 1));             \
-       (i)++)
+#define arrayForEachItem(type, /* type of object stored in array */      \
+			 array, /* array to iterate */                   \
+			 i, /* int, local variable for iterator */       \
+			 data /* object of type */                       \
+)                                                                        \
+	for ((i) = 0; (((i) < array_n((array))) &&                       \
+		       (((data) = array_fetch(type, (array), (i))), 1)); \
+	     (i)++)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define arrayForEachItemP(type,  /* type of object stored in array */          \
-                          array, /* array to iterate */                        \
-                          i,     /* int, local variable for iterator */        \
-                          pdata  /* pointer to object of type */               \
-)                                                                              \
-  for ((i) = 0; (((i) < array_n((array))) &&                                   \
-                 (((pdata) = array_fetch_p(type, (array), (i))), 1));          \
-       (i)++)
+#define arrayForEachItemP(type, /* type of object stored in array */        \
+			  array, /* array to iterate */                     \
+			  i, /* int, local variable for iterator */         \
+			  pdata /* pointer to object of type */             \
+)                                                                           \
+	for ((i) = 0; (((i) < array_n((array))) &&                          \
+		       (((pdata) = array_fetch_p(type, (array), (i))), 1)); \
+	     (i)++)
 
 #endif

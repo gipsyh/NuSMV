@@ -78,10 +78,11 @@
 
 */
 
-void WordNumber_init(NuSMVEnv_ptr env) {
-  WordNumberMgr_ptr mgr = WordNumberMgr_create(env);
+void WordNumber_init(NuSMVEnv_ptr env)
+{
+	WordNumberMgr_ptr mgr = WordNumberMgr_create(env);
 
-  NuSMVEnv_set_value(env, ENV_WORD_NUMBER_MGR, mgr);
+	NuSMVEnv_set_value(env, ENV_WORD_NUMBER_MGR, mgr);
 }
 
 /*!
@@ -90,11 +91,12 @@ void WordNumber_init(NuSMVEnv_ptr env) {
 
 */
 
-void WordNumber_quit(NuSMVEnv_ptr env) {
-  WordNumberMgr_ptr mgr =
-      WORD_NUMBER_MGR(NuSMVEnv_remove_value(env, ENV_WORD_NUMBER_MGR));
+void WordNumber_quit(NuSMVEnv_ptr env)
+{
+	WordNumberMgr_ptr mgr = WORD_NUMBER_MGR(
+		NuSMVEnv_remove_value(env, ENV_WORD_NUMBER_MGR));
 
-  WordNumberMgr_destroy(mgr);
+	WordNumberMgr_destroy(mgr);
 }
 
 /*!
@@ -104,7 +106,10 @@ void WordNumber_quit(NuSMVEnv_ptr env) {
 
 */
 
-int WordNumber_max_width() { return WordNumberMgr_max_width(); }
+int WordNumber_max_width()
+{
+	return WordNumberMgr_max_width();
+}
 
 /*!
   \brief returns the value of a WordNumber, as unsigned word
@@ -112,9 +117,10 @@ int WordNumber_max_width() { return WordNumberMgr_max_width(); }
 
 */
 
-unsigned long long WordNumber_get_unsigned_value(WordNumber_ptr self) {
-  WORD_NUMBER_CHECK_INSTANCE(self);
-  return self->value;
+unsigned long long WordNumber_get_unsigned_value(WordNumber_ptr self)
+{
+	WORD_NUMBER_CHECK_INSTANCE(self);
+	return self->value;
 }
 
 /*!
@@ -124,9 +130,10 @@ unsigned long long WordNumber_get_unsigned_value(WordNumber_ptr self) {
 
 */
 
-signed long long WordNumber_get_signed_value(WordNumber_ptr self) {
-  WORD_NUMBER_CHECK_INSTANCE(self);
-  return word_number_to_signed_c_value(self);
+signed long long WordNumber_get_signed_value(WordNumber_ptr self)
+{
+	WORD_NUMBER_CHECK_INSTANCE(self);
+	return word_number_to_signed_c_value(self);
 }
 
 /*!
@@ -135,9 +142,10 @@ signed long long WordNumber_get_signed_value(WordNumber_ptr self) {
 
 */
 
-boolean WordNumber_get_sign(WordNumber_ptr self) {
-  WORD_NUMBER_CHECK_INSTANCE(self);
-  return WordNumber_get_bit(self, WordNumber_get_width(self) - 1);
+boolean WordNumber_get_sign(WordNumber_ptr self)
+{
+	WORD_NUMBER_CHECK_INSTANCE(self);
+	return WordNumber_get_bit(self, WordNumber_get_width(self) - 1);
 }
 
 /*!
@@ -146,9 +154,10 @@ boolean WordNumber_get_sign(WordNumber_ptr self) {
 
 */
 
-int WordNumber_get_width(WordNumber_ptr self) {
-  WORD_NUMBER_CHECK_INSTANCE(self);
-  return self->width;
+int WordNumber_get_width(WordNumber_ptr self)
+{
+	WORD_NUMBER_CHECK_INSTANCE(self);
+	return self->width;
 }
 
 /*!
@@ -157,10 +166,11 @@ int WordNumber_get_width(WordNumber_ptr self) {
   the bit number should be in the range \[0, width-1\].
 */
 
-boolean WordNumber_get_bit(WordNumber_ptr self, int n) {
-  WORD_NUMBER_CHECK_INSTANCE(self);
-  nusmv_assert(n >= 0 && n < self->width);
-  return (self->value >> n) & 1;
+boolean WordNumber_get_bit(WordNumber_ptr self, int n)
+{
+	WORD_NUMBER_CHECK_INSTANCE(self);
+	nusmv_assert(n >= 0 && n < self->width);
+	return (self->value >> n) & 1;
 }
 
 /*!
@@ -171,12 +181,13 @@ boolean WordNumber_get_bit(WordNumber_ptr self, int n) {
 
 */
 
-const char *WordNumber_get_parsed_string(WordNumber_ptr self) {
-  WORD_NUMBER_CHECK_INSTANCE(self);
-  if ((string_ptr)NULL != self->parsedString) {
-    return UStringMgr_get_string_text(self->parsedString);
-  }
-  return (const char *)NULL;
+const char *WordNumber_get_parsed_string(WordNumber_ptr self)
+{
+	WORD_NUMBER_CHECK_INSTANCE(self);
+	if ((string_ptr)NULL != self->parsedString) {
+		return UStringMgr_get_string_text(self->parsedString);
+	}
+	return (const char *)NULL;
 }
 
 /*!
@@ -191,11 +202,12 @@ const char *WordNumber_get_parsed_string(WordNumber_ptr self) {
 */
 
 int WordNumber_based_print(FILE *output_stream, WordNumber_ptr self, int base,
-                           boolean isSigned) {
-  char *result = WordNumber_to_based_string(self, base, isSigned);
-  if ((char *)NULL == result)
-    return -1;
-  return fprintf(output_stream, "%s", result);
+			   boolean isSigned)
+{
+	char *result = WordNumber_to_based_string(self, base, isSigned);
+	if ((char *)NULL == result)
+		return -1;
+	return fprintf(output_stream, "%s", result);
 }
 
 /*!
@@ -217,89 +229,94 @@ int WordNumber_based_print(FILE *output_stream, WordNumber_ptr self, int base,
 */
 
 char *WordNumber_to_based_string(WordNumber_ptr self, int base,
-                                 boolean isSigned) {
-  static char *buffer = (char *)NULL;
-  static int buffer_size = 0;
+				 boolean isSigned)
+{
+	static char *buffer = (char *)NULL;
+	static int buffer_size = 0;
 
-  int printed;
+	int printed;
 
-  WORD_NUMBER_CHECK_INSTANCE(self);
+	WORD_NUMBER_CHECK_INSTANCE(self);
 
-  /* allocate a buffer. The requires string is very likely less than width+20*/
-  if (buffer_size < (self->width + 20)) {
-    buffer_size = self->width + 20;
-    buffer = REALLOC(char, buffer, buffer_size);
-  }
+	/* allocate a buffer. The requires string is very likely less than width+20*/
+	if (buffer_size < (self->width + 20)) {
+		buffer_size = self->width + 20;
+		buffer = REALLOC(char, buffer, buffer_size);
+	}
 
-  /* print the "0", the base, the width and the value */
-  switch (base) {
+	/* print the "0", the base, the width and the value */
+	switch (base) {
+	case 2: {
+		int n = self->width - 1;
+		WordNumberValue v = self->value;
+		char *str = buffer;
 
-  case 2: {
-    int n = self->width - 1;
-    WordNumberValue v = self->value;
-    char *str = buffer;
+		printed = snprintf(str, buffer_size, "0%sb%i_",
+				   isSigned ? "s" : "u", self->width);
+		SNPRINTF_CHECK(printed, buffer_size);
 
-    printed = snprintf(str, buffer_size, "0%sb%i_", isSigned ? "s" : "u",
-                       self->width);
-    SNPRINTF_CHECK(printed, buffer_size);
+		if (printed <= 0)
+			return (char *)NULL; /* error in printing */
+		else
+			str += printed;
 
-    if (printed <= 0)
-      return (char *)NULL; /* error in printing */
-    else
-      str += printed;
+		/* while (((v>>n)&1) == 0 && n > 0) --n; */ /* skip initial zeros */
 
-    /* while (((v>>n)&1) == 0 && n > 0) --n; */ /* skip initial zeros */
+		while (n >= 0) {
+			printed = snprintf(str, buffer_size, "%u",
+					   (int)((v >> n) & 1));
+			SNPRINTF_CHECK(printed, buffer_size);
 
-    while (n >= 0) {
-      printed = snprintf(str, buffer_size, "%u", (int)((v >> n) & 1));
-      SNPRINTF_CHECK(printed, buffer_size);
+			if (printed <= 0)
+				return (char *)NULL; /* error in printing */
+			else
+				str += printed;
+			--n;
+		}
+		nusmv_assert((str - buffer) < buffer_size);
+		return buffer;
+	}
 
-      if (printed <= 0)
-        return (char *)NULL; /* error in printing */
-      else
-        str += printed;
-      --n;
-    }
-    nusmv_assert((str - buffer) < buffer_size);
-    return buffer;
-  }
+	case 8:
+		printed = snprintf(buffer, buffer_size, "0%so%d_%" PRIoMAX,
+				   isSigned ? "s" : "u", self->width,
+				   self->value);
+		SNPRINTF_CHECK(printed, buffer_size);
+		break;
+	case 16:
+		printed = snprintf(buffer, buffer_size, "0%sh%d_%" PRIXMAX,
+				   isSigned ? "s" : "u", self->width,
+				   self->value);
+		SNPRINTF_CHECK(printed, buffer_size);
+		break;
+	case 10: {
+		WordNumberValue value = self->value;
+		int sign = 0;
+		const char *const format = "%s0%sd%d_%" PRIuMAX;
 
-  case 8:
-    printed = snprintf(buffer, buffer_size, "0%so%d_%" PRIoMAX,
-                       isSigned ? "s" : "u", self->width, self->value);
-    SNPRINTF_CHECK(printed, buffer_size);
-    break;
-  case 16:
-    printed = snprintf(buffer, buffer_size, "0%sh%d_%" PRIXMAX,
-                       isSigned ? "s" : "u", self->width, self->value);
-    SNPRINTF_CHECK(printed, buffer_size);
-    break;
-  case 10: {
-    WordNumberValue value = self->value;
-    int sign = 0;
-    const char *const format = "%s0%sd%d_%" PRIuMAX;
+		if (isSigned) { /* the word is signed => check the sign */
+			sign = value >> (self->width - 1);
+			nusmv_assert(0 == sign ||
+				     1 == sign); /* one the highest bit only */
+			if (sign) { /* get positive number */
+				value = -((((~0ULL) >> (self->width - 1))
+					   << (self->width - 1)) |
+					  value);
+			}
+		}
+		printed = snprintf(buffer, buffer_size, format, sign ? "-" : "",
+				   isSigned ? "s" : "u", self->width, value);
+		SNPRINTF_CHECK(printed, buffer_size);
+		break;
+	}
+	default:
+		error_unreachable_code(); /* unknown base */
+	} /* switch */
 
-    if (isSigned) { /* the word is signed => check the sign */
-      sign = value >> (self->width - 1);
-      nusmv_assert(0 == sign || 1 == sign); /* one the highest bit only */
-      if (sign) {                           /* get positive number */
-        value =
-            -((((~0ULL) >> (self->width - 1)) << (self->width - 1)) | value);
-      }
-    }
-    printed = snprintf(buffer, buffer_size, format, sign ? "-" : "",
-                       isSigned ? "s" : "u", self->width, value);
-    SNPRINTF_CHECK(printed, buffer_size);
-    break;
-  }
-  default:
-    error_unreachable_code(); /* unknown base */
-  }                           /* switch */
-
-  if (printed <= 0)
-    return (char *)NULL; /* error in printing */
-  nusmv_assert(printed < buffer_size);
-  return buffer;
+	if (printed <= 0)
+		return (char *)NULL; /* error in printing */
+	nusmv_assert(printed < buffer_size);
+	return buffer;
 }
 
 /*!
@@ -309,10 +326,11 @@ char *WordNumber_to_based_string(WordNumber_ptr self, int base,
 
 */
 
-boolean WordNumber_is_zero(WordNumber_ptr v) {
-  WORD_NUMBER_CHECK_INSTANCE(v);
+boolean WordNumber_is_zero(WordNumber_ptr v)
+{
+	WORD_NUMBER_CHECK_INSTANCE(v);
 
-  return (WordNumber_get_unsigned_value(v) == 0LL);
+	return (WordNumber_get_unsigned_value(v) == 0LL);
 }
 
 /*!
@@ -321,12 +339,13 @@ boolean WordNumber_is_zero(WordNumber_ptr v) {
   the width of operands should be equal
 */
 
-boolean WordNumber_equal(WordNumber_ptr v1, WordNumber_ptr v2) {
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+boolean WordNumber_equal(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  return v1->value == v2->value;
+	return v1->value == v2->value;
 }
 
 /*!
@@ -335,12 +354,13 @@ boolean WordNumber_equal(WordNumber_ptr v1, WordNumber_ptr v2) {
   the width of operands should be equal
 */
 
-boolean WordNumber_not_equal(WordNumber_ptr v1, WordNumber_ptr v2) {
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+boolean WordNumber_not_equal(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  return v1->value != v2->value;
+	return v1->value != v2->value;
 }
 
 /*!
@@ -350,12 +370,13 @@ boolean WordNumber_not_equal(WordNumber_ptr v1, WordNumber_ptr v2) {
   the width of operands should be equal
 */
 
-boolean WordNumber_unsigned_less(WordNumber_ptr v1, WordNumber_ptr v2) {
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+boolean WordNumber_unsigned_less(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  return v1->value < v2->value;
+	return v1->value < v2->value;
 }
 
 /*!
@@ -365,13 +386,13 @@ boolean WordNumber_unsigned_less(WordNumber_ptr v1, WordNumber_ptr v2) {
   the width of operands should be equal
 */
 
-boolean WordNumber_unsigned_less_or_equal(WordNumber_ptr v1,
-                                          WordNumber_ptr v2) {
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+boolean WordNumber_unsigned_less_or_equal(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  return v1->value <= v2->value;
+	return v1->value <= v2->value;
 }
 
 /*!
@@ -381,12 +402,13 @@ boolean WordNumber_unsigned_less_or_equal(WordNumber_ptr v1,
   the width of operands should be equal
 */
 
-boolean WordNumber_unsigned_greater(WordNumber_ptr v1, WordNumber_ptr v2) {
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+boolean WordNumber_unsigned_greater(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  return v1->value > v2->value;
+	return v1->value > v2->value;
 }
 
 /*!
@@ -397,12 +419,13 @@ boolean WordNumber_unsigned_greater(WordNumber_ptr v1, WordNumber_ptr v2) {
 */
 
 boolean WordNumber_unsigned_greater_or_equal(WordNumber_ptr v1,
-                                             WordNumber_ptr v2) {
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+					     WordNumber_ptr v2)
+{
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  return v1->value >= v2->value;
+	return v1->value >= v2->value;
 }
 
 /*!
@@ -412,17 +435,18 @@ boolean WordNumber_unsigned_greater_or_equal(WordNumber_ptr v1,
   the width of operands should be equal
 */
 
-boolean WordNumber_signed_less(WordNumber_ptr v1, WordNumber_ptr v2) {
-  boolean bit1, bit2;
+boolean WordNumber_signed_less(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	boolean bit1, bit2;
 
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  bit1 = WordNumber_get_bit(v1, v1->width - 1);
-  bit2 = WordNumber_get_bit(v2, v1->width - 1);
+	bit1 = WordNumber_get_bit(v1, v1->width - 1);
+	bit2 = WordNumber_get_bit(v2, v1->width - 1);
 
-  return bit1 > bit2 || (bit1 == bit2 && v1->value < v2->value);
+	return bit1 > bit2 || (bit1 == bit2 && v1->value < v2->value);
 }
 
 /*!
@@ -432,17 +456,18 @@ boolean WordNumber_signed_less(WordNumber_ptr v1, WordNumber_ptr v2) {
   the width of operands should be equal
 */
 
-boolean WordNumber_signed_less_or_equal(WordNumber_ptr v1, WordNumber_ptr v2) {
-  boolean bit1, bit2;
+boolean WordNumber_signed_less_or_equal(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	boolean bit1, bit2;
 
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  bit1 = WordNumber_get_bit(v1, v1->width - 1);
-  bit2 = WordNumber_get_bit(v2, v1->width - 1);
+	bit1 = WordNumber_get_bit(v1, v1->width - 1);
+	bit2 = WordNumber_get_bit(v2, v1->width - 1);
 
-  return bit1 > bit2 || (bit1 == bit2 && v1->value <= v2->value);
+	return bit1 > bit2 || (bit1 == bit2 && v1->value <= v2->value);
 }
 
 /*!
@@ -452,17 +477,18 @@ boolean WordNumber_signed_less_or_equal(WordNumber_ptr v1, WordNumber_ptr v2) {
   the width of operands should be equal
 */
 
-boolean WordNumber_signed_greater(WordNumber_ptr v1, WordNumber_ptr v2) {
-  boolean bit1, bit2;
+boolean WordNumber_signed_greater(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	boolean bit1, bit2;
 
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  bit1 = WordNumber_get_bit(v1, v1->width - 1);
-  bit2 = WordNumber_get_bit(v2, v1->width - 1);
+	bit1 = WordNumber_get_bit(v1, v1->width - 1);
+	bit2 = WordNumber_get_bit(v2, v1->width - 1);
 
-  return bit1 < bit2 || (bit1 == bit2 && v1->value > v2->value);
+	return bit1 < bit2 || (bit1 == bit2 && v1->value > v2->value);
 }
 
 /*!
@@ -472,34 +498,36 @@ boolean WordNumber_signed_greater(WordNumber_ptr v1, WordNumber_ptr v2) {
   the width of operands should be equal
 */
 
-boolean WordNumber_signed_greater_or_equal(WordNumber_ptr v1,
-                                           WordNumber_ptr v2) {
-  boolean bit1, bit2;
+boolean WordNumber_signed_greater_or_equal(WordNumber_ptr v1, WordNumber_ptr v2)
+{
+	boolean bit1, bit2;
 
-  WORD_NUMBER_CHECK_INSTANCE(v1);
-  WORD_NUMBER_CHECK_INSTANCE(v2);
-  nusmv_assert(v1->width == v2->width);
+	WORD_NUMBER_CHECK_INSTANCE(v1);
+	WORD_NUMBER_CHECK_INSTANCE(v2);
+	nusmv_assert(v1->width == v2->width);
 
-  bit1 = WordNumber_get_bit(v1, v1->width - 1);
-  bit2 = WordNumber_get_bit(v2, v1->width - 1);
+	bit1 = WordNumber_get_bit(v1, v1->width - 1);
+	bit2 = WordNumber_get_bit(v2, v1->width - 1);
 
-  return bit1 < bit2 || (bit1 == bit2 && v1->value >= v2->value);
+	return bit1 < bit2 || (bit1 == bit2 && v1->value >= v2->value);
 }
 
 WordNumber_ptr WordNumber_max(WordNumber_ptr v1, WordNumber_ptr v2,
-                              boolean isSigned) {
-  if (isSigned) {
-    return WordNumber_signed_less(v1, v2) ? v2 : v1;
-  }
-  return WordNumber_unsigned_less(v1, v2) ? v2 : v1;
+			      boolean isSigned)
+{
+	if (isSigned) {
+		return WordNumber_signed_less(v1, v2) ? v2 : v1;
+	}
+	return WordNumber_unsigned_less(v1, v2) ? v2 : v1;
 }
 
 WordNumber_ptr WordNumber_min(WordNumber_ptr v1, WordNumber_ptr v2,
-                              boolean isSigned) {
-  if (isSigned) {
-    return WordNumber_signed_less(v1, v2) ? v1 : v2;
-  }
-  return WordNumber_unsigned_less(v1, v2) ? v1 : v2;
+			      boolean isSigned)
+{
+	if (isSigned) {
+		return WordNumber_signed_less(v1, v2) ? v1 : v2;
+	}
+	return WordNumber_unsigned_less(v1, v2) ? v1 : v2;
 }
 
 /*!
@@ -508,14 +536,15 @@ WordNumber_ptr WordNumber_min(WordNumber_ptr v1, WordNumber_ptr v2,
 
 */
 
-WordNumberValue word_number_to_signed_c_value(const WordNumber_ptr self) {
-  WordNumberValue uv = WordNumber_get_unsigned_value(self);
-  int sign = uv >> (self->width - 1);
-  WordNumberValue l;
-  nusmv_assert(0 == sign || 1 == sign); /* one the highest bit only */
+WordNumberValue word_number_to_signed_c_value(const WordNumber_ptr self)
+{
+	WordNumberValue uv = WordNumber_get_unsigned_value(self);
+	int sign = uv >> (self->width - 1);
+	WordNumberValue l;
+	nusmv_assert(0 == sign || 1 == sign); /* one the highest bit only */
 
-  if (sign == 0)
-    return uv;
-  l = (((~0ULL) << (self->width - 1)) << 1);
-  return uv | l;
+	if (sign == 0)
+		return uv;
+	l = (((~0ULL) << (self->width - 1)) << 1);
+	return uv | l;
 }

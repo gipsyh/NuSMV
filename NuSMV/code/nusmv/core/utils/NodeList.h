@@ -61,8 +61,8 @@ typedef struct NodeList_TAG *NodeList_ptr;
 
   \todo Missing description
 */
-#define NODE_LIST_CHECK_INSTANCE(x)                                            \
-  (nusmv_assert(NODE_LIST(x) != NODE_LIST(NULL)))
+#define NODE_LIST_CHECK_INSTANCE(x) \
+	(nusmv_assert(NODE_LIST(x) != NODE_LIST(NULL)))
 
 /*!
   \struct Link
@@ -100,7 +100,7 @@ typedef boolean (*NodeListPred)(node_ptr element, void *arg);
 */
 
 typedef boolean (*NODE_LIST_FOREACH_FUN_P)(NodeList_ptr list, ListIter_ptr iter,
-                                           void *user_data);
+					   void *user_data);
 
 /* NodeList_ptr, ListIter_ptr */
 
@@ -109,9 +109,9 @@ typedef boolean (*NODE_LIST_FOREACH_FUN_P)(NodeList_ptr list, ListIter_ptr iter,
 
   \todo Missing description
 */
-#define NODE_LIST_FOREACH(list, iter)                                          \
-  for (iter = NodeList_get_first_iter(list); !ListIter_is_end(iter);           \
-       iter = ListIter_get_next(iter))
+#define NODE_LIST_FOREACH(list, iter)                                      \
+	for (iter = NodeList_get_first_iter(list); !ListIter_is_end(iter); \
+	     iter = ListIter_get_next(iter))
 
 /* Constructors, Destructors, Copiers and Cleaners ****************************/
 
@@ -230,7 +230,7 @@ node_ptr NodeList_get_elem_at(const NodeList_ptr self, const ListIter_ptr iter);
   it is at that time. Returns the number of removed elements
 */
 int NodeList_remove_elems(NodeList_ptr self, const NodeList_ptr other,
-                          NodeListPred disposer, void *disposer_arg);
+			  NodeListPred disposer, void *disposer_arg);
 
 /* ListIter subinterface ******************************************************/
 
@@ -277,7 +277,7 @@ ListIter_ptr NodeList_get_first_iter(const NodeList_ptr self);
   \sa insert_after
 */
 void NodeList_insert_before(NodeList_ptr self, ListIter_ptr iter,
-                            node_ptr elem);
+			    node_ptr elem);
 
 /*!
   \methodof NodeList
@@ -320,7 +320,7 @@ node_ptr NodeList_remove_elem_at(NodeList_ptr self, ListIter_ptr iter);
   \sa ListIter_is_end, NodeList_belongs_to
 */
 ListIter_ptr NodeList_search(const NodeList_ptr self, NodeListPred pred,
-                             void *arg);
+			     void *arg);
 
 /* Printers *******************************************************************/
 
@@ -331,7 +331,7 @@ ListIter_ptr NodeList_search(const NodeList_ptr self, NodeListPred pred,
   The list must be a list of actual node_ptr
 */
 void NodeList_print_nodes(const NodeList_ptr self, MasterPrinter_ptr printer,
-                          FILE *out);
+			  FILE *out);
 
 /* Miscellaneous **************************************************************/
 
@@ -383,7 +383,7 @@ int NodeList_count_elem(const NodeList_ptr self, node_ptr elem);
   the walking
 */
 int NodeList_foreach(NodeList_ptr self, NODE_LIST_FOREACH_FUN_P foo,
-                     void *user_data);
+		     void *user_data);
 
 /*!
   \methodof NodeList
@@ -412,7 +412,7 @@ NodeList_ptr NodeList_filter(const NodeList_ptr self, BPFN foo);
   qsort is used
 */
 void NodeList_sort(NodeList_ptr self,
-                   int (*cmp)(const void *el1, const void *el2));
+		   int (*cmp)(const void *el1, const void *el2));
 
 /*!
   \brief Test NodeList_sort

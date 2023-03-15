@@ -87,48 +87,49 @@ static void main_init_custom_cmd_options(void);
   \sa optional
 */
 
-int main(int argc, char **argv) {
-  int status;
-  boolean requires_shutdown = true;
-  NuSMVEnv_ptr env;
+int main(int argc, char **argv)
+{
+	int status;
+	boolean requires_shutdown = true;
+	NuSMVEnv_ptr env;
 
-  FP_V_E iq_fns[][2] = {
-    /* these are for the core */
-    {AddonsCore_Init, AddonsCore_Quit},
+	FP_V_E iq_fns[][2] = {
+		/* these are for the core */
+		{ AddonsCore_Init, AddonsCore_Quit },
 #if NUSMV_HAVE_INTERACTIVE_SHELL
-    /* these are for the interactive shell */
-    {CInit_init_cmd, CInit_quit_cmd},
-    {Compass_init_cmd, Compass_Cmd_quit},
+		/* these are for the interactive shell */
+		{ CInit_init_cmd, CInit_quit_cmd },
+		{ Compass_init_cmd, Compass_Cmd_quit },
 #endif
-  };
+	};
 
-  /* Initializes data such as tool name, tool version, email.. */
-  NuSMVCore_init_data();
+	/* Initializes data such as tool name, tool version, email.. */
+	NuSMVCore_init_data();
 
-  /* Customize the library data. */
-  main_init_custom_data();
+	/* Customize the library data. */
+	main_init_custom_data();
 
-  env = NuSMVEnv_create();
+	env = NuSMVEnv_create();
 
-  /* Initializes all packages, having the list of init/quit mfunctions */
-  NuSMVCore_init(env, iq_fns, sizeof(iq_fns) / sizeof(iq_fns[0]));
+	/* Initializes all packages, having the list of init/quit mfunctions */
+	NuSMVCore_init(env, iq_fns, sizeof(iq_fns) / sizeof(iq_fns[0]));
 
-  /* Adds the command line options of NuSMV */
-  NuSMVCore_init_cmd_options(env);
+	/* Adds the command line options of NuSMV */
+	NuSMVCore_init_cmd_options(env);
 
-  /* Add [or remove] custom command line options */
-  main_init_custom_cmd_options();
+	/* Add [or remove] custom command line options */
+	main_init_custom_cmd_options();
 
-  /* Finally, call the main function */
-  requires_shutdown = NuSMVCore_main(env, argc, argv, &status);
+	/* Finally, call the main function */
+	requires_shutdown = NuSMVCore_main(env, argc, argv, &status);
 
-  if (requires_shutdown) {
-    NuSMVCore_quit(env);
-  }
+	if (requires_shutdown) {
+		NuSMVCore_quit(env);
+	}
 
-  NuSMVEnv_destroy(env);
+	NuSMVEnv_destroy(env);
 
-  return status;
+	return status;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -144,11 +145,12 @@ int main(int argc, char **argv) {
 
   \todo Missing description
 */
-static void main_init_custom_data(void) {
-  /* Empty stub */
+static void main_init_custom_data(void)
+{
+	/* Empty stub */
 
-  /* Example: */
-  /* NuSMVCore_set_tool_name("esmc"); */
+	/* Example: */
+	/* NuSMVCore_set_tool_name("esmc"); */
 }
 
 /*!
@@ -156,9 +158,10 @@ static void main_init_custom_data(void) {
 
   \todo Missing description
 */
-static void main_init_custom_cmd_options(void) {
-  /* Empty stub */
+static void main_init_custom_cmd_options(void)
+{
+	/* Empty stub */
 
-  /* Example: */
-  /* NuSMVCore_add_env_command_line_option(...) */
+	/* Example: */
+	/* NuSMVCore_add_env_command_line_option(...) */
 }

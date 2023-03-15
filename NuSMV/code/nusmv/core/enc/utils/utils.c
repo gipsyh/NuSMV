@@ -65,50 +65,53 @@
 /*---------------------------------------------------------------------------*/
 
 OrdGroups_ptr enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
-                                            const char *order_filename,
-                                            const BoolEnc_ptr bool_enc) {
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  OrdGroups_ptr groups;
+					    const char *order_filename,
+					    const BoolEnc_ptr bool_enc)
+{
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	OrdGroups_ptr groups;
 
-  if (!util_is_string_null(order_filename)) {
-    ParserOrd_ptr parser;
-    FILE *f;
+	if (!util_is_string_null(order_filename)) {
+		ParserOrd_ptr parser;
+		FILE *f;
 
-    /* Parses the provided ordering file */
-    parser = ParserOrd_create(env);
-    f = fopen(order_filename, "r");
-    if (f == (FILE *)NULL) {
-      ErrorMgr_error_file_not_found(errmgr, order_filename);
-    }
-    /* parse the ordering file */
-    ParserOrd_parse_from_file(parser, f);
+		/* Parses the provided ordering file */
+		parser = ParserOrd_create(env);
+		f = fopen(order_filename, "r");
+		if (f == (FILE *)NULL) {
+			ErrorMgr_error_file_not_found(errmgr, order_filename);
+		}
+		/* parse the ordering file */
+		ParserOrd_parse_from_file(parser, f);
 
-    groups = enc_utils_create_vars_ord_groups(bool_enc,
-                                              ParserOrd_get_vars_list(parser));
-    fclose(f);
-    ParserOrd_destroy(parser);
-  } else {
-    groups = OrdGroups_create();
-  }
-  return groups;
+		groups = enc_utils_create_vars_ord_groups(
+			bool_enc, ParserOrd_get_vars_list(parser));
+		fclose(f);
+		ParserOrd_destroy(parser);
+	} else {
+		groups = OrdGroups_create();
+	}
+	return groups;
 }
 
 OrdGroups_ptr enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
-                                               NodeList_ptr vars) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(bool_enc));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+					       NodeList_ptr vars)
+{
+	const NuSMVEnv_ptr env =
+		EnvObject_get_environment(ENV_OBJECT(bool_enc));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  OrdGroups_ptr groups;
-  SymbTable_ptr symb_table;
-  ListIter_ptr iter;
+	OrdGroups_ptr groups;
+	SymbTable_ptr symb_table;
+	ListIter_ptr iter;
 
-  groups = OrdGroups_create();
+	groups = OrdGroups_create();
 
-  symb_table = BaseEnc_get_symb_table(BASE_ENC(bool_enc));
+	symb_table = BaseEnc_get_symb_table(BASE_ENC(bool_enc));
 
-  /* Iterates on the list of varianles in vars:
+	/* Iterates on the list of varianles in vars:
 
      If the symbol is a bool var: append to the ord list B.
      If the symbol is a scalar var:
@@ -121,61 +124,70 @@ OrdGroups_ptr enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
      After that, any remaining defined boolean var will be added.
   */
 
-  NODE_LIST_FOREACH(vars, iter) {
-    node_ptr name = NodeList_get_elem_at(vars, iter);
+	NODE_LIST_FOREACH(vars, iter)
+	{
+		node_ptr name = NodeList_get_elem_at(vars, iter);
 
-    if (!SymbTable_is_symbol_var(symb_table, name)) {
-      ErrorMgr_warning_variable_not_declared(errmgr, name);
-      continue;
-    }
+		if (!SymbTable_is_symbol_var(symb_table, name)) {
+			ErrorMgr_warning_variable_not_declared(errmgr, name);
+			continue;
+		}
 
-    if (SymbTable_is_symbol_bool_var(symb_table, name)) {
-      int gr = OrdGroups_get_var_group(groups, name);
-      if (gr == -1) {
-        gr = OrdGroups_create_group(groups);
-        OrdGroups_add_variable(groups, name, gr);
-      } else
-        ErrorMgr_warning_var_appear_twice_in_order_file(errmgr, name);
-    } else {
-      /* Variable is scalar. If one or more bits of that scalar var
+		if (SymbTable_is_symbol_bool_var(symb_table, name)) {
+			int gr = OrdGroups_get_var_group(groups, name);
+			if (gr == -1) {
+				gr = OrdGroups_create_group(groups);
+				OrdGroups_add_variable(groups, name, gr);
+			} else
+				ErrorMgr_warning_var_appear_twice_in_order_file(
+					errmgr, name);
+		} else {
+			/* Variable is scalar. If one or more bits of that scalar var
          have been previously specified in the ordering file, than
          the single bits that belong to the scalar variable will NOT
          be grouped.  If no bit has been previously specified, then
          all the bits of the scalar var that have not been possibly
          specified in the ordering file will be grouped */
-      NodeList_ptr bits;
-      ListIter_ptr bits_iter;
-      boolean grouped = true;
-      int group = -1;
+			NodeList_ptr bits;
+			ListIter_ptr bits_iter;
+			boolean grouped = true;
+			int group = -1;
 
-      /* Searches any previously specified bit */
-      bits = BoolEnc_get_var_bits(bool_enc, name);
-      NODE_LIST_FOREACH(bits, bits_iter) {
-        node_ptr bit = NodeList_get_elem_at(bits, bits_iter);
+			/* Searches any previously specified bit */
+			bits = BoolEnc_get_var_bits(bool_enc, name);
+			NODE_LIST_FOREACH(bits, bits_iter)
+			{
+				node_ptr bit =
+					NodeList_get_elem_at(bits, bits_iter);
 
-        if (OrdGroups_get_var_group(groups, bit) != -1) {
-          grouped = false;
-          break;
-        }
-      }
+				if (OrdGroups_get_var_group(groups, bit) !=
+				    -1) {
+					grouped = false;
+					break;
+				}
+			}
 
-      /* adds all bits that do not occur in the ordering file,
+			/* adds all bits that do not occur in the ordering file,
          either grouping or not depending on specific flag: */
-      NODE_LIST_FOREACH(bits, bits_iter) {
-        node_ptr bit = NodeList_get_elem_at(bits, bits_iter);
+			NODE_LIST_FOREACH(bits, bits_iter)
+			{
+				node_ptr bit =
+					NodeList_get_elem_at(bits, bits_iter);
 
-        if (-1 == group || !grouped) {
-          group = OrdGroups_create_group(groups);
-        }
-        if (!NodeList_belongs_to(vars, bit) &&
-            (-1 == OrdGroups_get_var_group(groups, bit))) {
-          OrdGroups_add_variable(groups, bit, group);
-        }
-      }
+				if (-1 == group || !grouped) {
+					group = OrdGroups_create_group(groups);
+				}
+				if (!NodeList_belongs_to(vars, bit) &&
+				    (-1 ==
+				     OrdGroups_get_var_group(groups, bit))) {
+					OrdGroups_add_variable(groups, bit,
+							       group);
+				}
+			}
 
-      NodeList_destroy(bits);
-    } /* scalar case */
-  }   /* loop on variables */
+			NodeList_destroy(bits);
+		} /* scalar case */
+	} /* loop on variables */
 
-  return groups;
+	return groups;
 }

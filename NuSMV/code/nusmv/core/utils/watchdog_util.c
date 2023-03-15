@@ -77,20 +77,23 @@
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-void watchdog_action(void *inputenv) {
-  NuSMVEnv_ptr env = NUSMV_ENV(inputenv);
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  ErrorMgr_ptr errmgr = ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void watchdog_action(void *inputenv)
+{
+	NuSMVEnv_ptr env = NUSMV_ENV(inputenv);
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  StreamMgr_print_output(streams, "Watchdog Timer: reached timeout\n");
-  if (!opt_batch(opts)) {
-    StreamMgr_print_error(streams,
-                          "Warning: %s status may not be consistent."
-                          "Use 'reset' command if needed.\n",
-                          get_pgm_name(opts));
-  }
-  ErrorMgr_long_jmp(errmgr);
+	StreamMgr_print_output(streams, "Watchdog Timer: reached timeout\n");
+	if (!opt_batch(opts)) {
+		StreamMgr_print_error(
+			streams,
+			"Warning: %s status may not be consistent."
+			"Use 'reset' command if needed.\n",
+			get_pgm_name(opts));
+	}
+	ErrorMgr_long_jmp(errmgr);
 }

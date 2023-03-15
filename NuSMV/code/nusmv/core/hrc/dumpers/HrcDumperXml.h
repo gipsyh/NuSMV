@@ -61,8 +61,8 @@ typedef struct HrcDumperXml_TAG *HrcDumperXml_ptr;
 
   \todo Missing description
 */
-#define HRC_DUMPER_XML_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(HRC_DUMPER_XML(self) != HRC_DUMPER_XML(NULL)))
+#define HRC_DUMPER_XML_CHECK_INSTANCE(self) \
+	(nusmv_assert(HRC_DUMPER_XML(self) != HRC_DUMPER_XML(NULL)))
 
 /**AutomaticStart*************************************************************/
 

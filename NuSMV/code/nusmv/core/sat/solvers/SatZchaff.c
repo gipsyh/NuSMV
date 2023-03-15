@@ -72,17 +72,19 @@ static int _get_clause_size(const int *clause);
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-SatZchaff_ptr SatZchaff_create(const NuSMVEnv_ptr env, const char *name) {
-  SatZchaff_ptr self = ALLOC(SatZchaff, 1);
+SatZchaff_ptr SatZchaff_create(const NuSMVEnv_ptr env, const char *name)
+{
+	SatZchaff_ptr self = ALLOC(SatZchaff, 1);
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  sat_zchaff_init(self, env, name);
-  return self;
+	sat_zchaff_init(self, env, name);
+	return self;
 }
 
-void SatZchaff_destroy(SatZchaff_ptr self) {
-  SatSolver_destroy(SAT_SOLVER(self));
+void SatZchaff_destroy(SatZchaff_ptr self)
+{
+	SatSolver_destroy(SAT_SOLVER(self));
 }
 
 /* ---------------------------------------------------------------------- */
@@ -102,29 +104,30 @@ void SatZchaff_destroy(SatZchaff_ptr self) {
   \sa sat_zchaff_zchaffLiteral2cnfLiteral
 */
 
-int sat_zchaff_cnfLiteral2zchaffLiteral(SatZchaff_ptr self, int cnfLiteral) {
-  int cnfVar = abs(cnfLiteral);
-  int zchaffVar;
+int sat_zchaff_cnfLiteral2zchaffLiteral(SatZchaff_ptr self, int cnfLiteral)
+{
+	int cnfVar = abs(cnfLiteral);
+	int zchaffVar;
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
-  nusmv_assert(0 < cnfVar);
-  /* it is important for  sat_zchaff_zchaffLiteral2cnfLiteral */
-  nusmv_assert(NODE_TO_INT(Nil) != cnfVar);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
+	nusmv_assert(0 < cnfVar);
+	/* it is important for  sat_zchaff_zchaffLiteral2cnfLiteral */
+	nusmv_assert(NODE_TO_INT(Nil) != cnfVar);
 
-  zchaffVar =
-      NODE_TO_INT(find_assoc(self->cnfVar2zchaffVar, NODE_FROM_INT(cnfVar)));
+	zchaffVar = NODE_TO_INT(
+		find_assoc(self->cnfVar2zchaffVar, NODE_FROM_INT(cnfVar)));
 
-  if (NODE_TO_INT(Nil) == zchaffVar) {
-    /* create a new internal var and associate with cnf */
-    zchaffVar = SAT_AddVariable(self->zchaffSolver);
-    insert_assoc(self->cnfVar2zchaffVar, NODE_FROM_INT(cnfVar),
-                 NODE_FROM_INT(zchaffVar));
+	if (NODE_TO_INT(Nil) == zchaffVar) {
+		/* create a new internal var and associate with cnf */
+		zchaffVar = SAT_AddVariable(self->zchaffSolver);
+		insert_assoc(self->cnfVar2zchaffVar, NODE_FROM_INT(cnfVar),
+			     NODE_FROM_INT(zchaffVar));
 
-    insert_assoc(self->zchaffVar2cnfVar, NODE_FROM_INT(zchaffVar),
-                 NODE_FROM_INT(cnfVar));
-  }
+		insert_assoc(self->zchaffVar2cnfVar, NODE_FROM_INT(zchaffVar),
+			     NODE_FROM_INT(cnfVar));
+	}
 
-  return 2 * zchaffVar + (cnfLiteral < 0);
+	return 2 * zchaffVar + (cnfLiteral < 0);
 }
 
 /*!
@@ -139,10 +142,11 @@ int sat_zchaff_cnfLiteral2zchaffLiteral(SatZchaff_ptr self, int cnfLiteral) {
   \sa sat_zchaff_cnfLiteral2zchaffLiteral
 */
 
-int sat_zchaff_zchaffLiteral2cnfLiteral(SatZchaff_ptr self, int zchaffLiteral) {
-  int zchaffVar = zchaffLiteral >> 1; /* 2*var+sign == literal */
-  int cnfVar =
-      NODE_TO_INT(find_assoc(self->zchaffVar2cnfVar, NODE_FROM_INT(zchaffVar)));
+int sat_zchaff_zchaffLiteral2cnfLiteral(SatZchaff_ptr self, int zchaffLiteral)
+{
+	int zchaffVar = zchaffLiteral >> 1; /* 2*var+sign == literal */
+	int cnfVar = NODE_TO_INT(
+		find_assoc(self->zchaffVar2cnfVar, NODE_FROM_INT(zchaffVar)));
 
 #if 0
   We cannot check that cnfVar != Nil, since some internal variables
@@ -158,7 +162,7 @@ int sat_zchaff_zchaffLiteral2cnfLiteral(SatZchaff_ptr self, int zchaffLiteral) {
                                         (lsGeneric)zchaffVar) );
 #endif
 
-  return (zchaffLiteral & 1) ? -cnfVar : cnfVar;
+	return (zchaffLiteral & 1) ? -cnfVar : cnfVar;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -174,49 +178,53 @@ int sat_zchaff_zchaffLiteral2cnfLiteral(SatZchaff_ptr self, int zchaffLiteral) {
 */
 
 void sat_zchaff_add(const SatSolver_ptr solver, const Be_Cnf_ptr cnfProb,
-                    SatSolverGroup group) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
+		    SatSolverGroup group)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
 
-  int *clause = (int *)NULL;
-  Siter iterClause;
-  int literal;
-  int literalNumber;
-  int clause_lenght;
+	int *clause = (int *)NULL;
+	Siter iterClause;
+	int literal;
+	int literalNumber;
+	int clause_lenght;
 
-  /* buffer to hold zchaff's clauses. I think a usual clause will be
+	/* buffer to hold zchaff's clauses. I think a usual clause will be
    2-4 literal and in any case it will not be more then 1000 literal
    (there is an assertion to check it) */
-  static int zchaffClause[1000];
-  /* just for efficiency */
-  const int groupIsNotPermanent =
-      SatSolver_get_permanent_group(SAT_SOLVER(self)) != group;
+	static int zchaffClause[1000];
+	/* just for efficiency */
+	const int groupIsNotPermanent =
+		SatSolver_get_permanent_group(SAT_SOLVER(self)) != group;
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  SLIST_FOREACH(Be_Cnf_GetClausesList(cnfProb), iterClause) {
-    int i = 0;
-    clause = (int *)Siter_element(iterClause);
+	SLIST_FOREACH(Be_Cnf_GetClausesList(cnfProb), iterClause)
+	{
+		int i = 0;
+		clause = (int *)Siter_element(iterClause);
 
-    literalNumber = 0;
-    clause_lenght = _get_clause_size(clause);
+		literalNumber = 0;
+		clause_lenght = _get_clause_size(clause);
 
-    nusmv_assert(1000 > clause_lenght); /* see zchaffClause above */
+		nusmv_assert(1000 > clause_lenght); /* see zchaffClause above */
 
-    while (clause[i] != 0) {
-      literal = clause[i];
-      zchaffClause[literalNumber] =
-          sat_zchaff_cnfLiteral2zchaffLiteral(self, literal);
-      ++literalNumber;
-      i++;
-    }
+		while (clause[i] != 0) {
+			literal = clause[i];
+			zchaffClause[literalNumber] =
+				sat_zchaff_cnfLiteral2zchaffLiteral(self,
+								    literal);
+			++literalNumber;
+			i++;
+		}
 
-    if (groupIsNotPermanent) { /* add literal with group id the the clause */
-      zchaffClause[literalNumber] = group * 2;
-      ++literalNumber;
-    }
-    /* add to real zchaff group 0 (real permanent one) */
-    SAT_AddClause(self->zchaffSolver, zchaffClause, literalNumber, 0);
-  }
+		if (groupIsNotPermanent) { /* add literal with group id the the clause */
+			zchaffClause[literalNumber] = group * 2;
+			++literalNumber;
+		}
+		/* add to real zchaff group 0 (real permanent one) */
+		SAT_AddClause(self->zchaffSolver, zchaffClause, literalNumber,
+			      0);
+	}
 }
 
 /*!
@@ -230,26 +238,27 @@ void sat_zchaff_add(const SatSolver_ptr solver, const Be_Cnf_ptr cnfProb,
 */
 
 void sat_zchaff_set_polarity(const SatSolver_ptr solver,
-                             const Be_Cnf_ptr cnfProb, int polarity,
-                             SatSolverGroup group) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
+			     const Be_Cnf_ptr cnfProb, int polarity,
+			     SatSolverGroup group)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
 
-  int cnfLiteral;
-  int zchaffLiteral;
-  int zchaffClause[5]; /* only one or two literals may be in the clause */
+	int cnfLiteral;
+	int zchaffLiteral;
+	int zchaffClause[5]; /* only one or two literals may be in the clause */
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  cnfLiteral = polarity * Be_Cnf_GetFormulaLiteral(cnfProb);
-  zchaffLiteral = sat_zchaff_cnfLiteral2zchaffLiteral(self, cnfLiteral);
-  zchaffClause[0] = zchaffLiteral;
+	cnfLiteral = polarity * Be_Cnf_GetFormulaLiteral(cnfProb);
+	zchaffLiteral = sat_zchaff_cnfLiteral2zchaffLiteral(self, cnfLiteral);
+	zchaffClause[0] = zchaffLiteral;
 
-  if (SatSolver_get_permanent_group(SAT_SOLVER(self)) == group) {
-    SAT_AddClause(self->zchaffSolver, zchaffClause, 1, 0);
-  } else { /* add group id to clause to controle the cnf formula */
-    zchaffClause[1] = group * 2;
-    SAT_AddClause(self->zchaffSolver, zchaffClause, 2, 0);
-  }
+	if (SatSolver_get_permanent_group(SAT_SOLVER(self)) == group) {
+		SAT_AddClause(self->zchaffSolver, zchaffClause, 1, 0);
+	} else { /* add group id to clause to controle the cnf formula */
+		zchaffClause[1] = group * 2;
+		SAT_AddClause(self->zchaffSolver, zchaffClause, 2, 0);
+	}
 }
 
 /*!
@@ -261,12 +270,13 @@ void sat_zchaff_set_polarity(const SatSolver_ptr solver,
 */
 
 void sat_zchaff_set_preferred_variables(const SatSolver_ptr solver,
-                                        const Slist_ptr cnfVars) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
+					const Slist_ptr cnfVars)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  /* Nop. Not (yet) implemented for this solver */
+	/* Nop. Not (yet) implemented for this solver */
 }
 
 /*!
@@ -277,12 +287,13 @@ void sat_zchaff_set_preferred_variables(const SatSolver_ptr solver,
   \sa sat_zchaff_set_preferred_variables
 */
 
-void sat_zchaff_clear_preferred_variables(const SatSolver_ptr solver) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
+void sat_zchaff_clear_preferred_variables(const SatSolver_ptr solver)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  /* Nop. Not (yet) implemented for this solver */
+	/* Nop. Not (yet) implemented for this solver */
 }
 
 /*!
@@ -291,12 +302,13 @@ void sat_zchaff_clear_preferred_variables(const SatSolver_ptr solver) {
 
 */
 
-SatSolverResult sat_zchaff_solve_all_groups(const SatSolver_ptr solver) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+SatSolverResult sat_zchaff_solve_all_groups(const SatSolver_ptr solver)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  return sat_zchaff_solve_groups(SAT_INC_SOLVER(self),
-                                 SAT_SOLVER(self)->existingGroups);
+	return sat_zchaff_solve_groups(SAT_INC_SOLVER(self),
+				       SAT_SOLVER(self)->existingGroups);
 }
 
 /*!
@@ -310,8 +322,9 @@ SatSolverResult sat_zchaff_solve_all_groups(const SatSolver_ptr solver) {
 
 SatSolverResult
 sat_zchaff_solve_permanent_group_assume(const SatSolver_ptr self,
-                                        const Slist_ptr assumptions) {
-  error_unreachable_code();
+					const Slist_ptr assumptions)
+{
+	error_unreachable_code();
 }
 
 /*!
@@ -323,8 +336,9 @@ sat_zchaff_solve_permanent_group_assume(const SatSolver_ptr self,
   sat_minisat_make_conflict
 */
 
-Slist_ptr sat_zchaff_get_conflicts(const SatSolver_ptr self) {
-  error_unreachable_code();
+Slist_ptr sat_zchaff_get_conflicts(const SatSolver_ptr self)
+{
+	error_unreachable_code();
 }
 
 /*!
@@ -333,45 +347,49 @@ Slist_ptr sat_zchaff_get_conflicts(const SatSolver_ptr self) {
   The previous invocation of SAT_Solve should have been successful
 */
 
-Slist_ptr sat_zchaff_make_model(const SatSolver_ptr solver) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
-  int index;
-  int varNumber;
-  Slist_ptr model = Slist_create();
+Slist_ptr sat_zchaff_make_model(const SatSolver_ptr solver)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
+	int index;
+	int varNumber;
+	Slist_ptr model = Slist_create();
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
-  /* a model is created only if there is no model */
-  nusmv_assert((Slist_ptr)NULL == SAT_SOLVER(self)->model);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
+	/* a model is created only if there is no model */
+	nusmv_assert((Slist_ptr)NULL == SAT_SOLVER(self)->model);
 
-  varNumber = SAT_NumVariables(self->zchaffSolver);
+	varNumber = SAT_NumVariables(self->zchaffSolver);
 
-  for (index = 1; index <= varNumber; ++index) {
-    int cnfLiteral = sat_zchaff_zchaffLiteral2cnfLiteral(self, index * 2);
+	for (index = 1; index <= varNumber; ++index) {
+		int cnfLiteral =
+			sat_zchaff_zchaffLiteral2cnfLiteral(self, index * 2);
 
-    if (cnfLiteral > 0) { /* it is a real variable */
-      int value = SAT_GetVarAsgnment(self->zchaffSolver, index);
+		if (cnfLiteral > 0) { /* it is a real variable */
+			int value =
+				SAT_GetVarAsgnment(self->zchaffSolver, index);
 
-      switch (value) {
-      case 0: /* negative polarity => change the CNF var's polarity */
-        cnfLiteral = -cnfLiteral;
-      case 1: /* polarity is  polarity => do nothing */
-        /* appends the model: */
-        Slist_push(model, PTR_FROM_INT(void *, cnfLiteral));
-        break;
-      case UNKNOWN:
-        break;
-      }
-    } else { /* just debugging */
-      /*
+			switch (value) {
+			case 0: /* negative polarity => change the CNF var's polarity */
+				cnfLiteral = -cnfLiteral;
+			case 1: /* polarity is  polarity => do nothing */
+				/* appends the model: */
+				Slist_push(model,
+					   PTR_FROM_INT(void *, cnfLiteral));
+				break;
+			case UNKNOWN:
+				break;
+			}
+		} else { /* just debugging */
+			/*
         We cannot check that cnfVar != Nil, since some internal variables
         can be used as group id-s.
         We cannnot check that internal variable is a group id, because
         some groups may be deleted and their id-s are removed from the list
         'existing group'.
       */
-    } /* if (UNKSNOW != value) */
-  }   /* for() */
-  return model;
+		} /* if (UNKSNOW != value) */
+	} /* for() */
+	return model;
 }
 
 /*!
@@ -383,16 +401,17 @@ Slist_ptr sat_zchaff_make_model(const SatSolver_ptr solver) {
   SatIncSolver_move_to_permanent_and_destroy_group
 */
 
-SatSolverGroup sat_zchaff_create_group(const SatIncSolver_ptr solver) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
-  int newGroup;
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+SatSolverGroup sat_zchaff_create_group(const SatIncSolver_ptr solver)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
+	int newGroup;
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  newGroup = SAT_AddVariable(self->zchaffSolver);
+	newGroup = SAT_AddVariable(self->zchaffSolver);
 
-  Olist_append(SAT_SOLVER(self)->existingGroups,
-               PTR_FROM_INT(void *, newGroup));
-  return newGroup;
+	Olist_append(SAT_SOLVER(self)->existingGroups,
+		     PTR_FROM_INT(void *, newGroup));
+	return newGroup;
 }
 
 /*!
@@ -406,24 +425,26 @@ SatSolverGroup sat_zchaff_create_group(const SatIncSolver_ptr solver) {
 */
 
 void sat_zchaff_destroy_group(const SatIncSolver_ptr solver,
-                              SatSolverGroup group) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
-  int zchaffClause[2];
+			      SatSolverGroup group)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
+	int zchaffClause[2];
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
-  /* it should not be a permanent group */
-  nusmv_assert(SatSolver_get_permanent_group(SAT_SOLVER(self)) != group);
-  /* the group should exist */
-  nusmv_assert(Olist_contains(SAT_SOLVER(self)->existingGroups, (void *)group));
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
+	/* it should not be a permanent group */
+	nusmv_assert(SatSolver_get_permanent_group(SAT_SOLVER(self)) != group);
+	/* the group should exist */
+	nusmv_assert(Olist_contains(SAT_SOLVER(self)->existingGroups,
+				    (void *)group));
 
-  /* delete the group from the lists */
-  Olist_remove(SAT_SOLVER(self)->existingGroups, (void *)group);
-  Olist_remove(SAT_SOLVER(self)->unsatisfiableGroups, (void *)group);
+	/* delete the group from the lists */
+	Olist_remove(SAT_SOLVER(self)->existingGroups, (void *)group);
+	Olist_remove(SAT_SOLVER(self)->unsatisfiableGroups, (void *)group);
 
-  /* add literal corresponding to group id to the solver (to
+	/* add literal corresponding to group id to the solver (to
      make all clauses contaning it true, so useless */
-  zchaffClause[0] = group * 2;
-  SAT_AddClause(self->zchaffSolver, zchaffClause, 1, 0);
+	zchaffClause[0] = group * 2;
+	SAT_AddClause(self->zchaffSolver, zchaffClause, 1, 0);
 }
 
 /*!
@@ -438,36 +459,40 @@ void sat_zchaff_destroy_group(const SatIncSolver_ptr solver,
 */
 
 void sat_zchaff_move_to_permanent_and_destroy_group(
-    const SatIncSolver_ptr solver, SatSolverGroup group) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
-  int zchaffClause[2];
-  /* shortcut */
-  SatSolverGroup permamentGroup;
+	const SatIncSolver_ptr solver, SatSolverGroup group)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
+	int zchaffClause[2];
+	/* shortcut */
+	SatSolverGroup permamentGroup;
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  permamentGroup = SatSolver_get_permanent_group(SAT_SOLVER(self));
+	permamentGroup = SatSolver_get_permanent_group(SAT_SOLVER(self));
 
-  /* it should not be a permanent group */
-  nusmv_assert(permamentGroup != group);
-  /* the group should exist */
-  nusmv_assert(Olist_contains(SAT_SOLVER(self)->existingGroups, (void *)group));
+	/* it should not be a permanent group */
+	nusmv_assert(permamentGroup != group);
+	/* the group should exist */
+	nusmv_assert(Olist_contains(SAT_SOLVER(self)->existingGroups,
+				    (void *)group));
 
-  /* if the group is unsatisfiable, make the permanent group unsatisfiable */
-  if (Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups, (void *)group) &&
-      (!Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups,
-                       (void *)permamentGroup))) {
-    Olist_append(SAT_SOLVER(self)->unsatisfiableGroups, (void *)permamentGroup);
-  }
+	/* if the group is unsatisfiable, make the permanent group unsatisfiable */
+	if (Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups,
+			   (void *)group) &&
+	    (!Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups,
+			     (void *)permamentGroup))) {
+		Olist_append(SAT_SOLVER(self)->unsatisfiableGroups,
+			     (void *)permamentGroup);
+	}
 
-  /* delete the group from the lists */
-  Olist_remove(SAT_SOLVER(self)->existingGroups, (void *)group);
-  Olist_remove(SAT_SOLVER(self)->unsatisfiableGroups, (void *)group);
+	/* delete the group from the lists */
+	Olist_remove(SAT_SOLVER(self)->existingGroups, (void *)group);
+	Olist_remove(SAT_SOLVER(self)->unsatisfiableGroups, (void *)group);
 
-  /* add negated literal corresponding to group id to the solver (to
+	/* add negated literal corresponding to group id to the solver (to
      remove the group id literal from all the clauses belonding to the group */
-  zchaffClause[0] = group * 2 + 1;
-  SAT_AddClause(self->zchaffSolver, zchaffClause, 1, 0);
+	zchaffClause[0] = group * 2 + 1;
+	SAT_AddClause(self->zchaffSolver, zchaffClause, 1, 0);
 }
 
 /*!
@@ -479,77 +504,81 @@ void sat_zchaff_move_to_permanent_and_destroy_group(
 */
 
 SatSolverResult sat_zchaff_solve_groups(const SatIncSolver_ptr solver,
-                                        const Olist_ptr groups) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
-  int zchaffClause[2];
-  int zchaffGroup;
-  int zchaffResult;
-  SatSolverGroup permanentGroup;
+					const Olist_ptr groups)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
+	int zchaffClause[2];
+	int zchaffGroup;
+	int zchaffResult;
+	SatSolverGroup permanentGroup;
 
-  Oiter iter;
-  SatSolverGroup aGroup;
+	Oiter iter;
+	SatSolverGroup aGroup;
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  permanentGroup = SatSolver_get_permanent_group(SAT_SOLVER(self));
+	permanentGroup = SatSolver_get_permanent_group(SAT_SOLVER(self));
 
-  /* if the permanent group is unsatisfiable => return
+	/* if the permanent group is unsatisfiable => return
      We check it here becuase the input list may not contain permenent group */
-  if (Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups,
-                     (void *)permanentGroup)) {
-    return SAT_SOLVER_UNSATISFIABLE_PROBLEM;
-  }
+	if (Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups,
+			   (void *)permanentGroup)) {
+		return SAT_SOLVER_UNSATISFIABLE_PROBLEM;
+	}
 
-  /* create a new group in actual zchaff */
-  zchaffGroup = SAT_AllocClauseGroupID(self->zchaffSolver);
+	/* create a new group in actual zchaff */
+	zchaffGroup = SAT_AllocClauseGroupID(self->zchaffSolver);
 
-  nusmv_assert(-1 != zchaffGroup);
+	nusmv_assert(-1 != zchaffGroup);
 
-  OLIST_FOREACH(groups, iter) {
-    aGroup = (SatSolverGroup)Oiter_element(iter);
-    /* the group must exist */
-    nusmv_assert(
-        Olist_contains(SAT_SOLVER(self)->existingGroups, (void *)aGroup));
+	OLIST_FOREACH(groups, iter)
+	{
+		aGroup = (SatSolverGroup)Oiter_element(iter);
+		/* the group must exist */
+		nusmv_assert(Olist_contains(SAT_SOLVER(self)->existingGroups,
+					    (void *)aGroup));
 
-    /* the group is unsatisfiable => exit */
-    if (Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups, (void *)aGroup)) {
-      SAT_DeleteClauseGroup(self->zchaffSolver, zchaffGroup);
-      return SAT_SOLVER_UNSATISFIABLE_PROBLEM;
-    }
+		/* the group is unsatisfiable => exit */
+		if (Olist_contains(SAT_SOLVER(self)->unsatisfiableGroups,
+				   (void *)aGroup)) {
+			SAT_DeleteClauseGroup(self->zchaffSolver, zchaffGroup);
+			return SAT_SOLVER_UNSATISFIABLE_PROBLEM;
+		}
 
-    /* add negated literal of the group id to the solver (if this is not
+		/* add negated literal of the group id to the solver (if this is not
        a permanent group) */
-    if (permanentGroup != aGroup) {
-      zchaffClause[0] = aGroup * 2 + 1;
-      SAT_AddClause(self->zchaffSolver, zchaffClause, 1, zchaffGroup);
-    }
-  } /* end of lsForEachItem */
+		if (permanentGroup != aGroup) {
+			zchaffClause[0] = aGroup * 2 + 1;
+			SAT_AddClause(self->zchaffSolver, zchaffClause, 1,
+				      zchaffGroup);
+		}
+	} /* end of lsForEachItem */
 
-  /* try to solver */
-  SAT_Reset(self->zchaffSolver);
-  zchaffResult = SAT_Solve(self->zchaffSolver);
+	/* try to solver */
+	SAT_Reset(self->zchaffSolver);
+	zchaffResult = SAT_Solve(self->zchaffSolver);
 
-  if (SATISFIABLE == zchaffResult) {
-    SatSolver_get_model(SAT_SOLVER(self)); /* build the model */
-  }
+	if (SATISFIABLE == zchaffResult) {
+		SatSolver_get_model(SAT_SOLVER(self)); /* build the model */
+	}
 
-  SAT_DeleteClauseGroup(self->zchaffSolver, zchaffGroup);
+	SAT_DeleteClauseGroup(self->zchaffSolver, zchaffGroup);
 
-  switch (zchaffResult) {
-  case UNSATISFIABLE:
-    return SAT_SOLVER_UNSATISFIABLE_PROBLEM;
-  case SATISFIABLE:
-    return SAT_SOLVER_SATISFIABLE_PROBLEM;
-  case TIME_OUT:
-  case MEM_OUT:
-  case ABORTED:
-    return SAT_SOLVER_INTERNAL_ERROR;
-  default:
-    error_unreachable_code();
-  }
+	switch (zchaffResult) {
+	case UNSATISFIABLE:
+		return SAT_SOLVER_UNSATISFIABLE_PROBLEM;
+	case SATISFIABLE:
+		return SAT_SOLVER_SATISFIABLE_PROBLEM;
+	case TIME_OUT:
+	case MEM_OUT:
+	case ABORTED:
+		return SAT_SOLVER_INTERNAL_ERROR;
+	default:
+		error_unreachable_code();
+	}
 
-  error_unreachable_code(); /* this code cannot be achieved. */
-  return SAT_SOLVER_INTERNAL_ERROR;
+	error_unreachable_code(); /* this code cannot be achieved. */
+	return SAT_SOLVER_INTERNAL_ERROR;
 }
 
 /*!
@@ -565,34 +594,38 @@ SatSolverResult sat_zchaff_solve_groups(const SatIncSolver_ptr solver,
 */
 
 SatSolverResult sat_zchaff_solve_without_groups(const SatIncSolver_ptr solver,
-                                                const Olist_ptr groups) {
-  SatZchaff_ptr self = SAT_ZCHAFF(solver);
-  SatSolverResult result;
-  Olist_ptr includeGroups;
-  Oiter gen;
-  SatSolverGroup aGroup;
+						const Olist_ptr groups)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(solver);
+	SatSolverResult result;
+	Olist_ptr includeGroups;
+	Oiter gen;
+	SatSolverGroup aGroup;
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
-  /* the permanent group is not in the list */
-  nusmv_assert(!Olist_contains(
-      groups, (void *)SatSolver_get_permanent_group(SAT_SOLVER(self))));
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
+	/* the permanent group is not in the list */
+	nusmv_assert(!Olist_contains(
+		groups,
+		(void *)SatSolver_get_permanent_group(SAT_SOLVER(self))));
 
-  /* create a list of all groups except the groups in the list */
-  includeGroups = Olist_create();
-  OLIST_FOREACH(SAT_SOLVER(self)->existingGroups, gen) {
-    aGroup = (SatSolverGroup)Oiter_element(gen);
-    if (!Olist_contains(groups, (void *)aGroup)) {
-      Olist_append(includeGroups, (void *)aGroup);
-    }
-  }
+	/* create a list of all groups except the groups in the list */
+	includeGroups = Olist_create();
+	OLIST_FOREACH(SAT_SOLVER(self)->existingGroups, gen)
+	{
+		aGroup = (SatSolverGroup)Oiter_element(gen);
+		if (!Olist_contains(groups, (void *)aGroup)) {
+			Olist_append(includeGroups, (void *)aGroup);
+		}
+	}
 
-  result = sat_zchaff_solve_groups(solver, includeGroups);
-  Olist_destroy(includeGroups);
-  return result;
+	result = sat_zchaff_solve_groups(solver, includeGroups);
+	Olist_destroy(includeGroups);
+	return result;
 }
 
-Slist_ptr sat_zchaff_make_conflicts(const SatZchaff_ptr self) {
-  error_unreachable_code();
+Slist_ptr sat_zchaff_make_conflicts(const SatZchaff_ptr self)
+{
+	error_unreachable_code();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -605,46 +638,47 @@ Slist_ptr sat_zchaff_make_conflicts(const SatZchaff_ptr self) {
 */
 
 void sat_zchaff_init(SatZchaff_ptr self, const NuSMVEnv_ptr env,
-                     const char *name) {
-  void *data;
+		     const char *name)
+{
+	void *data;
 
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  sat_inc_solver_init(SAT_INC_SOLVER(self), env, name);
+	sat_inc_solver_init(SAT_INC_SOLVER(self), env, name);
 
-  OVERRIDE(Object, finalize) = sat_zchaff_finalize;
+	OVERRIDE(Object, finalize) = sat_zchaff_finalize;
 
-  OVERRIDE(SatSolver, add) = sat_zchaff_add;
-  OVERRIDE(SatSolver, set_polarity) = sat_zchaff_set_polarity;
-  OVERRIDE(SatSolver, set_preferred_variables) =
-      sat_zchaff_set_preferred_variables;
-  OVERRIDE(SatSolver, clear_preferred_variables) =
-      sat_zchaff_clear_preferred_variables;
-  OVERRIDE(SatSolver, solve_all_groups) = sat_zchaff_solve_all_groups;
-  OVERRIDE(SatSolver, solve_all_groups_assume) =
-      sat_zchaff_solve_permanent_group_assume;
+	OVERRIDE(SatSolver, add) = sat_zchaff_add;
+	OVERRIDE(SatSolver, set_polarity) = sat_zchaff_set_polarity;
+	OVERRIDE(SatSolver, set_preferred_variables) =
+		sat_zchaff_set_preferred_variables;
+	OVERRIDE(SatSolver, clear_preferred_variables) =
+		sat_zchaff_clear_preferred_variables;
+	OVERRIDE(SatSolver, solve_all_groups) = sat_zchaff_solve_all_groups;
+	OVERRIDE(SatSolver, solve_all_groups_assume) =
+		sat_zchaff_solve_permanent_group_assume;
 
-  OVERRIDE(SatSolver, make_model) = sat_zchaff_make_model;
-  OVERRIDE(SatSolver, get_conflicts) = sat_zchaff_get_conflicts;
+	OVERRIDE(SatSolver, make_model) = sat_zchaff_make_model;
+	OVERRIDE(SatSolver, get_conflicts) = sat_zchaff_get_conflicts;
 
-  OVERRIDE(SatIncSolver, create_group) = sat_zchaff_create_group;
-  OVERRIDE(SatIncSolver, destroy_group) = sat_zchaff_destroy_group;
-  OVERRIDE(SatIncSolver, move_to_permanent_and_destroy_group) =
-      sat_zchaff_move_to_permanent_and_destroy_group;
-  OVERRIDE(SatIncSolver, solve_groups) = sat_zchaff_solve_groups;
-  OVERRIDE(SatIncSolver, solve_without_groups) =
-      sat_zchaff_solve_without_groups;
+	OVERRIDE(SatIncSolver, create_group) = sat_zchaff_create_group;
+	OVERRIDE(SatIncSolver, destroy_group) = sat_zchaff_destroy_group;
+	OVERRIDE(SatIncSolver, move_to_permanent_and_destroy_group) =
+		sat_zchaff_move_to_permanent_and_destroy_group;
+	OVERRIDE(SatIncSolver, solve_groups) = sat_zchaff_solve_groups;
+	OVERRIDE(SatIncSolver, solve_without_groups) =
+		sat_zchaff_solve_without_groups;
 
-  /* set a (new) proper zchaff permanent group, i.e. '0' */
-  data = Olist_delete_first(SAT_SOLVER(self)->existingGroups);
-  /* In SatSolver fake permanent group was -1. Just check. */
-  nusmv_assert(-1 == (nusmv_ptrint)data);
+	/* set a (new) proper zchaff permanent group, i.e. '0' */
+	data = Olist_delete_first(SAT_SOLVER(self)->existingGroups);
+	/* In SatSolver fake permanent group was -1. Just check. */
+	nusmv_assert(-1 == (nusmv_ptrint)data);
 
-  Olist_prepend(SAT_SOLVER(self)->existingGroups, (void *)0);
+	Olist_prepend(SAT_SOLVER(self)->existingGroups, (void *)0);
 
-  self->zchaffSolver = SAT_InitManager();
-  self->cnfVar2zchaffVar = new_assoc();
-  self->zchaffVar2cnfVar = new_assoc();
+	self->zchaffSolver = SAT_InitManager();
+	self->cnfVar2zchaffVar = new_assoc();
+	self->zchaffVar2cnfVar = new_assoc();
 }
 
 /*!
@@ -653,15 +687,16 @@ void sat_zchaff_init(SatZchaff_ptr self, const NuSMVEnv_ptr env,
 
 */
 
-void sat_zchaff_deinit(SatZchaff_ptr self) {
-  SAT_ZCHAFF_CHECK_INSTANCE(self);
+void sat_zchaff_deinit(SatZchaff_ptr self)
+{
+	SAT_ZCHAFF_CHECK_INSTANCE(self);
 
-  free_assoc(self->cnfVar2zchaffVar);
-  free_assoc(self->zchaffVar2cnfVar);
+	free_assoc(self->cnfVar2zchaffVar);
+	free_assoc(self->zchaffVar2cnfVar);
 
-  SAT_ReleaseManager(self->zchaffSolver);
+	SAT_ReleaseManager(self->zchaffSolver);
 
-  sat_solver_deinit(SAT_SOLVER(self));
+	sat_solver_deinit(SAT_SOLVER(self));
 }
 
 /*!
@@ -669,10 +704,11 @@ void sat_zchaff_deinit(SatZchaff_ptr self) {
 
   Pure virtual function. This must be refined by derived classes.
 */
-static void sat_zchaff_finalize(Object_ptr object, void *dummy) {
-  SatZchaff_ptr self = SAT_ZCHAFF(object);
-  sat_zchaff_deinit(self);
-  FREE(self);
+static void sat_zchaff_finalize(Object_ptr object, void *dummy)
+{
+	SatZchaff_ptr self = SAT_ZCHAFF(object);
+	sat_zchaff_deinit(self);
+	FREE(self);
 }
 
 /*!
@@ -680,12 +716,13 @@ static void sat_zchaff_finalize(Object_ptr object, void *dummy) {
 
   Computes the size of a clause.
 */
-static int _get_clause_size(const int *clause) {
-  int j = 0;
+static int _get_clause_size(const int *clause)
+{
+	int j = 0;
 
-  if ((int *)NULL != clause) {
-    while (clause[j] != 0)
-      j++;
-  }
-  return j;
+	if ((int *)NULL != clause) {
+		while (clause[j] != 0)
+			j++;
+	}
+	return j;
 }

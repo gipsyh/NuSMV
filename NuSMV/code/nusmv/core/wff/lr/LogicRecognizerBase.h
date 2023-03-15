@@ -62,8 +62,9 @@ typedef struct LogicRecognizerBase_TAG *LogicRecognizerBase_ptr;
 
   \todo Missing description
 */
-#define LOGIC_RECOGNIZER_BASE_CHECK_INSTANCE(self)                             \
-  (nusmv_assert(LOGIC_RECOGNIZER_BASE(self) != LOGIC_RECOGNIZER_BASE(NULL)))
+#define LOGIC_RECOGNIZER_BASE_CHECK_INSTANCE(self)   \
+	(nusmv_assert(LOGIC_RECOGNIZER_BASE(self) != \
+		      LOGIC_RECOGNIZER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,7 +80,7 @@ typedef struct LogicRecognizerBase_TAG *LogicRecognizerBase_ptr;
   the expression type to which it belongs.
 */
 LogicType LogicRecognizerBase_recognize(LogicRecognizerBase_ptr self,
-                                        node_ptr wff, node_ptr context);
+					node_ptr wff, node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

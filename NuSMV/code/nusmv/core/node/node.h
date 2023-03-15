@@ -63,11 +63,11 @@
                 node_ptr list
                 node_ptr iter
 */
-#define NODE_CONS_LIST_FOREACH(list, iter)                                     \
-  for (iter = list;                                                            \
-       /* nusmv_assert(Nil == iter || CONS == node_get_type(iter)), */ Nil !=  \
-       iter;                                                                   \
-       iter = cdr(iter))
+#define NODE_CONS_LIST_FOREACH(list, iter)                                          \
+	for (iter = list;                                                           \
+	     /* nusmv_assert(Nil == iter || CONS == node_get_type(iter)), */ Nil != \
+	     iter;                                                                  \
+	     iter = cdr(iter))
 
 /*!
   \brief Get the current element of the node conslist iterator
@@ -101,12 +101,12 @@
 
   \todo Missing description
 */
-#define NODE_FROM_INT(x)                                                       \
-  (PTR_FROM_INT(node_ptr, (0x00000000FFFFFFFFL & ((nusmv_ptrint)x))))
+#define NODE_FROM_INT(x) \
+	(PTR_FROM_INT(node_ptr, (0x00000000FFFFFFFFL & ((nusmv_ptrint)x))))
 #else
 /* Long is 4 bytes, thus we need to use long long (Windows 64bits) */
-#define NODE_FROM_INT(x)                                                       \
-  (PTR_FROM_INT(node_ptr, (0x00000000FFFFFFFFLL & ((nusmv_ptrint)x))))
+#define NODE_FROM_INT(x) \
+	(PTR_FROM_INT(node_ptr, (0x00000000FFFFFFFFLL & ((nusmv_ptrint)x))))
 #endif
 #else
 #define NODE_FROM_INT(x) (PTR_FROM_INT(node_ptr, (x)))
@@ -173,80 +173,80 @@
 
   \todo Missing description
 */
-#define node_bdd_setcar(_n_, _b_)                                              \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->left.bddtype = (_b_);                                               \
-  }
+#define node_bdd_setcar(_n_, _b_)            \
+	{ /*nusmv_assert(!(_n_)->locked);*/  \
+		(_n_)->left.bddtype = (_b_); \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define node_bdd_setcdr(_n_, _b_)                                              \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->right.bddtype = (_b_);                                              \
-  }
+#define node_bdd_setcdr(_n_, _b_)             \
+	{ /*nusmv_assert(!(_n_)->locked);*/   \
+		(_n_)->right.bddtype = (_b_); \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define node_node_setcar(_n_, _b_)                                             \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->left.nodetype = (_b_);                                              \
-  }
+#define node_node_setcar(_n_, _b_)            \
+	{ /*nusmv_assert(!(_n_)->locked);*/   \
+		(_n_)->left.nodetype = (_b_); \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define node_node_setcdr(_n_, _b_)                                             \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->right.nodetype = (_b_);                                             \
-  }
+#define node_node_setcdr(_n_, _b_)             \
+	{ /*nusmv_assert(!(_n_)->locked);*/    \
+		(_n_)->right.nodetype = (_b_); \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define node_int_setcar(_n_, _b_)                                              \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->left.inttype = (_b_);                                               \
-  }
+#define node_int_setcar(_n_, _b_)            \
+	{ /*nusmv_assert(!(_n_)->locked);*/  \
+		(_n_)->left.inttype = (_b_); \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define node_int_setcdr(_n_, _b_)                                              \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->right.inttype = (_b_);                                              \
-  }
+#define node_int_setcdr(_n_, _b_)             \
+	{ /*nusmv_assert(!(_n_)->locked);*/   \
+		(_n_)->right.inttype = (_b_); \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define node_str_setcar(_n_, _b_)                                              \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->left.strtype = (_b_);                                               \
-  }
+#define node_str_setcar(_n_, _b_)            \
+	{ /*nusmv_assert(!(_n_)->locked);*/  \
+		(_n_)->left.strtype = (_b_); \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define node_str_setcdr(_n_, _b_)                                              \
-  { /*nusmv_assert(!(_n_)->locked);*/                                          \
-    (_n_)->right.strtype = (_b_);                                              \
-  }
+#define node_str_setcdr(_n_, _b_)             \
+	{ /*nusmv_assert(!(_n_)->locked);*/   \
+		(_n_)->right.strtype = (_b_); \
+	}
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -347,7 +347,7 @@ node_ptr cdr(node_ptr);
   \sa print_sexp
 */
 void print_array_type(const NuSMVEnv_ptr env, FILE *output_stream,
-                      const node_ptr body);
+		      const node_ptr body);
 
 /*!
   \brief Replaces the car of X with Y
@@ -520,7 +520,7 @@ void walk(VPFN fun, node_ptr);
   list = Node_conslist_add(nodemgr, list, element);
 */
 node_ptr Node_conslist_add(NodeMgr_ptr nodemgr, node_ptr list,
-                           node_ptr element);
+			   node_ptr element);
 
 /*!
   \brief Remove an element from the list
@@ -528,7 +528,7 @@ node_ptr Node_conslist_add(NodeMgr_ptr nodemgr, node_ptr list,
   Linear time
 */
 node_ptr Node_conslist_remove(NodeMgr_ptr nodemgr, node_ptr list,
-                              node_ptr element);
+			      node_ptr element);
 
 /*!
   \brief DEPRECATED
@@ -615,7 +615,7 @@ node_ptr map(NodeMgr_ptr nodemgr, NPFN fun, node_ptr);
   \sa map2 walk
 */
 node_ptr map_param(NodeMgr_ptr nodemgr, node_ptr (*fun)(node_ptr, void *),
-                   node_ptr l, void *);
+		   node_ptr l, void *);
 
 /*!
   \brief DEPRECATED

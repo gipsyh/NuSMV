@@ -63,9 +63,9 @@
 */
 
 typedef struct TraceExplainer_TAG {
-  INHERITS_FROM(TracePlugin);
+	INHERITS_FROM(TracePlugin);
 
-  boolean changes_only;
+	boolean changes_only;
 } TraceExplainer;
 
 /*---------------------------------------------------------------------------*/

@@ -77,7 +77,7 @@ void SymbCache_destroy(SymbCache_ptr self);
   otherwise the resulting status will be corrupted.
 */
 void SymbCache_new_input_var(SymbCache_ptr self, node_ptr var,
-                             SymbType_ptr type);
+			     SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -87,7 +87,7 @@ void SymbCache_new_input_var(SymbCache_ptr self, node_ptr var,
   otherwise the resulting status will be corrupted.
 */
 void SymbCache_new_state_var(SymbCache_ptr self, node_ptr var,
-                             SymbType_ptr type);
+			     SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -99,7 +99,7 @@ void SymbCache_new_state_var(SymbCache_ptr self, node_ptr var,
   \sa SymbCache_redeclare_state_as_frozen_var
 */
 void SymbCache_new_frozen_var(SymbCache_ptr self, node_ptr var,
-                              SymbType_ptr type);
+			      SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -132,7 +132,7 @@ void SymbCache_remove_var(SymbCache_ptr self, node_ptr var);
   otherwise the resulting status will be corrupted.
 */
 void SymbCache_new_define(SymbCache_ptr self, node_ptr name, node_ptr context,
-                          node_ptr definition);
+			  node_ptr definition);
 
 /*!
   \methodof SymbCache
@@ -142,7 +142,7 @@ void SymbCache_new_define(SymbCache_ptr self, node_ptr name, node_ptr context,
   otherwise the resulting status will be corrupted.
 */
 void SymbCache_new_function(SymbCache_ptr self, node_ptr name, node_ptr context,
-                            SymbType_ptr type);
+			    SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -152,7 +152,7 @@ void SymbCache_new_function(SymbCache_ptr self, node_ptr name, node_ptr context,
   otherwise the resulting status will be corrupted.
 */
 void SymbCache_new_parameter(SymbCache_ptr self, node_ptr formal,
-                             node_ptr context, node_ptr actual);
+			     node_ptr context, node_ptr actual);
 
 /*!
   \methodof SymbCache
@@ -163,7 +163,7 @@ void SymbCache_new_parameter(SymbCache_ptr self, node_ptr formal,
   Internally we use ARRAY_DEF node to recognize a define array.
 */
 void SymbCache_new_array_define(SymbCache_ptr self, node_ptr name, node_ptr ctx,
-                                node_ptr definition);
+				node_ptr definition);
 
 /*!
   \methodof SymbCache
@@ -173,7 +173,7 @@ void SymbCache_new_array_define(SymbCache_ptr self, node_ptr name, node_ptr ctx,
   otherwise the resulting status will be corrupted.
 */
 void SymbCache_new_variable_array(SymbCache_ptr self, node_ptr name,
-                                  SymbType_ptr type);
+				  SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -226,7 +226,7 @@ void SymbCache_remove_constant(SymbCache_ptr self, node_ptr constant);
                       linear time
 */
 void SymbCache_remove_symbols(SymbCache_ptr self, const node_ptr *symbols,
-                              const unsigned int size);
+			      const unsigned int size);
 
 /*!
   \methodof SymbCache
@@ -236,7 +236,7 @@ void SymbCache_remove_symbols(SymbCache_ptr self, const node_ptr *symbols,
                       in the cache
 */
 SymbTableType SymbCache_get_symbol_type(const SymbCache_ptr self,
-                                        const node_ptr symbol);
+					const node_ptr symbol);
 
 /*!
   \methodof SymbCache
@@ -247,7 +247,7 @@ SymbTableType SymbCache_get_symbol_type(const SymbCache_ptr self,
                       satisfy the mask
 */
 void SymbCache_gen_iter(const SymbCache_ptr self, SymbTableIter *iter,
-                        const unsigned int mask);
+			const unsigned int mask);
 
 /*!
   \methodof SymbCache
@@ -266,7 +266,7 @@ void SymbCache_next_iter(const SymbCache_ptr self, SymbTableIter *iter);
   Checks if the iterator is at it's end
 */
 boolean SymbCache_is_iter_end(const SymbCache_ptr self,
-                              const SymbTableIter *iter);
+			      const SymbTableIter *iter);
 
 /*!
   \methodof SymbCache
@@ -275,7 +275,7 @@ boolean SymbCache_is_iter_end(const SymbCache_ptr self,
   Get the symbol pointed by the iterator
 */
 node_ptr SymbCache_iter_get_symbol(const SymbCache_ptr self,
-                                   const SymbTableIter *iter);
+				   const SymbTableIter *iter);
 
 /*!
   \methodof SymbCache
@@ -288,7 +288,7 @@ node_ptr SymbCache_iter_get_symbol(const SymbCache_ptr self,
                       both the mask and the filter
 */
 void SymbCache_iter_set_filter(const SymbCache_ptr self, SymbTableIter *iter,
-                               SymbTableIterFilterFun filter, void *arg);
+			       SymbTableIterFilterFun filter, void *arg);
 
 /*!
   \methodof SymbCache
@@ -407,9 +407,9 @@ int SymbCache_get_symbols_num(const SymbCache_ptr self);
   \sa SymbCache_remove_trigger
 */
 void SymbCache_add_trigger(const SymbCache_ptr self,
-                           SymbTableTriggerFun trigger,
-                           SymbTableTriggerAction action, void *arg1,
-                           boolean must_free_arg);
+			   SymbTableTriggerFun trigger,
+			   SymbTableTriggerAction action, void *arg1,
+			   boolean must_free_arg);
 
 /*!
   \methodof SymbCache
@@ -420,8 +420,8 @@ void SymbCache_add_trigger(const SymbCache_ptr self,
   \sa SymbCache_add_trigger
 */
 void SymbCache_remove_trigger(const SymbCache_ptr self,
-                              SymbTableTriggerFun trigger,
-                              SymbTableTriggerAction action);
+			      SymbTableTriggerFun trigger,
+			      SymbTableTriggerAction action);
 
 /*!
   \methodof SymbCache

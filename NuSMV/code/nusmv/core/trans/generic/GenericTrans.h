@@ -62,8 +62,8 @@ typedef struct GenericTrans_TAG *GenericTrans_ptr;
 
   \todo Missing description
 */
-#define GENERIC_TRANS_CHECK_INSTANCE(x)                                        \
-  (nusmv_assert(GENERIC_TRANS(x) != GENERIC_TRANS(NULL)))
+#define GENERIC_TRANS_CHECK_INSTANCE(x) \
+	(nusmv_assert(GENERIC_TRANS(x) != GENERIC_TRANS(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /*     Public methods                                                     */
@@ -79,7 +79,7 @@ typedef struct GenericTrans_TAG *GenericTrans_ptr;
   \sa Object_destroy
 */
 GenericTrans_ptr GenericTrans_create(const NuSMVEnv_ptr env,
-                                     const TransType trans_type);
+				     const TransType trans_type);
 
 /*!
   \methodof GenericTrans

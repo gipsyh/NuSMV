@@ -246,15 +246,15 @@
   \sa optional
 */
 typedef enum {
-  ALG_UNDEFINED,
-  ALG_CLASSIC,
-  ALG_EEN_SORENSSON,
-  ALG_FALSIFICATION,
-  ALG_DUAL,
-  ALG_ZIGZAG,
+	ALG_UNDEFINED,
+	ALG_CLASSIC,
+	ALG_EEN_SORENSSON,
+	ALG_FALSIFICATION,
+	ALG_DUAL,
+	ALG_ZIGZAG,
 
-  ALG_INTERP_SEQ,
-  ALG_INTERPOLANTS,
+	ALG_INTERP_SEQ,
+	ALG_INTERPOLANTS,
 } bmc_invar_algorithm;
 
 /*---------------------------------------------------------------------------*/

@@ -127,10 +127,10 @@ node_ptr Bmc_Conv_BexpList2BeList(BeEnc_ptr be_enc, node_ptr bexp_list);
   TODO[AT] a parameter may be added to make the returned assignments complete
 */
 void Bmc_Conv_get_BeModel2SymbModel(const BeEnc_ptr be_enc,
-                                    const Slist_ptr be_model, int k,
-                                    boolean convert_to_scalars,
-                                    node_ptr *frozen, array_t **states,
-                                    array_t **inputs);
+				    const Slist_ptr be_model, int k,
+				    boolean convert_to_scalars,
+				    node_ptr *frozen, array_t **states,
+				    array_t **inputs);
 
 /**AutomaticEnd***************************************************************/
 

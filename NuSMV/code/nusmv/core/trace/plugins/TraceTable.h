@@ -55,8 +55,8 @@
 */
 typedef struct TraceTable_TAG *TraceTable_ptr;
 typedef enum TraceTableStyle_TAG {
-  TRACE_TABLE_TYPE_ROW = 0,
-  TRACE_TABLE_TYPE_COLUMN
+	TRACE_TABLE_TYPE_ROW = 0,
+	TRACE_TABLE_TYPE_COLUMN
 } TraceTableStyle;
 
 /*---------------------------------------------------------------------------*/
@@ -79,8 +79,8 @@ typedef enum TraceTableStyle_TAG {
 
   \todo Missing description
 */
-#define TRACE_TABLE_CHECK_INSTANCE(x)                                          \
-  (nusmv_assert(TRACE_TABLE(x) != TRACE_TABLE(NULL)))
+#define TRACE_TABLE_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_TABLE(x) != TRACE_TABLE(NULL)))
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/

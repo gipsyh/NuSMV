@@ -64,8 +64,8 @@ typedef struct NodeGraph_TAG *NodeGraph_ptr;
 
   \todo Missing description
 */
-#define NODE_GRAPH_CHECK_INSTANCE(self)                                        \
-  (nusmv_assert(NODE_GRAPH(self) != NODE_GRAPH(NULL)))
+#define NODE_GRAPH_CHECK_INSTANCE(self) \
+	(nusmv_assert(NODE_GRAPH(self) != NODE_GRAPH(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -103,7 +103,7 @@ void NodeGraph_destroy(NodeGraph_ptr self);
          will not return empty set for those nodes.
 */
 void NodeGraph_add_children(NodeGraph_ptr self, node_ptr var,
-                            const Set_t children);
+			    const Set_t children);
 
 /*!
   \methodof NodeGraph
@@ -149,7 +149,7 @@ Set_t NodeGraph_get_parents(const NodeGraph_ptr self, node_ptr child);
   \brief Prints out the graph
 */
 void NodeGraph_print(const NodeGraph_ptr self, MasterPrinter_ptr printer,
-                     FILE *out);
+		     FILE *out);
 
 /**AutomaticEnd***************************************************************/
 

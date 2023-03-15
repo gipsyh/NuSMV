@@ -54,21 +54,21 @@
 */
 
 typedef struct SATPartialTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PartialTraceExecutor);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PartialTraceExecutor);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  BeFsm_ptr fsm;
-  BeEnc_ptr enc;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	BeFsm_ptr fsm;
+	BeEnc_ptr enc;
 
-  BddEnc_ptr bdd_enc; /* needed for booleanization */
+	BddEnc_ptr bdd_enc; /* needed for booleanization */
 
-  boolean use_restart;
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	boolean use_restart;
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } SATPartialTraceExecutor;
 
@@ -85,9 +85,9 @@ typedef struct SATPartialTraceExecutor_TAG {
   \sa SATPartialTraceExecutor_create
 */
 void sat_partial_trace_executor_init(SATPartialTraceExecutor_ptr self,
-                                     const BeFsm_ptr fsm, const BeEnc_ptr enc,
-                                     const BddEnc_ptr bdd_enc,
-                                     boolean use_restart);
+				     const BeFsm_ptr fsm, const BeEnc_ptr enc,
+				     const BddEnc_ptr bdd_enc,
+				     boolean use_restart);
 
 /*!
   \methodof SATPartialTraceExecutor

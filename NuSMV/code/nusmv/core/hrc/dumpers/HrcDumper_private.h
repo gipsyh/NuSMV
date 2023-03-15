@@ -54,33 +54,33 @@
 */
 
 typedef struct HrcDumper_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  MasterPrinter_ptr printer;
-  FILE *fout;
-  boolean use_indentation;
-  int indent;
-  size_t indent_size;
-  boolean indent_pending; /* used to control indentation */
-  unsigned int columns;
-  boolean use_mod_suffix;
+	MasterPrinter_ptr printer;
+	FILE *fout;
+	boolean use_indentation;
+	int indent;
+	size_t indent_size;
+	boolean indent_pending; /* used to control indentation */
+	unsigned int columns;
+	boolean use_mod_suffix;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  void (*dump_snippet)(HrcDumper_ptr self, HrcDumperSnippet snippet,
-                       const HrcDumperInfo *info);
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	void (*dump_snippet)(HrcDumper_ptr self, HrcDumperSnippet snippet,
+			     const HrcDumperInfo *info);
 
-  void (*dump_comment)(HrcDumper_ptr self, const char *msg);
+	void (*dump_comment)(HrcDumper_ptr self, const char *msg);
 
-  void (*dump_header)(HrcDumper_ptr self, const char *msg);
+	void (*dump_header)(HrcDumper_ptr self, const char *msg);
 
-  void (*dump_node)(HrcDumper_ptr self, node_ptr node);
+	void (*dump_node)(HrcDumper_ptr self, node_ptr node);
 } HrcDumper;
 
 /* ---------------------------------------------------------------------- */
@@ -101,33 +101,39 @@ typedef struct HrcDumper_TAG {
 */
 #define HRC_MODULE_SUFFIX "_hrc"
 
-#define _HRC_DUMP_STR(x)                                                       \
-  {                                                                            \
-    hrc_dumper_dump_indent(self);                                              \
-    fprintf(self->fout, x);                                                    \
-  }
+#define _HRC_DUMP_STR(x)                      \
+	{                                     \
+		hrc_dumper_dump_indent(self); \
+		fprintf(self->fout, x);       \
+	}
 
-#define _HRC_DUMP_STR_NL(x)                                                    \
-  {                                                                            \
-    hrc_dumper_dump_indent(self);                                              \
-    fprintf(self->fout, x);                                                    \
-    hrc_dumper_nl(self);                                                       \
-  }
+#define _HRC_DUMP_STR_NL(x)                   \
+	{                                     \
+		hrc_dumper_dump_indent(self); \
+		fprintf(self->fout, x);       \
+		hrc_dumper_nl(self);          \
+	}
 
-#define _HRC_DUMP_NL()                                                         \
-  { hrc_dumper_nl(self); }
+#define _HRC_DUMP_NL()               \
+	{                            \
+		hrc_dumper_nl(self); \
+	}
 
-#define _HRC_DUMP_NODE(x)                                                      \
-  {                                                                            \
-    hrc_dumper_dump_indent(self);                                              \
-    self->dump_node(self, x);                                                  \
-  }
+#define _HRC_DUMP_NODE(x)                     \
+	{                                     \
+		hrc_dumper_dump_indent(self); \
+		self->dump_node(self, x);     \
+	}
 
-#define _HRC_DUMP_COMMENT(x)                                                   \
-  { self->dump_comment(self, x); }
+#define _HRC_DUMP_COMMENT(x)                 \
+	{                                    \
+		self->dump_comment(self, x); \
+	}
 
-#define _HRC_DUMP_HEADER(x)                                                    \
-  { self->dump_header(self, x); }
+#define _HRC_DUMP_HEADER(x)                 \
+	{                                   \
+		self->dump_header(self, x); \
+	}
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -160,7 +166,7 @@ void hrc_dumper_deinit(HrcDumper_ptr self);
 
 */
 void hrc_dumper_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
-                             const HrcDumperInfo *info);
+			     const HrcDumperInfo *info);
 
 /*!
   \methodof HrcDumper

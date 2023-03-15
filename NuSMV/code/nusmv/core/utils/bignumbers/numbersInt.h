@@ -84,8 +84,8 @@
 */
 
 typedef struct {
-  mpz_t num;
-  mpz_t den;
+	mpz_t num;
+	mpz_t den;
 } Gmp;
 
 /*!
@@ -97,16 +97,16 @@ typedef struct {
 */
 
 typedef struct {
-  /*
+	/*
    * Implementation - numerator and denominator (normalized).  we keep both
    * in unions: if the values are small, we use plain integers, otherwise we
    * switch to GMP
    * */
-  union {
-    long num;
-    Gmp *gmp;
-  } data;
-  long den;
+	union {
+		long num;
+		Gmp *gmp;
+	} data;
+	long den;
 } QNumber;
 
 /*---------------------------------------------------------------------------*/
@@ -208,7 +208,7 @@ void QNumber_operator_self_mul(QNumber *self, const QNumber *r);
 void QNumber_operator_self_div(QNumber *self, const QNumber *r);
 
 boolean QNumber_operator_less_than_both_small(const QNumber *n,
-                                              const QNumber *r);
+					      const QNumber *r);
 
 boolean QNumber_operator_less_than_r_small(const QNumber *n, const QNumber *r);
 
@@ -239,10 +239,10 @@ boolean QNumber_operator_more_than(const QNumber *a, const QNumber *b);
 boolean QNumber_operator_equals(const QNumber *a, const QNumber *b);
 
 boolean QNumber_operator_less_than_or_equals(const QNumber *a,
-                                             const QNumber *b);
+					     const QNumber *b);
 
 boolean QNumber_operator_more_than_or_equals(const QNumber *a,
-                                             const QNumber *b);
+					     const QNumber *b);
 
 boolean QNumber_operator_not_equal(const QNumber *a, const QNumber *b);
 
@@ -271,7 +271,7 @@ boolean QNumber_divides(const QNumber *self, const QNumber *other);
 boolean QNumber_is_integer(const QNumber *self);
 
 void QNumber_divmod(const QNumber *self, const QNumber *other, QNumber *q,
-                    QNumber *r);
+		    QNumber *r);
 
 void QNumber_self_decompose(const QNumber *self);
 
@@ -288,7 +288,7 @@ boolean QNumber_mul_overflow(long *res, long lhs, long rhs);
 boolean QNumber_div_overflow(long *res, long lhs, long rhs);
 
 int QNumber_integer_from_string(char *str, char *error, int base,
-                                QNumber *target);
+				QNumber *target);
 
 char *QNumber_print_integer(const QNumber *n, int base);
 

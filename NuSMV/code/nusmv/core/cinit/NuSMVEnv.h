@@ -61,8 +61,8 @@ typedef struct NuSMVEnv_TAG *NuSMVEnv_ptr;
 
   \todo Missing description
 */
-#define NUSMV_ENV_CHECK_INSTANCE(self)                                         \
-  (nusmv_assert(NUSMV_ENV(self) != NUSMV_ENV(NULL)))
+#define NUSMV_ENV_CHECK_INSTANCE(self) \
+	(nusmv_assert(NUSMV_ENV(self) != NUSMV_ENV(NULL)))
 
 /* Common used keys. Those are "fast" keys, since they start with a
    "+" and have a ascii character that follows it. All printable ASCII
@@ -394,7 +394,7 @@ void NuSMVEnv_set_value(NuSMVEnv_ptr self, const char *key, void *value);
                       fast-keys.
 */
 void *NuSMVEnv_set_or_replace_value(NuSMVEnv_ptr self, const char *key,
-                                    void *value);
+				    void *value);
 
 /*!
   \methodof NuSMVEnv

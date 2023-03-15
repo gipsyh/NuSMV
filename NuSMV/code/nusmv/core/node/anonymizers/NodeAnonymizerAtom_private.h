@@ -52,16 +52,16 @@
 */
 
 typedef struct NodeAnonymizerAtom_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NodeAnonymizerBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NodeAnonymizerBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } NodeAnonymizerAtom;
 
@@ -78,8 +78,8 @@ typedef struct NodeAnonymizerAtom_TAG {
   \sa NodeAnonymizerAtom_create
 */
 void node_anonymizer_atom_init(NodeAnonymizerAtom_ptr self, NuSMVEnv_ptr env,
-                               const char *default_prefix,
-                               size_t memoization_threshold);
+			       const char *default_prefix,
+			       size_t memoization_threshold);
 
 /*!
   \methodof NodeAnonymizerAtom

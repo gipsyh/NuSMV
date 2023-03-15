@@ -60,8 +60,8 @@ typedef struct ParserOrd_TAG *ParserOrd_ptr;
 
   \todo Missing description
 */
-#define PARSER_ORD_CHECK_INSTANCE(x)                                           \
-  (nusmv_assert(PARSER_ORD(x) != PARSER_ORD(NULL)))
+#define PARSER_ORD_CHECK_INSTANCE(x) \
+	(nusmv_assert(PARSER_ORD(x) != PARSER_ORD(NULL)))
 
 /*!
   \methodof ParserOrd

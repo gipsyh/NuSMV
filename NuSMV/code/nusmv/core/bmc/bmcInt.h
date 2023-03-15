@@ -195,7 +195,7 @@ extern TraceMgr_ptr global_trace_manager;
 
 */
 node_ptr bmc_tableau_memoization_get_key(NodeMgr_ptr nodemgr, node_ptr wff,
-                                         int time, int k, int l);
+					 int time, int k, int l);
 
 /*!
   \brief Insertion function for ltl_tableau_hash
@@ -262,7 +262,7 @@ boolean isPureFuture(const node_ptr pltl_wff);
 
 */
 be_ptr Bmc_GetTestTableau(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
-                          const int k, const int l);
+			  const int k, const int l);
 
 /*!
   \brief Given a wff expressed in ltl builds the model-independent
@@ -278,7 +278,7 @@ be_ptr Bmc_GetTestTableau(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
   bmc_tableauGetUntilAtTime, bmc_tableauGetReleasesAtTime
 */
 be_ptr BmcInt_Tableau_GetAtTime(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
-                                const int time, const int k, const int l);
+				const int time, const int k, const int l);
 
 /* ================================================== */
 /* Tableaux for an LTL formula:                       */
@@ -291,7 +291,7 @@ be_ptr BmcInt_Tableau_GetAtTime(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
   out of [l, k] and there is no loop
 */
 be_ptr bmc_tableauGetNextAtTime(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
-                                const int time, const int k, const int l);
+				const int time, const int k, const int l);
 
 /*!
   \brief Resolves the future operator, and builds a conjunctive
@@ -303,8 +303,8 @@ be_ptr bmc_tableauGetNextAtTime(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
   iterates from intime to k, otherwise iterates from l to k
 */
 be_ptr bmc_tableauGetEventuallyAtTime(const BeEnc_ptr be_enc,
-                                      const node_ptr ltl_wff, const int intime,
-                                      const int k, const int l);
+				      const node_ptr ltl_wff, const int intime,
+				      const int k, const int l);
 
 /*!
   \brief As bmc_tableauGetEventuallyAtTime, but builds a
@@ -315,8 +315,8 @@ be_ptr bmc_tableauGetEventuallyAtTime(const BeEnc_ptr be_enc,
   \sa bmc_tableauGetEventuallyAtTime
 */
 be_ptr bmc_tableauGetGloballyAtTime(const BeEnc_ptr be_enc,
-                                    const node_ptr ltl_wff, const int intime,
-                                    const int k, const int l);
+				    const node_ptr ltl_wff, const int intime,
+				    const int k, const int l);
 
 /*!
   \brief Builds an expression which evaluates the until operator
@@ -327,8 +327,8 @@ be_ptr bmc_tableauGetGloballyAtTime(const BeEnc_ptr be_enc,
   \sa bmc_tableauGetUntilAtTime_aux
 */
 be_ptr bmc_tableauGetUntilAtTime(const BeEnc_ptr be_enc, const node_ptr p,
-                                 const node_ptr q, const int time, const int k,
-                                 const int l);
+				 const node_ptr q, const int time, const int k,
+				 const int l);
 
 /*!
   \brief Builds an expression which evaluates the release
@@ -340,8 +340,8 @@ be_ptr bmc_tableauGetUntilAtTime(const BeEnc_ptr be_enc, const node_ptr p,
   \sa bmc_tableauGetReleasesAtTime_aux
 */
 be_ptr bmc_tableauGetReleasesAtTime(const BeEnc_ptr be_enc, const node_ptr p,
-                                    const node_ptr q, const int time,
-                                    const int k, const int l);
+				    const node_ptr q, const int time,
+				    const int k, const int l);
 /* ================================================== */
 
 /* ================================================== */
@@ -357,8 +357,8 @@ be_ptr bmc_tableauGetReleasesAtTime(const BeEnc_ptr be_enc, const node_ptr p,
   \sa getTableauAtTime
 */
 be_ptr Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
-                                  const node_ptr pltl_wff, const int k,
-                                  const int l);
+				  const node_ptr pltl_wff, const int k,
+				  const int l);
 
 /*!
   \brief Builds the conjunction of the tableaux for a PLTL formula
@@ -373,7 +373,7 @@ be_ptr Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
   \sa evaluateOn
 */
 be_ptr Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
-                                         const node_ptr pltl_wff, const int k);
+					 const node_ptr pltl_wff, const int k);
 /* ================================================== */
 
 /* ================================================== */
@@ -395,7 +395,7 @@ be_ptr Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
                Returned list must be destroyed by the called.
 */
 lsList Bmc_Utils_get_vars_list_for_uniqueness(BeEnc_ptr be_enc,
-                                              Prop_ptr invarprop);
+					      Prop_ptr invarprop);
 
 /*!
   \brief Creates a list of BE variables that are intended to be
@@ -413,12 +413,12 @@ lsList Bmc_Utils_get_vars_list_for_uniqueness(BeEnc_ptr be_enc,
                Returned list must be destroyed by the called.
 */
 lsList Bmc_Utils_get_vars_list_for_uniqueness_fsm(BeEnc_ptr be_enc,
-                                                  SexpFsm_ptr bool_fsm);
+						  SexpFsm_ptr bool_fsm);
 
 /* ================================================== */
 /* Simulation                                         */
 void bmc_simulate_set_curr_sim_trace(const NuSMVEnv_ptr env, Trace_ptr trace,
-                                     int idx);
+				     int idx);
 Trace_ptr bmc_simulate_get_curr_sim_trace(const NuSMVEnv_ptr env);
 int bmc_simulate_get_curr_sim_trace_index(const NuSMVEnv_ptr env);
 /* ================================================== */
@@ -439,10 +439,10 @@ int bmc_simulate_get_curr_sim_trace_index(const NuSMVEnv_ptr env);
                Bmc_fill_trace_from_cnf_model
 */
 Trace_ptr Bmc_create_trace_from_cnf_model(const BeEnc_ptr be_enc,
-                                          const NodeList_ptr symbols,
-                                          const char *desc,
-                                          const TraceType type,
-                                          const Slist_ptr cnf_model, int k);
+					  const NodeList_ptr symbols,
+					  const char *desc,
+					  const TraceType type,
+					  const Slist_ptr cnf_model, int k);
 
 /*!
   \brief Fills the given trace out of a cnf model
@@ -456,8 +456,8 @@ Trace_ptr Bmc_create_trace_from_cnf_model(const BeEnc_ptr be_enc,
   \sa Trace_create, Mc_fill_trace_from_bdd_input_list
 */
 Trace_ptr Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
-                                        const Slist_ptr cnf_model, int k,
-                                        Trace_ptr trace);
+					const Slist_ptr cnf_model, int k,
+					Trace_ptr trace);
 
 /* internal bmc/trace utils */
 
@@ -473,7 +473,7 @@ Trace_ptr Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
   \se Trace is populated with default values
 */
 void bmc_trace_utils_complete_trace(Trace_ptr trace,
-                                    const BoolEnc_ptr bool_enc);
+				    const BoolEnc_ptr bool_enc);
 
 /*!
   \brief Appends a _complete_ (i,S') pair to existing trace
@@ -481,7 +481,7 @@ void bmc_trace_utils_complete_trace(Trace_ptr trace,
   This is a private service of BmcStepWise_Simulation
 */
 void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
-                                        const Slist_ptr cnf_model);
+					const Slist_ptr cnf_model);
 
 /**AutomaticEnd***************************************************************/
 

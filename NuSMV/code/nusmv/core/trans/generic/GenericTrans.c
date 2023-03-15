@@ -60,53 +60,57 @@ static void generic_trans_finalize(Object_ptr object, void *dummy);
 /* ---------------------------------------------------------------------- */
 
 GenericTrans_ptr GenericTrans_create(const NuSMVEnv_ptr env,
-                                     const TransType trans_type) {
-  GenericTrans_ptr self = ALLOC(GenericTrans, 1);
+				     const TransType trans_type)
+{
+	GenericTrans_ptr self = ALLOC(GenericTrans, 1);
 
-  GENERIC_TRANS_CHECK_INSTANCE(self);
+	GENERIC_TRANS_CHECK_INSTANCE(self);
 
-  generic_trans_init(self, env, trans_type);
-  return self;
+	generic_trans_init(self, env, trans_type);
+	return self;
 }
 
-TransType GenericTrans_get_type(const GenericTrans_ptr self) {
-  GENERIC_TRANS_CHECK_INSTANCE(self);
-  return self->_type;
+TransType GenericTrans_get_type(const GenericTrans_ptr self)
+{
+	GENERIC_TRANS_CHECK_INSTANCE(self);
+	return self->_type;
 }
 
-TransType TransType_from_string(const char *name) {
-  TransType res;
+TransType TransType_from_string(const char *name)
+{
+	TransType res;
 
-  if (strcmp(name, TRANS_TYPE_MONOLITHIC_STRING) == 0) {
-    res = TRANS_TYPE_MONOLITHIC;
-  } else if (strcmp(name, TRANS_TYPE_THRESHOLD_STRING) == 0) {
-    res = TRANS_TYPE_THRESHOLD;
-  } else if (strcmp(name, TRANS_TYPE_IWLS95_STRING) == 0) {
-    res = TRANS_TYPE_IWLS95;
-  } else
-    res = TRANS_TYPE_INVALID;
+	if (strcmp(name, TRANS_TYPE_MONOLITHIC_STRING) == 0) {
+		res = TRANS_TYPE_MONOLITHIC;
+	} else if (strcmp(name, TRANS_TYPE_THRESHOLD_STRING) == 0) {
+		res = TRANS_TYPE_THRESHOLD;
+	} else if (strcmp(name, TRANS_TYPE_IWLS95_STRING) == 0) {
+		res = TRANS_TYPE_IWLS95;
+	} else
+		res = TRANS_TYPE_INVALID;
 
-  return res;
+	return res;
 }
 
-char *TransType_to_string(const TransType self) {
-  char *res;
+char *TransType_to_string(const TransType self)
+{
+	char *res;
 
-  switch (self) {
-  case TRANS_TYPE_MONOLITHIC:
-    res = TRANS_TYPE_MONOLITHIC_STRING;
-    break;
-  case TRANS_TYPE_THRESHOLD:
-    res = TRANS_TYPE_THRESHOLD_STRING;
-    break;
-  case TRANS_TYPE_IWLS95:
-    res = TRANS_TYPE_IWLS95_STRING;
-    break;
-  default:
-    res = "Unknown";
-  }
+	switch (self) {
+	case TRANS_TYPE_MONOLITHIC:
+		res = TRANS_TYPE_MONOLITHIC_STRING;
+		break;
+	case TRANS_TYPE_THRESHOLD:
+		res = TRANS_TYPE_THRESHOLD_STRING;
+		break;
+	case TRANS_TYPE_IWLS95:
+		res = TRANS_TYPE_IWLS95_STRING;
+		break;
+	default:
+		res = "Unknown";
+	}
 
-  return res;
+	return res;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -114,26 +118,28 @@ char *TransType_to_string(const TransType self) {
 /* ---------------------------------------------------------------------- */
 
 void generic_trans_init(GenericTrans_ptr self, const NuSMVEnv_ptr env,
-                        const TransType trans_type) {
-  env_object_init(ENV_OBJECT(self), env);
+			const TransType trans_type)
+{
+	env_object_init(ENV_OBJECT(self), env);
 
-  self->_type = trans_type;
+	self->_type = trans_type;
 
-  OVERRIDE(Object, finalize) = generic_trans_finalize;
-  OVERRIDE(Object, copy) = generic_trans_copy;
+	OVERRIDE(Object, finalize) = generic_trans_finalize;
+	OVERRIDE(Object, copy) = generic_trans_copy;
 }
 
-void generic_trans_deinit(GenericTrans_ptr self) {
-  env_object_deinit(ENV_OBJECT(self));
+void generic_trans_deinit(GenericTrans_ptr self)
+{
+	env_object_deinit(ENV_OBJECT(self));
 }
 
-void generic_trans_copy_aux(const GenericTrans_ptr self,
-                            GenericTrans_ptr copy) {
-  /* copies the base class: */
-  env_object_copy_aux(ENV_OBJECT(self), ENV_OBJECT(copy));
+void generic_trans_copy_aux(const GenericTrans_ptr self, GenericTrans_ptr copy)
+{
+	/* copies the base class: */
+	env_object_copy_aux(ENV_OBJECT(self), ENV_OBJECT(copy));
 
-  /* copies class members: */
-  copy->_type = self->_type;
+	/* copies class members: */
+	copy->_type = self->_type;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -145,15 +151,16 @@ void generic_trans_copy_aux(const GenericTrans_ptr self,
 
   \todo Missing description
 */
-static Object_ptr generic_trans_copy(const Object_ptr object) {
-  GenericTrans_ptr self = GENERIC_TRANS(object);
-  GenericTrans_ptr copy;
+static Object_ptr generic_trans_copy(const Object_ptr object)
+{
+	GenericTrans_ptr self = GENERIC_TRANS(object);
+	GenericTrans_ptr copy;
 
-  copy = ALLOC(GenericTrans, 1);
-  GENERIC_TRANS_CHECK_INSTANCE(copy);
+	copy = ALLOC(GenericTrans, 1);
+	GENERIC_TRANS_CHECK_INSTANCE(copy);
 
-  generic_trans_copy_aux(self, copy);
-  return OBJECT(copy);
+	generic_trans_copy_aux(self, copy);
+	return OBJECT(copy);
 }
 
 /*!
@@ -161,9 +168,10 @@ static Object_ptr generic_trans_copy(const Object_ptr object) {
 
   \todo Missing description
 */
-static void generic_trans_finalize(Object_ptr object, void *dummy) {
-  GenericTrans_ptr self = GENERIC_TRANS(object);
+static void generic_trans_finalize(Object_ptr object, void *dummy)
+{
+	GenericTrans_ptr self = GENERIC_TRANS(object);
 
-  generic_trans_deinit(self);
-  FREE(self);
+	generic_trans_deinit(self);
+	FREE(self);
 }

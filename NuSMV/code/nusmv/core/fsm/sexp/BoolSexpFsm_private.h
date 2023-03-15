@@ -54,18 +54,18 @@
 */
 
 typedef struct BoolSexpFsm_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(SexpFsm);
+	/* this MUST stay on the top */
+	INHERITS_FROM(SexpFsm);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  BddEnc_ptr enc;          /* bdd encoder for booleanization */
-  SymbLayer_ptr det_layer; /* layer for determinizing */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	BddEnc_ptr enc; /* bdd encoder for booleanization */
+	SymbLayer_ptr det_layer; /* layer for determinizing */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } BoolSexpFsm;
 
@@ -82,8 +82,8 @@ typedef struct BoolSexpFsm_TAG {
   \sa BoolSexpFsm_create
 */
 void bool_sexp_fsm_init(BoolSexpFsm_ptr self, const FlatHierarchy_ptr hierarchy,
-                        const Set_t vars_set, BddEnc_ptr enc,
-                        SymbLayer_ptr det_layer);
+			const Set_t vars_set, BddEnc_ptr enc,
+			SymbLayer_ptr det_layer);
 
 /*!
   \methodof BoolSexpFsm

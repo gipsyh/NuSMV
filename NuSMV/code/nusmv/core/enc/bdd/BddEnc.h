@@ -77,9 +77,9 @@ typedef void (*VPFBEFNNV)(BddEnc_ptr, OStream_ptr, node_ptr, node_ptr, void *);
   \todo Missing description
 */
 typedef enum {
-  DUMP_FORMAT_INVALID,
-  DUMP_FORMAT_DOT,
-  DUMP_FORMAT_DAVINCI,
+	DUMP_FORMAT_INVALID,
+	DUMP_FORMAT_DOT,
+	DUMP_FORMAT_DAVINCI,
 } t_format;
 
 /*!
@@ -95,8 +95,8 @@ typedef enum {
 
   \todo Missing description
 */
-#define BDD_ENC_CHECK_INSTANCE(self)                                           \
-  (nusmv_assert(BDD_ENC(self) != BDD_ENC(NULL)))
+#define BDD_ENC_CHECK_INSTANCE(self) \
+	(nusmv_assert(BDD_ENC(self) != BDD_ENC(NULL)))
 
 /*!
   \brief Used when dumping ordering file
@@ -130,8 +130,8 @@ typedef enum { DUMP_DEFAULT, DUMP_BITS, DUMP_SCALARS_ONLY } VarOrderingType;
   \sa BddEnc_destroy
 */
 BddEnc_ptr BddEnc_create(SymbTable_ptr symb_table, BoolEnc_ptr bool_enc,
-                         VarsHandler_ptr dd_vars_hndr,
-                         OrdGroups_ptr ord_groups);
+			 VarsHandler_ptr dd_vars_hndr,
+			 OrdGroups_ptr ord_groups);
 
 /*!
   \methodof BddEnc
@@ -187,7 +187,7 @@ OrdGroups_ptr BddEnc_get_ord_groups(const BddEnc_ptr self);
    with TypeCheckingPkg_check_property
 */
 add_ptr BddEnc_expr_to_add(BddEnc_ptr self, const Expr_ptr expr,
-                           const node_ptr context);
+			   const node_ptr context);
 
 /*!
   \methodof BddEnc
@@ -207,7 +207,7 @@ add_ptr BddEnc_expr_to_add(BddEnc_ptr self, const Expr_ptr expr,
    with TypeCheckingPkg_check_property
 */
 AddArray_ptr BddEnc_expr_to_addarray(BddEnc_ptr self, const Expr_ptr expr,
-                                     const node_ptr context);
+				     const node_ptr context);
 
 /*!
   \methodof BddEnc
@@ -223,7 +223,7 @@ AddArray_ptr BddEnc_expr_to_addarray(BddEnc_ptr self, const Expr_ptr expr,
    with TypeCheckingPkg_check_property
 */
 bdd_ptr BddEnc_expr_to_bdd(BddEnc_ptr self, const Expr_ptr expr,
-                           const node_ptr context);
+			   const node_ptr context);
 
 /*!
   \methodof BddEnc
@@ -250,7 +250,7 @@ bdd_ptr BddEnc_expr_to_bdd(BddEnc_ptr self, const Expr_ptr expr,
   \sa bdd_enc_add2expr_recur
 */
 node_ptr BddEnc_add_to_expr(BddEnc_ptr self, const add_ptr add,
-                            SymbLayer_ptr det_layer);
+			    SymbLayer_ptr det_layer);
 
 /*!
   \methodof BddEnc
@@ -274,7 +274,7 @@ node_ptr BddEnc_add_to_expr(BddEnc_ptr self, const add_ptr add,
   \sa bdd_enc_add2expr_recur
 */
 node_ptr BddEnc_add_to_scalar_expr(BddEnc_ptr self, const add_ptr add,
-                                   SymbLayer_ptr det_layer);
+				   SymbLayer_ptr det_layer);
 
 /*!
   \methodof BddEnc
@@ -365,8 +365,8 @@ BddVarSet_ptr BddEnc_get_input_vars_cube(const BddEnc_ptr self);
    used.
 */
 BddVarSet_ptr BddEnc_get_layer_vars_cube(const BddEnc_ptr self,
-                                         SymbLayer_ptr layer,
-                                         SymbFilterType vt);
+					 SymbLayer_ptr layer,
+					 SymbFilterType vt);
 
 /*!
   \methodof BddEnc
@@ -381,7 +381,7 @@ BddVarSet_ptr BddEnc_get_layer_vars_cube(const BddEnc_ptr self,
    returned.
 */
 boolean BddEnc_is_var_in_cube(const BddEnc_ptr self, node_ptr name,
-                              add_ptr cube);
+			      add_ptr cube);
 
 /*!
   \methodof BddEnc
@@ -394,7 +394,7 @@ boolean BddEnc_is_var_in_cube(const BddEnc_ptr self, node_ptr name,
    corrisponding STATE variables
 */
 add_ptr BddEnc_state_var_to_next_state_var_add(const BddEnc_ptr self,
-                                               add_ptr add);
+					       add_ptr add);
 
 /*!
   \methodof BddEnc
@@ -407,7 +407,7 @@ add_ptr BddEnc_state_var_to_next_state_var_add(const BddEnc_ptr self,
    STATE variables
 */
 add_ptr BddEnc_next_state_var_to_state_var_add(const BddEnc_ptr self,
-                                               add_ptr add);
+					       add_ptr add);
 
 /*!
   \methodof BddEnc
@@ -443,7 +443,7 @@ bdd_ptr BddEnc_next_state_var_to_state_var(const BddEnc_ptr self, bdd_ptr bdd);
    out.
 */
 void BddEnc_print_bdd_begin(BddEnc_ptr self, NodeList_ptr symbols,
-                            boolean changes_only);
+			    boolean changes_only);
 
 /*!
   \methodof BddEnc
@@ -468,7 +468,7 @@ void BddEnc_print_bdd_end(BddEnc_ptr self);
    Returns the number of symbols actually printed
 */
 int BddEnc_print_bdd(BddEnc_ptr self, bdd_ptr bdd, VPFBEFNNV p_fun,
-                     OStream_ptr file, void *arg);
+		     OStream_ptr file, void *arg);
 
 /*!
   \methodof BddEnc
@@ -478,8 +478,8 @@ int BddEnc_print_bdd(BddEnc_ptr self, bdd_ptr bdd, VPFBEFNNV p_fun,
   Note: states are represented by state and frozen variables
 */
 void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
-                                boolean changes_only, boolean print_defines,
-                                VPFBEFNNV p_fun, OStream_ptr file, void *arg);
+				boolean changes_only, boolean print_defines,
+				VPFBEFNNV p_fun, OStream_ptr file, void *arg);
 
 /*!
   \methodof BddEnc
@@ -489,8 +489,8 @@ void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
 
 */
 void BddEnc_print_set_of_inputs(BddEnc_ptr self, bdd_ptr inputs,
-                                boolean changes_only, VPFBEFNNV p_fun,
-                                OStream_ptr file, void *arg);
+				boolean changes_only, VPFBEFNNV p_fun,
+				OStream_ptr file, void *arg);
 
 /*!
   \methodof BddEnc
@@ -501,10 +501,10 @@ void BddEnc_print_set_of_inputs(BddEnc_ptr self, bdd_ptr inputs,
   Note: states are represented by state and frozen variables
 */
 void BddEnc_print_set_of_state_input_pairs(BddEnc_ptr self,
-                                           bdd_ptr state_input_pairs,
-                                           boolean changes_only,
-                                           VPFBEFNNV p_fun, OStream_ptr file,
-                                           void *arg);
+					   bdd_ptr state_input_pairs,
+					   boolean changes_only,
+					   VPFBEFNNV p_fun, OStream_ptr file,
+					   void *arg);
 
 /*!
   \methodof BddEnc
@@ -515,9 +515,9 @@ void BddEnc_print_set_of_state_input_pairs(BddEnc_ptr self,
   \se none
 */
 void BddEnc_print_set_of_trans_models(BddEnc_ptr self,
-                                      bdd_ptr state_input_pairs,
-                                      /* boolean changes_only, */
-                                      OStream_ptr file);
+				      bdd_ptr state_input_pairs,
+				      /* boolean changes_only, */
+				      OStream_ptr file);
 
 /*!
   \methodof BddEnc
@@ -553,8 +553,8 @@ void BddEnc_print_set_of_trans_models(BddEnc_ptr self,
 
 */
 node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
-                               NodeList_ptr symbols, boolean onlyRequiredSymbs,
-                               bdd_ptr *resultBdd);
+			       NodeList_ptr symbols, boolean onlyRequiredSymbs,
+			       bdd_ptr *resultBdd);
 
 /*!
   \methodof BddEnc
@@ -569,7 +569,7 @@ node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
   \se None
 */
 void BddEnc_print_vars_in_cube(BddEnc_ptr self, bdd_ptr cube,
-                               node_ptr list_of_sym, OStream_ptr file);
+			       node_ptr list_of_sym, OStream_ptr file);
 
 /*!
   \methodof BddEnc
@@ -585,15 +585,15 @@ void BddEnc_print_vars_in_cube(BddEnc_ptr self, bdd_ptr cube,
    Returned list must be disposed by the caller.
 */
 NodeList_ptr BddEnc_get_vars_in_cube(const BddEnc_ptr self, bdd_ptr cube,
-                                     node_ptr list_of_sym,
-                                     boolean include_next);
+				     node_ptr list_of_sym,
+				     boolean include_next);
 
 /*!
   \methodof BddEnc
   \todo
 */
 NodeList_ptr BddEnc_get_var_ordering(const BddEnc_ptr self,
-                                     const VarOrderingType ord_type);
+				     const VarOrderingType ord_type);
 
 /*!
   \methodof BddEnc
@@ -613,7 +613,7 @@ NodeList_ptr BddEnc_get_var_ordering(const BddEnc_ptr self,
   \sa Compile_ReadOrder
 */
 int BddEnc_write_var_ordering(const BddEnc_ptr self, const char *oo_filename,
-                              const VarOrderingType dump_type);
+			      const VarOrderingType dump_type);
 
 /*!
   \methodof BddEnc
@@ -735,7 +735,7 @@ bdd_ptr BddEnc_pick_one_input(const BddEnc_ptr self, bdd_ptr inputs);
                        BddEnc_pick_one_input
 */
 bdd_ptr BddEnc_pick_one_input_state(const BddEnc_ptr self,
-                                    bdd_ptr inputs_states);
+				    bdd_ptr inputs_states);
 
 /*!
   \methodof BddEnc
@@ -756,8 +756,8 @@ bdd_ptr BddEnc_pick_one_input_state(const BddEnc_ptr self,
   \sa bdd_pick_all_terms
 */
 boolean BddEnc_pick_all_terms_states_inputs(const BddEnc_ptr self, bdd_ptr bdd,
-                                            bdd_ptr *result_array,
-                                            const int array_len);
+					    bdd_ptr *result_array,
+					    const int array_len);
 
 /*!
   \methodof BddEnc
@@ -777,8 +777,8 @@ boolean BddEnc_pick_all_terms_states_inputs(const BddEnc_ptr self, bdd_ptr bdd,
   \sa bdd_pick_all_terms
 */
 boolean BddEnc_pick_all_terms_states(const BddEnc_ptr self, bdd_ptr bdd,
-                                     bdd_ptr *result_array,
-                                     const int array_len);
+				     bdd_ptr *result_array,
+				     const int array_len);
 
 /*!
   \methodof BddEnc
@@ -796,8 +796,8 @@ boolean BddEnc_pick_all_terms_states(const BddEnc_ptr self, bdd_ptr bdd,
   \sa bdd_pick_all_terms
 */
 boolean BddEnc_pick_all_terms_inputs(const BddEnc_ptr self, bdd_ptr bdd,
-                                     bdd_ptr *result_array,
-                                     const int array_len);
+				     bdd_ptr *result_array,
+				     const int array_len);
 
 /*!
   \methodof BddEnc
@@ -836,7 +836,7 @@ bdd_ptr BddEnc_pick_one_input_rand(const BddEnc_ptr self, bdd_ptr inputs);
                        BddEnc_pick_one_input_rand, BddEnc_pick_one_state_rand
 */
 bdd_ptr BddEnc_pick_one_input_state_rand(const BddEnc_ptr self,
-                                         bdd_ptr inputs_states);
+					 bdd_ptr inputs_states);
 
 /*!
   \methodof BddEnc
@@ -1037,7 +1037,7 @@ bdd_ptr BddEnc_get_state_frozen_input_vars_mask_bdd(BddEnc_ptr self);
    occur within the layers committed to self
 */
 add_ptr BddEnc_apply_state_frozen_vars_mask_add(BddEnc_ptr self,
-                                                add_ptr states);
+						add_ptr states);
 
 /*!
   \methodof BddEnc
@@ -1060,7 +1060,7 @@ add_ptr BddEnc_apply_input_vars_mask_add(BddEnc_ptr self, add_ptr inputs);
    occur within the layers committed to self
 */
 add_ptr BddEnc_apply_state_frozen_input_vars_mask_add(BddEnc_ptr self,
-                                                      add_ptr states_inputs);
+						      add_ptr states_inputs);
 
 /*!
   \methodof BddEnc
@@ -1072,7 +1072,7 @@ add_ptr BddEnc_apply_state_frozen_input_vars_mask_add(BddEnc_ptr self,
    occur within the layers committed to self
 */
 BddStates BddEnc_apply_state_frozen_vars_mask_bdd(BddEnc_ptr self,
-                                                  BddStates states);
+						  BddStates states);
 
 /*!
   \methodof BddEnc
@@ -1096,7 +1096,7 @@ BddInputs BddEnc_apply_input_vars_mask_bdd(BddEnc_ptr self, BddInputs inputs);
 */
 BddStatesInputs
 BddEnc_apply_state_frozen_input_vars_mask_bdd(BddEnc_ptr self,
-                                              BddStatesInputs states_inputs);
+					      BddStatesInputs states_inputs);
 
 /*!
   \methodof BddEnc
@@ -1139,8 +1139,8 @@ add_ptr BddEnc_get_var_mask(BddEnc_ptr self, node_ptr var_name);
   \se None
 */
 array_t *BddEnc_ComputePrimeImplicants(BddEnc_ptr self,
-                                       const array_t *layer_names,
-                                       bdd_ptr formula);
+				       const array_t *layer_names,
+				       bdd_ptr formula);
 
 /*!
   \methodof BddEnc
@@ -1187,8 +1187,8 @@ void BddEnc_force_order_from_file(BddEnc_ptr self, FILE *orderfile);
   \sa BddEnc_bdd_to_wff
 */
 void BddEnc_print_bdd_wff(BddEnc_ptr self, bdd_ptr bdd, NodeList_ptr vars,
-                          boolean do_sharing, boolean do_indent,
-                          int start_at_column, OStream_ptr out);
+			  boolean do_sharing, boolean do_indent,
+			  int start_at_column, OStream_ptr out);
 
 /*!
   \methodof BddEnc
@@ -1199,8 +1199,8 @@ void BddEnc_print_bdd_wff(BddEnc_ptr self, bdd_ptr bdd, NodeList_ptr vars,
                  indifferent variables in the encoding.
 */
 void BddEnc_print_formula_info(BddEnc_ptr self, Expr_ptr formula,
-                               boolean print_models, boolean print_formula,
-                               OStream_ptr out);
+			       boolean print_models, boolean print_formula,
+			       OStream_ptr out);
 
 /*!
   \methodof BddEnc
@@ -1254,7 +1254,7 @@ void BddEnc_clean_evaluation_cache(BddEnc_ptr self);
    longer used.
 */
 BddVarSet_ptr BddEnc_get_vars_cube(const BddEnc_ptr self, Set_t vars,
-                                   SymbFilterType vt);
+				   SymbFilterType vt);
 
 /*!
   \methodof BddEnc
@@ -1271,7 +1271,7 @@ BddVarSet_ptr BddEnc_get_vars_cube(const BddEnc_ptr self, Set_t vars,
    longer used.
 */
 BddVarSet_ptr BddEnc_get_unfiltered_vars_cube(const BddEnc_ptr self,
-                                              Set_t vars);
+					      Set_t vars);
 
 /*!
   \methodof BddEnc
@@ -1283,7 +1283,7 @@ BddVarSet_ptr BddEnc_get_unfiltered_vars_cube(const BddEnc_ptr self,
   Returns 0 in case of success, 1 otherwise
 */
 int BddEnc_dump_addarray_dot(BddEnc_ptr self, AddArray_ptr addarray,
-                             const char **labels, FILE *outfile);
+			     const char **labels, FILE *outfile);
 
 /*!
   \methodof BddEnc
@@ -1295,7 +1295,7 @@ int BddEnc_dump_addarray_dot(BddEnc_ptr self, AddArray_ptr addarray,
   Returns 0 in case of success, 1 otherwise
 */
 int BddEnc_dump_addarray_davinci(BddEnc_ptr self, AddArray_ptr addarray,
-                                 const char **labels, FILE *outfile);
+				 const char **labels, FILE *outfile);
 
 /* Functions directly called by commands */
 
@@ -1305,7 +1305,7 @@ int BddEnc_dump_addarray_davinci(BddEnc_ptr self, AddArray_ptr addarray,
   Prints a formula in canonical format.
 */
 void BddEnc_print_formula(const NuSMVEnv_ptr env, node_ptr constr,
-                          const boolean verbose, const boolean formula);
+			  const boolean verbose, const boolean formula);
 
 /*!
   \methodof BddEnc
@@ -1314,8 +1314,8 @@ void BddEnc_print_formula(const NuSMVEnv_ptr env, node_ptr constr,
   type check the expression, then convers to bdd and dumps
 */
 int BddEnc_dump_expr(const BddEnc_ptr self, const node_ptr parsed_expr,
-                     const char *str_constr, const t_format format,
-                     FILE *outfile);
+		     const char *str_constr, const t_format format,
+		     FILE *outfile);
 
 /**AutomaticEnd**************************************************************/
 

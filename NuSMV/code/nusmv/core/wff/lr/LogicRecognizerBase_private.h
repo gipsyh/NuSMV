@@ -49,11 +49,12 @@
 
 
 */
-#define LR_THROW(self, exp, ctx)                                               \
-  (NodeWalker_can_handle(NODE_WALKER(self), exp)                               \
-       ? LOGIC_RECOGNIZER_BASE(self)->recognize(self, exp, ctx)                \
-       : master_logic_recognizer_recognize(                                    \
-             MASTER_LOGIC_RECOGNIZER(NODE_WALKER(self)->master), exp, ctx))
+#define LR_THROW(self, exp, ctx)                                             \
+	(NodeWalker_can_handle(NODE_WALKER(self), exp) ?                     \
+		 LOGIC_RECOGNIZER_BASE(self)->recognize(self, exp, ctx) :    \
+		 master_logic_recognizer_recognize(                          \
+			 MASTER_LOGIC_RECOGNIZER(NODE_WALKER(self)->master), \
+			 exp, ctx))
 
 /*!
   \brief LogicRecognizerBase class definition derived from
@@ -66,18 +67,18 @@
 */
 
 typedef struct LogicRecognizerBase_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  LogicType (*recognize)(LogicRecognizerBase_ptr self, node_ptr wff,
-                         node_ptr context);
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	LogicType (*recognize)(LogicRecognizerBase_ptr self, node_ptr wff,
+			       node_ptr context);
 
 } LogicRecognizerBase;
 
@@ -94,8 +95,8 @@ typedef struct LogicRecognizerBase_TAG {
   \sa LogicRecognizerBase_create
 */
 void logic_recognizer_base_init(LogicRecognizerBase_ptr self,
-                                const NuSMVEnv_ptr env, const char *name,
-                                int low, size_t num);
+				const NuSMVEnv_ptr env, const char *name,
+				int low, size_t num);
 
 /*!
   \methodof LogicRecognizerBase
@@ -114,6 +115,6 @@ void logic_recognizer_base_deinit(LogicRecognizerBase_ptr self);
   Pure virtual method, must be implemented
 */
 LogicType logic_recognizer_base_recognize(LogicRecognizerBase_ptr self,
-                                          node_ptr wff, node_ptr context);
+					  node_ptr wff, node_ptr context);
 
 #endif /* __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_BASE_PRIVATE_H__ */

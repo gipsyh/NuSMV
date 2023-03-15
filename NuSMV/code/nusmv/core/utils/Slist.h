@@ -71,8 +71,9 @@ typedef struct Slist_TAG *Slist_ptr;
 
   \todo Missing description
 */
-#define SLIST_FOREACH(list, iter)                                              \
-  for (iter = Slist_first(list); !Siter_is_end(iter); iter = Siter_next(iter))
+#define SLIST_FOREACH(list, iter)                           \
+	for (iter = Slist_first(list); !Siter_is_end(iter); \
+	     iter = Siter_next(iter))
 
 /* internal type. it cannot be used outside. */
 
@@ -90,7 +91,7 @@ typedef struct Snode_TAG *Snode_ptr;
    This does not influence on efficiency
 */
 typedef struct Siter_TAG {
-  Snode_ptr node;
+	Snode_ptr node;
 } Siter;
 
 /* Frre function type */
@@ -352,7 +353,7 @@ unsigned int Slist_get_size(Slist_ptr self);
   extra is a user parameter that is passed to every invocation of cmp
 */
 void Slist_sort(Slist_ptr self, int (*cmp)(void *el1, void *el2, void *extra),
-                void *extra);
+		void *extra);
 
 /*!
   \methodof Slist
@@ -372,7 +373,7 @@ void Slist_clear(Slist_ptr self);
   passed to the printer (can be NULL)
 */
 void Slist_print(Slist_ptr const self, MasterPrinter_ptr wffprint,
-                 void (*printer)(FILE *file, void *el, void *arg), FILE *file,
-                 void *printer_arg);
+		 void (*printer)(FILE *file, void *el, void *arg), FILE *file,
+		 void *printer_arg);
 
 #endif /* __NUSMV_CORE_UTILS_SLIST_H__ */

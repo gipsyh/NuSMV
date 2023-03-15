@@ -77,7 +77,7 @@
   in the model, otherwise them evaluate to false because of no loop
 */
 be_ptr Bmc_Tableau_GetNoLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                             const int k);
+			     const int k);
 
 /*!
   \brief Builds tableau for all possible loops in \[l, k\], in
@@ -88,7 +88,7 @@ be_ptr Bmc_Tableau_GetNoLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
   by R. Sebastiani
 */
 be_ptr Bmc_Tableau_GetSingleLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                                 const int k, const int l);
+				 const int k, const int l);
 
 /*!
   \brief Builds tableau for all possible loops in \[l, k\[,
@@ -109,7 +109,7 @@ be_ptr Bmc_Tableau_GetSingleLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
   to its step. All tableau are collected together into a disjunctive form.
 */
 be_ptr Bmc_Tableau_GetAllLoops(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                               const int k, const int l);
+			       const int k, const int l);
 
 /*!
   \brief Builds tableau for all possible loops in \[l, k\], in
@@ -120,7 +120,7 @@ be_ptr Bmc_Tableau_GetAllLoops(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
   by R. Sebastiani
 */
 be_ptr Bmc_Tableau_GetAllLoopsDepth1(const BeFsm_ptr be_fsm,
-                                     const node_ptr ltl_wff, const int k);
+				     const node_ptr ltl_wff, const int k);
 
 /*!
   \brief Builds a tableau for the LTL at length k with loopback l
@@ -129,7 +129,7 @@ be_ptr Bmc_Tableau_GetAllLoopsDepth1(const BeFsm_ptr be_fsm,
 
 */
 be_ptr Bmc_Tableau_GetLtlTableau(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                                 const int k, const int l);
+				 const int k, const int l);
 
 /**AutomaticEnd***************************************************************/
 

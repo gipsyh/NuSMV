@@ -42,6 +42,8 @@
 
 /* see the Description above */
 void cinit_dummy_function_to_make_ar_work_under_mac_os_x_DO_NOT_USE_THIS_FUNCTION(
-    void);
+	void);
 void cinit_dummy_function_to_make_ar_work_under_mac_os_x_DO_NOT_USE_THIS_FUNCTION(
-    void) {}
+	void)
+{
+}

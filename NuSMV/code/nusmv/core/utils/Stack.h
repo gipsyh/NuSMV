@@ -49,10 +49,10 @@
 */
 
 struct Stack_TAG {
-  size_t allocated;
-  size_t index;
+	size_t allocated;
+	size_t index;
 
-  void **array;
+	void **array;
 };
 
 /*---------------------------------------------------------------------------*/

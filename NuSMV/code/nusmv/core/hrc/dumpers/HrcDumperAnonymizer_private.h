@@ -52,17 +52,17 @@ version 2. Copyright (C) 2014 by FBK-irst.
 */
 
 typedef struct HrcDumperAnonymizer_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(HrcDumperSmv);
+	/* this MUST stay on the top */
+	INHERITS_FROM(HrcDumperSmv);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  NodeAnonymizerBase_ptr anonymizer;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	NodeAnonymizerBase_ptr anonymizer;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } HrcDumperAnonymizer;
 
@@ -79,8 +79,8 @@ typedef struct HrcDumperAnonymizer_TAG {
   \sa HrcDumperAnonymizer_create
 */
 void hrc_dumper_anonymizer_init(HrcDumperAnonymizer_ptr self,
-                                const NuSMVEnv_ptr env, FILE *fout,
-                                NodeAnonymizerBase_ptr anonymizer);
+				const NuSMVEnv_ptr env, FILE *fout,
+				NodeAnonymizerBase_ptr anonymizer);
 
 /*!
   \methodof HrcDumperAnonymizer
@@ -108,7 +108,7 @@ void hrc_dumper_anonymizer_dump_node(HrcDumper_ptr self, node_ptr node);
   not anonymize "main", for the others we call the super method)
 */
 void hrc_dumper_anonymizer_dump_snippet(HrcDumper_ptr self,
-                                        HrcDumperSnippet snippet,
-                                        const HrcDumperInfo *info);
+					HrcDumperSnippet snippet,
+					const HrcDumperInfo *info);
 
 #endif /* __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_ANONYMIZER_PRIVATE_H__ */

@@ -66,20 +66,24 @@ static void error_out_of_memory(size_t size);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Error_init(NuSMVEnv_ptr env) {
-  ErrorMgr_ptr error_manager = ErrorMgr_create(env);
+void Error_init(NuSMVEnv_ptr env)
+{
+	ErrorMgr_ptr error_manager = ErrorMgr_create(env);
 
-  NuSMVEnv_set_value(env, ENV_ERROR_MANAGER, error_manager);
+	NuSMVEnv_set_value(env, ENV_ERROR_MANAGER, error_manager);
 }
 
-void Error_quit(NuSMVEnv_ptr env) {
-  ErrorMgr_ptr err = ERROR_MGR(NuSMVEnv_remove_value(env, ENV_ERROR_MANAGER));
-  ErrorMgr_destroy(err);
+void Error_quit(NuSMVEnv_ptr env)
+{
+	ErrorMgr_ptr err =
+		ERROR_MGR(NuSMVEnv_remove_value(env, ENV_ERROR_MANAGER));
+	ErrorMgr_destroy(err);
 }
 
-void init_memory(void) {
+void init_memory(void)
+{
 #ifndef USE_MM
-  MMoutOfMemory = (void (*)(size_t))error_out_of_memory;
+	MMoutOfMemory = (void (*)(size_t))error_out_of_memory;
 #endif
 }
 
@@ -90,13 +94,16 @@ void init_memory(void) {
 
   \todo Missing description
 */
-static void error_out_of_memory(size_t size) {
-  (void)fprintf(stderr,
-                "\n##################################################\n");
-  (void)fprintf(stderr, "### Out of memory allocating %" PRIuPTR " bytes\n",
-                size);
-  (void)fprintf(stderr, "##################################################\n");
-  exit(1);
+static void error_out_of_memory(size_t size)
+{
+	(void)fprintf(stderr,
+		      "\n##################################################\n");
+	(void)fprintf(stderr,
+		      "### Out of memory allocating %" PRIuPTR " bytes\n",
+		      size);
+	(void)fprintf(stderr,
+		      "##################################################\n");
+	exit(1);
 }
 
 /*---------------------------------------------------------------------------*/

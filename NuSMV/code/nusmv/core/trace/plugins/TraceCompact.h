@@ -75,8 +75,8 @@ typedef struct TraceCompact_TAG *TraceCompact_ptr;
 
   \todo Missing description
 */
-#define TRACE_COMPACT_CHECK_INSTANCE(x)                                        \
-  (nusmv_assert(TRACE_COMPACT(x) != TRACE_COMPACT(NULL)))
+#define TRACE_COMPACT_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_COMPACT(x) != TRACE_COMPACT(NULL)))
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/

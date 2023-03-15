@@ -63,8 +63,8 @@ typedef struct BoolEncClient_TAG *BoolEncClient_ptr;
 
   \todo Missing description
 */
-#define BOOL_ENC_CLIENT_CHECK_INSTANCE(self)                                   \
-  (nusmv_assert(BOOL_ENC_CLIENT(self) != BOOL_ENC_CLIENT(NULL)))
+#define BOOL_ENC_CLIENT_CHECK_INSTANCE(self) \
+	(nusmv_assert(BOOL_ENC_CLIENT(self) != BOOL_ENC_CLIENT(NULL)))
 
 /**AutomaticStart*************************************************************/
 

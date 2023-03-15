@@ -73,17 +73,17 @@ typedef struct htable *hashPtr;
 /*---------------------------------------------------------------------------*/
 
 struct table_pair {
-  node_ptr key;
-  int data;
+	node_ptr key;
+	int data;
 };
 
 struct htable {
-  /**Number of slots allocated*/
-  unsigned alloc;
-  /**Number of slots occupied*/
-  unsigned occupied;
-  /**The table*/
-  struct table_pair *table;
+	/**Number of slots allocated*/
+	unsigned alloc;
+	/**Number of slots occupied*/
+	unsigned occupied;
+	/**The table*/
+	struct table_pair *table;
 };
 
 /*---------------------------------------------------------------------------*/

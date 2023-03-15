@@ -79,34 +79,36 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void SBmc_Init(NuSMVEnv_ptr env) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void SBmc_Init(NuSMVEnv_ptr env)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 1)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Initializing the SBMC package... \n");
-  }
-  sbmc_reset_unique_id(env);
-  if (opt_verbose_level_gt(opts, 1)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Done \n");
-  }
+	if (opt_verbose_level_gt(opts, 1)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Initializing the SBMC package... \n");
+	}
+	sbmc_reset_unique_id(env);
+	if (opt_verbose_level_gt(opts, 1)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Done \n");
+	}
 }
 
-void SBmc_Quit(NuSMVEnv_ptr env) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void SBmc_Quit(NuSMVEnv_ptr env)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 1)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Resetting the SBMC module...\n");
-  }
-  sbmc_reset_unique_id(env);
-  if (opt_verbose_level_gt(opts, 1)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Done \n");
-  }
+	if (opt_verbose_level_gt(opts, 1)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Resetting the SBMC module...\n");
+	}
+	sbmc_reset_unique_id(env);
+	if (opt_verbose_level_gt(opts, 1)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Done \n");
+	}
 }
 
 /*---------------------------------------------------------------------------*/

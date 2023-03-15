@@ -71,8 +71,8 @@ typedef struct FairnessList_TAG *FairnessList_ptr;
 
   \todo Missing description
 */
-#define FAIRNESS_LIST_CHECK_INSTANCE(self)                                     \
-  (nusmv_assert(FAIRNESS_LIST(self) != FAIRNESS_LIST(NULL)))
+#define FAIRNESS_LIST_CHECK_INSTANCE(self) \
+	(nusmv_assert(FAIRNESS_LIST(self) != FAIRNESS_LIST(NULL)))
 /* ---------------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------------- */
@@ -109,8 +109,8 @@ typedef struct JusticeList_TAG *JusticeList_ptr;
 
   \todo Missing description
 */
-#define JUSTICE_LIST_CHECK_INSTANCE(self)                                      \
-  (nusmv_assert(JUSTICE_LIST(self) != JUSTICE_LIST(NULL)))
+#define JUSTICE_LIST_CHECK_INSTANCE(self) \
+	(nusmv_assert(JUSTICE_LIST(self) != JUSTICE_LIST(NULL)))
 /* ---------------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------------- */
@@ -136,8 +136,8 @@ typedef struct CompassionList_TAG *CompassionList_ptr;
 
   \todo Missing description
 */
-#define COMPASSION_LIST_CHECK_INSTANCE(self)                                   \
-  (nusmv_assert(COMPASSION_LIST(self) != COMPASSION_LIST(NULL)))
+#define COMPASSION_LIST_CHECK_INSTANCE(self) \
+	(nusmv_assert(COMPASSION_LIST(self) != COMPASSION_LIST(NULL)))
 /* ---------------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------------- */
@@ -202,7 +202,7 @@ JusticeList_ptr JusticeList_create(DDMgr_ptr dd_manager);
   Returned bdd is referenced
 */
 BddStates JusticeList_get_p(const JusticeList_ptr self,
-                            const FairnessListIterator_ptr iter);
+			    const FairnessListIterator_ptr iter);
 
 /*!
   \methodof JusticeList
@@ -223,7 +223,7 @@ void JusticeList_append_p(JusticeList_ptr self, BddStates p);
   \se self changes
 */
 void JusticeList_apply_synchronous_product(JusticeList_ptr self,
-                                           const JusticeList_ptr other);
+					   const JusticeList_ptr other);
 
 /* Compassion */
 
@@ -242,7 +242,7 @@ CompassionList_ptr CompassionList_create(DDMgr_ptr dd_manager);
   Returned bdd is referenced
 */
 BddStates CompassionList_get_p(const CompassionList_ptr self,
-                               const FairnessListIterator_ptr iter);
+			       const FairnessListIterator_ptr iter);
 
 /*!
   \methodof CompassionList
@@ -251,7 +251,7 @@ BddStates CompassionList_get_p(const CompassionList_ptr self,
   Returned bdd is referenced
 */
 BddStates CompassionList_get_q(const CompassionList_ptr self,
-                               const FairnessListIterator_ptr iter);
+			       const FairnessListIterator_ptr iter);
 
 /*!
   \methodof CompassionList
@@ -261,7 +261,7 @@ BddStates CompassionList_get_q(const CompassionList_ptr self,
   when it is no longer needed
 */
 void CompassionList_append_p_q(CompassionList_ptr self, BddStates p,
-                               BddStates q);
+			       BddStates q);
 
 /*!
   \methodof CompassionList
@@ -273,6 +273,6 @@ void CompassionList_append_p_q(CompassionList_ptr self, BddStates p,
   \se self changes
 */
 void CompassionList_apply_synchronous_product(CompassionList_ptr self,
-                                              const CompassionList_ptr other);
+					      const CompassionList_ptr other);
 
 #endif /* __NUSMV_CORE_FSM_BDD_FAIRNESS_LIST_H__ */

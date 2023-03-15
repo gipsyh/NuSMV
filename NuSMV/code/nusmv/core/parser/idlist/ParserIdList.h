@@ -61,8 +61,8 @@ typedef struct ParserIdList_TAG *ParserIdList_ptr;
 
   \todo Missing description
 */
-#define PARSER_ID_LIST_CHECK_INSTANCE(x)                                       \
-  (nusmv_assert(PARSER_ID_LIST(x) != PARSER_ID_LIST(NULL)))
+#define PARSER_ID_LIST_CHECK_INSTANCE(x) \
+	(nusmv_assert(PARSER_ID_LIST(x) != PARSER_ID_LIST(NULL)))
 
 /* ---------------------------------------------------------------------- */
 

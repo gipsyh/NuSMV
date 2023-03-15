@@ -98,11 +98,11 @@
   \todo Missing description
 */
 typedef enum {
-  GENERIC_OPTION,
-  USER_OPTION,
-  INTEGER_OPTION,
-  ENUM_OPTION,
-  BOOL_OPTION
+	GENERIC_OPTION,
+	USER_OPTION,
+	INTEGER_OPTION,
+	ENUM_OPTION,
+	BOOL_OPTION
 } Option_Type;
 
 /*!
@@ -143,14 +143,14 @@ typedef boolean (*Opts_CheckFnType)(OptsHandler_ptr, const char *, void *);
 */
 typedef void *(*Opts_ReturnFnType)(OptsHandler_ptr, const char *, void *);
 typedef boolean (*Opts_TriggerFnType)(OptsHandler_ptr, const char *,
-                                      const char *, Trigger_Action, void *);
+				      const char *, Trigger_Action, void *);
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 struct _Opts_EnumRec {
-  char *v;
-  int e;
+	char *v;
+	int e;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -209,8 +209,8 @@ struct _Opts_EnumRec {
 
   \todo Missing description
 */
-#define OPTS_HANDLER_CHECK_INSTANCE(self)                                      \
-  (nusmv_assert(OPTS_HANDLER(self) != OPTS_HANDLER(NULL)))
+#define OPTS_HANDLER_CHECK_INSTANCE(self) \
+	(nusmv_assert(OPTS_HANDLER(self) != OPTS_HANDLER(NULL)))
 
 /*!
   \brief Operates on each entry of the option handler
@@ -220,9 +220,9 @@ struct _Opts_EnumRec {
 
   \sa Opts_GenInit Opts_Gen Opts_GenFree
 */
-#define OPTS_FOREACH_OPTION(h, name, value)                                    \
-  for (Opts_Gen_init(h);                                                       \
-       Opts_Gen_next(h, name, value) || (Opts_Gen_deinit(h), 0);)
+#define OPTS_FOREACH_OPTION(h, name, value) \
+	for (Opts_Gen_init(h);              \
+	     Opts_Gen_next(h, name, value) || (Opts_Gen_deinit(h), 0);)
 
 /**AutomaticStart*************************************************************/
 
@@ -263,7 +263,7 @@ void OptsHandler_destroy(OptsHandler_ptr h);
   \se None
 */
 boolean OptsHandler_is_option_registered(OptsHandler_ptr self,
-                                         const char *name);
+					 const char *name);
 
 /*!
   \methodof OptsHandler
@@ -275,7 +275,7 @@ boolean OptsHandler_is_option_registered(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_is_option_not_registered(OptsHandler_ptr self,
-                                             const char *name);
+					     const char *name);
 
 /*!
   \methodof OptsHandler
@@ -287,9 +287,9 @@ boolean OptsHandler_is_option_not_registered(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_register_option(OptsHandler_ptr self, const char *name,
-                                    const char *def, Opts_CheckFnType check,
-                                    Opts_ReturnFnType get, boolean is_public,
-                                    Option_Type type, void *arg);
+				    const char *def, Opts_CheckFnType check,
+				    Opts_ReturnFnType get, boolean is_public,
+				    Option_Type type, void *arg);
 
 /*!
   \methodof OptsHandler
@@ -301,8 +301,8 @@ boolean OptsHandler_register_option(OptsHandler_ptr self, const char *name,
   \se None
 */
 boolean OptsHandler_register_generic_option(OptsHandler_ptr self,
-                                            const char *name, const char *def,
-                                            boolean is_public);
+					    const char *name, const char *def,
+					    boolean is_public);
 
 /*!
   \methodof OptsHandler
@@ -313,7 +313,7 @@ boolean OptsHandler_register_generic_option(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_register_user_option(OptsHandler_ptr self, const char *name,
-                                         const char *def);
+					 const char *def);
 
 /*!
   \brief Registers a boolean option in an option handler.
@@ -326,7 +326,7 @@ boolean OptsHandler_register_user_option(OptsHandler_ptr self, const char *name,
   \se None
 */
 boolean OptsHandler_register_bool_option(OptsHandler_ptr self, const char *name,
-                                         boolean value, boolean is_public);
+					 boolean value, boolean is_public);
 
 /*!
   \methodof OptsHandler
@@ -341,8 +341,8 @@ boolean OptsHandler_register_bool_option(OptsHandler_ptr self, const char *name,
   \se None
 */
 boolean OptsHandler_register_enum_option(OptsHandler_ptr self, const char *name,
-                                         const char *def, Opts_EnumRec pv[],
-                                         int npv, boolean is_public);
+					 const char *def, Opts_EnumRec pv[],
+					 int npv, boolean is_public);
 
 /*!
   \methodof OptsHandler
@@ -356,7 +356,7 @@ boolean OptsHandler_register_enum_option(OptsHandler_ptr self, const char *name,
   \se None
 */
 boolean OptsHandler_register_int_option(OptsHandler_ptr self, const char *name,
-                                        int value, boolean is_public);
+					int value, boolean is_public);
 
 /*!
   \methodof OptsHandler
@@ -434,7 +434,7 @@ boolean OptsHandler_unregister_option(OptsHandler_ptr self, const char *name);
   \se None
 */
 boolean OptsHandler_set_option_value(OptsHandler_ptr self, const char *name,
-                                     const char *value);
+				     const char *value);
 
 /*!
   \methodof OptsHandler
@@ -444,7 +444,7 @@ boolean OptsHandler_set_option_value(OptsHandler_ptr self, const char *name,
   num_values stores the number of values, cannot be null
 */
 void OptsHandler_get_enum_option_values(OptsHandler_ptr self, const char *name,
-                                        char ***values, int *num_values);
+					char ***values, int *num_values);
 
 /*!
   \methodof OptsHandler
@@ -456,9 +456,9 @@ void OptsHandler_get_enum_option_values(OptsHandler_ptr self, const char *name,
   Returned nodelist must be freed
 */
 node_ptr OptsHandler_get_enum_option_values_as_node(OptsHandler_ptr self,
-                                                    NuSMVEnv_ptr env,
-                                                    const char *name,
-                                                    int *num_values);
+						    NuSMVEnv_ptr env,
+						    const char *name,
+						    int *num_values);
 
 /*!
   \methodof OptsHandler
@@ -473,7 +473,7 @@ node_ptr OptsHandler_get_enum_option_values_as_node(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_set_enum_option_value(OptsHandler_ptr self,
-                                          const char *name, const char *value);
+					  const char *name, const char *value);
 
 /*!
   \methodof OptsHandler
@@ -498,7 +498,7 @@ int OptsHandler_get_enum_option_value(OptsHandler_ptr self, const char *name);
   \se None
 */
 int OptsHandler_get_enum_option_default_value(OptsHandler_ptr self,
-                                              const char *name);
+					      const char *name);
 
 /*!
   \methodof OptsHandler
@@ -513,7 +513,7 @@ int OptsHandler_get_enum_option_default_value(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_set_bool_option_value(OptsHandler_ptr self,
-                                          const char *name, boolean value);
+					  const char *name, boolean value);
 
 /*!
   \methodof OptsHandler
@@ -529,7 +529,7 @@ boolean OptsHandler_set_bool_option_value(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_set_int_option_value(OptsHandler_ptr self, const char *name,
-                                         int value);
+					 int value);
 
 /*!
   \methodof OptsHandler
@@ -567,7 +567,7 @@ void *OptsHandler_get_option_value(OptsHandler_ptr self, const char *name);
   \se None
 */
 void *OptsHandler_get_option_default_value(OptsHandler_ptr self,
-                                           const char *name);
+					   const char *name);
 
 /*!
   \methodof OptsHandler
@@ -579,7 +579,7 @@ void *OptsHandler_get_option_default_value(OptsHandler_ptr self,
                       Caller should free the string
 */
 char *OptsHandler_get_string_option_value(OptsHandler_ptr self,
-                                          const char *name);
+					  const char *name);
 
 /*!
   \methodof OptsHandler
@@ -591,7 +591,7 @@ char *OptsHandler_get_string_option_value(OptsHandler_ptr self,
                       Caller should free the string
 */
 char *OptsHandler_get_string_option_default_value(OptsHandler_ptr self,
-                                                  const char *name);
+						  const char *name);
 
 /*!
   \methodof OptsHandler
@@ -602,7 +602,7 @@ char *OptsHandler_get_string_option_default_value(OptsHandler_ptr self,
 */
 char *
 OptsHandler_get_string_representation_option_default_value(OptsHandler_ptr self,
-                                                           const char *name);
+							   const char *name);
 
 /*!
   \methodof OptsHandler
@@ -612,7 +612,7 @@ OptsHandler_get_string_representation_option_default_value(OptsHandler_ptr self,
                       The returned string must be freed, if not NULL.
 */
 char *OptsHandler_get_string_representation_option_value(OptsHandler_ptr self,
-                                                         const char *name);
+							 const char *name);
 
 /*!
   \methodof OptsHandler
@@ -625,7 +625,7 @@ char *OptsHandler_get_string_representation_option_value(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_get_bool_option_value(OptsHandler_ptr self,
-                                          const char *name);
+					  const char *name);
 
 /*!
   \methodof OptsHandler
@@ -638,7 +638,7 @@ boolean OptsHandler_get_bool_option_value(OptsHandler_ptr self,
   \se None
 */
 boolean OptsHandler_get_bool_option_default_value(OptsHandler_ptr self,
-                                                  const char *name);
+						  const char *name);
 
 /*!
   \methodof OptsHandler
@@ -651,7 +651,7 @@ boolean OptsHandler_get_bool_option_default_value(OptsHandler_ptr self,
   \se None
 */
 int OptsHandler_get_int_option_default_value(OptsHandler_ptr self,
-                                             const char *name);
+					     const char *name);
 
 /*!
   \methodof OptsHandler
@@ -672,7 +672,7 @@ int OptsHandler_get_int_option_value(OptsHandler_ptr self, const char *name);
 
 */
 boolean OptsHandler_add_option_trigger(OptsHandler_ptr self, const char *name,
-                                       Opts_TriggerFnType trigger, void *arg);
+				       Opts_TriggerFnType trigger, void *arg);
 
 /*!
   \methodof OptsHandler
@@ -681,8 +681,8 @@ boolean OptsHandler_add_option_trigger(OptsHandler_ptr self, const char *name,
   Removes the given trigger from the given option
 */
 boolean OptsHandler_remove_option_trigger(OptsHandler_ptr self,
-                                          const char *name,
-                                          Opts_TriggerFnType trigger);
+					  const char *name,
+					  Opts_TriggerFnType trigger);
 
 /*!
   \methodof OptsHandler
@@ -737,7 +737,7 @@ void Opts_Gen_deinit(OptsHandler_ptr self);
   \sa Opts_GenFree Opts_Gen Opts_GenInit Opts_PrintAllOptions
 */
 void OptsHandler_print_all_options(OptsHandler_ptr self, FILE *fd,
-                                   boolean print_private);
+				   boolean print_private);
 
 /*!
   \methodof OptsHandler
@@ -746,7 +746,7 @@ void OptsHandler_print_all_options(OptsHandler_ptr self, FILE *fd,
   \todo Missing description
 */
 void OptsHandler_generate_test(OptsHandler_ptr self, FILE *of,
-                               boolean gen_unset);
+			       boolean gen_unset);
 
 /*!
   \brief Copy src_opts to dst_opts

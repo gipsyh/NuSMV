@@ -51,21 +51,21 @@ void parser_prob_add(ParserProb_ptr self, node_ptr prob);
   \todo
 */
 node_ptr parser_prob_mk_prob(ParserProb_ptr self, node_ptr assigns,
-                             node_ptr prob);
+			     node_ptr prob);
 
 /*!
   \methodof ParserProb
   \todo
 */
 node_ptr parser_prob_mk_var_assign(ParserProb_ptr self, node_ptr var,
-                                   node_ptr val);
+				   node_ptr val);
 
 /*!
   \methodof ParserProb
   \todo
 */
 node_ptr parser_prob_mk_var_assigns(ParserProb_ptr self, node_ptr left,
-                                    node_ptr right);
+				    node_ptr right);
 
 /*!
   \methodof ParserProb
@@ -78,7 +78,7 @@ node_ptr parser_prob_mk_dot(ParserProb_ptr self, node_ptr left, node_ptr right);
   \todo
 */
 node_ptr parser_prob_mk_array(ParserProb_ptr self, node_ptr left,
-                              node_ptr right);
+			      node_ptr right);
 
 /*!
   \methodof ParserProb

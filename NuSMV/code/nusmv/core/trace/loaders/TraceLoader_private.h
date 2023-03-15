@@ -57,17 +57,17 @@
 */
 
 typedef struct TraceLoader_TAG {
-  INHERITS_FROM(Object);
+	INHERITS_FROM(Object);
 
-  char *desc; /* Short description of the loader */
+	char *desc; /* Short description of the loader */
 
-  /* ---------------------------------------------------------------------- */
-  /*     Virtual Methods                                                    */
-  /* ---------------------------------------------------------------------- */
+	/* ---------------------------------------------------------------------- */
+	/*     Virtual Methods                                                    */
+	/* ---------------------------------------------------------------------- */
 
-  /* action */
-  VIRTUAL Trace_ptr (*load)(TraceLoader_ptr self, const SymbTable_ptr st,
-                            const NodeList_ptr symbols);
+	/* action */
+	VIRTUAL Trace_ptr (*load)(TraceLoader_ptr self, const SymbTable_ptr st,
+				  const NodeList_ptr symbols);
 
 } TraceLoader;
 
@@ -102,7 +102,7 @@ void trace_loader_deinit(TraceLoader_ptr self);
   if operation is successful, 0 otherwise.
 */
 Trace_ptr trace_loader_load(TraceLoader_ptr self, const SymbTable_ptr st,
-                            const NodeList_ptr symbols);
+			    const NodeList_ptr symbols);
 
 /**AutomaticEnd***************************************************************/
 

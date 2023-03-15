@@ -64,60 +64,70 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Bmc_Stack_ptr Bmc_Stack_new_stack(const NuSMVEnv_ptr env) {
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+Bmc_Stack_ptr Bmc_Stack_new_stack(const NuSMVEnv_ptr env)
+{
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  unsigned i;
-  Bmc_Stack_ptr thestack = (Bmc_Stack_ptr)ALLOC(struct nodeStack, 1);
-  thestack->alloc = STACK_SIZE;
-  thestack->first_free = 0;
-  thestack->table = (node_ptr *)ALLOC(node_ptr, thestack->alloc);
-  if (thestack->table == NULL) {
-    ErrorMgr_internal_error(errmgr, "Bmc_Stack_new_stack: Out of Memory");
-  }
+	unsigned i;
+	Bmc_Stack_ptr thestack = (Bmc_Stack_ptr)ALLOC(struct nodeStack, 1);
+	thestack->alloc = STACK_SIZE;
+	thestack->first_free = 0;
+	thestack->table = (node_ptr *)ALLOC(node_ptr, thestack->alloc);
+	if (thestack->table == NULL) {
+		ErrorMgr_internal_error(errmgr,
+					"Bmc_Stack_new_stack: Out of Memory");
+	}
 
-  for (i = 0; i < thestack->alloc; ++i) {
-    thestack->table[i] = NULL;
-  }
-  return thestack;
+	for (i = 0; i < thestack->alloc; ++i) {
+		thestack->table[i] = NULL;
+	}
+	return thestack;
 }
 
-void Bmc_Stack_push(Bmc_Stack_ptr thestack, node_ptr node) {
-  if (thestack->first_free >= thestack->alloc) { /**The stack needs to grow*/
-    unsigned i;
-    node_ptr *temp;
-    thestack->alloc = 2 * thestack->alloc;
-    temp = ALLOC(node_ptr, thestack->alloc);
-    nusmv_assert(temp != NULL);
-    for (i = thestack->first_free; i--;) {
-      temp[i] = thestack->table[i];
-    }
-    FREE(thestack->table);
-    thestack->table = temp;
-  }
-  /**Put node on stack*/
-  thestack->table[thestack->first_free] = node;
-  thestack->first_free++;
-  return;
+void Bmc_Stack_push(Bmc_Stack_ptr thestack, node_ptr node)
+{
+	if (thestack->first_free >=
+	    thestack->alloc) { /**The stack needs to grow*/
+		unsigned i;
+		node_ptr *temp;
+		thestack->alloc = 2 * thestack->alloc;
+		temp = ALLOC(node_ptr, thestack->alloc);
+		nusmv_assert(temp != NULL);
+		for (i = thestack->first_free; i--;) {
+			temp[i] = thestack->table[i];
+		}
+		FREE(thestack->table);
+		thestack->table = temp;
+	}
+	/**Put node on stack*/
+	thestack->table[thestack->first_free] = node;
+	thestack->first_free++;
+	return;
 }
 
-unsigned Bmc_Stack_size(Bmc_Stack_ptr thestack) { return thestack->first_free; }
-
-node_ptr Bmc_Stack_pop(Bmc_Stack_ptr thestack) {
-  nusmv_assert(thestack->first_free > 0);
-  thestack->first_free--;
-  return thestack->table[thestack->first_free];
+unsigned Bmc_Stack_size(Bmc_Stack_ptr thestack)
+{
+	return thestack->first_free;
 }
 
-void Bmc_Stack_delete(Bmc_Stack_ptr thestack) {
-  FREE(thestack->table);
-  FREE(thestack);
+node_ptr Bmc_Stack_pop(Bmc_Stack_ptr thestack)
+{
+	nusmv_assert(thestack->first_free > 0);
+	thestack->first_free--;
+	return thestack->table[thestack->first_free];
 }
 
-node_ptr Bmc_Stack_top(Bmc_Stack_ptr thestack) {
-  nusmv_assert(thestack->first_free > 0);
-  return thestack->table[thestack->first_free - 1];
+void Bmc_Stack_delete(Bmc_Stack_ptr thestack)
+{
+	FREE(thestack->table);
+	FREE(thestack);
+}
+
+node_ptr Bmc_Stack_top(Bmc_Stack_ptr thestack)
+{
+	nusmv_assert(thestack->first_free > 0);
+	return thestack->table[thestack->first_free - 1];
 }
 
 /*---------------------------------------------------------------------------*/

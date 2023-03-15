@@ -116,7 +116,7 @@ node_ptr eu_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr);
   \sa explain
 */
 node_ptr eu_si_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f,
-                       bdd_ptr g_si, bdd_ptr hulk);
+		       bdd_ptr g_si, bdd_ptr hulk);
 
 /*!
   \brief Set of states satisfying <i>EG(g)</i>.
@@ -160,7 +160,7 @@ BddStatesInputs eg_si(BddFsm_ptr fsm, bdd_ptr g_si);
   \sa explain
 */
 node_ptr ebu_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr, int,
-                     int);
+		     int);
 
 /*!
   \brief This function finds a path that is an example

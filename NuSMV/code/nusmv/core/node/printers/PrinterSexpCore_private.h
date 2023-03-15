@@ -38,7 +38,7 @@
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_SEXP_CORE_PRIVATE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_SEXP_CORE_PRIVATE_H__
 
-#include "nusmv/core/node/printers/PrinterBase.h"         /* fix this */
+#include "nusmv/core/node/printers/PrinterBase.h" /* fix this */
 #include "nusmv/core/node/printers/PrinterBase_private.h" /* fix this */
 #include "nusmv/core/node/printers/PrinterSexpCore.h"
 #include "nusmv/core/utils/utils.h"
@@ -53,16 +53,16 @@
 */
 
 typedef struct PrinterSexpCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PrinterBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PrinterBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } PrinterSexpCore;
 
@@ -79,7 +79,7 @@ typedef struct PrinterSexpCore_TAG {
   \sa PrinterSexpCore_create
 */
 void printer_sexp_core_init(PrinterSexpCore_ptr self, const NuSMVEnv_ptr env,
-                            const char *name, int low, size_t num);
+			    const char *name, int low, size_t num);
 
 /*!
   \methodof PrinterSexpCore
@@ -99,6 +99,6 @@ void printer_sexp_core_deinit(PrinterSexpCore_ptr self);
 
 */
 int printer_sexp_core_print_node(PrinterBase_ptr self, node_ptr n,
-                                 int priority);
+				 int priority);
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_PRINTER_SEXP_CORE_PRIVATE_H__ */

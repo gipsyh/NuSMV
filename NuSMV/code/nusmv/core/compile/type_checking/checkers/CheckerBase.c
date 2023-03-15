@@ -72,31 +72,33 @@
 static void checker_base_finalize(Object_ptr object, void *dummy);
 
 static SymbType_ptr checker_base_check_expr(CheckerBase_ptr self,
-                                            node_ptr expression,
-                                            node_ptr context);
+					    node_ptr expression,
+					    node_ptr context);
 
 static boolean checker_base_viol_handler(CheckerBase_ptr checker,
-                                         TypeSystemViolation violation,
-                                         node_ptr expression);
+					 TypeSystemViolation violation,
+					 node_ptr expression);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 CheckerBase_ptr CheckerBase_create(const NuSMVEnv_ptr env, const char *name,
-                                   int low, size_t num) {
-  CheckerBase_ptr self = ALLOC(CheckerBase, 1);
-  CHECKER_BASE_CHECK_INSTANCE(self);
+				   int low, size_t num)
+{
+	CheckerBase_ptr self = ALLOC(CheckerBase, 1);
+	CHECKER_BASE_CHECK_INSTANCE(self);
 
-  checker_base_init(self, env, name, low, num);
-  return self;
+	checker_base_init(self, env, name, low, num);
+	return self;
 }
 
 VIRTUAL SymbType_ptr CheckerBase_check_expr(CheckerBase_ptr self, node_ptr exp,
-                                            node_ptr ctx) {
-  CHECKER_BASE_CHECK_INSTANCE(self);
+					    node_ptr ctx)
+{
+	CHECKER_BASE_CHECK_INSTANCE(self);
 
-  return self->check_expr(self, exp, ctx);
+	return self->check_expr(self, exp, ctx);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -104,28 +106,31 @@ VIRTUAL SymbType_ptr CheckerBase_check_expr(CheckerBase_ptr self, node_ptr exp,
 /*---------------------------------------------------------------------------*/
 
 void checker_base_init(CheckerBase_ptr self, const NuSMVEnv_ptr env,
-                       const char *name, int low, size_t num) {
-  /* base class initialization */
-  node_walker_init(NODE_WALKER(self), env, name, low, num,
-                   false /* not handle NULL case */);
+		       const char *name, int low, size_t num)
+{
+	/* base class initialization */
+	node_walker_init(NODE_WALKER(self), env, name, low, num,
+			 false /* not handle NULL case */);
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = checker_base_finalize;
-  OVERRIDE(CheckerBase, check_expr) = checker_base_check_expr;
-  OVERRIDE(CheckerBase, viol_handler) = checker_base_viol_handler;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = checker_base_finalize;
+	OVERRIDE(CheckerBase, check_expr) = checker_base_check_expr;
+	OVERRIDE(CheckerBase, viol_handler) = checker_base_viol_handler;
 }
 
-void checker_base_deinit(CheckerBase_ptr self) {
-  /* members deinitialization */
+void checker_base_deinit(CheckerBase_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class initialization */
-  node_walker_deinit(NODE_WALKER(self));
+	/* base class initialization */
+	node_walker_deinit(NODE_WALKER(self));
 }
 
 VIRTUAL boolean checker_base_manage_violation(CheckerBase_ptr self,
-                                              TypeSystemViolation violation,
-                                              node_ptr expression) {
-  return self->viol_handler(self, violation, expression);
+					      TypeSystemViolation violation,
+					      node_ptr expression)
+{
+	return self->viol_handler(self, violation, expression);
 }
 
 /**Static function*************************************************************
@@ -145,27 +150,29 @@ VIRTUAL boolean checker_base_manage_violation(CheckerBase_ptr self,
   SeeAlso            []
 ******************************************************************************/
 void checker_base_print_type(CheckerBase_ptr self, FILE *output_stream,
-                             node_ptr expression, node_ptr context) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const MasterPrinter_ptr wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+			     node_ptr expression, node_ptr context)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const MasterPrinter_ptr wffprint =
+		MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-  SymbType_ptr type = TypeChecker_get_expression_type(
-      TYPE_CHECKER(NODE_WALKER(self)->master), expression, context);
+	SymbType_ptr type = TypeChecker_get_expression_type(
+		TYPE_CHECKER(NODE_WALKER(self)->master), expression, context);
 
-  /* this expression must have been checked by this type checker. and
+	/* this expression must have been checked by this type checker. and
      it must not be 0 since this is an sub-expression of a problematic
      expression */
-  if (type == SYMB_TYPE(NULL)) {
-    ErrorMgr_internal_error(
-        errmgr, "check_base_print_type: the type checker was not able \n"
-                "to retrieve the given expression type");
-  }
+	if (type == SYMB_TYPE(NULL)) {
+		ErrorMgr_internal_error(
+			errmgr,
+			"check_base_print_type: the type checker was not able \n"
+			"to retrieve the given expression type");
+	}
 
-  SymbType_print(type, wffprint, output_stream);
-  return;
+	SymbType_print(type, wffprint, output_stream);
+	return;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -177,11 +184,12 @@ void checker_base_print_type(CheckerBase_ptr self, FILE *output_stream,
 
   Called by the class destructor
 */
-static void checker_base_finalize(Object_ptr object, void *dummy) {
-  CheckerBase_ptr self = CHECKER_BASE(object);
+static void checker_base_finalize(Object_ptr object, void *dummy)
+{
+	CheckerBase_ptr self = CHECKER_BASE(object);
 
-  checker_base_deinit(self);
-  FREE(self);
+	checker_base_deinit(self);
+	FREE(self);
 }
 
 /*!
@@ -190,16 +198,17 @@ static void checker_base_finalize(Object_ptr object, void *dummy) {
 
 */
 static SymbType_ptr checker_base_check_expr(CheckerBase_ptr self,
-                                            node_ptr expression,
-                                            node_ptr context) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+					    node_ptr expression,
+					    node_ptr context)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  ErrorMgr_internal_error(errmgr,
-                          "CheckerBase: Pure virtual method check_expression "
-                          "not implemented\n");
-  return 0;
+	ErrorMgr_internal_error(
+		errmgr, "CheckerBase: Pure virtual method check_expression "
+			"not implemented\n");
+	return 0;
 }
 
 /*!
@@ -208,16 +217,17 @@ static SymbType_ptr checker_base_check_expr(CheckerBase_ptr self,
 
 */
 static boolean checker_base_viol_handler(CheckerBase_ptr checker,
-                                         TypeSystemViolation violation,
-                                         node_ptr expression) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(checker));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+					 TypeSystemViolation violation,
+					 node_ptr expression)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(checker));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  ErrorMgr_internal_error(errmgr,
-                          "CheckerBase: Pure virtual method viol_handler "
-                          "not implemented\n");
-  return 0;
+	ErrorMgr_internal_error(errmgr,
+				"CheckerBase: Pure virtual method viol_handler "
+				"not implemented\n");
+	return 0;
 }
 
 /**AutomaticEnd***************************************************************/

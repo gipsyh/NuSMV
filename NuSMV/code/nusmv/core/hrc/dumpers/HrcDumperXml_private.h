@@ -52,16 +52,16 @@
 */
 
 typedef struct HrcDumperXml_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(HrcDumper);
+	/* this MUST stay on the top */
+	INHERITS_FROM(HrcDumper);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } HrcDumperXml;
 
@@ -80,59 +80,59 @@ typedef struct HrcDumperXml_TAG {
 /* Macros                                                                 */
 /* ---------------------------------------------------------------------- */
 #undef _HRC_DUMP_STR_NL
-#define _HRC_DUMP_STR_NL(x)                                                    \
-  {                                                                            \
-    hrc_dumper_dump_indent(self);                                              \
-    fprintf(self->fout, x);                                                    \
-    if (self->use_indentation) {                                               \
-      hrc_dumper_nl(self);                                                     \
-    }                                                                          \
-  }
+#define _HRC_DUMP_STR_NL(x)                   \
+	{                                     \
+		hrc_dumper_dump_indent(self); \
+		fprintf(self->fout, x);       \
+		if (self->use_indentation) {  \
+			hrc_dumper_nl(self);  \
+		}                             \
+	}
 
 #undef _HRC_DUMP_NL
-#define _HRC_DUMP_NL()                                                         \
-  {                                                                            \
-    if (self->use_indentation) {                                               \
-      hrc_dumper_nl(self);                                                     \
-    }                                                                          \
-  }
+#define _HRC_DUMP_NL()                       \
+	{                                    \
+		if (self->use_indentation) { \
+			hrc_dumper_nl(self); \
+		}                            \
+	}
 
-#define _HRC_DUMP_XML_TAG_BEGIN(t)                                             \
-  {                                                                            \
-    _HRC_DUMP_STR("<");                                                        \
-    _HRC_DUMP_STR(t);                                                          \
-    _HRC_DUMP_STR(">");                                                        \
-  }
+#define _HRC_DUMP_XML_TAG_BEGIN(t)  \
+	{                           \
+		_HRC_DUMP_STR("<"); \
+		_HRC_DUMP_STR(t);   \
+		_HRC_DUMP_STR(">"); \
+	}
 
-#define _HRC_DUMP_XML_TAG_END(t)                                               \
-  {                                                                            \
-    _HRC_DUMP_STR("</");                                                       \
-    _HRC_DUMP_STR(t);                                                          \
-    _HRC_DUMP_STR_NL(">");                                                     \
-  }
+#define _HRC_DUMP_XML_TAG_END(t)       \
+	{                              \
+		_HRC_DUMP_STR("</");   \
+		_HRC_DUMP_STR(t);      \
+		_HRC_DUMP_STR_NL(">"); \
+	}
 
-#define _HRC_DUMP_XML_TAG_BEGIN_END(t, s)                                      \
-  {                                                                            \
-    _HRC_DUMP_XML_TAG_BEGIN(t);                                                \
-    if ((char *)NULL != (char *)s) {                                           \
-      _HRC_DUMP_STR(s);                                                        \
-    }                                                                          \
-    _HRC_DUMP_XML_TAG_END(t);                                                  \
-  }
+#define _HRC_DUMP_XML_TAG_BEGIN_END(t, s)        \
+	{                                        \
+		_HRC_DUMP_XML_TAG_BEGIN(t);      \
+		if ((char *)NULL != (char *)s) { \
+			_HRC_DUMP_STR(s);        \
+		}                                \
+		_HRC_DUMP_XML_TAG_END(t);        \
+	}
 
-#define _HRC_DUMP_XML_NODE(n)                                                  \
-  hrc_dumper_xml_dump_escaped_node(HRC_DUMPER_XML(self), n)
+#define _HRC_DUMP_XML_NODE(n) \
+	hrc_dumper_xml_dump_escaped_node(HRC_DUMPER_XML(self), n)
 
-#define _HRC_DUMP_XML_NODE_BEGIN_END(t, n)                                     \
-  {                                                                            \
-    _HRC_DUMP_STR("<");                                                        \
-    _HRC_DUMP_STR(t);                                                          \
-    _HRC_DUMP_STR(">");                                                        \
-    _HRC_DUMP_XML_NODE(n);                                                     \
-    _HRC_DUMP_STR("</");                                                       \
-    _HRC_DUMP_STR(t);                                                          \
-    _HRC_DUMP_STR_NL(">");                                                     \
-  }
+#define _HRC_DUMP_XML_NODE_BEGIN_END(t, n) \
+	{                                  \
+		_HRC_DUMP_STR("<");        \
+		_HRC_DUMP_STR(t);          \
+		_HRC_DUMP_STR(">");        \
+		_HRC_DUMP_XML_NODE(n);     \
+		_HRC_DUMP_STR("</");       \
+		_HRC_DUMP_STR(t);          \
+		_HRC_DUMP_STR_NL(">");     \
+	}
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -147,7 +147,7 @@ typedef struct HrcDumperXml_TAG {
   \sa HrcDumperXml_create
 */
 void hrc_dumper_xml_init(HrcDumperXml_ptr self, const NuSMVEnv_ptr env,
-                         FILE *fout);
+			 FILE *fout);
 
 /*!
   \methodof HrcDumperXml
@@ -166,7 +166,7 @@ void hrc_dumper_xml_deinit(HrcDumperXml_ptr self);
 
 */
 void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
-                                 const HrcDumperInfo *info);
+				 const HrcDumperInfo *info);
 
 /*!
   \methodof HrcDumper

@@ -66,7 +66,7 @@
 */
 
 typedef struct TraceCompact_TAG {
-  INHERITS_FROM(TracePlugin);
+	INHERITS_FROM(TracePlugin);
 } TraceCompact;
 
 /*---------------------------------------------------------------------------*/

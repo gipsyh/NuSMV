@@ -78,93 +78,112 @@
 /*---------------------------------------------------------------------------*/
 
 bdd_ptr TraceUtils_fetch_as_bdd(Trace_ptr trace, TraceIter step,
-                                TraceIteratorType iter_type,
-                                BddEnc_ptr bdd_enc) {
-  DDMgr_ptr dd = BddEnc_get_dd_manager(bdd_enc);
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(bdd_enc));
-  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  TraceStepIter iter;
-  node_ptr var, val;
-  SymbTable_ptr symb_table = Trace_get_symb_table(trace);
+				TraceIteratorType iter_type, BddEnc_ptr bdd_enc)
+{
+	DDMgr_ptr dd = BddEnc_get_dd_manager(bdd_enc);
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(bdd_enc));
+	const ExprMgr_ptr exprs =
+		EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+	TraceStepIter iter;
+	node_ptr var, val;
+	SymbTable_ptr symb_table = Trace_get_symb_table(trace);
 
-  bdd_ptr res = bdd_true(dd);
-  TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val) {
-    bdd_ptr tmp = BddEnc_expr_to_bdd(
-        bdd_enc, ExprMgr_equal(exprs, var, val, symb_table), Nil);
-    bdd_and_accumulate(dd, &res, tmp);
-    bdd_free(dd, tmp);
-  }
+	bdd_ptr res = bdd_true(dd);
+	TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val)
+	{
+		bdd_ptr tmp = BddEnc_expr_to_bdd(
+			bdd_enc, ExprMgr_equal(exprs, var, val, symb_table),
+			Nil);
+		bdd_and_accumulate(dd, &res, tmp);
+		bdd_free(dd, tmp);
+	}
 
-  return res;
+	return res;
 }
 
 be_ptr TraceUtils_fetch_as_be(Trace_ptr trace, TraceIter step,
-                              TraceIteratorType iter_type, BeEnc_ptr be_enc,
-                              BddEnc_ptr bdd_enc) {
-  TraceStepIter iter;
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(bdd_enc));
-  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  node_ptr var, val;
-  Be_Manager_ptr be_mgr;
-  bdd_ptr res;
+			      TraceIteratorType iter_type, BeEnc_ptr be_enc,
+			      BddEnc_ptr bdd_enc)
+{
+	TraceStepIter iter;
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(bdd_enc));
+	const ExprMgr_ptr exprs =
+		EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+	node_ptr var, val;
+	Be_Manager_ptr be_mgr;
+	bdd_ptr res;
 
-  TRACE_CHECK_INSTANCE(trace);
-  BE_ENC_CHECK_INSTANCE(be_enc);
-  BDD_ENC_CHECK_INSTANCE(bdd_enc);
+	TRACE_CHECK_INSTANCE(trace);
+	BE_ENC_CHECK_INSTANCE(be_enc);
+	BDD_ENC_CHECK_INSTANCE(bdd_enc);
 
-  be_mgr = BeEnc_get_be_manager(be_enc);
-  res = Be_Truth(be_mgr);
-  TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val) {
-    be_ptr tmp = Bmc_Conv_Bexp2Be(
-        be_enc, Compile_detexpr2bexpr(
-                    bdd_enc, ExprMgr_equal(exprs, var, val, SYMB_TABLE(NULL))));
-    res = Be_And(be_mgr, res, tmp);
-  }
+	be_mgr = BeEnc_get_be_manager(be_enc);
+	res = Be_Truth(be_mgr);
+	TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val)
+	{
+		be_ptr tmp = Bmc_Conv_Bexp2Be(
+			be_enc,
+			Compile_detexpr2bexpr(bdd_enc,
+					      ExprMgr_equal(exprs, var, val,
+							    SYMB_TABLE(NULL))));
+		res = Be_And(be_mgr, res, tmp);
+	}
 
-  return res;
+	return res;
 }
 
 Expr_ptr TraceUtils_fetch_as_sexp(Trace_ptr trace, TraceIter step,
-                                  TraceIteratorType iter_type) {
-  Expr_ptr res = Nil;
+				  TraceIteratorType iter_type)
+{
+	Expr_ptr res = Nil;
 
-  TRACE_CHECK_INSTANCE(trace);
+	TRACE_CHECK_INSTANCE(trace);
 
-  {
-    node_ptr var, val;
-    TraceStepIter iter;
-    SymbTable_ptr symb_table = Trace_get_symb_table(trace);
+	{
+		node_ptr var, val;
+		TraceStepIter iter;
+		SymbTable_ptr symb_table = Trace_get_symb_table(trace);
 
-    const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(symb_table));
-    const ExprMgr_ptr exprs =
-        EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+		const NuSMVEnv_ptr env =
+			EnvObject_get_environment(ENV_OBJECT(symb_table));
+		const ExprMgr_ptr exprs =
+			EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-    res = ExprMgr_true(exprs);
+		res = ExprMgr_true(exprs);
 
-    TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val) {
-      res = ExprMgr_and(exprs, ExprMgr_equal(exprs, var, val, symb_table), res);
-    }
-  }
+		TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val)
+		{
+			res = ExprMgr_and(exprs,
+					  ExprMgr_equal(exprs, var, val,
+							symb_table),
+					  res);
+		}
+	}
 
-  return res;
+	return res;
 }
 
 Expr_ptr TraceUtils_fetch_as_big_and(Trace_ptr trace, TraceIter step,
-                                     TraceIteratorType iter_type) {
-  Expr_ptr res = NULL;
-  node_ptr var, val;
-  TraceStepIter iter;
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(trace));
-  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+				     TraceIteratorType iter_type)
+{
+	Expr_ptr res = NULL;
+	node_ptr var, val;
+	TraceStepIter iter;
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(trace));
+	const NodeMgr_ptr nodemgr =
+		NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val) {
-    if ((Expr_ptr)NULL == res) {
-      res = find_node(nodemgr, EQUAL, var, val);
-    } else
-      res = find_node(nodemgr, AND, find_node(nodemgr, EQUAL, var, val), res);
-  }
+	TRACE_STEP_FOREACH(trace, step, iter_type, iter, var, val)
+	{
+		if ((Expr_ptr)NULL == res) {
+			res = find_node(nodemgr, EQUAL, var, val);
+		} else
+			res = find_node(nodemgr, AND,
+					find_node(nodemgr, EQUAL, var, val),
+					res);
+	}
 
-  return res;
+	return res;
 }
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */

@@ -68,11 +68,11 @@
 */
 
 typedef enum {
-  EXEC_NONE, /* undefined or unknown execution engine */
-  EXEC_BDD,  /* BDD based re-execution engine */
-  EXEC_SAT,  /* SAT based re-execution engine */
+	EXEC_NONE, /* undefined or unknown execution engine */
+	EXEC_BDD, /* BDD based re-execution engine */
+	EXEC_SAT, /* SAT based re-execution engine */
 
-  EXEC_RESERVED,
+	EXEC_RESERVED,
 } execEngine;
 
 /*---------------------------------------------------------------------------*/

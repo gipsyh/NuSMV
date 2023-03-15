@@ -429,7 +429,7 @@ be_ptr Be_Iff(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
   \se ...
 */
 be_ptr Be_Ite(Be_Manager_ptr manager, be_ptr arg_if, be_ptr arg_then,
-              be_ptr arg_else);
+	      be_ptr arg_else);
 
 /*!
   \brief Creates a fresh copy G(X') of the be F(X) by shifting
@@ -456,7 +456,7 @@ be_ptr Be_Ite(Be_Manager_ptr manager, be_ptr arg_if, be_ptr arg_then,
 
 */
 be_ptr Be_LogicalShiftVar(Be_Manager_ptr manager, be_ptr f, int shift,
-                          const int *log2phy, const int *phy2log);
+			  const int *log2phy, const int *phy2log);
 
 /*!
   \brief Replaces all variables in f with other variables, taking
@@ -485,7 +485,7 @@ be_ptr Be_LogicalShiftVar(Be_Manager_ptr manager, be_ptr f, int shift,
                encodings.
 */
 be_ptr Be_LogicalVarSubst(Be_Manager_ptr manager, be_ptr f, int *subst,
-                          const int *log2phy, const int *phy2log);
+			  const int *log2phy, const int *phy2log);
 
 /* ================================================== */
 
@@ -516,7 +516,7 @@ be_ptr Be_LogicalVarSubst(Be_Manager_ptr manager, be_ptr f, int *subst,
   \sa Be_Cnf_Delete
 */
 Be_Cnf_ptr Be_ConvertToCnf(Be_Manager_ptr manager, be_ptr f, int polarity,
-                           Be_CnfAlgorithm alg);
+			   Be_CnfAlgorithm alg);
 
 /*!
   \brief Converts a CNF literal into a BE literal
@@ -577,7 +577,7 @@ int Be_BeIndex2CnfLiteral(const Be_Manager_ptr self, int beIndex);
   (via lsDestroy)
 */
 Slist_ptr Be_CnfModelToBeModel(Be_Manager_ptr manager,
-                               const Slist_ptr cnfModel);
+			       const Slist_ptr cnfModel);
 
 /*!
   \brief Dumps the given be into a file with Davinci format

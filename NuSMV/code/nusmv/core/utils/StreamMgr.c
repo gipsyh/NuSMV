@@ -58,13 +58,13 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct StreamMgr_TAG {
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  OStream_ptr err_stream;
-  OStream_ptr out_stream;
-  FILE *in_stream;
+	OStream_ptr err_stream;
+	OStream_ptr out_stream;
+	FILE *in_stream;
 
 } StreamMgr;
 
@@ -89,144 +89,168 @@ static void stream_mgr_deinit(StreamMgr_ptr self);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Stream_init(NuSMVEnv_ptr env) {
-  StreamMgr_ptr mgr = StreamMgr_create();
+void Stream_init(NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr mgr = StreamMgr_create();
 
-  NuSMVEnv_set_value(env, ENV_STREAM_MANAGER, mgr);
+	NuSMVEnv_set_value(env, ENV_STREAM_MANAGER, mgr);
 }
 
-void Stream_quit(NuSMVEnv_ptr env) {
-  StreamMgr_ptr mgr = NuSMVEnv_remove_value(env, ENV_STREAM_MANAGER);
+void Stream_quit(NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr mgr = NuSMVEnv_remove_value(env, ENV_STREAM_MANAGER);
 
-  StreamMgr_destroy(mgr);
+	StreamMgr_destroy(mgr);
 }
 
-StreamMgr_ptr StreamMgr_create(void) {
-  StreamMgr_ptr self = ALLOC(StreamMgr, 1);
-  STREAM_MGR_CHECK_INSTANCE(self);
+StreamMgr_ptr StreamMgr_create(void)
+{
+	StreamMgr_ptr self = ALLOC(StreamMgr, 1);
+	STREAM_MGR_CHECK_INSTANCE(self);
 
-  stream_mgr_init(self);
-  return self;
+	stream_mgr_init(self);
+	return self;
 }
 
-void StreamMgr_destroy(StreamMgr_ptr self) {
-  STREAM_MGR_CHECK_INSTANCE(self);
+void StreamMgr_destroy(StreamMgr_ptr self)
+{
+	STREAM_MGR_CHECK_INSTANCE(self);
 
-  stream_mgr_deinit(self);
-  FREE(self);
+	stream_mgr_deinit(self);
+	FREE(self);
 }
 
-void StreamMgr_set_error_stream(StreamMgr_ptr self, FILE *err) {
-  OStream_set_stream(self->err_stream, err);
+void StreamMgr_set_error_stream(StreamMgr_ptr self, FILE *err)
+{
+	OStream_set_stream(self->err_stream, err);
 }
 
-void StreamMgr_set_output_stream(StreamMgr_ptr self, FILE *out) {
-  OStream_set_stream(self->out_stream, out);
+void StreamMgr_set_output_stream(StreamMgr_ptr self, FILE *out)
+{
+	OStream_set_stream(self->out_stream, out);
 }
 
-void StreamMgr_set_input_stream(StreamMgr_ptr self, FILE *in) {
-  self->in_stream = in;
+void StreamMgr_set_input_stream(StreamMgr_ptr self, FILE *in)
+{
+	self->in_stream = in;
 }
 
-FILE *StreamMgr_reset_output_stream(StreamMgr_ptr self) {
-  STREAM_MGR_CHECK_INSTANCE(self);
+FILE *StreamMgr_reset_output_stream(StreamMgr_ptr self)
+{
+	STREAM_MGR_CHECK_INSTANCE(self);
 
-  return OStream_reset_stream(self->out_stream);
+	return OStream_reset_stream(self->out_stream);
 }
 
-FILE *StreamMgr_reset_error_stream(StreamMgr_ptr self) {
-  STREAM_MGR_CHECK_INSTANCE(self);
+FILE *StreamMgr_reset_error_stream(StreamMgr_ptr self)
+{
+	STREAM_MGR_CHECK_INSTANCE(self);
 
-  return OStream_reset_stream(self->err_stream);
+	return OStream_reset_stream(self->err_stream);
 }
 
-FILE *StreamMgr_get_error_stream(const StreamMgr_ptr self) {
-  return OStream_get_stream(self->err_stream);
+FILE *StreamMgr_get_error_stream(const StreamMgr_ptr self)
+{
+	return OStream_get_stream(self->err_stream);
 }
 
-FILE *StreamMgr_get_output_stream(const StreamMgr_ptr self) {
-  return OStream_get_stream(self->out_stream);
+FILE *StreamMgr_get_output_stream(const StreamMgr_ptr self)
+{
+	return OStream_get_stream(self->out_stream);
 }
 
-FILE *StreamMgr_get_input_stream(const StreamMgr_ptr self) {
-  return self->in_stream;
+FILE *StreamMgr_get_input_stream(const StreamMgr_ptr self)
+{
+	return self->in_stream;
 }
 
-OStream_ptr StreamMgr_get_output_ostream(const StreamMgr_ptr self) {
-  return self->out_stream;
+OStream_ptr StreamMgr_get_output_ostream(const StreamMgr_ptr self)
+{
+	return self->out_stream;
 }
 
-OStream_ptr StreamMgr_get_error_ostream(const StreamMgr_ptr self) {
-  return self->err_stream;
+OStream_ptr StreamMgr_get_error_ostream(const StreamMgr_ptr self)
+{
+	return self->err_stream;
 }
 
-void StreamMgr_print_output(const StreamMgr_ptr self, const char *format, ...) {
-  va_list args;
-  va_start(args, format);
+void StreamMgr_print_output(const StreamMgr_ptr self, const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
 
-  OStream_vprintf(self->out_stream, format, args);
+	OStream_vprintf(self->out_stream, format, args);
 
-  va_end(args);
+	va_end(args);
 }
 
 void StreamMgr_nprint_output(const StreamMgr_ptr self,
-                             const MasterPrinter_ptr printer,
-                             const char *format, ...) {
-  va_list args;
-  va_start(args, format);
+			     const MasterPrinter_ptr printer,
+			     const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
 
-  OStream_nvprintf(self->out_stream, printer, format, args);
+	OStream_nvprintf(self->out_stream, printer, format, args);
 
-  va_end(args);
+	va_end(args);
 }
 
-void StreamMgr_print_error(const StreamMgr_ptr self, const char *format, ...) {
-  va_list args;
-  va_start(args, format);
+void StreamMgr_print_error(const StreamMgr_ptr self, const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
 
-  OStream_vprintf(self->err_stream, format, args);
+	OStream_vprintf(self->err_stream, format, args);
 
-  va_end(args);
+	va_end(args);
 }
 
 void StreamMgr_nprint_error(const StreamMgr_ptr self,
-                            const MasterPrinter_ptr printer, const char *format,
-                            ...) {
-  va_list args;
-  va_start(args, format);
+			    const MasterPrinter_ptr printer, const char *format,
+			    ...)
+{
+	va_list args;
+	va_start(args, format);
 
-  OStream_nvprintf(self->err_stream, printer, format, args);
+	OStream_nvprintf(self->err_stream, printer, format, args);
 
-  va_end(args);
+	va_end(args);
 }
 
-void StreamMgr_flush_streams(const StreamMgr_ptr self) {
-  OStream_flush(self->err_stream);
-  OStream_flush(self->out_stream);
+void StreamMgr_flush_streams(const StreamMgr_ptr self)
+{
+	OStream_flush(self->err_stream);
+	OStream_flush(self->out_stream);
 }
 
-void StreamMgr_inc_indent_size(StreamMgr_ptr self) {
-  OStream_inc_indent_size(self->out_stream);
-  OStream_inc_indent_size(self->err_stream);
+void StreamMgr_inc_indent_size(StreamMgr_ptr self)
+{
+	OStream_inc_indent_size(self->out_stream);
+	OStream_inc_indent_size(self->err_stream);
 }
 
-void StreamMgr_dec_indent_size(StreamMgr_ptr self) {
-  OStream_dec_indent_size(self->out_stream);
-  OStream_dec_indent_size(self->err_stream);
+void StreamMgr_dec_indent_size(StreamMgr_ptr self)
+{
+	OStream_dec_indent_size(self->out_stream);
+	OStream_dec_indent_size(self->err_stream);
 }
 
-int StreamMgr_get_indent_size(const StreamMgr_ptr self) {
-  return OStream_get_indent_size(self->out_stream);
+int StreamMgr_get_indent_size(const StreamMgr_ptr self)
+{
+	return OStream_get_indent_size(self->out_stream);
 }
 
-void StreamMgr_reset_indent_size(StreamMgr_ptr self) {
-  OStream_reset_indent_size(self->out_stream);
-  OStream_reset_indent_size(self->err_stream);
+void StreamMgr_reset_indent_size(StreamMgr_ptr self)
+{
+	OStream_reset_indent_size(self->out_stream);
+	OStream_reset_indent_size(self->err_stream);
 }
 
-void StreamMgr_set_indent_size(StreamMgr_ptr self, int n) {
-  OStream_set_indent_size(self->out_stream, n);
-  OStream_set_indent_size(self->err_stream, n);
+void StreamMgr_set_indent_size(StreamMgr_ptr self, int n)
+{
+	OStream_set_indent_size(self->out_stream, n);
+	OStream_set_indent_size(self->err_stream, n);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -244,11 +268,12 @@ void StreamMgr_set_indent_size(StreamMgr_ptr self, int n) {
 
   \sa StreamMgr_create
 */
-static void stream_mgr_init(StreamMgr_ptr self) {
-  /* members initialization */
-  self->err_stream = OStream_create(stderr);
-  self->out_stream = OStream_create(stdout);
-  self->in_stream = stdin;
+static void stream_mgr_init(StreamMgr_ptr self)
+{
+	/* members initialization */
+	self->err_stream = OStream_create(stderr);
+	self->out_stream = OStream_create(stdout);
+	self->in_stream = stdin;
 }
 
 /*!
@@ -258,15 +283,16 @@ static void stream_mgr_init(StreamMgr_ptr self) {
 
   \sa StreamMgr_destroy
 */
-static void stream_mgr_deinit(StreamMgr_ptr self) {
-  /* members deinitialization */
+static void stream_mgr_deinit(StreamMgr_ptr self)
+{
+	/* members deinitialization */
 
-  OStream_destroy(self->err_stream);
-  OStream_destroy(self->out_stream);
+	OStream_destroy(self->err_stream);
+	OStream_destroy(self->out_stream);
 
-  if (self->in_stream != stdin) {
-    fclose(self->in_stream);
-  }
+	if (self->in_stream != stdin) {
+		fclose(self->in_stream);
+	}
 }
 
 /**AutomaticEnd***************************************************************/

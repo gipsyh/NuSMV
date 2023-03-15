@@ -63,8 +63,8 @@ typedef struct TraceOpt_TAG *TraceOpt_ptr;
 
   \todo Missing description
 */
-#define TRACE_OPT_CHECK_INSTANCE(self)                                         \
-  (nusmv_assert(TRACE_OPT(self) != TRACE_OPT(NULL)))
+#define TRACE_OPT_CHECK_INSTANCE(self) \
+	(nusmv_assert(TRACE_OPT(self) != TRACE_OPT(NULL)))
 
 /**AutomaticStart*************************************************************/
 

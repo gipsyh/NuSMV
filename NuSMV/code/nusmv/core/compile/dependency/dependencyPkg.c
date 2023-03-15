@@ -88,32 +88,36 @@
   the global environment.
 */
 
-void DependencyPkg_init(NuSMVEnv_ptr env) {
-  FormulaDependency_ptr dependency;
-  OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void DependencyPkg_init(NuSMVEnv_ptr env)
+{
+	FormulaDependency_ptr dependency;
+	OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 4)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Instantiating the FormulaDependency instance "
-                       "within the given environment...\n");
-  }
+	if (opt_verbose_level_gt(opts, 4)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger,
+			   "Instantiating the FormulaDependency instance "
+			   "within the given environment...\n");
+	}
 
-  dependency = FormulaDependency_create(env);
-  {
-    /* add core handlers */
-    DependencyBase_ptr core_dep;
-    DependencyBase_ptr psl_dep;
-    core_dep = DEPENDENCY_BASE(DependencyCore_create(env, "Dependency core"));
-    MasterNodeWalker_register_walker(MASTER_NODE_WALKER(dependency),
-                                     NODE_WALKER(core_dep));
+	dependency = FormulaDependency_create(env);
+	{
+		/* add core handlers */
+		DependencyBase_ptr core_dep;
+		DependencyBase_ptr psl_dep;
+		core_dep = DEPENDENCY_BASE(
+			DependencyCore_create(env, "Dependency core"));
+		MasterNodeWalker_register_walker(MASTER_NODE_WALKER(dependency),
+						 NODE_WALKER(core_dep));
 
-    psl_dep = DEPENDENCY_BASE(DependencyPsl_create(env, "Dependency psl"));
-    MasterNodeWalker_register_walker(MASTER_NODE_WALKER(dependency),
-                                     NODE_WALKER(psl_dep));
-  }
+		psl_dep = DEPENDENCY_BASE(
+			DependencyPsl_create(env, "Dependency psl"));
+		MasterNodeWalker_register_walker(MASTER_NODE_WALKER(dependency),
+						 NODE_WALKER(psl_dep));
+	}
 
-  NuSMVEnv_set_value(env, ENV_DEPENDENCY, dependency);
+	NuSMVEnv_set_value(env, ENV_DEPENDENCY, dependency);
 }
 
 /*!
@@ -122,19 +126,21 @@ void DependencyPkg_init(NuSMVEnv_ptr env) {
 
 */
 
-void DependencyPkg_quit(NuSMVEnv_ptr env) {
-  FormulaDependency_ptr dependency =
-      FORMULA_DEPENDENCY(NuSMVEnv_remove_value(env, ENV_DEPENDENCY));
-  OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void DependencyPkg_quit(NuSMVEnv_ptr env)
+{
+	FormulaDependency_ptr dependency =
+		FORMULA_DEPENDENCY(NuSMVEnv_remove_value(env, ENV_DEPENDENCY));
+	OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 4)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Clearing the formula dependency instance in "
-                       "the given environment...\n");
-  }
+	if (opt_verbose_level_gt(opts, 4)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger,
+			   "Clearing the formula dependency instance in "
+			   "the given environment...\n");
+	}
 
-  MasterNodeWalker_destroy(MASTER_NODE_WALKER(dependency));
+	MasterNodeWalker_destroy(MASTER_NODE_WALKER(dependency));
 }
 
 /*---------------------------------------------------------------------------*/

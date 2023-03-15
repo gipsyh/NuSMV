@@ -52,22 +52,22 @@
 */
 
 typedef struct CompleteTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(BaseTraceExecutor);
+	/* this MUST stay on the top */
+	INHERITS_FROM(BaseTraceExecutor);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
-  /* executes the given trace, returns true iff the whole trace was
+	/* executes the given trace, returns true iff the whole trace was
      succesfully executed. Number of succesful transitions if returned
      in *n_steps, if a non-NULL pointer is given. */
-  VIRTUAL boolean (*execute)(const CompleteTraceExecutor_ptr self,
-                             const Trace_ptr trace, int *n_steps);
+	VIRTUAL boolean (*execute)(const CompleteTraceExecutor_ptr self,
+				   const Trace_ptr trace, int *n_steps);
 
 } CompleteTraceExecutor;
 
@@ -84,7 +84,7 @@ typedef struct CompleteTraceExecutor_TAG {
   \sa CompleteTraceExecutor_create
 */
 void complete_trace_executor_init(CompleteTraceExecutor_ptr self,
-                                  const NuSMVEnv_ptr env);
+				  const NuSMVEnv_ptr env);
 
 /*!
   \methodof CompleteTraceExecutor
@@ -109,6 +109,6 @@ void complete_trace_executor_deinit(CompleteTraceExecutor_ptr self);
 */
 boolean
 complete_trace_executor_check_loopbacks(const CompleteTraceExecutor_ptr self,
-                                        const Trace_ptr trace);
+					const Trace_ptr trace);
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_COMPLETE_TRACE_EXECUTOR_PRIVATE_H__ */

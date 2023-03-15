@@ -58,15 +58,17 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Fsm_init() {
+void Fsm_init()
+{
 #ifdef SYMB_TABLE_STATIC
-  fsm_sexp_expr_init();
+	fsm_sexp_expr_init();
 #endif
 }
 
-void Fsm_quit() {
+void Fsm_quit()
+{
 #ifdef SYMB_TABLE_STATIC
-  fsm_sexp_expr_quit();
+	fsm_sexp_expr_quit();
 #endif
 }
 

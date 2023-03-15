@@ -65,125 +65,143 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void node_pkg_init(NuSMVEnv_ptr env) {
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+void node_pkg_init(NuSMVEnv_ptr env)
+{
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  MasterPrinter_ptr wff_printer;
-  MasterPrinter_ptr iwff_printer;
-  MasterPrinter_ptr sexp_printer;
-  MasterNormalizer_ptr normalizer;
+	MasterPrinter_ptr wff_printer;
+	MasterPrinter_ptr iwff_printer;
+	MasterPrinter_ptr sexp_printer;
+	MasterNormalizer_ptr normalizer;
 
-  node_init(env);
+	node_init(env);
 
-  if (!NuSMVEnv_has_value(env, ENV_WFF_PRINTER)) {
+	if (!NuSMVEnv_has_value(env, ENV_WFF_PRINTER)) {
+		/* Core printer (legacy) */
+		wff_printer = MasterPrinter_create(env);
+		NuSMVEnv_set_value(env, ENV_WFF_PRINTER, wff_printer);
 
-    /* Core printer (legacy) */
-    wff_printer = MasterPrinter_create(env);
-    NuSMVEnv_set_value(env, ENV_WFF_PRINTER, wff_printer);
+		CATCH(errmgr)
+		{
+			PrinterBase_ptr printer;
+			printer = PRINTER_BASE(
+				PrinterWffCore_create(env, "Core Wff Printer"));
+			MasterNodeWalker_register_walker(
+				MASTER_NODE_WALKER(wff_printer),
+				NODE_WALKER(printer));
 
-    CATCH(errmgr) {
+			/* printer for PSL: */
+			printer = PRINTER_BASE(
+				PrinterPsl_create(env, "PSL Printer"));
+			MasterNodeWalker_register_walker(
+				MASTER_NODE_WALKER(wff_printer),
+				NODE_WALKER(printer));
+		}
 
-      PrinterBase_ptr printer;
-      printer = PRINTER_BASE(PrinterWffCore_create(env, "Core Wff Printer"));
-      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(wff_printer),
-                                       NODE_WALKER(printer));
+		FAIL(errmgr)
+		{
+			node_pkg_quit(env);
+			ErrorMgr_nusmv_exit(errmgr, 1);
+		}
+	}
 
-      /* printer for PSL: */
-      printer = PRINTER_BASE(PrinterPsl_create(env, "PSL Printer"));
-      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(wff_printer),
-                                       NODE_WALKER(printer));
-    }
+	if (!NuSMVEnv_has_value(env, ENV_IWFF_PRINTER)) {
+		/* Core printer (indenting) */
+		iwff_printer = MasterPrinter_create(env);
+		NuSMVEnv_set_value(env, ENV_IWFF_PRINTER, iwff_printer);
 
-    FAIL(errmgr) {
-      node_pkg_quit(env);
-      ErrorMgr_nusmv_exit(errmgr, 1);
-    }
-  }
+		CATCH(errmgr)
+		{
+			PrinterBase_ptr printer;
+			printer = PRINTER_BASE(PrinterIWffCore_create(
+				env, "Core IWff Printer"));
+			MasterNodeWalker_register_walker(
+				MASTER_NODE_WALKER(iwff_printer),
+				NODE_WALKER(printer));
+			/* printer for PSL: */
+			printer = PRINTER_BASE(
+				PrinterPsl_create(env, "PSL Printer"));
+			MasterNodeWalker_register_walker(
+				MASTER_NODE_WALKER(iwff_printer),
+				NODE_WALKER(printer));
+		}
 
-  if (!NuSMVEnv_has_value(env, ENV_IWFF_PRINTER)) {
+		FAIL(errmgr)
+		{
+			node_pkg_quit(env);
+			ErrorMgr_nusmv_exit(errmgr, 1);
+		}
+	}
 
-    /* Core printer (indenting) */
-    iwff_printer = MasterPrinter_create(env);
-    NuSMVEnv_set_value(env, ENV_IWFF_PRINTER, iwff_printer);
+	if (!NuSMVEnv_has_value(env, ENV_SEXP_PRINTER)) {
+		/* Core printer (sexp) */
+		sexp_printer = MasterPrinter_create(env);
+		NuSMVEnv_set_value(env, ENV_SEXP_PRINTER, sexp_printer);
 
-    CATCH(errmgr) {
+		CATCH(errmgr)
+		{
+			PrinterBase_ptr printer;
+			printer = PRINTER_BASE(PrinterSexpCore_create(
+				env, "Core Sexp Printer"));
+			MasterNodeWalker_register_walker(
+				MASTER_NODE_WALKER(sexp_printer),
+				NODE_WALKER(printer));
+		}
 
-      PrinterBase_ptr printer;
-      printer = PRINTER_BASE(PrinterIWffCore_create(env, "Core IWff Printer"));
-      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(iwff_printer),
-                                       NODE_WALKER(printer));
-      /* printer for PSL: */
-      printer = PRINTER_BASE(PrinterPsl_create(env, "PSL Printer"));
-      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(iwff_printer),
-                                       NODE_WALKER(printer));
-    }
+		FAIL(errmgr)
+		{
+			node_pkg_quit(env);
+			ErrorMgr_nusmv_exit(errmgr, 1);
+		}
+	}
 
-    FAIL(errmgr) {
-      node_pkg_quit(env);
-      ErrorMgr_nusmv_exit(errmgr, 1);
-    }
-  }
+	if (!NuSMVEnv_has_value(env, ENV_NODE_NORMALIZER)) {
+		normalizer = MasterNormalizer_create(env);
+		NuSMVEnv_set_value(env, ENV_NODE_NORMALIZER, normalizer);
 
-  if (!NuSMVEnv_has_value(env, ENV_SEXP_PRINTER)) {
+		CATCH(errmgr)
+		{
+			NormalizerBase_ptr tmp_normalizer;
+			tmp_normalizer = NORMALIZER_BASE(
+				NormalizerCore_create(env, "Core Normalizer"));
+			MasterNodeWalker_register_walker(
+				MASTER_NODE_WALKER(normalizer),
+				NODE_WALKER(tmp_normalizer));
 
-    /* Core printer (sexp) */
-    sexp_printer = MasterPrinter_create(env);
-    NuSMVEnv_set_value(env, ENV_SEXP_PRINTER, sexp_printer);
+			tmp_normalizer = NORMALIZER_BASE(
+				NormalizerPsl_create(env, "Psl Normalizer"));
+			MasterNodeWalker_register_walker(
+				MASTER_NODE_WALKER(normalizer),
+				NODE_WALKER(tmp_normalizer));
+		}
 
-    CATCH(errmgr) {
-
-      PrinterBase_ptr printer;
-      printer = PRINTER_BASE(PrinterSexpCore_create(env, "Core Sexp Printer"));
-      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(sexp_printer),
-                                       NODE_WALKER(printer));
-    }
-
-    FAIL(errmgr) {
-      node_pkg_quit(env);
-      ErrorMgr_nusmv_exit(errmgr, 1);
-    }
-  }
-
-  if (!NuSMVEnv_has_value(env, ENV_NODE_NORMALIZER)) {
-    normalizer = MasterNormalizer_create(env);
-    NuSMVEnv_set_value(env, ENV_NODE_NORMALIZER, normalizer);
-
-    CATCH(errmgr) {
-
-      NormalizerBase_ptr tmp_normalizer;
-      tmp_normalizer =
-          NORMALIZER_BASE(NormalizerCore_create(env, "Core Normalizer"));
-      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(normalizer),
-                                       NODE_WALKER(tmp_normalizer));
-
-      tmp_normalizer =
-          NORMALIZER_BASE(NormalizerPsl_create(env, "Psl Normalizer"));
-      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(normalizer),
-                                       NODE_WALKER(tmp_normalizer));
-    }
-
-    FAIL(errmgr) {
-      node_pkg_quit(env);
-      ErrorMgr_nusmv_exit(errmgr, 1);
-    }
-  }
+		FAIL(errmgr)
+		{
+			node_pkg_quit(env);
+			ErrorMgr_nusmv_exit(errmgr, 1);
+		}
+	}
 }
 
-void node_pkg_quit(NuSMVEnv_ptr env) {
-  MasterPrinter_ptr wff_printer = NuSMVEnv_remove_value(env, ENV_WFF_PRINTER);
-  MasterPrinter_ptr iwff_printer = NuSMVEnv_remove_value(env, ENV_IWFF_PRINTER);
-  MasterPrinter_ptr sexp_printer = NuSMVEnv_remove_value(env, ENV_SEXP_PRINTER);
-  MasterNormalizer_ptr normalizer =
-      NuSMVEnv_remove_value(env, ENV_NODE_NORMALIZER);
+void node_pkg_quit(NuSMVEnv_ptr env)
+{
+	MasterPrinter_ptr wff_printer =
+		NuSMVEnv_remove_value(env, ENV_WFF_PRINTER);
+	MasterPrinter_ptr iwff_printer =
+		NuSMVEnv_remove_value(env, ENV_IWFF_PRINTER);
+	MasterPrinter_ptr sexp_printer =
+		NuSMVEnv_remove_value(env, ENV_SEXP_PRINTER);
+	MasterNormalizer_ptr normalizer =
+		NuSMVEnv_remove_value(env, ENV_NODE_NORMALIZER);
 
-  MasterNodeWalker_destroy(MASTER_NODE_WALKER(wff_printer));
-  MasterNodeWalker_destroy(MASTER_NODE_WALKER(iwff_printer));
-  MasterNodeWalker_destroy(MASTER_NODE_WALKER(sexp_printer));
+	MasterNodeWalker_destroy(MASTER_NODE_WALKER(wff_printer));
+	MasterNodeWalker_destroy(MASTER_NODE_WALKER(iwff_printer));
+	MasterNodeWalker_destroy(MASTER_NODE_WALKER(sexp_printer));
 
-  MasterNodeWalker_destroy(MASTER_NODE_WALKER(normalizer));
+	MasterNodeWalker_destroy(MASTER_NODE_WALKER(normalizer));
 
-  node_quit(env);
+	node_quit(env);
 }
 
 /*---------------------------------------------------------------------------*/

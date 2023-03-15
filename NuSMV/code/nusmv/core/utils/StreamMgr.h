@@ -65,8 +65,8 @@ typedef struct StreamMgr_TAG *StreamMgr_ptr;
 
   \todo Missing description
 */
-#define STREAM_MGR_CHECK_INSTANCE(self)                                        \
-  (nusmv_assert(STREAM_MGR(self) != STREAM_MGR(NULL)))
+#define STREAM_MGR_CHECK_INSTANCE(self) \
+	(nusmv_assert(STREAM_MGR(self) != STREAM_MGR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -215,8 +215,8 @@ void StreamMgr_print_output(const StreamMgr_ptr self, const char *format, ...);
                       supports node_ptr's too. Use format '%N' for nodes
 */
 void StreamMgr_nprint_output(const StreamMgr_ptr self,
-                             const MasterPrinter_ptr printer,
-                             const char *format, ...);
+			     const MasterPrinter_ptr printer,
+			     const char *format, ...);
 
 /*!
   \methodof StreamMgr
@@ -236,8 +236,8 @@ void StreamMgr_print_error(const StreamMgr_ptr self, const char *format, ...);
                       supports node_ptr's too. Use format '%N' for nodes
 */
 void StreamMgr_nprint_error(const StreamMgr_ptr self,
-                            const MasterPrinter_ptr printer, const char *format,
-                            ...);
+			    const MasterPrinter_ptr printer, const char *format,
+			    ...);
 
 /*!
   \methodof StreamMgr

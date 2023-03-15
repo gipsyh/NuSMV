@@ -67,8 +67,8 @@ typedef struct TraceXmlDumper_TAG *TraceXmlDumper_ptr;
 
   \todo Missing description
 */
-#define TRACE_XML_DUMPER_CHECK_INSTANCE(x)                                     \
-  (nusmv_assert(TRACE_XML_DUMPER(x) != TRACE_XML_DUMPER(NULL)))
+#define TRACE_XML_DUMPER_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_XML_DUMPER(x) != TRACE_XML_DUMPER(NULL)))
 
 /**AutomaticStart*************************************************************/
 

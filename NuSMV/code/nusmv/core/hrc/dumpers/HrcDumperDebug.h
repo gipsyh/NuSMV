@@ -61,8 +61,8 @@ typedef struct HrcDumperDebug_TAG *HrcDumperDebug_ptr;
 
   \todo Missing description
 */
-#define HRC_DUMPER_DEBUG_CHECK_INSTANCE(self)                                  \
-  (nusmv_assert(HRC_DUMPER_DEBUG(self) != HRC_DUMPER_DEBUG(NULL)))
+#define HRC_DUMPER_DEBUG_CHECK_INSTANCE(self) \
+	(nusmv_assert(HRC_DUMPER_DEBUG(self) != HRC_DUMPER_DEBUG(NULL)))
 
 /**AutomaticStart*************************************************************/
 

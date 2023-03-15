@@ -62,7 +62,7 @@
 */
 
 typedef struct {
-  void *repr;
+	void *repr;
 } Number;
 
 /*---------------------------------------------------------------------------*/
@@ -157,7 +157,7 @@ Number BigNumber_max_unsigned_int(int widht);
                       number.
 */
 boolean BigNumber_to_unsigned_long_long(Number *number,
-                                        unsigned long long *target);
+					unsigned long long *target);
 
 /*!
   \brief sets the given bit of the binary representation of the
@@ -199,7 +199,7 @@ Number BigNumber_make_number_from_long(long n);
   \se if 1 is returned, numb is set to the value of string
 */
 int BigNumber_assign_number_from_string(char *string, char *error_char,
-                                        int base, Number *value);
+					int base, Number *value);
 
 /*!
   \brief returns a new Number of value left * right

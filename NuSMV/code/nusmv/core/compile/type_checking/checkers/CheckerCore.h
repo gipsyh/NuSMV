@@ -61,8 +61,8 @@ typedef struct CheckerCore_TAG *CheckerCore_ptr;
 
   \todo Missing description
 */
-#define CHECKER_CORE_CHECK_INSTANCE(self)                                      \
-  (nusmv_assert(CHECKER_CORE(self) != CHECKER_CORE(NULL)))
+#define CHECKER_CORE_CHECK_INSTANCE(self) \
+	(nusmv_assert(CHECKER_CORE(self) != CHECKER_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 

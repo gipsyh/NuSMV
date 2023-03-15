@@ -89,10 +89,11 @@
   \se None
 */
 
-void *rpl_malloc(size_t size) {
-  if (size == 0)
-    size = 1;
-  return malloc(size);
+void *rpl_malloc(size_t size)
+{
+	if (size == 0)
+		size = 1;
+	return malloc(size);
 }
 #endif /* if not NUSMV_HAVE_MALLOC */
 
@@ -107,10 +108,11 @@ void *rpl_malloc(size_t size) {
   \se None
 */
 
-void *rpl_realloc(void *ptr, size_t size) {
-  if (size == 0)
-    size = 1;
-  return realloc(ptr, size);
+void *rpl_realloc(void *ptr, size_t size)
+{
+	if (size == 0)
+		size = 1;
+	return realloc(ptr, size);
 }
 #endif /* if not NUSMV_HAVE_MALLOC */
 

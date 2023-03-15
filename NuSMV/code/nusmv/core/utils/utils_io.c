@@ -60,402 +60,448 @@
 /*---------------------------------------------------------------------------*/
 
 int UtilsIO_get_param_len(const char *fmt, enum var_type *type,
-                          enum var_modifier *mod) {
-  int i = 1;
-  boolean done = false;
+			  enum var_modifier *mod)
+{
+	int i = 1;
+	boolean done = false;
 
-  *type = VAR_NONE;
-  *mod = MOD_NONE;
+	*type = VAR_NONE;
+	*mod = MOD_NONE;
 
-  nusmv_assert(fmt[0] == '%');
+	nusmv_assert(fmt[0] == '%');
 
-  do {
-    switch (fmt[i]) {
+	do {
+		switch (fmt[i]) {
+			/* Conversion specifiers (see man fprintf) */
+		case 'o':
+		case 'u':
+		case 'x':
+		case 'X':
+		case 'd':
+		case 'i':
+			*type = VAR_INT;
+			done = true;
+			break;
 
-      /* Conversion specifiers (see man fprintf) */
-    case 'o':
-    case 'u':
-    case 'x':
-    case 'X':
-    case 'd':
-    case 'i':
-      *type = VAR_INT;
-      done = true;
-      break;
+		case 'G':
+		case 'g':
+		case 'F':
+		case 'f':
+		case 'E':
+		case 'e':
+			*type = VAR_DOUBLE;
+			done = true;
+			break;
 
-    case 'G':
-    case 'g':
-    case 'F':
-    case 'f':
-    case 'E':
-    case 'e':
-      *type = VAR_DOUBLE;
-      done = true;
-      break;
+		case 'c':
+			*type = VAR_CHAR;
+			done = true;
+			break;
 
-    case 'c':
-      *type = VAR_CHAR;
-      done = true;
-      break;
+		case 's':
+			*type = VAR_STRING;
+			done = true;
+			break;
 
-    case 's':
-      *type = VAR_STRING;
-      done = true;
-      break;
+		case 'p':
+			*type = VAR_POINTER;
+			done = true;
+			break;
 
-    case 'p':
-      *type = VAR_POINTER;
-      done = true;
-      break;
+			/* Length modifiers (also in man fprintf) */
+		case 'h':
+			if (MOD_SHORT == *mod)
+				*mod = MOD_SHORT_SHORT;
+			else {
+				nusmv_assert(MOD_NONE == *mod);
+				*mod = MOD_SHORT;
+			}
+			break;
 
-      /* Length modifiers (also in man fprintf) */
-    case 'h':
-      if (MOD_SHORT == *mod)
-        *mod = MOD_SHORT_SHORT;
-      else {
-        nusmv_assert(MOD_NONE == *mod);
-        *mod = MOD_SHORT;
-      }
-      break;
+		case 'l':
+			if (MOD_LONG == *mod)
+				*mod = MOD_LONG_LONG;
+			else {
+				nusmv_assert(MOD_NONE == *mod);
+				*mod = MOD_LONG;
+			}
+			break;
 
-    case 'l':
-      if (MOD_LONG == *mod)
-        *mod = MOD_LONG_LONG;
-      else {
-        nusmv_assert(MOD_NONE == *mod);
-        *mod = MOD_LONG;
-      }
-      break;
+		case 'L':
+			nusmv_assert(MOD_NONE == *mod);
+			*mod = MOD_LONG_DOUBLE;
+			break;
 
-    case 'L':
-      nusmv_assert(MOD_NONE == *mod);
-      *mod = MOD_LONG_DOUBLE;
-      break;
+		case 'z':
+			nusmv_assert(MOD_NONE == *mod);
+			*mod = MOD_SIZE_T;
+			break;
 
-    case 'z':
-      nusmv_assert(MOD_NONE == *mod);
-      *mod = MOD_SIZE_T;
-      break;
+			/* Not handled */
+		case 'N': /* N should be trapped by callers */
 
-      /* Not handled */
-    case 'N': /* N should be trapped by callers */
+		case 'n':
+		case 'j':
+			error_unreachable_code();
 
-    case 'n':
-    case 'j':
-      error_unreachable_code();
+			/* Error trapping */
+		case '\0':
+			error_unreachable_code();
 
-      /* Error trapping */
-    case '\0':
-      error_unreachable_code();
+		default: /* None */
+			break;
+		}
 
-    default: /* None */
-      break;
-    }
+		++i;
+	} while (!done);
 
-    ++i;
-  } while (!done);
-
-  return i;
+	return i;
 }
 
 int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer, char *output,
-                           size_t size, const char *fmt, va_list args) {
-  int res = 0;
-  size_t i = 0;
-  char buf[32];
+			   size_t size, const char *fmt, va_list args)
+{
+	int res = 0;
+	size_t i = 0;
+	char buf[32];
 
-  MASTER_PRINTER_CHECK_INSTANCE(printer);
-  nusmv_assert((const char *)NULL != fmt);
+	MASTER_PRINTER_CHECK_INSTANCE(printer);
+	nusmv_assert((const char *)NULL != fmt);
 
-  output[0] = '\0';
+	output[0] = '\0';
 
-  while (fmt[i] != '\0') {
-    if (fmt[i] == '%') {
-      if (fmt[i + 1] == '%') {
+	while (fmt[i] != '\0') {
+		if (fmt[i] == '%') {
+			if (fmt[i + 1] == '%') {
+				if (res < size) {
+					output = strncat(output, "%%",
+							 size - res - 1);
+				}
 
-        if (res < size) {
-          output = strncat(output, "%%", size - res - 1);
-        }
+				res += 2;
+				i += 2;
+			} else if (fmt[i + 1] == 'N') {
+				node_ptr node = va_arg(args, node_ptr);
+				char *str = sprint_node(printer, node);
 
-        res += 2;
-        i += 2;
-      } else if (fmt[i + 1] == 'N') {
-        node_ptr node = va_arg(args, node_ptr);
-        char *str = sprint_node(printer, node);
+				if (res < size) {
+					output = strncat(output, str,
+							 size - res - 1);
+				}
 
-        if (res < size) {
-          output = strncat(output, str, size - res - 1);
-        }
+				res += strlen(str);
+				FREE(str);
+				i += 2;
+			} else {
+				enum var_type type;
+				enum var_modifier mod;
+				int read, wrote;
+				char *tmp = ALLOC(char, size);
+				nusmv_assert(NULL != tmp);
 
-        res += strlen(str);
-        FREE(str);
-        i += 2;
-      } else {
-        enum var_type type;
-        enum var_modifier mod;
-        int read, wrote;
-        char *tmp = ALLOC(char, size);
-        nusmv_assert(NULL != tmp);
+				read = UtilsIO_get_param_len(fmt + i, &type,
+							     &mod);
 
-        read = UtilsIO_get_param_len(fmt + i, &type, &mod);
+				snprintf(buf, read + 1, "%s", fmt + i);
 
-        snprintf(buf, read + 1, "%s", fmt + i);
+				switch (type) {
+				case VAR_INT:
+					switch (mod) {
+					case MOD_NONE:
+					case MOD_SHORT:
+					case MOD_SHORT_SHORT:
+						wrote = snprintf(tmp, size, buf,
+								 va_arg(args,
+									int));
+						break;
+					case MOD_SIZE_T:
+						wrote = snprintf(
+							tmp, size, buf,
+							va_arg(args, size_t));
+						break;
+					case MOD_LONG:
+						wrote = snprintf(
+							tmp, size, buf,
+							va_arg(args, long int));
+						break;
+					case MOD_LONG_LONG:
+						wrote = snprintf(
+							tmp, size, buf,
+							va_arg(args,
+							       long long int));
+						break;
 
-        switch (type) {
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_INT */
 
-        case VAR_INT:
-          switch (mod) {
-          case MOD_NONE:
-          case MOD_SHORT:
-          case MOD_SHORT_SHORT:
-            wrote = snprintf(tmp, size, buf, va_arg(args, int));
-            break;
-          case MOD_SIZE_T:
-            wrote = snprintf(tmp, size, buf, va_arg(args, size_t));
-            break;
-          case MOD_LONG:
-            wrote = snprintf(tmp, size, buf, va_arg(args, long int));
-            break;
-          case MOD_LONG_LONG:
-            wrote = snprintf(tmp, size, buf, va_arg(args, long long int));
-            break;
+				case VAR_CHAR:
+					switch (mod) {
+					case MOD_NONE:
+						wrote = snprintf(tmp, size, buf,
+								 va_arg(args,
+									int));
+						break;
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_INT */
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_CHAR */
 
-        case VAR_CHAR:
-          switch (mod) {
-          case MOD_NONE:
-            wrote = snprintf(tmp, size, buf, va_arg(args, int));
-            break;
+				case VAR_STRING:
+					switch (mod) {
+					case MOD_NONE:
+						wrote = snprintf(
+							tmp, size, buf,
+							va_arg(args, char *));
+						break;
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_CHAR */
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_STRING */
 
-        case VAR_STRING:
-          switch (mod) {
-          case MOD_NONE:
-            wrote = snprintf(tmp, size, buf, va_arg(args, char *));
-            break;
+				case VAR_POINTER:
+					switch (mod) {
+					case MOD_NONE:
+						wrote = snprintf(
+							tmp, size, buf,
+							va_arg(args, void *));
+						break;
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_STRING */
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_POINTER */
 
-        case VAR_POINTER:
-          switch (mod) {
-          case MOD_NONE:
-            wrote = snprintf(tmp, size, buf, va_arg(args, void *));
-            break;
+				case VAR_DOUBLE:
+					switch (mod) {
+					case MOD_NONE:
+						wrote = snprintf(
+							tmp, size, buf,
+							va_arg(args, double));
+						break;
+					case MOD_LONG_DOUBLE:
+						wrote = snprintf(
+							tmp, size, buf,
+							va_arg(args,
+							       long double));
+						break;
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_POINTER */
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_DOUBLE */
 
-        case VAR_DOUBLE:
-          switch (mod) {
-          case MOD_NONE:
-            wrote = snprintf(tmp, size, buf, va_arg(args, double));
-            break;
-          case MOD_LONG_DOUBLE:
-            wrote = snprintf(tmp, size, buf, va_arg(args, long double));
-            break;
+					/* Errors */
+				default:
+					error_unreachable_code();
+				}
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_DOUBLE */
+				if (res < size) {
+					output = strncat(output, tmp,
+							 size - res - 1);
+				}
 
-          /* Errors */
-        default:
-          error_unreachable_code();
-        }
+				res += wrote;
+				i += read;
 
-        if (res < size) {
-          output = strncat(output, tmp, size - res - 1);
-        }
+				FREE(tmp);
+			}
+		} /* if (fmt[i] = '%') */
+		else {
+			if (res < size) {
+				output[res] = fmt[i];
+				output[res + 1] = '\0';
+			}
 
-        res += wrote;
-        i += read;
+			++res;
+			++i;
+		}
+	}
 
-        FREE(tmp);
-      }
-    } /* if (fmt[i] = '%') */
-    else {
-      if (res < size) {
-        output[res] = fmt[i];
-        output[res + 1] = '\0';
-      }
+	output[res + 1] = '\0';
 
-      ++res;
-      ++i;
-    }
-  }
-
-  output[res + 1] = '\0';
-
-  return res;
+	return res;
 }
 
 int UtilsIO_node_vfprintf(const MasterPrinter_ptr printer, FILE *output,
-                          const char *fmt, va_list args) {
-  int res = 0;
-  size_t i = 0;
-  char buf[32];
+			  const char *fmt, va_list args)
+{
+	int res = 0;
+	size_t i = 0;
+	char buf[32];
 
-  MASTER_PRINTER_CHECK_INSTANCE(printer);
-  nusmv_assert((const char *)NULL != fmt);
+	MASTER_PRINTER_CHECK_INSTANCE(printer);
+	nusmv_assert((const char *)NULL != fmt);
 
-  while (fmt[i] != '\0') {
-    if (fmt[i] == '%') {
-      if (fmt[i + 1] == '%') {
-        res += fprintf(output, "%%");
-        i += 2;
-      } else if (fmt[i + 1] == 'N') {
-        node_ptr node = va_arg(args, node_ptr);
-        char *str = sprint_node(printer, node);
-        res += fprintf(output, "%s", str);
-        FREE(str);
-        i += 2;
-      } else {
-        enum var_type type;
-        enum var_modifier mod;
-        int read;
+	while (fmt[i] != '\0') {
+		if (fmt[i] == '%') {
+			if (fmt[i + 1] == '%') {
+				res += fprintf(output, "%%");
+				i += 2;
+			} else if (fmt[i + 1] == 'N') {
+				node_ptr node = va_arg(args, node_ptr);
+				char *str = sprint_node(printer, node);
+				res += fprintf(output, "%s", str);
+				FREE(str);
+				i += 2;
+			} else {
+				enum var_type type;
+				enum var_modifier mod;
+				int read;
 
-        read = UtilsIO_get_param_len(fmt + i, &type, &mod);
+				read = UtilsIO_get_param_len(fmt + i, &type,
+							     &mod);
 
-        snprintf(buf, read + 1, "%s", fmt + i);
+				snprintf(buf, read + 1, "%s", fmt + i);
 
-        switch (type) {
+				switch (type) {
+				case VAR_INT:
+					switch (mod) {
+					case MOD_NONE:
+					case MOD_SHORT:
+					case MOD_SHORT_SHORT:
+						res += fprintf(output, buf,
+							       va_arg(args,
+								      int));
+						break;
+					case MOD_SIZE_T:
+						res += fprintf(output, buf,
+							       va_arg(args,
+								      size_t));
+						break;
+					case MOD_LONG:
+						res += fprintf(
+							output, buf,
+							va_arg(args, long int));
+						break;
+					case MOD_LONG_LONG:
+						res += fprintf(
+							output, buf,
+							va_arg(args,
+							       long long int));
+						break;
 
-        case VAR_INT:
-          switch (mod) {
-          case MOD_NONE:
-          case MOD_SHORT:
-          case MOD_SHORT_SHORT:
-            res += fprintf(output, buf, va_arg(args, int));
-            break;
-          case MOD_SIZE_T:
-            res += fprintf(output, buf, va_arg(args, size_t));
-            break;
-          case MOD_LONG:
-            res += fprintf(output, buf, va_arg(args, long int));
-            break;
-          case MOD_LONG_LONG:
-            res += fprintf(output, buf, va_arg(args, long long int));
-            break;
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_INT */
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_INT */
+				case VAR_CHAR:
+					switch (mod) {
+					case MOD_NONE:
+						res += fprintf(output, buf,
+							       va_arg(args,
+								      int));
+						break;
 
-        case VAR_CHAR:
-          switch (mod) {
-          case MOD_NONE:
-            res += fprintf(output, buf, va_arg(args, int));
-            break;
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_CHAR */
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_CHAR */
+				case VAR_STRING:
+					switch (mod) {
+					case MOD_NONE:
+						res += fprintf(output, buf,
+							       va_arg(args,
+								      char *));
+						break;
 
-        case VAR_STRING:
-          switch (mod) {
-          case MOD_NONE:
-            res += fprintf(output, buf, va_arg(args, char *));
-            break;
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_STRING */
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_STRING */
+				case VAR_POINTER:
+					switch (mod) {
+					case MOD_NONE:
+						res += fprintf(output, buf,
+							       va_arg(args,
+								      void *));
+						break;
 
-        case VAR_POINTER:
-          switch (mod) {
-          case MOD_NONE:
-            res += fprintf(output, buf, va_arg(args, void *));
-            break;
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_POINTER */
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_POINTER */
+				case VAR_DOUBLE:
+					switch (mod) {
+					case MOD_NONE:
+						res += fprintf(output, buf,
+							       va_arg(args,
+								      double));
+						break;
+					case MOD_LONG_DOUBLE:
+						res += fprintf(
+							output, buf,
+							va_arg(args,
+							       long double));
+						break;
 
-        case VAR_DOUBLE:
-          switch (mod) {
-          case MOD_NONE:
-            res += fprintf(output, buf, va_arg(args, double));
-            break;
-          case MOD_LONG_DOUBLE:
-            res += fprintf(output, buf, va_arg(args, long double));
-            break;
+						/* The rest is an error (or unhandled feature) */
+					default:
+						error_unreachable_code();
+					}
+					break; /* case VAR_DOUBLE */
 
-            /* The rest is an error (or unhandled feature) */
-          default:
-            error_unreachable_code();
-          }
-          break; /* case VAR_DOUBLE */
+					/* Errors */
+				default:
+					error_unreachable_code();
+				}
 
-          /* Errors */
-        default:
-          error_unreachable_code();
-        }
+				i += read;
+			}
+		} /* if (fmt[i] = '%') */
+		else {
+			res += fprintf(output, "%c", fmt[i]);
+			++i;
+		}
+	}
 
-        i += read;
-      }
-    } /* if (fmt[i] = '%') */
-    else {
-      res += fprintf(output, "%c", fmt[i]);
-      ++i;
-    }
-  }
-
-  return res;
+	return res;
 }
 
 int UtilsIO_node_fprintf(const MasterPrinter_ptr printer, FILE *output,
-                         const char *fmt, ...) {
-  int res;
-  va_list args;
+			 const char *fmt, ...)
+{
+	int res;
+	va_list args;
 
-  va_start(args, fmt);
+	va_start(args, fmt);
 
-  res = UtilsIO_node_vfprintf(printer, output, fmt, args);
+	res = UtilsIO_node_vfprintf(printer, output, fmt, args);
 
-  va_end(args);
+	va_end(args);
 
-  return res;
+	return res;
 }
 
 int UtilsIO_node_snprintf(const MasterPrinter_ptr printer, char *output,
-                          size_t size, const char *fmt, ...) {
-  int res;
-  va_list args;
+			  size_t size, const char *fmt, ...)
+{
+	int res;
+	va_list args;
 
-  va_start(args, fmt);
+	va_start(args, fmt);
 
-  res = UtilsIO_node_vsnprintf(printer, output, size, fmt, args);
+	res = UtilsIO_node_vsnprintf(printer, output, size, fmt, args);
 
-  va_end(args);
+	va_end(args);
 
-  return res;
+	return res;
 }
 
 #if 0

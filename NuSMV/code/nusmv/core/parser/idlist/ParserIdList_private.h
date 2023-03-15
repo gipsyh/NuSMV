@@ -88,6 +88,6 @@ node_ptr parser_id_list_mk_num(ParserIdList_ptr self, const int num);
 
 */
 node_ptr parser_id_list_mk_bit(ParserIdList_ptr self, node_ptr left,
-                               int suffix);
+			       int suffix);
 
 #endif /* __NUSMV_CORE_PARSER_IDLIST_PARSER_ID_LIST_PRIVATE_H__ */

@@ -72,145 +72,162 @@
 /*---------------------------------------------------------------------------*/
 
 Expr_ptr Compile_compile_simpwff_from_string(NuSMVEnv_ptr env,
-                                             const SymbTable_ptr st,
-                                             const char *str_formula) {
-  Expr_ptr res;
+					     const SymbTable_ptr st,
+					     const char *str_formula)
+{
+	Expr_ptr res;
 
-  if (str_formula != (char *)NULL) {
-    TypeChecker_ptr tc;
+	if (str_formula != (char *)NULL) {
+		TypeChecker_ptr tc;
 
-    if (Parser_ReadSimpExprFromString(env, str_formula, &res) != 0 ||
-        res == Nil || node_get_type(res) != SIMPWFF) {
-      const StreamMgr_ptr streams =
-          STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+		if (Parser_ReadSimpExprFromString(env, str_formula, &res) !=
+			    0 ||
+		    res == Nil || node_get_type(res) != SIMPWFF) {
+			const StreamMgr_ptr streams = STREAM_MGR(
+				NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-      StreamMgr_print_error(streams, "Parsing error: formula must be "
-                                     "\"simple expression\".\n");
-      return EXPR(NULL);
-    }
-    res = car(res); /* get rid of SIMPWFF/NEXTWFF token */
+			StreamMgr_print_error(streams,
+					      "Parsing error: formula must be "
+					      "\"simple expression\".\n");
+			return EXPR(NULL);
+		}
+		res = car(res); /* get rid of SIMPWFF/NEXTWFF token */
 
-    tc = SymbTable_get_type_checker(st);
-    if (!TypeChecker_is_expression_wellformed(tc, res, Nil)) {
-      const StreamMgr_ptr streams =
-          STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+		tc = SymbTable_get_type_checker(st);
+		if (!TypeChecker_is_expression_wellformed(tc, res, Nil)) {
+			const StreamMgr_ptr streams = STREAM_MGR(
+				NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-      StreamMgr_print_error(streams, "Type System Violation\n");
-      return EXPR(NULL);
-    }
-  } else {
-    res = ExprMgr_true(EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER)));
-  }
+			StreamMgr_print_error(streams,
+					      "Type System Violation\n");
+			return EXPR(NULL);
+		}
+	} else {
+		res = ExprMgr_true(
+			EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER)));
+	}
 
-  return res;
+	return res;
 }
 
 Expr_ptr Compile_compile_nextwff_from_string(NuSMVEnv_ptr env,
-                                             const SymbTable_ptr st,
-                                             const char *str_formula) {
-  Expr_ptr res;
+					     const SymbTable_ptr st,
+					     const char *str_formula)
+{
+	Expr_ptr res;
 
-  if (str_formula != (char *)NULL) {
-    TypeChecker_ptr tc;
+	if (str_formula != (char *)NULL) {
+		TypeChecker_ptr tc;
 
-    if (Parser_ReadNextExprFromString(env, str_formula, &res) != 0 ||
-        res == Nil || node_get_type(res) != NEXTWFF) {
-      const StreamMgr_ptr streams =
-          STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+		if (Parser_ReadNextExprFromString(env, str_formula, &res) !=
+			    0 ||
+		    res == Nil || node_get_type(res) != NEXTWFF) {
+			const StreamMgr_ptr streams = STREAM_MGR(
+				NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-      StreamMgr_print_error(streams, "Parsing error: formula must be "
-                                     "\"next expression\".\n");
-      return EXPR(NULL);
-    }
-    res = car(res); /* get rid of SIMPWFF/NEXTWFF token */
+			StreamMgr_print_error(streams,
+					      "Parsing error: formula must be "
+					      "\"next expression\".\n");
+			return EXPR(NULL);
+		}
+		res = car(res); /* get rid of SIMPWFF/NEXTWFF token */
 
-    tc = SymbTable_get_type_checker(st);
-    if (!TypeChecker_is_expression_wellformed(tc, res, Nil)) {
-      const StreamMgr_ptr streams =
-          STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+		tc = SymbTable_get_type_checker(st);
+		if (!TypeChecker_is_expression_wellformed(tc, res, Nil)) {
+			const StreamMgr_ptr streams = STREAM_MGR(
+				NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-      StreamMgr_print_error(streams, "Type System Violation\n");
-      return EXPR(NULL);
-    }
-  } else {
-    res = ExprMgr_true(EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER)));
-  }
+			StreamMgr_print_error(streams,
+					      "Type System Violation\n");
+			return EXPR(NULL);
+		}
+	} else {
+		res = ExprMgr_true(
+			EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER)));
+	}
 
-  return res;
+	return res;
 }
 
 Expr_ptr Compile_compile_spec_from_string(NuSMVEnv_ptr env,
-                                          const SymbTable_ptr st,
-                                          const char *str_formula,
-                                          const Prop_Type prop_type) {
-  Expr_ptr res = Nil;
+					  const SymbTable_ptr st,
+					  const char *str_formula,
+					  const Prop_Type prop_type)
+{
+	Expr_ptr res = Nil;
 
-  if (str_formula != (char *)NULL) {
-    const char *argv[2];
-    const int argc = 2;
-    int parse_result;
+	if (str_formula != (char *)NULL) {
+		const char *argv[2];
+		const int argc = 2;
+		int parse_result;
 
-    argv[0] = (char *)NULL;
-    argv[1] = (char *)str_formula;
+		argv[0] = (char *)NULL;
+		argv[1] = (char *)str_formula;
 
-    if (Prop_Psl == prop_type) {
-      parse_result = Parser_read_psl_from_string(env, argc, argv, &res);
-    } else {
-      char *prefix = NULL;
-      switch (prop_type) {
-        /* WATCH OUT! The final space is required! */
-      case Prop_Ctl:
-        prefix = "CTLWFF ";
-        break;
-      case Prop_Ltl:
-        prefix = "LTLWFF ";
-        break;
-      case Prop_Invar:
-        prefix = "NEXTWFF ";
-        break;
-      case Prop_Compute:
-        prefix = "COMPWFF ";
-        break;
-      default:
-        nusmv_assert(false); /* not supported type */
-      }
+		if (Prop_Psl == prop_type) {
+			parse_result = Parser_read_psl_from_string(env, argc,
+								   argv, &res);
+		} else {
+			char *prefix = NULL;
+			switch (prop_type) {
+				/* WATCH OUT! The final space is required! */
+			case Prop_Ctl:
+				prefix = "CTLWFF ";
+				break;
+			case Prop_Ltl:
+				prefix = "LTLWFF ";
+				break;
+			case Prop_Invar:
+				prefix = "NEXTWFF ";
+				break;
+			case Prop_Compute:
+				prefix = "COMPWFF ";
+				break;
+			default:
+				nusmv_assert(false); /* not supported type */
+			}
 
-      parse_result =
-          Parser_ReadCmdFromString(env, argc, argv, prefix, ";\n", &res);
+			parse_result = Parser_ReadCmdFromString(
+				env, argc, argv, prefix, ";\n", &res);
 
-      /* fixes res in the case != PSL as parser gives results in
+			/* fixes res in the case != PSL as parser gives results in
          different format */
-      if (Nil != res) {
-        res = car(res);
-      }
-    }
+			if (Nil != res) {
+				res = car(res);
+			}
+		}
 
-    /* error checking */
-    if (parse_result != 0 || res == Nil) {
-      const StreamMgr_ptr streams =
-          STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+		/* error checking */
+		if (parse_result != 0 || res == Nil) {
+			const StreamMgr_ptr streams = STREAM_MGR(
+				NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-      StreamMgr_print_error(streams,
-                            "Parsing error: expected a \"%s\" expression.\n",
-                            PropType_to_string(prop_type));
-      return NULL;
-    }
+			StreamMgr_print_error(
+				streams,
+				"Parsing error: expected a \"%s\" expression.\n",
+				PropType_to_string(prop_type));
+			return NULL;
+		}
 
-    { /* type check it */
-      TypeChecker_ptr tc = SymbTable_get_type_checker(st);
-      if (!TypeChecker_is_expression_wellformed(tc, res, Nil)) {
-        const StreamMgr_ptr streams =
-            STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+		{ /* type check it */
+			TypeChecker_ptr tc = SymbTable_get_type_checker(st);
+			if (!TypeChecker_is_expression_wellformed(tc, res,
+								  Nil)) {
+				const StreamMgr_ptr streams = STREAM_MGR(
+					NuSMVEnv_get_value(env,
+							   ENV_STREAM_MANAGER));
 
-        StreamMgr_print_error(streams, "Type System Violation\n");
-        return EXPR(NULL);
-      }
-    }
-  } else {
-    res = ExprMgr_true(EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER)));
-  }
+				StreamMgr_print_error(
+					streams, "Type System Violation\n");
+				return EXPR(NULL);
+			}
+		}
+	} else {
+		res = ExprMgr_true(
+			EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER)));
+	}
 
-  return res;
+	return res;
 }
 
 /*---------------------------------------------------------------------------*/

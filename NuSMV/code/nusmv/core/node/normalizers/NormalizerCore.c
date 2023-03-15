@@ -88,13 +88,14 @@ static void normalizer_core_finalize(Object_ptr object, void *dummy);
 /*---------------------------------------------------------------------------*/
 
 NormalizerCore_ptr NormalizerCore_create(const NuSMVEnv_ptr env,
-                                         const char *name) {
-  NormalizerCore_ptr self = ALLOC(NormalizerCore, 1);
-  NORMALIZER_CORE_CHECK_INSTANCE(self);
+					 const char *name)
+{
+	NormalizerCore_ptr self = ALLOC(NormalizerCore, 1);
+	NORMALIZER_CORE_CHECK_INSTANCE(self);
 
-  normalizer_core_init(self, env, name, NUSMV_CORE_SYMBOL_FIRST,
-                       NUSMV_CORE_SYMBOL_LAST - NUSMV_CORE_SYMBOL_FIRST);
-  return self;
+	normalizer_core_init(self, env, name, NUSMV_CORE_SYMBOL_FIRST,
+			     NUSMV_CORE_SYMBOL_LAST - NUSMV_CORE_SYMBOL_FIRST);
+	return self;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -102,62 +103,67 @@ NormalizerCore_ptr NormalizerCore_create(const NuSMVEnv_ptr env,
 /*---------------------------------------------------------------------------*/
 
 void normalizer_core_init(NormalizerCore_ptr self, const NuSMVEnv_ptr env,
-                          const char *name, int low, size_t num) {
-  /* base class initialization */
-  normalizer_base_init(NORMALIZER_BASE(self), env, name, low, num,
-                       true /*handles NULL*/);
+			  const char *name, int low, size_t num)
+{
+	/* base class initialization */
+	normalizer_base_init(NORMALIZER_BASE(self), env, name, low, num,
+			     true /*handles NULL*/);
 
-  /* members initialization */
+	/* members initialization */
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = normalizer_core_finalize;
-  OVERRIDE(NormalizerBase, normalize_node) = normalizer_core_normalize_node;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = normalizer_core_finalize;
+	OVERRIDE(NormalizerBase, normalize_node) =
+		normalizer_core_normalize_node;
 }
 
-void normalizer_core_deinit(NormalizerCore_ptr self) {
-  /* members deinitialization */
+void normalizer_core_deinit(NormalizerCore_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class initialization */
-  normalizer_base_deinit(NORMALIZER_BASE(self));
+	/* base class initialization */
+	normalizer_base_deinit(NORMALIZER_BASE(self));
 }
 
-node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self,
-                                        node_ptr node) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self, node_ptr node)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const NodeMgr_ptr nodemgr =
+		NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (Nil == node)
-    return Nil;
+	if (Nil == node)
+		return Nil;
 
-  switch (node_get_type(node)) {
-  case FAILURE:
-  case TRUEEXP:
-  case FALSEEXP:
-  case BOOLEAN:
-  case NUMBER:
-  case NUMBER_FRAC:
-  case NUMBER_REAL:
-  case NUMBER_EXP:
-  case ATOM:
-  case BIT:
-    return find_atom(nodemgr, node);
+	switch (node_get_type(node)) {
+	case FAILURE:
+	case TRUEEXP:
+	case FALSEEXP:
+	case BOOLEAN:
+	case NUMBER:
+	case NUMBER_FRAC:
+	case NUMBER_REAL:
+	case NUMBER_EXP:
+	case ATOM:
+	case BIT:
+		return find_atom(nodemgr, node);
 
-  case NUMBER_SIGNED_WORD:
-  case NUMBER_UNSIGNED_WORD: {
-    const WordNumberMgr_ptr words =
-        WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+	case NUMBER_SIGNED_WORD:
+	case NUMBER_UNSIGNED_WORD: {
+		const WordNumberMgr_ptr words = WORD_NUMBER_MGR(
+			NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
-    const WordNumber_ptr num = (const WordNumber_ptr)car(node);
-    return find_node(nodemgr, node_get_type(node),
-                     NODE_PTR(WordNumberMgr_normalize_word_number(words, num)),
-                     Nil);
-  }
-  default:
-    break;
-  }
+		const WordNumber_ptr num = (const WordNumber_ptr)car(node);
+		return find_node(nodemgr, node_get_type(node),
+				 NODE_PTR(WordNumberMgr_normalize_word_number(
+					 words, num)),
+				 Nil);
+	}
+	default:
+		break;
+	}
 
-  return find_node(nodemgr, node_get_type(node), _THROW(car(node)),
-                   _THROW(cdr(node)));
+	return find_node(nodemgr, node_get_type(node), _THROW(car(node)),
+			 _THROW(cdr(node)));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -169,11 +175,12 @@ node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self,
 
   Called by the class destructor
 */
-static void normalizer_core_finalize(Object_ptr object, void *dummy) {
-  NormalizerCore_ptr self = NORMALIZER_CORE(object);
+static void normalizer_core_finalize(Object_ptr object, void *dummy)
+{
+	NormalizerCore_ptr self = NORMALIZER_CORE(object);
 
-  normalizer_core_deinit(self);
-  FREE(self);
+	normalizer_core_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

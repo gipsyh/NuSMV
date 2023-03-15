@@ -64,18 +64,18 @@
 */
 
 typedef struct NodeAnonymizerST_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NodeAnonymizerDot);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NodeAnonymizerDot);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  SymbTable_ptr symb_table;
-  int counters[NAST_COUNTERS_CARDINALITY];
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	SymbTable_ptr symb_table;
+	int counters[NAST_COUNTERS_CARDINALITY];
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } NodeAnonymizerST;
 
@@ -92,9 +92,9 @@ typedef struct NodeAnonymizerST_TAG {
   \sa NodeAnonymizerST_create
 */
 void node_anonymizer_st_init(NodeAnonymizerST_ptr self, NuSMVEnv_ptr env,
-                             const char *default_prefix,
-                             size_t memoization_threshold,
-                             SymbTable_ptr symb_table);
+			     const char *default_prefix,
+			     size_t memoization_threshold,
+			     SymbTable_ptr symb_table);
 
 /*!
   \methodof NodeAnonymizerST
@@ -113,7 +113,7 @@ void node_anonymizer_st_deinit(NodeAnonymizerST_ptr self);
   \todo Missing description
 */
 const char *node_anonymizer_st_build_anonymous(NodeAnonymizerBase_ptr self,
-                                               node_ptr id, const char *prefix);
+					       node_ptr id, const char *prefix);
 
 /*!
   \methodof NodeAnonymizerST
@@ -127,6 +127,6 @@ const char *node_anonymizer_st_build_anonymous(NodeAnonymizerBase_ptr self,
   @param prefix a prefix to be used instead of the default one
 */
 node_ptr node_anonymizer_st_translate(NodeAnonymizerBase_ptr self, node_ptr id,
-                                      const char *prefix);
+				      const char *prefix);
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ST_PRIVATE_H__ */

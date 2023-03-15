@@ -68,7 +68,7 @@
   \sa Be_RbcManager_Delete
 */
 Be_Manager_ptr Be_RbcManager_Create(const NuSMVEnv_ptr env,
-                                    const size_t capacity);
+				    const size_t capacity);
 
 /*!
   \brief Destroys the given Be_MAnager instance you previously

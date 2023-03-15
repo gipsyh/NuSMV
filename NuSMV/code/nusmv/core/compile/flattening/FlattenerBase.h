@@ -64,8 +64,8 @@ typedef struct FlattenerBase_TAG *FlattenerBase_ptr;
 
   \todo Missing description
 */
-#define FLATTENER_BASE_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(FLATTENER_BASE(self) != FLATTENER_BASE(NULL)))
+#define FLATTENER_BASE_CHECK_INSTANCE(self) \
+	(nusmv_assert(FLATTENER_BASE(self) != FLATTENER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -84,10 +84,10 @@ typedef struct FlattenerBase_TAG *FlattenerBase_ptr;
   handle sexp.
 */
 VIRTUAL node_ptr FlattenerBase_flatten(FlattenerBase_ptr self,
-                                       SymbTable_ptr symb_table,
-                                       hash_ptr def_hash, node_ptr sexp,
-                                       node_ptr context,
-                                       MasterCompileFlattener_def_mode mode);
+				       SymbTable_ptr symb_table,
+				       hash_ptr def_hash, node_ptr sexp,
+				       node_ptr context,
+				       MasterCompileFlattener_def_mode mode);
 
 /**AutomaticEnd***************************************************************/
 

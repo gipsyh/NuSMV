@@ -80,8 +80,8 @@ typedef struct FlatHierarchy *FlatHierarchy_ptr;
 
   \todo Missing description
 */
-#define FLAT_HIERARCHY_CHECK_INSTANCE(x)                                       \
-  (nusmv_assert(FLAT_HIERARCHY(x) != FLAT_HIERARCHY(NULL)))
+#define FLAT_HIERARCHY_CHECK_INSTANCE(x) \
+	(nusmv_assert(FLAT_HIERARCHY(x) != FLAT_HIERARCHY(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -132,8 +132,8 @@ FlatHierarchy_ptr FlatHierarchy_create(SymbTable_ptr st);
   \se FlatHierarchy_create
 */
 FlatHierarchy_ptr FlatHierarchy_create_from_members(
-    SymbTable_ptr st, node_ptr init, node_ptr invar, node_ptr trans,
-    node_ptr input, node_ptr justice, node_ptr compassion);
+	SymbTable_ptr st, node_ptr init, node_ptr invar, node_ptr trans,
+	node_ptr input, node_ptr justice, node_ptr compassion);
 
 /*!
   \methodof FlatHierarchy
@@ -162,7 +162,7 @@ intact)
 SexpFsm_apply_synchronous_product
 */
 void FlatHierarchy_mergeinto(FlatHierarchy_ptr self,
-                             const FlatHierarchy_ptr other);
+			     const FlatHierarchy_ptr other);
 
 /* Getters and Setters ********************************************************/
 
@@ -189,7 +189,7 @@ SymbTable_ptr FlatHierarchy_get_symb_table(const FlatHierarchy_ptr self);
 
 */
 void FlatHierarchy_set_symb_table(const FlatHierarchy_ptr self,
-                                  SymbTable_ptr symb_table);
+				  SymbTable_ptr symb_table);
 
 /* Access function to the class's fields : constrains and specifications ******/
 
@@ -435,7 +435,7 @@ void FlatHierarchy_remove_var(FlatHierarchy_ptr self, node_ptr n);
                     and their respective outgoing edges to other variables
 */
 NodeList_ptr FlatHierarchy_get_ordered_vars(const FlatHierarchy_ptr self,
-                                            hash_ptr *outbound_edges);
+					    hash_ptr *outbound_edges);
 
 /*!
   \brief \todo Missing synopsis
@@ -538,7 +538,7 @@ NB: All given assignments should have been declared in the given hierarchy.
   \sa FlatHierarchy_lookup_assign
 */
 void FlatHierarchy_insert_assign(FlatHierarchy_ptr self, node_ptr name,
-                                 node_ptr assign);
+				 node_ptr assign);
 
 /*!
   \methodof FlatHierarchy
@@ -583,7 +583,7 @@ NB: All given expressions should have been declared in the given hierarchy.
   \sa FlatHierarchy_lookup_constrains
 */
 void FlatHierarchy_add_constrains(FlatHierarchy_ptr self, node_ptr name,
-                                  node_ptr expr);
+				  node_ptr expr);
 
 /*!
   \methodof FlatHierarchy
@@ -596,7 +596,7 @@ void FlatHierarchy_add_constrains(FlatHierarchy_ptr self, node_ptr name,
   \sa FlatHierarchy_add_constant_constrains
 */
 node_ptr FlatHierarchy_lookup_constant_constrains(FlatHierarchy_ptr self,
-                                                  int type);
+						  int type);
 
 /*!
   \methodof FlatHierarchy
@@ -610,7 +610,7 @@ node_ptr FlatHierarchy_lookup_constant_constrains(FlatHierarchy_ptr self,
   \sa FlatHierarchy_lookup_constant_constrains
 */
 void FlatHierarchy_add_constant_constrains(FlatHierarchy_ptr self,
-                                           node_ptr expr, int type);
+					   node_ptr expr, int type);
 
 /*!
   \methodof FlatHierarchy
@@ -657,7 +657,7 @@ whatsoever.
 
 */
 void FlatHierarchy_set_var_expr_associations(FlatHierarchy_ptr self,
-                                             hash_ptr h);
+					     hash_ptr h);
 
 /*!
   \methodof FlatHierarchy
@@ -699,7 +699,7 @@ hash_ptr FlatHierarchy_get_constants_associations(FlatHierarchy_ptr self);
                     performing modifications on the table.
 */
 void FlatHierarchy_set_constants_associations(FlatHierarchy_ptr self,
-                                              hash_ptr h);
+					      hash_ptr h);
 
 /*!
   \methodof FlatHierarchy

@@ -76,19 +76,22 @@ static void node_anonymizer_dot_finalize(Object_ptr object, void *dummy);
 /*---------------------------------------------------------------------------*/
 
 NodeAnonymizerDot_ptr NodeAnonymizerDot_create(NuSMVEnv_ptr env,
-                                               const char *default_prefix,
-                                               size_t memoization_threshold) {
-  NodeAnonymizerDot_ptr self = ALLOC(NodeAnonymizerDot, 1);
-  NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self);
+					       const char *default_prefix,
+					       size_t memoization_threshold)
+{
+	NodeAnonymizerDot_ptr self = ALLOC(NodeAnonymizerDot, 1);
+	NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self);
 
-  node_anonymizer_dot_init(self, env, default_prefix, memoization_threshold);
-  return self;
+	node_anonymizer_dot_init(self, env, default_prefix,
+				 memoization_threshold);
+	return self;
 }
 
-void NodeAnonymizerDot_destroy(NodeAnonymizerDot_ptr self) {
-  NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self);
+void NodeAnonymizerDot_destroy(NodeAnonymizerDot_ptr self)
+{
+	NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self);
 
-  Object_destroy(OBJECT(self), NULL);
+	Object_destroy(OBJECT(self), NULL);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -96,38 +99,41 @@ void NodeAnonymizerDot_destroy(NodeAnonymizerDot_ptr self) {
 /*---------------------------------------------------------------------------*/
 
 void node_anonymizer_dot_init(NodeAnonymizerDot_ptr self, NuSMVEnv_ptr env,
-                              const char *default_prefix,
-                              size_t memoization_threshold) {
-  /* base class initialization */
-  node_anonymizer_base_init(NODE_ANONYMIZER_BASE(self), env, default_prefix,
-                            memoization_threshold);
+			      const char *default_prefix,
+			      size_t memoization_threshold)
+{
+	/* base class initialization */
+	node_anonymizer_base_init(NODE_ANONYMIZER_BASE(self), env,
+				  default_prefix, memoization_threshold);
 
-  /* members initialization */
+	/* members initialization */
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = node_anonymizer_dot_finalize;
-  OVERRIDE(NodeAnonymizerBase, is_id) = node_anonymizer_dot_is_id;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = node_anonymizer_dot_finalize;
+	OVERRIDE(NodeAnonymizerBase, is_id) = node_anonymizer_dot_is_id;
 }
 
-void node_anonymizer_dot_deinit(NodeAnonymizerDot_ptr self) {
-  /* members deinitialization */
+void node_anonymizer_dot_deinit(NodeAnonymizerDot_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  node_anonymizer_base_deinit(NODE_ANONYMIZER_BASE(self));
+	/* base class deinitialization */
+	node_anonymizer_base_deinit(NODE_ANONYMIZER_BASE(self));
 }
 
-boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self, node_ptr id) {
-  boolean retval = false;
+boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self, node_ptr id)
+{
+	boolean retval = false;
 
-  if (id == Nil) { /* just return false */
-  } else if (DOT == node_get_type(id))
-    retval = true;
-  else if (ATOM == node_get_type(id))
-    retval = true;
-  else { /* just return false */
-  }
+	if (id == Nil) { /* just return false */
+	} else if (DOT == node_get_type(id))
+		retval = true;
+	else if (ATOM == node_get_type(id))
+		retval = true;
+	else { /* just return false */
+	}
 
-  return retval;
+	return retval;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -139,11 +145,12 @@ boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self, node_ptr id) {
 
   Called by the class destructor
 */
-static void node_anonymizer_dot_finalize(Object_ptr object, void *dummy) {
-  NodeAnonymizerDot_ptr self = NODE_ANONYMIZER_DOT(object);
+static void node_anonymizer_dot_finalize(Object_ptr object, void *dummy)
+{
+	NodeAnonymizerDot_ptr self = NODE_ANONYMIZER_DOT(object);
 
-  node_anonymizer_dot_deinit(self);
-  FREE(self);
+	node_anonymizer_dot_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

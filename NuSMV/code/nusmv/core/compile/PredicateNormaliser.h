@@ -86,8 +86,8 @@ typedef struct PredicateNormaliser_TAG *PredicateNormaliser_ptr;
 
   \todo Missing description
 */
-#define PREDICATE_NORMALISER_CHECK_INSTANCE(x)                                 \
-  (nusmv_assert(PREDICATE_NORMALISER(x) != PREDICATE_NORMALISER(NULL)))
+#define PREDICATE_NORMALISER_CHECK_INSTANCE(x) \
+	(nusmv_assert(PREDICATE_NORMALISER(x) != PREDICATE_NORMALISER(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -150,7 +150,7 @@ void PredicateNormaliser_destroy(PredicateNormaliser_ptr self);
    class.
 */
 node_ptr PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self,
-                                            node_ptr expr);
+					    node_ptr expr);
 
 /*!
   \methodof PredicateNormaliser
@@ -172,7 +172,7 @@ node_ptr PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self,
 */
 node_ptr
 PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self,
-                                             node_ptr expr);
+					     node_ptr expr);
 
 /*!
   \methodof PredicateNormaliser
@@ -186,7 +186,7 @@ PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self,
 */
 node_ptr
 PredicateNormaliser_normalise_specification(PredicateNormaliser_ptr self,
-                                            node_ptr expr);
+					    node_ptr expr);
 
 /*!
   \methodof PredicateNormaliser
@@ -206,7 +206,7 @@ PredicateNormaliser_normalise_specification(PredicateNormaliser_ptr self,
 
 */
 void PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
-                                             Set_t *preds, node_ptr expr);
+					     Set_t *preds, node_ptr expr);
 
 /*!
   \methodof PredicateNormaliser
@@ -225,6 +225,6 @@ void PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
   \se PredicateNormaliser_get_predicates_only
 */
 void PredicateNormaliser_print_predicates_only(
-    const PredicateNormaliser_ptr self, FILE *stream, node_ptr expr);
+	const PredicateNormaliser_ptr self, FILE *stream, node_ptr expr);
 
 #endif /* __NUSMV_CORE_COMPILE_PREDICATE_NORMALISER_H__ */

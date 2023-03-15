@@ -63,8 +63,8 @@ typedef struct BaseEnc_TAG *BaseEnc_ptr;
 
   \todo Missing description
 */
-#define BASE_ENC_CHECK_INSTANCE(self)                                          \
-  (nusmv_assert(BASE_ENC(self) != BASE_ENC(NULL)))
+#define BASE_ENC_CHECK_INSTANCE(self) \
+	(nusmv_assert(BASE_ENC(self) != BASE_ENC(NULL)))
 
 /**AutomaticStart*************************************************************/
 

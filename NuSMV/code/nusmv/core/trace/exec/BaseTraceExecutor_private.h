@@ -54,25 +54,25 @@
 */
 
 typedef struct BaseTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* verbosity level */
-  int verbosity;
+	/* verbosity level */
+	int verbosity;
 
-  /* the output stream */
-  FILE *output_stream;
+	/* the output stream */
+	FILE *output_stream;
 
-  /* the error stream */
-  FILE *error_stream;
+	/* the error stream */
+	FILE *error_stream;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 } BaseTraceExecutor;
 
 /* ---------------------------------------------------------------------- */
@@ -111,6 +111,6 @@ void trace_executor_deinit(BaseTraceExecutor_ptr self);
   \se none
 */
 boolean trace_executor_check_defines(const BaseTraceExecutor_ptr self,
-                                     Trace_ptr trace);
+				     Trace_ptr trace);
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_BASE_TRACE_EXECUTOR_PRIVATE_H__ */

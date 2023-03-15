@@ -75,8 +75,8 @@ typedef node_ptr TraceLabel;
 
   \todo Missing description
 */
-#define TRACE_LABEL_CHECK_INSTANCE(x)                                          \
-  (nusmv_assert(TRACE_LABEL(x) != TRACE_LABEL(NULL)))
+#define TRACE_LABEL_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_LABEL(x) != TRACE_LABEL(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -116,7 +116,7 @@ TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr, int trace_id, int state_id);
   \sa TraceLabel_create
 */
 TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr,
-                                         const char *label_str);
+					 const char *label_str);
 
 /* TraceLabel Getters */
 

@@ -85,9 +85,9 @@
   \se None
 */
 int Bmc_Simulate(NuSMVEnv_ptr env, const BeFsm_ptr be_fsm, BddEnc_ptr bdd_enc,
-                 be_ptr constraints, boolean time_shift, const int k,
-                 const boolean print_trace, const boolean changes_only,
-                 Simulation_Mode mode);
+		 be_ptr constraints, boolean time_shift, const int k,
+		 const boolean print_trace, const boolean changes_only,
+		 Simulation_Mode mode);
 
 /*!
   \brief SAT Based Incremental simulation
@@ -118,11 +118,11 @@ int Bmc_Simulate(NuSMVEnv_ptr env, const BeFsm_ptr be_fsm, BddEnc_ptr bdd_enc,
   \sa optional
 */
 int Bmc_StepWiseSimulation(NuSMVEnv_ptr env, BeFsm_ptr be_fsm,
-                           BddEnc_ptr bdd_enc, TraceMgr_ptr trace_manager,
-                           int target_steps, be_ptr constraints,
-                           boolean time_shift, boolean printtrace,
-                           boolean changes_only, Simulation_Mode mode,
-                           boolean display_all);
+			   BddEnc_ptr bdd_enc, TraceMgr_ptr trace_manager,
+			   int target_steps, be_ptr constraints,
+			   boolean time_shift, boolean printtrace,
+			   boolean changes_only, Simulation_Mode mode,
+			   boolean display_all);
 
 /*!
   \brief Checks the truth value of a list of constraints on the
@@ -143,10 +143,10 @@ int Bmc_StepWiseSimulation(NuSMVEnv_ptr env, BeFsm_ptr be_fsm,
   \se None
 */
 Olist_ptr Bmc_simulate_check_feasible_constraints(NuSMVEnv_ptr env,
-                                                  BeFsm_ptr be_fsm,
-                                                  BddEnc_ptr bdd_enc,
-                                                  Olist_ptr constraints,
-                                                  be_ptr from_state);
+						  BeFsm_ptr be_fsm,
+						  BddEnc_ptr bdd_enc,
+						  Olist_ptr constraints,
+						  be_ptr from_state);
 
 /*!
   \brief Picks a state from the initial state, creates a trace
@@ -159,8 +159,8 @@ Olist_ptr Bmc_simulate_check_feasible_constraints(NuSMVEnv_ptr env,
   \se A new trace possibly created into the trace manager
 */
 int Bmc_pick_state_from_constr(NuSMVEnv_ptr env, BeFsm_ptr fsm,
-                               BddEnc_ptr bdd_enc, be_ptr constr,
-                               Simulation_Mode mode, boolean display_all);
+			       BddEnc_ptr bdd_enc, be_ptr constr,
+			       Simulation_Mode mode, boolean display_all);
 
 /*!
   \brief Picks a state from the set of initial states
@@ -168,9 +168,9 @@ int Bmc_pick_state_from_constr(NuSMVEnv_ptr env, BeFsm_ptr fsm,
   Picks a state from the set of initial states
 */
 int Bmc_Simulate_bmc_pick_state(const NuSMVEnv_ptr env, TraceLabel label,
-                                be_ptr be_constr, int tr_number,
-                                const Simulation_Mode mode,
-                                const int display_all, const boolean verbose);
+				be_ptr be_constr, int tr_number,
+				const Simulation_Mode mode,
+				const int display_all, const boolean verbose);
 
 /*!
   \brief Checks feasibility of a list of constraints for the
@@ -180,9 +180,9 @@ int Bmc_Simulate_bmc_pick_state(const NuSMVEnv_ptr env, TraceLabel label,
   simulation
 */
 int Bmc_Simulate_bmc_simulate_check_feasible_constraints(
-    const NuSMVEnv_ptr env, const Olist_ptr str_constraints,
-    const Olist_ptr be_constraints, const Olist_ptr expr_constraints,
-    const boolean human_readable);
+	const NuSMVEnv_ptr env, const Olist_ptr str_constraints,
+	const Olist_ptr be_constraints, const Olist_ptr expr_constraints,
+	const boolean human_readable);
 
 /**AutomaticEnd***************************************************************/
 

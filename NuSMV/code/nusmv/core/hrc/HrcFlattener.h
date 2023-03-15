@@ -66,8 +66,8 @@ typedef struct HrcFlattener_TAG *HrcFlattener_ptr;
 
   \todo Missing description
 */
-#define HRC_FLATTENER_CHECK_INSTANCE(self)                                     \
-  (nusmv_assert(HRC_FLATTENER(self) != HRC_FLATTENER(NULL)))
+#define HRC_FLATTENER_CHECK_INSTANCE(self) \
+	(nusmv_assert(HRC_FLATTENER(self) != HRC_FLATTENER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -89,8 +89,8 @@ typedef struct HrcFlattener_TAG *HrcFlattener_ptr;
   \sa HrcFlattener_create
 */
 FlatHierarchy_ptr HrcToFlatHierarchy(const NuSMVEnv_ptr env, HrcNode_ptr node,
-                                     SymbTable_ptr symb_table,
-                                     SymbLayer_ptr layer);
+				     SymbTable_ptr symb_table,
+				     SymbLayer_ptr layer);
 
 /*!
   \brief HrcFlattener main routine
@@ -108,7 +108,7 @@ FlatHierarchy_ptr HrcToFlatHierarchy(const NuSMVEnv_ptr env, HrcNode_ptr node,
   \sa HrcFlattener_create
 */
 SexpFsm_ptr HrcToSexpFsm(const NuSMVEnv_ptr env, HrcNode_ptr node,
-                         SymbTable_ptr symb_table, SymbLayer_ptr layer);
+			 SymbTable_ptr symb_table, SymbLayer_ptr layer);
 
 /*!
   \methodof HrcFlattener
@@ -126,8 +126,8 @@ SexpFsm_ptr HrcToSexpFsm(const NuSMVEnv_ptr env, HrcNode_ptr node,
   \sa HrcFlattener_destroy
 */
 HrcFlattener_ptr HrcFlattener_create(const NuSMVEnv_ptr env, HrcNode_ptr node,
-                                     SymbTable_ptr symb_table,
-                                     SymbLayer_ptr layer);
+				     SymbTable_ptr symb_table,
+				     SymbLayer_ptr layer);
 
 /*!
   \methodof HrcFlattener

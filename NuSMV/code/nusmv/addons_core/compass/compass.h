@@ -89,10 +89,10 @@ void Compass_quit(NuSMVEnv_ptr env);
 
 */
 int Compass_write_sigref(NuSMVEnv_ptr env, BddFsm_ptr fsm, FILE *sigref_file,
-                         FILE *prob_file,  /* can be NULL */
-                         FILE *ap_file,    /* can be NULL */
-                         Expr_ptr tau,     /* can be NULL */
-                         boolean do_indent /* Beautify the XML output */
+			 FILE *prob_file, /* can be NULL */
+			 FILE *ap_file, /* can be NULL */
+			 Expr_ptr tau, /* can be NULL */
+			 boolean do_indent /* Beautify the XML output */
 );
 
 /*!
@@ -110,6 +110,6 @@ int Compass_write_language_sigref(BddEnc_ptr enc, FILE *file);
   Returns 0 if successful, a negative number if an occurs
 */
 int Compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add, FILE *file,
-                                    boolean do_indent);
+				    boolean do_indent);
 
 #endif /* __NUSMV_ADDONS_CORE_COMPASS_COMPASS_H__ */

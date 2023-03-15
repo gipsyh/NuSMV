@@ -79,8 +79,8 @@ typedef struct TypeChecker_TAG *TypeChecker_ptr;
 
   \todo Missing description
 */
-#define TYPE_CHECKER_CHECK_INSTANCE(self)                                      \
-  (nusmv_assert(TYPE_CHECKER(self) != TYPE_CHECKER(NULL)))
+#define TYPE_CHECKER_CHECK_INSTANCE(self) \
+	(nusmv_assert(TYPE_CHECKER(self) != TYPE_CHECKER(NULL)))
 
 /* forward declaration, to avoid  circular dependency */
 struct Prop_TAG;
@@ -217,9 +217,9 @@ boolean TypeChecker_check_layer(TypeChecker_ptr self, SymbLayer_ptr layer);
 
 */
 boolean TypeChecker_check_constrains(TypeChecker_ptr self, node_ptr init,
-                                     node_ptr trans, node_ptr invar,
-                                     node_ptr assign, node_ptr justice,
-                                     node_ptr compassion);
+				     node_ptr trans, node_ptr invar,
+				     node_ptr assign, node_ptr justice,
+				     node_ptr compassion);
 
 /*!
   \methodof TypeChecker
@@ -239,7 +239,7 @@ boolean TypeChecker_check_constrains(TypeChecker_ptr self, node_ptr init,
    and true value otherwise.
 */
 boolean TypeChecker_check_property(TypeChecker_ptr self,
-                                   struct Prop_TAG *property);
+				   struct Prop_TAG *property);
 
 /*!
   \methodof TypeChecker
@@ -266,8 +266,8 @@ boolean TypeChecker_check_property(TypeChecker_ptr self,
   \sa type_checker_check_expression
 */
 boolean TypeChecker_is_expression_wellformed(TypeChecker_ptr self,
-                                             node_ptr expression,
-                                             node_ptr context);
+					     node_ptr expression,
+					     node_ptr context);
 
 /*!
   \methodof TypeChecker
@@ -296,7 +296,7 @@ boolean TypeChecker_is_expression_wellformed(TypeChecker_ptr self,
   \sa type_checker_check_expression
 */
 boolean TypeChecker_is_specification_wellformed(TypeChecker_ptr self,
-                                                node_ptr expression);
+						node_ptr expression);
 
 /*!
   \methodof TypeChecker
@@ -327,7 +327,7 @@ boolean TypeChecker_is_specification_wellformed(TypeChecker_ptr self,
   \sa type_checker_check_expression
 */
 boolean TypeChecker_is_type_wellformed(TypeChecker_ptr self, SymbType_ptr type,
-                                       node_ptr varName);
+				       node_ptr varName);
 
 /*!
   \methodof TypeChecker
@@ -352,8 +352,8 @@ boolean TypeChecker_is_type_wellformed(TypeChecker_ptr self, SymbType_ptr type,
    TypeChecker_is_specification_wellformed
 */
 SymbType_ptr TypeChecker_get_expression_type(TypeChecker_ptr self,
-                                             node_ptr expression,
-                                             node_ptr context);
+					     node_ptr expression,
+					     node_ptr context);
 
 /*!
   \methodof TypeChecker
@@ -371,8 +371,8 @@ SymbType_ptr TypeChecker_get_expression_type(TypeChecker_ptr self,
   \sa TypeChecker_get_expression_type
 */
 boolean TypeChecker_is_expression_type_checked(TypeChecker_ptr self,
-                                               node_ptr expression,
-                                               node_ptr context);
+					       node_ptr expression,
+					       node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

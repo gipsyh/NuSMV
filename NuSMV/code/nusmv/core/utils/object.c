@@ -65,32 +65,37 @@ static Object_ptr object_copy(const Object_ptr self);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-VIRTUAL void Object_destroy(Object_ptr self, void *arg) {
-  OBJECT_CHECK_INSTANCE(self);
-  self->finalize(self, arg);
+VIRTUAL void Object_destroy(Object_ptr self, void *arg)
+{
+	OBJECT_CHECK_INSTANCE(self);
+	self->finalize(self, arg);
 }
 
-VIRTUAL Object_ptr Object_copy(const Object_ptr self) {
-  return self->copy(self);
+VIRTUAL Object_ptr Object_copy(const Object_ptr self)
+{
+	return self->copy(self);
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of private functions                                           */
 /*---------------------------------------------------------------------------*/
 
-void object_init(Object_ptr self) {
-  OVERRIDE(Object, finalize) = object_finalize;
-  OVERRIDE(Object, copy) = object_copy;
+void object_init(Object_ptr self)
+{
+	OVERRIDE(Object, finalize) = object_finalize;
+	OVERRIDE(Object, copy) = object_copy;
 }
 
-void object_deinit(Object_ptr self) {
-  OVERRIDE(Object, finalize) = NULL;
-  OVERRIDE(Object, copy) = NULL;
+void object_deinit(Object_ptr self)
+{
+	OVERRIDE(Object, finalize) = NULL;
+	OVERRIDE(Object, copy) = NULL;
 }
 
-void object_copy_aux(const Object_ptr self, Object_ptr copy) {
-  copy->finalize = self->finalize;
-  copy->copy = self->copy;
+void object_copy_aux(const Object_ptr self, Object_ptr copy)
+{
+	copy->finalize = self->finalize;
+	copy->copy = self->copy;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -112,10 +117,11 @@ void object_copy_aux(const Object_ptr self, Object_ptr copy) {
 
   \sa object_copy_aux
 */
-static Object_ptr object_copy(const Object_ptr self) {
-  error_unreachable_code(); /* this is a virtual class, no real instances
+static Object_ptr object_copy(const Object_ptr self)
+{
+	error_unreachable_code(); /* this is a virtual class, no real instances
                           are allowed */
-  return OBJECT(NULL);
+	return OBJECT(NULL);
 }
 
 /*!
@@ -126,9 +132,10 @@ static Object_ptr object_copy(const Object_ptr self) {
   class does not override the finalizer, then an assertion is fired when
   the virtual destroyer Object_destroy is called.
 */
-static void object_finalize(Object_ptr self, void *arg) {
-  object_deinit(self);
+static void object_finalize(Object_ptr self, void *arg)
+{
+	object_deinit(self);
 
-  error_unreachable_code(); /* this is a virtual class, no real instances
+	error_unreachable_code(); /* this is a virtual class, no real instances
                                are allowed */
 }

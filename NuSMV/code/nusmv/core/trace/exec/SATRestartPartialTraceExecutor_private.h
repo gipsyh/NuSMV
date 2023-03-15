@@ -54,16 +54,16 @@
 */
 
 typedef struct SATRestartPartialTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PartialTraceExecutor);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PartialTraceExecutor);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } SATRestartPartialTraceExecutor;
 

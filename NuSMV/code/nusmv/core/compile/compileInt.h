@@ -223,9 +223,9 @@ void cmp_struct_quit(cmp_struct_ptr);
 
 */
 void Compile_ConstructHierarchy(const NuSMVEnv_ptr env,
-                                SymbTable_ptr symb_table, SymbLayer_ptr,
-                                node_ptr, node_ptr, node_ptr, FlatHierarchy_ptr,
-                                HrcNode_ptr, hash_ptr, boolean);
+				SymbTable_ptr symb_table, SymbLayer_ptr,
+				node_ptr, node_ptr, node_ptr, FlatHierarchy_ptr,
+				HrcNode_ptr, hash_ptr, boolean);
 
 /*!
   \brief Builds the parameters of a module from the list of formal
@@ -244,8 +244,8 @@ flattening information that is implicit in the hierarchy.
 actual parameter used to instatiate a module is changed.
 */
 void compile_make_params_hrc(const NuSMVEnv_ptr env, node_ptr basename,
-                             node_ptr actual_list, node_ptr formal_list,
-                             HrcNode_ptr hrc_result);
+			     node_ptr actual_list, node_ptr formal_list,
+			     HrcNode_ptr hrc_result);
 
 /*!
   \brief Add assign declarations in hrc_result.
@@ -258,7 +258,7 @@ void compile_make_params_hrc(const NuSMVEnv_ptr env, node_ptr basename,
   assign constraint.
 */
 void compile_add_assign_hrc(NodeMgr_ptr nodemgr, HrcNode_ptr hrc_result,
-                            node_ptr assign_list);
+			    node_ptr assign_list);
 
 /* This will be removed when assignment of bit selection is implemented */
 
@@ -271,7 +271,7 @@ void compile_add_assign_hrc(NodeMgr_ptr nodemgr, HrcNode_ptr hrc_result,
 
 */
 void error_bit_selection_assignment_not_supported(NuSMVEnv_ptr env,
-                                                  node_ptr name);
+						  node_ptr name);
 
 /*!
   \brief Rewrites the toint operator for word expressions
@@ -303,7 +303,7 @@ void error_bit_selection_assignment_not_supported(NuSMVEnv_ptr env,
                        esac
 */
 node_ptr compile_flatten_rewrite_word_toint_cast(const NuSMVEnv_ptr env,
-                                                 node_ptr body,
-                                                 SymbType_ptr type);
+						 node_ptr body,
+						 SymbType_ptr type);
 
 #endif /* __NUSMV_CORE_COMPILE_COMPILE_INT_H__ */

@@ -50,32 +50,32 @@
 /*---------------------------------------------------------------------------*/
 
 typedef enum SyntaxClass_TAG {
-  SC_NUM_EXPR,  /* numerical or id */
-  SC_BOOL_EXPR, /* boolean or id */
-  SC_WORD_EXPR,
-  SC_IDENTIFIER,         /* only id */
-  SC_NUM_BOOL_WORD_EXPR, /* boolean or numerical or word or id */
-  SC_NUM_BOOL_EXPR,      /* boolean or numerical or id */
+	SC_NUM_EXPR, /* numerical or id */
+	SC_BOOL_EXPR, /* boolean or id */
+	SC_WORD_EXPR,
+	SC_IDENTIFIER, /* only id */
+	SC_NUM_BOOL_WORD_EXPR, /* boolean or numerical or word or id */
+	SC_NUM_BOOL_EXPR, /* boolean or numerical or id */
 
-  SC_BOOL_WORD_EXPR, /* Boolean or word or id */
+	SC_BOOL_WORD_EXPR, /* Boolean or word or id */
 
-  SC_NUM_WORD_EXPR, /* numerical or word or id operation */
+	SC_NUM_WORD_EXPR, /* numerical or word or id operation */
 
-  SC_PROPERTY,
-  SC_FL_PROPERTY,
-  SC_OBE_PROPERTY,
+	SC_PROPERTY,
+	SC_FL_PROPERTY,
+	SC_OBE_PROPERTY,
 
-  SC_SEQUENCE,
-  SC_REPLICATOR,
-  SC_NONE,
-  SC_RANGE,
-  SC_LIST,
-  SC_NUM_RANGE /* number, id or range */
+	SC_SEQUENCE,
+	SC_REPLICATOR,
+	SC_NONE,
+	SC_RANGE,
+	SC_LIST,
+	SC_NUM_RANGE /* number, id or range */
 } SyntaxClass;
 
 typedef struct PslExpr_TAG {
-  SyntaxClass klass;
-  PslNode_ptr psl_node;
+	SyntaxClass klass;
+	PslNode_ptr psl_node;
 } PslExpr;
 
 /*---------------------------------------------------------------------------*/
@@ -100,108 +100,115 @@ typedef struct PslExpr_TAG {
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_W2W_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_WORD_EXPR, SC_WORD_EXPR)
+#define PSL_EXPR_MAKE_W2W_OP(env, res, right, op)                   \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_WORD_EXPR, \
+			       SC_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_B2W_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_EXPR, SC_WORD_EXPR)
+#define PSL_EXPR_MAKE_B2W_OP(env, res, right, op)                   \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_EXPR, \
+			       SC_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_W2B_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_WORD_EXPR, SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_W2B_OP(env, res, right, op)                   \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_WORD_EXPR, \
+			       SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_W2N_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_WORD_EXPR, SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_W2N_OP(env, res, right, op)                   \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_WORD_EXPR, \
+			       SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NW2NW_OP(env, res, right, op)                            \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_WORD_EXPR,              \
-                         SC_NUM_WORD_EXPR)
+#define PSL_EXPR_MAKE_NW2NW_OP(env, res, right, op)                     \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_WORD_EXPR, \
+			       SC_NUM_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_BW2BW_OP(env, res, right, op)                            \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_WORD_EXPR,             \
-                         SC_BOOL_WORD_EXPR)
+#define PSL_EXPR_MAKE_BW2BW_OP(env, res, right, op)                      \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_WORD_EXPR, \
+			       SC_BOOL_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_N2N_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_EXPR, SC_NUM_EXPR)
+#define PSL_EXPR_MAKE_N2N_OP(env, res, right, op) \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_EXPR, SC_NUM_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_N2B_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_EXPR, SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_N2B_OP(env, res, right, op) \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_EXPR, SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_B2B_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_EXPR, SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_B2B_OP(env, res, right, op)                   \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_EXPR, \
+			       SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NBW2N_OP(env, res, right, op)                            \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_BOOL_WORD_EXPR,         \
-                         SC_NUM_EXPR)
+#define PSL_EXPR_MAKE_NBW2N_OP(env, res, right, op)                          \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_BOOL_WORD_EXPR, \
+			       SC_NUM_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NBW2B_OP(env, res, right, op)                            \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_BOOL_WORD_EXPR,         \
-                         SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_NBW2B_OP(env, res, right, op)                          \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_NUM_BOOL_WORD_EXPR, \
+			       SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_F2F_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_FL_PROPERTY, SC_FL_PROPERTY)
+#define PSL_EXPR_MAKE_F2F_OP(env, res, right, op)                     \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_FL_PROPERTY, \
+			       SC_FL_PROPERTY)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_B2F_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_EXPR, SC_FL_PROPERTY)
+#define PSL_EXPR_MAKE_B2F_OP(env, res, right, op)                   \
+	psl_expr_make_unary_op(env, &res, &right, op, SC_BOOL_EXPR, \
+			       SC_FL_PROPERTY)
 
 /* this preserves the right's klass */
 
@@ -210,8 +217,8 @@ typedef struct PslExpr_TAG {
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_T2T_OP(env, res, right, op)                              \
-  psl_expr_make_unary_op(env, &res, &right, op, right.klass, right.klass)
+#define PSL_EXPR_MAKE_T2T_OP(env, res, right, op) \
+	psl_expr_make_unary_op(env, &res, &right, op, right.klass, right.klass)
 
 /* Shortcuts for binary operators: */
 
@@ -220,9 +227,9 @@ typedef struct PslExpr_TAG {
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_W_N2W_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_mixed_op(env, &res, &left, op, &right, SC_WORD_EXPR,    \
-                                SC_NUM_EXPR, SC_WORD_EXPR)
+#define PSL_EXPR_MAKE_W_N2W_OP(env, res, left, op, right)           \
+	psl_expr_make_binary_mixed_op(env, &res, &left, op, &right, \
+				      SC_WORD_EXPR, SC_NUM_EXPR, SC_WORD_EXPR)
 /* Shortcuts for binary operators: */
 
 /*!
@@ -230,185 +237,187 @@ typedef struct PslExpr_TAG {
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_N_N2W_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_EXPR,           \
-                          SC_WORD_EXPR)
+#define PSL_EXPR_MAKE_N_N2W_OP(env, res, left, op, right)                  \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_EXPR, \
+				SC_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_N_N2N_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_EXPR,           \
-                          SC_NUM_EXPR)
+#define PSL_EXPR_MAKE_N_N2N_OP(env, res, left, op, right)                  \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_EXPR, \
+				SC_NUM_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_N_N2B_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_EXPR,           \
-                          SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_N_N2B_OP(env, res, left, op, right)                  \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_EXPR, \
+				SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NB_NB2B_OP(env, res, left, op, right)                    \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_BOOL_EXPR,      \
-                          SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_NB_NB2B_OP(env, res, left, op, right)   \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, \
+				SC_NUM_BOOL_EXPR, SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_BW_BW2BW_OP(env, res, left, op, right)                   \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_BOOL_WORD_EXPR,     \
-                          SC_BOOL_WORD_EXPR)
+#define PSL_EXPR_MAKE_BW_BW2BW_OP(env, res, left, op, right)  \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, \
+				SC_BOOL_WORD_EXPR, SC_BOOL_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_B_B2B_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_BOOL_EXPR,          \
-                          SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_B_B2B_OP(env, res, left, op, right)                   \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, SC_BOOL_EXPR, \
+				SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_W_W2W_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_WORD_EXPR,          \
-                          SC_WORD_EXPR)
+#define PSL_EXPR_MAKE_W_W2W_OP(env, res, left, op, right)                   \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, SC_WORD_EXPR, \
+				SC_WORD_EXPR)
 
-#define PSL_EXPR_MAKE_W_N2W_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_mixed_op(env, &res, &left, op, &right, SC_WORD_EXPR,    \
-                                SC_NUM_EXPR, SC_WORD_EXPR)
-
-/*!
-  \brief \todo Missing synopsis
-
-  \todo Missing description
-*/
-#define PSL_EXPR_MAKE_W_NW2W_OP(env, res, left, op, right)                     \
-  psl_expr_make_binary_mixed_op(env, &res, &left, op, &right, SC_WORD_EXPR,    \
-                                SC_NUM_WORD_EXPR, SC_WORD_EXPR)
+#define PSL_EXPR_MAKE_W_N2W_OP(env, res, left, op, right)           \
+	psl_expr_make_binary_mixed_op(env, &res, &left, op, &right, \
+				      SC_WORD_EXPR, SC_NUM_EXPR, SC_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_N_W2W_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_mixed_op(env, &res, &left, op, &right, SC_NUM_EXPR,     \
-                                SC_WORD_EXPR, SC_WORD_EXPR)
+#define PSL_EXPR_MAKE_W_NW2W_OP(env, res, left, op, right)            \
+	psl_expr_make_binary_mixed_op(env, &res, &left, op, &right,   \
+				      SC_WORD_EXPR, SC_NUM_WORD_EXPR, \
+				      SC_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NB_NB2N_OP(env, res, left, op, right)                    \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_BOOL_EXPR,      \
-                          SC_NUM_EXPR)
+#define PSL_EXPR_MAKE_N_W2W_OP(env, res, left, op, right)           \
+	psl_expr_make_binary_mixed_op(env, &res, &left, op, &right, \
+				      SC_NUM_EXPR, SC_WORD_EXPR, SC_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NW_NW2NW_OP(env, res, left, op, right)                   \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_WORD_EXPR,      \
-                          SC_NUM_WORD_EXPR)
+#define PSL_EXPR_MAKE_NB_NB2N_OP(env, res, left, op, right)   \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, \
+				SC_NUM_BOOL_EXPR, SC_NUM_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NW_NW2B_OP(env, res, left, op, right)                    \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_WORD_EXPR,      \
-                          SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_NW_NW2NW_OP(env, res, left, op, right)  \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, \
+				SC_NUM_WORD_EXPR, SC_NUM_WORD_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NBW_NBW2N_OP(env, res, left, op, right)                  \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_BOOL_WORD_EXPR, \
-                          SC_NUM_EXPR)
+#define PSL_EXPR_MAKE_NW_NW2B_OP(env, res, left, op, right)   \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, \
+				SC_NUM_WORD_EXPR, SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_NBW_NBW2B_OP(env, res, left, op, right)                  \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_NUM_BOOL_WORD_EXPR, \
-                          SC_BOOL_EXPR)
+#define PSL_EXPR_MAKE_NBW_NBW2N_OP(env, res, left, op, right) \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, \
+				SC_NUM_BOOL_WORD_EXPR, SC_NUM_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_F_F2F_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_FL_PROPERTY,        \
-                          SC_FL_PROPERTY)
+#define PSL_EXPR_MAKE_NBW_NBW2B_OP(env, res, left, op, right) \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, \
+				SC_NUM_BOOL_WORD_EXPR, SC_BOOL_EXPR)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_B_B2F_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, SC_BOOL_EXPR,          \
-                          SC_FL_PROPERTY)
+#define PSL_EXPR_MAKE_F_F2F_OP(env, res, left, op, right)                     \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, SC_FL_PROPERTY, \
+				SC_FL_PROPERTY)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_T_T2T_OP(env, res, left, op, right)                      \
-  psl_expr_make_binary_op(env, &res, &left, op, &right, left.klass, left.klass)
+#define PSL_EXPR_MAKE_B_B2F_OP(env, res, left, op, right)                   \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, SC_BOOL_EXPR, \
+				SC_FL_PROPERTY)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_EXT_NEXT_OP_BOOL(env, res, operator, fl_property,        \
-                                       bool_expr)                              \
-  psl_expr_make_extended_next_op(env, operator, & fl_property, NULL,           \
-                                 &bool_expr, &res);
+#define PSL_EXPR_MAKE_T_T2T_OP(env, res, left, op, right)                 \
+	psl_expr_make_binary_op(env, &res, &left, op, &right, left.klass, \
+				left.klass)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_EXT_NEXT_OP_WHEN(env, res, operator, fl_property, when)  \
-  psl_expr_make_extended_next_op(env, operator, & fl_property, &when, NULL,    \
-                                 &res);
+#define PSL_EXPR_MAKE_EXT_NEXT_OP_BOOL(env, res, operator, fl_property,    \
+				       bool_expr)                          \
+	psl_expr_make_extended_next_op(env, operator, & fl_property, NULL, \
+				       &bool_expr, &res);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PSL_EXPR_MAKE_EXT_NEXT_OP_WHEN_BOOL(env, res, operator, fl_property,   \
-                                            when, bool_expr)                   \
-  psl_expr_make_extended_next_op(env, operator, & fl_property, &when,          \
-                                 &bool_expr, &res);
+#define PSL_EXPR_MAKE_EXT_NEXT_OP_WHEN(env, res, operator, fl_property, when) \
+	psl_expr_make_extended_next_op(env, operator, & fl_property, &when,   \
+				       NULL, &res);
+
+/*!
+  \brief \todo Missing synopsis
+
+  \todo Missing description
+*/
+#define PSL_EXPR_MAKE_EXT_NEXT_OP_WHEN_BOOL(env, res, operator, fl_property, \
+					    when, bool_expr)                 \
+	psl_expr_make_extended_next_op(env, operator, & fl_property, &when,  \
+				       &bool_expr, &res);
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -420,9 +429,9 @@ typedef struct PslExpr_TAG {
   \todo Missing description
 */
 void psl_expr_make_unary_op(const NuSMVEnv_ptr env, PslExpr *res,
-                            const PslExpr *right, const PslOp op_id,
-                            const SyntaxClass right_req_klass,
-                            const SyntaxClass res_klass);
+			    const PslExpr *right, const PslOp op_id,
+			    const SyntaxClass right_req_klass,
+			    const SyntaxClass res_klass);
 
 /*!
   \brief \todo Missing synopsis
@@ -430,10 +439,10 @@ void psl_expr_make_unary_op(const NuSMVEnv_ptr env, PslExpr *res,
   \todo Missing description
 */
 void psl_expr_make_binary_op(const NuSMVEnv_ptr env, PslExpr *res,
-                             const PslExpr *left, const PslOp op_id,
-                             const PslExpr *right,
-                             const SyntaxClass ops_req_klass,
-                             const SyntaxClass res_klass);
+			     const PslExpr *left, const PslOp op_id,
+			     const PslExpr *right,
+			     const SyntaxClass ops_req_klass,
+			     const SyntaxClass res_klass);
 
 /*!
   \brief \todo Missing synopsis
@@ -441,11 +450,11 @@ void psl_expr_make_binary_op(const NuSMVEnv_ptr env, PslExpr *res,
   \todo Missing description
 */
 void psl_expr_make_binary_mixed_op(const NuSMVEnv_ptr env, PslExpr *res,
-                                   const PslExpr *left, const PslOp op_id,
-                                   const PslExpr *right,
-                                   const SyntaxClass left_req_klass,
-                                   const SyntaxClass right_req_klass,
-                                   const SyntaxClass res_klass);
+				   const PslExpr *left, const PslOp op_id,
+				   const PslExpr *right,
+				   const SyntaxClass left_req_klass,
+				   const SyntaxClass right_req_klass,
+				   const SyntaxClass res_klass);
 
 /*!
   \brief \todo Missing synopsis
@@ -453,9 +462,9 @@ void psl_expr_make_binary_mixed_op(const NuSMVEnv_ptr env, PslExpr *res,
   \todo Missing description
 */
 void psl_expr_make_extended_next_op(const NuSMVEnv_ptr env, PslOp op_id,
-                                    const PslExpr *fl_property,
-                                    const PslExpr *when,
-                                    const PslExpr *bool_expr, PslExpr *res);
+				    const PslExpr *fl_property,
+				    const PslExpr *when,
+				    const PslExpr *bool_expr, PslExpr *res);
 
 /*!
   \brief \todo Missing synopsis
@@ -463,7 +472,7 @@ void psl_expr_make_extended_next_op(const NuSMVEnv_ptr env, PslOp op_id,
   \todo Missing description
 */
 PslExpr psl_expr_make_replicator(const NuSMVEnv_ptr env, PslOp op_id,
-                                 PslExpr id, PslExpr range, PslExpr value_set);
+				 PslExpr id, PslExpr range, PslExpr value_set);
 
 /*!
   \brief \todo Missing synopsis
@@ -471,7 +480,7 @@ PslExpr psl_expr_make_replicator(const NuSMVEnv_ptr env, PslOp op_id,
   \todo Missing description
 */
 PslExpr psl_expr_make_replicated_property(const NuSMVEnv_ptr env,
-                                          PslExpr replicator, PslExpr expr);
+					  PslExpr replicator, PslExpr expr);
 
 /*!
   \brief \todo Missing synopsis
@@ -500,7 +509,7 @@ PslExpr psl_expr_make_id_array(const NuSMVEnv_ptr env, PslExpr id, PslExpr num);
   \todo Missing description
 */
 PslExpr psl_expr_make_context(const NuSMVEnv_ptr env, PslExpr ctx,
-                              PslExpr node);
+			      PslExpr node);
 
 /*!
   \brief \todo Missing synopsis
@@ -550,7 +559,7 @@ PslExpr psl_expr_make_boolean_value(const NuSMVEnv_ptr env, int val);
   \todo Missing description
 */
 PslExpr psl_expr_make_failure(const NuSMVEnv_ptr env, const char *msg,
-                              FailureKind kind);
+			      FailureKind kind);
 
 /*!
   \brief \todo Missing synopsis
@@ -593,7 +602,7 @@ PslExpr psl_expr_make_range(const NuSMVEnv_ptr env, PslExpr low, PslExpr high);
   \todo Missing description
 */
 PslExpr psl_expr_make_case(const NuSMVEnv_ptr env, PslExpr cond, PslExpr _then,
-                           PslExpr _list);
+			   PslExpr _list);
 
 /*!
   \brief \todo Missing synopsis
@@ -601,7 +610,7 @@ PslExpr psl_expr_make_case(const NuSMVEnv_ptr env, PslExpr cond, PslExpr _then,
   \todo Missing description
 */
 PslExpr psl_expr_make_ite(const NuSMVEnv_ptr env, PslExpr cond, PslExpr _then,
-                          PslExpr _else);
+			  PslExpr _else);
 
 /*!
   \brief \todo Missing synopsis
@@ -609,8 +618,8 @@ PslExpr psl_expr_make_ite(const NuSMVEnv_ptr env, PslExpr cond, PslExpr _then,
   \todo Missing description
 */
 PslExpr psl_expr_make_suffix_implication_weak(const NuSMVEnv_ptr env,
-                                              PslExpr seq, PslOp op,
-                                              PslExpr expr);
+					      PslExpr seq, PslOp op,
+					      PslExpr expr);
 
 /*!
   \brief \todo Missing synopsis
@@ -618,8 +627,8 @@ PslExpr psl_expr_make_suffix_implication_weak(const NuSMVEnv_ptr env,
   \todo Missing description
 */
 PslExpr psl_expr_make_suffix_implication_strong(const NuSMVEnv_ptr env,
-                                                PslExpr seq, PslOp op,
-                                                PslExpr expr);
+						PslExpr seq, PslOp op,
+						PslExpr expr);
 
 /*!
   \brief \todo Missing synopsis
@@ -627,7 +636,7 @@ PslExpr psl_expr_make_suffix_implication_strong(const NuSMVEnv_ptr env,
   \todo Missing description
 */
 PslExpr psl_expr_make_within(const NuSMVEnv_ptr env, PslOp op, PslExpr begin,
-                             PslExpr end, PslExpr seq);
+			     PslExpr end, PslExpr seq);
 
 /*!
   \brief \todo Missing synopsis
@@ -635,7 +644,7 @@ PslExpr psl_expr_make_within(const NuSMVEnv_ptr env, PslOp op, PslExpr begin,
   \todo Missing description
 */
 PslExpr psl_expr_make_whilenot(const NuSMVEnv_ptr env, PslOp op, PslExpr expr,
-                               PslExpr seq);
+			       PslExpr seq);
 
 /*!
   \brief \todo Missing synopsis
@@ -643,7 +652,7 @@ PslExpr psl_expr_make_whilenot(const NuSMVEnv_ptr env, PslOp op, PslExpr expr,
   \todo Missing description
 */
 PslExpr psl_expr_make_abort(const NuSMVEnv_ptr env, PslExpr fl_prop,
-                            PslExpr cond);
+			    PslExpr cond);
 
 /*!
   \brief \todo Missing synopsis
@@ -658,7 +667,7 @@ PslExpr psl_expr_make_sere(const NuSMVEnv_ptr env, PslExpr expr);
   \todo Missing description
 */
 PslExpr psl_expr_make_sere_concat(const NuSMVEnv_ptr env, PslExpr seq1,
-                                  PslExpr seq2);
+				  PslExpr seq2);
 
 /*!
   \brief \todo Missing synopsis
@@ -666,7 +675,7 @@ PslExpr psl_expr_make_sere_concat(const NuSMVEnv_ptr env, PslExpr seq1,
   \todo Missing description
 */
 PslExpr psl_expr_make_sere_fusion(const NuSMVEnv_ptr env, PslExpr seq1,
-                                  PslExpr seq2);
+				  PslExpr seq2);
 
 /*!
   \brief \todo Missing synopsis
@@ -674,8 +683,8 @@ PslExpr psl_expr_make_sere_fusion(const NuSMVEnv_ptr env, PslExpr seq1,
   \todo Missing description
 */
 PslExpr psl_expr_make_sere_compound_binary_op(const NuSMVEnv_ptr env,
-                                              PslExpr seq1, PslOp op,
-                                              PslExpr seq2);
+					      PslExpr seq1, PslOp op,
+					      PslExpr seq2);
 
 /*!
   \brief \todo Missing synopsis
@@ -683,7 +692,7 @@ PslExpr psl_expr_make_sere_compound_binary_op(const NuSMVEnv_ptr env,
   \todo Missing description
 */
 PslExpr psl_expr_make_repeated_sere(const NuSMVEnv_ptr env, PslOp op,
-                                    PslExpr sere, PslExpr count);
+				    PslExpr sere, PslExpr count);
 
 /*!
   \brief \todo Missing synopsis
@@ -712,7 +721,7 @@ PslExpr psl_expr_make_concatenation(const NuSMVEnv_ptr env, PslExpr expr_list);
   \todo Missing description
 */
 PslExpr psl_expr_make_multiple_concatenation(const NuSMVEnv_ptr env,
-                                             PslExpr expr, PslExpr expr_list);
+					     PslExpr expr, PslExpr expr_list);
 
 /*!
   \brief \todo Missing synopsis
@@ -727,7 +736,7 @@ PslExpr psl_expr_make_obe_unary(const NuSMVEnv_ptr env, PslOp op, PslExpr expr);
   \todo Missing description
 */
 PslExpr psl_expr_make_obe_binary(const NuSMVEnv_ptr env, PslExpr left, PslOp op,
-                                 PslExpr right);
+				 PslExpr right);
 
 /*!
   \brief \todo Missing synopsis
@@ -735,7 +744,7 @@ PslExpr psl_expr_make_obe_binary(const NuSMVEnv_ptr env, PslExpr left, PslOp op,
   \todo Missing description
 */
 PslExpr psl_expr_make_bit_selection(const NuSMVEnv_ptr env, PslExpr word_expr,
-                                    PslExpr left, PslExpr right);
+				    PslExpr left, PslExpr right);
 
 /*!
   \brief \todo Missing synopsis
@@ -743,6 +752,6 @@ PslExpr psl_expr_make_bit_selection(const NuSMVEnv_ptr env, PslExpr word_expr,
   \todo Missing description
 */
 PslExpr psl_expr_make_word_concatenation(const NuSMVEnv_ptr env, PslExpr left,
-                                         PslExpr right);
+					 PslExpr right);
 
 #endif /* __NUSMV_CORE_PARSER_PSL_PSL_EXPR_H__ */

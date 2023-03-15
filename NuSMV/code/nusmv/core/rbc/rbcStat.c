@@ -70,9 +70,10 @@
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Rbc_PrintStats(Rbc_Manager_t *rbcManager, int clustSz, FILE *outFile) {
-  Dag_PrintStats(rbcManager->dagManager, clustSz, outFile);
+void Rbc_PrintStats(Rbc_Manager_t *rbcManager, int clustSz, FILE *outFile)
+{
+	Dag_PrintStats(rbcManager->dagManager, clustSz, outFile);
 
-  return;
+	return;
 
 } /* End of Rbc_PrintStats. */

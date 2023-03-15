@@ -65,11 +65,11 @@ typedef node_ptr PslNode_ptr;
 typedef short int PslOp;
 
 typedef enum PslOpConvType_TAG {
-  TOK2PSL,
-  TOK2SMV,
-  PSL2SMV,
-  PSL2PSL,
-  PSL2TOK
+	TOK2PSL,
+	TOK2SMV,
+	PSL2SMV,
+	PSL2PSL,
+	PSL2TOK
 } PslOpConvType;
 
 /*---------------------------------------------------------------------------*/
@@ -119,7 +119,7 @@ typedef enum PslOpConvType_TAG {
 node_ptr PslNode_convert_psl_to_core(const NuSMVEnv_ptr env, PslNode_ptr expr);
 
 PslNode_ptr psl_new_node(NodeMgr_ptr nodemgr, PslOp op, PslNode_ptr left,
-                         PslNode_ptr right);
+			 PslNode_ptr right);
 
 /*!
   \brief Returns the given expression's left branch
@@ -207,12 +207,12 @@ boolean psl_node_is_true(PslNode_ptr e);
 boolean psl_node_is_false(PslNode_ptr e);
 
 PslNode_ptr psl_node_prune(NodeMgr_ptr nodemgr, PslNode_ptr tree,
-                           PslNode_ptr branch);
+			   PslNode_ptr branch);
 
 boolean psl_node_is_sere(PslNode_ptr expr);
 PslNode_ptr psl_node_sere_star_get_count(const PslNode_ptr e);
 boolean psl_node_is_handled_star(const NuSMVEnv_ptr env, PslNode_ptr expr,
-                                 boolean toplevel);
+				 boolean toplevel);
 boolean psl_node_sere_is_propositional(PslNode_ptr e);
 boolean psl_node_sere_is_repeated(PslNode_ptr e);
 boolean psl_node_sere_is_star(PslNode_ptr e);
@@ -336,7 +336,7 @@ PslNode_ptr psl_node_sere_concat_get_rightmost(PslNode_ptr e);
 
 */
 PslNode_ptr psl_node_sere_concat_cut_leftmost(NodeMgr_ptr nodemgr,
-                                              PslNode_ptr e);
+					      PslNode_ptr e);
 
 /*!
   \brief Returns the left operand of a fusion.
@@ -402,7 +402,7 @@ PslNode_ptr psl_node_sere_compound_get_right(PslNode_ptr e);
   \se None
 */
 PslNode_ptr psl_node_make_sere_propositional(NodeMgr_ptr nodemgr,
-                                             PslNode_ptr expr);
+					     PslNode_ptr expr);
 
 /*!
   \brief Maker for a concatenation sere
@@ -412,7 +412,7 @@ PslNode_ptr psl_node_make_sere_propositional(NodeMgr_ptr nodemgr,
   \se None
 */
 PslNode_ptr psl_node_make_sere_concat(NodeMgr_ptr nodemgr, PslNode_ptr seq1,
-                                      PslNode_ptr seq2);
+				      PslNode_ptr seq2);
 
 /*!
   \brief Maker for a && sere
@@ -422,7 +422,7 @@ PslNode_ptr psl_node_make_sere_concat(NodeMgr_ptr nodemgr, PslNode_ptr seq1,
   \se None
 */
 PslNode_ptr psl_node_make_sere_2ampersand(NodeMgr_ptr nodemgr, PslNode_ptr seq1,
-                                          PslNode_ptr seq2);
+					  PslNode_ptr seq2);
 
 /*!
   \brief Maker for a star sere
@@ -434,13 +434,13 @@ PslNode_ptr psl_node_make_sere_2ampersand(NodeMgr_ptr nodemgr, PslNode_ptr seq1,
 PslNode_ptr psl_node_make_sere_star(NodeMgr_ptr nodemgr, PslNode_ptr seq);
 
 PslNode_ptr psl_node_make_sere_compound(NodeMgr_ptr nodemgr, PslNode_ptr seq1,
-                                        PslOp op, PslNode_ptr seq2);
+					PslOp op, PslNode_ptr seq2);
 boolean psl_node_is_sere_compound_binary(PslNode_ptr e);
 
 PslNode_ptr psl_node_make_cons(NodeMgr_ptr nodemgr, PslNode_ptr elem,
-                               PslNode_ptr next);
+			       PslNode_ptr next);
 PslNode_ptr psl_node_make_cons_new(NodeMgr_ptr nodemgr, PslNode_ptr elem,
-                                   PslNode_ptr next);
+				   PslNode_ptr next);
 
 boolean psl_node_is_boolean_type(PslNode_ptr expr);
 
@@ -497,7 +497,7 @@ boolean psl_node_is_num_equal(PslNode_ptr _id1, PslNode_ptr _id2);
   \se None
 */
 PslNode_ptr psl_node_make_failure(NodeMgr_ptr nodemgr, const char *msg,
-                                  FailureKind kind);
+				  FailureKind kind);
 
 /*!
   \brief Maker for a CASE node
@@ -507,7 +507,7 @@ PslNode_ptr psl_node_make_failure(NodeMgr_ptr nodemgr, const char *msg,
   \se None
 */
 PslNode_ptr psl_node_make_case(NodeMgr_ptr nodemgr, PslNode_ptr _cond,
-                               PslNode_ptr _then, PslNode_ptr _next);
+			       PslNode_ptr _then, PslNode_ptr _next);
 
 /*!
   \brief Returns true if the given node is a range
@@ -615,7 +615,7 @@ of the enumerated values
   \sa optional
 */
 PslNode_ptr psl_node_get_replicator_normalized_value_set(const NuSMVEnv_ptr env,
-                                                         PslNode_ptr rep);
+							 PslNode_ptr rep);
 
 /*!
   \brief Given a replicator, returns its range
@@ -646,7 +646,7 @@ PslNode_ptr psl_node_get_replicator_id(PslNode_ptr _repl);
   \se None
 */
 PslNode_ptr psl_node_context_to_main_context(NodeMgr_ptr nodemgr,
-                                             PslNode_ptr context);
+					     PslNode_ptr context);
 
 /*!
   \brief Creates a psl node that represents a contestualized
@@ -657,11 +657,11 @@ node
   \se None
 */
 PslNode_ptr PslNode_new_context(NodeMgr_ptr nodemgr, PslNode_ptr ctx,
-                                PslNode_ptr node);
+				PslNode_ptr node);
 
 PslNode_ptr psl_node_make_extended_next(NodeMgr_ptr nodemgr, PslOp op,
-                                        PslNode_ptr expr, PslNode_ptr when,
-                                        PslNode_ptr condition);
+					PslNode_ptr expr, PslNode_ptr when,
+					PslNode_ptr condition);
 boolean psl_node_is_extended_next(PslNode_ptr e);
 
 /*!
@@ -763,13 +763,13 @@ boolean PslNode_is_ltl(const PslNode_ptr expr);
 
 /* convert */
 PslNode_ptr PslNode_convert_id(const NuSMVEnv_ptr env, PslNode_ptr id,
-                               PslOpConvType type);
+			       PslOpConvType type);
 PslNode_ptr PslNode_pslobe2ctl(const NuSMVEnv_ptr env, PslNode_ptr expr,
-                               PslOpConvType type);
+			       PslOpConvType type);
 PslNode_ptr PslNode_pslltl2ltl(const NuSMVEnv_ptr env, PslNode_ptr expr,
-                               PslOpConvType type);
+			       PslOpConvType type);
 PslNode_ptr PslNode_remove_sere(const NuSMVEnv_ptr env, PslNode_ptr e);
 PslNode_ptr PslNode_remove_forall_replicators(const NuSMVEnv_ptr env,
-                                              PslNode_ptr e);
+					      PslNode_ptr e);
 
 #endif /* __NUSMV_CORE_PARSER_PSL_PSL_NODE_H__ */

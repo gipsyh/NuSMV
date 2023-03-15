@@ -53,16 +53,16 @@
 */
 
 typedef struct HrcDumperSmv_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(HrcDumper);
+	/* this MUST stay on the top */
+	INHERITS_FROM(HrcDumper);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } HrcDumperSmv;
 
@@ -79,7 +79,7 @@ typedef struct HrcDumperSmv_TAG {
   \sa HrcDumperSmv_create
 */
 void hrc_dumper_smv_init(HrcDumperSmv_ptr self, const NuSMVEnv_ptr env,
-                         FILE *fout);
+			 FILE *fout);
 
 /*!
   \methodof HrcDumperSmv
@@ -98,7 +98,7 @@ void hrc_dumper_smv_deinit(HrcDumperSmv_ptr self);
 
 */
 void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
-                                 const HrcDumperInfo *info);
+				 const HrcDumperInfo *info);
 
 /*!
   \methodof HrcDumper

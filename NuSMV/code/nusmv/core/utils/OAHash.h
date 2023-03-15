@@ -83,28 +83,30 @@ typedef void (*OA_HASH_FREE_FUN)(void *key, void *value, void *arg);
 
   \todo Missing description
 */
-#define OA_HASH_CHECK_INSTANCE(self)                                           \
-  (nusmv_assert(OA_HASH(self) != OA_HASH(NULL)))
+#define OA_HASH_CHECK_INSTANCE(self) \
+	(nusmv_assert(OA_HASH(self) != OA_HASH(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OA_HASH_FOREACH(self, iter)                                            \
-  for (iter = OAHash_get_first_iter(self); !OAHash_iter_is_end(self, iter);    \
-       iter = OAHash_iter_next(self, iter))
+#define OA_HASH_FOREACH(self, iter)              \
+	for (iter = OAHash_get_first_iter(self); \
+	     !OAHash_iter_is_end(self, iter);    \
+	     iter = OAHash_iter_next(self, iter))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OA_HASH_FOREACH_ENTRY(self, iter, key, value)                          \
-  for (iter = OAHash_get_first_iter(self);                                     \
-       !OAHash_iter_is_end(self, iter) &&                                      \
-       (OAHash_iter_values(self, iter, (void **)key, (void **)value), true);   \
-       iter = OAHash_iter_next(self, iter))
+#define OA_HASH_FOREACH_ENTRY(self, iter, key, value)                       \
+	for (iter = OAHash_get_first_iter(self);                            \
+	     !OAHash_iter_is_end(self, iter) &&                             \
+	     (OAHash_iter_values(self, iter, (void **)key, (void **)value), \
+	      true);                                                        \
+	     iter = OAHash_iter_next(self, iter))
 
 /**AutomaticStart*************************************************************/
 
@@ -127,8 +129,8 @@ typedef void (*OA_HASH_FREE_FUN)(void *key, void *value, void *arg);
   \sa OAHash_destroy
 */
 OAHash_ptr OAHash_create(OA_HASH_EQ_FUN key_eq_fun,
-                         OA_HASH_HASH_FUN key_hash_fun,
-                         OA_HASH_FREE_FUN free_entry_fun, void *custom_arg);
+			 OA_HASH_HASH_FUN key_hash_fun,
+			 OA_HASH_FREE_FUN free_entry_fun, void *custom_arg);
 
 /*!
   \methodof OAHash
@@ -244,7 +246,7 @@ boolean OAHash_iter_is_end(const OAHash_ptr self, const OAHashIter iter);
   iterator. Both key and value can be NULL
 */
 void OAHash_iter_values(const OAHash_ptr self, const OAHashIter iter,
-                        void **key, void **value);
+			void **key, void **value);
 
 /* Functions for key_eq_fun and key_hash_fun */
 

@@ -72,12 +72,15 @@ static int CommandCompassGenSigref(NuSMVEnv_ptr env, int argc, char **argv);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Compass_init_cmd(NuSMVEnv_ptr env) {
-  Cmd_CommandAdd(env, "compass_gen_sigref", CommandCompassGenSigref, 0, true);
+void Compass_init_cmd(NuSMVEnv_ptr env)
+{
+	Cmd_CommandAdd(env, "compass_gen_sigref", CommandCompassGenSigref, 0,
+		       true);
 }
 
-void Compass_Cmd_quit(NuSMVEnv_ptr env) {
-  Cmd_CommandRemove(env, "compass_gen_sigref");
+void Compass_Cmd_quit(NuSMVEnv_ptr env)
+{
+	Cmd_CommandRemove(env, "compass_gen_sigref");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -106,174 +109,184 @@ void Compass_Cmd_quit(NuSMVEnv_ptr env) {
   </dl>
 */
 
-static int CommandCompassGenSigref(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE *outstream = StreamMgr_get_output_stream(streams);
-  FILE *errstream = StreamMgr_get_error_stream(streams);
-  ErrorMgr_ptr const errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+static int CommandCompassGenSigref(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	FILE *outstream = StreamMgr_get_output_stream(streams);
+	FILE *errstream = StreamMgr_get_error_stream(streams);
+	ErrorMgr_ptr const errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  BddFsm_ptr bdd_fsm = NULL;
-  int c = 0;
-  const char *prob_fname = (char *)NULL;
-  const char *sigref_fname = (char *)NULL;
-  const char *tau_expr_str = (char *)NULL;
-  const char *ap_fname = (char *)NULL;
-  boolean do_indent = false;
-  int retval = 0;
+	BddFsm_ptr bdd_fsm = NULL;
+	int c = 0;
+	const char *prob_fname = (char *)NULL;
+	const char *sigref_fname = (char *)NULL;
+	const char *tau_expr_str = (char *)NULL;
+	const char *ap_fname = (char *)NULL;
+	boolean do_indent = false;
+	int retval = 0;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "hbi:t:o:a:")) != EOF) {
-    switch (c) {
-    case 'b':
-      do_indent = true;
-      break;
-    case 'h':
-      goto __compass_gen_sigref_fail_help;
-    case 'i':
-      if (prob_fname != (char *)NULL) {
-        FREE(prob_fname);
-      }
-      prob_fname = util_strsav(util_optarg);
-      break;
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "hbi:t:o:a:")) != EOF) {
+		switch (c) {
+		case 'b':
+			do_indent = true;
+			break;
+		case 'h':
+			goto __compass_gen_sigref_fail_help;
+		case 'i':
+			if (prob_fname != (char *)NULL) {
+				FREE(prob_fname);
+			}
+			prob_fname = util_strsav(util_optarg);
+			break;
 
-    case 't':
-      if (tau_expr_str != (char *)NULL) {
-        FREE(tau_expr_str);
-      }
-      tau_expr_str = util_strsav(util_optarg);
-      break;
+		case 't':
+			if (tau_expr_str != (char *)NULL) {
+				FREE(tau_expr_str);
+			}
+			tau_expr_str = util_strsav(util_optarg);
+			break;
 
-    case 'o':
-      if (sigref_fname != (char *)NULL)
-        FREE(sigref_fname);
-      sigref_fname = util_strsav(util_optarg);
-      break;
+		case 'o':
+			if (sigref_fname != (char *)NULL)
+				FREE(sigref_fname);
+			sigref_fname = util_strsav(util_optarg);
+			break;
 
-    case 'a':
-      if (ap_fname != (char *)NULL)
-        FREE(ap_fname);
-      ap_fname = util_strsav(util_optarg);
-      break;
+		case 'a':
+			if (ap_fname != (char *)NULL)
+				FREE(ap_fname);
+			ap_fname = util_strsav(util_optarg);
+			break;
 
-    default:
-      goto __compass_gen_sigref_fail_help;
-    }
-  }
+		default:
+			goto __compass_gen_sigref_fail_help;
+		}
+	}
 
-  if (argc != util_optind)
-    goto __compass_gen_sigref_fail_help;
+	if (argc != util_optind)
+		goto __compass_gen_sigref_fail_help;
 
-  /* preconditions */
-  /* I think here we should use Compile_check_if_model_was_built instead of
+	/* preconditions */
+	/* I think here we should use Compile_check_if_model_was_built instead of
      flat_model version, since bddfsm is assumed */
-  if (Compile_check_if_flat_model_was_built(env, errstream, false) ||
-      Compile_check_if_encoding_was_built(env, errstream)) {
-    goto __compass_gen_sigref_fail;
-  }
+	if (Compile_check_if_flat_model_was_built(env, errstream, false) ||
+	    Compile_check_if_encoding_was_built(env, errstream)) {
+		goto __compass_gen_sigref_fail;
+	}
 
-  {
-    /* Input checking */
-    Expr_ptr tau_expr = (Expr_ptr)NULL;
-    FILE *prob_file = (FILE *)NULL;
-    FILE *sigref_file = NULL;
-    FILE *ap_file = NULL;
+	{
+		/* Input checking */
+		Expr_ptr tau_expr = (Expr_ptr)NULL;
+		FILE *prob_file = (FILE *)NULL;
+		FILE *sigref_file = NULL;
+		FILE *ap_file = NULL;
 
-    if (tau_expr_str != (char *)NULL) {
-      if (Parser_ReadSimpExprFromString(env, tau_expr_str, &tau_expr) != 0) {
-        goto __compass_gen_sigref_fail;
-      }
-    }
+		if (tau_expr_str != (char *)NULL) {
+			if (Parser_ReadSimpExprFromString(env, tau_expr_str,
+							  &tau_expr) != 0) {
+				goto __compass_gen_sigref_fail;
+			}
+		}
 
-    if (prob_fname != (char *)NULL) {
-      prob_file = fopen(prob_fname, "r");
-      if (prob_file == (FILE *)NULL) {
-        StreamMgr_print_error(streams,
-                              "Unable to open probability list file \"%s\".\n",
-                              prob_fname);
-        goto __compass_gen_sigref_fail;
-      }
-    }
+		if (prob_fname != (char *)NULL) {
+			prob_file = fopen(prob_fname, "r");
+			if (prob_file == (FILE *)NULL) {
+				StreamMgr_print_error(
+					streams,
+					"Unable to open probability list file \"%s\".\n",
+					prob_fname);
+				goto __compass_gen_sigref_fail;
+			}
+		}
 
-    if (ap_fname != (char *)NULL) {
-      ap_file = fopen(ap_fname, "r");
-      if (ap_file == (FILE *)NULL) {
-        StreamMgr_print_error(
-            streams, "Unable to atomic proposition list file \"%s\".\n",
-            prob_fname);
-        goto __compass_gen_sigref_fail;
-      }
-    }
+		if (ap_fname != (char *)NULL) {
+			ap_file = fopen(ap_fname, "r");
+			if (ap_file == (FILE *)NULL) {
+				StreamMgr_print_error(
+					streams,
+					"Unable to atomic proposition list file \"%s\".\n",
+					prob_fname);
+				goto __compass_gen_sigref_fail;
+			}
+		}
 
-    /* Was file name specified for sigref output? */
-    if (sigref_fname != (char *)NULL) {
-      sigref_file = fopen(sigref_fname, "w");
-      if (sigref_file == (FILE *)NULL) {
-        StreamMgr_print_error(streams,
-                              "Unable to open output sigref file \"%s\".\n",
-                              sigref_fname);
-        fclose(prob_file);
-        goto __compass_gen_sigref_fail;
-      }
-    } else
-      sigref_file = outstream;
+		/* Was file name specified for sigref output? */
+		if (sigref_fname != (char *)NULL) {
+			sigref_file = fopen(sigref_fname, "w");
+			if (sigref_file == (FILE *)NULL) {
+				StreamMgr_print_error(
+					streams,
+					"Unable to open output sigref file \"%s\".\n",
+					sigref_fname);
+				fclose(prob_file);
+				goto __compass_gen_sigref_fail;
+			}
+		} else
+			sigref_file = outstream;
 
-    bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
-    if (NULL == bdd_fsm)
-      goto __compass_gen_sigref_fail;
+		bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
+		if (NULL == bdd_fsm)
+			goto __compass_gen_sigref_fail;
 
-    /* end of input checkings */
+		/* end of input checkings */
 
-    CATCH(errmgr) {
-      retval = Compass_write_sigref(env, bdd_fsm, sigref_file, prob_file,
-                                    ap_file, tau_expr, do_indent);
-    }
-    FAIL(errmgr) { retval = 1; }
+		CATCH(errmgr)
+		{
+			retval = Compass_write_sigref(env, bdd_fsm, sigref_file,
+						      prob_file, ap_file,
+						      tau_expr, do_indent);
+		}
+		FAIL(errmgr)
+		{
+			retval = 1;
+		}
 
-    goto __compass_gen_sigref_exit;
+		goto __compass_gen_sigref_exit;
 
-  __compass_gen_sigref_fail_help:
-    (void)UsageCompassGenSigref(env);
+__compass_gen_sigref_fail_help:
+		(void)UsageCompassGenSigref(env);
 
-    FALLTHROUGH
+		FALLTHROUGH
 
-  __compass_gen_sigref_fail:
-    retval = 1;
+__compass_gen_sigref_fail:
+		retval = 1;
 
-  __compass_gen_sigref_exit:
-    if (tau_expr_str != (char *)NULL)
-      FREE(tau_expr_str);
+__compass_gen_sigref_exit:
+		if (tau_expr_str != (char *)NULL)
+			FREE(tau_expr_str);
 
-    if (sigref_fname != (char *)NULL) {
-      FREE(sigref_fname);
+		if (sigref_fname != (char *)NULL) {
+			FREE(sigref_fname);
 
-      if (NULL != sigref_file) {
-        if (0 != fclose(sigref_file))
-          retval = 1;
-      }
-    }
+			if (NULL != sigref_file) {
+				if (0 != fclose(sigref_file))
+					retval = 1;
+			}
+		}
 
-    if (prob_fname != (char *)NULL) {
-      FREE(prob_fname);
+		if (prob_fname != (char *)NULL) {
+			FREE(prob_fname);
 
-      if (NULL != prob_file) {
-        if (0 != fclose(prob_file))
-          retval = 1;
-      }
-    }
+			if (NULL != prob_file) {
+				if (0 != fclose(prob_file))
+					retval = 1;
+			}
+		}
 
-    if (ap_fname != (char *)NULL) {
-      FREE(ap_fname);
+		if (ap_fname != (char *)NULL) {
+			FREE(ap_fname);
 
-      if (NULL != ap_file) {
-        if (0 != fclose(ap_file))
-          retval = 1;
-      }
-    }
-  }
+			if (NULL != ap_file) {
+				if (0 != fclose(ap_file))
+					retval = 1;
+			}
+		}
+	}
 
-  return retval;
+	return retval;
 }
 
 /*!
@@ -281,25 +294,29 @@ static int CommandCompassGenSigref(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsageCompassGenSigref(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,
-                        "usage: compass_gen_sigref [-h] [-b] [-i <prob-fname>] "
-                        "[-t \"<tau>\"] [-o <sigref-fname>]\n");
-  StreamMgr_print_error(streams, "  -h \t\t Prints the command usage.\n");
-  StreamMgr_print_error(streams,
-                        "  -i <fname>\t Read probabilistic info from fname.\n");
-  StreamMgr_print_error(
-      streams,
-      "  -t \"<tau>\"\t Read tau location from given assignment expression.\n");
-  StreamMgr_print_error(
-      streams,
-      "  -a <fname>\t Read atomic proposition list from file fname.\n");
-  StreamMgr_print_error(streams,
-                        "  -o <fname>\t Write result into file fname.\n");
-  StreamMgr_print_error(
-      streams, "  -b \t\t Beautify the XML output (default disabled).\n");
+static int UsageCompassGenSigref(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(
+		streams,
+		"usage: compass_gen_sigref [-h] [-b] [-i <prob-fname>] "
+		"[-t \"<tau>\"] [-o <sigref-fname>]\n");
+	StreamMgr_print_error(streams, "  -h \t\t Prints the command usage.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -i <fname>\t Read probabilistic info from fname.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -t \"<tau>\"\t Read tau location from given assignment expression.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -a <fname>\t Read atomic proposition list from file fname.\n");
+	StreamMgr_print_error(streams,
+			      "  -o <fname>\t Write result into file fname.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -b \t\t Beautify the XML output (default disabled).\n");
 
-  return 1;
+	return 1;
 }

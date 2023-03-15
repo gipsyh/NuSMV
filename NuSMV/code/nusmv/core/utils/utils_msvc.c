@@ -43,31 +43,33 @@
 
 #include <windows.h>
 
-int Utils_msvc_files_are_the_same(const char *fname1, const char *fname2) {
-  int res = 0;
-  HANDLE h1, h2;
-  h1 = CreateFile(fname1, GENERIC_READ, 0, NULL, OPEN_EXISTING,
-                  FILE_ATTRIBUTE_NORMAL, NULL);
+int Utils_msvc_files_are_the_same(const char *fname1, const char *fname2)
+{
+	int res = 0;
+	HANDLE h1, h2;
+	h1 = CreateFile(fname1, GENERIC_READ, 0, NULL, OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL, NULL);
 
-  h2 = CreateFile(fname2, GENERIC_READ, 0, NULL, OPEN_EXISTING,
-                  FILE_ATTRIBUTE_NORMAL, NULL);
+	h2 = CreateFile(fname2, GENERIC_READ, 0, NULL, OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL, NULL);
 
-  if (INVALID_HANDLE_VALUE != h1 && INVALID_HANDLE_VALUE != h2) {
-    BY_HANDLE_FILE_INFORMATION s1, s2;
-    BOOL b1 = GetFileInformationByHandle(h1, &s1);
-    BOOL b2 = GetFileInformationByHandle(h2, &s2);
+	if (INVALID_HANDLE_VALUE != h1 && INVALID_HANDLE_VALUE != h2) {
+		BY_HANDLE_FILE_INFORMATION s1, s2;
+		BOOL b1 = GetFileInformationByHandle(h1, &s1);
+		BOOL b2 = GetFileInformationByHandle(h2, &s2);
 
-    res = (b1 && b2 && s1.dwVolumeSerialNumber == s2.dwVolumeSerialNumber &&
-           s1.nFileIndexLow == s2.nFileIndexLow &&
-           s1.nFileIndexHigh == s2.nFileIndexHigh);
-  }
+		res = (b1 && b2 &&
+		       s1.dwVolumeSerialNumber == s2.dwVolumeSerialNumber &&
+		       s1.nFileIndexLow == s2.nFileIndexLow &&
+		       s1.nFileIndexHigh == s2.nFileIndexHigh);
+	}
 
-  if (INVALID_HANDLE_VALUE != h1) {
-    CloseHandle(h1);
-  }
-  if (INVALID_HANDLE_VALUE != h2) {
-    CloseHandle(h2);
-  }
-  /* one or both do not exist */
-  return res;
+	if (INVALID_HANDLE_VALUE != h1) {
+		CloseHandle(h1);
+	}
+	if (INVALID_HANDLE_VALUE != h2) {
+		CloseHandle(h2);
+	}
+	/* one or both do not exist */
+	return res;
 }

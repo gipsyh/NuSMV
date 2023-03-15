@@ -68,43 +68,44 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 static void rbc_inlining_cache_add_result(Rbc_Manager_t *, Rbc_t *f,
-                                          InlineResult_ptr res);
+					  InlineResult_ptr res);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-InlineResult_ptr RbcInline_apply_inlining(Rbc_Manager_t *rbcm, Rbc_t *f) {
-  const NuSMVEnv_ptr env = Rbc_ManagerGetEnvironment(rbcm);
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+InlineResult_ptr RbcInline_apply_inlining(Rbc_Manager_t *rbcm, Rbc_t *f)
+{
+	const NuSMVEnv_ptr env = Rbc_ManagerGetEnvironment(rbcm);
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  InlineResult_ptr ir;
+	InlineResult_ptr ir;
 #if RBC_ENABLE_INLINING_CACHE
-  ir = rbc_inlining_cache_lookup_result(rbcm, f);
-  if (NULL != ir) {
-    return InlineResult_ref(ir);
-  }
+	ir = rbc_inlining_cache_lookup_result(rbcm, f);
+	if (NULL != ir) {
+		return InlineResult_ref(ir);
+	}
 #endif
 
-  if (opt_verbose_level_gt(opts, 2)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Rbc: starting inlining ... \n");
-  }
+	if (opt_verbose_level_gt(opts, 2)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Rbc: starting inlining ... \n");
+	}
 
-  ir = InlineResult_create(rbcm, f);
+	ir = InlineResult_create(rbcm, f);
 
 #if RBC_ENABLE_INLINING_CACHE
-  /* ir gets referenced by this function */
-  rbc_inlining_cache_add_result(rbcm, f, ir); /* caches result */
+	/* ir gets referenced by this function */
+	rbc_inlining_cache_add_result(rbcm, f, ir); /* caches result */
 #endif
 
-  if (opt_verbose_level_gt(opts, 2)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "RBC: end of inlining\n");
-  }
+	if (opt_verbose_level_gt(opts, 2)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "RBC: end of inlining\n");
+	}
 
-  return ir;
+	return ir;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -114,38 +115,42 @@ InlineResult_ptr RbcInline_apply_inlining(Rbc_Manager_t *rbcm, Rbc_t *f) {
 /*!
   \brief Inline caching private service for content destruction
 */
-static void _destroy_cache_entry(void *key, void *_elem, void *arg) {
-  if (NULL != _elem) {
-    InlineResult_destroy(INLINE_RESULT(_elem));
-  }
+static void _destroy_cache_entry(void *key, void *_elem, void *arg)
+{
+	if (NULL != _elem) {
+		InlineResult_destroy(INLINE_RESULT(_elem));
+	}
 }
 
 /*!
   \brief Inline caching initialization
 */
-void rbc_inlining_cache_init(Rbc_Manager_t *rbcm) {
-  nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
-  nusmv_assert(NULL == rbcm->inlining_cache);
+void rbc_inlining_cache_init(Rbc_Manager_t *rbcm)
+{
+	nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
+	nusmv_assert(NULL == rbcm->inlining_cache);
 
-  rbcm->inlining_cache =
-      LRUCache_create(RBC_INLINE_CACHE_THREASHOLD, OAHash_pointer_eq_fun,
-                      OAHash_pointer_hash_fun, _destroy_cache_entry, NULL);
+	rbcm->inlining_cache = LRUCache_create(RBC_INLINE_CACHE_THREASHOLD,
+					       OAHash_pointer_eq_fun,
+					       OAHash_pointer_hash_fun,
+					       _destroy_cache_entry, NULL);
 }
 
 /*!
   \brief Inline caching deinitialization
 */
-void rbc_inlining_cache_quit(Rbc_Manager_t *rbcm) {
-  nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
+void rbc_inlining_cache_quit(Rbc_Manager_t *rbcm)
+{
+	nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
 
-  LRUCache_destroy(rbcm->inlining_cache);
-  rbcm->inlining_cache = NULL;
+	LRUCache_destroy(rbcm->inlining_cache);
+	rbcm->inlining_cache = NULL;
 }
 
-InlineResult_ptr rbc_inlining_cache_lookup_result(Rbc_Manager_t *rbcm,
-                                                  Rbc_t *f) {
-  nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
-  return INLINE_RESULT(LRUCache_lookup(rbcm->inlining_cache, f));
+InlineResult_ptr rbc_inlining_cache_lookup_result(Rbc_Manager_t *rbcm, Rbc_t *f)
+{
+	nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
+	return INLINE_RESULT(LRUCache_lookup(rbcm->inlining_cache, f));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -159,22 +164,23 @@ InlineResult_ptr rbc_inlining_cache_lookup_result(Rbc_Manager_t *rbcm,
   cache, caller keeps its ownership
 */
 static void rbc_inlining_cache_add_result(Rbc_Manager_t *rbcm, Rbc_t *f,
-                                          InlineResult_ptr res) {
-  InlineResult_ptr old;
-  nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
+					  InlineResult_ptr res)
+{
+	InlineResult_ptr old;
+	nusmv_assert((Rbc_Manager_t *)NULL != rbcm);
 
-  old = rbc_inlining_cache_lookup_result(rbcm, f);
-  if (res == old) {
-    /* alread cached */
-    return;
-  }
+	old = rbc_inlining_cache_lookup_result(rbcm, f);
+	if (res == old) {
+		/* alread cached */
+		return;
+	}
 
-  if (NULL != old) {
-    /* clear the old association */
-    InlineResult_destroy(old);
-  }
+	if (NULL != old) {
+		/* clear the old association */
+		InlineResult_destroy(old);
+	}
 
-  /* since we cache, the stored InlineResult gets referenced to
+	/* since we cache, the stored InlineResult gets referenced to
    * protect against multiple destruction */
-  LRUCache_insert(rbcm->inlining_cache, f, InlineResult_ref(res));
+	LRUCache_insert(rbcm->inlining_cache, f, InlineResult_ref(res));
 }

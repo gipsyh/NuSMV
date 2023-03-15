@@ -75,7 +75,7 @@
   Fairness is ignored
 */
 be_ptr Bmc_SBMCTableau_GetNoLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                                 const int k);
+				 const int k);
 
 /*!
   \brief Builds tableau for a single loop. This function takes
@@ -84,8 +84,8 @@ be_ptr Bmc_SBMCTableau_GetNoLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
 
 */
 be_ptr Bmc_SBMCTableau_GetSingleLoop(const BeFsm_ptr be_fsm,
-                                     const node_ptr ltl_wff, const int k,
-                                     const int l);
+				     const node_ptr ltl_wff, const int k,
+				     const int l);
 
 /*!
   \brief Builds tableau for all possible loops in \[l, k\[,
@@ -104,8 +104,8 @@ be_ptr Bmc_SBMCTableau_GetSingleLoop(const BeFsm_ptr be_fsm,
   Fairness is taken care of by adding it to the formula.
 */
 be_ptr Bmc_SBMCTableau_GetAllLoops(const BeFsm_ptr be_fsm,
-                                   const node_ptr ltl_wff, const int k,
-                                   const int l);
+				   const node_ptr ltl_wff, const int k,
+				   const int l);
 
 /*!
   \brief Builds a tableau that constraints state k to be equal to
@@ -120,7 +120,7 @@ be_ptr Bmc_SBMCTableau_GetAllLoops(const BeFsm_ptr be_fsm,
   \sa Bmc_Tableau_GetAllLoopsDisjunction
 */
 be_ptr Bmc_SBMCTableau_GetLoopCondition(const BeEnc_ptr be_enc, const int k,
-                                        const int l);
+					const int l);
 
 /**AutomaticEnd***************************************************************/
 

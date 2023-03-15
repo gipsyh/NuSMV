@@ -65,8 +65,8 @@ typedef struct ConjSet_TAG *ConjSet_ptr;
 
   \todo Missing description
 */
-#define CONJ_SET_CHECK_INSTANCE(self)                                          \
-  (nusmv_assert(CONJ_SET(self) != CONJ_SET(NULL)))
+#define CONJ_SET_CHECK_INSTANCE(self) \
+	(nusmv_assert(CONJ_SET(self) != CONJ_SET(NULL)))
 
 /**AutomaticStart*************************************************************/
 

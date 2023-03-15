@@ -58,17 +58,17 @@
 */
 
 typedef struct SatZchaff_TAG {
-  INHERITS_FROM(SatIncSolver);
+	INHERITS_FROM(SatIncSolver);
 
-  SAT_Manager zchaffSolver; /* actual instance of zchaff */
-  /* All input variables are represented by the  internal ones inside the
+	SAT_Manager zchaffSolver; /* actual instance of zchaff */
+	/* All input variables are represented by the  internal ones inside the
      SatZchaff. Bellow two hash table perform the convertion in both ways */
-  hash_ptr cnfVar2zchaffVar; /* converts CNF variable to internal variable */
-  hash_ptr zchaffVar2cnfVar; /* converts internal variable into CNF variable */
+	hash_ptr cnfVar2zchaffVar; /* converts CNF variable to internal variable */
+	hash_ptr zchaffVar2cnfVar; /* converts internal variable into CNF variable */
 
-  /* contains set of conflicting assumptions after using
+	/* contains set of conflicting assumptions after using
      SatMinisat_solve_permanent_group_assume */
-  Slist_ptr conflict;
+	Slist_ptr conflict;
 } SatZchaff;
 
 /**AutomaticStart*************************************************************/
@@ -81,7 +81,7 @@ typedef struct SatZchaff_TAG {
   \todo
 */
 void sat_zchaff_init(SatZchaff_ptr self, const NuSMVEnv_ptr env,
-                     const char *name);
+		     const char *name);
 
 /*!
   \methodof SatZchaff
@@ -106,21 +106,21 @@ int sat_zchaff_zchaffLiteral2cnfLiteral(SatZchaff_ptr self, int zchaffLiteral);
   \todo
 */
 void sat_zchaff_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                    SatSolverGroup group);
+		    SatSolverGroup group);
 
 /*!
   \methodof SatZchaff
   \todo
 */
 void sat_zchaff_set_polarity(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                             int polarity, SatSolverGroup group);
+			     int polarity, SatSolverGroup group);
 
 /*!
   \methodof SatZchaff
   \todo
 */
 void sat_zchaff_set_preferred_variables(const SatSolver_ptr self,
-                                        const Slist_ptr cnfVars);
+					const Slist_ptr cnfVars);
 
 /*!
   \methodof SatZchaff
@@ -152,27 +152,27 @@ SatSolverGroup sat_zchaff_create_group(const SatIncSolver_ptr self);
   \todo
 */
 void sat_zchaff_destroy_group(const SatIncSolver_ptr self,
-                              SatSolverGroup group);
+			      SatSolverGroup group);
 
 /*!
   \methodof SatZchaff
   \todo
 */
 void sat_zchaff_move_to_permanent_and_destroy_group(const SatIncSolver_ptr self,
-                                                    SatSolverGroup group);
+						    SatSolverGroup group);
 /*!
   \methodof SatZchaff
   \todo
 */
 SatSolverResult sat_zchaff_solve_groups(const SatIncSolver_ptr self,
-                                        const Olist_ptr groups);
+					const Olist_ptr groups);
 
 /*!
   \methodof SatZchaff
   \todo
 */
 SatSolverResult sat_zchaff_solve_without_groups(const SatIncSolver_ptr self,
-                                                const Olist_ptr groups);
+						const Olist_ptr groups);
 
 /*!
   \methodof SatZchaff
@@ -180,7 +180,7 @@ SatSolverResult sat_zchaff_solve_without_groups(const SatIncSolver_ptr self,
 */
 SatSolverResult
 sat_zchaff_solve_permanent_group_assume(const SatSolver_ptr self,
-                                        Slist_ptr assumption);
+					Slist_ptr assumption);
 
 Slist_ptr sat_zchaff_get_conflicts(const SatSolver_ptr);
 

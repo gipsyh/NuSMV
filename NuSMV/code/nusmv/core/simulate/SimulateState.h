@@ -63,8 +63,8 @@ typedef struct SimulateState_TAG *SimulateState_ptr;
 
   \todo Missing description
 */
-#define SIMULATE_STATE_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(SIMULATE_STATE(self) != SIMULATE_STATE(NULL)))
+#define SIMULATE_STATE_CHECK_INSTANCE(self) \
+	(nusmv_assert(SIMULATE_STATE(self) != SIMULATE_STATE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -83,8 +83,8 @@ typedef struct SimulateState_TAG *SimulateState_ptr;
   \sa SimulateState_destroy
 */
 SimulateState_ptr SimulateState_create(DDMgr_ptr const dd_mgr,
-                                       bdd_ptr const bdd,
-                                       TraceLabel const trace_label);
+				       bdd_ptr const bdd,
+				       TraceLabel const trace_label);
 
 /* Destructors ****************************************************************/
 
@@ -122,7 +122,7 @@ TraceLabel SimulateState_get_trace_label(SimulateState_ptr const self);
   Set all fields of the class
 */
 void SimulateState_set_all(SimulateState_ptr const self, bdd_ptr const state,
-                           TraceLabel const label);
+			   TraceLabel const label);
 
 /* Others *********************************************************************/
 
@@ -134,8 +134,8 @@ void SimulateState_set_all(SimulateState_ptr const self, bdd_ptr const state,
   already present
 */
 SimulateState_ptr SimulateState_set_in_env(NuSMVEnv_ptr const env,
-                                           bdd_ptr const bdd,
-                                           TraceLabel const trace_label);
+					   bdd_ptr const bdd,
+					   TraceLabel const trace_label);
 
 /**AutomaticEnd***************************************************************/
 

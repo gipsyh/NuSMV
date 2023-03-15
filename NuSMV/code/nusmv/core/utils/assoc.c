@@ -112,47 +112,54 @@ static enum st_retval assoc_get_key_aux(char *key, char *data, char *arg);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-hash_ptr new_assoc(void) {
-  return new_assoc_with_params((ST_PFICPCP)assoc_neq_fun,
-                               (ST_PFICPI)assoc_hash_fun);
+hash_ptr new_assoc(void)
+{
+	return new_assoc_with_params((ST_PFICPCP)assoc_neq_fun,
+				     (ST_PFICPI)assoc_hash_fun);
 }
 
-hash_ptr new_assoc_with_size(int initial_size) {
-  st_table *new_table = st_init_table_with_params(
-      (ST_PFICPCP)assoc_neq_fun, (ST_PFICPI)assoc_hash_fun, initial_size,
-      ASSOC_MAX_DENSITY, ASSOC_GROW_FACTOR, ASSOC_REORDER_FLAG);
-  if (new_table == (st_table *)NULL) {
-    error_unreachable_code_msg("new_assoc: Out of Memory\n");
-  }
+hash_ptr new_assoc_with_size(int initial_size)
+{
+	st_table *new_table = st_init_table_with_params(
+		(ST_PFICPCP)assoc_neq_fun, (ST_PFICPI)assoc_hash_fun,
+		initial_size, ASSOC_MAX_DENSITY, ASSOC_GROW_FACTOR,
+		ASSOC_REORDER_FLAG);
+	if (new_table == (st_table *)NULL) {
+		error_unreachable_code_msg("new_assoc: Out of Memory\n");
+	}
 
-  return ((hash_ptr)new_table);
+	return ((hash_ptr)new_table);
 }
 
-hash_ptr new_assoc_with_params(ST_PFICPCP compare_fun, ST_PFICPI hash_fun) {
-  st_table *new_table = st_init_table_with_params(
-      compare_fun, hash_fun, ASSOC_HASH_SIZE, ASSOC_MAX_DENSITY,
-      ASSOC_GROW_FACTOR, ASSOC_REORDER_FLAG);
-  if (new_table == (st_table *)NULL) {
-    error_unreachable_code_msg("new_assoc: Out of Memory\n");
-  }
+hash_ptr new_assoc_with_params(ST_PFICPCP compare_fun, ST_PFICPI hash_fun)
+{
+	st_table *new_table = st_init_table_with_params(
+		compare_fun, hash_fun, ASSOC_HASH_SIZE, ASSOC_MAX_DENSITY,
+		ASSOC_GROW_FACTOR, ASSOC_REORDER_FLAG);
+	if (new_table == (st_table *)NULL) {
+		error_unreachable_code_msg("new_assoc: Out of Memory\n");
+	}
 
-  return ((hash_ptr)new_table);
+	return ((hash_ptr)new_table);
 }
 
-hash_ptr new_assoc_string_key(void) {
-  st_table *new_table = st_init_table_with_params(
-      (ST_PFICPCP)assoc_string_key_neq_fun,
-      (ST_PFICPI)assoc_string_key_hash_fun, ASSOC_HASH_SIZE, ASSOC_MAX_DENSITY,
-      ASSOC_GROW_FACTOR, ASSOC_REORDER_FLAG);
+hash_ptr new_assoc_string_key(void)
+{
+	st_table *new_table = st_init_table_with_params(
+		(ST_PFICPCP)assoc_string_key_neq_fun,
+		(ST_PFICPI)assoc_string_key_hash_fun, ASSOC_HASH_SIZE,
+		ASSOC_MAX_DENSITY, ASSOC_GROW_FACTOR, ASSOC_REORDER_FLAG);
 
-  if (new_table == (st_table *)NULL) {
-    error_unreachable_code_msg("new_assoc_string_key: Out of Memory\n");
-  }
-  return ((hash_ptr)new_table);
+	if (new_table == (st_table *)NULL) {
+		error_unreachable_code_msg(
+			"new_assoc_string_key: Out of Memory\n");
+	}
+	return ((hash_ptr)new_table);
 }
 
-hash_ptr copy_assoc(hash_ptr hash) {
-  return (hash_ptr)st_copy((st_table *)hash);
+hash_ptr copy_assoc(hash_ptr hash)
+{
+	return (hash_ptr)st_copy((st_table *)hash);
 }
 
 /*!
@@ -164,33 +171,35 @@ hash_ptr copy_assoc(hash_ptr hash) {
   ocra/core/OcraComponent.c:oc_contract_assoc_copy_func
 */
 
-hash_ptr assoc_deep_copy(hash_ptr hash, ST_PFSR copy_fun) {
-  st_table *self = (st_table *)hash;
-  hash_ptr copy = st_init_table_with_params(
-      self->compare, self->hash, self->num_bins, self->max_density,
-      self->grow_factor, self->reorder_flag);
+hash_ptr assoc_deep_copy(hash_ptr hash, ST_PFSR copy_fun)
+{
+	st_table *self = (st_table *)hash;
+	hash_ptr copy = st_init_table_with_params(
+		self->compare, self->hash, self->num_bins, self->max_density,
+		self->grow_factor, self->reorder_flag);
 
-  st_foreach(self, copy_fun, (char *)copy);
+	st_foreach(self, copy_fun, (char *)copy);
 
-  return copy;
+	return copy;
 }
 
-node_ptr find_assoc(hash_ptr hash, node_ptr key) {
-  node_ptr data;
+node_ptr find_assoc(hash_ptr hash, node_ptr key)
+{
+	node_ptr data;
 
-  if (st_lookup((st_table *)hash, (char *)key, (char **)&data))
-    return (data);
-  else
-    return (Nil);
+	if (st_lookup((st_table *)hash, (char *)key, (char **)&data))
+		return (data);
+	else
+		return (Nil);
 }
 
-node_ptr assoc_get_keys(hash_ptr hash, NodeMgr_ptr nodemgr,
-                        boolean ignore_nils) {
-  Triple triple;
-  Triple_init(&triple, nodemgr, Nil, (node_ptr)ignore_nils);
+node_ptr assoc_get_keys(hash_ptr hash, NodeMgr_ptr nodemgr, boolean ignore_nils)
+{
+	Triple triple;
+	Triple_init(&triple, nodemgr, Nil, (node_ptr)ignore_nils);
 
-  st_foreach(hash, assoc_get_key_aux, (char *)&triple);
-  return NODE_PTR(Triple_get_second(&triple));
+	st_foreach(hash, assoc_get_key_aux, (char *)&triple);
+	return NODE_PTR(Triple_get_second(&triple));
 }
 
 /*!
@@ -201,17 +210,22 @@ node_ptr assoc_get_keys(hash_ptr hash, NodeMgr_ptr nodemgr,
 
 /* Inserts association key -> data. If the key has already been in the
    table then the old associated data is rewritten */
-void insert_assoc(hash_ptr hash, node_ptr key, node_ptr data) {
-  (void)st_insert((st_table *)hash, (char *)key, (char *)data);
+void insert_assoc(hash_ptr hash, node_ptr key, node_ptr data)
+{
+	(void)st_insert((st_table *)hash, (char *)key, (char *)data);
 }
 
-node_ptr remove_assoc(hash_ptr hash, node_ptr key) {
-  node_ptr data;
-  int tmp = st_delete((st_table *)hash, (char **)&key, (char **)&data);
-  return tmp ? data : Nil;
+node_ptr remove_assoc(hash_ptr hash, node_ptr key)
+{
+	node_ptr data;
+	int tmp = st_delete((st_table *)hash, (char **)&key, (char **)&data);
+	return tmp ? data : Nil;
 }
 
-void free_assoc(hash_ptr hash) { (void)st_free_table((st_table *)hash); }
+void free_assoc(hash_ptr hash)
+{
+	(void)st_free_table((st_table *)hash);
+}
 
 /*!
   \brief
@@ -219,25 +233,32 @@ void free_assoc(hash_ptr hash) { (void)st_free_table((st_table *)hash); }
 
 */
 
-static enum st_retval delete_entry(char *key, char *data, char *arg) {
-  return (ST_DELETE);
+static enum st_retval delete_entry(char *key, char *data, char *arg)
+{
+	return (ST_DELETE);
 }
 
-void clear_assoc(hash_ptr hash) { st_foreach(hash, delete_entry, NULL); }
-
-void clear_assoc_and_free_entries(hash_ptr hash, ST_PFSR fn) {
-  clear_assoc_and_free_entries_arg(hash, fn, NULL);
+void clear_assoc(hash_ptr hash)
+{
+	st_foreach(hash, delete_entry, NULL);
 }
 
-void clear_assoc_and_free_entries_arg(hash_ptr hash, ST_PFSR fn, char *arg) {
-  nusmv_assert(hash != NULL);
-  st_foreach(hash, fn, arg);
+void clear_assoc_and_free_entries(hash_ptr hash, ST_PFSR fn)
+{
+	clear_assoc_and_free_entries_arg(hash, fn, NULL);
 }
 
-void assoc_foreach(hash_ptr hash, ST_PFSR fn, char *arg) {
-  nusmv_assert((hash_ptr)NULL != hash);
+void clear_assoc_and_free_entries_arg(hash_ptr hash, ST_PFSR fn, char *arg)
+{
+	nusmv_assert(hash != NULL);
+	st_foreach(hash, fn, arg);
+}
 
-  st_foreach(hash, fn, arg);
+void assoc_foreach(hash_ptr hash, ST_PFSR fn, char *arg)
+{
+	nusmv_assert((hash_ptr)NULL != hash);
+
+	st_foreach(hash, fn, arg);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -249,8 +270,9 @@ void assoc_foreach(hash_ptr hash, ST_PFSR fn, char *arg) {
 
   \todo Missing description
 */
-static unsigned long assoc_hash_fun(node_ptr key, int size) {
-  return ((unsigned long)(key) % size);
+static unsigned long assoc_hash_fun(node_ptr key, int size)
+{
+	return ((unsigned long)(key) % size);
 }
 
 /*!
@@ -258,26 +280,27 @@ static unsigned long assoc_hash_fun(node_ptr key, int size) {
 
   Used to hash string keys.
 */
-static int assoc_string_key_hash_fun(node_ptr key, int size) {
-  int hash, i;
-  int len;
+static int assoc_string_key_hash_fun(node_ptr key, int size)
+{
+	int hash, i;
+	int len;
 
-  hash = 0;
-  len = strlen((const char *)key);
+	hash = 0;
+	len = strlen((const char *)key);
 
-  for (i = 0; i < len; ++i) {
-    hash += ((const char *)key)[i];
-    hash += (hash << 10);
-    hash ^= (hash >> 6);
-  }
-  hash += (hash << 3);
-  hash ^= (hash >> 11);
-  hash += (hash << 15);
+	for (i = 0; i < len; ++i) {
+		hash += ((const char *)key)[i];
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+	}
+	hash += (hash << 3);
+	hash ^= (hash >> 11);
+	hash += (hash << 15);
 
-  if (hash < 0)
-    hash = -hash;
+	if (hash < 0)
+		hash = -hash;
 
-  return (hash % size);
+	return (hash % size);
 }
 
 /*!
@@ -285,23 +308,30 @@ static int assoc_string_key_hash_fun(node_ptr key, int size) {
 
   \todo Missing description
 */
-static int assoc_eq_fun(node_ptr a1, node_ptr a2) { return ((a1) == (a2)); }
+static int assoc_eq_fun(node_ptr a1, node_ptr a2)
+{
+	return ((a1) == (a2));
+}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-static int assoc_neq_fun(node_ptr a1, node_ptr a2) { return ((a1) != (a2)); }
+static int assoc_neq_fun(node_ptr a1, node_ptr a2)
+{
+	return ((a1) != (a2));
+}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-static int assoc_string_key_eq_fun(node_ptr a1, node_ptr a2) {
-  return (assoc_eq_fun(a1, a2) ||
-          (strcmp((const char *)a1, (const char *)a2) == 0));
+static int assoc_string_key_eq_fun(node_ptr a1, node_ptr a2)
+{
+	return (assoc_eq_fun(a1, a2) ||
+		(strcmp((const char *)a1, (const char *)a2) == 0));
 }
 
 /*!
@@ -309,9 +339,10 @@ static int assoc_string_key_eq_fun(node_ptr a1, node_ptr a2) {
 
 
 */
-static int assoc_string_key_neq_fun(node_ptr a1, node_ptr a2) {
-  return (assoc_neq_fun(a1, a2) &&
-          (strcmp((const char *)a1, (const char *)a2) != 0));
+static int assoc_string_key_neq_fun(node_ptr a1, node_ptr a2)
+{
+	return (assoc_neq_fun(a1, a2) &&
+		(strcmp((const char *)a1, (const char *)a2) != 0));
 }
 
 /*!
@@ -327,15 +358,16 @@ static int assoc_string_key_neq_fun(node_ptr a1, node_ptr a2) {
 
   \todo Missing description
 */
-static enum st_retval assoc_get_key_aux(char *key, char *data, char *arg) {
-  Triple_ptr triple = TRIPLE(arg);
-  NodeMgr_ptr nodemgr = NODE_MGR(Triple_get_first(triple));
-  node_ptr res = NODE_PTR(Triple_get_second(triple));
-  boolean ignore_nils = (boolean)NODE_PTR(Triple_get_third(triple));
+static enum st_retval assoc_get_key_aux(char *key, char *data, char *arg)
+{
+	Triple_ptr triple = TRIPLE(arg);
+	NodeMgr_ptr nodemgr = NODE_MGR(Triple_get_first(triple));
+	node_ptr res = NODE_PTR(Triple_get_second(triple));
+	boolean ignore_nils = (boolean)NODE_PTR(Triple_get_third(triple));
 
-  if (!ignore_nils || data != (char *)NULL) {
-    Triple_set_second(triple, cons(nodemgr, (node_ptr)key, res));
-  }
+	if (!ignore_nils || data != (char *)NULL) {
+		Triple_set_second(triple, cons(nodemgr, (node_ptr)key, res));
+	}
 
-  return ST_CONTINUE;
+	return ST_CONTINUE;
 }

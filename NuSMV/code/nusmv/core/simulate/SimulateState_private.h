@@ -56,19 +56,19 @@
 */
 
 typedef struct SimulateState_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(Object);
+	/* this MUST stay on the top */
+	INHERITS_FROM(Object);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  DDMgr_ptr dd_mgr;
-  bdd_ptr bdd;
-  TraceLabel trace_label;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	DDMgr_ptr dd_mgr;
+	bdd_ptr bdd;
+	TraceLabel trace_label;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } SimulateState;
 
@@ -84,7 +84,7 @@ typedef struct SimulateState_TAG {
   \sa SimulateState_create
 */
 void simulate_state_init(SimulateState_ptr const self, DDMgr_ptr const dd_mgr,
-                         bdd_ptr const bdd, TraceLabel const trace_label);
+			 bdd_ptr const bdd, TraceLabel const trace_label);
 
 /*!
   \methodof SimulateState

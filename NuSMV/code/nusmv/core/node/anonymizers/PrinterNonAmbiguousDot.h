@@ -61,8 +61,9 @@ typedef struct PrinterNonAmbiguousDot_TAG *PrinterNonAmbiguousDot_ptr;
 
   \todo Missing description
 */
-#define PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self)                            \
-  (nusmv_assert(PRINTER_ANON_MAP_ENTRY(self) != PRINTER_ANON_MAP_ENTRY(NULL)))
+#define PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self)   \
+	(nusmv_assert(PRINTER_ANON_MAP_ENTRY(self) != \
+		      PRINTER_ANON_MAP_ENTRY(NULL)))
 
 /**AutomaticStart*************************************************************/
 

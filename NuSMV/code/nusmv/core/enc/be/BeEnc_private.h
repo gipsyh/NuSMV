@@ -246,71 +246,71 @@
 */
 
 typedef struct BeEnc_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(BoolEncClient);
+	/* this MUST stay on the top */
+	INHERITS_FROM(BoolEncClient);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* the boolean expr manager, that is in charge of actually allocate
+	/* the boolean expr manager, that is in charge of actually allocate
      be variables: */
-  Be_Manager_ptr be_mgr;
+	Be_Manager_ptr be_mgr;
 
-  /* the number of physical indices allocated from BE manager
+	/* the number of physical indices allocated from BE manager
      (which may be different from number of used physical index
      and number of logical indices) */
-  int phy_idx_capacity;
+	int phy_idx_capacity;
 
-  /* the maximum physical index already in the use. */
-  int max_used_phy_idx;
+	/* the maximum physical index already in the use. */
+	int max_used_phy_idx;
 
-  /* the number of logical indices which enough memory has been
+	/* the number of logical indices which enough memory has been
      allocated for. The number of logical indices in use equals
      the total size of untimed and all timed frames and is always
      less than this fields. Number of logical and physical indices
      may be different because every frozen var requires one
      physical and many logical indices. */
-  int log_idx_capacity;
+	int log_idx_capacity;
 
-  /* the amount of memory should be requested as an excess to
+	/* the amount of memory should be requested as an excess to
      optimize memory handling */
-  int grow_excess;
+	int grow_excess;
 
-  /* max time reached until now for the variables environment: */
-  int max_allocated_time;
+	/* max time reached until now for the variables environment: */
+	int max_allocated_time;
 
-  /* number of variables occurring in the untimed logical block */
-  int state_vars_num;
-  int frozen_vars_num;
-  int input_vars_num;
+	/* number of variables occurring in the untimed logical block */
+	int state_vars_num;
+	int frozen_vars_num;
+	int input_vars_num;
 
-  /* queue of physical indices that can be reused after a layer is
+	/* queue of physical indices that can be reused after a layer is
      removed: */
-  NodeList_ptr avail_phy_idx_queue;
+	NodeList_ptr avail_phy_idx_queue;
 
-  /* var name to corresponding be: */
-  hash_ptr name2be;
+	/* var name to corresponding be: */
+	hash_ptr name2be;
 
-  /* var logical index to name: */
-  node_ptr *index2name;
-  int index2name_size;
+	/* var logical index to name: */
+	node_ptr *index2name;
+	int index2name_size;
 
-  /* logical to physical indices map and viceversa:
+	/* logical to physical indices map and viceversa:
      the size of phy2log is phy_idx_capacity.
      the size of log2phy is log_idx_capacity.
    */
-  int *log2phy;
-  int *phy2log;
+	int *log2phy;
+	int *phy2log;
 
-  int *subst_array; /* Used by substitution operations */
-  int subst_array_size;
+	int *subst_array; /* Used by substitution operations */
+	int subst_array_size;
 
-  st_table *shift_hash; /* used to memoize shifting operations */
+	st_table *shift_hash; /* used to memoize shifting operations */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } BeEnc;
 
@@ -322,7 +322,7 @@ typedef struct BeEnc_TAG {
   \todo
 */
 void be_enc_init(BeEnc_ptr self, SymbTable_ptr symb_table,
-                 BoolEnc_ptr bool_enc);
+		 BoolEnc_ptr bool_enc);
 
 /*!
   \methodof BeEnc

@@ -58,10 +58,10 @@
 
 */
 typedef enum {
-  BMC_DUMP_NONE,
-  BMC_DUMP_DIMACS,
-  BMC_DUMP_DA_VINCI,
-  BMC_DUMP_GDL
+	BMC_DUMP_NONE,
+	BMC_DUMP_DIMACS,
+	BMC_DUMP_DA_VINCI,
+	BMC_DUMP_GDL
 } Bmc_DumpType;
 
 /*---------------------------------------------------------------------------*/
@@ -90,9 +90,9 @@ typedef enum {
   \se None
 */
 void Bmc_Dump_WriteProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
-                           Prop_ptr prop, const int k, const int loop,
-                           const Bmc_DumpType dump_type,
-                           const char *dump_fname_template);
+			   Prop_ptr prop, const int k, const int loop,
+			   const Bmc_DumpType dump_type,
+			   const char *dump_fname_template);
 
 /*!
   \brief Opens a new file named filename, than dumps the given
@@ -101,8 +101,8 @@ void Bmc_Dump_WriteProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
 
 */
 int Bmc_Dump_DimacsInvarProblemFilename(const BeEnc_ptr be_enc,
-                                        const Be_Cnf_ptr cnf,
-                                        const char *filename);
+					const Be_Cnf_ptr cnf,
+					const char *filename);
 
 /*!
   \brief Opens a new file named filename, than dumps the given
@@ -111,7 +111,7 @@ int Bmc_Dump_DimacsInvarProblemFilename(const BeEnc_ptr be_enc,
 
 */
 int Bmc_Dump_DimacsProblemFilename(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
-                                   const char *filename, const int k);
+				   const char *filename, const int k);
 
 /*!
   \brief Dumps the given invar problem in the given file
@@ -119,7 +119,7 @@ int Bmc_Dump_DimacsProblemFilename(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
   dimacsfile must be writable
 */
 void Bmc_Dump_DimacsInvarProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
-                                 FILE *dimacsfile);
+				 FILE *dimacsfile);
 
 /*!
   \brief Dumps the given LTL problem in the given file
@@ -127,7 +127,7 @@ void Bmc_Dump_DimacsInvarProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
   dimacsfile must be writable
 */
 void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
-                            const int k, FILE *dimacsfile);
+			    const int k, FILE *dimacsfile);
 
 /**AutomaticEnd***************************************************************/
 

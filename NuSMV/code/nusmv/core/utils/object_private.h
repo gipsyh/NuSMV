@@ -42,8 +42,8 @@
 #include "nusmv/core/utils/utils.h"
 
 typedef struct Object_TAG {
-  VIRTUAL void (*finalize)(Object_ptr self, void *arg);
-  VIRTUAL Object_ptr (*copy)(const Object_ptr self);
+	VIRTUAL void (*finalize)(Object_ptr self, void *arg);
+	VIRTUAL Object_ptr (*copy)(const Object_ptr self);
 } Object;
 
 /* ---------------------------------------------------------------------- */

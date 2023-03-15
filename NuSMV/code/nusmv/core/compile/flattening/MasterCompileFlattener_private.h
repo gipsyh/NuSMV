@@ -53,16 +53,16 @@
 */
 
 typedef struct MasterCompileFlattener_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(MasterNodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(MasterNodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } MasterCompileFlattener;
 
@@ -87,7 +87,7 @@ typedef struct MasterCompileFlattener_TAG {
   \sa MasterCompileFlattener_create
 */
 void master_compile_flattener_init(MasterCompileFlattener_ptr self,
-                                   const NuSMVEnv_ptr env);
+				   const NuSMVEnv_ptr env);
 
 /*!
   \methodof MasterCompileFlattener
@@ -151,9 +151,9 @@ void master_compile_flattener_deinit(MasterCompileFlattener_ptr self);
 */
 node_ptr
 master_compile_flattener_flatten(MasterCompileFlattener_ptr self,
-                                 SymbTable_ptr symb_table, hash_ptr def_hash,
-                                 node_ptr sexp, node_ptr context,
-                                 MasterCompileFlattener_def_mode def_mode);
+				 SymbTable_ptr symb_table, hash_ptr def_hash,
+				 node_ptr sexp, node_ptr context,
+				 MasterCompileFlattener_def_mode def_mode);
 
 /*!
   \methodof MasterCompileFlattener
@@ -168,8 +168,9 @@ master_compile_flattener_flatten(MasterCompileFlattener_ptr self,
    order to memoize previously computed definition expansion.
 */
 node_ptr master_compile_flattener_get_definition(
-    MasterCompileFlattener_ptr self, SymbTable_ptr symb_table,
-    hash_ptr def_hash, node_ptr name, MasterCompileFlattener_def_mode def_mode);
+	MasterCompileFlattener_ptr self, SymbTable_ptr symb_table,
+	hash_ptr def_hash, node_ptr name,
+	MasterCompileFlattener_def_mode def_mode);
 
 /*!
   \methodof MasterCompileFlattener
@@ -178,7 +179,7 @@ node_ptr master_compile_flattener_get_definition(
 
 */
 hash_ptr master_compile_flattener_get_def_hash(MasterCompileFlattener_ptr self,
-                                               SymbTable_ptr symb_table);
+					       SymbTable_ptr symb_table);
 
 #endif /* __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_PRIVATE_H__ \
         */

@@ -71,7 +71,7 @@
   \todo Missing description
 */
 typedef int (*PropDb_prop_create_and_add_method)(PropDb_ptr, SymbTable_ptr,
-                                                 node_ptr, Prop_Type);
+						 node_ptr, Prop_Type);
 
 /*!
   \brief \todo Missing synopsis
@@ -82,23 +82,23 @@ typedef void (*PropDb_verify_all_method)(const PropDb_ptr);
 
 /* The class itself. */
 typedef struct PropDb_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  array_t *prop_database; /* contained properties */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	array_t *prop_database; /* contained properties */
 
-  PropDb_PrintFmt print_fmt; /* print format */
+	PropDb_PrintFmt print_fmt; /* print format */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  /* int (*)(PropDb_ptr, SymbTable_ptr, node_ptr, Prop_Type) */
-  PropDb_prop_create_and_add_method prop_create_and_add;
-  /* void (*)(const PropDb_ptr) */
-  PropDb_verify_all_method verify_all;
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	/* int (*)(PropDb_ptr, SymbTable_ptr, node_ptr, Prop_Type) */
+	PropDb_prop_create_and_add_method prop_create_and_add;
+	/* void (*)(const PropDb_ptr) */
+	PropDb_verify_all_method verify_all;
 } PropDb;
 
 /* ---------------------------------------------------------------------- */
@@ -135,7 +135,7 @@ void prop_db_deinit(PropDb_ptr self);
 
 */
 int prop_db_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
-                                node_ptr spec, Prop_Type type);
+				node_ptr spec, Prop_Type type);
 
 /*!
   \methodof PropDb

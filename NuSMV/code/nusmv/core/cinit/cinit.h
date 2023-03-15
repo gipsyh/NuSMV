@@ -568,10 +568,10 @@ void NuSMVCore_set_batch_fun(void (*batch_fun)(NuSMVEnv_ptr));
   \sa NuSMVCore_add_command_line_option
 */
 void NuSMVCore_add_env_command_line_option(char *name, char *usage,
-                                           char *parameter, char *env_var,
-                                           boolean is_deprecated,
-                                           boolean is_public, char *dependency,
-                                           char *conflict);
+					   char *parameter, char *env_var,
+					   boolean is_deprecated,
+					   boolean is_public, char *dependency,
+					   char *conflict);
 
 /*!
   \brief Adds a command line option to the system.
@@ -611,9 +611,10 @@ void NuSMVCore_add_env_command_line_option(char *name, char *usage,
   \sa NuSMVCore_add_env_command_line_option
 */
 void NuSMVCore_add_command_line_option(
-    char *name, char *usage, char *parameter,
-    boolean (*check_and_apply)(OptsHandler_ptr, char *, NuSMVEnv_ptr),
-    boolean is_deprecated, boolean is_public, char *dependency, char *conflict);
+	char *name, char *usage, char *parameter,
+	boolean (*check_and_apply)(OptsHandler_ptr, char *, NuSMVEnv_ptr),
+	boolean is_deprecated, boolean is_public, char *dependency,
+	char *conflict);
 
 /*!
   \brief Initializes the NuSMVCore data. This  function has to be called

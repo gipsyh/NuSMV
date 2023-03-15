@@ -61,8 +61,8 @@ typedef struct DependencyCore_TAG *DependencyCore_ptr;
 
   \todo Missing description
 */
-#define DEPENDENCY_CORE_CHECK_INSTANCE(self)                                   \
-  (nusmv_assert(DEPENDENCY_CORE(self) != DEPENDENCY_CORE(NULL)))
+#define DEPENDENCY_CORE_CHECK_INSTANCE(self) \
+	(nusmv_assert(DEPENDENCY_CORE(self) != DEPENDENCY_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,7 +79,7 @@ typedef struct DependencyCore_TAG *DependencyCore_ptr;
   \sa DependencyCore_destroy
 */
 DependencyCore_ptr DependencyCore_create(const NuSMVEnv_ptr env,
-                                         const char *name);
+					 const char *name);
 
 /**AutomaticEnd***************************************************************/
 

@@ -75,8 +75,8 @@
    to achieve a similar result
 */
 node_ptr Compile_Util_symbol_from_expr(NuSMVEnv_ptr const env,
-                                       node_ptr const var, const char *prefix,
-                                       const char *suffix);
+				       node_ptr const var, const char *prefix,
+				       const char *suffix);
 
 /*!
   \brief Builds an internal representation for a given string.
@@ -113,7 +113,7 @@ node_ptr sym_intern(const NuSMVEnv_ptr env, const char *);
   \sa sym_intern
 */
 node_ptr sym_intern_from_ustring(const NuSMVEnv_ptr env,
-                                 const string_ptr _string);
+				 const string_ptr _string);
 
 /*!
   \brief Compares two names and returns true iff the names are
@@ -124,7 +124,7 @@ node_ptr sym_intern_from_ustring(const NuSMVEnv_ptr env,
    even independently on the NodeMgr the names were built with.
 */
 boolean sym_names_are_equal(const NuSMVEnv_ptr env, node_ptr name1,
-                            node_ptr name2);
+			    node_ptr name2);
 
 /*!
   \brief Simplifies the given property by exploiting
@@ -177,8 +177,8 @@ node_ptr Compile_remove_ltl_bop(const NuSMVEnv_ptr env, node_ptr prop);
    caller.
 */
 Set_t Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
-                                               const NodeList_ptr vars,
-                                               const NodeList_ptr vars_order);
+					       const NodeList_ptr vars,
+					       const NodeList_ptr vars_order);
 
 /**AutomaticEnd***************************************************************/
 

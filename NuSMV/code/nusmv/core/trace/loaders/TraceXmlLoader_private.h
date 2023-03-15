@@ -95,51 +95,51 @@
 */
 
 typedef struct TraceXmlLoader_TAG {
-  INHERITS_FROM(TraceLoader);
+	INHERITS_FROM(TraceLoader);
 
-  xmlParserCtxtPtr parser;
-  NuSMVEnv_ptr environment;
+	xmlParserCtxtPtr parser;
+	NuSMVEnv_ptr environment;
 
-  /* for xml attributes: */
-  /* int type; */
+	/* for xml attributes: */
+	/* int type; */
 
-  char *stream_buf;
-  char *trace_desc;
+	char *stream_buf;
+	char *trace_desc;
 
-  char *xml_filename;
+	char *xml_filename;
 
-  char *curr_symb; /* last parsed symbol */
-  char *curr_val;  /* contents of the text stream */
+	char *curr_symb; /* last parsed symbol */
+	char *curr_val; /* contents of the text stream */
 
-  char *curr_eq;   /* tmp equality buf */
-  Trace_ptr trace; /* trace under construction */
-  TraceIter step;  /* current step to put data into */
+	char *curr_eq; /* tmp equality buf */
+	Trace_ptr trace; /* trace under construction */
+	TraceIter step; /* current step to put data into */
 
-  /* parsing flags: */
-  TraceXmlTag curr_parsing;
-  boolean parse_error;
-  unsigned last_time;
+	/* parsing flags: */
+	TraceXmlTag curr_parsing;
+	boolean parse_error;
+	unsigned last_time;
 
-  boolean requires_value;
+	boolean requires_value;
 
-  /* preserve internal parser informations */
-  int nusmv_yylineno;
-  char *nusmv_input_file;
+	/* preserve internal parser informations */
+	int nusmv_yylineno;
+	char *nusmv_input_file;
 
-  NodeList_ptr loopback_states;
+	NodeList_ptr loopback_states;
 
-  /* a hash table to remember already reported
+	/* a hash table to remember already reported
      undeclared/wrongly-places symbols to avoid reporting them many
      times (this is meaningless if it is not an error to find such
      symbol) */
-  hash_ptr all_wrong_symbols;
+	hash_ptr all_wrong_symbols;
 
-  /* If true parsing halts when encounters undefined symbols */
-  boolean halt_on_undefined_symbols;
+	/* If true parsing halts when encounters undefined symbols */
+	boolean halt_on_undefined_symbols;
 
-  /* If true parsing halts when encounters a symbol in an
+	/* If true parsing halts when encounters a symbol in an
      inappropriate section */
-  boolean halt_on_wrong_section;
+	boolean halt_on_wrong_section;
 
 } TraceXmlLoader;
 
@@ -154,8 +154,8 @@ typedef struct TraceXmlLoader_TAG {
   \todo
 */
 void trace_xml_loader_init(TraceXmlLoader_ptr self, const char *xml_filename,
-                           boolean halt_on_undefined_symbols,
-                           boolean halt_on_wrong_section);
+			   boolean halt_on_undefined_symbols,
+			   boolean halt_on_wrong_section);
 
 /*!
   \methodof TraceXmlLoader
@@ -164,7 +164,7 @@ void trace_xml_loader_init(TraceXmlLoader_ptr self, const char *xml_filename,
 void trace_xml_loader_deinit(TraceXmlLoader_ptr self);
 
 Trace_ptr trace_xml_loader_load(TraceLoader_ptr loader, const SymbTable_ptr st,
-                                const NodeList_ptr symbols);
+				const NodeList_ptr symbols);
 
 /**AutomaticEnd***************************************************************/
 

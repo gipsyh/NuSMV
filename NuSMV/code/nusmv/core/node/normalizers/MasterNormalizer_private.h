@@ -53,7 +53,7 @@
 
 */
 node_ptr master_normalizer_normalize_node(MasterNormalizer_ptr self,
-                                          node_ptr n);
+					  node_ptr n);
 
 /**AutomaticEnd***************************************************************/
 

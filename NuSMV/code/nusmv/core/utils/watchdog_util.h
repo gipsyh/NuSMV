@@ -81,8 +81,8 @@ static NuSMVEnv_ptr watchdog_env;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE_WATCHDOG_LIBRARY
-#define WATCHDOG_INIT(env, name, period, action, options)                      \
-  watchdog_mod(name, period, action, options, env)
+#define WATCHDOG_INIT(env, name, period, action, options) \
+	watchdog_mod(name, period, action, options, env)
 #else
 #define WATCHDOG_INIT(env, name, period, action, options)
 #endif

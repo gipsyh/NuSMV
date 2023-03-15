@@ -115,8 +115,8 @@ typedef struct SymbType_TAG *SymbType_ptr;
 
   \todo Missing description
 */
-#define SYMB_TYPE_CHECK_INSTANCE(x)                                            \
-  (nusmv_assert(SYMB_TYPE(x) != SYMB_TYPE(NULL)))
+#define SYMB_TYPE_CHECK_INSTANCE(x) \
+	(nusmv_assert(SYMB_TYPE(x) != SYMB_TYPE(NULL)))
 
 /*!
   \brief Generic and symbolic encoding
@@ -140,36 +140,36 @@ typedef struct SymbType_TAG *SymbType_ptr;
 */
 
 typedef enum SymbTypeTag_TAG {
-  SYMB_TYPE_NONE,      /* no-type and no error. */
-  SYMB_TYPE_STATEMENT, /* for statements like assignements, INIT, TRANS etc */
-  SYMB_TYPE_BOOLEAN,
-  SYMB_TYPE_ENUM, /* an enumeration of values (includes ranges, i.e. -1..4) */
-  SYMB_TYPE_INTEGER, /* (infinite-precision) integer */
-  SYMB_TYPE_REAL,    /* (infinite-precision) rational */
-  SYMB_TYPE_NFUNCTION,
-  SYMB_TYPE_CONTINUOUS,
-  SYMB_TYPE_SIGNED_WORD,   /* word is like an arrary of booleans + signed
+	SYMB_TYPE_NONE, /* no-type and no error. */
+	SYMB_TYPE_STATEMENT, /* for statements like assignements, INIT, TRANS etc */
+	SYMB_TYPE_BOOLEAN,
+	SYMB_TYPE_ENUM, /* an enumeration of values (includes ranges, i.e. -1..4) */
+	SYMB_TYPE_INTEGER, /* (infinite-precision) integer */
+	SYMB_TYPE_REAL, /* (infinite-precision) rational */
+	SYMB_TYPE_NFUNCTION,
+	SYMB_TYPE_CONTINUOUS,
+	SYMB_TYPE_SIGNED_WORD, /* word is like an arrary of booleans + signed
                               arithmetic */
-  SYMB_TYPE_UNSIGNED_WORD, /* word is like an arrary of booleans + unsigned
+	SYMB_TYPE_UNSIGNED_WORD, /* word is like an arrary of booleans + unsigned
                               arithmetic */
-  SYMB_TYPE_WORDARRAY,     /* an array of words */
-  SYMB_TYPE_ARRAY,         /* an array */
-  SYMB_TYPE_SET_BOOL,      /* a set of boolean values */
-  SYMB_TYPE_SET_INT,       /* a set of integer values */
-  SYMB_TYPE_SET_SYMB,      /* a set of symbolic values */
-  SYMB_TYPE_SET_INT_SYMB,  /* a set of symbolic and integer values */
-  SYMB_TYPE_INTARRAY,      /* unbounded array with integer index */
-  SYMB_TYPE_ERROR,         /* indicates an error */
-  /* SYMB_TYPE_NONE must be the first and SYMB_TYPE_ERROR must be
+	SYMB_TYPE_WORDARRAY, /* an array of words */
+	SYMB_TYPE_ARRAY, /* an array */
+	SYMB_TYPE_SET_BOOL, /* a set of boolean values */
+	SYMB_TYPE_SET_INT, /* a set of integer values */
+	SYMB_TYPE_SET_SYMB, /* a set of symbolic values */
+	SYMB_TYPE_SET_INT_SYMB, /* a set of symbolic and integer values */
+	SYMB_TYPE_INTARRAY, /* unbounded array with integer index */
+	SYMB_TYPE_ERROR, /* indicates an error */
+	/* SYMB_TYPE_NONE must be the first and SYMB_TYPE_ERROR must be
      the last in the list
   */
 } SymbTypeTag;
 
 /* a set of constants to identify different enum-types */
 enum Enum_types {
-  ENUM_TYPE_PURE_INT,
-  ENUM_TYPE_PURE_SYMBOLIC,
-  ENUM_TYPE_INT_SYMBOLIC,
+	ENUM_TYPE_PURE_INT,
+	ENUM_TYPE_PURE_SYMBOLIC,
+	ENUM_TYPE_INT_SYMBOLIC,
 };
 
 /* Forward declaration */
@@ -226,7 +226,7 @@ typedef struct NFunction_TAG *NFunction_ptr;
   \sa SymbType_create_array, SymbType_destroy
 */
 SymbType_ptr SymbType_create(const NuSMVEnv_ptr env, SymbTypeTag tag,
-                             node_ptr body);
+			     node_ptr body);
 
 /*!
   \methodof SymbType
@@ -254,7 +254,7 @@ SymbType_ptr SymbType_create(const NuSMVEnv_ptr env, SymbTypeTag tag,
   \sa SymbType_destroy
 */
 SymbType_ptr SymbType_create_array(SymbType_ptr subtype, int lower_bound,
-                                   int upper_bound);
+				   int upper_bound);
 
 /*!
   \methodof SymbType
@@ -272,7 +272,7 @@ SymbType_ptr SymbType_create_array(SymbType_ptr subtype, int lower_bound,
   \sa SymbType_destroy
 */
 SymbType_ptr SymbType_create_nfunction(const NuSMVEnv_ptr env,
-                                       NFunction_ptr nfunction);
+				       NFunction_ptr nfunction);
 
 /* SymbType_create_from_node: use Compile_InstantiateType */
 
@@ -648,7 +648,7 @@ SymbType_ptr SymbType_get_intarray_subtype(const SymbType_ptr self);
   \sa  SymbType_sprint
 */
 void SymbType_print(const SymbType_ptr self, MasterPrinter_ptr printer,
-                    FILE *output_stream);
+		    FILE *output_stream);
 
 /*!
   \methodof SymbType
@@ -691,7 +691,7 @@ boolean SymbType_is_back_comp(const SymbType_ptr type);
    NOTE: only memory-shared types can be given to this function.
 */
 SymbType_ptr SymbType_get_greater(const SymbType_ptr type1,
-                                  const SymbType_ptr type2);
+				  const SymbType_ptr type2);
 
 /*!
   \methodof SymbType
@@ -750,7 +750,7 @@ SymbType_ptr SymbType_make_memory_shared(const SymbType_ptr self);
    NOTE: only memory-shared types can be given to this function.
 */
 SymbType_ptr SymbType_convert_right_to_left(SymbType_ptr leftType,
-                                            SymbType_ptr rightType);
+					    SymbType_ptr rightType);
 
 /*!
   \brief Returns the minimal type to which the both given types
@@ -761,7 +761,7 @@ SymbType_ptr SymbType_convert_right_to_left(SymbType_ptr leftType,
    function except for SYMB_TYPE_ARRAY which can be non-memory shared
 */
 SymbType_ptr SymbType_get_minimal_common(SymbType_ptr type1,
-                                         SymbType_ptr type2);
+					 SymbType_ptr type2);
 
 /*!
   \methodof SymbType

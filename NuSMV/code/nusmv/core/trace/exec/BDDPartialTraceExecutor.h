@@ -64,9 +64,9 @@ typedef struct BDDPartialTraceExecutor_TAG *BDDPartialTraceExecutor_ptr;
 
   \todo Missing description
 */
-#define BDD_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)                        \
-  (nusmv_assert(BDD_PARTIAL_TRACE_EXECUTOR(self) !=                            \
-                BDD_PARTIAL_TRACE_EXECUTOR(NULL)))
+#define BDD_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)   \
+	(nusmv_assert(BDD_PARTIAL_TRACE_EXECUTOR(self) != \
+		      BDD_PARTIAL_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 

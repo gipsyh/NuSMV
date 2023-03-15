@@ -80,22 +80,24 @@ static void flattener_base_finalize(Object_ptr object, void *dummy);
 /*---------------------------------------------------------------------------*/
 
 FlattenerBase_ptr FlattenerBase_create(const NuSMVEnv_ptr env, const char *name,
-                                       int low, size_t num) {
-  FlattenerBase_ptr self = ALLOC(FlattenerBase, 1);
-  FLATTENER_BASE_CHECK_INSTANCE(self);
+				       int low, size_t num)
+{
+	FlattenerBase_ptr self = ALLOC(FlattenerBase, 1);
+	FLATTENER_BASE_CHECK_INSTANCE(self);
 
-  flattener_base_init(self, env, name, low, num, false);
-  return self;
+	flattener_base_init(self, env, name, low, num, false);
+	return self;
 }
 
 VIRTUAL node_ptr FlattenerBase_flatten(FlattenerBase_ptr self,
-                                       SymbTable_ptr symb_table,
-                                       hash_ptr def_hash, node_ptr sexp,
-                                       node_ptr context,
-                                       MasterCompileFlattener_def_mode mode) {
-  FLATTENER_BASE_CHECK_INSTANCE(self);
+				       SymbTable_ptr symb_table,
+				       hash_ptr def_hash, node_ptr sexp,
+				       node_ptr context,
+				       MasterCompileFlattener_def_mode mode)
+{
+	FLATTENER_BASE_CHECK_INSTANCE(self);
 
-  return self->flatten(self, symb_table, def_hash, sexp, context, mode);
+	return self->flatten(self, symb_table, def_hash, sexp, context, mode);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -103,52 +105,58 @@ VIRTUAL node_ptr FlattenerBase_flatten(FlattenerBase_ptr self,
 /*---------------------------------------------------------------------------*/
 
 void flattener_base_init(FlattenerBase_ptr self, const NuSMVEnv_ptr env,
-                         const char *name, int low, size_t num,
-                         boolean can_handle_null) {
-  /* base class initialization */
-  node_walker_init(NODE_WALKER(self), env, name, low, num, can_handle_null);
+			 const char *name, int low, size_t num,
+			 boolean can_handle_null)
+{
+	/* base class initialization */
+	node_walker_init(NODE_WALKER(self), env, name, low, num,
+			 can_handle_null);
 
-  /* members initialization */
+	/* members initialization */
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = flattener_base_finalize;
-  OVERRIDE(FlattenerBase, flatten) = flattener_base_flatten;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = flattener_base_finalize;
+	OVERRIDE(FlattenerBase, flatten) = flattener_base_flatten;
 }
 
-void flattener_base_deinit(FlattenerBase_ptr self) {
-  /* members deinitialization */
+void flattener_base_deinit(FlattenerBase_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  node_walker_deinit(NODE_WALKER(self));
+	/* base class deinitialization */
+	node_walker_deinit(NODE_WALKER(self));
 }
 
 node_ptr flattener_base_flatten(FlattenerBase_ptr self,
-                                SymbTable_ptr symb_table, hash_ptr def_hash,
-                                node_ptr sexp, node_ptr context,
-                                MasterCompileFlattener_def_mode mode) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+				SymbTable_ptr symb_table, hash_ptr def_hash,
+				node_ptr sexp, node_ptr context,
+				MasterCompileFlattener_def_mode mode)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  ErrorMgr_internal_error(errmgr, "FlattenerBase: Pure virtual method flatten "
-                                  "not implemented\n");
-  return 0;
+	ErrorMgr_internal_error(errmgr,
+				"FlattenerBase: Pure virtual method flatten "
+				"not implemented\n");
+	return 0;
 }
 
 node_ptr flattener_base_throw_flatten(FlattenerBase_ptr self,
-                                      SymbTable_ptr symb_table,
-                                      hash_ptr def_hash, node_ptr sexp,
-                                      node_ptr context,
-                                      MasterCompileFlattener_def_mode mode) {
-  if (NodeWalker_can_handle(NODE_WALKER(self), sexp)) {
-    /* checks if self can handle the node without need of re-throw
+				      SymbTable_ptr symb_table,
+				      hash_ptr def_hash, node_ptr sexp,
+				      node_ptr context,
+				      MasterCompileFlattener_def_mode mode)
+{
+	if (NodeWalker_can_handle(NODE_WALKER(self), sexp)) {
+		/* checks if self can handle the node without need of re-throw
        to the master */
-    return FlattenerBase_flatten(self, symb_table, def_hash, sexp, context,
-                                 mode);
-  }
-  return master_compile_flattener_flatten(
-      MASTER_COMPILE_FLATTENER(NODE_WALKER(self)->master), symb_table, def_hash,
-      sexp, context, mode);
+		return FlattenerBase_flatten(self, symb_table, def_hash, sexp,
+					     context, mode);
+	}
+	return master_compile_flattener_flatten(
+		MASTER_COMPILE_FLATTENER(NODE_WALKER(self)->master), symb_table,
+		def_hash, sexp, context, mode);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -160,11 +168,12 @@ node_ptr flattener_base_throw_flatten(FlattenerBase_ptr self,
 
   Called by the class destructor
 */
-static void flattener_base_finalize(Object_ptr object, void *dummy) {
-  FlattenerBase_ptr self = FLATTENER_BASE(object);
+static void flattener_base_finalize(Object_ptr object, void *dummy)
+{
+	FlattenerBase_ptr self = FLATTENER_BASE(object);
 
-  flattener_base_deinit(self);
-  FREE(self);
+	flattener_base_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

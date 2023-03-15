@@ -45,16 +45,17 @@
 /*---------------------------------------------------------------------------*/
 
 static void print_array_type_rec(const NuSMVEnv_ptr env, FILE *out,
-                                 const node_ptr body);
+				 const node_ptr body);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 void print_array_type(const NuSMVEnv_ptr env, FILE *output_stream,
-                      const node_ptr body) {
-  nusmv_assert(ARRAY_TYPE == node_get_type(body));
-  print_array_type_rec(env, output_stream, body);
+		      const node_ptr body)
+{
+	nusmv_assert(ARRAY_TYPE == node_get_type(body));
+	print_array_type_rec(env, output_stream, body);
 }
 
 /*!
@@ -65,58 +66,59 @@ void print_array_type(const NuSMVEnv_ptr env, FILE *output_stream,
   \sa print_array_type
 */
 static void print_array_type_rec(const NuSMVEnv_ptr env, FILE *out,
-                                 const node_ptr body) {
-  const MasterPrinter_ptr wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+				 const node_ptr body)
+{
+	const MasterPrinter_ptr wffprint =
+		MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-  switch (node_get_type(body)) {
-  case ARRAY_TYPE:
-    fprintf(out, "array ");
-    print_array_type_rec(env, out, car(body));
-    fprintf(out, " of ");
-    print_array_type_rec(env, out, cdr(body));
-    break;
+	switch (node_get_type(body)) {
+	case ARRAY_TYPE:
+		fprintf(out, "array ");
+		print_array_type_rec(env, out, car(body));
+		fprintf(out, " of ");
+		print_array_type_rec(env, out, cdr(body));
+		break;
 
-  case TWODOTS:
-    print_node(wffprint, out, car(body));
-    fprintf(out, " .. ");
-    print_node(wffprint, out, cdr(body));
-    break;
+	case TWODOTS:
+		print_node(wffprint, out, car(body));
+		fprintf(out, " .. ");
+		print_node(wffprint, out, cdr(body));
+		break;
 
-  case BOOLEAN:
-    fprintf(out, "boolean");
-    break;
+	case BOOLEAN:
+		fprintf(out, "boolean");
+		break;
 
-  case UNSIGNED_WORD:
-    fprintf(out, "word[");
-    print_node(wffprint, out, car(body));
-    fprintf(out, "]");
-    break;
+	case UNSIGNED_WORD:
+		fprintf(out, "word[");
+		print_node(wffprint, out, car(body));
+		fprintf(out, "]");
+		break;
 
-  case INTEGER:
-    fprintf(out, "integer");
-    break;
+	case INTEGER:
+		fprintf(out, "integer");
+		break;
 
-  case REAL:
-    fprintf(out, "real");
-    break;
+	case REAL:
+		fprintf(out, "real");
+		break;
 
-  case SCALAR:
-    fprintf(out, "{ ");
-    print_array_type_rec(env, out, car(body));
-    fprintf(out, " }");
-    break;
+	case SCALAR:
+		fprintf(out, "{ ");
+		print_array_type_rec(env, out, car(body));
+		fprintf(out, " }");
+		break;
 
-  case CONS:
-    print_array_type_rec(env, out, car(body));
-    if (cdr(body) != Nil) {
-      fprintf(out, ", ");
-      print_array_type_rec(env, out, cdr(body));
-    }
-    break;
+	case CONS:
+		print_array_type_rec(env, out, car(body));
+		if (cdr(body) != Nil) {
+			fprintf(out, ", ");
+			print_array_type_rec(env, out, cdr(body));
+		}
+		break;
 
-  default:
-    print_node(wffprint, out, body);
-    break;
-  }
+	default:
+		print_node(wffprint, out, body);
+		break;
+	}
 }

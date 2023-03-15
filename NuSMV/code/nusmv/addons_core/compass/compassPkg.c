@@ -66,24 +66,29 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Compass_init(NuSMVEnv_ptr env) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void Compass_init(NuSMVEnv_ptr env)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Initializing the Compass package... \n");
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Initializing the Compass package... \n");
+	}
 }
 
-void Compass_reset(NuSMVEnv_ptr env) { UNUSED_PARAM(env); }
+void Compass_reset(NuSMVEnv_ptr env)
+{
+	UNUSED_PARAM(env);
+}
 
-void Compass_quit(NuSMVEnv_ptr env) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void Compass_quit(NuSMVEnv_ptr env)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Quitting the Compass package... \n");
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Quitting the Compass package... \n");
+	}
 }

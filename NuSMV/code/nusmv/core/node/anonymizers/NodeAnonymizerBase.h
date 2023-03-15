@@ -63,8 +63,8 @@ typedef struct NodeAnonymizerBase_TAG *NodeAnonymizerBase_ptr;
 
   \todo Missing description
 */
-#define NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self)                              \
-  (nusmv_assert(NODE_ANONYMIZER_BASE(self) != NODE_ANONYMIZER_BASE(NULL)))
+#define NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self) \
+	(nusmv_assert(NODE_ANONYMIZER_BASE(self) != NODE_ANONYMIZER_BASE(NULL)))
 
 /*!
   \brief The encoding of the printed map:
@@ -141,7 +141,7 @@ void NodeAnonymizerBase_destroy(NodeAnonymizerBase_ptr self);
   @param prefix must not be NULL
 */
 int NodeAnonymizerBase_map(NodeAnonymizerBase_ptr self, node_ptr id,
-                           const char *prefix);
+			   const char *prefix);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -152,7 +152,7 @@ int NodeAnonymizerBase_map(NodeAnonymizerBase_ptr self, node_ptr id,
   @param anonymous must be an id and not in the map back
 */
 int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self, node_ptr original,
-                                 node_ptr anonymous);
+				 node_ptr anonymous);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -161,7 +161,7 @@ int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self, node_ptr original,
   expr is not normalized
 */
 node_ptr NodeAnonymizerBase_map_expr(NodeAnonymizerBase_ptr self,
-                                     node_ptr expr);
+				     node_ptr expr);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -172,7 +172,7 @@ node_ptr NodeAnonymizerBase_map_expr(NodeAnonymizerBase_ptr self,
   @return the anonymized expression or NULL if an error occurred
 */
 node_ptr NodeAnonymizerBase_map_back(NodeAnonymizerBase_ptr self,
-                                     node_ptr expr);
+				     node_ptr expr);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -197,7 +197,7 @@ int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self, FILE *stream);
 
 */
 int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
-                                            FILE *stream);
+					    FILE *stream);
 
 /*!
   \brief Reads a map from a bimap, and merge it into self
@@ -207,7 +207,7 @@ int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
   id or if an anonymous id is already used in self
 */
 int NodeAnonymizer_read_map_from_bimap(NodeAnonymizerBase_ptr self,
-                                       BiMap_ptr map);
+				       BiMap_ptr map);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -227,7 +227,7 @@ size_t NodeAnonymizerBase_get_map_size(NodeAnonymizerBase_ptr self);
   id must be an id
 */
 boolean NodeAnonymizerBase_is_id_original(NodeAnonymizerBase_ptr self,
-                                          node_ptr id);
+					  node_ptr id);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -237,7 +237,7 @@ boolean NodeAnonymizerBase_is_id_original(NodeAnonymizerBase_ptr self,
   id must be an id
 */
 boolean NodeAnonymizerBase_is_id_anonymous(NodeAnonymizerBase_ptr self,
-                                           node_ptr id);
+					   node_ptr id);
 
 /*!
   \methodof NodeAnonymizerBase

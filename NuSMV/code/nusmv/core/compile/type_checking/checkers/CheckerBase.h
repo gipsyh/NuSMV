@@ -65,8 +65,8 @@ typedef struct CheckerBase_TAG *CheckerBase_ptr;
 
   \todo Missing description
 */
-#define CHECKER_BASE_CHECK_INSTANCE(self)                                      \
-  (nusmv_assert(CHECKER_BASE(self) != CHECKER_BASE(NULL)))
+#define CHECKER_BASE_CHECK_INSTANCE(self) \
+	(nusmv_assert(CHECKER_BASE(self) != CHECKER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -87,7 +87,7 @@ typedef struct CheckerBase_TAG *CheckerBase_ptr;
   \sa CheckerBase_can_handle
 */
 VIRTUAL SymbType_ptr CheckerBase_check_expr(CheckerBase_ptr self, node_ptr expr,
-                                            node_ptr context);
+					    node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

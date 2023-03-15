@@ -64,36 +64,37 @@
 */
 
 typedef struct TracePlugin_TAG {
-  INHERITS_FROM(Object);
+	INHERITS_FROM(Object);
 
-  char *desc; /* Short description of the plugin */
+	char *desc; /* Short description of the plugin */
 
-  /* current trace */
-  Trace_ptr trace;
+	/* current trace */
+	Trace_ptr trace;
 
-  /* options from the caller */
-  TraceOpt_ptr opt;
+	/* options from the caller */
+	TraceOpt_ptr opt;
 
-  /* used for filtering */
-  hash_ptr visibility_map;
+	/* used for filtering */
+	hash_ptr visibility_map;
 
-  /* used for obfuscation */
-  NodeAnonymizerBase_ptr anonymizer;
+	/* used for obfuscation */
+	NodeAnonymizerBase_ptr anonymizer;
 
-  /* ---------------------------------------------------------------------- */
-  /*     Virtual Methods                                                    */
-  /* ---------------------------------------------------------------------- */
+	/* ---------------------------------------------------------------------- */
+	/*     Virtual Methods                                                    */
+	/* ---------------------------------------------------------------------- */
 
-  /* action */
-  VIRTUAL int (*action)(const TracePlugin_ptr self);
+	/* action */
+	VIRTUAL int (*action)(const TracePlugin_ptr self);
 
-  /* protected virtual methods for printing */
-  VIRTUAL void (*print_symbol)(const TracePlugin_ptr self, node_ptr symbol);
+	/* protected virtual methods for printing */
+	VIRTUAL void (*print_symbol)(const TracePlugin_ptr self,
+				     node_ptr symbol);
 
-  VIRTUAL void (*print_list)(const TracePlugin_ptr self, node_ptr list);
+	VIRTUAL void (*print_list)(const TracePlugin_ptr self, node_ptr list);
 
-  VIRTUAL void (*print_assignment)(const TracePlugin_ptr self, node_ptr symbol,
-                                   node_ptr val);
+	VIRTUAL void (*print_assignment)(const TracePlugin_ptr self,
+					 node_ptr symbol, node_ptr val);
 } TracePlugin;
 
 /**AutomaticStart*************************************************************/
@@ -111,7 +112,7 @@ typedef struct TracePlugin_TAG {
 
 */
 VIRTUAL void TracePlugin_print_symbol(const TracePlugin_ptr self,
-                                      node_ptr symb);
+				      node_ptr symb);
 
 /*!
   \methodof TracePlugin
@@ -128,7 +129,7 @@ VIRTUAL void TracePlugin_print_list(const TracePlugin_ptr self, node_ptr list);
 
 */
 VIRTUAL void TracePlugin_print_assignment(const TracePlugin_ptr self,
-                                          node_ptr symb, node_ptr val);
+					  node_ptr symb, node_ptr val);
 
 /*!
   \methodof TracePlugin
@@ -161,7 +162,7 @@ void trace_plugin_print_list(const TracePlugin_ptr self, node_ptr list);
 
 */
 void trace_plugin_print_assignment(const TracePlugin_ptr self, node_ptr symb,
-                                   node_ptr val);
+				   node_ptr val);
 
 /*!
   \methodof TracePlugin

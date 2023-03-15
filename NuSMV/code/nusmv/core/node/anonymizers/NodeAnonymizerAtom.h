@@ -61,8 +61,8 @@ typedef struct NodeAnonymizerAtom_TAG *NodeAnonymizerAtom_ptr;
 
   \todo Missing description
 */
-#define NODE_ANONYMIZER_ATOM_CHECK_INSTANCE(self)                              \
-  (nusmv_assert(NODE_ANONYMIZER_ATOM(self) != NODE_ANONYMIZER_ATOM(NULL)))
+#define NODE_ANONYMIZER_ATOM_CHECK_INSTANCE(self) \
+	(nusmv_assert(NODE_ANONYMIZER_ATOM(self) != NODE_ANONYMIZER_ATOM(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,8 +79,8 @@ typedef struct NodeAnonymizerAtom_TAG *NodeAnonymizerAtom_ptr;
   \sa NodeAnonymizerAtom_destroy
 */
 NodeAnonymizerAtom_ptr NodeAnonymizerAtom_create(NuSMVEnv_ptr env,
-                                                 const char *default_prefix,
-                                                 size_t memoization_threshold);
+						 const char *default_prefix,
+						 size_t memoization_threshold);
 
 /*!
   \methodof NodeAnonymizerAtom

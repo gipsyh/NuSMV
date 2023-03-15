@@ -47,14 +47,14 @@
 */
 
 typedef enum LogicType_TAG {
-  EXP_FIRST = -1,
-  EXP_NONE = 0,
-  EXP_SIMPLE,
-  EXP_NEXT,
-  EXP_LTL,
-  EXP_CTL,
-  EXP_ERROR,
-  EXP_LAST
+	EXP_FIRST = -1,
+	EXP_NONE = 0,
+	EXP_SIMPLE,
+	EXP_NEXT,
+	EXP_LTL,
+	EXP_CTL,
+	EXP_ERROR,
+	EXP_LAST
 } LogicType;
 
 /*!
@@ -62,24 +62,24 @@ typedef enum LogicType_TAG {
 
 
 */
-#define LOGIC_RECOGNIZED_CHECK_INSTANCE(self)                                  \
-  nusmv_assert(self > EXP_FIRST && self < EXP_LAST);
+#define LOGIC_RECOGNIZED_CHECK_INSTANCE(self) \
+	nusmv_assert(self > EXP_FIRST && self < EXP_LAST);
 
 /*!
   \brief
 
 
 */
-#define LOGIC_RECOGNIZED_ASSERT_VALID(self)                                    \
-  nusmv_assert(self > EXP_FIRST && self < EXP_ERROR);
+#define LOGIC_RECOGNIZED_ASSERT_VALID(self) \
+	nusmv_assert(self > EXP_FIRST && self < EXP_ERROR);
 
 /*!
   \brief
 
 
 */
-#define LOGIC_RECOGNIZED_ASSERT_HAS_VALUE(self)                                \
-  nusmv_assert(self > EXP_NONE && self < EXP_ERROR);
+#define LOGIC_RECOGNIZED_ASSERT_HAS_VALUE(self) \
+	nusmv_assert(self > EXP_NONE && self < EXP_ERROR);
 
 /*!
   \struct MasterLogicRecognizer
@@ -102,8 +102,9 @@ typedef struct MasterLogicRecognizer_TAG *MasterLogicRecognizer_ptr;
 
   \todo Missing description
 */
-#define MASTER_LOGIC_RECOGNIZER_CHECK_INSTANCE(self)                           \
-  (nusmv_assert(MASTER_LOGIC_RECOGNIZER(self) != MASTER_LOGIC_RECOGNIZER(NULL)))
+#define MASTER_LOGIC_RECOGNIZER_CHECK_INSTANCE(self)   \
+	(nusmv_assert(MASTER_LOGIC_RECOGNIZER(self) != \
+		      MASTER_LOGIC_RECOGNIZER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -145,8 +146,8 @@ void MasterLogicRecognizer_destroy(MasterLogicRecognizer_ptr self);
   \todo
 */
 LogicType MasterLogicRecognizer_recognize(MasterLogicRecognizer_ptr self,
-                                          node_ptr expression,
-                                          node_ptr context);
+					  node_ptr expression,
+					  node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

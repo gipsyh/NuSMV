@@ -121,9 +121,9 @@ typedef DdGen dd_gen;
 */
 
 typedef enum DdDynVarOrderAction_TAG {
-  DD_DYN_VAR_ORDER_ACTION_DISABLE = 1,
-  DD_DYN_VAR_ORDER_ACTION_ENABLE,
-  DD_DYN_VAR_ORDER_ACTION_FORCE
+	DD_DYN_VAR_ORDER_ACTION_DISABLE = 1,
+	DD_DYN_VAR_ORDER_ACTION_ENABLE,
+	DD_DYN_VAR_ORDER_ACTION_FORCE
 } DdDynVarOrderAction;
 
 DdDynVarOrderAction Dd_action_str_to_enum(char *action);
@@ -315,7 +315,8 @@ char *Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define DEFAULT_REORDER REORDER_SIFT /* The default value in the CUDD package  \
+#define DEFAULT_REORDER \
+	REORDER_SIFT /* The default value in the CUDD package  \
                                       */
 
 /*!
@@ -323,7 +324,8 @@ char *Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define DEFAULT_MINSIZE 10 /* 10 = whatever (Verbatim from file cuddTable.c)   \
+#define DEFAULT_MINSIZE \
+	10 /* 10 = whatever (Verbatim from file cuddTable.c)   \
                             */
 
 /*!
@@ -331,16 +333,16 @@ char *Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define ADD_FOREACH_NODE(manager, f, gen, node)                                \
-  Cudd_ForeachNode(DDMgr_get_dd_manager(manager), f, gen, node)
+#define ADD_FOREACH_NODE(manager, f, gen, node) \
+	Cudd_ForeachNode(DDMgr_get_dd_manager(manager), f, gen, node)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_FOREACH_NODE(manager, f, gen, node)                                \
-  ADD_FOREACH_NODE(manager, f, gen, node)
+#define BDD_FOREACH_NODE(manager, f, gen, node) \
+	ADD_FOREACH_NODE(manager, f, gen, node)
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -372,7 +374,7 @@ void Dd_quit(NuSMVEnv_ptr env);
 
 */
 int Dd_dynamic_var_ordering(NuSMVEnv_ptr env, DDMgr_ptr dd,
-                            int dynOrderingMethod, DdDynVarOrderAction action);
+			    int dynOrderingMethod, DdDynVarOrderAction action);
 
 /*!
   \brief Prints the user flags of the cudd package so the user can
@@ -382,7 +384,7 @@ int Dd_dynamic_var_ordering(NuSMVEnv_ptr env, DDMgr_ptr dd,
   flags printed by this function
 */
 int Dd_set_bdd_parameters(NuSMVEnv_ptr env, DDMgr_ptr dd_manager,
-                          boolean showAfter);
+			  boolean showAfter);
 
 /*!
   \brief Applies function <code>f</code> to the list of BDD/ADD <code>l</code>.
@@ -671,7 +673,7 @@ int dd_dump_dot(DDMgr_ptr, int, dd_ptr *, const char **, const char **, FILE *);
   \sa dd_dump_davinci
 */
 int dd_dump_davinci(DDMgr_ptr, int, dd_ptr *, const char **, const char **,
-                    FILE *);
+		    FILE *);
 
 /*!
   \brief Converts an ADD to a BDD.
@@ -1807,7 +1809,7 @@ bdd_ptr bdd_compute_essentials(DDMgr_ptr dd, bdd_ptr b);
   \sa bdd_DumpBlifBody dd_dump_dot
 */
 int bdd_DumpBlif(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames, char **onames,
-                 char *mname, FILE *fp);
+		 char *mname, FILE *fp);
 
 /*!
   \brief Writes a blif body representing the argument BDDs.
@@ -1829,7 +1831,7 @@ int bdd_DumpBlif(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames, char **onames,
   \sa bdd_DumpBlif dd_dump_dot
 */
 int bdd_DumpBlifBody(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames,
-                     char **onames, FILE *fp);
+		     char **onames, FILE *fp);
 
 /*!
   \brief Determines whether f is less than or equal to g.
@@ -1854,7 +1856,7 @@ int bdd_leq(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
   \se None
 */
 bdd_ptr bdd_swap_variables(DDMgr_ptr dd, bdd_ptr f, bdd_ptr *x_varlist,
-                           bdd_ptr *y_varlist, int n);
+			   bdd_ptr *y_varlist, int n);
 
 /*!
   \brief Substitutes g for x_v in the BDD for f.

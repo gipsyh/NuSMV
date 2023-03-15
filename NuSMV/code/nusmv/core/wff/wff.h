@@ -275,6 +275,6 @@ node_ptr Wff_make_triggered(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
   The allowance of next is controlled by a flag.
 */
 boolean Wff_is_propositional(SymbTable_ptr symb_table, node_ptr wff,
-                             node_ptr context, boolean is_next_allowed);
+			     node_ptr context, boolean is_next_allowed);
 
 #endif /* __NUSMV_CORE_WFF_WFF_H__ */

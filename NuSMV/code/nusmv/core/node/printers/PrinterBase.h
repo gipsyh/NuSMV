@@ -63,8 +63,8 @@ typedef struct PrinterBase_TAG *PrinterBase_ptr;
 
   \todo Missing description
 */
-#define PRINTER_BASE_CHECK_INSTANCE(self)                                      \
-  (nusmv_assert(PRINTER_BASE(self) != PRINTER_BASE(NULL)))
+#define PRINTER_BASE_CHECK_INSTANCE(self) \
+	(nusmv_assert(PRINTER_BASE(self) != PRINTER_BASE(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -83,7 +83,7 @@ typedef struct PrinterBase_TAG *PrinterBase_ptr;
   \sa PrinterBase_can_handle
 */
 VIRTUAL int PrinterBase_print_node(PrinterBase_ptr self, node_ptr n,
-                                   int priority);
+				   int priority);
 
 /**AutomaticEnd***************************************************************/
 

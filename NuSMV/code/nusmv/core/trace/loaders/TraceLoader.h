@@ -75,8 +75,8 @@ typedef struct TraceLoader_TAG *TraceLoader_ptr;
 
   \todo Missing description
 */
-#define TRACE_LOADER_CHECK_INSTANCE(x)                                         \
-  (nusmv_assert(TRACE_LOADER(x) != TRACE_LOADER(NULL)))
+#define TRACE_LOADER_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_LOADER(x) != TRACE_LOADER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -91,8 +91,8 @@ typedef struct TraceLoader_TAG *TraceLoader_ptr;
 
 */
 VIRTUAL Trace_ptr TraceLoader_load_trace(const TraceLoader_ptr self,
-                                         SymbTable_ptr st,
-                                         NodeList_ptr symbols);
+					 SymbTable_ptr st,
+					 NodeList_ptr symbols);
 
 /*!
   \methodof TraceLoader

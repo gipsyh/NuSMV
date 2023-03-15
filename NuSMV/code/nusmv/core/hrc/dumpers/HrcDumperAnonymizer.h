@@ -62,8 +62,9 @@ typedef struct HrcDumperAnonymizer_TAG *HrcDumperAnonymizer_ptr;
 
   \todo Missing description
 */
-#define HRC_DUMPER_ANONYMIZER_CHECK_INSTANCE(self)                             \
-  (nusmv_assert(HRC_DUMPER_ANONYMIZER(self) != HRC_DUMPER_ANONYMIZER(NULL)))
+#define HRC_DUMPER_ANONYMIZER_CHECK_INSTANCE(self)   \
+	(nusmv_assert(HRC_DUMPER_ANONYMIZER(self) != \
+		      HRC_DUMPER_ANONYMIZER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -81,7 +82,7 @@ typedef struct HrcDumperAnonymizer_TAG *HrcDumperAnonymizer_ptr;
 */
 HrcDumperAnonymizer_ptr
 HrcDumperAnonymizer_create(const NuSMVEnv_ptr env, FILE *fout,
-                           NodeAnonymizerBase_ptr anonymizer);
+			   NodeAnonymizerBase_ptr anonymizer);
 
 /*!
   \methodof HrcDumperAnonymizer

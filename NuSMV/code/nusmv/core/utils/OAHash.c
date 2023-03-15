@@ -76,28 +76,29 @@ static const size_t dummy = (~0ULL);
 */
 
 static inline OAHashIter oa_hash_iter_validate(const OAHash_ptr self,
-                                               OAHashIter index) {
-  OAEntry *table = self->table;
-  OAEntry *ep;
+					       OAHashIter index)
+{
+	OAEntry *table = self->table;
+	OAEntry *ep;
 
-  if (index > self->mask) {
-    return index;
-  }
+	if (index > self->mask) {
+		return index;
+	}
 
-  ep = &(table[index]);
+	ep = &(table[index]);
 
-  while (((void *)NULL == ep->key) || (ep->key == (void *)dummy)) {
-    ++index;
+	while (((void *)NULL == ep->key) || (ep->key == (void *)dummy)) {
+		++index;
 
-    if (index > self->mask) {
-      /* Reached the end of the array */
-      return index;
-    }
+		if (index > self->mask) {
+			/* Reached the end of the array */
+			return index;
+		}
 
-    ep = &(table[index]);
-  }
+		ep = &(table[index]);
+	}
 
-  return index;
+	return index;
 }
 
 /*!
@@ -107,55 +108,56 @@ static inline OAHashIter oa_hash_iter_validate(const OAHash_ptr self,
 */
 
 static inline OAEntry *oa_hash_lookup(OAHash_ptr self, const void *key,
-                                      const size_t hash) {
-  OAEntry *ep = (OAEntry *)NULL;
-  OAEntry *result = (OAEntry *)NULL;
+				      const size_t hash)
+{
+	OAEntry *ep = (OAEntry *)NULL;
+	OAEntry *result = (OAEntry *)NULL;
 
-  size_t i = hash & self->mask;
-  size_t perturb;
+	size_t i = hash & self->mask;
+	size_t perturb;
 
-  ep = &(self->table[i]);
+	ep = &(self->table[i]);
 
-  /* If the slot is not set or the key matches */
-  if (((void *)NULL == ep->key) || (ep->key == key)) {
-    /* Thats it, we can reuse this entry if available or create a new
+	/* If the slot is not set or the key matches */
+	if (((void *)NULL == ep->key) || (ep->key == key)) {
+		/* Thats it, we can reuse this entry if available or create a new
        one in this position */
-    return ep;
-  }
+		return ep;
+	}
 
-  if (ep->key == (void *)dummy) {
-    result = ep;
-  } else {
-    if ((ep->hash == hash) &&
-        (self->key_eq_fun(ep->key, key, self->custom_arg))) {
-      return ep;
-    }
+	if (ep->key == (void *)dummy) {
+		result = ep;
+	} else {
+		if ((ep->hash == hash) &&
+		    (self->key_eq_fun(ep->key, key, self->custom_arg))) {
+			return ep;
+		}
 
-    result = (OAEntry *)NULL;
-  }
+		result = (OAEntry *)NULL;
+	}
 
-  /* In the loop, key == &dummy is by far (factor of 100s) the
+	/* In the loop, key == &dummy is by far (factor of 100s) the
      least likely outcome, so test for that last. */
-  for (perturb = hash;; perturb >>= PERTURB_SHIFT) {
-    i = (i << 2) + i + perturb + 1;
-    ep = &(self->table[i & self->mask]);
+	for (perturb = hash;; perturb >>= PERTURB_SHIFT) {
+		i = (i << 2) + i + perturb + 1;
+		ep = &(self->table[i & self->mask]);
 
-    if ((void *)NULL == ep->key)
-      return (OAEntry *)NULL == result ? ep : result;
+		if ((void *)NULL == ep->key)
+			return (OAEntry *)NULL == result ? ep : result;
 
-    if ((ep->key == key) ||
-        ((ep->hash == hash) && (ep->key != (void *)dummy) &&
-         (self->key_eq_fun(ep->key, key, self->custom_arg)))) {
-      return ep;
-    }
+		if ((ep->key == key) ||
+		    ((ep->hash == hash) && (ep->key != (void *)dummy) &&
+		     (self->key_eq_fun(ep->key, key, self->custom_arg)))) {
+			return ep;
+		}
 
-    if (ep->key == (void *)dummy && (OAEntry *)NULL == result) {
-      result = ep;
-    }
-  }
+		if (ep->key == (void *)dummy && (OAEntry *)NULL == result) {
+			result = ep;
+		}
+	}
 
-  error_unreachable_code();
-  return (OAEntry *)NULL;
+	error_unreachable_code();
+	return (OAEntry *)NULL;
 }
 
 /*!
@@ -166,10 +168,11 @@ static inline OAEntry *oa_hash_lookup(OAHash_ptr self, const void *key,
 */
 
 static inline void oa_hash_clean_entry(const OAHash_ptr self, void *key,
-                                       void *value) {
-  if (NULL != self->free_entry_fun) {
-    self->free_entry_fun(key, value, self->free_fun_arg);
-  }
+				       void *value)
+{
+	if (NULL != self->free_entry_fun) {
+		self->free_entry_fun(key, value, self->free_fun_arg);
+	}
 }
 
 /*!
@@ -179,47 +182,49 @@ static inline void oa_hash_clean_entry(const OAHash_ptr self, void *key,
 */
 
 static inline boolean oa_hash_insert(OAHash_ptr self, const void *key,
-                                     const size_t hash, const void *value) {
-  boolean exists = false;
-  OAEntry *ep;
+				     const size_t hash, const void *value)
+{
+	boolean exists = false;
+	OAEntry *ep;
 
-  if (key == (void *)dummy) {
-    error_unreachable_code_msg("Inserting key that conflicts with dummy value");
-  }
+	if (key == (void *)dummy) {
+		error_unreachable_code_msg(
+			"Inserting key that conflicts with dummy value");
+	}
 
-  ep = oa_hash_lookup(self, key, hash);
+	ep = oa_hash_lookup(self, key, hash);
 
-  if (ep == NULL) {
-    error_unreachable_code();
-  }
+	if (ep == NULL) {
+		error_unreachable_code();
+	}
 
-  /* We are replacing a key -> value entry*/
-  if ((ep->key != (void *)NULL) && (ep->key != (void *)dummy)) {
-    void *old_value = ep->value;
-    void *old_key = ep->key;
+	/* We are replacing a key -> value entry*/
+	if ((ep->key != (void *)NULL) && (ep->key != (void *)dummy)) {
+		void *old_value = ep->value;
+		void *old_key = ep->key;
 
-    ep->hash = hash;
-    ep->value = (void *)value;
-    ep->key = (void *)key;
+		ep->hash = hash;
+		ep->value = (void *)value;
+		ep->key = (void *)key;
 
-    oa_hash_clean_entry(self, old_key, old_value);
-    exists = true;
-  }
-  /* We have a new entry */
-  else {
-    if (ep->key == NULL) {
-      self->fill++;
-    } else {
-      assert(ep->key == (void *)dummy);
-    }
+		oa_hash_clean_entry(self, old_key, old_value);
+		exists = true;
+	}
+	/* We have a new entry */
+	else {
+		if (ep->key == NULL) {
+			self->fill++;
+		} else {
+			assert(ep->key == (void *)dummy);
+		}
 
-    ep->key = (void *)key;
-    ep->hash = hash;
-    ep->value = (void *)value;
-    self->used++;
-  }
+		ep->key = (void *)key;
+		ep->hash = hash;
+		ep->value = (void *)value;
+		self->used++;
+	}
 
-  return exists;
+	return exists;
 }
 
 /*!
@@ -230,31 +235,33 @@ static inline boolean oa_hash_insert(OAHash_ptr self, const void *key,
 */
 
 static inline void oa_hash_resize_clean(OAHash_ptr self, const void *key,
-                                        const size_t hash, const void *value) {
-  size_t i;
-  size_t perturb;
-  size_t mask = self->mask;
-  OAEntry *ep0 = self->table;
-  OAEntry *ep;
+					const size_t hash, const void *value)
+{
+	size_t i;
+	size_t perturb;
+	size_t mask = self->mask;
+	OAEntry *ep0 = self->table;
+	OAEntry *ep;
 
-  i = hash & mask;
+	i = hash & mask;
 
-  ep = &ep0[i];
+	ep = &ep0[i];
 
-  for (perturb = hash; (void *)NULL != ep->key; perturb >>= PERTURB_SHIFT) {
-    i = (i << 2) + i + perturb + 1;
-    ep = &ep0[i & mask];
-  }
+	for (perturb = hash; (void *)NULL != ep->key;
+	     perturb >>= PERTURB_SHIFT) {
+		i = (i << 2) + i + perturb + 1;
+		ep = &ep0[i & mask];
+	}
 
-  /* "self" uses already the new array: we can assert that all entries
+	/* "self" uses already the new array: we can assert that all entries
      are clean */
-  assert((void *)NULL == ep->value);
+	assert((void *)NULL == ep->value);
 
-  self->fill++;
-  ep->key = (void *)key;
-  ep->hash = hash;
-  ep->value = (void *)value;
-  self->used++;
+	self->fill++;
+	ep->key = (void *)key;
+	ep->hash = hash;
+	ep->value = (void *)value;
+	self->used++;
 }
 
 /*!
@@ -263,68 +270,70 @@ static inline void oa_hash_resize_clean(OAHash_ptr self, const void *key,
   Resizes the OAHash table if necessary
 */
 
-static inline void oa_hash_resize(OAHash_ptr self, const size_t minused) {
-  size_t newsize;
-  OAEntry *old_table;
-  OAEntry *new_table;
-  OAEntry *ep;
-  boolean allocated = false;
-  OAEntry small_copy[OA_HASH_MINSIZE];
-  size_t i;
+static inline void oa_hash_resize(OAHash_ptr self, const size_t minused)
+{
+	size_t newsize;
+	OAEntry *old_table;
+	OAEntry *new_table;
+	OAEntry *ep;
+	boolean allocated = false;
+	OAEntry small_copy[OA_HASH_MINSIZE];
+	size_t i;
 
-  /* Find the smallest table size > minused. */
-  for (newsize = OA_HASH_MINSIZE; newsize <= minused && newsize > 0;
-       newsize <<= 1)
-    ;
+	/* Find the smallest table size > minused. */
+	for (newsize = OA_HASH_MINSIZE; newsize <= minused && newsize > 0;
+	     newsize <<= 1)
+		;
 
-  old_table = self->table;
-  allocated = (old_table != self->small_table);
+	old_table = self->table;
+	allocated = (old_table != self->small_table);
 
-  if (OA_HASH_MINSIZE == newsize) {
-    /* A large table is shrinking, or we can't get any smaller. */
-    new_table = self->small_table;
+	if (OA_HASH_MINSIZE == newsize) {
+		/* A large table is shrinking, or we can't get any smaller. */
+		new_table = self->small_table;
 
-    if (new_table == old_table) {
-      if (self->fill == self->used) {
-        /* We don't need any operation */
-        return;
-      }
+		if (new_table == old_table) {
+			if (self->fill == self->used) {
+				/* We don't need any operation */
+				return;
+			}
 
-      nusmv_assert(self->fill > self->used);
-      memcpy(small_copy, old_table, sizeof(small_copy));
-      old_table = small_copy;
-    }
-  } else {
-    new_table = ALLOC(OAEntry, newsize);
-  }
+			nusmv_assert(self->fill > self->used);
+			memcpy(small_copy, old_table, sizeof(small_copy));
+			old_table = small_copy;
+		}
+	} else {
+		new_table = ALLOC(OAEntry, newsize);
+	}
 
-  nusmv_assert(old_table != new_table);
+	nusmv_assert(old_table != new_table);
 
-  /* Prepare the "self" instance for the new resized table */
-  self->table = new_table;
-  self->mask = newsize - 1;
-  memset(new_table, 0, sizeof(OAEntry) * newsize);
-  self->used = 0;
-  i = self->fill;
-  self->fill = 0;
+	/* Prepare the "self" instance for the new resized table */
+	self->table = new_table;
+	self->mask = newsize - 1;
+	memset(new_table, 0, sizeof(OAEntry) * newsize);
+	self->used = 0;
+	i = self->fill;
+	self->fill = 0;
 
-  /* Copy old values in the new table */
-  for (ep = old_table; i > 0; ep++) {
-    if ((void *)NULL != ep->key &&
-        ep->key != (void *)dummy) { /* active entry */
-      --i;
-      oa_hash_resize_clean(self, ep->key, ep->hash, ep->value);
-    } else if ((void *)NULL != ep->key) { /* dummy entry */
-      --i;
-      assert(ep->key == (void *)dummy);
-    }
-    /* else key == value == NULL:  nothing to do */
-  }
+	/* Copy old values in the new table */
+	for (ep = old_table; i > 0; ep++) {
+		if ((void *)NULL != ep->key &&
+		    ep->key != (void *)dummy) { /* active entry */
+			--i;
+			oa_hash_resize_clean(self, ep->key, ep->hash,
+					     ep->value);
+		} else if ((void *)NULL != ep->key) { /* dummy entry */
+			--i;
+			assert(ep->key == (void *)dummy);
+		}
+		/* else key == value == NULL:  nothing to do */
+	}
 
-  /* The table is NOT the small_table (which is pre-allocated) */
-  if (allocated) {
-    FREE(old_table);
-  }
+	/* The table is NOT the small_table (which is pre-allocated) */
+	if (allocated) {
+		FREE(old_table);
+	}
 }
 
 /*---------------------------------------------------------------------------*/
@@ -332,201 +341,222 @@ static inline void oa_hash_resize(OAHash_ptr self, const size_t minused) {
 /*---------------------------------------------------------------------------*/
 
 OAHash_ptr OAHash_create(OA_HASH_EQ_FUN key_eq_fun,
-                         OA_HASH_HASH_FUN key_hash_fun,
-                         OA_HASH_FREE_FUN free_entry_fun, void *custom_arg) {
-  OAHash_ptr self = ALLOC(OAHash, 1);
-  OA_HASH_CHECK_INSTANCE(self);
-  nusmv_assert(NULL != key_hash_fun);
-  nusmv_assert(NULL != key_eq_fun);
+			 OA_HASH_HASH_FUN key_hash_fun,
+			 OA_HASH_FREE_FUN free_entry_fun, void *custom_arg)
+{
+	OAHash_ptr self = ALLOC(OAHash, 1);
+	OA_HASH_CHECK_INSTANCE(self);
+	nusmv_assert(NULL != key_hash_fun);
+	nusmv_assert(NULL != key_eq_fun);
 
-  oa_hash_init(self, key_eq_fun, key_hash_fun, free_entry_fun, custom_arg);
-  return self;
+	oa_hash_init(self, key_eq_fun, key_hash_fun, free_entry_fun,
+		     custom_arg);
+	return self;
 }
 
-OAHash_ptr OAHash_copy(const OAHash_ptr self) {
-  OAHash_ptr copy = ALLOC(OAHash, 1);
+OAHash_ptr OAHash_copy(const OAHash_ptr self)
+{
+	OAHash_ptr copy = ALLOC(OAHash, 1);
 
-  OA_HASH_CHECK_INSTANCE(self);
-  OA_HASH_CHECK_INSTANCE(copy);
+	OA_HASH_CHECK_INSTANCE(self);
+	OA_HASH_CHECK_INSTANCE(copy);
 
-  copy->fill = self->fill;
-  copy->used = self->used;
-  copy->mask = self->mask;
+	copy->fill = self->fill;
+	copy->used = self->used;
+	copy->mask = self->mask;
 
-  copy->table = copy->small_table;
+	copy->table = copy->small_table;
 
-  if (self->table != self->small_table) {
-    copy->table = ALLOC(OAEntry, self->mask + 1);
-  }
+	if (self->table != self->small_table) {
+		copy->table = ALLOC(OAEntry, self->mask + 1);
+	}
 
-  copy->table =
-      memcpy(copy->table, self->table, (self->mask + 1) * sizeof(OAEntry));
+	copy->table = memcpy(copy->table, self->table,
+			     (self->mask + 1) * sizeof(OAEntry));
 
-  copy->key_eq_fun = self->key_eq_fun;
-  copy->key_hash_fun = self->key_hash_fun;
-  copy->free_entry_fun = self->free_entry_fun;
+	copy->key_eq_fun = self->key_eq_fun;
+	copy->key_hash_fun = self->key_hash_fun;
+	copy->free_entry_fun = self->free_entry_fun;
 
-  copy->custom_arg = self->custom_arg;
-  copy->free_fun_arg = copy->free_fun_arg;
+	copy->custom_arg = self->custom_arg;
+	copy->free_fun_arg = copy->free_fun_arg;
 
-  return copy;
+	return copy;
 }
 
-boolean OAHash_insert(OAHash_ptr self, const void *key, const void *value) {
-  boolean res = false;
-  size_t n_used = self->used;
-  size_t hash_code = self->key_hash_fun(key, self->custom_arg);
+boolean OAHash_insert(OAHash_ptr self, const void *key, const void *value)
+{
+	boolean res = false;
+	size_t n_used = self->used;
+	size_t hash_code = self->key_hash_fun(key, self->custom_arg);
 
-  /* NULL keys are NOT admitted */
-  nusmv_assert((void *)NULL != key);
+	/* NULL keys are NOT admitted */
+	nusmv_assert((void *)NULL != key);
 
-  res = oa_hash_insert(self, key, hash_code, value);
+	res = oa_hash_insert(self, key, hash_code, value);
 
-  if ((self->used > n_used && self->fill * 3 >= (self->mask + 1) * 2)) {
-    /* We need to resize. Quadriply if the size is less than 50000,
+	if ((self->used > n_used && self->fill * 3 >= (self->mask + 1) * 2)) {
+		/* We need to resize. Quadriply if the size is less than 50000,
        double otherwise. */
-    oa_hash_resize(self, (self->used > 50000 ? 2 : 4) * self->used);
-  }
+		oa_hash_resize(self, (self->used > 50000 ? 2 : 4) * self->used);
+	}
 
-  return res;
+	return res;
 }
 
-void *OAHash_lookup(OAHash_ptr self, const void *key) {
-  size_t hash_code = self->key_hash_fun(key, self->custom_arg);
-  OAEntry *entry = oa_hash_lookup(self, key, hash_code);
+void *OAHash_lookup(OAHash_ptr self, const void *key)
+{
+	size_t hash_code = self->key_hash_fun(key, self->custom_arg);
+	OAEntry *entry = oa_hash_lookup(self, key, hash_code);
 
-  nusmv_assert((OAEntry *)NULL != entry);
+	nusmv_assert((OAEntry *)NULL != entry);
 
-  return entry->value;
+	return entry->value;
 }
 
-boolean OAHash_has_key(OAHash_ptr self, const void *key) {
-  size_t hash_code = self->key_hash_fun(key, self->custom_arg);
-  OAEntry *entry = oa_hash_lookup(self, key, hash_code);
+boolean OAHash_has_key(OAHash_ptr self, const void *key)
+{
+	size_t hash_code = self->key_hash_fun(key, self->custom_arg);
+	OAEntry *entry = oa_hash_lookup(self, key, hash_code);
 
-  nusmv_assert((OAEntry *)NULL != entry);
+	nusmv_assert((OAEntry *)NULL != entry);
 
-  return (entry->key != (void *)NULL && entry->key != (void *)dummy);
+	return (entry->key != (void *)NULL && entry->key != (void *)dummy);
 }
 
-boolean OAHash_remove(OAHash_ptr self, const void *key) {
-  OAEntry *ep;
-  void *old_value;
-  void *old_key;
+boolean OAHash_remove(OAHash_ptr self, const void *key)
+{
+	OAEntry *ep;
+	void *old_value;
+	void *old_key;
 
-  size_t hash = self->key_hash_fun(key, self->custom_arg);
+	size_t hash = self->key_hash_fun(key, self->custom_arg);
 
-  ep = oa_hash_lookup(self, key, hash);
+	ep = oa_hash_lookup(self, key, hash);
 
-  nusmv_assert((OAEntry *)NULL != ep);
+	nusmv_assert((OAEntry *)NULL != ep);
 
-  if ((void *)NULL == ep->key || ep->key == (void *)dummy) {
-    return false;
-  }
+	if ((void *)NULL == ep->key || ep->key == (void *)dummy) {
+		return false;
+	}
 
-  old_key = ep->key;
-  old_value = ep->value;
+	old_key = ep->key;
+	old_value = ep->value;
 
-  ep->key = (void *)dummy;
-  ep->value = (void *)NULL;
-  ep->hash = 0;
+	ep->key = (void *)dummy;
+	ep->value = (void *)NULL;
+	ep->hash = 0;
 
-  self->used--;
+	self->used--;
 
-  oa_hash_clean_entry(self, old_key, old_value);
+	oa_hash_clean_entry(self, old_key, old_value);
 
-  return true;
+	return true;
 }
 
-size_t OAHash_get_size(const OAHash_ptr self) { return self->used; }
-
-OAHashIter OAHash_get_first_iter(const OAHash_ptr self) {
-  return oa_hash_iter_validate(self, 0);
+size_t OAHash_get_size(const OAHash_ptr self)
+{
+	return self->used;
 }
 
-OAHashIter OAHash_iter_next(const OAHash_ptr self, const OAHashIter iter) {
-  return oa_hash_iter_validate(self, iter + 1);
+OAHashIter OAHash_get_first_iter(const OAHash_ptr self)
+{
+	return oa_hash_iter_validate(self, 0);
 }
 
-boolean OAHash_iter_is_end(const OAHash_ptr self, const OAHashIter iter) {
-  return iter > self->mask;
+OAHashIter OAHash_iter_next(const OAHash_ptr self, const OAHashIter iter)
+{
+	return oa_hash_iter_validate(self, iter + 1);
+}
+
+boolean OAHash_iter_is_end(const OAHash_ptr self, const OAHashIter iter)
+{
+	return iter > self->mask;
 }
 
 void OAHash_iter_values(const OAHash_ptr self, const OAHashIter iter,
-                        void **key, void **value) {
-  OAEntry *ep;
+			void **key, void **value)
+{
+	OAEntry *ep;
 
-  nusmv_assert(!OAHash_iter_is_end(self, iter));
+	nusmv_assert(!OAHash_iter_is_end(self, iter));
 
-  ep = &(self->table[iter]);
+	ep = &(self->table[iter]);
 
-  if ((void **)NULL != key) {
-    *key = ep->key;
-  }
+	if ((void **)NULL != key) {
+		*key = ep->key;
+	}
 
-  if ((void **)NULL != value) {
-    *value = ep->value;
-  }
+	if ((void **)NULL != value) {
+		*value = ep->value;
+	}
 }
 
-void OAHash_clear(OAHash_ptr self) {
-  size_t i;
-  OAEntry *ep;
+void OAHash_clear(OAHash_ptr self)
+{
+	size_t i;
+	OAEntry *ep;
 
-  for (i = oa_hash_iter_validate(self, 0); i <= self->mask;
-       i = oa_hash_iter_validate(self, i + 1)) {
+	for (i = oa_hash_iter_validate(self, 0); i <= self->mask;
+	     i = oa_hash_iter_validate(self, i + 1)) {
+		ep = &(self->table[i]);
 
-    ep = &(self->table[i]);
+		oa_hash_clean_entry(self, ep->key, ep->value);
+	}
 
-    oa_hash_clean_entry(self, ep->key, ep->value);
-  }
+	if (self->table != self->small_table) {
+		FREE(self->table);
+		self->table = self->small_table;
+	}
 
-  if (self->table != self->small_table) {
-    FREE(self->table);
-    self->table = self->small_table;
-  }
-
-  memset(self->table, 0, OA_HASH_MINSIZE * sizeof(OAEntry));
-  self->fill = 0;
-  self->used = 0;
-  self->mask = OA_HASH_MINSIZE - 1;
+	memset(self->table, 0, OA_HASH_MINSIZE * sizeof(OAEntry));
+	self->fill = 0;
+	self->used = 0;
+	self->mask = OA_HASH_MINSIZE - 1;
 }
 
-void OAHash_destroy(OAHash_ptr self) {
-  OA_HASH_CHECK_INSTANCE(self);
+void OAHash_destroy(OAHash_ptr self)
+{
+	OA_HASH_CHECK_INSTANCE(self);
 
-  oa_hash_deinit(self);
-  FREE(self);
+	oa_hash_deinit(self);
+	FREE(self);
 }
 
-boolean OAHash_pointer_eq_fun(const void *k1, const void *k2, void *arg) {
-  return k1 == k2;
+boolean OAHash_pointer_eq_fun(const void *k1, const void *k2, void *arg)
+{
+	return k1 == k2;
 }
 
-size_t OAHash_pointer_hash_fun(const void *k1, void *arg) { return (size_t)k1; }
-
-boolean OAHash_string_eq_fun(const void *k1, const void *k2, void *arg) {
-  return (k1 == k2) || (strcmp((const char *)k1, (const char *)k2) == 0);
+size_t OAHash_pointer_hash_fun(const void *k1, void *arg)
+{
+	return (size_t)k1;
 }
 
-size_t OAHash_string_hash_fun(const void *k1, void *arg) {
-  int i;
-  int len;
-  size_t hash;
+boolean OAHash_string_eq_fun(const void *k1, const void *k2, void *arg)
+{
+	return (k1 == k2) || (strcmp((const char *)k1, (const char *)k2) == 0);
+}
 
-  hash = 0;
-  len = strlen((const char *)k1);
+size_t OAHash_string_hash_fun(const void *k1, void *arg)
+{
+	int i;
+	int len;
+	size_t hash;
 
-  for (i = 0; i < len; ++i) {
-    hash += ((const char *)k1)[i];
-    hash += (hash << 10);
-    hash ^= (hash >> 6);
-  }
-  hash += (hash << 3);
-  hash ^= (hash >> 11);
-  hash += (hash << 15);
+	hash = 0;
+	len = strlen((const char *)k1);
 
-  return hash;
+	for (i = 0; i < len; ++i) {
+		hash += ((const char *)k1)[i];
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+	}
+	hash += (hash << 3);
+	hash ^= (hash >> 11);
+	hash += (hash << 15);
+
+	return hash;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -542,22 +572,23 @@ size_t OAHash_string_hash_fun(const void *k1, void *arg) {
 */
 
 void oa_hash_init(OAHash_ptr self, OA_HASH_EQ_FUN key_eq_fun,
-                  OA_HASH_HASH_FUN key_hash_fun,
-                  OA_HASH_FREE_FUN free_entry_fun, void *custom_arg) {
-  /* members initialization */
-  self->fill = 0;
-  self->used = 0;
-  self->mask = OA_HASH_MINSIZE - 1;
-  self->table = self->small_table;
+		  OA_HASH_HASH_FUN key_hash_fun,
+		  OA_HASH_FREE_FUN free_entry_fun, void *custom_arg)
+{
+	/* members initialization */
+	self->fill = 0;
+	self->used = 0;
+	self->mask = OA_HASH_MINSIZE - 1;
+	self->table = self->small_table;
 
-  memset(self->table, 0, OA_HASH_MINSIZE * sizeof(OAEntry));
+	memset(self->table, 0, OA_HASH_MINSIZE * sizeof(OAEntry));
 
-  self->key_eq_fun = key_eq_fun;
-  self->key_hash_fun = key_hash_fun;
-  self->free_entry_fun = free_entry_fun;
+	self->key_eq_fun = key_eq_fun;
+	self->key_hash_fun = key_hash_fun;
+	self->free_entry_fun = free_entry_fun;
 
-  self->custom_arg = custom_arg;
-  self->free_fun_arg = custom_arg;
+	self->custom_arg = custom_arg;
+	self->free_fun_arg = custom_arg;
 }
 
 /*!
@@ -568,26 +599,28 @@ void oa_hash_init(OAHash_ptr self, OA_HASH_EQ_FUN key_eq_fun,
   \sa OAHash_destroy
 */
 
-void oa_hash_deinit(OAHash_ptr self) {
-  /* members deinitialization */
+void oa_hash_deinit(OAHash_ptr self)
+{
+	/* members deinitialization */
 
-  /* If needed, destroy all keys and values using the provided
+	/* If needed, destroy all keys and values using the provided
      free_entry_fun */
-  if (NULL != self->free_entry_fun) {
-    size_t i;
+	if (NULL != self->free_entry_fun) {
+		size_t i;
 
-    for (i = 0; i <= self->mask; ++i) {
-      if ((void *)NULL != self->table[i].key &&
-          self->table[i].key != (void *)dummy) {
-        self->free_entry_fun(self->table[i].key, self->table[i].value,
-                             self->free_fun_arg);
-      }
-    }
-  }
+		for (i = 0; i <= self->mask; ++i) {
+			if ((void *)NULL != self->table[i].key &&
+			    self->table[i].key != (void *)dummy) {
+				self->free_entry_fun(self->table[i].key,
+						     self->table[i].value,
+						     self->free_fun_arg);
+			}
+		}
+	}
 
-  if (self->small_table != self->table) {
-    FREE(self->table);
-  }
+	if (self->small_table != self->table) {
+		FREE(self->table);
+	}
 }
 
 /*---------------------------------------------------------------------------*/

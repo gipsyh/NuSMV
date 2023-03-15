@@ -54,245 +54,269 @@ static Number qnumber2number(QNumber *t);
  * Exported functions
  *****************************************************************************/
 
-Number BigNumber_bit_complement(Number *n) {
-  QNumber *org = (number2qnumber(*n));
-  QNumber value = BVQNumber_bit_complement(org);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_bit_complement(Number *n)
+{
+	QNumber *org = (number2qnumber(*n));
+	QNumber value = BVQNumber_bit_complement(org);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_twos_complement(Number *n, int width) {
-  const QNumber *org;
-  QNumber value;
-  QNumber *nnumber;
+Number BigNumber_twos_complement(Number *n, int width)
+{
+	const QNumber *org;
+	QNumber value;
+	QNumber *nnumber;
 
-  nusmv_assert(width > 0);
+	nusmv_assert(width > 0);
 
-  org = (number2qnumber(*n));
-  value = BVQNumber_twos_complement(org, width);
-  nnumber = QNumber_copy_to_heap(&value);
+	org = (number2qnumber(*n));
+	value = BVQNumber_twos_complement(org, width);
+	nnumber = QNumber_copy_to_heap(&value);
 
-  return qnumber2number(nnumber);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_bit_and(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  QNumber value = BVQNumber_bit_and(orgl, orgr);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_bit_and(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	QNumber value = BVQNumber_bit_and(orgl, orgr);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_bit_or(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  QNumber value = BVQNumber_bit_or(orgl, orgr);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_bit_or(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	QNumber value = BVQNumber_bit_or(orgl, orgr);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_bit_xor(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  QNumber value = BVQNumber_bit_xor(orgl, orgr);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_bit_xor(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	QNumber value = BVQNumber_bit_xor(orgl, orgr);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_bit_left_shift(Number *number, int amount) {
-  const QNumber *org;
-  QNumber value;
-  QNumber *nnumber;
+Number BigNumber_bit_left_shift(Number *number, int amount)
+{
+	const QNumber *org;
+	QNumber value;
+	QNumber *nnumber;
 
-  nusmv_assert(amount >= 0);
-  org = (number2qnumber(*number));
-  value = BVQNumber_bit_left_shift(org, amount);
-  nnumber = QNumber_copy_to_heap(&value);
+	nusmv_assert(amount >= 0);
+	org = (number2qnumber(*number));
+	value = BVQNumber_bit_left_shift(org, amount);
+	nnumber = QNumber_copy_to_heap(&value);
 
-  return qnumber2number(nnumber);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_bit_right_shift(Number *number, int amount) {
+Number BigNumber_bit_right_shift(Number *number, int amount)
+{
+	const QNumber *org;
+	QNumber value;
+	QNumber *nnumber;
 
-  const QNumber *org;
-  QNumber value;
-  QNumber *nnumber;
+	nusmv_assert(amount >= 0);
 
-  nusmv_assert(amount >= 0);
+	org = (number2qnumber(*number));
+	value = BVQNumber_bit_right_shift(org, amount);
+	nnumber = QNumber_copy_to_heap(&value);
 
-  org = (number2qnumber(*number));
-  value = BVQNumber_bit_right_shift(org, amount);
-  nnumber = QNumber_copy_to_heap(&value);
-
-  return qnumber2number(nnumber);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_pow2(int widht) {
-  QNumber value;
-  QNumber *nnumber;
+Number BigNumber_pow2(int widht)
+{
+	QNumber value;
+	QNumber *nnumber;
 
-  nusmv_assert(widht >= 0);
-  value = BVQNumber_pow2(widht);
+	nusmv_assert(widht >= 0);
+	value = BVQNumber_pow2(widht);
 
-  nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+	nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_max_unsigned_int(int widht) {
-  QNumber value;
-  QNumber one;
-  QNumber *nnumber;
+Number BigNumber_max_unsigned_int(int widht)
+{
+	QNumber value;
+	QNumber one;
+	QNumber *nnumber;
 
-  nusmv_assert(widht >= 0);
+	nusmv_assert(widht >= 0);
 
-  value = BVQNumber_pow2(widht);
-  one = QNumber_from_long(1);
-  QNumber_operator_self_minus(&value, &one);
-  nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+	value = BVQNumber_pow2(widht);
+	one = QNumber_from_long(1);
+	QNumber_operator_self_minus(&value, &one);
+	nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_make_number_from_long(long n) {
-  QNumber value = QNumber_from_long(n);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_make_number_from_long(long n)
+{
+	QNumber value = QNumber_from_long(n);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
 boolean BigNumber_to_unsigned_long_long(Number *number,
-                                        unsigned long long *target) {
-  QNumber *org = (number2qnumber(*number));
+					unsigned long long *target)
+{
+	QNumber *org = (number2qnumber(*number));
 
-  nusmv_assert(target != (unsigned long long *)NULL);
+	nusmv_assert(target != (unsigned long long *)NULL);
 
-  if (!QNumber_big(org)) {
-    long t;
-    int b = BVQNumber_to_long(org, &t);
-    nusmv_assert(b);
-    *target = (unsigned long long)t;
-    return b;
-  } else {
-    unsigned long long ull;
-    char *str;
-    char *err;
+	if (!QNumber_big(org)) {
+		long t;
+		int b = BVQNumber_to_long(org, &t);
+		nusmv_assert(b);
+		*target = (unsigned long long)t;
+		return b;
+	} else {
+		unsigned long long ull;
+		char *str;
+		char *err;
 
-    str = QNumber_print_integer(org, 10);
-    ull = strtoull(str, &err, 10);
-    if (NULL == (char *)str || '\0' != *err) {
-      return false;
-    }
-    *target = ull;
-    return true;
-  }
+		str = QNumber_print_integer(org, 10);
+		ull = strtoull(str, &err, 10);
+		if (NULL == (char *)str || '\0' != *err) {
+			return false;
+		}
+		*target = ull;
+		return true;
+	}
 }
 
-void BigNumber_set_bit(Number *number, int location, int value) {
-  QNumber *org;
+void BigNumber_set_bit(Number *number, int location, int value)
+{
+	QNumber *org;
 
-  nusmv_assert(location >= 0);
-  nusmv_assert(value >= 0 && value <= 1);
+	nusmv_assert(location >= 0);
+	nusmv_assert(value >= 0 && value <= 1);
 
-  org = (number2qnumber(*number));
-  BVQNumber_set_bit(org, location, value);
+	org = (number2qnumber(*number));
+	BVQNumber_set_bit(org, location, value);
 }
 
-boolean BigNumber_test_bit(Number *number, int location) {
-  QNumber *org = (number2qnumber(*number));
-  boolean rvalue;
+boolean BigNumber_test_bit(Number *number, int location)
+{
+	QNumber *org = (number2qnumber(*number));
+	boolean rvalue;
 
-  nusmv_assert(location >= 0);
+	nusmv_assert(location >= 0);
 
-  rvalue = BVQNumber_test_bit(org, location);
+	rvalue = BVQNumber_test_bit(org, location);
 
-  return rvalue;
+	return rvalue;
 }
 
-Number BigNumber_make_number_from_unsigned_long_long(unsigned long long n) {
-  QNumber value = QNumber_make_number_from_unsigned_long_long(n);
-  Number res = qnumber2number(QNumber_copy_to_heap(&value));
-  return res;
+Number BigNumber_make_number_from_unsigned_long_long(unsigned long long n)
+{
+	QNumber value = QNumber_make_number_from_unsigned_long_long(n);
+	Number res = qnumber2number(QNumber_copy_to_heap(&value));
+	return res;
 }
 
-Number BigNumber_multiplication(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  QNumber value = QNumber_operator_mul(orgl, orgr);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_multiplication(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	QNumber value = QNumber_operator_mul(orgl, orgr);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_plus(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  QNumber value = QNumber_operator_plus(orgl, orgr);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_plus(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	QNumber value = QNumber_operator_plus(orgl, orgr);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_minus(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  QNumber value = QNumber_operator_minus(orgl, orgr);
-  QNumber *nnumber = QNumber_copy_to_heap(&value);
-  return qnumber2number(nnumber);
+Number BigNumber_minus(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	QNumber value = QNumber_operator_minus(orgl, orgr);
+	QNumber *nnumber = QNumber_copy_to_heap(&value);
+	return qnumber2number(nnumber);
 }
 
-Number BigNumber_copy(Number *orig) {
-  QNumber *org = (number2qnumber(*orig));
-  return qnumber2number(QNumber_copy_to_heap(org));
+Number BigNumber_copy(Number *orig)
+{
+	QNumber *org = (number2qnumber(*orig));
+	return qnumber2number(QNumber_copy_to_heap(org));
 }
 
-boolean BigNumber_less_than(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  return QNumber_operator_less_than(orgl, orgr);
+boolean BigNumber_less_than(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	return QNumber_operator_less_than(orgl, orgr);
 }
 
-boolean BigNumber_identity(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  return (orgl == orgr);
+boolean BigNumber_identity(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	return (orgl == orgr);
 }
 
-boolean BigNumber_equal(Number *left, Number *right) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  return QNumber_operator_equals(orgl, orgr);
+boolean BigNumber_equal(Number *left, Number *right)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	return QNumber_operator_equals(orgl, orgr);
 }
 
-boolean BigNumber_does_integer_fit_into_number_of_bits(Number *value,
-                                                       int widht) {
-  const QNumber *org = (number2qnumber(*value));
-  return BVQNumber_fits(org, widht);
+boolean BigNumber_does_integer_fit_into_number_of_bits(Number *value, int widht)
+{
+	const QNumber *org = (number2qnumber(*value));
+	return BVQNumber_fits(org, widht);
 }
 
-void BigNumber_divmod(Number *left, Number *right, Number *q, Number *r) {
-  const QNumber *orgl = (number2qnumber(*left));
-  const QNumber *orgr = (number2qnumber(*right));
-  QNumber *target_q = (number2qnumber(*q));
-  QNumber *target_r = (number2qnumber(*r));
+void BigNumber_divmod(Number *left, Number *right, Number *q, Number *r)
+{
+	const QNumber *orgl = (number2qnumber(*left));
+	const QNumber *orgr = (number2qnumber(*right));
+	QNumber *target_q = (number2qnumber(*q));
+	QNumber *target_r = (number2qnumber(*r));
 
-  nusmv_assert(q != (Number *)NULL);
-  nusmv_assert(r != (Number *)NULL);
+	nusmv_assert(q != (Number *)NULL);
+	nusmv_assert(r != (Number *)NULL);
 
-  QNumber_divmod(orgl, orgr, target_q, target_r);
+	QNumber_divmod(orgl, orgr, target_q, target_r);
 }
 
-void BigNumber_free_number(Number *number) {
-  QNumber *tofree = number2qnumber(*number);
-  QNumber_clean_gmp(tofree);
-  FREE(tofree);
+void BigNumber_free_number(Number *number)
+{
+	QNumber *tofree = number2qnumber(*number);
+	QNumber_clean_gmp(tofree);
+	FREE(tofree);
 }
 
-char *BigNumber_print_as_number(Number *number, int base) {
-  QNumber *toPrint = number2qnumber(*number);
-  return QNumber_print_integer(toPrint, base);
+char *BigNumber_print_as_number(Number *number, int base)
+{
+	QNumber *toPrint = number2qnumber(*number);
+	return QNumber_print_integer(toPrint, base);
 }
 
 int BigNumber_assign_number_from_string(char *string, char *error_char,
-                                        int base, Number *numb) {
-  int b = QNumber_integer_from_string(string, error_char, base,
-                                      (number2qnumber(*numb)));
-  return b == 0 ? 1 : 0;
+					int base, Number *numb)
+{
+	int b = QNumber_integer_from_string(string, error_char, base,
+					    (number2qnumber(*numb)));
+	return b == 0 ? 1 : 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -305,10 +329,11 @@ int BigNumber_assign_number_from_string(char *string, char *error_char,
   Translates a QNumber into a Number
 */
 
-inline Number qnumber2number(QNumber *t) {
-  Number ret;
-  ret.repr = (void *)t;
-  return ret;
+inline Number qnumber2number(QNumber *t)
+{
+	Number ret;
+	ret.repr = (void *)t;
+	return ret;
 }
 
 /*!
@@ -317,10 +342,11 @@ inline Number qnumber2number(QNumber *t) {
   Translates a Number into a QNumber
 */
 
-inline QNumber *number2qnumber(Number n) {
-  void *struct_p = n.repr;
-  QNumber *rvalue = ((QNumber *)struct_p);
+inline QNumber *number2qnumber(Number n)
+{
+	void *struct_p = n.repr;
+	QNumber *rvalue = ((QNumber *)struct_p);
 
-  nusmv_assert(struct_p != (void *)NULL);
-  return rvalue;
+	nusmv_assert(struct_p != (void *)NULL);
+	return rvalue;
 }

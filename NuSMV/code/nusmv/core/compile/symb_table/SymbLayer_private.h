@@ -53,7 +53,7 @@
   name is copied, the caller keeps ownership of cache.
 */
 SymbLayer_ptr SymbLayer_create(const char *name, const LayerInsertPolicy policy,
-                               SymbCache_ptr cache);
+			       SymbCache_ptr cache);
 
 /*!
   \methodof SymbLayer

@@ -33,7 +33,7 @@
 
 /* This can be typedef'ed to void if supported */
 typedef struct ls_dummy_defn {
-  int dummy; /* Not used */
+	int dummy; /* Not used */
 } ls_dummy;
 
 /*!
@@ -41,8 +41,8 @@ typedef struct ls_dummy_defn {
 
   \todo Missing description
 */
-typedef ls_dummy *lsList;   /* List handle           */
-typedef ls_dummy *lsGen;    /* List generator handle */
+typedef ls_dummy *lsList; /* List handle           */
+typedef ls_dummy *lsGen; /* List generator handle */
 typedef ls_dummy *lsHandle; /* Handle to an item     */
 
 /*!
@@ -424,7 +424,7 @@ lsStatus lsSort(lsList, int (*compare)(char *, char *));
  is required.
 */
 lsStatus lsUniq(lsList, int (*compare)(char *, char *),
-                void (*delFunc)(lsGeneric));
+		void (*delFunc)(lsGeneric));
 
 /*!
   \brief Calls given function to all element of the list
@@ -445,7 +445,7 @@ lsStatus lsUniq(lsList, int (*compare)(char *, char *),
   LS_BADPARAM.
 */
 lsStatus lsForeach(lsList list, lsStatus (*userFunc)(lsGeneric, lsGeneric),
-                   lsGeneric arg);
+		   lsGeneric arg);
 
 /*!
   \brief Like lsForeach, but in reversed order.
@@ -456,7 +456,7 @@ lsStatus lsForeach(lsList list, lsStatus (*userFunc)(lsGeneric, lsGeneric),
   \sa lsForeach
 */
 lsStatus lsBackeach(lsList list, lsStatus (*userFunc)(lsGeneric, lsGeneric),
-                    lsGeneric arg);
+		    lsGeneric arg);
 
 /*!
   \brief Macro for iteration.
@@ -468,12 +468,12 @@ lsStatus lsBackeach(lsList list, lsStatus (*userFunc)(lsGeneric, lsGeneric),
   3) the comma operator returns the value of its second argument.
 
 */
-#define lsForEachItem(list, /* lsList, list to iterate */                      \
-                      gen,  /* lsGen, local variable for iterator */           \
-                      data  /* lsGeneric, variable to return data */           \
-)                                                                              \
-  for (gen = lsStart(list);                                                    \
-       (lsNext(gen, (lsGeneric *)&data, LS_NH) == LS_OK) ||                    \
-       ((void)lsFinish(gen), 0);)
+#define lsForEachItem(list, /* lsList, list to iterate */           \
+		      gen, /* lsGen, local variable for iterator */ \
+		      data /* lsGeneric, variable to return data */ \
+)                                                                   \
+	for (gen = lsStart(list);                                   \
+	     (lsNext(gen, (lsGeneric *)&data, LS_NH) == LS_OK) ||   \
+	     ((void)lsFinish(gen), 0);)
 
 #endif /* __NUSMV_CORE_UTILS_LIST_H__ */

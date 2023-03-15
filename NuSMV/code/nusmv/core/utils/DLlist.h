@@ -51,9 +51,9 @@ typedef struct DLlist_TAG *DLlist_ptr;
 
   \todo Missing description
 */
-#define DL_LIST_FOREACH(list, iter)                                            \
-  for (iter = DLlist_first(list); !DLiter_is_end(iter);                        \
-       iter = DLiter_next(iter))
+#define DL_LIST_FOREACH(list, iter)                           \
+	for (iter = DLlist_first(list); !DLiter_is_end(iter); \
+	     iter = DLiter_next(iter))
 
 /* internal type. it cannot be used outside. */
 
@@ -67,7 +67,7 @@ typedef struct DLnode_TAG *DLnode_ptr;
 /* here a struct definition is used only to create a new type. Thus
    C type checker will be able to catch incorrect use of iterators */
 typedef struct DLiter_TAG {
-  DLnode_ptr node;
+	DLnode_ptr node;
 } DLiter;
 
 /* ---------------------------------------------------------------------- */

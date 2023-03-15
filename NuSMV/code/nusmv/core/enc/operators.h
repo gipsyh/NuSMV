@@ -81,7 +81,7 @@ node_ptr node_or(node_ptr n1, node_ptr n2, const NuSMVEnv_ptr env);
   actually applies to the first operand only
 */
 node_ptr node_not(node_ptr n, node_ptr this_node_not_used,
-                  const NuSMVEnv_ptr env);
+		  const NuSMVEnv_ptr env);
 
 /*!
   \brief  performs logical IFF on two nodes.
@@ -252,41 +252,45 @@ node_ptr node_setin(node_ptr n1, node_ptr n2, const NuSMVEnv_ptr env);
 */
 size_t node_word_get_width(node_ptr w);
 
-#define _CHECK_WORD(w)                                                         \
-  nusmv_assert(((node_get_type(w) == UNSIGNED_WORD ||                          \
-                 node_get_type(w) == SIGNED_WORD) &&                           \
-                node_word_get_width(w) > 0) ||                                 \
-               (node_get_type(w) == NUMBER_UNSIGNED_WORD ||                    \
-                node_get_type(w) == NUMBER_SIGNED_WORD))
+#define _CHECK_WORD(w)                                            \
+	nusmv_assert(((node_get_type(w) == UNSIGNED_WORD ||       \
+		       node_get_type(w) == SIGNED_WORD) &&        \
+		      node_word_get_width(w) > 0) ||              \
+		     (node_get_type(w) == NUMBER_UNSIGNED_WORD || \
+		      node_get_type(w) == NUMBER_SIGNED_WORD))
 
-#define _CHECK_WORDS(w1, w2)                                                   \
-  _CHECK_WORD(w1);                                                             \
-  _CHECK_WORD(w2);                                                             \
-  if ((node_get_type(w1) == UNSIGNED_WORD ||                                   \
-       node_get_type(w1) == SIGNED_WORD) &&                                    \
-      (node_get_type(w2) == UNSIGNED_WORD ||                                   \
-       node_get_type(w2) == SIGNED_WORD)) /* all words */                      \
-    nusmv_assert(node_word_get_width(w1) == node_word_get_width(w2));          \
-  else if ((node_get_type(w1) == UNSIGNED_WORD ||                              \
-            node_get_type(w1) == SIGNED_WORD) &&                               \
-           (node_get_type(w2) == NUMBER_UNSIGNED_WORD ||                       \
-            node_get_type(w2) == NUMBER_SIGNED_WORD)) /* word and const */     \
-    nusmv_assert(node_word_get_width(w1) ==                                    \
-                 WordNumber_get_width(WORD_NUMBER(car(w2))));                  \
-  else if ((node_get_type(w2) == UNSIGNED_WORD ||                              \
-            node_get_type(w2) == SIGNED_WORD) &&                               \
-           (node_get_type(w1) == NUMBER_UNSIGNED_WORD ||                       \
-            node_get_type(w1) == NUMBER_SIGNED_WORD)) /* const and word */     \
-    nusmv_assert(node_word_get_width(w2) ==                                    \
-                 WordNumber_get_width(WORD_NUMBER(car(w1))));                  \
-  else if ((node_get_type(w2) == NUMBER_UNSIGNED_WORD ||                       \
-            node_get_type(w2) == NUMBER_SIGNED_WORD) &&                        \
-           (node_get_type(w1) == NUMBER_UNSIGNED_WORD ||                       \
-            node_get_type(w1) == NUMBER_SIGNED_WORD)) /* const and const */    \
-    nusmv_assert(WordNumber_get_width(WORD_NUMBER(car(w2))) ==                 \
-                 WordNumber_get_width(WORD_NUMBER(car(w1))));                  \
-  else                                                                         \
-    error_unreachable_code();
+#define _CHECK_WORDS(w1, w2)                                               \
+	_CHECK_WORD(w1);                                                   \
+	_CHECK_WORD(w2);                                                   \
+	if ((node_get_type(w1) == UNSIGNED_WORD ||                         \
+	     node_get_type(w1) == SIGNED_WORD) &&                          \
+	    (node_get_type(w2) == UNSIGNED_WORD ||                         \
+	     node_get_type(w2) == SIGNED_WORD)) /* all words */            \
+		nusmv_assert(node_word_get_width(w1) ==                    \
+			     node_word_get_width(w2));                     \
+	else if ((node_get_type(w1) == UNSIGNED_WORD ||                    \
+		  node_get_type(w1) == SIGNED_WORD) &&                     \
+		 (node_get_type(w2) == NUMBER_UNSIGNED_WORD ||             \
+		  node_get_type(w2) ==                                     \
+			  NUMBER_SIGNED_WORD)) /* word and const */        \
+		nusmv_assert(node_word_get_width(w1) ==                    \
+			     WordNumber_get_width(WORD_NUMBER(car(w2))));  \
+	else if ((node_get_type(w2) == UNSIGNED_WORD ||                    \
+		  node_get_type(w2) == SIGNED_WORD) &&                     \
+		 (node_get_type(w1) == NUMBER_UNSIGNED_WORD ||             \
+		  node_get_type(w1) ==                                     \
+			  NUMBER_SIGNED_WORD)) /* const and word */        \
+		nusmv_assert(node_word_get_width(w2) ==                    \
+			     WordNumber_get_width(WORD_NUMBER(car(w1))));  \
+	else if ((node_get_type(w2) == NUMBER_UNSIGNED_WORD ||             \
+		  node_get_type(w2) == NUMBER_SIGNED_WORD) &&              \
+		 (node_get_type(w1) == NUMBER_UNSIGNED_WORD ||             \
+		  node_get_type(w1) ==                                     \
+			  NUMBER_SIGNED_WORD)) /* const and const */       \
+		nusmv_assert(WordNumber_get_width(WORD_NUMBER(car(w2))) == \
+			     WordNumber_get_width(WORD_NUMBER(car(w1))));  \
+	else                                                               \
+		error_unreachable_code();
 
 /*!
   \brief Creates a node_ptr that represents the encoding of a
@@ -306,7 +310,7 @@ node_ptr node_word_create(node_ptr bitval, size_t w, const NuSMVEnv_ptr env);
   \se node_word_create
 */
 node_ptr node_word_create_from_list(node_ptr l, size_t w,
-                                    const NuSMVEnv_ptr env);
+				    const NuSMVEnv_ptr env);
 
 /*!
   \brief Creates a node_ptr that represents the encoding of a
@@ -315,7 +319,7 @@ node_ptr node_word_create_from_list(node_ptr l, size_t w,
   Word width is taken from the given WordNumber
 */
 node_ptr node_word_create_from_wordnumber(WordNumber_ptr wn,
-                                          const NuSMVEnv_ptr env);
+					  const NuSMVEnv_ptr env);
 
 /*!
   \brief Creates a node_ptr that represents the encoding of a
@@ -324,7 +328,7 @@ node_ptr node_word_create_from_wordnumber(WordNumber_ptr wn,
 
 */
 node_ptr node_word_create_from_integer(unsigned long long value, size_t width,
-                                       const NuSMVEnv_ptr env);
+				       const NuSMVEnv_ptr env);
 
 /*!
   \brief Creates a node_ptr that represents the encoding of a
@@ -360,7 +364,7 @@ node_ptr node_word_apply_unary(node_ptr wenc, int op, const NuSMVEnv_ptr env);
 
 */
 node_ptr node_word_apply_attime(node_ptr wenc, int time,
-                                const NuSMVEnv_ptr env);
+				const NuSMVEnv_ptr env);
 
 /*!
   \brief Traverses two given words, and creates a new word
@@ -369,7 +373,7 @@ node_ptr node_word_apply_attime(node_ptr wenc, int time,
 
 */
 node_ptr node_word_apply_binary(node_ptr wenc1, node_ptr wenc2, int op,
-                                const NuSMVEnv_ptr env);
+				const NuSMVEnv_ptr env);
 
 /*!
   \brief Returns an AND node that is the conjuction of all
@@ -482,7 +486,7 @@ node_ptr node_word_concat(node_ptr a, node_ptr b, const NuSMVEnv_ptr env);
   width, and must be a node in the form of COLON(NUMBER, NUMBER)
 */
 node_ptr node_word_selection(node_ptr word, node_ptr range,
-                             const NuSMVEnv_ptr env);
+			     const NuSMVEnv_ptr env);
 
 /*!
   \brief Concatenates bit 0 (if isSigned is false) or
@@ -492,7 +496,7 @@ node_ptr node_word_selection(node_ptr word, node_ptr range,
   a NUMBER
 */
 node_ptr node_word_extend(node_ptr a, node_ptr b, boolean isSigned,
-                          const NuSMVEnv_ptr env);
+			  const NuSMVEnv_ptr env);
 
 /*!
   \brief Bit-blasts the given words, creating a new word
@@ -501,7 +505,7 @@ node_ptr node_word_extend(node_ptr a, node_ptr b, boolean isSigned,
 
 */
 node_ptr node_word_adder(node_ptr a, node_ptr b, node_ptr carry_in,
-                         node_ptr *carry_out, const NuSMVEnv_ptr env);
+			 node_ptr *carry_out, const NuSMVEnv_ptr env);
 
 /*!
   \brief Creates a new word encoding that is the circuit that
@@ -542,7 +546,7 @@ node_ptr node_word_times(node_ptr a, node_ptr b, const NuSMVEnv_ptr env);
 
 */
 node_ptr node_word_unsigned_divide(node_ptr a, node_ptr b,
-                                   const NuSMVEnv_ptr env);
+				   const NuSMVEnv_ptr env);
 
 /*!
   \brief Creates a new word encoding that is the circuit that
@@ -559,7 +563,7 @@ node_ptr node_word_unsigned_mod(node_ptr a, node_ptr b, const NuSMVEnv_ptr env);
 
 */
 node_ptr node_word_signed_divide(node_ptr a, node_ptr b,
-                                 const NuSMVEnv_ptr env);
+				 const NuSMVEnv_ptr env);
 
 /*!
   \brief Creates a new word encoding that is the circuit that
@@ -575,7 +579,7 @@ node_ptr node_word_signed_mod(node_ptr a, node_ptr b, const NuSMVEnv_ptr env);
 
 */
 node_ptr node_word_unsigned_less(node_ptr a, node_ptr b,
-                                 const NuSMVEnv_ptr env);
+				 const NuSMVEnv_ptr env);
 
 /*!
   \brief Predicate for a <= b
@@ -583,7 +587,7 @@ node_ptr node_word_unsigned_less(node_ptr a, node_ptr b,
 
 */
 node_ptr node_word_unsigned_less_equal(node_ptr a, node_ptr b,
-                                       const NuSMVEnv_ptr env);
+				       const NuSMVEnv_ptr env);
 
 /*!
   \brief Predicate for a > b
@@ -591,7 +595,7 @@ node_ptr node_word_unsigned_less_equal(node_ptr a, node_ptr b,
 
 */
 node_ptr node_word_unsigned_greater(node_ptr a, node_ptr b,
-                                    const NuSMVEnv_ptr env);
+				    const NuSMVEnv_ptr env);
 
 /*!
   \brief Predicate for a >= b
@@ -599,7 +603,7 @@ node_ptr node_word_unsigned_greater(node_ptr a, node_ptr b,
 
 */
 node_ptr node_word_unsigned_greater_equal(node_ptr a, node_ptr b,
-                                          const NuSMVEnv_ptr env);
+					  const NuSMVEnv_ptr env);
 
 /*!
   \brief Predicate for a <s b
@@ -614,7 +618,7 @@ node_ptr node_word_signed_less(node_ptr a, node_ptr b, const NuSMVEnv_ptr env);
   Signed operation is performed
 */
 node_ptr node_word_signed_less_equal(node_ptr a, node_ptr b,
-                                     const NuSMVEnv_ptr env);
+				     const NuSMVEnv_ptr env);
 
 /*!
   \brief Predicate for a >s b
@@ -622,7 +626,7 @@ node_ptr node_word_signed_less_equal(node_ptr a, node_ptr b,
   Signed operation is performed
 */
 node_ptr node_word_signed_greater(node_ptr a, node_ptr b,
-                                  const NuSMVEnv_ptr env);
+				  const NuSMVEnv_ptr env);
 
 /*!
   \brief Predicate for a >=s b
@@ -630,7 +634,7 @@ node_ptr node_word_signed_greater(node_ptr a, node_ptr b,
   Signed operation is performed
 */
 node_ptr node_word_signed_greater_equal(node_ptr a, node_ptr b,
-                                        const NuSMVEnv_ptr env);
+					const NuSMVEnv_ptr env);
 
 /*!
   \brief \todo Missing synopsis
@@ -638,7 +642,7 @@ node_ptr node_word_signed_greater_equal(node_ptr a, node_ptr b,
   \todo Missing description
 */
 node_ptr map2_param(node_ptr (*fun)(node_ptr, node_ptr, int,
-                                    const NuSMVEnv_ptr),
-                    node_ptr l1, node_ptr l2, int op, const NuSMVEnv_ptr env);
+				    const NuSMVEnv_ptr),
+		    node_ptr l1, node_ptr l2, int op, const NuSMVEnv_ptr env);
 
 #endif /* __NUSMV_CORE_ENC_OPERATORS_H__ */

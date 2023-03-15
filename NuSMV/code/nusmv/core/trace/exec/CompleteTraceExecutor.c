@@ -76,28 +76,31 @@ static void complete_trace_executor_finalize(Object_ptr object, void *dummy);
 
 static boolean
 complete_trace_executor_execute(const CompleteTraceExecutor_ptr self,
-                                const Trace_ptr trace, int *n_steps);
+				const Trace_ptr trace, int *n_steps);
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 boolean CompleteTraceExecutor_execute(const CompleteTraceExecutor_ptr self,
-                                      const Trace_ptr trace, int *n_steps) {
-  return (*self->execute)(self, trace, n_steps);
+				      const Trace_ptr trace, int *n_steps)
+{
+	return (*self->execute)(self, trace, n_steps);
 }
 
-CompleteTraceExecutor_ptr CompleteTraceExecutor_create(const NuSMVEnv_ptr env) {
-  CompleteTraceExecutor_ptr self = ALLOC(CompleteTraceExecutor, 1);
-  COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
+CompleteTraceExecutor_ptr CompleteTraceExecutor_create(const NuSMVEnv_ptr env)
+{
+	CompleteTraceExecutor_ptr self = ALLOC(CompleteTraceExecutor, 1);
+	COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
-  complete_trace_executor_init(self, env);
-  return self;
+	complete_trace_executor_init(self, env);
+	return self;
 }
 
-void CompleteTraceExecutor_destroy(CompleteTraceExecutor_ptr self) {
-  COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
+void CompleteTraceExecutor_destroy(CompleteTraceExecutor_ptr self)
+{
+	COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
-  Object_destroy(OBJECT(self), NULL);
+	Object_destroy(OBJECT(self), NULL);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -105,67 +108,72 @@ void CompleteTraceExecutor_destroy(CompleteTraceExecutor_ptr self) {
 /*---------------------------------------------------------------------------*/
 
 void complete_trace_executor_init(CompleteTraceExecutor_ptr self,
-                                  const NuSMVEnv_ptr env) {
-  /* base class initialization */
-  trace_executor_init(BASE_TRACE_EXECUTOR(self), env);
+				  const NuSMVEnv_ptr env)
+{
+	/* base class initialization */
+	trace_executor_init(BASE_TRACE_EXECUTOR(self), env);
 
-  /* members initialization */
+	/* members initialization */
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = complete_trace_executor_finalize;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = complete_trace_executor_finalize;
 
-  /* virtual abstract complete execution method */
-  OVERRIDE(CompleteTraceExecutor, execute) = complete_trace_executor_execute;
+	/* virtual abstract complete execution method */
+	OVERRIDE(CompleteTraceExecutor, execute) =
+		complete_trace_executor_execute;
 }
 
-void complete_trace_executor_deinit(CompleteTraceExecutor_ptr self) {
-  /* members deinitialization */
+void complete_trace_executor_deinit(CompleteTraceExecutor_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  trace_executor_deinit(BASE_TRACE_EXECUTOR(self));
+	/* base class deinitialization */
+	trace_executor_deinit(BASE_TRACE_EXECUTOR(self));
 }
 
 boolean
 complete_trace_executor_check_loopbacks(const CompleteTraceExecutor_ptr self,
-                                        const Trace_ptr trace) {
-  const NuSMVEnv_ptr env =
-      EnvObject_get_environment(ENV_OBJECT(Trace_get_symb_table(trace)));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+					const Trace_ptr trace)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(
+		ENV_OBJECT(Trace_get_symb_table(trace)));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  boolean res = true; /* no error */
-  TraceIter step;
+	boolean res = true; /* no error */
+	TraceIter step;
 
-  int i = 1;
+	int i = 1;
 
-  /* local reference to superclass */
-  BaseTraceExecutor_ptr executor = BASE_TRACE_EXECUTOR(self);
+	/* local reference to superclass */
+	BaseTraceExecutor_ptr executor = BASE_TRACE_EXECUTOR(self);
 
-  COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
-  TRACE_CHECK_INSTANCE(trace);
+	COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
+	TRACE_CHECK_INSTANCE(trace);
 
-  /* as a last check it is necessary to make sure loopback information
+	/* as a last check it is necessary to make sure loopback information
      is consistent (if trace is thawed this check is trivially
      true) */
-  if (opt_verbose_level_ge(opts, 4)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "now checking loopbacks...\n");
-  }
-  TRACE_FOREACH(trace, step) {
-    if (trace_step_is_loopback(trace, step) &&
-        !trace_step_test_loopback(trace, step)) {
-      fprintf(BaseTraceExecutor_get_error_stream(executor),
-              "*** Error ***\n"
-              "Inconsistent loopback information found at step %d.\n",
-              i);
-      res = false;
-      break; /*  continuing is pointless */
-    }
+	if (opt_verbose_level_ge(opts, 4)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "now checking loopbacks...\n");
+	}
+	TRACE_FOREACH(trace, step)
+	{
+		if (trace_step_is_loopback(trace, step) &&
+		    !trace_step_test_loopback(trace, step)) {
+			fprintf(BaseTraceExecutor_get_error_stream(executor),
+				"*** Error ***\n"
+				"Inconsistent loopback information found at step %d.\n",
+				i);
+			res = false;
+			break; /*  continuing is pointless */
+		}
 
-    ++i;
-  } /* trace foreach */
+		++i;
+	} /* trace foreach */
 
-  return res;
+	return res;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -177,11 +185,12 @@ complete_trace_executor_check_loopbacks(const CompleteTraceExecutor_ptr self,
 
   Called by the class destructor
 */
-static void complete_trace_executor_finalize(Object_ptr object, void *dummy) {
-  CompleteTraceExecutor_ptr self = COMPLETE_TRACE_EXECUTOR(object);
+static void complete_trace_executor_finalize(Object_ptr object, void *dummy)
+{
+	CompleteTraceExecutor_ptr self = COMPLETE_TRACE_EXECUTOR(object);
 
-  complete_trace_executor_deinit(self);
-  FREE(self);
+	complete_trace_executor_deinit(self);
+	FREE(self);
 }
 
 /*!
@@ -192,9 +201,10 @@ static void complete_trace_executor_finalize(Object_ptr object, void *dummy) {
 */
 static boolean
 complete_trace_executor_execute(const CompleteTraceExecutor_ptr self,
-                                const Trace_ptr trace, int *n_steps) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return 0;
+				const Trace_ptr trace, int *n_steps)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return 0;
 }
 
 /**AutomaticEnd***************************************************************/

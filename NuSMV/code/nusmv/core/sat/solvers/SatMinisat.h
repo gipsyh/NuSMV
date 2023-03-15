@@ -76,8 +76,8 @@ typedef struct SatMinisat_TAG *SatMinisat_ptr;
 
   \todo Missing description
 */
-#define SAT_MINISAT_CHECK_INSTANCE(x)                                          \
-  (nusmv_assert(SAT_MINISAT(x) != SAT_MINISAT(NULL)))
+#define SAT_MINISAT_CHECK_INSTANCE(x) \
+	(nusmv_assert(SAT_MINISAT(x) != SAT_MINISAT(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -94,7 +94,7 @@ typedef struct SatMinisat_TAG *SatMinisat_ptr;
   The first parameter is the name of the solver.
 */
 SatMinisat_ptr SatMinisat_create(const NuSMVEnv_ptr env, const char *name,
-                                 boolean enable_proof_logging);
+				 boolean enable_proof_logging);
 
 /*!
   \methodof SatMinisat

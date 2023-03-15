@@ -62,8 +62,8 @@ typedef struct ProbAssign_TAG *ProbAssign_ptr;
 
   \todo Missing description
 */
-#define PROB_ASSIGN_CHECK_INSTANCE(self)                                       \
-  (nusmv_assert(PROB_ASSIGN(self) != PROB_ASSIGN(NULL)))
+#define PROB_ASSIGN_CHECK_INSTANCE(self) \
+	(nusmv_assert(PROB_ASSIGN(self) != PROB_ASSIGN(NULL)))
 
 /**AutomaticStart*************************************************************/
 

@@ -58,8 +58,8 @@ This file is part of the ``rbc.clg'' package
 
   \todo Missing description
 */
-#define CLG_ZCHAFF                                                             \
-  21 /* Create clauses suitable for feeding to ZChaff directly */
+#define CLG_ZCHAFF \
+	21 /* Create clauses suitable for feeding to ZChaff directly */
 
 /*!
   \brief \todo Missing synopsis
@@ -141,7 +141,7 @@ clause_graph Clg_Lit(ClgManager_ptr clgmgr, int literal);
 
 */
 clause_graph Clg_Conj(ClgManager_ptr clgmgr, clause_graph left,
-                      clause_graph right);
+		      clause_graph right);
 
 /*!
   \brief Create a CLG representing a disjunction of two CLGs
@@ -149,7 +149,7 @@ clause_graph Clg_Conj(ClgManager_ptr clgmgr, clause_graph left,
 
 */
 clause_graph Clg_Disj(ClgManager_ptr clgmgr, clause_graph left,
-                      clause_graph right);
+		      clause_graph right);
 
 /*!
   \brief Extract the real clauses from the CLG
@@ -164,7 +164,7 @@ clause_graph Clg_Disj(ClgManager_ptr clgmgr, clause_graph left,
                       occurrences of the same literal are skipped.
 */
 void Clg_Extract(const NuSMVEnv_ptr env, clause_graph head, int type,
-                 Clg_Commit commit, void *data);
+		 Clg_Commit commit, void *data);
 
 /*!
   \brief Return the number of clauses stored in the CLG

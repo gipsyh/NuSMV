@@ -96,7 +96,7 @@ boolean hrc_prefix_utils_is_subprefix(node_ptr subprefix, node_ptr prefix);
   to build a correct DOT tree.
 */
 node_ptr hrc_prefix_utils_add_context(NodeMgr_ptr nodemgr, node_ptr context,
-                                      node_ptr expression);
+				      node_ptr expression);
 
 /*!
   \brief Get the first subcontext of the given symbol.
@@ -117,7 +117,7 @@ node_ptr hrc_prefix_utils_get_first_subcontext(node_ptr symbol);
   If context is not
 */
 node_ptr hrc_prefix_utils_remove_context(NodeMgr_ptr nodemgr,
-                                         node_ptr identifier, node_ptr context);
+					 node_ptr identifier, node_ptr context);
 
 /*!
   \brief Creates a new name for the module instance.
@@ -127,13 +127,13 @@ node_ptr hrc_prefix_utils_remove_context(NodeMgr_ptr nodemgr,
   The generated module name is <module_name>_<module_instance_flattened_name>
 */
 node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
-                                             node_ptr instance_name);
+					     node_ptr instance_name);
 
 node_ptr hrc_prefix_utils_concat_context(const NuSMVEnv_ptr env, node_ptr ctx1,
-                                         node_ptr ctx2);
+					 node_ptr ctx2);
 
 node_ptr hrc_prefix_utils_contextualize_expr(const NuSMVEnv_ptr env,
-                                             node_ptr expr, node_ptr context);
+					     node_ptr expr, node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

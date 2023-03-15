@@ -62,8 +62,8 @@ typedef struct SexpInliner_TAG *SexpInliner_ptr;
 
   \todo Missing description
 */
-#define SEXP_INLINER_CHECK_INSTANCE(x)                                         \
-  (nusmv_assert(SEXP_INLINER(x) != SEXP_INLINER(NULL)))
+#define SEXP_INLINER_CHECK_INSTANCE(x) \
+	(nusmv_assert(SEXP_INLINER(x) != SEXP_INLINER(NULL)))
 
 /*!
   \struct InlineRes
@@ -85,8 +85,8 @@ typedef struct InlineRes_TAG *InlineRes_ptr;
 
   \todo Missing description
 */
-#define INLINE_RES_CHECK_INSTANCE(x)                                           \
-  (nusmv_assert(INLINE_RES(x) != INLINE_RES(NULL)))
+#define INLINE_RES_CHECK_INSTANCE(x) \
+	(nusmv_assert(INLINE_RES(x) != INLINE_RES(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Public Function Interface                                                 */
@@ -104,7 +104,7 @@ typedef struct InlineRes_TAG *InlineRes_ptr;
                       no limit.
 */
 SexpInliner_ptr SexpInliner_create(SymbTable_ptr st,
-                                   const size_t fixpoint_limit);
+				   const size_t fixpoint_limit);
 
 /*!
   \methodof SexpInliner
@@ -144,7 +144,7 @@ SymbTable_ptr SexpInliner_get_symb_table(const SexpInliner_ptr self);
                       accepted, or false otherwise.
 */
 boolean SexpInliner_force_equivalence(SexpInliner_ptr self, node_ptr var,
-                                      Expr_ptr expr);
+				      Expr_ptr expr);
 
 /*!
   \methodof SexpInliner
@@ -179,7 +179,7 @@ boolean SexpInliner_force_equivalences(SexpInliner_ptr self, Set_t equivs);
                       forced, or false otherwise.
 */
 boolean SexpInliner_force_invariant(SexpInliner_ptr self, node_ptr var,
-                                    Expr_ptr expr);
+				    Expr_ptr expr);
 
 /*!
   \methodof SexpInliner
@@ -252,7 +252,7 @@ void SexpInliner_clear_blacklist(SexpInliner_ptr self);
                  find_node)
 */
 InlineRes_ptr SexpInliner_inline(SexpInliner_ptr self, Expr_ptr expr,
-                                 boolean *changed);
+				 boolean *changed);
 
 /*!
   \methodof SexpInliner
@@ -277,7 +277,7 @@ InlineRes_ptr SexpInliner_inline(SexpInliner_ptr self, Expr_ptr expr,
   \se SexpInliner_inline
 */
 Expr_ptr SexpInliner_inline_no_learning(SexpInliner_ptr self, Expr_ptr expr,
-                                        boolean *changed);
+					boolean *changed);
 
 /*!
   \methodof SexpInliner

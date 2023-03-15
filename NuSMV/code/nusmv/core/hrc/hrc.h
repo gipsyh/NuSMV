@@ -58,10 +58,10 @@
 */
 
 typedef enum HrcDumpFormat_TAG {
-  HRC_DUMP_FORMAT_INVALID = 0,
-  HRC_DUMP_FORMAT_DEBUG = 1,
-  HRC_DUMP_FORMAT_SMV,
-  HRC_DUMP_FORMAT_XML
+	HRC_DUMP_FORMAT_INVALID = 0,
+	HRC_DUMP_FORMAT_DEBUG = 1,
+	HRC_DUMP_FORMAT_SMV,
+	HRC_DUMP_FORMAT_XML
 } HrcDumpFormat;
 
 HrcDumpFormat Hrc_dump_format_str_to_enum(char *format);
@@ -146,7 +146,7 @@ void Hrc_DumpModel(HrcNode_ptr hrcNode, HrcDumper_ptr dumper);
   ownership of ofileid is taken (by the dumpers)
 */
 int Hrc_dump_model(const NuSMVEnv_ptr env, HrcDumpFormat format, FILE *ofileid,
-                   const boolean append_suffix, const boolean use_indent);
+		   const boolean append_suffix, const boolean use_indent);
 
 /**AutomaticEnd***************************************************************/
 

@@ -70,9 +70,9 @@
 /*---------------------------------------------------------------------------*/
 
 void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
-                                              SymbLayer_ptr symb_layer,
-                                              HrcNode_ptr node,
-                                              node_ptr context);
+					      SymbLayer_ptr symb_layer,
+					      HrcNode_ptr node,
+					      node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

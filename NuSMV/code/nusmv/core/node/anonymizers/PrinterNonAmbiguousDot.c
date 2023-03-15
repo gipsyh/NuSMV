@@ -100,68 +100,71 @@ static void printer_anon_map_entry_finalize(Object_ptr object, void *dummy);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-PrinterNonAmbiguousDot_ptr
-PrinterNonAmbiguousDot_create(const NuSMVEnv_ptr env) {
-  PrinterNonAmbiguousDot_ptr self = ALLOC(PrinterNonAmbiguousDot, 1);
-  PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self);
+PrinterNonAmbiguousDot_ptr PrinterNonAmbiguousDot_create(const NuSMVEnv_ptr env)
+{
+	PrinterNonAmbiguousDot_ptr self = ALLOC(PrinterNonAmbiguousDot, 1);
+	PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self);
 
-  printer_anon_map_entry_init(self, env, "", ATOM, DOT - ATOM + 1);
-  return self;
+	printer_anon_map_entry_init(self, env, "", ATOM, DOT - ATOM + 1);
+	return self;
 }
 
-void PrinterNonAmbiguousDot_destroy(PrinterNonAmbiguousDot_ptr self) {
-  PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self);
+void PrinterNonAmbiguousDot_destroy(PrinterNonAmbiguousDot_ptr self)
+{
+	PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self);
 
-  Object_destroy(OBJECT(self), NULL);
+	Object_destroy(OBJECT(self), NULL);
 }
 
 int printer_anon_map_entry_print_node(PrinterBase_ptr self, node_ptr n,
-                                      int priority) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+				      int priority)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  if (Nil == n)
-    return 1;
+	if (Nil == n)
+		return 1;
 
-  switch (node_get_type(n)) {
-  case DOT: {
-    /* since "." is also a separator, we can skip print the "," if
+	switch (node_get_type(n)) {
+	case DOT: {
+		/* since "." is also a separator, we can skip print the "," if
        immediately followed by "." */
-    return _PRINT(NODE_ANONYMIZER_DOT_STR) && _THROW(car(n)) &&
-           ((Nil != cdr(n) && DOT == node_get_type(cdr(n))) ||
-            _PRINT(NODE_ANONYMIZER_SEPARATOR_STR)) &&
-           _THROW(cdr(n));
-  }
+		return _PRINT(NODE_ANONYMIZER_DOT_STR) && _THROW(car(n)) &&
+		       ((Nil != cdr(n) && DOT == node_get_type(cdr(n))) ||
+			_PRINT(NODE_ANONYMIZER_SEPARATOR_STR)) &&
+		       _THROW(cdr(n));
+	}
 
-  case ATOM:
-    /* Here ideally we would let the PrinterWffCore handle it. We can't because
+	case ATOM:
+		/* Here ideally we would let the PrinterWffCore handle it. We can't because
        PrinterWffCore and this printer both handle DOT nodes. So we are
        duplicating the PrinterWffCore code for ATOM and NUMBER */
-    if (!_PRINT(UStringMgr_get_string_text((string_ptr)car(n))))
-      return 0;
-    if (cdr(n)) {
-      char buf[20];
-      int chars = snprintf(buf, 20, "_%d", NODE_TO_INT(cdr(n)));
-      SNPRINTF_CHECK(chars, 20);
+		if (!_PRINT(UStringMgr_get_string_text((string_ptr)car(n))))
+			return 0;
+		if (cdr(n)) {
+			char buf[20];
+			int chars =
+				snprintf(buf, 20, "_%d", NODE_TO_INT(cdr(n)));
+			SNPRINTF_CHECK(chars, 20);
 
-      return _PRINT(buf);
-    }
-    return 1;
+			return _PRINT(buf);
+		}
+		return 1;
 
-  case NUMBER: {
-    char buf[20];
-    int c = snprintf(buf, 20, "%d", NODE_TO_INT(car(n)));
-    SNPRINTF_CHECK(c, 20);
+	case NUMBER: {
+		char buf[20];
+		int c = snprintf(buf, 20, "%d", NODE_TO_INT(car(n)));
+		SNPRINTF_CHECK(c, 20);
 
-    return _PRINT(buf);
-  }
-    /* end of code duplication */
+		return _PRINT(buf);
+	}
+		/* end of code duplication */
 
-  default:
-    ErrorMgr_internal_error(errmgr, "%s: not supported type = %d", __func__,
-                            node_get_type(n));
-  }
+	default:
+		ErrorMgr_internal_error(errmgr, "%s: not supported type = %d",
+					__func__, node_get_type(n));
+	}
 }
 
 /*---------------------------------------------------------------------------*/
@@ -169,23 +172,25 @@ int printer_anon_map_entry_print_node(PrinterBase_ptr self, node_ptr n,
 /*---------------------------------------------------------------------------*/
 
 void printer_anon_map_entry_init(PrinterNonAmbiguousDot_ptr self,
-                                 const NuSMVEnv_ptr env, const char *name,
-                                 int low, size_t num) {
-  /* base class initialization */
-  printer_base_init(PRINTER_BASE(self), env, name, low, num, true);
+				 const NuSMVEnv_ptr env, const char *name,
+				 int low, size_t num)
+{
+	/* base class initialization */
+	printer_base_init(PRINTER_BASE(self), env, name, low, num, true);
 
-  /* members initialization */
+	/* members initialization */
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = printer_anon_map_entry_finalize;
-  OVERRIDE(PrinterBase, print_node) = printer_anon_map_entry_print_node;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = printer_anon_map_entry_finalize;
+	OVERRIDE(PrinterBase, print_node) = printer_anon_map_entry_print_node;
 }
 
-void printer_anon_map_entry_deinit(PrinterNonAmbiguousDot_ptr self) {
-  /* members deinitialization */
+void printer_anon_map_entry_deinit(PrinterNonAmbiguousDot_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  printer_base_deinit(PRINTER_BASE(self));
+	/* base class deinitialization */
+	printer_base_deinit(PRINTER_BASE(self));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -197,11 +202,12 @@ void printer_anon_map_entry_deinit(PrinterNonAmbiguousDot_ptr self) {
 
   Called by the class destructor
 */
-static void printer_anon_map_entry_finalize(Object_ptr object, void *dummy) {
-  PrinterNonAmbiguousDot_ptr self = PRINTER_ANON_MAP_ENTRY(object);
+static void printer_anon_map_entry_finalize(Object_ptr object, void *dummy)
+{
+	PrinterNonAmbiguousDot_ptr self = PRINTER_ANON_MAP_ENTRY(object);
 
-  printer_anon_map_entry_deinit(self);
-  FREE(self);
+	printer_anon_map_entry_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

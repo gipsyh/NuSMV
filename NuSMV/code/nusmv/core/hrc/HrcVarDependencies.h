@@ -62,8 +62,8 @@ typedef struct HrcVarDependencies_TAG *HrcVarDependencies_ptr;
 
   \todo Missing description
 */
-#define HRC_VAR_DEPENDENCIES_CHECK_INSTANCE(self)                              \
-  (nusmv_assert(HRC_VAR_DEPENDENCIES(self) != HRC_VAR_DEPENDENCIES(NULL)))
+#define HRC_VAR_DEPENDENCIES_CHECK_INSTANCE(self) \
+	(nusmv_assert(HRC_VAR_DEPENDENCIES(self) != HRC_VAR_DEPENDENCIES(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -108,7 +108,7 @@ HrcVarDependencies_get_node_manager(const HrcVarDependencies_ptr self);
   No checks are performed to ensure that variable is really a variable.
 */
 void HrcVarDependencies_add_variable(HrcVarDependencies_ptr self,
-                                     node_ptr variable);
+				     node_ptr variable);
 
 /*!
   \methodof HrcVarDependencies
@@ -118,7 +118,7 @@ void HrcVarDependencies_add_variable(HrcVarDependencies_ptr self,
   No checks are performed to ensure that define is really a define.
 */
 void HrcVarDependencies_add_define(HrcVarDependencies_ptr self,
-                                   node_ptr define);
+				   node_ptr define);
 
 /*!
   \methodof HrcVarDependencies
@@ -127,7 +127,7 @@ void HrcVarDependencies_add_define(HrcVarDependencies_ptr self,
 
 */
 void HrcVarDependencies_add_parameter(HrcVarDependencies_ptr self,
-                                      node_ptr formal, node_ptr actual);
+				      node_ptr formal, node_ptr actual);
 
 /*!
   \methodof HrcVarDependencies
@@ -171,7 +171,7 @@ Set_t HrcVarDependencies_get_actual_par_set(HrcVarDependencies_ptr self);
 
 */
 boolean HrcVarDependencies_has_formal_parameter(HrcVarDependencies_ptr self,
-                                                node_ptr formal);
+						node_ptr formal);
 
 /**AutomaticEnd***************************************************************/
 

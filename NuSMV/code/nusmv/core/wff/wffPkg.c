@@ -53,37 +53,41 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void wff_pkg_init(const NuSMVEnv_ptr env) {
-  {
-    ExprMgr_ptr expr_mgr = ExprMgr_create(env);
-    NuSMVEnv_set_value(env, ENV_EXPR_MANAGER, expr_mgr);
-  }
+void wff_pkg_init(const NuSMVEnv_ptr env)
+{
+	{
+		ExprMgr_ptr expr_mgr = ExprMgr_create(env);
+		NuSMVEnv_set_value(env, ENV_EXPR_MANAGER, expr_mgr);
+	}
 
-  {
-    MasterLogicRecognizer_ptr master_recogn =
-        MasterLogicRecognizer_create_with_default_recognizers(env);
-    NuSMVEnv_set_value(env, ENV_MASTER_LOGIC_RECOGNIZER, master_recogn);
-  }
+	{
+		MasterLogicRecognizer_ptr master_recogn =
+			MasterLogicRecognizer_create_with_default_recognizers(
+				env);
+		NuSMVEnv_set_value(env, ENV_MASTER_LOGIC_RECOGNIZER,
+				   master_recogn);
+	}
 }
 
-void wff_pkg_quit(const NuSMVEnv_ptr env) {
+void wff_pkg_quit(const NuSMVEnv_ptr env)
+{
+	{
+		hash_ptr wff2nnf = NuSMVEnv_get_handled_hash_ptr(
+			env, ENV_W2W_WFF2NNF_HASH);
+		clear_assoc(wff2nnf);
+	}
 
-  {
-    hash_ptr wff2nnf = NuSMVEnv_get_handled_hash_ptr(env, ENV_W2W_WFF2NNF_HASH);
-    clear_assoc(wff2nnf);
-  }
+	{
+		ExprMgr_ptr expr_mgr =
+			EXPR_MGR(NuSMVEnv_remove_value(env, ENV_EXPR_MANAGER));
+		ExprMgr_destroy(expr_mgr);
+	}
 
-  {
-    ExprMgr_ptr expr_mgr =
-        EXPR_MGR(NuSMVEnv_remove_value(env, ENV_EXPR_MANAGER));
-    ExprMgr_destroy(expr_mgr);
-  }
-
-  {
-    MasterLogicRecognizer_ptr master_recogn =
-        NuSMVEnv_remove_value(env, ENV_MASTER_LOGIC_RECOGNIZER);
-    MasterLogicRecognizer_destroy(master_recogn);
-  }
+	{
+		MasterLogicRecognizer_ptr master_recogn =
+			NuSMVEnv_remove_value(env, ENV_MASTER_LOGIC_RECOGNIZER);
+		MasterLogicRecognizer_destroy(master_recogn);
+	}
 }
 
 /*---------------------------------------------------------------------------*/

@@ -53,19 +53,19 @@
 */
 
 typedef struct FlattenerBase_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  node_ptr (*flatten)(FlattenerBase_ptr self, SymbTable_ptr symb_table,
-                      hash_ptr def_hash, node_ptr sexp, node_ptr context,
-                      MasterCompileFlattener_def_mode mode);
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	node_ptr (*flatten)(FlattenerBase_ptr self, SymbTable_ptr symb_table,
+			    hash_ptr def_hash, node_ptr sexp, node_ptr context,
+			    MasterCompileFlattener_def_mode mode);
 
 } FlattenerBase;
 
@@ -79,9 +79,9 @@ typedef struct FlattenerBase_TAG {
   Use this macro to recursively recall the flatten function
 */
 
-#define _THROW(sexp, symb_table, def_hash, context, mode)                      \
-  flattener_base_throw_flatten(FLATTENER_BASE(self), symb_table, def_hash,     \
-                               sexp, context, mode)
+#define _THROW(sexp, symb_table, def_hash, context, mode)              \
+	flattener_base_throw_flatten(FLATTENER_BASE(self), symb_table, \
+				     def_hash, sexp, context, mode)
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -102,7 +102,7 @@ typedef struct FlattenerBase_TAG {
   This constructor is private, as this class is virtual
 */
 FlattenerBase_ptr FlattenerBase_create(const NuSMVEnv_ptr env, const char *name,
-                                       int low, size_t num);
+				       int low, size_t num);
 
 /*!
   \methodof FlattenerBase
@@ -113,8 +113,8 @@ FlattenerBase_ptr FlattenerBase_create(const NuSMVEnv_ptr env, const char *name,
   \sa FlattenerBase_create
 */
 void flattener_base_init(FlattenerBase_ptr self, const NuSMVEnv_ptr env,
-                         const char *name, int low, size_t num,
-                         boolean can_handle_null);
+			 const char *name, int low, size_t num,
+			 boolean can_handle_null);
 
 /*!
   \methodof FlattenerBase
@@ -131,9 +131,9 @@ void flattener_base_deinit(FlattenerBase_ptr self);
 
 */
 node_ptr flattener_base_flatten(FlattenerBase_ptr self,
-                                SymbTable_ptr symb_table, hash_ptr def_hash,
-                                node_ptr sexp, node_ptr context,
-                                MasterCompileFlattener_def_mode mode);
+				SymbTable_ptr symb_table, hash_ptr def_hash,
+				node_ptr sexp, node_ptr context,
+				MasterCompileFlattener_def_mode mode);
 
 /*!
   \methodof FlattenerBase
@@ -143,9 +143,9 @@ node_ptr flattener_base_flatten(FlattenerBase_ptr self,
 
 */
 node_ptr flattener_base_throw_flatten(FlattenerBase_ptr self,
-                                      SymbTable_ptr symb_table,
-                                      hash_ptr def_hash, node_ptr sexp,
-                                      node_ptr context,
-                                      MasterCompileFlattener_def_mode mode);
+				      SymbTable_ptr symb_table,
+				      hash_ptr def_hash, node_ptr sexp,
+				      node_ptr context,
+				      MasterCompileFlattener_def_mode mode);
 
 #endif /* __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_BASE_PRIVATE_H__ */

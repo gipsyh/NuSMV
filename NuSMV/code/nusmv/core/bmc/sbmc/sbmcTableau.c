@@ -79,56 +79,62 @@
 /*---------------------------------------------------------------------------*/
 
 be_ptr Bmc_SBMCTableau_GetNoLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                                 const int k) {
-  return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm), ltl_wff, 0,
-                                      k, Bmc_Utils_GetNoLoopback());
+				 const int k)
+{
+	return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm),
+					    ltl_wff, 0, k,
+					    Bmc_Utils_GetNoLoopback());
 }
 
 be_ptr Bmc_SBMCTableau_GetSingleLoop(const BeFsm_ptr be_fsm,
-                                     const node_ptr ltl_wff, const int k,
-                                     const int l) {
-  BeEnc_ptr be_enc = BeFsm_get_be_encoding(be_fsm);
-  be_ptr loopback = Bmc_SBMCTableau_GetLoopCondition(be_enc, k, l);
+				     const node_ptr ltl_wff, const int k,
+				     const int l)
+{
+	BeEnc_ptr be_enc = BeFsm_get_be_encoding(be_fsm);
+	be_ptr loopback = Bmc_SBMCTableau_GetLoopCondition(be_enc, k, l);
 
-  be_ptr tableau_k = BmcInt_SBMCTableau_GetAtTime(be_enc, ltl_wff, 0, k, l);
+	be_ptr tableau_k =
+		BmcInt_SBMCTableau_GetAtTime(be_enc, ltl_wff, 0, k, l);
 
-  return Be_And(BeEnc_get_be_manager(be_enc), loopback, tableau_k);
+	return Be_And(BeEnc_get_be_manager(be_enc), loopback, tableau_k);
 }
 
 be_ptr Bmc_SBMCTableau_GetAllLoops(const BeFsm_ptr be_fsm,
-                                   const node_ptr ltl_wff, const int k,
-                                   const int l) {
-  /* asserts on l, k compatibility */
-  nusmv_assert(!Bmc_Utils_IsNoLoopback(l));
-  nusmv_assert(l < k);
+				   const node_ptr ltl_wff, const int k,
+				   const int l)
+{
+	/* asserts on l, k compatibility */
+	nusmv_assert(!Bmc_Utils_IsNoLoopback(l));
+	nusmv_assert(l < k);
 
-  return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm), ltl_wff, 0,
-                                      k, l);
+	return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm),
+					    ltl_wff, 0, k, l);
 }
 
 be_ptr Bmc_SBMCTableau_GetLoopCondition(const BeEnc_ptr be_enc, const int k,
-                                        const int l) {
-  Be_Manager_ptr be_mgr;
-  be_ptr tableau_iff_constraints;
-  int iter;
+					const int l)
+{
+	Be_Manager_ptr be_mgr;
+	be_ptr tableau_iff_constraints;
+	int iter;
 
-  nusmv_assert(l < k);
+	nusmv_assert(l < k);
 
-  be_mgr = BeEnc_get_be_manager(be_enc);
-  tableau_iff_constraints = Be_Truth(BeEnc_get_be_manager(be_enc));
+	be_mgr = BeEnc_get_be_manager(be_enc);
+	tableau_iff_constraints = Be_Truth(BeEnc_get_be_manager(be_enc));
 
-  iter = BeEnc_get_first_untimed_var_index(be_enc, BE_VAR_TYPE_CURR);
-  while (BeEnc_is_var_index_valid(be_enc, iter)) {
-    /* Here we can consider removing the loop variable */
-    tableau_iff_constraints =
-        Be_And(be_mgr, tableau_iff_constraints,
-               Be_Iff(be_mgr, BeEnc_index_to_timed(be_enc, iter, l),
-                      BeEnc_index_to_timed(be_enc, iter, k)));
+	iter = BeEnc_get_first_untimed_var_index(be_enc, BE_VAR_TYPE_CURR);
+	while (BeEnc_is_var_index_valid(be_enc, iter)) {
+		/* Here we can consider removing the loop variable */
+		tableau_iff_constraints = Be_And(
+			be_mgr, tableau_iff_constraints,
+			Be_Iff(be_mgr, BeEnc_index_to_timed(be_enc, iter, l),
+			       BeEnc_index_to_timed(be_enc, iter, k)));
 
-    iter = BeEnc_get_next_var_index(be_enc, iter, BE_VAR_TYPE_CURR);
-  }
+		iter = BeEnc_get_next_var_index(be_enc, iter, BE_VAR_TYPE_CURR);
+	}
 
-  return tableau_iff_constraints;
+	return tableau_iff_constraints;
 }
 
 /*---------------------------------------------------------------------------*/

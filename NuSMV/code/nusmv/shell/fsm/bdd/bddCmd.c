@@ -108,30 +108,34 @@ static int UsageDumpFsm(const NuSMVEnv_ptr env);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Bdd_Init(NuSMVEnv_ptr env) {
-  Cmd_CommandAdd(env, "check_fsm", CommandCheckFsm, 0, false);
-  Cmd_CommandAdd(env, "print_reachable_states", CommandPrintReachableStates, 0,
-                 false);
-  Cmd_CommandAdd(env, "compute_reachable", CommandComputeReachable, 0, false);
-  Cmd_CommandAdd(env, "print_fair_states", CommandPrintFairStates, 0, false);
-  Cmd_CommandAdd(env, "print_fair_transitions", CommandPrintFairTransitions, 0,
-                 false);
-  Cmd_CommandAdd(env, "_print_fair_state_input_pairs",
-                 CommandPrintFairStateInputPairs, 0, false);
-  Cmd_CommandAdd(env, "dump_fsm", CommandDumpFsm, 0, false);
+void Bdd_Init(NuSMVEnv_ptr env)
+{
+	Cmd_CommandAdd(env, "check_fsm", CommandCheckFsm, 0, false);
+	Cmd_CommandAdd(env, "print_reachable_states",
+		       CommandPrintReachableStates, 0, false);
+	Cmd_CommandAdd(env, "compute_reachable", CommandComputeReachable, 0,
+		       false);
+	Cmd_CommandAdd(env, "print_fair_states", CommandPrintFairStates, 0,
+		       false);
+	Cmd_CommandAdd(env, "print_fair_transitions",
+		       CommandPrintFairTransitions, 0, false);
+	Cmd_CommandAdd(env, "_print_fair_state_input_pairs",
+		       CommandPrintFairStateInputPairs, 0, false);
+	Cmd_CommandAdd(env, "dump_fsm", CommandDumpFsm, 0, false);
 }
 
-void Bdd_End(NuSMVEnv_ptr env) {
-  boolean status = true;
+void Bdd_End(NuSMVEnv_ptr env)
+{
+	boolean status = true;
 
-  status = status && Cmd_CommandRemove(env, "check_fsm");
-  status = status && Cmd_CommandRemove(env, "print_reachable_states");
-  status = status && Cmd_CommandRemove(env, "compute_reachable");
-  status = status && Cmd_CommandRemove(env, "print_fair_states");
-  status = status && Cmd_CommandRemove(env, "print_fair_transitions");
-  status = status && Cmd_CommandRemove(env, "dump_fsm");
+	status = status && Cmd_CommandRemove(env, "check_fsm");
+	status = status && Cmd_CommandRemove(env, "print_reachable_states");
+	status = status && Cmd_CommandRemove(env, "compute_reachable");
+	status = status && Cmd_CommandRemove(env, "print_fair_states");
+	status = status && Cmd_CommandRemove(env, "print_fair_transitions");
+	status = status && Cmd_CommandRemove(env, "dump_fsm");
 
-  nusmv_assert(status);
+	nusmv_assert(status);
 }
 
 /*!
@@ -157,111 +161,120 @@ void Bdd_End(NuSMVEnv_ptr env) {
   that deadlock states are actually reachable.
 */
 
-int CommandCheckFsm(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE *outstream = StreamMgr_get_output_stream(streams);
-  FILE *errstream = StreamMgr_get_error_stream(streams);
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+int CommandCheckFsm(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	FILE *outstream = StreamMgr_get_output_stream(streams);
+	FILE *errstream = StreamMgr_get_error_stream(streams);
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  int c;
-  int useMore = 0;
-  char *dbgFileName = NIL(char);
+	int c;
+	int useMore = 0;
+	char *dbgFileName = NIL(char);
 #if NUSMV_HAVE_GETENV
-  char *pager;
+	char *pager;
 #endif
-  FILE *old_outstream = NIL(FILE);
+	FILE *old_outstream = NIL(FILE);
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "hmo:")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsageCheckFsm(env);
-    case 'o':
-      if (useMore == 1)
-        return UsageCheckFsm(env);
-      dbgFileName = util_strsav(util_optarg);
-      StreamMgr_print_output(streams, "Output to file: %s\n", dbgFileName);
-      break;
-    case 'm':
-      if (dbgFileName != NIL(char))
-        return UsageCheckFsm(env);
-      useMore = 1;
-      break;
-    default:
-      return UsageCheckFsm(env);
-    }
-  }
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "hmo:")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsageCheckFsm(env);
+		case 'o':
+			if (useMore == 1)
+				return UsageCheckFsm(env);
+			dbgFileName = util_strsav(util_optarg);
+			StreamMgr_print_output(streams, "Output to file: %s\n",
+					       dbgFileName);
+			break;
+		case 'm':
+			if (dbgFileName != NIL(char))
+				return UsageCheckFsm(env);
+			useMore = 1;
+			break;
+		default:
+			return UsageCheckFsm(env);
+		}
+	}
 
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
 
-  if (argc != util_optind)
-    return UsageCheckFsm(env);
+	if (argc != util_optind)
+		return UsageCheckFsm(env);
 
-  if (useMore) {
+	if (useMore) {
 #if NUSMV_HAVE_POPEN
-    old_outstream = outstream;
+		old_outstream = outstream;
 #if NUSMV_HAVE_GETENV
-    pager = getenv("PAGER");
-    if (pager == NULL) {
-      outstream = popen("more", "w");
-      if (outstream == NULL) {
-        StreamMgr_print_error(streams, "Unable to open pipe with \"more\".\n");
-        outstream = old_outstream;
-        return 1;
-      }
-    } else {
-      outstream = popen(pager, "w");
-      if (outstream == NULL) {
-        StreamMgr_print_error(streams, "Unable to open pipe with \"%s\".\n",
-                              pager);
-        outstream = old_outstream;
-        return 1;
-      }
-    }
-#else  /* NUSMV_HAVE_GETENV */
-    outstream = popen("more", "w");
-    if (outstream == NULL) {
-      StreamMgr_print_error(streams, "Unable to open pipe with \"more\".\n");
-      outstream = old_outstream;
-      return 1;
-    }
+		pager = getenv("PAGER");
+		if (pager == NULL) {
+			outstream = popen("more", "w");
+			if (outstream == NULL) {
+				StreamMgr_print_error(
+					streams,
+					"Unable to open pipe with \"more\".\n");
+				outstream = old_outstream;
+				return 1;
+			}
+		} else {
+			outstream = popen(pager, "w");
+			if (outstream == NULL) {
+				StreamMgr_print_error(
+					streams,
+					"Unable to open pipe with \"%s\".\n",
+					pager);
+				outstream = old_outstream;
+				return 1;
+			}
+		}
+#else /* NUSMV_HAVE_GETENV */
+		outstream = popen("more", "w");
+		if (outstream == NULL) {
+			StreamMgr_print_error(
+				streams,
+				"Unable to open pipe with \"more\".\n");
+			outstream = old_outstream;
+			return 1;
+		}
 #endif /* NUSMV_HAVE_GETENV */
 
-#else  /* NUSMV_HAVE_POPEN */
-    StreamMgr_print_error(streams, "Pipe is not supported\n");
-    return 1;
+#else /* NUSMV_HAVE_POPEN */
+		StreamMgr_print_error(streams, "Pipe is not supported\n");
+		return 1;
 #endif /* NUSMV_HAVE_POPEN */
-  }
-  if (dbgFileName != NIL(char)) {
-    old_outstream = outstream;
-    outstream = fopen(dbgFileName, "w");
-    if (outstream == NULL) {
-      StreamMgr_print_error(streams, "Unable to open file \"%s\".\n",
-                            dbgFileName);
-      outstream = old_outstream;
-      return 1;
-    }
-  }
+	}
+	if (dbgFileName != NIL(char)) {
+		old_outstream = outstream;
+		outstream = fopen(dbgFileName, "w");
+		if (outstream == NULL) {
+			StreamMgr_print_error(streams,
+					      "Unable to open file \"%s\".\n",
+					      dbgFileName);
+			outstream = old_outstream;
+			return 1;
+		}
+	}
 
-  BddFsm_check_machine(BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM)));
-  set_forward_search(opts);
+	BddFsm_check_machine(BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM)));
+	set_forward_search(opts);
 
 #if NUSMV_HAVE_POPEN
-  if (useMore) {
-    pclose(outstream);
-    outstream = old_outstream;
-  }
+	if (useMore) {
+		pclose(outstream);
+		outstream = old_outstream;
+	}
 #endif
 
-  if (dbgFileName != NIL(char)) {
-    fflush(outstream);
-    fclose(outstream);
-    outstream = old_outstream;
-  }
-  return 0;
+	if (dbgFileName != NIL(char)) {
+		fflush(outstream);
+		fclose(outstream);
+		outstream = old_outstream;
+	}
+	return 0;
 }
 
 /*!
@@ -269,20 +282,25 @@ int CommandCheckFsm(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsageCheckFsm(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams, "usage: check_fsm [-h] [-m | -o file]\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(
-      streams, "   -m \t\tPipes output through the program specified by\n");
-  StreamMgr_print_error(
-      streams, "      \t\tthe \"PAGER\" environment variable if defined,\n");
-  StreamMgr_print_error(streams,
-                        "      \t\telse through the UNIX command \"more\".\n");
-  StreamMgr_print_error(
-      streams, "   -o file\tWrites the generated output to \"file\".\n");
-  return 1;
+static int UsageCheckFsm(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(streams,
+			      "usage: check_fsm [-h] [-m | -o file]\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(
+		streams,
+		"   -m \t\tPipes output through the program specified by\n");
+	StreamMgr_print_error(
+		streams,
+		"      \t\tthe \"PAGER\" environment variable if defined,\n");
+	StreamMgr_print_error(
+		streams, "      \t\telse through the UNIX command \"more\".\n");
+	StreamMgr_print_error(
+		streams,
+		"   -o file\tWrites the generated output to \"file\".\n");
+	return 1;
 }
 
 /*!
@@ -305,104 +323,113 @@ static int UsageCheckFsm(const NuSMVEnv_ptr env) {
   </dl>
 */
 
-int CommandComputeReachable(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE *errstream = StreamMgr_get_error_stream(streams);
-  int c, k, t;
-  boolean used_k, used_t, completed;
-  BddFsm_ptr fsm;
-  int diameter = 0;
+int CommandComputeReachable(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	FILE *errstream = StreamMgr_get_error_stream(streams);
+	int c, k, t;
+	boolean used_k, used_t, completed;
+	BddFsm_ptr fsm;
+	int diameter = 0;
 
-  used_k = false;
-  used_t = false;
+	used_k = false;
+	used_t = false;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "t:k:h")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsageComputeReachable(env);
-    case 'k': {
-      int res;
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "t:k:h")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsageComputeReachable(env);
+		case 'k': {
+			int res;
 
-      if (used_k) {
-        StreamMgr_print_error(streams,
-                              "You cannot specify -k more than once!\n");
-      }
-      used_k = true;
+			if (used_k) {
+				StreamMgr_print_error(
+					streams,
+					"You cannot specify -k more than once!\n");
+			}
+			used_k = true;
 
-      res = sscanf(util_optarg, "%d", &k);
-      if (res <= 0) {
-        StreamMgr_print_error(
-            streams, "You must specify a valid integer number as k!\n");
-        return 1;
-      }
-      if (k <= 0) {
-        StreamMgr_print_error(streams,
-                              "You must specify a positive number as k!\n");
-        return 1;
-      }
+			res = sscanf(util_optarg, "%d", &k);
+			if (res <= 0) {
+				StreamMgr_print_error(
+					streams,
+					"You must specify a valid integer number as k!\n");
+				return 1;
+			}
+			if (k <= 0) {
+				StreamMgr_print_error(
+					streams,
+					"You must specify a positive number as k!\n");
+				return 1;
+			}
 
-      break;
-    }
-    case 't': {
-      int res;
+			break;
+		}
+		case 't': {
+			int res;
 
-      if (used_t) {
-        StreamMgr_print_error(streams,
-                              "You cannot specify -t more than once!\n");
-      }
-      used_t = true;
+			if (used_t) {
+				StreamMgr_print_error(
+					streams,
+					"You cannot specify -t more than once!\n");
+			}
+			used_t = true;
 
-      res = sscanf(util_optarg, "%d", &t);
-      if (res <= 0) {
-        StreamMgr_print_error(
-            streams, "You must specify a valid integer number as time!\n");
-        return 1;
-      }
-      if (t <= 0) {
-        StreamMgr_print_error(streams,
-                              "You must specify a positive number as time!\n");
-        return 1;
-      }
+			res = sscanf(util_optarg, "%d", &t);
+			if (res <= 0) {
+				StreamMgr_print_error(
+					streams,
+					"You must specify a valid integer number as time!\n");
+				return 1;
+			}
+			if (t <= 0) {
+				StreamMgr_print_error(
+					streams,
+					"You must specify a positive number as time!\n");
+				return 1;
+			}
 
-      break;
-    }
-    default:
-      return UsageComputeReachable(env);
-    }
-  }
-  if (argc != util_optind)
-    return UsageComputeReachable(env);
+			break;
+		}
+		default:
+			return UsageComputeReachable(env);
+		}
+	}
+	if (argc != util_optind)
+		return UsageComputeReachable(env);
 
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
 
-  fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
+	fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
 
-  if (!used_t) {
-    t = -1; /* No limit */
-  }
+	if (!used_t) {
+		t = -1; /* No limit */
+	}
 
-  if (!used_k) {
-    k = -1; /* No limit */
-  }
+	if (!used_k) {
+		k = -1; /* No limit */
+	}
 
-  completed = BddFsm_compute_reachable(fsm, k, t, &diameter);
+	completed = BddFsm_compute_reachable(fsm, k, t, &diameter);
 
-  if (completed) {
-    StreamMgr_print_error(
-        streams, "The computation of reachable states has been completed.\n");
-    StreamMgr_print_error(streams, "The diameter of the FSM is %d.\n",
-                          diameter);
-  } else {
-    StreamMgr_print_error(
-        streams,
-        "The computation of reachable states has not been completed yet.\n");
-    StreamMgr_print_error(streams, "The number of performed steps is %d.\n",
-                          diameter);
-  }
-  return 0;
+	if (completed) {
+		StreamMgr_print_error(
+			streams,
+			"The computation of reachable states has been completed.\n");
+		StreamMgr_print_error(
+			streams, "The diameter of the FSM is %d.\n", diameter);
+	} else {
+		StreamMgr_print_error(
+			streams,
+			"The computation of reachable states has not been completed yet.\n");
+		StreamMgr_print_error(streams,
+				      "The number of performed steps is %d.\n",
+				      diameter);
+	}
+	return 0;
 }
 
 /*!
@@ -410,19 +437,22 @@ int CommandComputeReachable(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsageComputeReachable(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(
-      streams, "usage: compute_reachable [-h] [-k number] [-t time ]\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,
-                        "   -k \t\tLimit the forward search to number steps "
-                        "forward starting from the last reached frontier.\n");
-  StreamMgr_print_error(
-      streams, "   -t \t\tLimit the forward search to time seconds (The limit "
-               "can be exceeded for the duration of the last cycle).\n");
-  return 1;
+static int UsageComputeReachable(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(
+		streams,
+		"usage: compute_reachable [-h] [-k number] [-t time ]\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(
+		streams, "   -k \t\tLimit the forward search to number steps "
+			 "forward starting from the last reached frontier.\n");
+	StreamMgr_print_error(
+		streams,
+		"   -t \t\tLimit the forward search to time seconds (The limit "
+		"can be exceeded for the duration of the last cycle).\n");
+	return 1;
 }
 
 /*!
@@ -448,112 +478,120 @@ static int UsageComputeReachable(const NuSMVEnv_ptr env) {
 
 */
 
-int CommandPrintReachableStates(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE *errstream = StreamMgr_get_error_stream(streams);
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  BddFsm_ptr bdd_fsm = NULL;
+int CommandPrintReachableStates(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	FILE *errstream = StreamMgr_get_error_stream(streams);
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	BddFsm_ptr bdd_fsm = NULL;
 
-  int c;
-  boolean verbose = false;
-  boolean formula = false;
-  boolean print_defines = false;
-  char *filename;
-  int retval = 0;
+	int c;
+	boolean verbose = false;
+	boolean formula = false;
+	boolean print_defines = false;
+	char *filename;
+	int retval = 0;
 
-  filename = (char *)NULL;
+	filename = (char *)NULL;
 
-  /* Parse the command line */
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "hfvdo:")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsagePrintReachableStates(env);
-    case 'f':
-      formula = true;
-      break;
-    case 'v':
-      verbose = true;
-      break;
-    case 'd':
-      print_defines = true;
-      break;
-    case 'o':
-      if ((char *)NULL != filename) {
-        FREE(filename);
-        return UsagePrintReachableStates(env);
-      }
+	/* Parse the command line */
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "hfvdo:")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsagePrintReachableStates(env);
+		case 'f':
+			formula = true;
+			break;
+		case 'v':
+			verbose = true;
+			break;
+		case 'd':
+			print_defines = true;
+			break;
+		case 'o':
+			if ((char *)NULL != filename) {
+				FREE(filename);
+				return UsagePrintReachableStates(env);
+			}
 
-      filename = util_strsav(util_optarg);
-      break;
-    default:
-      if ((char *)NULL != filename)
-        FREE(filename);
-      return UsagePrintReachableStates(env);
-    }
-  }
+			filename = util_strsav(util_optarg);
+			break;
+		default:
+			if ((char *)NULL != filename)
+				FREE(filename);
+			return UsagePrintReachableStates(env);
+		}
+	}
 
-  if (verbose && formula) {
-    if ((char *)NULL != filename)
-      FREE(filename);
-    return UsagePrintReachableStates(env);
-  }
+	if (verbose && formula) {
+		if ((char *)NULL != filename)
+			FREE(filename);
+		return UsagePrintReachableStates(env);
+	}
 
-  if (print_defines && formula) {
-    StreamMgr_print_error(streams, "-f and -d are non combinable!\n");
-    if ((char *)NULL != filename)
-      FREE(filename);
-    return UsagePrintReachableStates(env);
-  }
+	if (print_defines && formula) {
+		StreamMgr_print_error(streams,
+				      "-f and -d are non combinable!\n");
+		if ((char *)NULL != filename)
+			FREE(filename);
+		return UsagePrintReachableStates(env);
+	}
 
-  if (print_defines && !(verbose)) {
-    StreamMgr_print_error(streams, "-d requires -v option!\n");
-    if ((char *)NULL != filename)
-      FREE(filename);
-    return UsagePrintReachableStates(env);
-  }
+	if (print_defines && !(verbose)) {
+		StreamMgr_print_error(streams, "-d requires -v option!\n");
+		if ((char *)NULL != filename)
+			FREE(filename);
+		return UsagePrintReachableStates(env);
+	}
 
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
 
-  { /* Printing */
-    OStream_ptr stream = StreamMgr_get_output_ostream(streams);
+	{ /* Printing */
+		OStream_ptr stream = StreamMgr_get_output_ostream(streams);
 
-    CATCH(errmgr) {
-      if ((char *)NULL != filename) {
-        stream = OStream_create_file(filename, false);
+		CATCH(errmgr)
+		{
+			if ((char *)NULL != filename) {
+				stream = OStream_create_file(filename, false);
 
-        if (OSTREAM(NULL) == stream) {
-          StreamMgr_print_error(streams, "Unable to open specified file.\n");
-          FREE(filename);
-          return 1;
-        }
-      }
+				if (OSTREAM(NULL) == stream) {
+					StreamMgr_print_error(
+						streams,
+						"Unable to open specified file.\n");
+					FREE(filename);
+					return 1;
+				}
+			}
 
-      bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
-      retval = BddFsm_print_reachable_states(bdd_fsm, env, stream, verbose,
-                                             print_defines, formula);
+			bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
+			retval = BddFsm_print_reachable_states(bdd_fsm, env,
+							       stream, verbose,
+							       print_defines,
+							       formula);
 
-      if ((char *)NULL != filename) {
-        OStream_destroy(stream);
-        FREE(filename);
-      }
-    }
-    FAIL(errmgr) {
-      if ((char *)NULL != filename) {
-        OStream_destroy(stream);
-        FREE(filename);
-      }
+			if ((char *)NULL != filename) {
+				OStream_destroy(stream);
+				FREE(filename);
+			}
+		}
+		FAIL(errmgr)
+		{
+			if ((char *)NULL != filename) {
+				OStream_destroy(stream);
+				FREE(filename);
+			}
 
-      retval = 1;
-    }
-  } /* printing */
+			retval = 1;
+		}
+	} /* printing */
 
-  return retval;
+	return retval;
 }
 
 /*!
@@ -561,27 +599,29 @@ int CommandPrintReachableStates(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsagePrintReachableStates(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(
-      streams,
-      "usage: print_reachable_states [-h] [-v] [-d] [-f] [-o filename]\n");
+static int UsagePrintReachableStates(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(
+		streams,
+		"usage: print_reachable_states [-h] [-v] [-d] [-f] [-o filename]\n");
 
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,
-                        "   -v \t\tPrints the list of reachable states.\n");
-  StreamMgr_print_error(streams,
-                        "   -d \t\tPrints the list of reachable states with ");
-  StreamMgr_print_error(streams, "defines (Requires -v).\n");
-  StreamMgr_print_error(streams,
-                        "   -f \t\tPrints the formula representing the ");
-  StreamMgr_print_error(streams, "reachable states.\n");
-  StreamMgr_print_error(streams,
-                        "   -o filename\tPrints the result on the specified ");
-  StreamMgr_print_error(streams, "filename instead of on standard output\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(
+		streams, "   -v \t\tPrints the list of reachable states.\n");
+	StreamMgr_print_error(
+		streams, "   -d \t\tPrints the list of reachable states with ");
+	StreamMgr_print_error(streams, "defines (Requires -v).\n");
+	StreamMgr_print_error(streams,
+			      "   -f \t\tPrints the formula representing the ");
+	StreamMgr_print_error(streams, "reachable states.\n");
+	StreamMgr_print_error(
+		streams, "   -o filename\tPrints the result on the specified ");
+	StreamMgr_print_error(streams,
+			      "filename instead of on standard output\n");
 
-  return 1;
+	return 1;
 }
 
 /*!
@@ -600,34 +640,35 @@ static int UsagePrintReachableStates(const NuSMVEnv_ptr env) {
   </dl>
 */
 
-int CommandPrintFairStates(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+int CommandPrintFairStates(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  BddFsm_ptr bdd_fsm = NULL;
-  int c;
-  boolean verbose = false;
+	BddFsm_ptr bdd_fsm = NULL;
+	int c;
+	boolean verbose = false;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "hv")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsagePrintFairStates(env);
-    case 'v':
-      verbose = true;
-      break;
-    default:
-      return UsagePrintFairStates(env);
-    }
-  }
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "hv")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsagePrintFairStates(env);
+		case 'v':
+			verbose = true;
+			break;
+		default:
+			return UsagePrintFairStates(env);
+		}
+	}
 
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
-  bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
+	bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
 
-  return BddFsm_print_fair_states(bdd_fsm, env, outstream, verbose);
+	return BddFsm_print_fair_states(bdd_fsm, env, outstream, verbose);
 }
 
 /*!
@@ -635,13 +676,15 @@ int CommandPrintFairStates(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsagePrintFairStates(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams, "usage: print_fair_states [-h] [-v]\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams, "   -v \t\tPrints the list of fair states.\n");
-  return 1;
+static int UsagePrintFairStates(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(streams, "usage: print_fair_states [-h] [-v]\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(streams,
+			      "   -v \t\tPrints the list of fair states.\n");
+	return 1;
 }
 
 /*!
@@ -664,82 +707,89 @@ static int UsagePrintFairStates(const NuSMVEnv_ptr env) {
   </dl>
 */
 
-int CommandPrintFairTransitions(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  OStream_ptr outstream = NULL;
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+int CommandPrintFairTransitions(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	OStream_ptr outstream = NULL;
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  BddFsm_ptr bdd_fsm = NULL;
-  int c;
-  boolean verbose = false;
-  enum BddFsmTransPrinterFormat format = BDD_FSM_TRANS_PRINTER_SMV;
-  int res;
+	BddFsm_ptr bdd_fsm = NULL;
+	int c;
+	boolean verbose = false;
+	enum BddFsmTransPrinterFormat format = BDD_FSM_TRANS_PRINTER_SMV;
+	int res;
 
-  /* Parse the command line */
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "ho:vf:")) != EOF) {
-    switch (c) {
-    case 'h':
-      goto cmd_help;
+	/* Parse the command line */
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "ho:vf:")) != EOF) {
+		switch (c) {
+		case 'h':
+			goto cmd_help;
 
-    case 'o':
-      outstream = OStream_create_file(util_optarg, false);
-      break;
+		case 'o':
+			outstream = OStream_create_file(util_optarg, false);
+			break;
 
-    case 'v':
-      verbose = true;
-      break;
+		case 'v':
+			verbose = true;
+			break;
 
-    case 'f':
-      verbose = true;
-      format = BddFsm_trans_printer_format_from_string(util_optarg);
-      if (BDD_FSM_TRANS_PRINTER_INVALID == format) {
-        size_t num;
-        int i;
-        enum BddFsmTransPrinterFormat *formats;
+		case 'f':
+			verbose = true;
+			format = BddFsm_trans_printer_format_from_string(
+				util_optarg);
+			if (BDD_FSM_TRANS_PRINTER_INVALID == format) {
+				size_t num;
+				int i;
+				enum BddFsmTransPrinterFormat *formats;
 
-        StreamMgr_print_error(streams, "Invalid format. Valid formats are: ");
-        formats = BddFsm_trans_printer_get_avail_formats(&num);
-        for (i = 0; i < num; ++i) {
-          StreamMgr_print_error(
-              streams, "%s%s",
-              BddFsm_trans_printer_format_to_string(formats[i]),
-              i + 1 < num ? ", " : "");
-        }
+				StreamMgr_print_error(
+					streams,
+					"Invalid format. Valid formats are: ");
+				formats =
+					BddFsm_trans_printer_get_avail_formats(
+						&num);
+				for (i = 0; i < num; ++i) {
+					StreamMgr_print_error(
+						streams, "%s%s",
+						BddFsm_trans_printer_format_to_string(
+							formats[i]),
+						i + 1 < num ? ", " : "");
+				}
 
-        StreamMgr_print_error(streams, "\n");
-        FREE(formats);
-        goto cmd_fail;
-      }
-      break;
+				StreamMgr_print_error(streams, "\n");
+				FREE(formats);
+				goto cmd_fail;
+			}
+			break;
 
-    default:
-      return UsagePrintFairTransitions(env);
-    }
-  }
+		default:
+			return UsagePrintFairTransitions(env);
+		}
+	}
 
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
 
-  bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
-  res = BddFsm_print_fair_transitions(
-      bdd_fsm, env, verbose ? format : BDD_FSM_TRANS_PRINTER_SILENT,
-      outstream ? outstream : StreamMgr_get_output_ostream(streams));
+	bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
+	res = BddFsm_print_fair_transitions(
+		bdd_fsm, env, verbose ? format : BDD_FSM_TRANS_PRINTER_SILENT,
+		outstream ? outstream : StreamMgr_get_output_ostream(streams));
 
 cmd_exit:
-  if (NULL != outstream) {
-    OStream_destroy(outstream);
-  }
-  return res;
+	if (NULL != outstream) {
+		OStream_destroy(outstream);
+	}
+	return res;
 
 cmd_help:
-  res = UsagePrintFairTransitions(env);
-  goto cmd_exit;
+	res = UsagePrintFairTransitions(env);
+	goto cmd_exit;
 
 cmd_fail:
-  res = 1;
-  goto cmd_exit;
+	res = 1;
+	goto cmd_exit;
 }
 
 /*!
@@ -747,38 +797,43 @@ cmd_fail:
 
   \todo Missing description
 */
-static int UsagePrintFairTransitions(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(
-      streams,
-      "usage: print_fair_transitions [-h] [-v [-f format] [-o fname]]\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,
-                        "   -v \t\tPrints the list of fair transitions.\n");
-  StreamMgr_print_error(streams,
-                        "   -f format\tUse given format when printing the list "
-                        "of fair transitions.\n");
-  StreamMgr_print_error(streams, "      \t\tValid formats are: ");
-  {
-    size_t num;
-    int i;
-    enum BddFsmTransPrinterFormat *formats;
+static int UsagePrintFairTransitions(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(
+		streams,
+		"usage: print_fair_transitions [-h] [-v [-f format] [-o fname]]\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(
+		streams, "   -v \t\tPrints the list of fair transitions.\n");
+	StreamMgr_print_error(
+		streams,
+		"   -f format\tUse given format when printing the list "
+		"of fair transitions.\n");
+	StreamMgr_print_error(streams, "      \t\tValid formats are: ");
+	{
+		size_t num;
+		int i;
+		enum BddFsmTransPrinterFormat *formats;
 
-    formats = BddFsm_trans_printer_get_avail_formats(&num);
-    for (i = 0; i < num; ++i) {
-      StreamMgr_print_error(streams, "%s%s",
-                            BddFsm_trans_printer_format_to_string(formats[i]),
-                            i + 1 < num ? ", " : "");
-    }
+		formats = BddFsm_trans_printer_get_avail_formats(&num);
+		for (i = 0; i < num; ++i) {
+			StreamMgr_print_error(
+				streams, "%s%s",
+				BddFsm_trans_printer_format_to_string(
+					formats[i]),
+				i + 1 < num ? ", " : "");
+		}
 
-    StreamMgr_print_error(streams, "\n");
-    FREE(formats);
-  }
-  StreamMgr_print_error(
-      streams, "   -o fname\tWrites to given filename (default: stderr).\n");
+		StreamMgr_print_error(streams, "\n");
+		FREE(formats);
+	}
+	StreamMgr_print_error(
+		streams,
+		"   -o fname\tWrites to given filename (default: stderr).\n");
 
-  return 1;
+	return 1;
 }
 
 /*!
@@ -797,35 +852,37 @@ static int UsagePrintFairTransitions(const NuSMVEnv_ptr env) {
   </dl>
 */
 
-int CommandPrintFairStateInputPairs(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+int CommandPrintFairStateInputPairs(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  BddFsm_ptr bdd_fsm = NULL;
-  int c;
-  boolean verbose = false;
+	BddFsm_ptr bdd_fsm = NULL;
+	int c;
+	boolean verbose = false;
 
-  /* Parse the command line */
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "hv")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsagePrintFairStateInputPairs(env);
-    case 'v':
-      verbose = true;
-      break;
-    default:
-      return UsagePrintFairStateInputPairs(env);
-    }
-  }
+	/* Parse the command line */
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "hv")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsagePrintFairStateInputPairs(env);
+		case 'v':
+			verbose = true;
+			break;
+		default:
+			return UsagePrintFairStateInputPairs(env);
+		}
+	}
 
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
 
-  bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
-  return BddFsm_print_fair_state_input_pairs(bdd_fsm, env, outstream, verbose);
+	bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
+	return BddFsm_print_fair_state_input_pairs(bdd_fsm, env, outstream,
+						   verbose);
 }
 
 /*!
@@ -833,15 +890,17 @@ int CommandPrintFairStateInputPairs(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsagePrintFairStateInputPairs(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,
-                        "usage: _print_fair_state_input_pairs [-h] [-v]\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(
-      streams, "   -v \t\tPrints the list of fair state/input pairs.\n");
-  return 1;
+static int UsagePrintFairStateInputPairs(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(
+		streams, "usage: _print_fair_state_input_pairs [-h] [-v]\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(
+		streams,
+		"   -v \t\tPrints the list of fair state/input pairs.\n");
+	return 1;
 }
 
 /*!
@@ -885,142 +944,154 @@ static int UsagePrintFairStateInputPairs(const NuSMVEnv_ptr env) {
   </dl>
 */
 
-int CommandDumpFsm(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  BddFsm_ptr bdd_fsm = NULL;
+int CommandDumpFsm(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	BddFsm_ptr bdd_fsm = NULL;
 
-  FILE *errstream = StreamMgr_get_error_stream(streams);
-  int c;
-  int res = 0;
-  boolean init = false;
-  boolean invar = false;
-  boolean trans = false;
-  boolean fair = false;
-  boolean reachable = false;
-  char *str_constr = (char *)NULL;
-  char *fname = (char *)NULL;
-  FILE *outfile = (FILE *)NULL;
-  node_ptr parsed_expr = NULL;
-  node_ptr node_expr = NULL;
+	FILE *errstream = StreamMgr_get_error_stream(streams);
+	int c;
+	int res = 0;
+	boolean init = false;
+	boolean invar = false;
+	boolean trans = false;
+	boolean fair = false;
+	boolean reachable = false;
+	char *str_constr = (char *)NULL;
+	char *fname = (char *)NULL;
+	FILE *outfile = (FILE *)NULL;
+	node_ptr parsed_expr = NULL;
+	node_ptr node_expr = NULL;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "ho:e:iItFr")) != EOF) {
-    switch (c) {
-    case 'h':
-      res = UsageDumpFsm(env);
-      goto dump_fsm_quit;
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "ho:e:iItFr")) != EOF) {
+		switch (c) {
+		case 'h':
+			res = UsageDumpFsm(env);
+			goto dump_fsm_quit;
 
-    case 'i':
-      init = true;
-      break;
-    case 'I':
-      invar = true;
-      break;
-    case 't':
-      trans = true;
-      break;
-    case 'F':
-      fair = true;
-      break;
-    case 'r':
-      reachable = true;
-      break;
+		case 'i':
+			init = true;
+			break;
+		case 'I':
+			invar = true;
+			break;
+		case 't':
+			trans = true;
+			break;
+		case 'F':
+			fair = true;
+			break;
+		case 'r':
+			reachable = true;
+			break;
 
-    case 'e':
-      if ((char *)NULL != str_constr)
-        FREE(str_constr);
-      str_constr = util_strsav(util_optarg);
-      break;
+		case 'e':
+			if ((char *)NULL != str_constr)
+				FREE(str_constr);
+			str_constr = util_strsav(util_optarg);
+			break;
 
-    case 'o':
-      if ((char *)NULL != fname)
-        FREE(fname);
-      fname = util_strsav(util_optarg);
-      break;
+		case 'o':
+			if ((char *)NULL != fname)
+				FREE(fname);
+			fname = util_strsav(util_optarg);
+			break;
 
-    default:
-      res = 1;
-      goto dump_fsm_quit;
-    }
-  }
+		default:
+			res = 1;
+			goto dump_fsm_quit;
+		}
+	}
 
-  /* preconditions */
-  if (Compile_check_if_model_was_built(env, errstream, true)) {
-    res = 1;
-    goto dump_fsm_quit;
-  }
+	/* preconditions */
+	if (Compile_check_if_model_was_built(env, errstream, true)) {
+		res = 1;
+		goto dump_fsm_quit;
+	}
 
-  /* checks and processes arguments */
-  if ((char *)NULL == fname) {
-    StreamMgr_print_error(streams, "Output file must be specified\n");
-    res = 1;
-    goto dump_fsm_quit;
-  }
+	/* checks and processes arguments */
+	if ((char *)NULL == fname) {
+		StreamMgr_print_error(streams,
+				      "Output file must be specified\n");
+		res = 1;
+		goto dump_fsm_quit;
+	}
 
-  if ((((char *)NULL != str_constr) + init + trans + invar + fair +
-       reachable) == 0) {
-    StreamMgr_print_error(
-        streams, "At least one option in 'eiItFr' must be specified.\n");
-    res = 1;
-    goto dump_fsm_quit;
-  }
+	if ((((char *)NULL != str_constr) + init + trans + invar + fair +
+	     reachable) == 0) {
+		StreamMgr_print_error(
+			streams,
+			"At least one option in 'eiItFr' must be specified.\n");
+		res = 1;
+		goto dump_fsm_quit;
+	}
 
-  outfile = fopen(fname, "w");
-  if ((FILE *)NULL == outfile) {
-    StreamMgr_print_error(streams, "Problems opening output file '%s'.\n",
-                          fname);
-    res = 1;
-    goto dump_fsm_quit;
-  }
+	outfile = fopen(fname, "w");
+	if ((FILE *)NULL == outfile) {
+		StreamMgr_print_error(
+			streams, "Problems opening output file '%s'.\n", fname);
+		res = 1;
+		goto dump_fsm_quit;
+	}
 
-  if ((char *)NULL != str_constr) {
-    if (Parser_ReadNextExprFromString(env, str_constr, &parsed_expr)) {
-      res = 1;
-      goto dump_fsm_quit;
-    }
+	if ((char *)NULL != str_constr) {
+		if (Parser_ReadNextExprFromString(env, str_constr,
+						  &parsed_expr)) {
+			res = 1;
+			goto dump_fsm_quit;
+		}
 
-    /* [MD] This should be a function */
-    {
-      BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-      SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(bdd_enc));
-      TypeChecker_ptr tc = SymbTable_get_type_checker(st);
-      SymbType_ptr tp = NULL;
+		/* [MD] This should be a function */
+		{
+			BddEnc_ptr bdd_enc = BDD_ENC(
+				NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
+			SymbTable_ptr st =
+				BaseEnc_get_symb_table(BASE_ENC(bdd_enc));
+			TypeChecker_ptr tc = SymbTable_get_type_checker(st);
+			SymbType_ptr tp = NULL;
 
-      node_expr = Compile_FlattenSexp(st, car(parsed_expr), Nil);
+			node_expr =
+				Compile_FlattenSexp(st, car(parsed_expr), Nil);
 
-      tp = TypeChecker_get_expression_type(tc, node_expr, Nil);
-      if (SymbType_is_error(tp)) {
-        StreamMgr_print_error(streams, "Type of expression is not correct.\n");
+			tp = TypeChecker_get_expression_type(tc, node_expr,
+							     Nil);
+			if (SymbType_is_error(tp)) {
+				StreamMgr_print_error(
+					streams,
+					"Type of expression is not correct.\n");
 
-        res = 1;
-        goto dump_fsm_quit;
-      }
-      if (SymbType_is_real(tp) || SymbType_is_continuous(tp) ||
-          SymbType_is_statement(tp)) {
-        StreamMgr_print_error(streams,
-                              "Type of expression is not supported.\n");
+				res = 1;
+				goto dump_fsm_quit;
+			}
+			if (SymbType_is_real(tp) ||
+			    SymbType_is_continuous(tp) ||
+			    SymbType_is_statement(tp)) {
+				StreamMgr_print_error(
+					streams,
+					"Type of expression is not supported.\n");
 
-        res = 1;
-        goto dump_fsm_quit;
-      }
-    }
-  }
+				res = 1;
+				goto dump_fsm_quit;
+			}
+		}
+	}
 
-  bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
-  res = BddFsm_dump_fsm(bdd_fsm, env, node_expr, str_constr, init, invar, trans,
-                        fair, reachable, outfile);
+	bdd_fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
+	res = BddFsm_dump_fsm(bdd_fsm, env, node_expr, str_constr, init, invar,
+			      trans, fair, reachable, outfile);
 dump_fsm_quit:
-  if ((char *)NULL != str_constr) {
-    FREE(str_constr);
-  }
-  if ((char *)NULL != fname) {
-    FREE(fname);
-  }
-  if ((FILE *)NULL != outfile) {
-    fclose(outfile);
-  }
-  return res;
+	if ((char *)NULL != str_constr) {
+		FREE(str_constr);
+	}
+	if ((char *)NULL != fname) {
+		FREE(fname);
+	}
+	if ((FILE *)NULL != outfile) {
+		fclose(outfile);
+	}
+	return res;
 }
 
 /*!
@@ -1028,21 +1099,25 @@ dump_fsm_quit:
 
   \todo Missing description
 */
-static int UsageDumpFsm(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(
-      streams,
-      "usage: dump_fsm [-h] -o <fname> [-i][-I][-t][-F][-r][-e <expr>]\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,
-                        "   -o fname \tDumps to the specified file.\n");
-  StreamMgr_print_error(streams,
-                        "   -e expr \tDumps the specified expression.\n");
-  StreamMgr_print_error(streams, "   -i \t\tDumps the initial states.\n");
-  StreamMgr_print_error(streams, "   -I \t\tDumps the invariant states.\n");
-  StreamMgr_print_error(streams, "   -t \t\tDumps the transition relation.\n");
-  StreamMgr_print_error(streams, "   -F \t\tDumps the fair states.\n");
-  StreamMgr_print_error(streams, "   -r \t\tDumps the reachable states.\n");
-  return 1;
+static int UsageDumpFsm(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(
+		streams,
+		"usage: dump_fsm [-h] -o <fname> [-i][-I][-t][-F][-r][-e <expr>]\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(streams,
+			      "   -o fname \tDumps to the specified file.\n");
+	StreamMgr_print_error(streams,
+			      "   -e expr \tDumps the specified expression.\n");
+	StreamMgr_print_error(streams, "   -i \t\tDumps the initial states.\n");
+	StreamMgr_print_error(streams,
+			      "   -I \t\tDumps the invariant states.\n");
+	StreamMgr_print_error(streams,
+			      "   -t \t\tDumps the transition relation.\n");
+	StreamMgr_print_error(streams, "   -F \t\tDumps the fair states.\n");
+	StreamMgr_print_error(streams,
+			      "   -r \t\tDumps the reachable states.\n");
+	return 1;
 }

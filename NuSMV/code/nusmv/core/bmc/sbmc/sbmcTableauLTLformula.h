@@ -81,8 +81,8 @@
   \sa AtMostOnce, Loop, get_f_at_time
 */
 be_ptr BmcInt_SBMCTableau_GetAtTime(const BeEnc_ptr be_enc,
-                                    const node_ptr ltl_wff, const int time,
-                                    const int k, const int l);
+				    const node_ptr ltl_wff, const int time,
+				    const int k, const int l);
 
 /**AutomaticEnd***************************************************************/
 

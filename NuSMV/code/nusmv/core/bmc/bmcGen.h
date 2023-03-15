@@ -68,7 +68,7 @@ be_ptr Bmc_Gen_InvarProblem(const BeFsm_ptr be_fsm, const node_ptr wff);
 
 */
 be_ptr Bmc_Gen_LtlProblem(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                          const int k, const int l);
+			  const int k, const int l);
 
 /*!
   \brief Returns the base step of the invariant construction
@@ -116,8 +116,8 @@ be_ptr Bmc_Gen_UnrollingFragment(const BeFsm_ptr self, const int i);
   \se None
 */
 int Bmc_Gen_check_psl_property(NuSMVEnv_ptr env, Prop_ptr prop,
-                               boolean dump_prob, boolean inc_sat,
-                               boolean single_prob, int k, int rel_loop);
+			       boolean dump_prob, boolean inc_sat,
+			       boolean single_prob, int k, int rel_loop);
 
 /**AutomaticEnd***************************************************************/
 

@@ -91,7 +91,7 @@
   \se None
 */
 be_ptr sbmc_equal_vectors_formula(const BeEnc_ptr be_enc, lsList vars,
-                                  const unsigned int i, const unsigned int j);
+				  const unsigned int i, const unsigned int j);
 
 /*!
   \brief Associates each subformula node of ltlspec with
@@ -105,11 +105,11 @@ be_ptr sbmc_equal_vectors_formula(const BeEnc_ptr be_enc, lsList vars,
   \se None
 */
 hash_ptr sbmc_init_LTL_info(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
-                            node_ptr ltlspec, lsList state_vars_formula_pd0,
-                            lsList state_vars_formula_pdx,
-                            lsList state_vars_formula_aux,
-                            const int opt_force_state_vars,
-                            const int opt_do_virtual_unrolling);
+			    node_ptr ltlspec, lsList state_vars_formula_pd0,
+			    lsList state_vars_formula_pdx,
+			    lsList state_vars_formula_aux,
+			    const int opt_force_state_vars,
+			    const int opt_do_virtual_unrolling);
 
 /*!
   \brief Initialize trans_bes[i][d] for each sub-formula.
@@ -123,9 +123,9 @@ hash_ptr sbmc_init_LTL_info(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
   \se None
 */
 void sbmc_init_state_vector(const BeEnc_ptr be_enc, const node_ptr ltlspec,
-                            const hash_ptr info_map, const unsigned int i_real,
-                            const node_ptr LastState_var,
-                            const be_ptr be_LoopExists);
+			    const hash_ptr info_map, const unsigned int i_real,
+			    const node_ptr LastState_var,
+			    const be_ptr be_LoopExists);
 
 /*!
   \brief Build InLoop_i
@@ -137,8 +137,8 @@ void sbmc_init_state_vector(const BeEnc_ptr be_enc, const node_ptr ltlspec,
   \se None
 */
 be_ptr sbmc_build_InLoop_i(const BeEnc_ptr be_enc,
-                           const state_vars_struct *state_vars,
-                           array_t *InLoop_array, const unsigned int i_model);
+			   const state_vars_struct *state_vars,
+			   array_t *InLoop_array, const unsigned int i_model);
 
 /*!
   \brief Build SimplePath_{i,k} for each 0<=i<k
@@ -148,8 +148,8 @@ be_ptr sbmc_build_InLoop_i(const BeEnc_ptr be_enc,
   \se None
 */
 lsList sbmc_SimplePaths(const BeEnc_ptr be_enc,
-                        const state_vars_struct *state_vars,
-                        array_t *InLoop_array, const unsigned int k);
+			const state_vars_struct *state_vars,
+			array_t *InLoop_array, const unsigned int k);
 
 /**AutomaticEnd***************************************************************/
 

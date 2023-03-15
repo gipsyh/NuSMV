@@ -79,12 +79,12 @@
 static void checker_statement_finalize(Object_ptr object, void *dummy);
 
 static SymbType_ptr checker_statement_check_expr(CheckerBase_ptr self,
-                                                 node_ptr expression,
-                                                 node_ptr context);
+						 node_ptr expression,
+						 node_ptr context);
 
 static boolean checker_statement_viol_handler(CheckerBase_ptr checker,
-                                              TypeSystemViolation violation,
-                                              node_ptr expression);
+					      TypeSystemViolation violation,
+					      node_ptr expression);
 
 static void print_operator(FILE *output_stream, node_ptr expr);
 
@@ -92,39 +92,42 @@ static void print_operator(FILE *output_stream, node_ptr expr);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-CheckerStatement_ptr CheckerStatement_create(const NuSMVEnv_ptr env) {
-  CheckerStatement_ptr self = ALLOC(CheckerStatement, 1);
-  CHECKER_STATEMENT_CHECK_INSTANCE(self);
+CheckerStatement_ptr CheckerStatement_create(const NuSMVEnv_ptr env)
+{
+	CheckerStatement_ptr self = ALLOC(CheckerStatement, 1);
+	CHECKER_STATEMENT_CHECK_INSTANCE(self);
 
-  checker_statement_init(self, env);
-  return self;
+	checker_statement_init(self, env);
+	return self;
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void checker_statement_init(CheckerStatement_ptr self, const NuSMVEnv_ptr env) {
-  /* base class initialization */
-  checker_core_init(
-      CHECKER_CORE(self), env, "Statements SMV Type Checker",
-      NUSMV_STATEMENTS_SYMBOL_FIRST,
-      (NUSMV_STATEMENTS_SYMBOL_LAST - NUSMV_STATEMENTS_SYMBOL_FIRST));
+void checker_statement_init(CheckerStatement_ptr self, const NuSMVEnv_ptr env)
+{
+	/* base class initialization */
+	checker_core_init(
+		CHECKER_CORE(self), env, "Statements SMV Type Checker",
+		NUSMV_STATEMENTS_SYMBOL_FIRST,
+		(NUSMV_STATEMENTS_SYMBOL_LAST - NUSMV_STATEMENTS_SYMBOL_FIRST));
 
-  /* members initialization */
-  self->inside_attime = false;
+	/* members initialization */
+	self->inside_attime = false;
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = checker_statement_finalize;
-  OVERRIDE(CheckerBase, check_expr) = checker_statement_check_expr;
-  OVERRIDE(CheckerBase, viol_handler) = checker_statement_viol_handler;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = checker_statement_finalize;
+	OVERRIDE(CheckerBase, check_expr) = checker_statement_check_expr;
+	OVERRIDE(CheckerBase, viol_handler) = checker_statement_viol_handler;
 }
 
-void checker_statement_deinit(CheckerStatement_ptr self) {
-  /* members deinitialization */
+void checker_statement_deinit(CheckerStatement_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class initialization */
-  checker_core_deinit(CHECKER_CORE(self));
+	/* base class initialization */
+	checker_core_deinit(CHECKER_CORE(self));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -136,11 +139,12 @@ void checker_statement_deinit(CheckerStatement_ptr self) {
 
   Called by the class destructor
 */
-static void checker_statement_finalize(Object_ptr object, void *dummy) {
-  CheckerStatement_ptr self = CHECKER_STATEMENT(object);
+static void checker_statement_finalize(Object_ptr object, void *dummy)
+{
+	CheckerStatement_ptr self = CHECKER_STATEMENT(object);
 
-  checker_statement_deinit(self);
-  FREE(self);
+	checker_statement_deinit(self);
+	FREE(self);
 }
 
 /*!
@@ -149,166 +153,175 @@ static void checker_statement_finalize(Object_ptr object, void *dummy) {
 
 */
 static SymbType_ptr checker_statement_check_expr(CheckerBase_ptr self,
-                                                 node_ptr expr,
-                                                 node_ptr context) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  /* wrap expr into the context. This is required by
+						 node_ptr expr,
+						 node_ptr context)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const NodeMgr_ptr nodemgr =
+		NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+	/* wrap expr into the context. This is required by
      the facilities which remembers the type of expressions
      and by the violation handler.
   */
-  node_ptr ctx_expr;
-  if (context != Nil)
-    ctx_expr = find_node(nodemgr, CONTEXT, context, expr);
-  else
-    ctx_expr = expr;
+	node_ptr ctx_expr;
+	if (context != Nil)
+		ctx_expr = find_node(nodemgr, CONTEXT, context, expr);
+	else
+		ctx_expr = expr;
 
-  { /* checks memoizing */
-    SymbType_ptr tmp = _GET_TYPE(ctx_expr);
-    if (nullType != tmp)
-      return tmp;
-  }
+	{ /* checks memoizing */
+		SymbType_ptr tmp = _GET_TYPE(ctx_expr);
+		if (nullType != tmp)
+			return tmp;
+	}
 
-  switch (node_get_type(expr)) {
+	switch (node_get_type(expr)) {
+	case TRANS:
+	case INIT:
+	case INVAR:
+	case FAIRNESS:
+	case JUSTICE:
+	case COMPASSION:
+	case SPEC:
+	case LTLSPEC:
+	case PSLSPEC:
+	case INVARSPEC:
+	case ISA:
+	case CONSTRAINT:
+	case MODULE:
+	case PROCESS:
+	case MODTYPE:
+	case LAMBDA: {
+		/* get the operand's type */
+		SymbType_ptr type = _THROW(car(expr), Nil);
 
-  case TRANS:
-  case INIT:
-  case INVAR:
-  case FAIRNESS:
-  case JUSTICE:
-  case COMPASSION:
-  case SPEC:
-  case LTLSPEC:
-  case PSLSPEC:
-  case INVARSPEC:
-  case ISA:
-  case CONSTRAINT:
-  case MODULE:
-  case PROCESS:
-  case MODTYPE:
-  case LAMBDA: {
-    /* get the operand's type */
-    SymbType_ptr type = _THROW(car(expr), Nil);
+		if (SymbType_is_error(type)) {
+			/* earlier error */
+			return _SET_TYPE(ctx_expr,
+					 SymbTablePkg_error_type(env));
+		}
 
-    if (SymbType_is_error(type)) {
-      /* earlier error */
-      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
-    }
-
-    /* The operand must be boolean or statement-type (statements can
+		/* The operand must be boolean or statement-type (statements can
        be produced by predicate-normalisation in symbolic FSM (when
        assignments are pushed into expressions). */
-    if (SymbType_is_boolean(type) || SymbType_is_statement(type)) {
-      return _SET_TYPE(ctx_expr, type);
-    }
+		if (SymbType_is_boolean(type) || SymbType_is_statement(type)) {
+			return _SET_TYPE(ctx_expr, type);
+		}
 
-    /* there is violation */
-    if (_VIOLATION(SymbType_is_back_comp(type) ? TC_VIOLATION_TYPE_BACK_COMP
-                                               : TC_VIOLATION_TYPE_MANDATORY,
-                   expr)) {
-      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
-    }
+		/* there is violation */
+		if (_VIOLATION(SymbType_is_back_comp(type) ?
+				       TC_VIOLATION_TYPE_BACK_COMP :
+				       TC_VIOLATION_TYPE_MANDATORY,
+			       expr)) {
+			return _SET_TYPE(ctx_expr,
+					 SymbTablePkg_error_type(env));
+		}
 
-    /* this is not an error after all -> keeps the current type */
-    return _SET_TYPE(ctx_expr, type);
-  }
+		/* this is not an error after all -> keeps the current type */
+		return _SET_TYPE(ctx_expr, type);
+	}
 
-  case ATTIME: {
-    /* boolean expression and a constant integer */
-    SymbType_ptr type;
+	case ATTIME: {
+		/* boolean expression and a constant integer */
+		SymbType_ptr type;
 
-    /* not nested */
-    if ((CHECKER_STATEMENT(self)->inside_attime) &&
-        _VIOLATION(TC_VIOLATION_ATTIME_NESTED, expr)) {
-      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
-    }
+		/* not nested */
+		if ((CHECKER_STATEMENT(self)->inside_attime) &&
+		    _VIOLATION(TC_VIOLATION_ATTIME_NESTED, expr)) {
+			return _SET_TYPE(ctx_expr,
+					 SymbTablePkg_error_type(env));
+		}
 
-    /* time is a number */
-    if ((node_get_type(cdr(expr)) != NUMBER) &&
-        _VIOLATION(TC_VIOLATION_ATTIME_NUM_REQ, expr)) {
-      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
-    }
-    CHECKER_STATEMENT(self)->inside_attime = true;
-    type = _THROW(car(expr), context);
-    CHECKER_STATEMENT(self)->inside_attime = false;
-    if (SymbType_is_error(type)) {
-      /* earlier error */
-      return _SET_TYPE(ctx_expr, SymbTablePkg_error_type(env));
-    }
+		/* time is a number */
+		if ((node_get_type(cdr(expr)) != NUMBER) &&
+		    _VIOLATION(TC_VIOLATION_ATTIME_NUM_REQ, expr)) {
+			return _SET_TYPE(ctx_expr,
+					 SymbTablePkg_error_type(env));
+		}
+		CHECKER_STATEMENT(self)->inside_attime = true;
+		type = _THROW(car(expr), context);
+		CHECKER_STATEMENT(self)->inside_attime = false;
+		if (SymbType_is_error(type)) {
+			/* earlier error */
+			return _SET_TYPE(ctx_expr,
+					 SymbTablePkg_error_type(env));
+		}
 
-    /* this is not an error after all -> keeps the current type */
-    return _SET_TYPE(ctx_expr, type);
-  }
+		/* this is not an error after all -> keeps the current type */
+		return _SET_TYPE(ctx_expr, type);
+	}
 
-  case DEFINE: { /* DEFINE is artificial contract to check DEFINES body */
-    SymbType_ptr type = _THROW(car(expr), Nil);
+	case DEFINE: { /* DEFINE is artificial contract to check DEFINES body */
+		SymbType_ptr type = _THROW(car(expr), Nil);
 
-    /* earlier error */
-    if (SymbType_is_error(type))
-      return _SET_TYPE(ctx_expr, type);
+		/* earlier error */
+		if (SymbType_is_error(type))
+			return _SET_TYPE(ctx_expr, type);
 
-    /* DEFINEs can have any type => do not check constrains on the type */
-    return _SET_TYPE(ctx_expr, type);
-  }
+		/* DEFINEs can have any type => do not check constrains on the type */
+		return _SET_TYPE(ctx_expr, type);
+	}
 
-  case ASSIGN: { /* type check the assignment: EQDEF */
-    SymbType_ptr type;
+	case ASSIGN: { /* type check the assignment: EQDEF */
+		SymbType_ptr type;
 
-    /* the car is an EQDEF or it is a CONTEXT node that has an EQDEF
+		/* the car is an EQDEF or it is a CONTEXT node that has an EQDEF
        as right child.
 
        Checking for CONTEXT enable to type check not-flattened ASSIGN.
     */
-    nusmv_assert(EQDEF == node_get_type(car(expr)) ||
-                 (CONTEXT == node_get_type(car(expr)) &&
-                  EQDEF == node_get_type(cdr(car(expr)))));
+		nusmv_assert(EQDEF == node_get_type(car(expr)) ||
+			     (CONTEXT == node_get_type(car(expr)) &&
+			      EQDEF == node_get_type(cdr(car(expr)))));
 
-    type = _THROW(car(expr), Nil);
+		type = _THROW(car(expr), Nil);
 
-    /* mark the error situation */
-    if (SymbType_is_error(type))
-      return _SET_TYPE(ctx_expr, type);
-    return _SET_TYPE(ctx_expr, type);
-  }
+		/* mark the error situation */
+		if (SymbType_is_error(type))
+			return _SET_TYPE(ctx_expr, type);
+		return _SET_TYPE(ctx_expr, type);
+	}
 
-  case COMPUTE: {
-    SymbType_ptr type;
+	case COMPUTE: {
+		SymbType_ptr type;
 
-    /* the expression is also wrapped in context */
-    nusmv_assert(CONTEXT == node_get_type(car(expr)));
+		/* the expression is also wrapped in context */
+		nusmv_assert(CONTEXT == node_get_type(car(expr)));
 
-    /* now the expression should be MAX or MIN */
-    nusmv_assert(MINU == node_get_type(cdr(car(expr))) ||
-                 MAXU == node_get_type(cdr(car(expr))));
+		/* now the expression should be MAX or MIN */
+		nusmv_assert(MINU == node_get_type(cdr(car(expr))) ||
+			     MAXU == node_get_type(cdr(car(expr))));
 
-    /* get the operands' type */
-    type = _THROW(car(expr), context);
+		/* get the operands' type */
+		type = _THROW(car(expr), context);
 
-    if (SymbType_is_error(type)) {
-      return _SET_TYPE(expr, SymbTablePkg_error_type(env)); /*earlier error*/
-    }
+		if (SymbType_is_error(type)) {
+			return _SET_TYPE(expr, SymbTablePkg_error_type(
+						       env)); /*earlier error*/
+		}
 
-    /* the expressions must be boolean */
-    if (SymbType_is_boolean(type)) {
-      return _SET_TYPE(expr, type);
-    }
+		/* the expressions must be boolean */
+		if (SymbType_is_boolean(type)) {
+			return _SET_TYPE(expr, type);
+		}
 
-    if (_VIOLATION(SymbType_is_back_comp(type) ? TC_VIOLATION_TYPE_BACK_COMP
-                                               : TC_VIOLATION_TYPE_MANDATORY,
-                   expr)) {
-      _SET_TYPE(expr, SymbTablePkg_error_type(env));
-    }
+		if (_VIOLATION(SymbType_is_back_comp(type) ?
+				       TC_VIOLATION_TYPE_BACK_COMP :
+				       TC_VIOLATION_TYPE_MANDATORY,
+			       expr)) {
+			_SET_TYPE(expr, SymbTablePkg_error_type(env));
+		}
 
-    /* this is not an error after all -> keeps the current type */
-    return _SET_TYPE(ctx_expr, type);
-  } /* COMPUTE */
+		/* this is not an error after all -> keeps the current type */
+		return _SET_TYPE(ctx_expr, type);
+	} /* COMPUTE */
 
-  default:
-    error_unreachable_code();
+	default:
+		error_unreachable_code();
 
-  } /* switch */
+	} /* switch */
 
-  return nullType;
+	return nullType;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -347,128 +360,135 @@ static SymbType_ptr checker_statement_check_expr(CheckerBase_ptr self,
   \sa TypeSystemViolation
 */
 static boolean checker_statement_viol_handler(CheckerBase_ptr self,
-                                              TypeSystemViolation violation,
-                                              node_ptr expression) {
-  /* In the output message, the information about the expression
+					      TypeSystemViolation violation,
+					      node_ptr expression)
+{
+	/* In the output message, the information about the expression
      location are output. So, make sure that the input file name and
      line number are correctly set!
   */
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  boolean isError = true; /* is this error or warning */
+	boolean isError = true; /* is this error or warning */
 
-  /* get rid of the context the expression may be wrapped in */
-  node_ptr context = Nil;
-  node_ptr expr = expression;
+	/* get rid of the context the expression may be wrapped in */
+	node_ptr context = Nil;
+	node_ptr expr = expression;
 
-  if (node_get_type(expression) == CONTEXT) {
-    context = car(expression);
-    expr = cdr(expression);
-  }
+	if (node_get_type(expression) == CONTEXT) {
+		context = car(expression);
+		expr = cdr(expression);
+	}
 
-  /* checks the given violation */
-  nusmv_assert(TypeSystemViolation_is_valid(violation));
+	/* checks the given violation */
+	nusmv_assert(TypeSystemViolation_is_valid(violation));
 
-  /* only violation TC_VIOLATION_TYPE_BACK_COMP or
+	/* only violation TC_VIOLATION_TYPE_BACK_COMP or
      TC_VIOLATION_DUPLICATE_CONSTANTS and the variable
      type_checking_backward_compatibility being true, may
      make a warning from an error.
      TC_VIOLATION_TYPE_WARNING always forces a warning
   */
-  if (TC_VIOLATION_TYPE_WARNING == violation ||
-      ((TC_VIOLATION_TYPE_BACK_COMP == violation ||
-        TC_VIOLATION_DUPLICATE_CONSTANTS == violation) &&
-       opt_backward_comp(opts))) {
-    isError = false;
-  }
+	if (TC_VIOLATION_TYPE_WARNING == violation ||
+	    ((TC_VIOLATION_TYPE_BACK_COMP == violation ||
+	      TC_VIOLATION_DUPLICATE_CONSTANTS == violation) &&
+	     opt_backward_comp(opts))) {
+		isError = false;
+	}
 
-  if (!isError && !opt_type_checking_warning_on(opts)) {
-    /* this is a warning and warning messages are not allowed.
+	if (!isError && !opt_type_checking_warning_on(opts)) {
+		/* this is a warning and warning messages are not allowed.
      So, do nothing, just return false (this is not an error)
     */
-    return false;
-  }
+		return false;
+	}
 
-  _PRINT_ERROR_MSG(expr, isError);
+	_PRINT_ERROR_MSG(expr, isError);
 
-  switch (violation) {
-  case TC_VIOLATION_ATTIME_NESTED:
-    StreamMgr_print_error(streams, "Nested ATTIME are not allowed\n");
-    break;
+	switch (violation) {
+	case TC_VIOLATION_ATTIME_NESTED:
+		StreamMgr_print_error(streams,
+				      "Nested ATTIME are not allowed\n");
+		break;
 
-  case TC_VIOLATION_ATTIME_NUM_REQ:
-    StreamMgr_print_error(
-        streams, "ATTIME requires time is a constant integer number\n");
-    break;
+	case TC_VIOLATION_ATTIME_NUM_REQ:
+		StreamMgr_print_error(
+			streams,
+			"ATTIME requires time is a constant integer number\n");
+		break;
 
-  case TC_VIOLATION_TYPE_MANDATORY:
-  case TC_VIOLATION_TYPE_BACK_COMP:
-  case TC_VIOLATION_TYPE_WARNING:
-    if (isError)
-      StreamMgr_print_error(streams, "illegal ");
-    else
-      StreamMgr_print_error(streams, "potentially incorrect ");
+	case TC_VIOLATION_TYPE_MANDATORY:
+	case TC_VIOLATION_TYPE_BACK_COMP:
+	case TC_VIOLATION_TYPE_WARNING:
+		if (isError)
+			StreamMgr_print_error(streams, "illegal ");
+		else
+			StreamMgr_print_error(streams,
+					      "potentially incorrect ");
 
-    switch (node_get_type(expr)) {
-    case DEFINE:
-    case ISA:
-    case MODULE:
-    case MODTYPE:
-    case LAMBDA: {
-      const MasterPrinter_ptr sexpprint =
-          MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
+		switch (node_get_type(expr)) {
+		case DEFINE:
+		case ISA:
+		case MODULE:
+		case MODTYPE:
+		case LAMBDA: {
+			const MasterPrinter_ptr sexpprint = MASTER_PRINTER(
+				NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
 
-      StreamMgr_nprint_error(streams, sexpprint, "%N", expr);
-      error_unreachable_code(); /* this is impossible */
-    }
+			StreamMgr_nprint_error(streams, sexpprint, "%N", expr);
+			error_unreachable_code(); /* this is impossible */
+		}
 
-    /* high level unary operator */
-    case TRANS:
-    case INIT:
-    case INVAR:
-    case FAIRNESS:
-    case JUSTICE:
-    case COMPASSION:
-    case SPEC:
-    case LTLSPEC:
-    case PSLSPEC:
-    case INVARSPEC:
-    case CONSTRAINT:
-    case COMPUTE:
-    case PROCESS: /*PROCESS is artificial contract to check 'running' symbols*/
-      StreamMgr_print_error(streams, "type of ");
-      print_operator(errstream, expr);
-      StreamMgr_print_error(streams, " expression : ");
-      checker_base_print_type(self, errstream, car(expr), context);
-      break;
+		/* high level unary operator */
+		case TRANS:
+		case INIT:
+		case INVAR:
+		case FAIRNESS:
+		case JUSTICE:
+		case COMPASSION:
+		case SPEC:
+		case LTLSPEC:
+		case PSLSPEC:
+		case INVARSPEC:
+		case CONSTRAINT:
+		case COMPUTE:
+		case PROCESS: /*PROCESS is artificial contract to check 'running' symbols*/
+			StreamMgr_print_error(streams, "type of ");
+			print_operator(errstream, expr);
+			StreamMgr_print_error(streams, " expression : ");
+			checker_base_print_type(self, errstream, car(expr),
+						context);
+			break;
 
-    default: /* unknown kind of an expression */
-    {
-      const MasterPrinter_ptr sexpprint =
-          MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
+		default: /* unknown kind of an expression */
+		{
+			const MasterPrinter_ptr sexpprint = MASTER_PRINTER(
+				NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
 
-      StreamMgr_print_error(streams,
-                            "\nchecker_statement_viol_handler: expression ");
-      StreamMgr_nprint_error(streams, sexpprint, "%N", expr);
-      ErrorMgr_internal_error(errmgr, "\nUnknown kind of expression");
-    }
-    } /* switch (node_get_type(expr)) */
+			StreamMgr_print_error(
+				streams,
+				"\nchecker_statement_viol_handler: expression ");
+			StreamMgr_nprint_error(streams, sexpprint, "%N", expr);
+			ErrorMgr_internal_error(errmgr,
+						"\nUnknown kind of expression");
+		}
+		} /* switch (node_get_type(expr)) */
 
-    StreamMgr_print_error(streams, "\n");
-    break;
+		StreamMgr_print_error(streams, "\n");
+		break;
 
-  default:
-    error_unreachable_code(); /* unknown kind of an error */
-  }                           /* switch (errorKind) */
+	default:
+		error_unreachable_code(); /* unknown kind of an error */
+	} /* switch (errorKind) */
 
-  return isError;
+	return isError;
 }
 
 /**Static function*************************************************************
@@ -490,77 +510,77 @@ static boolean checker_statement_viol_handler(CheckerBase_ptr self,
 
   \todo Missing description
 */
-static void print_operator(FILE *output_stream, node_ptr expr) {
-  nusmv_assert((node_ptr)Nil != expr);
-  switch (node_get_type(expr)) {
+static void print_operator(FILE *output_stream, node_ptr expr)
+{
+	nusmv_assert((node_ptr)Nil != expr);
+	switch (node_get_type(expr)) {
+	case TRANS:
+		fprintf(output_stream, "TRANS");
+		return;
+	case INIT:
+		fprintf(output_stream, "INIT");
+		return;
+	case INVAR:
+		fprintf(output_stream, "INVAR");
+		return;
+	case ASSIGN:
+		fprintf(output_stream, "ASSIGN");
+		return;
+	case FAIRNESS:
+		fprintf(output_stream, "FAIRNESS");
+		return;
+	case JUSTICE:
+		fprintf(output_stream, "JUSTICE");
+		return;
+	case COMPASSION:
+		fprintf(output_stream, "COMPASSION");
+		return;
+	case SPEC:
+		fprintf(output_stream, "SPEC");
+		return;
+	case LTLSPEC:
+		fprintf(output_stream, "LTLSPEC");
+		return;
+	case PSLSPEC:
+		fprintf(output_stream, "PSLSPEC");
+		return;
+	case INVARSPEC:
+		fprintf(output_stream, "INVARSPEC");
+		return;
+	case COMPUTE:
+		fprintf(output_stream, "COMPUTE");
+		return;
+	case DEFINE:
+		fprintf(output_stream, "\n(DEFINE ");
+		return;
+	case ISA:
+		fprintf(output_stream, "\n(ISA ");
+		return;
+	case CONSTRAINT:
+		fprintf(output_stream, "\nCONSTRAINT ");
+		return;
+	case MODULE:
+		fprintf(output_stream, "\n(MODULE ");
+		return;
+	case ATTIME:
+		fprintf(output_stream, "\nATTIME ");
+		return;
 
-  case TRANS:
-    fprintf(output_stream, "TRANS");
-    return;
-  case INIT:
-    fprintf(output_stream, "INIT");
-    return;
-  case INVAR:
-    fprintf(output_stream, "INVAR");
-    return;
-  case ASSIGN:
-    fprintf(output_stream, "ASSIGN");
-    return;
-  case FAIRNESS:
-    fprintf(output_stream, "FAIRNESS");
-    return;
-  case JUSTICE:
-    fprintf(output_stream, "JUSTICE");
-    return;
-  case COMPASSION:
-    fprintf(output_stream, "COMPASSION");
-    return;
-  case SPEC:
-    fprintf(output_stream, "SPEC");
-    return;
-  case LTLSPEC:
-    fprintf(output_stream, "LTLSPEC");
-    return;
-  case PSLSPEC:
-    fprintf(output_stream, "PSLSPEC");
-    return;
-  case INVARSPEC:
-    fprintf(output_stream, "INVARSPEC");
-    return;
-  case COMPUTE:
-    fprintf(output_stream, "COMPUTE");
-    return;
-  case DEFINE:
-    fprintf(output_stream, "\n(DEFINE ");
-    return;
-  case ISA:
-    fprintf(output_stream, "\n(ISA ");
-    return;
-  case CONSTRAINT:
-    fprintf(output_stream, "\nCONSTRAINT ");
-    return;
-  case MODULE:
-    fprintf(output_stream, "\n(MODULE ");
-    return;
-  case ATTIME:
-    fprintf(output_stream, "\nATTIME ");
-    return;
+	/* PROCESS is artificial contract to check 'running' symbols */
+	case PROCESS:
+		fprintf(output_stream, "'running'");
+		return;
 
-  /* PROCESS is artificial contract to check 'running' symbols */
-  case PROCESS:
-    fprintf(output_stream, "'running'");
-    return;
+	case MODTYPE:
+		fprintf(output_stream, "\n(MODTYPE ");
+		return;
+	case LAMBDA:
+		fprintf(output_stream, "\n(LAMBDA ");
+		return;
 
-  case MODTYPE:
-    fprintf(output_stream, "\n(MODTYPE ");
-    return;
-  case LAMBDA:
-    fprintf(output_stream, "\n(LAMBDA ");
-    return;
-
-  default:
-    error_unreachable_code_msg("\n%d\n", node_get_type(expr));
-  }
+	default:
+		error_unreachable_code_msg("\n%d\n", node_get_type(expr));
+	}
 }
 
 /**AutomaticEnd***************************************************************/

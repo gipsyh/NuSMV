@@ -66,8 +66,8 @@ typedef struct EnvObject_TAG *EnvObject_ptr;
 
   \todo Missing description
 */
-#define ENV_OBJECT_CHECK_INSTANCE(self)                                        \
-  (nusmv_assert(ENV_OBJECT(self) != ENV_OBJECT(NULL)))
+#define ENV_OBJECT_CHECK_INSTANCE(self) \
+	(nusmv_assert(ENV_OBJECT(self) != ENV_OBJECT(NULL)))
 
 /*!
   \brief Macro that returns the environment from an env object

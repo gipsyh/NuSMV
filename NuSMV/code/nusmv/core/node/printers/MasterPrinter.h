@@ -61,8 +61,8 @@ typedef struct MasterPrinter_TAG *MasterPrinter_ptr;
 
   \todo Missing description
 */
-#define MASTER_PRINTER_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(MASTER_PRINTER(self) != MASTER_PRINTER(NULL)))
+#define MASTER_PRINTER_CHECK_INSTANCE(self) \
+	(nusmv_assert(MASTER_PRINTER(self) != MASTER_PRINTER(NULL)))
 
 /*!
   \brief Definition of enumeration StreamType
@@ -72,12 +72,12 @@ typedef struct MasterPrinter_TAG *MasterPrinter_ptr;
 */
 
 typedef enum StreamType_TAG {
-  STREAM_TYPE_DEFAULT, /* the default stream type (STREAM_TYPE_STDOUT) */
-  STREAM_TYPE_STDOUT,
-  STREAM_TYPE_STDERR,
-  STREAM_TYPE_STRING,
-  STREAM_TYPE_FILE,    /* This requires a parameter */
-  STREAM_TYPE_FUNCTION /* This requires a parameter */
+	STREAM_TYPE_DEFAULT, /* the default stream type (STREAM_TYPE_STDOUT) */
+	STREAM_TYPE_STDOUT,
+	STREAM_TYPE_STDERR,
+	STREAM_TYPE_STRING,
+	STREAM_TYPE_FILE, /* This requires a parameter */
+	STREAM_TYPE_FUNCTION /* This requires a parameter */
 } StreamType;
 
 /*!
@@ -100,16 +100,16 @@ typedef int (*StreamTypeFunction_ptr)(const char *str, void *arg);
 */
 
 union StreamTypeArg {
-  /* for STREAM_TYPE_FILE */
-  FILE *file;
+	/* for STREAM_TYPE_FILE */
+	FILE *file;
 
-  /* for STREAM_TYPE_FUNCTION */
-  struct {
-    /* The function pointer */
-    StreamTypeFunction_ptr func_ptr;
-    /* The argument to pass to each function call */
-    void *argument;
-  } function;
+	/* for STREAM_TYPE_FUNCTION */
+	struct {
+		/* The function pointer */
+		StreamTypeFunction_ptr func_ptr;
+		/* The argument to pass to each function call */
+		void *argument;
+	} function;
 };
 
 /*!
@@ -149,7 +149,7 @@ char *sprint_node(MasterPrinter_ptr wffprinter, node_ptr);
    at given offset.
 */
 int print_node_indent_at(MasterPrinter_ptr iwffprinter, FILE *stream,
-                         node_ptr n, int ofs);
+			 node_ptr n, int ofs);
 
 /*!
   \brief Pretty print a formula into a string (indenting)
@@ -247,7 +247,7 @@ void MasterPrinter_reset_stream(MasterPrinter_ptr self, int offs);
 
 */
 void MasterPrinter_set_stream_type(MasterPrinter_ptr self, StreamType type,
-                                   const union StreamTypeArg *arg);
+				   const union StreamTypeArg *arg);
 
 /*!
   \methodof MasterPrinter

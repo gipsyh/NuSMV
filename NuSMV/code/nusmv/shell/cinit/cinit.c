@@ -70,45 +70,47 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void CInit_init_cmd(NuSMVEnv_ptr env) {
-  Cmd_init_cmd(env);
-  Parser_Cmd_init(env);
-  Enc_add_commands(env);
-  Hrc_init_cmd(env);
-  Simulate_Cmd_init(env);
-  PropPkg_init_cmd(env);
-  Compile_init_cmd(env);
-  Mc_Init(env);
-  cinit_AddCmd(env);
+void CInit_init_cmd(NuSMVEnv_ptr env)
+{
+	Cmd_init_cmd(env);
+	Parser_Cmd_init(env);
+	Enc_add_commands(env);
+	Hrc_init_cmd(env);
+	Simulate_Cmd_init(env);
+	PropPkg_init_cmd(env);
+	Compile_init_cmd(env);
+	Mc_Init(env);
+	cinit_AddCmd(env);
 
 #if NUSMV_HAVE_SAT_SOLVER
-  Bmc_AddCmd(env);
+	Bmc_AddCmd(env);
 #endif
 
-  Utils_init_cmd(env);
-  traceCmd_init(env);
-  Opt_Cmd_init(env);
-  dd_AddCmd(env);
+	Utils_init_cmd(env);
+	traceCmd_init(env);
+	Opt_Cmd_init(env);
+	dd_AddCmd(env);
 
-  Bdd_Init(env);
-  Ltl_Init(env);
+	Bdd_Init(env);
+	Ltl_Init(env);
 
-  Opt_Cmd_init(env);
+	Opt_Cmd_init(env);
 }
 
-void CInit_quit_cmd(NuSMVEnv_ptr env) {
-  Cmd_quit_cmd(env);
-  Utils_quit_cmd(env);
-  Hrc_quit_cmd(env);
-  PropPkg_quit_cmd(env);
-  Simulate_Cmd_quit(env);
+void CInit_quit_cmd(NuSMVEnv_ptr env)
+{
+	Cmd_quit_cmd(env);
+	Utils_quit_cmd(env);
+	Hrc_quit_cmd(env);
+	PropPkg_quit_cmd(env);
+	Simulate_Cmd_quit(env);
 
 #if NUSMV_HAVE_SAT_SOLVER
-  Bmc_Cmd_quit(env);
+	Bmc_Cmd_quit(env);
 #endif
 
-  Bdd_End(env); /* does nothing */
-  Mc_End(env);  /* does nothing */
+	Bdd_End(env); /* does nothing */
+	Mc_End(env); /* does nothing */
 }
 
 /*---------------------------------------------------------------------------*/

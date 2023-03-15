@@ -52,16 +52,16 @@
 */
 
 typedef struct NormalizerPsl_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NormalizerBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NormalizerBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } NormalizerPsl;
 
@@ -78,7 +78,7 @@ typedef struct NormalizerPsl_TAG {
   \sa NormalizerPsl_create
 */
 void normalizer_psl_init(NormalizerPsl_ptr self, const NuSMVEnv_ptr env,
-                         const char *name, int low, size_t num);
+			 const char *name, int low, size_t num);
 
 /*!
   \methodof NormalizerPsl

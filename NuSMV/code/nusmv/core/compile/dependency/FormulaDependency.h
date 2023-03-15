@@ -63,8 +63,8 @@ typedef struct FormulaDependency_TAG *FormulaDependency_ptr;
 
   \todo Missing description
 */
-#define FORMULA_DEPENDENCY_CHECK_INSTANCE(self)                                \
-  (nusmv_assert(FORMULA_DEPENDENCY(self) != FORMULA_DEPENDENCY(NULL)))
+#define FORMULA_DEPENDENCY_CHECK_INSTANCE(self) \
+	(nusmv_assert(FORMULA_DEPENDENCY(self) != FORMULA_DEPENDENCY(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -110,8 +110,8 @@ void FormulaDependency_destroy(FormulaDependency_ptr self);
   \sa formula_dependency_get_definition_dependencies
 */
 Set_t FormulaDependency_get_dependencies(FormulaDependency_ptr self,
-                                         SymbTable_ptr symb_table,
-                                         node_ptr formula, node_ptr context);
+					 SymbTable_ptr symb_table,
+					 node_ptr formula, node_ptr context);
 
 /*!
   \methodof FormulaDependency
@@ -133,8 +133,8 @@ Set_t FormulaDependency_get_dependencies(FormulaDependency_ptr self,
    formula_dependency_get_definition_dependencies
 */
 Set_t FormulaDependency_get_dependencies_by_type(
-    FormulaDependency_ptr self, SymbTable_ptr symb_table, node_ptr formula,
-    node_ptr context, SymbFilterType filter, boolean preserve_time);
+	FormulaDependency_ptr self, SymbTable_ptr symb_table, node_ptr formula,
+	node_ptr context, SymbFilterType filter, boolean preserve_time);
 
 /*!
   \methodof FormulaDependency
@@ -145,8 +145,8 @@ Set_t FormulaDependency_get_dependencies_by_type(
   Set must be disposed by the caller.
 */
 Set_t FormulaDependency_formulae_get_dependencies_by_type(
-    FormulaDependency_ptr, SymbTable_ptr, node_ptr, node_ptr, node_ptr,
-    SymbFilterType, boolean);
+	FormulaDependency_ptr, SymbTable_ptr, node_ptr, node_ptr, node_ptr,
+	SymbFilterType, boolean);
 
 /*!
   \methodof FormulaDependency
@@ -157,10 +157,10 @@ Set_t FormulaDependency_formulae_get_dependencies_by_type(
    disposed by the caller
 */
 Set_t FormulaDependency_formulae_get_dependencies(FormulaDependency_ptr self,
-                                                  SymbTable_ptr symb_table,
-                                                  node_ptr formula,
-                                                  node_ptr justice,
-                                                  node_ptr compassion);
+						  SymbTable_ptr symb_table,
+						  node_ptr formula,
+						  node_ptr justice,
+						  node_ptr compassion);
 
 /**AutomaticEnd***************************************************************/
 

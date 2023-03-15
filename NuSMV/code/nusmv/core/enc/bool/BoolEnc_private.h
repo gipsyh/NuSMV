@@ -53,18 +53,18 @@
 */
 
 typedef struct BoolEnc_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(BaseEnc);
+	/* this MUST stay on the top */
+	INHERITS_FROM(BaseEnc);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  hash_ptr var2enc;  /* var -> boolean encoding hash */
-  hash_ptr var2mask; /* var -> mask encoding hash */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	hash_ptr var2enc; /* var -> boolean encoding hash */
+	hash_ptr var2mask; /* var -> mask encoding hash */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } BoolEnc;
 

@@ -63,8 +63,9 @@ typedef struct PartialTraceExecutor_TAG *PartialTraceExecutor_ptr;
 
   \todo Missing description
 */
-#define PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)                            \
-  (nusmv_assert(PARTIAL_TRACE_EXECUTOR(self) != PARTIAL_TRACE_EXECUTOR(NULL)))
+#define PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)   \
+	(nusmv_assert(PARTIAL_TRACE_EXECUTOR(self) != \
+		      PARTIAL_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -90,9 +91,9 @@ typedef struct PartialTraceExecutor_TAG *PartialTraceExecutor_ptr;
   \sa CompleteTraceExecutor_execute
 */
 Trace_ptr PartialTraceExecutor_execute(const PartialTraceExecutor_ptr self,
-                                       const Trace_ptr trace,
-                                       const NodeList_ptr language,
-                                       int *n_steps);
+				       const Trace_ptr trace,
+				       const NodeList_ptr language,
+				       int *n_steps);
 
 /**AutomaticEnd***************************************************************/
 

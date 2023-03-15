@@ -61,12 +61,12 @@
 
   \todo Missing description
 */
-#define error_unreachable_code()                                               \
-  do {                                                                         \
-    fprintf(stderr, "%s:%d:%s: reached invalid code\n", __FILE__, __LINE__,    \
-            __func__);                                                         \
-    exit(4);                                                                   \
-  } while (0)
+#define error_unreachable_code()                                              \
+	do {                                                                  \
+		fprintf(stderr, "%s:%d:%s: reached invalid code\n", __FILE__, \
+			__LINE__, __func__);                                  \
+		exit(4);                                                      \
+	} while (0)
 
 /* Define the alternative for nusmv_assert(0 && "message") */
 
@@ -75,13 +75,13 @@
 
   \todo Missing description
 */
-#define error_unreachable_code_msg(...)                                        \
-  do {                                                                         \
-    printf(__VA_ARGS__);                                                       \
-    fprintf(stderr, "%s:%d:%s: reached invalid code\n", __FILE__, __LINE__,    \
-            __func__);                                                         \
-    exit(4);                                                                   \
-  } while (0)
+#define error_unreachable_code_msg(...)                                       \
+	do {                                                                  \
+		printf(__VA_ARGS__);                                          \
+		fprintf(stderr, "%s:%d:%s: reached invalid code\n", __FILE__, \
+			__LINE__, __func__);                                  \
+		exit(4);                                                      \
+	} while (0)
 
 /*!
   \brief Checks if the return value of a snprintf call is
@@ -107,19 +107,19 @@
 
   \sa snprintf
 */
-#define SNPRINTF_CHECK(chars, buffsize)                                        \
-  do {                                                                         \
-    if (chars < 0) {                                                           \
-      fprintf(stderr, "%s:%d:%s: Error in buffer writing", __FILE__, __LINE__, \
-              __func__);                                                       \
-      exit(5);                                                                 \
-    } else if ((unsigned int)chars >= buffsize) {                              \
-      fprintf(stderr, "%s:%d:%s: String buffer overflow", __FILE__, __LINE__,  \
-              __func__);                                                       \
-      exit(5);                                                                 \
-    } else {                                                                   \
-    };                                                                         \
-  } while (0)
+#define SNPRINTF_CHECK(chars, buffsize)                                      \
+	do {                                                                 \
+		if (chars < 0) {                                             \
+			fprintf(stderr, "%s:%d:%s: Error in buffer writing", \
+				__FILE__, __LINE__, __func__);               \
+			exit(5);                                             \
+		} else if ((unsigned int)chars >= buffsize) {                \
+			fprintf(stderr, "%s:%d:%s: String buffer overflow",  \
+				__FILE__, __LINE__, __func__);               \
+			exit(5);                                             \
+		} else {                                                     \
+		};                                                           \
+	} while (0)
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */

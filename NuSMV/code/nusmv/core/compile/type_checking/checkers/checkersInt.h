@@ -64,54 +64,54 @@
 */
 
 typedef enum {
-  TC_VIOLATION_FIRST, /* This MUST be the first! */
-  /* --------------------------------------------------------------------- */
+	TC_VIOLATION_FIRST, /* This MUST be the first! */
+	/* --------------------------------------------------------------------- */
 
-  TC_VIOLATION_UNDEF_IDENTIFIER,     /* undefined identifier is met */
-  TC_VIOLATION_AMBIGUOUS_IDENTIFIER, /* identifier has two interpretations */
-  TC_VIOLATION_TYPE_MANDATORY,       /* the most general type system
+	TC_VIOLATION_UNDEF_IDENTIFIER, /* undefined identifier is met */
+	TC_VIOLATION_AMBIGUOUS_IDENTIFIER, /* identifier has two interpretations */
+	TC_VIOLATION_TYPE_MANDATORY, /* the most general type system
                                         violation, and this is mandatory
                                         to report
                                      */
-  TC_VIOLATION_TYPE_BACK_COMP,       /* type system is violated, but it
+	TC_VIOLATION_TYPE_BACK_COMP, /* type system is violated, but it
                                         was not an error before the
                                         introduction of the type
                                         checking package.
                                      */
-  TC_VIOLATION_TYPE_WARNING,         /* type system is violated, but is
+	TC_VIOLATION_TYPE_WARNING, /* type system is violated, but is
                                         NOT an error, i.e. just
                                         a warning is output.
                                      */
-  TC_VIOLATION_OUT_OF_WORD_WIDTH,    /* access to the bits outside
+	TC_VIOLATION_OUT_OF_WORD_WIDTH, /* access to the bits outside
                                         of the Word width */
-  TC_VIOLATION_INCORRECT_WORD_WIDTH, /* incorrectly formed Word type */
+	TC_VIOLATION_INCORRECT_WORD_WIDTH, /* incorrectly formed Word type */
 
-  TC_VIOLATION_OUT_OF_WORDARRAY_WIDTH,    /* the address or
+	TC_VIOLATION_OUT_OF_WORDARRAY_WIDTH, /* the address or
                                              value word widths are not
                                              the specified ones */
-  TC_VIOLATION_INCORRECT_WORDARRAY_WIDTH, /* incorrectly formed WordArray type*/
+	TC_VIOLATION_INCORRECT_WORDARRAY_WIDTH, /* incorrectly formed WordArray type*/
 
-  TC_VIOLATION_DUPLICATE_CONSTANTS, /* duplicate constants in an enum type */
+	TC_VIOLATION_DUPLICATE_CONSTANTS, /* duplicate constants in an enum type */
 
-  TC_VIOLATION_ATTIME_NESTED,  /* nested attime operator */
-  TC_VIOLATION_ATTIME_NUM_REQ, /* time must be a constant number */
+	TC_VIOLATION_ATTIME_NESTED, /* nested attime operator */
+	TC_VIOLATION_ATTIME_NUM_REQ, /* time must be a constant number */
 
-  TC_VIOLATION_PARAMS_NUM_ERROR, /* Invalid number of parameters in
+	TC_VIOLATION_PARAMS_NUM_ERROR, /* Invalid number of parameters in
                                   NFunctions calls*/
 
-  TC_VIOLATION_PARAMS_TYPE_ERROR, /* Invalid number of parameters in
+	TC_VIOLATION_PARAMS_TYPE_ERROR, /* Invalid number of parameters in
                                      NFunctions calls*/
 
-  /* TODO[AMa] This should be removed when MathSAT will support multiple
+	/* TODO[AMa] This should be removed when MathSAT will support multiple
      parameter types */
-  TC_VIOLATION_DIFFERENT_TYPE_PARAMS_ERROR, /* Invalid types for parameters..
+	TC_VIOLATION_DIFFERENT_TYPE_PARAMS_ERROR, /* Invalid types for parameters..
                                                due a MathSAT limitation, types
                                                cannot be of mixed types */
-  TC_VIOLATION_UNCONSTANT_EXPRESSION,
+	TC_VIOLATION_UNCONSTANT_EXPRESSION,
 
-  TC_VIOLATION_INVALID_RANGE,
-  /* --------------------------------------------------------------------- */
-  TC_VIOLATION_LAST, /* This MUST be the last! */
+	TC_VIOLATION_INVALID_RANGE,
+	/* --------------------------------------------------------------------- */
+	TC_VIOLATION_LAST, /* This MUST be the last! */
 
 } TypeSystemViolation;
 
@@ -138,8 +138,8 @@ typedef enum {
   NB: Not all kinds of type system violation may be ignored.
 */
 typedef boolean (*TypeCheckingViolationHandler_ptr)(
-    CheckerBase_ptr checker, TypeSystemViolation violation,
-    node_ptr expression);
+	CheckerBase_ptr checker, TypeSystemViolation violation,
+	node_ptr expression);
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */

@@ -50,19 +50,19 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct NFunction_TAG {
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  NodeList_ptr args;
+	NodeList_ptr args;
 
-  SymbType_ptr return_type;
+	SymbType_ptr return_type;
 
-  boolean is_uninterpreted;
+	boolean is_uninterpreted;
 
-  void *body;
+	void *body;
 
-  SymbType_ptr main_type;
+	SymbType_ptr main_type;
 
 } NFunction;
 
@@ -81,8 +81,8 @@ typedef struct NFunction_TAG {
 /*---------------------------------------------------------------------------*/
 
 static void n_function_init(NFunction_ptr self, int num_args,
-                            SymbType_ptr *args, SymbType_ptr ret,
-                            boolean is_uninterpreted, void *body);
+			    SymbType_ptr *args, SymbType_ptr ret,
+			    boolean is_uninterpreted, void *body);
 
 static void n_function_deinit(NFunction_ptr self);
 
@@ -91,116 +91,133 @@ static void n_function_deinit(NFunction_ptr self);
 /*---------------------------------------------------------------------------*/
 
 NFunction_ptr NFunction_create_uninterpreted(int num_args, SymbType_ptr *args,
-                                             SymbType_ptr ret) {
-  NFunction_ptr self = ALLOC(NFunction, 1);
-  N_FUNCTION_CHECK_INSTANCE(self);
+					     SymbType_ptr ret)
+{
+	NFunction_ptr self = ALLOC(NFunction, 1);
+	N_FUNCTION_CHECK_INSTANCE(self);
 
-  n_function_init(self, num_args, args, ret, true, NULL);
-  return self;
+	n_function_init(self, num_args, args, ret, true, NULL);
+	return self;
 }
 
 NFunction_ptr NFunction_create_interpreted(int num_args, SymbType_ptr *args,
-                                           SymbType_ptr ret, void *body) {
-  NFunction_ptr self = ALLOC(NFunction, 1);
-  N_FUNCTION_CHECK_INSTANCE(self);
+					   SymbType_ptr ret, void *body)
+{
+	NFunction_ptr self = ALLOC(NFunction, 1);
+	N_FUNCTION_CHECK_INSTANCE(self);
 
-  n_function_init(self, num_args, args, ret, false, body);
-  return self;
+	n_function_init(self, num_args, args, ret, false, body);
+	return self;
 }
 
-NFunction_ptr NFunction_copy(NFunction_ptr self) {
-  int num_args;
-  SymbType_ptr *args;
-  ListIter_ptr iter;
-  int i;
+NFunction_ptr NFunction_copy(NFunction_ptr self)
+{
+	int num_args;
+	SymbType_ptr *args;
+	ListIter_ptr iter;
+	int i;
 
-  N_FUNCTION_CHECK_INSTANCE(self);
+	N_FUNCTION_CHECK_INSTANCE(self);
 
-  num_args = NodeList_get_length(self->args);
-  args = ALLOC(SymbType_ptr, num_args);
+	num_args = NodeList_get_length(self->args);
+	args = ALLOC(SymbType_ptr, num_args);
 
-  i = 0;
-  NODE_LIST_FOREACH(self->args, iter) {
-    SymbType_ptr type = (SymbType_ptr)NodeList_get_elem_at(self->args, iter);
-    args[i++] = SymbType_copy(type);
-  }
+	i = 0;
+	NODE_LIST_FOREACH(self->args, iter)
+	{
+		SymbType_ptr type =
+			(SymbType_ptr)NodeList_get_elem_at(self->args, iter);
+		args[i++] = SymbType_copy(type);
+	}
 
-  return NFunction_create_uninterpreted(num_args, args,
-                                        SymbType_copy(self->return_type));
+	return NFunction_create_uninterpreted(num_args, args,
+					      SymbType_copy(self->return_type));
 }
 
-void NFunction_destroy(NFunction_ptr self) {
-  N_FUNCTION_CHECK_INSTANCE(self);
+void NFunction_destroy(NFunction_ptr self)
+{
+	N_FUNCTION_CHECK_INSTANCE(self);
 
-  n_function_deinit(self);
-  FREE(self);
+	n_function_deinit(self);
+	FREE(self);
 }
 
-int NFunction_get_args_number(NFunction_ptr self) {
-  N_FUNCTION_CHECK_INSTANCE(self);
-  return NodeList_get_length(self->args);
+int NFunction_get_args_number(NFunction_ptr self)
+{
+	N_FUNCTION_CHECK_INSTANCE(self);
+	return NodeList_get_length(self->args);
 }
 
-NodeList_ptr NFunction_get_args(NFunction_ptr self) {
-  N_FUNCTION_CHECK_INSTANCE(self);
-  return self->args;
+NodeList_ptr NFunction_get_args(NFunction_ptr self)
+{
+	N_FUNCTION_CHECK_INSTANCE(self);
+	return self->args;
 }
 
-SymbType_ptr NFunction_get_main_type(NFunction_ptr self) {
-  N_FUNCTION_CHECK_INSTANCE(self);
-  return self->main_type;
+SymbType_ptr NFunction_get_main_type(NFunction_ptr self)
+{
+	N_FUNCTION_CHECK_INSTANCE(self);
+	return self->main_type;
 }
 
-boolean NFunction_is_uninterpreted(NFunction_ptr self) {
-  N_FUNCTION_CHECK_INSTANCE(self);
-  return self->is_uninterpreted;
+boolean NFunction_is_uninterpreted(NFunction_ptr self)
+{
+	N_FUNCTION_CHECK_INSTANCE(self);
+	return self->is_uninterpreted;
 }
 
-void *NFunction_get_body(NFunction_ptr self) {
-  N_FUNCTION_CHECK_INSTANCE(self);
+void *NFunction_get_body(NFunction_ptr self)
+{
+	N_FUNCTION_CHECK_INSTANCE(self);
 
-  nusmv_assert(!self->is_uninterpreted);
+	nusmv_assert(!self->is_uninterpreted);
 
-  return self->body;
+	return self->body;
 }
 
-SymbType_ptr NFunction_get_return_type(NFunction_ptr self) {
-  N_FUNCTION_CHECK_INSTANCE(self);
-  return self->return_type;
+SymbType_ptr NFunction_get_return_type(NFunction_ptr self)
+{
+	N_FUNCTION_CHECK_INSTANCE(self);
+	return self->return_type;
 }
 
-boolean NFunction_equals(NFunction_ptr self, NFunction_ptr other) {
-  boolean retval = true;
+boolean NFunction_equals(NFunction_ptr self, NFunction_ptr other)
+{
+	boolean retval = true;
 
-  if (self->is_uninterpreted != self->is_uninterpreted)
-    retval = false;
-  else if (NodeList_get_length(self->args) !=
-           NodeList_get_length(other->args)) {
-    retval = false;
-  } else if (!SymbType_equals(self->return_type, other->return_type)) {
-    retval = false;
-  } else {
-    ListIter_ptr siter;
-    ListIter_ptr oiter;
-    oiter = NodeList_get_first_iter(other->args);
-    NODE_LIST_FOREACH(self->args, siter) {
-      SymbType_ptr sarg;
-      SymbType_ptr oarg;
+	if (self->is_uninterpreted != self->is_uninterpreted)
+		retval = false;
+	else if (NodeList_get_length(self->args) !=
+		 NodeList_get_length(other->args)) {
+		retval = false;
+	} else if (!SymbType_equals(self->return_type, other->return_type)) {
+		retval = false;
+	} else {
+		ListIter_ptr siter;
+		ListIter_ptr oiter;
+		oiter = NodeList_get_first_iter(other->args);
+		NODE_LIST_FOREACH(self->args, siter)
+		{
+			SymbType_ptr sarg;
+			SymbType_ptr oarg;
 
-      sarg = SYMB_TYPE(NodeList_get_elem_at(self->args, siter));
-      oarg = SYMB_TYPE(NodeList_get_elem_at(other->args, oiter));
+			sarg = SYMB_TYPE(
+				NodeList_get_elem_at(self->args, siter));
+			oarg = SYMB_TYPE(
+				NodeList_get_elem_at(other->args, oiter));
 
-      if (!SymbType_equals(self->return_type, other->return_type)) {
-        retval = false;
-        break;
-      }
+			if (!SymbType_equals(self->return_type,
+					     other->return_type)) {
+				retval = false;
+				break;
+			}
 
-      oiter = ListIter_get_next(oiter);
-    }
-    nusmv_assert(retval || ListIter_is_end(oiter));
-  }
+			oiter = ListIter_get_next(oiter);
+		}
+		nusmv_assert(retval || ListIter_is_end(oiter));
+	}
 
-  return retval;
+	return retval;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -219,40 +236,42 @@ boolean NFunction_equals(NFunction_ptr self, NFunction_ptr other) {
   \sa NFunction_create
 */
 static void n_function_init(NFunction_ptr self, int num_args,
-                            SymbType_ptr *args, SymbType_ptr ret,
-                            boolean is_uninterpreted, void *body) {
-  int i, type_i = -1;
-  boolean have_word = false;
-  boolean have_real_int = false;
+			    SymbType_ptr *args, SymbType_ptr ret,
+			    boolean is_uninterpreted, void *body)
+{
+	int i, type_i = -1;
+	boolean have_word = false;
+	boolean have_real_int = false;
 
-  /* members initialization */
-  self->args = NodeList_create();
-  self->return_type = SymbType_copy(ret);
-  self->is_uninterpreted = is_uninterpreted;
-  self->body = body;
-  self->main_type = SYMB_TYPE(NULL);
+	/* members initialization */
+	self->args = NodeList_create();
+	self->return_type = SymbType_copy(ret);
+	self->is_uninterpreted = is_uninterpreted;
+	self->body = body;
+	self->main_type = SYMB_TYPE(NULL);
 
-  for (i = 0; i < num_args; ++i) {
-    SymbType_ptr type = args[i];
+	for (i = 0; i < num_args; ++i) {
+		SymbType_ptr type = args[i];
 
-    if (SymbType_is_word(type)) {
-      type_i = i;
-      have_word = true;
-    } else if (!have_word && (SymbType_is_infinite_precision(type) ||
-                              SymbType_is_pure_int_enum(type))) {
-      type_i = i;
-      have_real_int = true;
-    } else if (!have_real_int && SymbType_is_boolean(type)) {
-      type_i = i;
-    }
+		if (SymbType_is_word(type)) {
+			type_i = i;
+			have_word = true;
+		} else if (!have_word &&
+			   (SymbType_is_infinite_precision(type) ||
+			    SymbType_is_pure_int_enum(type))) {
+			type_i = i;
+			have_real_int = true;
+		} else if (!have_real_int && SymbType_is_boolean(type)) {
+			type_i = i;
+		}
 
-    NodeList_append(self->args, NODE_PTR(SymbType_copy(type)));
-  }
+		NodeList_append(self->args, NODE_PTR(SymbType_copy(type)));
+	}
 
-  if (type_i >= 0) {
-    self->main_type = SymbType_copy(args[type_i]);
-  } else
-    self->main_type = NULL;
+	if (type_i >= 0) {
+		self->main_type = SymbType_copy(args[type_i]);
+	} else
+		self->main_type = NULL;
 }
 
 /*!
@@ -262,20 +281,23 @@ static void n_function_init(NFunction_ptr self, int num_args,
 
   \sa NFunction_destroy
 */
-static void n_function_deinit(NFunction_ptr self) {
-  /* members deinitialization */
-  ListIter_ptr iter;
+static void n_function_deinit(NFunction_ptr self)
+{
+	/* members deinitialization */
+	ListIter_ptr iter;
 
-  NODE_LIST_FOREACH(self->args, iter) {
-    SymbType_ptr type = (SymbType_ptr)NodeList_get_elem_at(self->args, iter);
-    SymbType_destroy(type);
-  }
+	NODE_LIST_FOREACH(self->args, iter)
+	{
+		SymbType_ptr type =
+			(SymbType_ptr)NodeList_get_elem_at(self->args, iter);
+		SymbType_destroy(type);
+	}
 
-  NodeList_destroy(self->args);
+	NodeList_destroy(self->args);
 
-  SymbType_destroy(self->return_type);
-  if (NULL != self->main_type)
-    SymbType_destroy(self->main_type);
+	SymbType_destroy(self->return_type);
+	if (NULL != self->main_type)
+		SymbType_destroy(self->main_type);
 }
 
 /**AutomaticEnd***************************************************************/

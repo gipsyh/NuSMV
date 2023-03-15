@@ -76,8 +76,8 @@ typedef struct SatZchaff_TAG *SatZchaff_ptr;
 
   \todo Missing description
 */
-#define SAT_ZCHAFF_CHECK_INSTANCE(x)                                           \
-  (nusmv_assert(SAT_ZCHAFF(x) != SAT_ZCHAFF(NULL)))
+#define SAT_ZCHAFF_CHECK_INSTANCE(x) \
+	(nusmv_assert(SAT_ZCHAFF(x) != SAT_ZCHAFF(NULL)))
 
 /**AutomaticStart*************************************************************/
 

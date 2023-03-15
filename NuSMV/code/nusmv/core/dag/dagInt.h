@@ -82,14 +82,14 @@
 */
 
 struct DagManager {
-  st_table *vTable;
-  int hashFn[DAGMAX_WORDS];
-  lsList gcList;
-  int dfsCode;
+	st_table *vTable;
+	int hashFn[DAGMAX_WORDS];
+	lsList gcList;
+	int dfsCode;
 
-  int stats[DAG_MAX_STAT];
+	int stats[DAG_MAX_STAT];
 
-  Dag_DfsFunctions_t *dag_DfsClean;
+	Dag_DfsFunctions_t *dag_DfsClean;
 };
 
 /*---------------------------------------------------------------------------*/

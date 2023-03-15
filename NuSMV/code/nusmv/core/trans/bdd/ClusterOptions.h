@@ -64,8 +64,8 @@ typedef struct ClusterOptions_TAG *ClusterOptions_ptr;
 
   \todo Missing description
 */
-#define CLUSTER_OPTIONS_CHECK_INSTANCE(x)                                      \
-  nusmv_assert(CLUSTER_OPTIONS(x) != CLUSTER_OPTIONS(NULL))
+#define CLUSTER_OPTIONS_CHECK_INSTANCE(x) \
+	nusmv_assert(CLUSTER_OPTIONS(x) != CLUSTER_OPTIONS(NULL))
 
 /*!
   \methodof ClusterOptions

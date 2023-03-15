@@ -60,9 +60,9 @@ typedef struct BitValues_TAG *BitValues_ptr;
 */
 
 typedef enum BitValue_TAG {
-  BIT_VALUE_FALSE,
-  BIT_VALUE_TRUE,
-  BIT_VALUE_DONTCARE,
+	BIT_VALUE_FALSE,
+	BIT_VALUE_TRUE,
+	BIT_VALUE_DONTCARE,
 } BitValue;
 
 /*!
@@ -78,8 +78,8 @@ typedef enum BitValue_TAG {
 
   \todo Missing description
 */
-#define BIT_VALUES_CHECK_INSTANCE(self)                                        \
-  (nusmv_assert(BIT_VALUES(self) != BIT_VALUES(NULL)))
+#define BIT_VALUES_CHECK_INSTANCE(self) \
+	(nusmv_assert(BIT_VALUES(self) != BIT_VALUES(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -185,7 +185,7 @@ void BitValues_set_from_expr(BitValues_ptr self, size_t index, node_ptr expr);
   BIT_VALUE_DONCARE
 */
 void BitValues_set_from_values_list(BitValues_ptr self, struct BoolEnc_TAG *enc,
-                                    node_ptr vals);
+				    node_ptr vals);
 
 /**AutomaticEnd***************************************************************/
 

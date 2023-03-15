@@ -58,17 +58,17 @@
 */
 
 typedef struct BoolEncClient_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(BaseEnc);
+	/* this MUST stay on the top */
+	INHERITS_FROM(BaseEnc);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  BoolEnc_ptr bool_enc;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	BoolEnc_ptr bool_enc;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } BoolEncClient;
 
@@ -80,7 +80,7 @@ typedef struct BoolEncClient_TAG {
   \todo
 */
 void bool_enc_client_init(BoolEncClient_ptr self, SymbTable_ptr symb_table,
-                          BoolEnc_ptr bool_enc);
+			  BoolEnc_ptr bool_enc);
 
 /*!
   \methodof BoolEncClient

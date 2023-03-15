@@ -57,11 +57,11 @@
 #define PERTURB_SHIFT 5
 
 typedef struct OAEntry_TAG {
-  size_t hash; /* This is for performances, if key_eq_fun is fast
+	size_t hash; /* This is for performances, if key_eq_fun is fast
                   (e.g. pointers equality) can be removed, sparing 64
                   bits for each entry*/
-  void *key;
-  void *value;
+	void *key;
+	void *value;
 } OAEntry;
 
 /*!
@@ -71,37 +71,37 @@ typedef struct OAEntry_TAG {
 */
 
 typedef struct OAHash_TAG {
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  size_t fill;
-  size_t used;
-  size_t mask;
+	size_t fill;
+	size_t used;
+	size_t mask;
 
-  OAEntry *table;
-  OAEntry small_table[OA_HASH_MINSIZE];
+	OAEntry *table;
+	OAEntry small_table[OA_HASH_MINSIZE];
 
-  /* The argument passed to key_eq_fun, key_hash_fun and
+	/* The argument passed to key_eq_fun, key_hash_fun and
      free_entry_fun */
-  void *custom_arg;
+	void *custom_arg;
 
-  /* In the OAHash, this value is equal to custom_arg. However, having
+	/* In the OAHash, this value is equal to custom_arg. However, having
      it adds the possibility to class extending the OAHash to have a
      custom value. */
-  void *free_fun_arg;
+	void *free_fun_arg;
 
-  /* Function to check keys equality. Parameters are key1, key2 and
+	/* Function to check keys equality. Parameters are key1, key2 and
      the custom argument */
-  OA_HASH_EQ_FUN key_eq_fun;
+	OA_HASH_EQ_FUN key_eq_fun;
 
-  /* The function for calculating the hash of the given
+	/* The function for calculating the hash of the given
      key. Parameters are key and the custom argument */
-  OA_HASH_HASH_FUN key_hash_fun;
+	OA_HASH_HASH_FUN key_hash_fun;
 
-  /* The function used for deleting entries. Parameters are key, value
+	/* The function used for deleting entries. Parameters are key, value
      and the custom argument */
-  OA_HASH_FREE_FUN free_entry_fun;
+	OA_HASH_FREE_FUN free_entry_fun;
 
 } OAHash;
 
@@ -114,8 +114,8 @@ typedef struct OAHash_TAG {
   \todo
 */
 void oa_hash_init(OAHash_ptr self, OA_HASH_EQ_FUN key_eq_fun,
-                  OA_HASH_HASH_FUN key_hash_fun,
-                  OA_HASH_FREE_FUN free_entry_fun, void *custom_arg);
+		  OA_HASH_HASH_FUN key_hash_fun,
+		  OA_HASH_FREE_FUN free_entry_fun, void *custom_arg);
 
 /*!
   \methodof OAHash

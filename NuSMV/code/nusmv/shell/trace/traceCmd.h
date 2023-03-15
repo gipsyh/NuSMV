@@ -245,7 +245,7 @@ int CommandExecutePartialTraces(NuSMVEnv_ptr env, int argc, char **argv);
    the values for 'trace', 'from', and 'to' are assigned.
 */
 int traceCmd_parse_slice(const NuSMVEnv_ptr env, const char *s, int *trace,
-                         int *from, int *to);
+			 int *from, int *to);
 
 /**AutomaticEnd***************************************************************/
 

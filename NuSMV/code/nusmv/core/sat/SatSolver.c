@@ -60,259 +60,289 @@ static void sat_solver_finalize(Object_ptr object, void *dummy);
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void SatSolver_destroy(SatSolver_ptr self) {
-  const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void SatSolver_destroy(SatSolver_ptr self)
+{
+	const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  nusmv_assert(SAT_SOLVER(NULL) != self);
+	nusmv_assert(SAT_SOLVER(NULL) != self);
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Destroying a SAT solver instance '%s'\n",
-               SatSolver_get_name(self));
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Destroying a SAT solver instance '%s'\n",
+			   SatSolver_get_name(self));
+	}
 
-  Object_destroy(OBJECT(self), (char *)NULL);
+	Object_destroy(OBJECT(self), (char *)NULL);
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Done\n");
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Done\n");
+	}
 }
 
-SatSolverGroup SatSolver_get_permanent_group(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
+SatSolverGroup SatSolver_get_permanent_group(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  /* the first element in the list of existing group is always
+	/* the first element in the list of existing group is always
      the permanent group */
-  return (SatSolverGroup)Oiter_element(Olist_first(self->existingGroups));
+	return (SatSolverGroup)Oiter_element(Olist_first(self->existingGroups));
 }
 
 void SatSolver_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                   SatSolverGroup group) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  /* the formula is a constant => do nothing (see SatSolver_set_polarity) */
-  if (Be_Cnf_GetFormulaLiteral(cnfProb) == INT_MAX)
-    return;
+		   SatSolverGroup group)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	/* the formula is a constant => do nothing (see SatSolver_set_polarity) */
+	if (Be_Cnf_GetFormulaLiteral(cnfProb) == INT_MAX)
+		return;
 
-  self->add(self, cnfProb, group);
+	self->add(self, cnfProb, group);
 }
 
 void SatSolver_set_polarity(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                            int polarity, SatSolverGroup group) {
-  NuSMVEnv_ptr env;
-  OptsHandler_ptr opts;
+			    int polarity, SatSolverGroup group)
+{
+	NuSMVEnv_ptr env;
+	OptsHandler_ptr opts;
 
-  SAT_SOLVER_CHECK_INSTANCE(self);
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  env = ENV_OBJECT(self)->environment;
-  opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	env = ENV_OBJECT(self)->environment;
+	opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  nusmv_assert((-1 == polarity) || (1 == polarity));
-  nusmv_assert(Olist_contains(self->existingGroups, (void *)group));
+	nusmv_assert((-1 == polarity) || (1 == polarity));
+	nusmv_assert(Olist_contains(self->existingGroups, (void *)group));
 
-  /* special case: the formula is a constant */
-  if (Be_Cnf_GetFormulaLiteral(cnfProb) == INT_MAX) {
-    Slist_ptr clauses = Be_Cnf_GetClausesList(cnfProb);
-    int length = Slist_get_size(clauses);
-    int theConstant;
+	/* special case: the formula is a constant */
+	if (Be_Cnf_GetFormulaLiteral(cnfProb) == INT_MAX) {
+		Slist_ptr clauses = Be_Cnf_GetClausesList(cnfProb);
+		int length = Slist_get_size(clauses);
+		int theConstant;
 
-    /* cehck whether the constant value is true or false (see Be_Cnf_ptr) */
-    if (0 == length)
-      theConstant = 1;
-    else {
-      /* the list must be a list with one empty clause */
-      int *clause = (int *)NULL;
-      nusmv_assert(1 == length);
-      clause = (int *)Slist_top(clauses);
-      nusmv_assert((int *)NULL != clause);
-      nusmv_assert(0 == clause[0]);
+		/* cehck whether the constant value is true or false (see Be_Cnf_ptr) */
+		if (0 == length)
+			theConstant = 1;
+		else {
+			/* the list must be a list with one empty clause */
+			int *clause = (int *)NULL;
+			nusmv_assert(1 == length);
+			clause = (int *)Slist_top(clauses);
+			nusmv_assert((int *)NULL != clause);
+			nusmv_assert(0 == clause[0]);
 
-      theConstant = -1;
-    }
-    theConstant *= polarity; /* consider the polarity */
-    /* insert the formula */
-    if (1 == theConstant) {
-      if (opt_verbose_level_gt(opts, 0)) {
-        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger, "The true constant has been added to a solver\n");
-      }
-      /* the formula is true => do nothing */
-    } else {
-      if (opt_verbose_level_gt(opts, 0)) {
-        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger, "The false constant has been added to a solver\n");
-      }
-      /* the formula is false. Remember this group as unsatisfiable */
-      if (!self->interpolation) {
-        if (!Olist_contains(self->unsatisfiableGroups, (void *)group)) {
-          Olist_prepend(self->unsatisfiableGroups, (void *)group);
-        }
-      } else {
-        self->set_polarity(self, cnfProb, polarity, group);
-      }
-    }
-    return;
-  } /* if INT_MAX */
+			theConstant = -1;
+		}
+		theConstant *= polarity; /* consider the polarity */
+		/* insert the formula */
+		if (1 == theConstant) {
+			if (opt_verbose_level_gt(opts, 0)) {
+				Logger_ptr logger = LOGGER(
+					NuSMVEnv_get_value(env, ENV_LOGGER));
+				Logger_log(
+					logger,
+					"The true constant has been added to a solver\n");
+			}
+			/* the formula is true => do nothing */
+		} else {
+			if (opt_verbose_level_gt(opts, 0)) {
+				Logger_ptr logger = LOGGER(
+					NuSMVEnv_get_value(env, ENV_LOGGER));
+				Logger_log(
+					logger,
+					"The false constant has been added to a solver\n");
+			}
+			/* the formula is false. Remember this group as unsatisfiable */
+			if (!self->interpolation) {
+				if (!Olist_contains(self->unsatisfiableGroups,
+						    (void *)group)) {
+					Olist_prepend(self->unsatisfiableGroups,
+						      (void *)group);
+				}
+			} else {
+				self->set_polarity(self, cnfProb, polarity,
+						   group);
+			}
+		}
+		return;
+	} /* if INT_MAX */
 
-  self->set_polarity(self, cnfProb, polarity, group);
+	self->set_polarity(self, cnfProb, polarity, group);
 }
 
 void SatSolver_set_preferred_variables(const SatSolver_ptr self,
-                                       const Slist_ptr cnfVars) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
+				       const Slist_ptr cnfVars)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  self->set_preferred_variables(self, cnfVars);
+	self->set_preferred_variables(self, cnfVars);
 }
 
-void SatSolver_clear_preferred_variables(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
+void SatSolver_clear_preferred_variables(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  self->clear_preferred_variables(self);
+	self->clear_preferred_variables(self);
 }
 
-SatSolverResult SatSolver_solve_all_groups(const SatSolver_ptr self) {
-  SatSolverResult result;
-  const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+SatSolverResult SatSolver_solve_all_groups(const SatSolver_ptr self)
+{
+	SatSolverResult result;
+	const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  SAT_SOLVER_CHECK_INSTANCE(self);
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  /* destroy the model of previous solving */
-  if ((Slist_ptr)NULL != self->model) {
-    Slist_destroy(self->model);
-  }
-  self->model = (Slist_ptr)NULL;
+	/* destroy the model of previous solving */
+	if ((Slist_ptr)NULL != self->model) {
+		Slist_destroy(self->model);
+	}
+	self->model = (Slist_ptr)NULL;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Invoking solver '%s'...\n", SatSolver_get_name(self));
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Invoking solver '%s'...\n",
+			   SatSolver_get_name(self));
+	}
 
-  self->solvingTime = util_cpu_time();
+	self->solvingTime = util_cpu_time();
 
-  /* we have unsatisfiable formulas in some groups */
-  if (0 != Olist_get_size(self->unsatisfiableGroups)) {
-    result = SAT_SOLVER_UNSATISFIABLE_PROBLEM;
-  } else
-    result = self->solve_all_groups(self);
+	/* we have unsatisfiable formulas in some groups */
+	if (0 != Olist_get_size(self->unsatisfiableGroups)) {
+		result = SAT_SOLVER_UNSATISFIABLE_PROBLEM;
+	} else
+		result = self->solve_all_groups(self);
 
-  self->solvingTime = util_cpu_time() - self->solvingTime;
+	self->solvingTime = util_cpu_time() - self->solvingTime;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Solver '%s' returned after %f secs \n",
-               SatSolver_get_name(self),
-               SatSolver_get_last_solving_time(self) / 1000.0);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Solver '%s' returned after %f secs \n",
+			   SatSolver_get_name(self),
+			   SatSolver_get_last_solving_time(self) / 1000.0);
+	}
 
-  return result;
+	return result;
 }
 
 SatSolverResult SatSolver_solve_all_groups_assume(const SatSolver_ptr self,
-                                                  Slist_ptr assumptions) {
-  SatSolverResult result;
-  const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+						  Slist_ptr assumptions)
+{
+	SatSolverResult result;
+	const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  SAT_SOLVER_CHECK_INSTANCE(self);
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  /* destroy the model of previous solving */
-  Slist_destroy(self->model);
-  self->model = (Slist_ptr)NULL;
+	/* destroy the model of previous solving */
+	Slist_destroy(self->model);
+	self->model = (Slist_ptr)NULL;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Invoking solver '%s'...\n", SatSolver_get_name(self));
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Invoking solver '%s'...\n",
+			   SatSolver_get_name(self));
+	}
 
-  self->solvingTime = util_cpu_time();
+	self->solvingTime = util_cpu_time();
 
-  result = self->solve_all_groups_assume(self, assumptions);
+	result = self->solve_all_groups_assume(self, assumptions);
 
-  self->solvingTime = util_cpu_time() - self->solvingTime;
+	self->solvingTime = util_cpu_time() - self->solvingTime;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Solver '%s' returned after %f secs \n",
-               SatSolver_get_name(self),
-               SatSolver_get_last_solving_time(self) / 1000.0);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Solver '%s' returned after %f secs \n",
+			   SatSolver_get_name(self),
+			   SatSolver_get_last_solving_time(self) / 1000.0);
+	}
 
-  return result;
+	return result;
 }
 
-Slist_ptr SatSolver_get_conflicts(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
+Slist_ptr SatSolver_get_conflicts(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  if ((Slist_ptr)NULL == self->conflicts) {
-    self->conflicts = self->get_conflicts(self);
-  }
+	if ((Slist_ptr)NULL == self->conflicts) {
+		self->conflicts = self->get_conflicts(self);
+	}
 
-  return self->conflicts;
+	return self->conflicts;
 }
 
-Slist_ptr SatSolver_get_model(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
+Slist_ptr SatSolver_get_model(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  if ((Slist_ptr)NULL == self->model) {
-    self->model = self->make_model(self);
-  }
+	if ((Slist_ptr)NULL == self->model) {
+		self->model = self->make_model(self);
+	}
 
-  return self->model;
+	return self->model;
 }
 
-int SatSolver_get_cnf_var(const SatSolver_ptr self, int var) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  return self->get_cnf_var(self, var);
+int SatSolver_get_cnf_var(const SatSolver_ptr self, int var)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	return self->get_cnf_var(self, var);
 }
 
-void SatSolver_set_random_mode(SatSolver_ptr self, double seed) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  self->set_random_mode(self, seed);
+void SatSolver_set_random_mode(SatSolver_ptr self, double seed)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	self->set_random_mode(self, seed);
 }
 
-void SatSolver_set_polarity_mode(SatSolver_ptr self, int mode) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  self->set_polarity_mode(self, mode);
+void SatSolver_set_polarity_mode(SatSolver_ptr self, int mode)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	self->set_polarity_mode(self, mode);
 }
 
-int SatSolver_get_polarity_mode(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  return self->get_polarity_mode(self);
+int SatSolver_get_polarity_mode(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	return self->get_polarity_mode(self);
 }
 
-const char *SatSolver_get_name(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  return self->name;
+const char *SatSolver_get_name(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	return self->name;
 }
 
-long SatSolver_get_last_solving_time(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  return self->solvingTime;
+long SatSolver_get_last_solving_time(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	return self->solvingTime;
 }
 
-SatSolverItpGroup SatSolver_curr_itp_group(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  return self->curr_itp_group(self);
+SatSolverItpGroup SatSolver_curr_itp_group(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	return self->curr_itp_group(self);
 }
 
-SatSolverItpGroup SatSolver_new_itp_group(const SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  self->interpolation = true;
-  return self->new_itp_group(self);
+SatSolverItpGroup SatSolver_new_itp_group(const SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	self->interpolation = true;
+	return self->new_itp_group(self);
 }
 
 Term SatSolver_extract_interpolant(const SatSolver_ptr self, int nof_ga_groups,
-                                   SatSolverItpGroup *ga_groups,
-                                   TermFactoryCallbacks_ptr callbacks,
-                                   TermFactoryCallbacksUserData_ptr user_data) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
-  return self->extract_interpolant(self, nof_ga_groups, ga_groups, callbacks,
-                                   user_data);
+				   SatSolverItpGroup *ga_groups,
+				   TermFactoryCallbacks_ptr callbacks,
+				   TermFactoryCallbacksUserData_ptr user_data)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
+	return self->extract_interpolant(self, nof_ga_groups, ga_groups,
+					 callbacks, user_data);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -329,8 +359,9 @@ Term SatSolver_extract_interpolant(const SatSolver_ptr self, int nof_ga_groups,
 */
 
 void sat_solver_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                    SatSolverGroup group) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
+		    SatSolverGroup group)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
 /*!
@@ -343,8 +374,9 @@ void sat_solver_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
 */
 
 void sat_solver_set_polarity(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                             int polarity, SatSolverGroup group) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
+			     int polarity, SatSolverGroup group)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
 /*!
@@ -355,9 +387,10 @@ void sat_solver_set_polarity(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
   base class. Every derived class must ovewrwrite this function.
 */
 
-SatSolverResult sat_solver_solve_all_groups(const SatSolver_ptr self) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return SAT_SOLVER_INTERNAL_ERROR;
+SatSolverResult sat_solver_solve_all_groups(const SatSolver_ptr self)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return SAT_SOLVER_INTERNAL_ERROR;
 }
 
 /*!
@@ -369,9 +402,10 @@ SatSolverResult sat_solver_solve_all_groups(const SatSolver_ptr self) {
 */
 
 SatSolverResult sat_solver_solve_all_groups_assume(const SatSolver_ptr self,
-                                                   Slist_ptr assumption) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return SAT_SOLVER_INTERNAL_ERROR;
+						   Slist_ptr assumption)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return SAT_SOLVER_INTERNAL_ERROR;
 }
 
 /*!
@@ -383,9 +417,10 @@ SatSolverResult sat_solver_solve_all_groups_assume(const SatSolver_ptr self,
   It is an error if the last solving was unsuccessful.
 */
 
-Slist_ptr sat_solver_make_model(const SatSolver_ptr self) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return (Slist_ptr)NULL;
+Slist_ptr sat_solver_make_model(const SatSolver_ptr self)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return (Slist_ptr)NULL;
 }
 
 /*!
@@ -395,9 +430,10 @@ Slist_ptr sat_solver_make_model(const SatSolver_ptr self) {
 
 */
 
-int sat_solver_get_cnf_var(const SatSolver_ptr self, int lit) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return 0;
+int sat_solver_get_cnf_var(const SatSolver_ptr self, int lit)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return 0;
 }
 
 /*!
@@ -409,9 +445,10 @@ int sat_solver_get_cnf_var(const SatSolver_ptr self, int lit) {
   It is an error if the last solving was unsuccessful.
 */
 
-Slist_ptr sat_solver_get_conflicts(const SatSolver_ptr self) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return (Slist_ptr)NULL;
+Slist_ptr sat_solver_get_conflicts(const SatSolver_ptr self)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return (Slist_ptr)NULL;
 }
 
 /*!
@@ -423,8 +460,9 @@ Slist_ptr sat_solver_get_conflicts(const SatSolver_ptr self) {
   It is an error if the last solving was unsuccessful.
 */
 
-void sat_solver_set_random_mode(SatSolver_ptr self, double seed) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
+void sat_solver_set_random_mode(SatSolver_ptr self, double seed)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
 /*!
@@ -436,8 +474,9 @@ void sat_solver_set_random_mode(SatSolver_ptr self, double seed) {
   It is an error if the last solving was unsuccessful.
 */
 
-void sat_solver_set_polarity_mode(SatSolver_ptr self, int mode) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
+void sat_solver_set_polarity_mode(SatSolver_ptr self, int mode)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
 /*!
@@ -448,9 +487,10 @@ void sat_solver_set_polarity_mode(SatSolver_ptr self, int mode) {
   It is an error if the last solving was unsuccessful.
 */
 
-int sat_solver_get_polarity_mode(const SatSolver_ptr self) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return -1;
+int sat_solver_get_polarity_mode(const SatSolver_ptr self)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return -1;
 }
 
 /*!
@@ -459,8 +499,9 @@ int sat_solver_get_polarity_mode(const SatSolver_ptr self) {
   Pure virtual function. This must be refined by derived classes.
 */
 
-static SatSolverItpGroup sat_solver_curr_itp_group(SatSolver_ptr self) {
-  error_unreachable_code();
+static SatSolverItpGroup sat_solver_curr_itp_group(SatSolver_ptr self)
+{
+	error_unreachable_code();
 }
 
 /*!
@@ -469,8 +510,9 @@ static SatSolverItpGroup sat_solver_curr_itp_group(SatSolver_ptr self) {
   Pure virtual function. This must be refined by derived classes.
 */
 
-static SatSolverItpGroup sat_solver_new_itp_group(SatSolver_ptr self) {
-  error_unreachable_code();
+static SatSolverItpGroup sat_solver_new_itp_group(SatSolver_ptr self)
+{
+	error_unreachable_code();
 }
 
 /*!
@@ -481,10 +523,11 @@ static SatSolverItpGroup sat_solver_new_itp_group(SatSolver_ptr self) {
 
 static Term
 sat_solver_extract_interpolant(SatSolver_ptr self, int nof_ga_groups,
-                               SatSolverItpGroup *ga_groups,
-                               TermFactoryCallbacks_ptr callbacks,
-                               TermFactoryCallbacksUserData_ptr user_data) {
-  error_unreachable_code();
+			       SatSolverItpGroup *ga_groups,
+			       TermFactoryCallbacks_ptr callbacks,
+			       TermFactoryCallbacksUserData_ptr user_data)
+{
+	error_unreachable_code();
 }
 
 /*!
@@ -493,19 +536,20 @@ sat_solver_extract_interpolant(SatSolver_ptr self, int nof_ga_groups,
   If there is no such element in the list => do nothing
 */
 
-void sat_solver_RemoveFromList(lsList list, const lsGeneric element) {
-  lsGen gen = lsStart(list);
-  lsGeneric data;
-  while (lsNext(gen, &data, LS_NH) == LS_OK) {
-    if (element == data) { /* delete the item */
-      lsDelBefore(gen, &data);
-      nusmv_assert(element == data);
-      lsFinish(gen);
-      return;
-    }
-  }
-  lsFinish(gen);
-  return;
+void sat_solver_RemoveFromList(lsList list, const lsGeneric element)
+{
+	lsGen gen = lsStart(list);
+	lsGeneric data;
+	while (lsNext(gen, &data, LS_NH) == LS_OK) {
+		if (element == data) { /* delete the item */
+			lsDelBefore(gen, &data);
+			nusmv_assert(element == data);
+			lsFinish(gen);
+			return;
+		}
+	}
+	lsFinish(gen);
+	return;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -519,45 +563,47 @@ void sat_solver_RemoveFromList(lsList list, const lsGeneric element) {
 */
 
 void sat_solver_init(SatSolver_ptr self, const NuSMVEnv_ptr env,
-                     const char *name) {
-  const char *defName;
-  SAT_SOLVER_CHECK_INSTANCE(self);
+		     const char *name)
+{
+	const char *defName;
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  env_object_init(ENV_OBJECT(self), env);
+	env_object_init(ENV_OBJECT(self), env);
 
-  OVERRIDE(Object, finalize) = sat_solver_finalize;
-  OVERRIDE(SatSolver, add) = sat_solver_add;
-  OVERRIDE(SatSolver, set_polarity) = sat_solver_set_polarity;
-  OVERRIDE(SatSolver, solve_all_groups) = sat_solver_solve_all_groups;
-  OVERRIDE(SatSolver, solve_all_groups_assume) =
-      sat_solver_solve_all_groups_assume;
-  OVERRIDE(SatSolver, make_model) = sat_solver_make_model;
-  OVERRIDE(SatSolver, get_cnf_var) = sat_solver_get_cnf_var;
-  OVERRIDE(SatSolver, get_conflicts) = sat_solver_get_conflicts;
-  OVERRIDE(SatSolver, set_random_mode) = sat_solver_set_random_mode;
-  OVERRIDE(SatSolver, set_polarity_mode) = sat_solver_set_polarity_mode;
-  OVERRIDE(SatSolver, get_polarity_mode) = sat_solver_get_polarity_mode;
-  OVERRIDE(SatSolver, curr_itp_group) = sat_solver_curr_itp_group;
-  OVERRIDE(SatSolver, new_itp_group) = sat_solver_new_itp_group;
-  OVERRIDE(SatSolver, extract_interpolant) = sat_solver_extract_interpolant;
+	OVERRIDE(Object, finalize) = sat_solver_finalize;
+	OVERRIDE(SatSolver, add) = sat_solver_add;
+	OVERRIDE(SatSolver, set_polarity) = sat_solver_set_polarity;
+	OVERRIDE(SatSolver, solve_all_groups) = sat_solver_solve_all_groups;
+	OVERRIDE(SatSolver, solve_all_groups_assume) =
+		sat_solver_solve_all_groups_assume;
+	OVERRIDE(SatSolver, make_model) = sat_solver_make_model;
+	OVERRIDE(SatSolver, get_cnf_var) = sat_solver_get_cnf_var;
+	OVERRIDE(SatSolver, get_conflicts) = sat_solver_get_conflicts;
+	OVERRIDE(SatSolver, set_random_mode) = sat_solver_set_random_mode;
+	OVERRIDE(SatSolver, set_polarity_mode) = sat_solver_set_polarity_mode;
+	OVERRIDE(SatSolver, get_polarity_mode) = sat_solver_get_polarity_mode;
+	OVERRIDE(SatSolver, curr_itp_group) = sat_solver_curr_itp_group;
+	OVERRIDE(SatSolver, new_itp_group) = sat_solver_new_itp_group;
+	OVERRIDE(SatSolver, extract_interpolant) =
+		sat_solver_extract_interpolant;
 
-  /* inits members: */
-  defName = ((char *)NULL) != name ? name : "Unknown";
-  self->name = ALLOC(char, strlen(defName) + 1);
-  nusmv_assert(self->name != (char *)NULL);
-  strcpy(self->name, defName);
+	/* inits members: */
+	defName = ((char *)NULL) != name ? name : "Unknown";
+	self->name = ALLOC(char, strlen(defName) + 1);
+	nusmv_assert(self->name != (char *)NULL);
+	strcpy(self->name, defName);
 
-  self->solvingTime = 0;
-  self->model = (Slist_ptr)NULL;
-  self->conflicts = (Slist_ptr)NULL;
-  self->existingGroups = Olist_create();
-  /* insert the permanent group with ID '-1',
+	self->solvingTime = 0;
+	self->model = (Slist_ptr)NULL;
+	self->conflicts = (Slist_ptr)NULL;
+	self->existingGroups = Olist_create();
+	/* insert the permanent group with ID '-1',
      !!! In a concrete class you should remove the inserted permanent group
      and insert a real one */
-  Olist_append(self->existingGroups, (void *)-1);
-  self->unsatisfiableGroups = Olist_create();
+	Olist_append(self->existingGroups, (void *)-1);
+	self->unsatisfiableGroups = Olist_create();
 
-  self->interpolation = false;
+	self->interpolation = false;
 }
 
 /*!
@@ -566,23 +612,24 @@ void sat_solver_init(SatSolver_ptr self, const NuSMVEnv_ptr env,
 
 */
 
-void sat_solver_deinit(SatSolver_ptr self) {
-  SAT_SOLVER_CHECK_INSTANCE(self);
+void sat_solver_deinit(SatSolver_ptr self)
+{
+	SAT_SOLVER_CHECK_INSTANCE(self);
 
-  FREE(self->name);
+	FREE(self->name);
 
-  if ((Slist_ptr)NULL != self->model) {
-    Slist_destroy(self->model);
-  }
+	if ((Slist_ptr)NULL != self->model) {
+		Slist_destroy(self->model);
+	}
 
-  if ((Slist_ptr)NULL != self->conflicts) {
-    Slist_destroy(self->conflicts);
-  }
+	if ((Slist_ptr)NULL != self->conflicts) {
+		Slist_destroy(self->conflicts);
+	}
 
-  Olist_destroy(self->existingGroups);
-  Olist_destroy(self->unsatisfiableGroups);
+	Olist_destroy(self->existingGroups);
+	Olist_destroy(self->unsatisfiableGroups);
 
-  env_object_deinit(ENV_OBJECT(self));
+	env_object_deinit(ENV_OBJECT(self));
 }
 
 /*!
@@ -590,9 +637,10 @@ void sat_solver_deinit(SatSolver_ptr self) {
 
   Pure virtual function. This must be refined by derived classes.
 */
-static void sat_solver_finalize(Object_ptr object, void *dummy) {
-  SatSolver_ptr self = SAT_SOLVER(object);
+static void sat_solver_finalize(Object_ptr object, void *dummy)
+{
+	SatSolver_ptr self = SAT_SOLVER(object);
 
-  sat_solver_deinit(self);
-  error_unreachable_code();
+	sat_solver_deinit(self);
+	error_unreachable_code();
 }

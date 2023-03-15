@@ -83,7 +83,7 @@ typedef struct SexpFsm_TAG *SexpFsm_ptr;
   caller is responsible for its destruction (best if frozen)
 */
 SexpFsm_ptr SexpFsm_create(const FlatHierarchy_ptr hierarchy,
-                           const Set_t vars_set);
+			   const Set_t vars_set);
 
 /*!
   \methodof SexpFsm
@@ -117,7 +117,7 @@ SexpFsm_ptr SexpFsm_copy(const SexpFsm_ptr self);
 */
 SexpFsm_ptr
 SexpFsm_create_predicate_normalised_copy(const SexpFsm_ptr self,
-                                         PredicateNormaliser_ptr normaliser);
+					 PredicateNormaliser_ptr normaliser);
 
 /* deconstructors */
 

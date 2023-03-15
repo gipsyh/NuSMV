@@ -59,100 +59,108 @@ static void sat_inc_solver_finalize(Object_ptr object, void *dummy);
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void SatIncSolver_destroy(SatIncSolver_ptr self) {
-  SatSolver_destroy(SAT_SOLVER(self));
+void SatIncSolver_destroy(SatIncSolver_ptr self)
+{
+	SatSolver_destroy(SAT_SOLVER(self));
 }
 
-SatSolverGroup SatIncSolver_create_group(const SatIncSolver_ptr self) {
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
-  return self->create_group(self);
+SatSolverGroup SatIncSolver_create_group(const SatIncSolver_ptr self)
+{
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
+	return self->create_group(self);
 }
 
 void SatIncSolver_destroy_group(const SatIncSolver_ptr self,
-                                SatSolverGroup group) {
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
-  self->destroy_group(self, group);
+				SatSolverGroup group)
+{
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
+	self->destroy_group(self, group);
 }
 
 void SatIncSolver_move_to_permanent_and_destroy_group(
-    const SatIncSolver_ptr self, SatSolverGroup group) {
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
-  self->move_to_permanent_and_destroy_group(self, group);
+	const SatIncSolver_ptr self, SatSolverGroup group)
+{
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
+	self->move_to_permanent_and_destroy_group(self, group);
 }
 
 SatSolverResult SatIncSolver_solve_groups(const SatIncSolver_ptr self,
-                                          const Olist_ptr groups) {
-  SatSolverResult result;
-  NuSMVEnv_ptr env;
-  OptsHandler_ptr opts;
+					  const Olist_ptr groups)
+{
+	SatSolverResult result;
+	NuSMVEnv_ptr env;
+	OptsHandler_ptr opts;
 
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
 
-  env = ENV_OBJECT(self)->environment;
-  opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	env = ENV_OBJECT(self)->environment;
+	opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  Slist_destroy(SAT_SOLVER(self)->model); /* destroy the model of
+	Slist_destroy(SAT_SOLVER(self)->model); /* destroy the model of
                                              previous solving */
-  SAT_SOLVER(self)->model = (Slist_ptr)NULL;
+	SAT_SOLVER(self)->model = (Slist_ptr)NULL;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Invoking solver '%s'...\n",
-               SatSolver_get_name(SAT_SOLVER(self)));
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Invoking solver '%s'...\n",
+			   SatSolver_get_name(SAT_SOLVER(self)));
+	}
 
-  SAT_SOLVER(self)->solvingTime = util_cpu_time();
-  result = self->solve_groups(self, groups);
-  SAT_SOLVER(self)->solvingTime =
-      util_cpu_time() - SAT_SOLVER(self)->solvingTime;
+	SAT_SOLVER(self)->solvingTime = util_cpu_time();
+	result = self->solve_groups(self, groups);
+	SAT_SOLVER(self)->solvingTime =
+		util_cpu_time() - SAT_SOLVER(self)->solvingTime;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Solver '%s' returned after %f secs \n",
-               SatSolver_get_name(SAT_SOLVER(self)),
-               SatSolver_get_last_solving_time(SAT_SOLVER(self)) / 1000.0);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Solver '%s' returned after %f secs \n",
+			   SatSolver_get_name(SAT_SOLVER(self)),
+			   SatSolver_get_last_solving_time(SAT_SOLVER(self)) /
+				   1000.0);
+	}
 
-  return result;
+	return result;
 }
 
 SatSolverResult SatIncSolver_solve_without_groups(const SatIncSolver_ptr self,
-                                                  const Olist_ptr groups) {
-  SatSolverResult result;
-  NuSMVEnv_ptr env;
-  OptsHandler_ptr opts;
+						  const Olist_ptr groups)
+{
+	SatSolverResult result;
+	NuSMVEnv_ptr env;
+	OptsHandler_ptr opts;
 
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
 
-  env = ENV_OBJECT(self)->environment;
-  opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	env = ENV_OBJECT(self)->environment;
+	opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if ((Slist_ptr)NULL != SAT_SOLVER(self)->model) {
-    Slist_destroy(SAT_SOLVER(self)->model); /* destroy the model of
+	if ((Slist_ptr)NULL != SAT_SOLVER(self)->model) {
+		Slist_destroy(SAT_SOLVER(self)->model); /* destroy the model of
                                                previous solving */
-  }
+	}
 
-  SAT_SOLVER(self)->model = (Slist_ptr)NULL;
+	SAT_SOLVER(self)->model = (Slist_ptr)NULL;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Invoking solver '%s'...\n",
-               SatSolver_get_name(SAT_SOLVER(self)));
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Invoking solver '%s'...\n",
+			   SatSolver_get_name(SAT_SOLVER(self)));
+	}
 
-  SAT_SOLVER(self)->solvingTime = util_cpu_time();
-  result = self->solve_without_groups(self, groups);
-  SAT_SOLVER(self)->solvingTime =
-      util_cpu_time() - SAT_SOLVER(self)->solvingTime;
+	SAT_SOLVER(self)->solvingTime = util_cpu_time();
+	result = self->solve_without_groups(self, groups);
+	SAT_SOLVER(self)->solvingTime =
+		util_cpu_time() - SAT_SOLVER(self)->solvingTime;
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Solver '%s' returned after %f secs \n",
-               SatSolver_get_name(SAT_SOLVER(self)),
-               SatSolver_get_last_solving_time(SAT_SOLVER(self)) / 1000.0);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Solver '%s' returned after %f secs \n",
+			   SatSolver_get_name(SAT_SOLVER(self)),
+			   SatSolver_get_last_solving_time(SAT_SOLVER(self)) /
+				   1000.0);
+	}
 
-  return result;
+	return result;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -168,9 +176,10 @@ SatSolverResult SatIncSolver_solve_without_groups(const SatIncSolver_ptr self,
   \sa SatIncSolver_add
 */
 
-SatSolverGroup sat_inc_solver_create_group(const SatIncSolver_ptr self) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return -1;
+SatSolverGroup sat_inc_solver_create_group(const SatIncSolver_ptr self)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return -1;
 }
 
 /*!
@@ -183,8 +192,9 @@ SatSolverGroup sat_inc_solver_create_group(const SatIncSolver_ptr self) {
 */
 
 void sat_inc_solver_destroy_group(const SatIncSolver_ptr self,
-                                  SatSolverGroup group) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
+				  SatSolverGroup group)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
 /*!
@@ -198,8 +208,9 @@ void sat_inc_solver_destroy_group(const SatIncSolver_ptr self,
 */
 
 void sat_inc_solver_move_to_permanent_and_destroy_group(
-    const SatIncSolver_ptr self, SatSolverGroup group) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
+	const SatIncSolver_ptr self, SatSolverGroup group)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
 /*!
@@ -214,9 +225,10 @@ void sat_inc_solver_move_to_permanent_and_destroy_group(
 */
 
 SatSolverResult sat_inc_solver_solve_groups(const SatIncSolver_ptr self,
-                                            const Olist_ptr groups) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return SAT_SOLVER_INTERNAL_ERROR;
+					    const Olist_ptr groups)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return SAT_SOLVER_INTERNAL_ERROR;
 }
 
 /*!
@@ -231,9 +243,10 @@ SatSolverResult sat_inc_solver_solve_groups(const SatIncSolver_ptr self,
 */
 
 SatSolverResult sat_inc_solver_solve_without_groups(const SatIncSolver_ptr self,
-                                                    const Olist_ptr groups) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return SAT_SOLVER_INTERNAL_ERROR;
+						    const Olist_ptr groups)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return SAT_SOLVER_INTERNAL_ERROR;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -247,23 +260,24 @@ SatSolverResult sat_inc_solver_solve_without_groups(const SatIncSolver_ptr self,
 */
 
 void sat_inc_solver_init(SatIncSolver_ptr self, const NuSMVEnv_ptr env,
-                         const char *name) {
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
+			 const char *name)
+{
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
 
-  sat_solver_init(SAT_SOLVER(self), env, name);
+	sat_solver_init(SAT_SOLVER(self), env, name);
 
-  OVERRIDE(Object, finalize) = sat_inc_solver_finalize;
-  /* use default SatSolver pure-virtual functions */
-  OVERRIDE(SatIncSolver, create_group) = sat_inc_solver_create_group;
-  OVERRIDE(SatIncSolver, destroy_group) = sat_inc_solver_destroy_group;
-  OVERRIDE(SatIncSolver, move_to_permanent_and_destroy_group) =
-      sat_inc_solver_move_to_permanent_and_destroy_group;
-  OVERRIDE(SatIncSolver, solve_groups) = sat_inc_solver_solve_groups;
-  OVERRIDE(SatIncSolver, solve_groups) = sat_inc_solver_solve_groups;
-  OVERRIDE(SatIncSolver, solve_without_groups) =
-      sat_inc_solver_solve_without_groups;
+	OVERRIDE(Object, finalize) = sat_inc_solver_finalize;
+	/* use default SatSolver pure-virtual functions */
+	OVERRIDE(SatIncSolver, create_group) = sat_inc_solver_create_group;
+	OVERRIDE(SatIncSolver, destroy_group) = sat_inc_solver_destroy_group;
+	OVERRIDE(SatIncSolver, move_to_permanent_and_destroy_group) =
+		sat_inc_solver_move_to_permanent_and_destroy_group;
+	OVERRIDE(SatIncSolver, solve_groups) = sat_inc_solver_solve_groups;
+	OVERRIDE(SatIncSolver, solve_groups) = sat_inc_solver_solve_groups;
+	OVERRIDE(SatIncSolver, solve_without_groups) =
+		sat_inc_solver_solve_without_groups;
 
-  /* inits members: */
+	/* inits members: */
 }
 
 /*!
@@ -272,10 +286,11 @@ void sat_inc_solver_init(SatIncSolver_ptr self, const NuSMVEnv_ptr env,
 
 */
 
-void sat_inc_solver_deinit(SatIncSolver_ptr self) {
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
+void sat_inc_solver_deinit(SatIncSolver_ptr self)
+{
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
 
-  sat_solver_deinit(SAT_SOLVER(self));
+	sat_solver_deinit(SAT_SOLVER(self));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -287,11 +302,12 @@ void sat_inc_solver_deinit(SatIncSolver_ptr self) {
 
   Pure virtual function. This must be refined by derived classes.
 */
-static void sat_inc_solver_finalize(Object_ptr object, void *dummy) {
-  SatIncSolver_ptr self = SAT_INC_SOLVER(object);
+static void sat_inc_solver_finalize(Object_ptr object, void *dummy)
+{
+	SatIncSolver_ptr self = SAT_INC_SOLVER(object);
 
-  SAT_INC_SOLVER_CHECK_INSTANCE(self);
+	SAT_INC_SOLVER_CHECK_INSTANCE(self);
 
-  sat_inc_solver_deinit(self);
-  error_unreachable_code();
+	sat_inc_solver_deinit(self);
+	error_unreachable_code();
 }

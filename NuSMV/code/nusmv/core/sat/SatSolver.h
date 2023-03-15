@@ -61,12 +61,12 @@
 
 /* a flag returned by the 'solve' methods */
 typedef enum SatSolverResult_TAG {
-  SAT_SOLVER_INTERNAL_ERROR = -1,
-  SAT_SOLVER_TIMEOUT,
-  SAT_SOLVER_MEMOUT,
-  SAT_SOLVER_SATISFIABLE_PROBLEM,
-  SAT_SOLVER_UNSATISFIABLE_PROBLEM,
-  SAT_SOLVER_UNAVAILABLE
+	SAT_SOLVER_INTERNAL_ERROR = -1,
+	SAT_SOLVER_TIMEOUT,
+	SAT_SOLVER_MEMOUT,
+	SAT_SOLVER_SATISFIABLE_PROBLEM,
+	SAT_SOLVER_UNSATISFIABLE_PROBLEM,
+	SAT_SOLVER_UNAVAILABLE
 } SatSolverResult;
 
 /*---------------------------------------------------------------------------*/
@@ -90,15 +90,16 @@ typedef nusmv_ptrint SatSolverGroup;
 typedef nusmv_ptrint SatSolverItpGroup;
 
 typedef struct TermFactoryCallbacks_TAG {
-  Term (*make_false)(TermFactoryCallbacksUserData_ptr user_data);
-  Term (*make_true)(TermFactoryCallbacksUserData_ptr user_data);
+	Term (*make_false)(TermFactoryCallbacksUserData_ptr user_data);
+	Term (*make_true)(TermFactoryCallbacksUserData_ptr user_data);
 
-  Term (*make_and)(Term t1, Term t2,
-                   TermFactoryCallbacksUserData_ptr user_data);
-  Term (*make_or)(Term t1, Term t2, TermFactoryCallbacksUserData_ptr user_data);
-  Term (*make_not)(Term t, TermFactoryCallbacksUserData_ptr user_data);
+	Term (*make_and)(Term t1, Term t2,
+			 TermFactoryCallbacksUserData_ptr user_data);
+	Term (*make_or)(Term t1, Term t2,
+			TermFactoryCallbacksUserData_ptr user_data);
+	Term (*make_not)(Term t, TermFactoryCallbacksUserData_ptr user_data);
 
-  Term (*make_var)(int var, TermFactoryCallbacksUserData_ptr user_data);
+	Term (*make_var)(int var, TermFactoryCallbacksUserData_ptr user_data);
 } TermFactoryCallbacks;
 
 /*!
@@ -128,8 +129,8 @@ typedef TermFactoryCallbacks *TermFactoryCallbacks_ptr;
 
   \todo Missing description
 */
-#define SAT_SOLVER_CHECK_INSTANCE(x)                                           \
-  (nusmv_assert(SAT_SOLVER(x) != SAT_SOLVER(NULL)))
+#define SAT_SOLVER_CHECK_INSTANCE(x) \
+	(nusmv_assert(SAT_SOLVER(x) != SAT_SOLVER(NULL)))
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/
@@ -175,7 +176,7 @@ SatSolverGroup SatSolver_get_permanent_group(const SatSolver_ptr self);
   \sa SatSolver_set_polarity
 */
 VIRTUAL void SatSolver_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                           SatSolverGroup group);
+			   SatSolverGroup group);
 
 /*!
   \methodof SatSolver
@@ -191,8 +192,8 @@ VIRTUAL void SatSolver_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
   \sa SatSolver_add
 */
 VIRTUAL void SatSolver_set_polarity(const SatSolver_ptr self,
-                                    const Be_Cnf_ptr cnfProb, int polarity,
-                                    SatSolverGroup group);
+				    const Be_Cnf_ptr cnfProb, int polarity,
+				    SatSolverGroup group);
 
 /*!
   \methodof SatSolver
@@ -203,7 +204,7 @@ VIRTUAL void SatSolver_set_polarity(const SatSolver_ptr self,
   \sa SatSolver_clear_preferred_variables
 */
 VIRTUAL void SatSolver_set_preferred_variables(const SatSolver_ptr self,
-                                               const Slist_ptr cnfVars);
+					       const Slist_ptr cnfVars);
 
 /*!
   \methodof SatSolver
@@ -246,7 +247,7 @@ VIRTUAL SatSolverResult SatSolver_solve_all_groups(const SatSolver_ptr self);
   \sa SatSolverResult
 */
 VIRTUAL SatSolverResult SatSolver_solve_all_groups_assume(
-    const SatSolver_ptr self, Slist_ptr assumptions);
+	const SatSolver_ptr self, Slist_ptr assumptions);
 
 /*!
   \methodof SatSolver
@@ -333,9 +334,9 @@ SatSolverItpGroup SatSolver_new_itp_group(const SatSolver_ptr self);
 
 */
 Term SatSolver_extract_interpolant(const SatSolver_ptr self, int nof_ga_groups,
-                                   SatSolverItpGroup *ga_groups,
-                                   TermFactoryCallbacks_ptr callbacks,
-                                   TermFactoryCallbacksUserData_ptr user_data);
+				   SatSolverItpGroup *ga_groups,
+				   TermFactoryCallbacks_ptr callbacks,
+				   TermFactoryCallbacksUserData_ptr user_data);
 
 /**AutomaticEnd***************************************************************/
 

@@ -78,8 +78,8 @@ typedef struct AddArray_TAG *AddArray_ptr;
 
   \todo Missing description
 */
-#define ADD_ARRAY_CHECK_INSTANCE(x)                                            \
-  (nusmv_assert(ADD_ARRAY(x) != ADD_ARRAY(NULL)))
+#define ADD_ARRAY_CHECK_INSTANCE(x) \
+	(nusmv_assert(ADD_ARRAY(x) != ADD_ARRAY(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Definition of external funcions                                           */
@@ -195,7 +195,7 @@ array_t *AddArray_get_array(AddArray_ptr self);
   Returned AddArray must be destroyed by the caller
 */
 AddArray_ptr AddArray_word_apply_unary(DDMgr_ptr dd, AddArray_ptr arg1,
-                                       FP_A_DA op);
+				       FP_A_DA op);
 
 /*!
   \brief Applies binary operator to each bits pair of given
@@ -204,7 +204,7 @@ AddArray_ptr AddArray_word_apply_unary(DDMgr_ptr dd, AddArray_ptr arg1,
   Returned AddArray must be destroyed by the caller
 */
 AddArray_ptr AddArray_word_apply_binary(DDMgr_ptr dd, AddArray_ptr arg1,
-                                        AddArray_ptr arg2, FP_A_DAA op);
+					AddArray_ptr arg2, FP_A_DAA op);
 
 /*!
   \brief Returns an ADD that is the disjunction of all bits of arg
@@ -228,7 +228,7 @@ add_ptr AddArray_make_conjunction(DDMgr_ptr dd, AddArray_ptr arg);
   The size of both arguments should be the same.
 */
 AddArray_ptr AddArray_word_plus(DDMgr_ptr dd, AddArray_ptr arg1,
-                                AddArray_ptr arg2);
+				AddArray_ptr arg2);
 
 /*!
   \brief Perform the subtraction operations
@@ -238,7 +238,7 @@ AddArray_ptr AddArray_word_plus(DDMgr_ptr dd, AddArray_ptr arg1,
   The size of both arguments should be the same.
 */
 AddArray_ptr AddArray_word_minus(DDMgr_ptr dd, AddArray_ptr arg1,
-                                 AddArray_ptr arg2);
+				 AddArray_ptr arg2);
 
 /*!
   \brief Changes the sign of the given word.
@@ -255,7 +255,7 @@ AddArray_ptr AddArray_word_unary_minus(DDMgr_ptr dd, AddArray_ptr arg);
   The size of both arguments should be the same.
 */
 AddArray_ptr AddArray_word_times(DDMgr_ptr dd, AddArray_ptr arg1,
-                                 AddArray_ptr arg2);
+				 AddArray_ptr arg2);
 
 /*!
   \brief Perform the division operations
@@ -265,7 +265,7 @@ AddArray_ptr AddArray_word_times(DDMgr_ptr dd, AddArray_ptr arg1,
   The size of both arguments should be the same.
 */
 AddArray_ptr AddArray_word_unsigned_divide(DDMgr_ptr dd, AddArray_ptr arg1,
-                                           AddArray_ptr arg2);
+					   AddArray_ptr arg2);
 
 /*!
   \brief Perform the remainder operations
@@ -275,7 +275,7 @@ AddArray_ptr AddArray_word_unsigned_divide(DDMgr_ptr dd, AddArray_ptr arg1,
   The size of both arguments should be the same.
 */
 AddArray_ptr AddArray_word_unsigned_mod(DDMgr_ptr dd, AddArray_ptr arg1,
-                                        AddArray_ptr arg2);
+					AddArray_ptr arg2);
 
 /*!
   \brief Perform the division operations
@@ -285,7 +285,7 @@ AddArray_ptr AddArray_word_unsigned_mod(DDMgr_ptr dd, AddArray_ptr arg1,
   The size of both arguments should be the same.
 */
 AddArray_ptr AddArray_word_signed_divide(DDMgr_ptr dd, AddArray_ptr arg1,
-                                         AddArray_ptr arg2);
+					 AddArray_ptr arg2);
 
 /*!
   \brief Perform the remainder operations
@@ -295,7 +295,7 @@ AddArray_ptr AddArray_word_signed_divide(DDMgr_ptr dd, AddArray_ptr arg1,
   The size of both arguments should be the same.
 */
 AddArray_ptr AddArray_word_signed_mod(DDMgr_ptr dd, AddArray_ptr arg1,
-                                      AddArray_ptr arg2);
+				      AddArray_ptr arg2);
 
 /*!
   \brief Performs left shift operations
@@ -318,7 +318,7 @@ AddArray_ptr AddArray_word_signed_mod(DDMgr_ptr dd, AddArray_ptr arg1,
 
 */
 AddArray_ptr AddArray_word_left_shift(DDMgr_ptr dd, AddArray_ptr arg,
-                                      AddArray_ptr number);
+				      AddArray_ptr number);
 
 /*!
   \brief Invokes add_array_word_right_shift with isSigned set to
@@ -329,7 +329,7 @@ AddArray_ptr AddArray_word_left_shift(DDMgr_ptr dd, AddArray_ptr arg,
   \sa add_array_word_right_shift
 */
 AddArray_ptr AddArray_word_unsigned_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
-                                                AddArray_ptr number);
+						AddArray_ptr number);
 
 /*!
   \brief Invokes add_array_word_right_shift with isSigned set to
@@ -340,7 +340,7 @@ AddArray_ptr AddArray_word_unsigned_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
   \sa add_array_word_right_shift
 */
 AddArray_ptr AddArray_word_signed_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
-                                              AddArray_ptr number);
+					      AddArray_ptr number);
 
 /*!
   \brief Performs left rotate operations
@@ -363,7 +363,7 @@ AddArray_ptr AddArray_word_signed_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
                 ITE(number=width, arg[i], FAILURE
 */
 AddArray_ptr AddArray_word_left_rotate(DDMgr_ptr dd, AddArray_ptr arg,
-                                       AddArray_ptr number);
+				       AddArray_ptr number);
 
 /*!
   \brief Performs right rotate operations
@@ -386,7 +386,7 @@ AddArray_ptr AddArray_word_left_rotate(DDMgr_ptr dd, AddArray_ptr arg,
                 ITE(number=width, arg[i], FAILURE
 */
 AddArray_ptr AddArray_word_right_rotate(DDMgr_ptr dd, AddArray_ptr arg,
-                                        AddArray_ptr number);
+					AddArray_ptr number);
 
 /*!
   \brief Performs less-then operation
@@ -399,7 +399,7 @@ AddArray_ptr AddArray_word_right_rotate(DDMgr_ptr dd, AddArray_ptr arg,
 
 */
 AddArray_ptr AddArray_word_unsigned_less(DDMgr_ptr dd, AddArray_ptr arg1,
-                                         AddArray_ptr arg2);
+					 AddArray_ptr arg2);
 
 /*!
   \brief Performs less-or-equal operation
@@ -412,7 +412,7 @@ AddArray_ptr AddArray_word_unsigned_less(DDMgr_ptr dd, AddArray_ptr arg1,
 
 */
 AddArray_ptr AddArray_word_unsigned_less_equal(DDMgr_ptr dd, AddArray_ptr arg1,
-                                               AddArray_ptr arg2);
+					       AddArray_ptr arg2);
 
 /*!
   \brief Performs greater-then operation
@@ -425,7 +425,7 @@ AddArray_ptr AddArray_word_unsigned_less_equal(DDMgr_ptr dd, AddArray_ptr arg1,
 
 */
 AddArray_ptr AddArray_word_unsigned_greater(DDMgr_ptr dd, AddArray_ptr arg1,
-                                            AddArray_ptr arg2);
+					    AddArray_ptr arg2);
 
 /*!
   \brief Performs greater-or-equal operation
@@ -438,8 +438,8 @@ AddArray_ptr AddArray_word_unsigned_greater(DDMgr_ptr dd, AddArray_ptr arg1,
 
 */
 AddArray_ptr AddArray_word_unsigned_greater_equal(DDMgr_ptr dd,
-                                                  AddArray_ptr arg1,
-                                                  AddArray_ptr arg2);
+						  AddArray_ptr arg1,
+						  AddArray_ptr arg2);
 
 /*!
   \brief Performs _signed_ less-then operation
@@ -451,7 +451,7 @@ AddArray_ptr AddArray_word_unsigned_greater_equal(DDMgr_ptr dd,
   NB: The invoker should destroy the returned array.
 */
 AddArray_ptr AddArray_word_signed_less(DDMgr_ptr dd, AddArray_ptr arg1,
-                                       AddArray_ptr arg2);
+				       AddArray_ptr arg2);
 
 /*!
   \brief Performs _signed_ less-equal-then operation
@@ -463,7 +463,7 @@ AddArray_ptr AddArray_word_signed_less(DDMgr_ptr dd, AddArray_ptr arg1,
   NB: The invoker should destroy the returned array.
 */
 AddArray_ptr AddArray_word_signed_less_equal(DDMgr_ptr dd, AddArray_ptr arg1,
-                                             AddArray_ptr arg2);
+					     AddArray_ptr arg2);
 
 /*!
   \brief Performs _signed_ greater-then operation
@@ -475,7 +475,7 @@ AddArray_ptr AddArray_word_signed_less_equal(DDMgr_ptr dd, AddArray_ptr arg1,
   NB: The invoker should destroy the returned array.
 */
 AddArray_ptr AddArray_word_signed_greater(DDMgr_ptr dd, AddArray_ptr arg1,
-                                          AddArray_ptr arg2);
+					  AddArray_ptr arg2);
 
 /*!
   \brief Performs _signed_ greater-equal-then operation
@@ -487,7 +487,7 @@ AddArray_ptr AddArray_word_signed_greater(DDMgr_ptr dd, AddArray_ptr arg1,
   NB: The invoker should destroy the returned array.
 */
 AddArray_ptr AddArray_word_signed_greater_equal(DDMgr_ptr dd, AddArray_ptr arg1,
-                                                AddArray_ptr arg2);
+						AddArray_ptr arg2);
 
 /*!
   \brief Extends the width of a signed Word expression keeping
@@ -501,7 +501,7 @@ AddArray_ptr AddArray_word_signed_greater_equal(DDMgr_ptr dd, AddArray_ptr arg1,
   \sa AddArray_word_extend
 */
 AddArray_ptr AddArray_word_signed_extend(DDMgr_ptr dd, AddArray_ptr arg,
-                                         AddArray_ptr repeat);
+					 AddArray_ptr repeat);
 
 /*!
   \brief Extends the width of an unsigned Word expression keeping
@@ -515,7 +515,7 @@ AddArray_ptr AddArray_word_signed_extend(DDMgr_ptr dd, AddArray_ptr arg,
   \sa AddArray_word_signed_extend
 */
 AddArray_ptr AddArray_word_unsigned_extend(DDMgr_ptr dd, AddArray_ptr arg,
-                                           AddArray_ptr repeat);
+					   AddArray_ptr repeat);
 
 /*!
   \brief Performs signed resize operation on a Word expression
@@ -529,7 +529,7 @@ AddArray_ptr AddArray_word_unsigned_extend(DDMgr_ptr dd, AddArray_ptr arg,
   \sa AddArray_word_unsigned_resize
 */
 AddArray_ptr AddArray_word_signed_resize(DDMgr_ptr dd, AddArray_ptr arg,
-                                         AddArray_ptr new_size);
+					 AddArray_ptr new_size);
 
 /*!
   \brief Performs signed resize operation on a Word expression
@@ -543,7 +543,7 @@ AddArray_ptr AddArray_word_signed_resize(DDMgr_ptr dd, AddArray_ptr arg,
   \sa AddArray_word_signed_resize
 */
 AddArray_ptr AddArray_word_unsigned_resize(DDMgr_ptr dd, AddArray_ptr arg,
-                                           AddArray_ptr new_size);
+					   AddArray_ptr new_size);
 
 /*!
   \brief Performs equal-operation
@@ -556,7 +556,7 @@ AddArray_ptr AddArray_word_unsigned_resize(DDMgr_ptr dd, AddArray_ptr arg,
 
 */
 AddArray_ptr AddArray_word_equal(DDMgr_ptr dd, AddArray_ptr arg1,
-                                 AddArray_ptr arg2);
+				 AddArray_ptr arg2);
 
 /*!
   \brief Performs not-equal-operation
@@ -569,7 +569,7 @@ AddArray_ptr AddArray_word_equal(DDMgr_ptr dd, AddArray_ptr arg1,
 
 */
 AddArray_ptr AddArray_word_not_equal(DDMgr_ptr dd, AddArray_ptr arg1,
-                                     AddArray_ptr arg2);
+				     AddArray_ptr arg2);
 
 /*!
   \brief Creates a ITE word array:
@@ -587,7 +587,7 @@ AddArray_ptr AddArray_word_not_equal(DDMgr_ptr dd, AddArray_ptr arg1,
   The invoker should destroy the returned array.
 */
 AddArray_ptr AddArray_word_ite(DDMgr_ptr dd, AddArray_ptr _if,
-                               AddArray_ptr _then, AddArray_ptr _else);
+			       AddArray_ptr _then, AddArray_ptr _else);
 
 /*!
   \brief Performs bit-selection operation
@@ -602,7 +602,7 @@ AddArray_ptr AddArray_word_ite(DDMgr_ptr dd, AddArray_ptr _if,
 
 */
 AddArray_ptr AddArray_word_bit_selection(DDMgr_ptr dd, AddArray_ptr word,
-                                         AddArray_ptr range);
+					 AddArray_ptr range);
 
 /*!
   \brief Performs concatenation operation
@@ -614,6 +614,6 @@ AddArray_ptr AddArray_word_bit_selection(DDMgr_ptr dd, AddArray_ptr word,
 
 */
 AddArray_ptr AddArray_word_concatenation(DDMgr_ptr dd, AddArray_ptr arg1,
-                                         AddArray_ptr arg2);
+					 AddArray_ptr arg2);
 
 #endif /* __NUSMV_CORE_ENC_UTILS_ADD_ARRAY_H__ */

@@ -76,14 +76,16 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void PropPkg_init(NuSMVEnv_ptr env) {
-  PropDb_ptr db = PropDb_create(env);
-  NuSMVEnv_set_value(env, ENV_PROP_DB, db);
+void PropPkg_init(NuSMVEnv_ptr env)
+{
+	PropDb_ptr db = PropDb_create(env);
+	NuSMVEnv_set_value(env, ENV_PROP_DB, db);
 }
 
-void PropPkg_quit(NuSMVEnv_ptr env) {
-  PropDb_ptr db = PROP_DB(NuSMVEnv_remove_value(env, ENV_PROP_DB));
-  PropDb_destroy(db);
+void PropPkg_quit(NuSMVEnv_ptr env)
+{
+	PropDb_ptr db = PROP_DB(NuSMVEnv_remove_value(env, ENV_PROP_DB));
+	PropDb_destroy(db);
 }
 
 /*---------------------------------------------------------------------------*/

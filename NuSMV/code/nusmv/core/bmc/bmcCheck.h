@@ -78,7 +78,7 @@ typedef void (*BMC_PF_MATCH_ANSWER)(const NuSMVEnv_ptr, node_ptr, int, void *);
   \sa bmc_check_wff_list
 */
 node_ptr Bmc_CheckFairnessListForPropositionalFormulae(const NuSMVEnv_ptr env,
-                                                       node_ptr wffList);
+						       node_ptr wffList);
 
 /*!
   \brief For each element belonging to a given list of wffs,
@@ -138,10 +138,10 @@ node_ptr Bmc_CheckFairnessListForPropositionalFormulae(const NuSMVEnv_ptr env,
   match has found out
 */
 int Bmc_WffListMatchProperty(const NuSMVEnv_ptr env, node_ptr wffList,
-                             BMC_PF_MATCH pCheck, void *pCheckOptArgument,
-                             int iMaxMatches, unsigned int *aiMatchedIndexes,
-                             BMC_PF_MATCH_ANSWER pAnswer,
-                             void *pAnswerOptArgument);
+			     BMC_PF_MATCH pCheck, void *pCheckOptArgument,
+			     int iMaxMatches, unsigned int *aiMatchedIndexes,
+			     BMC_PF_MATCH_ANSWER pAnswer,
+			     void *pAnswerOptArgument);
 
 /**AutomaticEnd***************************************************************/
 

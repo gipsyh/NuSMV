@@ -55,7 +55,7 @@
 #include "nusmv/core/enc/enc.h" /* for VarsOrderType and BddSohEnum*/
 #include "nusmv/core/fsm/bdd/bdd.h" /* for BddOregJusticeEmptinessBddAlgorithmType */
 #include "nusmv/core/opt/OptsHandler.h"
-#include "nusmv/core/sat/sat.h"     /* for SAT Solver */
+#include "nusmv/core/sat/sat.h" /* for SAT Solver */
 #include "nusmv/core/trans/trans.h" /* for TransType */
 #include "nusmv/core/utils/utils.h"
 
@@ -195,8 +195,8 @@
 
   \todo Missing description
 */
-#define DEFAULT_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM                           \
-  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD
+#define DEFAULT_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM \
+	BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD
 
 /*!
   \brief \todo Missing synopsis
@@ -808,8 +808,8 @@ typedef enum { STEPS_HEURISTIC, SIZE_HEURISTIC } Bdd2bmc_Heuristic;
 
   \todo Missing description
 */
-#define OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM                                   \
-  "oreg_justice_emptiness_bdd_algorithm"
+#define OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM \
+	"oreg_justice_emptiness_bdd_algorithm"
 
 /*!
   \brief \todo Missing synopsis
@@ -875,8 +875,8 @@ typedef enum { STEPS_HEURISTIC, SIZE_HEURISTIC } Bdd2bmc_Heuristic;
 
   \todo Missing description
 */
-#define BOOLEAN_CONVERSION_USES_PREDICATE_NORMALIZATION                        \
-  "boolean_conversion_uses_predicate_normalization"
+#define BOOLEAN_CONVERSION_USES_PREDICATE_NORMALIZATION \
+	"boolean_conversion_uses_predicate_normalization"
 
 /*!
   \brief \todo Missing synopsis
@@ -2316,7 +2316,7 @@ const char *opt_check_invar_fb_heuristic_as_string(OptsHandler_ptr opt);
   \todo Missing description
 */
 void set_check_invar_bddbmc_heuristic(OptsHandler_ptr opt,
-                                      Bdd2bmc_Heuristic strategy);
+				      Bdd2bmc_Heuristic strategy);
 
 /*!
   \brief \todo Missing synopsis
@@ -2446,7 +2446,7 @@ void unset_daggifier_statistics(OptsHandler_ptr opt);
 BddOregJusticeEmptinessBddAlgorithmType
 get_oreg_justice_emptiness_bdd_algorithm(OptsHandler_ptr opt);
 void set_oreg_justice_emptiness_bdd_algorithm(
-    OptsHandler_ptr opt, BddOregJusticeEmptinessBddAlgorithmType alg);
+	OptsHandler_ptr opt, BddOregJusticeEmptinessBddAlgorithmType alg);
 void reset_oreg_justice_emptiness_bdd_algorithm(OptsHandler_ptr opt);
 
 /* RBC2CNF */

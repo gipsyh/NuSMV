@@ -61,8 +61,8 @@
   \todo Missing description
 */
 typedef enum {
-  LTL_REWRITE_STANDARD,
-  LTL_REWRITE_DEADLOCK_FREE,
+	LTL_REWRITE_STANDARD,
+	LTL_REWRITE_DEADLOCK_FREE,
 } LtlRewriteType;
 
 /*---------------------------------------------------------------------------*/
@@ -108,7 +108,7 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc);
   \todo Missing description
 */
 node_ptr Ltl_RewriteInput(SymbTable_ptr symb_table, node_ptr expr,
-                          SymbLayer_ptr layer, node_ptr *init, node_ptr *invar,
-                          node_ptr *trans, LtlRewriteType rewrite_type);
+			  SymbLayer_ptr layer, node_ptr *init, node_ptr *invar,
+			  node_ptr *trans, LtlRewriteType rewrite_type);
 
 #endif /* __NUSMV_CORE_LTL_LTL_INT_H__ */

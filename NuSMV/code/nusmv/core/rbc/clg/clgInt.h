@@ -66,10 +66,10 @@ This file is part of the ``rbc.clg'' package
 /*---------------------------------------------------------------------------*/
 
 struct Clg_Vertex {
-  int label;
-  int size;
-  struct Clg_Vertex *left;
-  struct Clg_Vertex *right;
+	int label;
+	int size;
+	struct Clg_Vertex *left;
+	struct Clg_Vertex *right;
 };
 
 /*---------------------------------------------------------------------------*/

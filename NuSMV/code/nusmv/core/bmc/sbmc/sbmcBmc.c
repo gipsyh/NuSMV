@@ -107,10 +107,10 @@ clock_t start_time;
 /*---------------------------------------------------------------------------*/
 
 static void bmc_expandFilename(const OptsHandler_ptr opts, const int k,
-                               const int l, const int prop_idx,
-                               const char *filename_to_be_expanded,
-                               char *filename_expanded,
-                               const size_t filename_expanded_maxlen);
+			       const int l, const int prop_idx,
+			       const char *filename_to_be_expanded,
+			       char *filename_expanded,
+			       const size_t filename_expanded_maxlen);
 
 /**AutomaticEnd***************************************************************/
 
@@ -119,272 +119,322 @@ static void bmc_expandFilename(const OptsHandler_ptr opts, const int k,
 /*---------------------------------------------------------------------------*/
 
 int Bmc_SBMCGenSolveLtl(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
-                        const int relative_loop, const boolean must_inc_length,
-                        const boolean must_solve, const Bmc_DumpType dump_type,
-                        const char *dump_fname_template) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+			const int relative_loop, const boolean must_inc_length,
+			const boolean must_solve, const Bmc_DumpType dump_type,
+			const char *dump_fname_template)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-  node_ptr bltlspec;               /* Its booleanization */
-  BeFsm_ptr be_fsm = BE_FSM(NULL); /* The corresponding be fsm  */
-  BeEnc_ptr be_enc;
-  Be_Manager_ptr be_mgr;
-  const Be_CnfAlgorithm cnf_alg = get_rbc2cnf_algorithm(opts);
+	BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
+	node_ptr bltlspec; /* Its booleanization */
+	BeFsm_ptr be_fsm = BE_FSM(NULL); /* The corresponding be fsm  */
+	BeEnc_ptr be_enc;
+	Be_Manager_ptr be_mgr;
+	const Be_CnfAlgorithm cnf_alg = get_rbc2cnf_algorithm(opts);
 
-  /* ----------------------------------------------------------------------*/
-  /* Here a property was selected                                          */
-  /* ----------------------------------------------------------------------*/
-  int k_max = k;
-  int k_min = 0;
-  int increasingK;
-  int found_solution;
+	/* ----------------------------------------------------------------------*/
+	/* Here a property was selected                                          */
+	/* ----------------------------------------------------------------------*/
+	int k_max = k;
+	int k_min = 0;
+	int increasingK;
+	int found_solution;
 
-  Prop_ptr inputprop = ltlprop;
-  Prop_Rewriter_ptr rewriter = NULL;
+	Prop_ptr inputprop = ltlprop;
+	Prop_Rewriter_ptr rewriter = NULL;
 
-  /* checks that a property was selected: */
-  nusmv_assert(ltlprop != (Prop_ptr)NULL);
+	/* checks that a property was selected: */
+	nusmv_assert(ltlprop != (Prop_ptr)NULL);
 
-  if (Prop_get_status(ltlprop) != Prop_Unchecked) {
-    return 0;
-  }
+	if (Prop_get_status(ltlprop) != Prop_Unchecked) {
+		return 0;
+	}
 
-  found_solution = false;
+	found_solution = false;
 
-  if (must_inc_length == false)
-    k_min = k_max;
+	if (must_inc_length == false)
+		k_min = k_max;
 
-  be_fsm = Prop_compute_ground_be_fsm(env, ltlprop);
-  BE_FSM_CHECK_INSTANCE(be_fsm);
+	be_fsm = Prop_compute_ground_be_fsm(env, ltlprop);
+	BE_FSM_CHECK_INSTANCE(be_fsm);
 
-  rewriter = Prop_Rewriter_create(
-      env, ltlprop, WFF_REWRITE_METHOD_DEADLOCK_FREE,
-      WFF_REWRITER_REWRITE_INPUT_NEXT, FSM_TYPE_BE, bdd_enc);
-  ltlprop = Prop_Rewriter_rewrite(rewriter);
-  be_fsm = Prop_get_be_fsm(ltlprop);
+	rewriter = Prop_Rewriter_create(env, ltlprop,
+					WFF_REWRITE_METHOD_DEADLOCK_FREE,
+					WFF_REWRITER_REWRITE_INPUT_NEXT,
+					FSM_TYPE_BE, bdd_enc);
+	ltlprop = Prop_Rewriter_rewrite(rewriter);
+	be_fsm = Prop_get_be_fsm(ltlprop);
 
-  be_enc = BeFsm_get_be_encoding(be_fsm);
-  be_mgr = BeEnc_get_be_manager(be_enc);
+	be_enc = BeFsm_get_be_encoding(be_fsm);
+	be_mgr = BeEnc_get_be_manager(be_enc);
 
-  sbmc_add_loop_variable(bdd_enc, be_fsm);
+	sbmc_add_loop_variable(bdd_enc, be_fsm);
 
-  /* Start problems generations: */
-  for (increasingK = k_min; (increasingK <= k_max) && !found_solution;
-       ++increasingK) {
-    int l;
-    char szLoop[16]; /* to keep loopback string */
-    be_ptr prob;     /* The problem in BE format */
-    Be_Cnf_ptr cnf;  /* The CNFed be problem */
+	/* Start problems generations: */
+	for (increasingK = k_min; (increasingK <= k_max) && !found_solution;
+	     ++increasingK) {
+		int l;
+		char szLoop[16]; /* to keep loopback string */
+		be_ptr prob; /* The problem in BE format */
+		Be_Cnf_ptr cnf; /* The CNFed be problem */
 
-    /* the loopback value could be depending on the length
+		/* the loopback value could be depending on the length
        if it were relative: */
-    l = Bmc_Utils_RelLoop2AbsLoop(relative_loop, increasingK);
+		l = Bmc_Utils_RelLoop2AbsLoop(relative_loop, increasingK);
 
-    /* prints a verbose message: */
-    Bmc_Utils_ConvertLoopFromInteger(relative_loop, szLoop, sizeof(szLoop));
+		/* prints a verbose message: */
+		Bmc_Utils_ConvertLoopFromInteger(relative_loop, szLoop,
+						 sizeof(szLoop));
 
-    if (opt_verbose_level_gt(opts, 0)) {
-      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      if (Bmc_Utils_IsNoLoopback(l)) {
-        Logger_log(logger,
-                   "\nGenerating problem with bound %d, no loopback...\n",
-                   increasingK);
-      } else if (Bmc_Utils_IsAllLoopbacks(l)) {
-        Logger_log(
-            logger,
-            "\nGenerating problem with bound %d, all possible loopbacks...\n",
-            increasingK);
-      } else {
-        /* l can be negative iff loopback from the user pov is < -length */
-        if ((l < increasingK) && (l >= 0)) {
-          Logger_log(logger,
-                     "\nGenerating problem with bound %d, loopback %s...\n",
-                     increasingK, szLoop);
-        }
-      }
-    } /* verbose messages */
+		if (opt_verbose_level_gt(opts, 0)) {
+			Logger_ptr logger =
+				LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+			if (Bmc_Utils_IsNoLoopback(l)) {
+				Logger_log(
+					logger,
+					"\nGenerating problem with bound %d, no loopback...\n",
+					increasingK);
+			} else if (Bmc_Utils_IsAllLoopbacks(l)) {
+				Logger_log(
+					logger,
+					"\nGenerating problem with bound %d, all possible loopbacks...\n",
+					increasingK);
+			} else {
+				/* l can be negative iff loopback from the user pov is < -length */
+				if ((l < increasingK) && (l >= 0)) {
+					Logger_log(
+						logger,
+						"\nGenerating problem with bound %d, loopback %s...\n",
+						increasingK, szLoop);
+				}
+			}
+		} /* verbose messages */
 
-    /* checks for loopback vs k compatibility */
-    if (Bmc_Utils_IsSingleLoopback(l) && ((l >= increasingK) || (l < 0))) {
-      StreamMgr_print_error(streams,
-                            "\nWarning: problem with bound %d and loopback %s "
-                            "is not allowed: skipped\n",
-                            increasingK, szLoop);
-      continue;
-    }
-
-#ifdef BENCHMARKING
-    StreamMgr_print_error(streams, ":START:benchmarking bound\n");
-    StreamMgr_print_error(streams, ":bound %d\n", increasingK);
-    StreamMgr_print_error(streams, ":STOP:benchmarking bound\n");
-    StreamMgr_print_output(streams, ":START:benchmarking Generation\n");
-    start_time = clock();
-#endif
-
-    /* generates the problem: */
-    bltlspec = sbmc_make_boolean_formula(bdd_enc, ltlprop);
-    prob = Bmc_Gen_SBMCProblem(be_fsm, bltlspec, increasingK, l);
-    prob = Bmc_Utils_apply_inlining(be_mgr, prob);
+		/* checks for loopback vs k compatibility */
+		if (Bmc_Utils_IsSingleLoopback(l) &&
+		    ((l >= increasingK) || (l < 0))) {
+			StreamMgr_print_error(
+				streams,
+				"\nWarning: problem with bound %d and loopback %s "
+				"is not allowed: skipped\n",
+				increasingK, szLoop);
+			continue;
+		}
 
 #ifdef BENCHMARKING
-    StreamMgr_print_output(streams, ":UTIME = %.4f secs.\n",
-                           ((double)(clock() - start_time)) / CLOCKS_PER_SEC);
-    StreamMgr_print_output(streams, ":STOP:benchmarking Generation\n");
+		StreamMgr_print_error(streams, ":START:benchmarking bound\n");
+		StreamMgr_print_error(streams, ":bound %d\n", increasingK);
+		StreamMgr_print_error(streams, ":STOP:benchmarking bound\n");
+		StreamMgr_print_output(streams,
+				       ":START:benchmarking Generation\n");
+		start_time = clock();
 #endif
 
-    cnf = (Be_Cnf_ptr)NULL;
-
-    /* Problem dumping: */
-    if (dump_type != BMC_DUMP_NONE) {
-      cnf = Be_ConvertToCnf(be_mgr, prob, 0, cnf_alg);
-      Bmc_Dump_WriteProblem(be_enc, cnf, ltlprop, increasingK, l, dump_type,
-                            dump_fname_template);
-    }
-
-    /* SAT problem solving */
-    if (must_solve) {
-      SatSolver_ptr solver;
-      SatSolverResult sat_res;
-
-      /* Sat construction */
-      solver = Sat_CreateNonIncSolver(env, get_sat_solver(opts));
-      if (solver == SAT_SOLVER(NULL)) {
-        StreamMgr_print_error(
-            streams, "Non-incremental sat solver '%s' is not available.\n",
-            get_sat_solver(opts));
-
-        if (cnf != (Be_Cnf_ptr)NULL)
-          Be_Cnf_Delete(cnf);
-        sbmc_remove_loop_variable(bdd_enc, be_fsm);
-        return 1;
-      }
-
-      /* Cnf construction (if needed): */
-      if (cnf == (Be_Cnf_ptr)NULL) {
-        cnf = Be_ConvertToCnf(be_mgr, prob, 1, cnf_alg);
-      }
+		/* generates the problem: */
+		bltlspec = sbmc_make_boolean_formula(bdd_enc, ltlprop);
+		prob = Bmc_Gen_SBMCProblem(be_fsm, bltlspec, increasingK, l);
+		prob = Bmc_Utils_apply_inlining(be_mgr, prob);
 
 #ifdef BENCHMARKING
-      StreamMgr_print_output(streams, ":START:benchmarking Solving\n");
-      start_time = clock();
+		StreamMgr_print_output(streams, ":UTIME = %.4f secs.\n",
+				       ((double)(clock() - start_time)) /
+					       CLOCKS_PER_SEC);
+		StreamMgr_print_output(streams,
+				       ":STOP:benchmarking Generation\n");
 #endif
 
-      /* SAT invokation */
-      SatSolver_add(solver, cnf, SatSolver_get_permanent_group(solver));
-      SatSolver_set_polarity(solver, cnf, 1,
-                             SatSolver_get_permanent_group(solver));
-      sat_res = SatSolver_solve_all_groups(solver);
+		cnf = (Be_Cnf_ptr)NULL;
+
+		/* Problem dumping: */
+		if (dump_type != BMC_DUMP_NONE) {
+			cnf = Be_ConvertToCnf(be_mgr, prob, 0, cnf_alg);
+			Bmc_Dump_WriteProblem(be_enc, cnf, ltlprop, increasingK,
+					      l, dump_type,
+					      dump_fname_template);
+		}
+
+		/* SAT problem solving */
+		if (must_solve) {
+			SatSolver_ptr solver;
+			SatSolverResult sat_res;
+
+			/* Sat construction */
+			solver = Sat_CreateNonIncSolver(env,
+							get_sat_solver(opts));
+			if (solver == SAT_SOLVER(NULL)) {
+				StreamMgr_print_error(
+					streams,
+					"Non-incremental sat solver '%s' is not available.\n",
+					get_sat_solver(opts));
+
+				if (cnf != (Be_Cnf_ptr)NULL)
+					Be_Cnf_Delete(cnf);
+				sbmc_remove_loop_variable(bdd_enc, be_fsm);
+				return 1;
+			}
+
+			/* Cnf construction (if needed): */
+			if (cnf == (Be_Cnf_ptr)NULL) {
+				cnf = Be_ConvertToCnf(be_mgr, prob, 1, cnf_alg);
+			}
 
 #ifdef BENCHMARKING
-      StreamMgr_print_output(streams, ":UTIME = %.4f secs.\n",
-                             ((double)(clock() - start_time)) / CLOCKS_PER_SEC);
-      StreamMgr_print_output(streams, ":STOP:benchmarking Solving\n");
+			StreamMgr_print_output(streams,
+					       ":START:benchmarking Solving\n");
+			start_time = clock();
 #endif
 
-      /* Processes the result: */
-      switch (sat_res) {
+			/* SAT invokation */
+			SatSolver_add(solver, cnf,
+				      SatSolver_get_permanent_group(solver));
+			SatSolver_set_polarity(
+				solver, cnf, 1,
+				SatSolver_get_permanent_group(solver));
+			sat_res = SatSolver_solve_all_groups(solver);
 
-      case SAT_SOLVER_UNSATISFIABLE_PROBLEM: {
-        char szLoopMsg[16]; /* for loopback part of message */
-        memset(szLoopMsg, 0, sizeof(szLoopMsg));
+#ifdef BENCHMARKING
+			StreamMgr_print_output(
+				streams, ":UTIME = %.4f secs.\n",
+				((double)(clock() - start_time)) /
+					CLOCKS_PER_SEC);
+			StreamMgr_print_output(streams,
+					       ":STOP:benchmarking Solving\n");
+#endif
 
-        if (Bmc_Utils_IsAllLoopbacks(l)) {
-          strncpy(szLoopMsg, "", sizeof(szLoopMsg) - 1);
-        } else if (Bmc_Utils_IsNoLoopback(l)) {
-          strncpy(szLoopMsg, " and no loop", sizeof(szLoopMsg) - 1);
-        } else {
-          /* loop is Natural: */
-          strncpy(szLoopMsg, " and loop at ", sizeof(szLoopMsg) - 1);
-          strncat(szLoopMsg, szLoop, sizeof(szLoopMsg) - 1 - strlen(szLoopMsg));
-        }
+			/* Processes the result: */
+			switch (sat_res) {
+			case SAT_SOLVER_UNSATISFIABLE_PROBLEM: {
+				char szLoopMsg
+					[16]; /* for loopback part of message */
+				memset(szLoopMsg, 0, sizeof(szLoopMsg));
 
-        StreamMgr_print_output(streams,
-                               "-- no counterexample found with bound %d%s",
-                               increasingK, szLoopMsg);
-        if (opt_verbose_level_gt(opts, 2)) {
-          Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, " for ");
-          print_spec(Logger_get_ostream(logger), inputprop,
-                     (Prop_PrintFmt)get_prop_print_method(opts));
-        }
-        StreamMgr_print_output(streams, "\n");
+				if (Bmc_Utils_IsAllLoopbacks(l)) {
+					strncpy(szLoopMsg, "",
+						sizeof(szLoopMsg) - 1);
+				} else if (Bmc_Utils_IsNoLoopback(l)) {
+					strncpy(szLoopMsg, " and no loop",
+						sizeof(szLoopMsg) - 1);
+				} else {
+					/* loop is Natural: */
+					strncpy(szLoopMsg, " and loop at ",
+						sizeof(szLoopMsg) - 1);
+					strncat(szLoopMsg, szLoop,
+						sizeof(szLoopMsg) - 1 -
+							strlen(szLoopMsg));
+				}
 
-        break;
-      }
+				StreamMgr_print_output(
+					streams,
+					"-- no counterexample found with bound %d%s",
+					increasingK, szLoopMsg);
+				if (opt_verbose_level_gt(opts, 2)) {
+					Logger_ptr logger = LOGGER(
+						NuSMVEnv_get_value(env,
+								   ENV_LOGGER));
+					Logger_log(logger, " for ");
+					print_spec(
+						Logger_get_ostream(logger),
+						inputprop,
+						(Prop_PrintFmt)
+							get_prop_print_method(
+								opts));
+				}
+				StreamMgr_print_output(streams, "\n");
 
-      case SAT_SOLVER_SATISFIABLE_PROBLEM:
-        StreamMgr_print_output(streams, "-- ");
+				break;
+			}
 
-        print_spec(StreamMgr_get_output_ostream(streams), inputprop,
-                   (Prop_PrintFmt)get_prop_print_method(opts));
+			case SAT_SOLVER_SATISFIABLE_PROBLEM:
+				StreamMgr_print_output(streams, "-- ");
 
-        StreamMgr_print_output(streams, "  is false\n");
-        Prop_set_status(ltlprop, Prop_False);
+				print_spec(
+					StreamMgr_get_output_ostream(streams),
+					inputprop,
+					(Prop_PrintFmt)get_prop_print_method(
+						opts));
 
-        found_solution = true;
+				StreamMgr_print_output(streams, "  is false\n");
+				Prop_set_status(ltlprop, Prop_False);
 
-        if (opt_counter_examples(opts)) {
-          TraceMgr_ptr tm = TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR));
-          BoolSexpFsm_ptr bsexp_fsm; /* needed for trace language */
-          Trace_ptr trace;
+				found_solution = true;
 
-          bsexp_fsm = Prop_get_bool_sexp_fsm(ltlprop);
+				if (opt_counter_examples(opts)) {
+					TraceMgr_ptr tm =
+						TRACE_MGR(NuSMVEnv_get_value(
+							env, ENV_TRACE_MGR));
+					BoolSexpFsm_ptr
+						bsexp_fsm; /* needed for trace language */
+					Trace_ptr trace;
 
-          if (BOOL_SEXP_FSM(NULL) == bsexp_fsm) {
-            bsexp_fsm = BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
-            BOOL_SEXP_FSM_CHECK_INSTANCE(bsexp_fsm);
-          }
+					bsexp_fsm =
+						Prop_get_bool_sexp_fsm(ltlprop);
 
-          trace = Bmc_Utils_generate_and_print_cntexample(
-              be_enc, tm, solver, prob, increasingK, "BMC Counterexample",
-              SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
+					if (BOOL_SEXP_FSM(NULL) == bsexp_fsm) {
+						bsexp_fsm = BOOL_SEXP_FSM(
+							NuSMVEnv_get_value(
+								env,
+								ENV_BOOL_FSM));
+						BOOL_SEXP_FSM_CHECK_INSTANCE(
+							bsexp_fsm);
+					}
 
-          Prop_set_trace(ltlprop, Trace_get_id(trace));
-        }
+					trace = Bmc_Utils_generate_and_print_cntexample(
+						be_enc, tm, solver, prob,
+						increasingK,
+						"BMC Counterexample",
+						SexpFsm_get_symbols_list(
+							SEXP_FSM(bsexp_fsm)));
 
-        break;
+					Prop_set_trace(ltlprop,
+						       Trace_get_id(trace));
+				}
 
-      case SAT_SOLVER_INTERNAL_ERROR:
-        sbmc_remove_loop_variable(bdd_enc, be_fsm);
-        ErrorMgr_internal_error(errmgr,
-                                "Sorry, solver answered with a fatal Internal "
-                                "Failure during problem solving.\n");
+				break;
 
-      case SAT_SOLVER_TIMEOUT:
-      case SAT_SOLVER_MEMOUT:
-        sbmc_remove_loop_variable(bdd_enc, be_fsm);
-        ErrorMgr_internal_error(
-            errmgr, "Sorry, solver ran out of resources and aborted "
-                    "the execution.\n");
+			case SAT_SOLVER_INTERNAL_ERROR:
+				sbmc_remove_loop_variable(bdd_enc, be_fsm);
+				ErrorMgr_internal_error(
+					errmgr,
+					"Sorry, solver answered with a fatal Internal "
+					"Failure during problem solving.\n");
 
-      default:
-        sbmc_remove_loop_variable(bdd_enc, be_fsm);
-        ErrorMgr_internal_error(
-            errmgr, "Bmc_GenSolveLtl: Unexpected value in sat result");
+			case SAT_SOLVER_TIMEOUT:
+			case SAT_SOLVER_MEMOUT:
+				sbmc_remove_loop_variable(bdd_enc, be_fsm);
+				ErrorMgr_internal_error(
+					errmgr,
+					"Sorry, solver ran out of resources and aborted "
+					"the execution.\n");
 
-      } /* switch */
+			default:
+				sbmc_remove_loop_variable(bdd_enc, be_fsm);
+				ErrorMgr_internal_error(
+					errmgr,
+					"Bmc_GenSolveLtl: Unexpected value in sat result");
 
-      SatSolver_destroy(solver);
-    } /* must solve */
+			} /* switch */
 
-    if (cnf != (Be_Cnf_ptr)NULL) {
-      Be_Cnf_Delete(cnf);
-      cnf = (Be_Cnf_ptr)NULL;
-    }
+			SatSolver_destroy(solver);
+		} /* must solve */
 
-  } /* for all problems length */
-  sbmc_remove_loop_variable(bdd_enc, be_fsm);
+		if (cnf != (Be_Cnf_ptr)NULL) {
+			Be_Cnf_Delete(cnf);
+			cnf = (Be_Cnf_ptr)NULL;
+		}
 
-  Prop_Rewriter_update_original_property(rewriter);
-  Prop_Rewriter_destroy(rewriter);
-  rewriter = NULL;
+	} /* for all problems length */
+	sbmc_remove_loop_variable(bdd_enc, be_fsm);
 
-  return 0;
+	Prop_Rewriter_update_original_property(rewriter);
+	Prop_Rewriter_destroy(rewriter);
+	rewriter = NULL;
+
+	return 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -404,34 +454,36 @@ int Bmc_SBMCGenSolveLtl(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
   \se None
 */
 static void bmc_expandFilename(const OptsHandler_ptr opts, const int k,
-                               const int l, const int prop_idx,
-                               const char *filename_to_be_expanded,
-                               char *filename_expanded,
-                               const size_t filename_expanded_maxlen) {
-  char szBuffer[1024];
-  char szLoopback[16];
+			       const int l, const int prop_idx,
+			       const char *filename_to_be_expanded,
+			       char *filename_expanded,
+			       const size_t filename_expanded_maxlen)
+{
+	char szBuffer[1024];
+	char szLoopback[16];
 
-  /* Prepares the structure for macro-expansion: */
-  SubstString aSubstTable[] = {SYMBOL_CREATE(), SYMBOL_CREATE(),
-                               SYMBOL_CREATE(), SYMBOL_CREATE(),
-                               SYMBOL_CREATE(), SYMBOL_CREATE()};
+	/* Prepares the structure for macro-expansion: */
+	SubstString aSubstTable[] = { SYMBOL_CREATE(), SYMBOL_CREATE(),
+				      SYMBOL_CREATE(), SYMBOL_CREATE(),
+				      SYMBOL_CREATE(), SYMBOL_CREATE() };
 
-  /* customizes the table with runtime values: */
-  Utils_StripPathNoExtension(get_input_file(opts), szBuffer);
-  Bmc_Utils_ConvertLoopFromInteger(l, szLoopback, sizeof(szLoopback));
+	/* customizes the table with runtime values: */
+	Utils_StripPathNoExtension(get_input_file(opts), szBuffer);
+	Bmc_Utils_ConvertLoopFromInteger(l, szLoopback, sizeof(szLoopback));
 
-  SYMBOL_ASSIGN(aSubstTable[0], "@F", string, "%s", get_input_file(opts));
-  SYMBOL_ASSIGN(aSubstTable[1], "@f", string, "%s", szBuffer);
-  SYMBOL_ASSIGN(aSubstTable[2], "@k", integer, "%d", k);
-  SYMBOL_ASSIGN(aSubstTable[3], "@l", string, "%s", szLoopback);
-  if (prop_idx != BMC_NO_PROPERTY_INDEX) {
-    SYMBOL_ASSIGN(aSubstTable[4], "@n", integer, "%d", prop_idx);
-  } else {
-    SYMBOL_ASSIGN(aSubstTable[4], "@n", string, "%s", "undef");
-  }
-  SYMBOL_ASSIGN(aSubstTable[5], "@@", string, "%s", "@");
+	SYMBOL_ASSIGN(aSubstTable[0], "@F", string, "%s", get_input_file(opts));
+	SYMBOL_ASSIGN(aSubstTable[1], "@f", string, "%s", szBuffer);
+	SYMBOL_ASSIGN(aSubstTable[2], "@k", integer, "%d", k);
+	SYMBOL_ASSIGN(aSubstTable[3], "@l", string, "%s", szLoopback);
+	if (prop_idx != BMC_NO_PROPERTY_INDEX) {
+		SYMBOL_ASSIGN(aSubstTable[4], "@n", integer, "%d", prop_idx);
+	} else {
+		SYMBOL_ASSIGN(aSubstTable[4], "@n", string, "%s", "undef");
+	}
+	SYMBOL_ASSIGN(aSubstTable[5], "@@", string, "%s", "@");
 
-  Bmc_Utils_ExpandMacrosInFilename(filename_to_be_expanded, aSubstTable,
-                                   sizeof(aSubstTable) / sizeof(aSubstTable[0]),
-                                   filename_expanded, filename_expanded_maxlen);
+	Bmc_Utils_ExpandMacrosInFilename(
+		filename_to_be_expanded, aSubstTable,
+		sizeof(aSubstTable) / sizeof(aSubstTable[0]), filename_expanded,
+		filename_expanded_maxlen);
 }

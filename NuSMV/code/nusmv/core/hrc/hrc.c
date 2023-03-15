@@ -88,69 +88,79 @@ typedef HrcDumper_ptr (*HrcDumperFactory)(const NuSMVEnv_ptr env, FILE *fout);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Hrc_init(NuSMVEnv_ptr env) {
-  HrcNode_ptr node = HrcNode_create(env);
+void Hrc_init(NuSMVEnv_ptr env)
+{
+	HrcNode_ptr node = HrcNode_create(env);
 
-  NuSMVEnv_set_value(env, ENV_HRC_HIERARCHY, node);
+	NuSMVEnv_set_value(env, ENV_HRC_HIERARCHY, node);
 }
 
-void Hrc_quit(NuSMVEnv_ptr env) {
-  if (NuSMVEnv_has_value(env, ENV_HRC_HIERARCHY)) {
-    HrcNode_ptr node = HRC_NODE(NuSMVEnv_remove_value(env, ENV_HRC_HIERARCHY));
-    HrcNode_destroy_recur(node);
-  }
+void Hrc_quit(NuSMVEnv_ptr env)
+{
+	if (NuSMVEnv_has_value(env, ENV_HRC_HIERARCHY)) {
+		HrcNode_ptr node =
+			HRC_NODE(NuSMVEnv_remove_value(env, ENV_HRC_HIERARCHY));
+		HrcNode_destroy_recur(node);
+	}
 }
 
 int Hrc_dump_model(const NuSMVEnv_ptr env, HrcDumpFormat dump_format,
-                   FILE *ofileid, const boolean append_suffix,
-                   const boolean use_indent) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  HrcDumper_ptr dumper = NULL;
+		   FILE *ofileid, const boolean append_suffix,
+		   const boolean use_indent)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	HrcDumper_ptr dumper = NULL;
 
-  int rv = 1;
+	int rv = 1;
 
-  switch (dump_format) {
-  case HRC_DUMP_FORMAT_DEBUG:
-    dumper = HRC_DUMPER(HrcDumperDebug_create(env, ofileid));
-    break;
+	switch (dump_format) {
+	case HRC_DUMP_FORMAT_DEBUG:
+		dumper = HRC_DUMPER(HrcDumperDebug_create(env, ofileid));
+		break;
 
-  case HRC_DUMP_FORMAT_SMV:
-    dumper = HRC_DUMPER(HrcDumperSmv_create(env, ofileid));
-    break;
+	case HRC_DUMP_FORMAT_SMV:
+		dumper = HRC_DUMPER(HrcDumperSmv_create(env, ofileid));
+		break;
 
-  case HRC_DUMP_FORMAT_XML:
-    dumper = HRC_DUMPER(HrcDumperXml_create(env, ofileid));
-    break;
+	case HRC_DUMP_FORMAT_XML:
+		dumper = HRC_DUMPER(HrcDumperXml_create(env, ofileid));
+		break;
 
-  default:
-    error_unreachable_code();
-  }
+	default:
+		error_unreachable_code();
+	}
 
-  HrcDumper_enable_mod_suffix(dumper, append_suffix);
-  HrcDumper_enable_indentation(dumper, use_indent);
+	HrcDumper_enable_mod_suffix(dumper, append_suffix);
+	HrcDumper_enable_indentation(dumper, use_indent);
 
-  CATCH(errmgr) {
-    HrcNode_ptr hrcNode = HRC_NODE(NuSMVEnv_get_value(env, ENV_HRC_HIERARCHY));
+	CATCH(errmgr)
+	{
+		HrcNode_ptr hrcNode =
+			HRC_NODE(NuSMVEnv_get_value(env, ENV_HRC_HIERARCHY));
 
-    Hrc_DumpModel(hrcNode, dumper);
+		Hrc_DumpModel(hrcNode, dumper);
 
-    if (opt_verbose_level_gt(opts, 0)) {
-      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      Logger_log(logger, "  done.\n");
-    }
-    rv = 0;
-  }
-  FAIL(errmgr) { rv = 1; }
+		if (opt_verbose_level_gt(opts, 0)) {
+			Logger_ptr logger =
+				LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+			Logger_log(logger, "  done.\n");
+		}
+		rv = 0;
+	}
+	FAIL(errmgr)
+	{
+		rv = 1;
+	}
 
-  HrcDumper_destroy(dumper);
-  dumper = NULL;
+	HrcDumper_destroy(dumper);
+	dumper = NULL;
 
-  return rv;
+	return rv;
 }
 
 /*!
@@ -159,15 +169,16 @@ int Hrc_dump_model(const NuSMVEnv_ptr env, HrcDumpFormat dump_format,
   If the string is not recognized, an invalide value is set
 */
 
-HrcDumpFormat Hrc_dump_format_str_to_enum(char *format) {
-  if (0 == strcmp("debug", format)) {
-    return HRC_DUMP_FORMAT_DEBUG;
-  } else if (0 == strcmp("smv", format)) {
-    return HRC_DUMP_FORMAT_SMV;
-  } else if (0 == strcmp("xml", format)) {
-    return HRC_DUMP_FORMAT_XML;
-  } else
-    return HRC_DUMP_FORMAT_INVALID;
+HrcDumpFormat Hrc_dump_format_str_to_enum(char *format)
+{
+	if (0 == strcmp("debug", format)) {
+		return HRC_DUMP_FORMAT_DEBUG;
+	} else if (0 == strcmp("smv", format)) {
+		return HRC_DUMP_FORMAT_SMV;
+	} else if (0 == strcmp("xml", format)) {
+		return HRC_DUMP_FORMAT_XML;
+	} else
+		return HRC_DUMP_FORMAT_INVALID;
 }
 
 /*!
@@ -176,20 +187,21 @@ HrcDumpFormat Hrc_dump_format_str_to_enum(char *format) {
   If the format is not recognized, NULL is returned
 */
 
-char *Hrc_dump_format_enum_to_str(HrcDumpFormat format) {
-  switch (format) {
-  case HRC_DUMP_FORMAT_DEBUG:
-    return "debug";
+char *Hrc_dump_format_enum_to_str(HrcDumpFormat format)
+{
+	switch (format) {
+	case HRC_DUMP_FORMAT_DEBUG:
+		return "debug";
 
-  case HRC_DUMP_FORMAT_SMV:
-    return "smv";
+	case HRC_DUMP_FORMAT_SMV:
+		return "smv";
 
-  case HRC_DUMP_FORMAT_XML:
-    return "xml";
+	case HRC_DUMP_FORMAT_XML:
+		return "xml";
 
-  default:
-    return NULL;
-  }
+	default:
+		return NULL;
+	}
 }
 
 /*!
@@ -199,7 +211,10 @@ char *Hrc_dump_format_enum_to_str(HrcDumpFormat format) {
   Useful for usage message
 */
 
-char *Hrc_dump_format_get_available(void) { return "debug, smv, xml"; }
+char *Hrc_dump_format_get_available(void)
+{
+	return "debug, smv, xml";
+}
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */

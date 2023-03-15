@@ -65,8 +65,8 @@ typedef struct BaseEvaluator_TAG *BaseEvaluator_ptr;
 
   \todo Missing description
 */
-#define BASE_EVALUATOR_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(BASE_EVALUATOR(self) != BASE_EVALUATOR(NULL)))
+#define BASE_EVALUATOR_CHECK_INSTANCE(self) \
+	(nusmv_assert(BASE_EVALUATOR(self) != BASE_EVALUATOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -107,7 +107,7 @@ void BaseEvaluator_destroy(BaseEvaluator_ptr self);
   \sa BaseEvaluator_evaluate
 */
 void BaseEvaluator_set_context(BaseEvaluator_ptr self, const SymbTable_ptr st,
-                               const hash_ptr env);
+			       const hash_ptr env);
 
 /*!
   \methodof BaseEvaluator

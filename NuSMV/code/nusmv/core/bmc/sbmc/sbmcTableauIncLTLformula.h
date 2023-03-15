@@ -107,8 +107,8 @@
   \se None
 */
 lsList sbmc_unroll_base(const BeEnc_ptr be_enc, const node_ptr ltlspec,
-                        const hash_ptr info_map, const be_ptr be_LoopExists,
-                        const int do_optimization);
+			const hash_ptr info_map, const be_ptr be_LoopExists,
+			const int do_optimization);
 
 /*!
   \brief Create the k-invariant constraints for
@@ -120,10 +120,13 @@ lsList sbmc_unroll_base(const BeEnc_ptr be_enc, const node_ptr ltlspec,
 
   \se None
 */
-lsList sbmc_unroll_invariant_propositional(
-    const BeEnc_ptr be_enc, const node_ptr ltlspec, const unsigned int i_model,
-    const hash_ptr info_map, const be_ptr be_InLoop_i, const be_ptr be_l_i,
-    const int do_optimization);
+lsList sbmc_unroll_invariant_propositional(const BeEnc_ptr be_enc,
+					   const node_ptr ltlspec,
+					   const unsigned int i_model,
+					   const hash_ptr info_map,
+					   const be_ptr be_InLoop_i,
+					   const be_ptr be_l_i,
+					   const int do_optimization);
 
 /*!
   \brief Create the k-invariant constraints for propositional and
@@ -136,12 +139,12 @@ lsList sbmc_unroll_invariant_propositional(
   \se None
 */
 lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc, const node_ptr ltlspec,
-                               const unsigned int i_model,
-                               const hash_ptr info_map,
-                               const be_ptr be_InLoop_i, const be_ptr be_l_i,
-                               const be_ptr be_LastState_i,
-                               const be_ptr be_LoopExists,
-                               const int do_optimization);
+			       const unsigned int i_model,
+			       const hash_ptr info_map,
+			       const be_ptr be_InLoop_i, const be_ptr be_l_i,
+			       const be_ptr be_LastState_i,
+			       const be_ptr be_LoopExists,
+			       const int do_optimization);
 
 /*!
   \brief Create the k-invariant constraints at time i.
@@ -152,10 +155,10 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc, const node_ptr ltlspec,
   \se None
 */
 lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc, const node_ptr ltlspec,
-                               const unsigned int i_model,
-                               const hash_ptr info_map,
-                               const be_ptr be_InLoop_i, const be_ptr be_l_i,
-                               const int do_optimization);
+			       const unsigned int i_model,
+			       const hash_ptr info_map,
+			       const be_ptr be_InLoop_i, const be_ptr be_l_i,
+			       const int do_optimization);
 
 /*!
   \brief Create the formula specific k-dependent constraints.
@@ -166,8 +169,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc, const node_ptr ltlspec,
   \se None
 */
 lsList sbmc_formula_dependent(const BeEnc_ptr be_enc, const node_ptr ltlspec,
-                              const unsigned int k_model,
-                              const hash_ptr info_map);
+			      const unsigned int k_model,
+			      const hash_ptr info_map);
 
 /*!
   \brief Unroll future and past fragment from
@@ -179,11 +182,11 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc, const node_ptr ltlspec,
   \se None
 */
 lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc, const node_ptr bltlspec,
-                             const int previous_k, const int new_k,
-                             const state_vars_struct *state_vars,
-                             array_t *InLoop_array, const hash_ptr info_map,
-                             const be_ptr be_LoopExists,
-                             const int opt_do_optimization);
+			     const int previous_k, const int new_k,
+			     const state_vars_struct *state_vars,
+			     array_t *InLoop_array, const hash_ptr info_map,
+			     const be_ptr be_LoopExists,
+			     const int opt_do_optimization);
 
 /*!
   \brief required
@@ -199,9 +202,9 @@ lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc, const node_ptr bltlspec,
   \se None
 */
 lsList sbmc_dependent(const BeEnc_ptr be_enc, const node_ptr bltlspec,
-                      const int k, const state_vars_struct *state_vars,
-                      array_t *InLoop_array, const be_ptr be_LoopExists,
-                      const hash_ptr info_map);
+		      const int k, const state_vars_struct *state_vars,
+		      array_t *InLoop_array, const be_ptr be_LoopExists,
+		      const hash_ptr info_map);
 
 /**AutomaticEnd***************************************************************/
 

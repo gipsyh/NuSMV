@@ -37,11 +37,11 @@
 #include "nusmv/core/utils/TimerBench.h"
 
 typedef struct TimerBench_TAG {
-  long start_time;
-  long acc_time;
-  long laps;
+	long start_time;
+	long acc_time;
+	long laps;
 
-  char *name;
+	char *name;
 } TimerBench;
 
 /*!
@@ -51,93 +51,102 @@ typedef struct TimerBench_TAG {
 */
 #define TIMER_BENCH_STOPPED -1
 
-TimerBench_ptr TimerBench_create(const char *name) {
-  TimerBench_ptr self = (TimerBench_ptr)ALLOC(TimerBench, 1);
-  TIMER_BENCH_CHECK_INSTANCE(self);
+TimerBench_ptr TimerBench_create(const char *name)
+{
+	TimerBench_ptr self = (TimerBench_ptr)ALLOC(TimerBench, 1);
+	TIMER_BENCH_CHECK_INSTANCE(self);
 
-  self->name = util_strsav((char *)name);
-  self->start_time = TIMER_BENCH_STOPPED;
-  self->acc_time = 0;
-  self->laps = 0;
-  return self;
+	self->name = util_strsav((char *)name);
+	self->start_time = TIMER_BENCH_STOPPED;
+	self->acc_time = 0;
+	self->laps = 0;
+	return self;
 }
 
-void TimerBench_destroy(TimerBench_ptr self) {
-  TIMER_BENCH_CHECK_INSTANCE(self);
-  FREE(self->name);
-  FREE(self);
+void TimerBench_destroy(TimerBench_ptr self)
+{
+	TIMER_BENCH_CHECK_INSTANCE(self);
+	FREE(self->name);
+	FREE(self);
 }
 
-void TimerBench_start(TimerBench_ptr self) {
-  long now = util_cpu_time();
+void TimerBench_start(TimerBench_ptr self)
+{
+	long now = util_cpu_time();
 
-  TIMER_BENCH_CHECK_INSTANCE(self);
-  nusmv_assert(!TimerBench_is_running(self));
+	TIMER_BENCH_CHECK_INSTANCE(self);
+	nusmv_assert(!TimerBench_is_running(self));
 
-  self->start_time = now;
-  self->laps += 1;
+	self->start_time = now;
+	self->laps += 1;
 }
 
-void TimerBench_stop(TimerBench_ptr self) {
-  long now = util_cpu_time();
+void TimerBench_stop(TimerBench_ptr self)
+{
+	long now = util_cpu_time();
 
-  TIMER_BENCH_CHECK_INSTANCE(self);
-  nusmv_assert(TimerBench_is_running(self));
+	TIMER_BENCH_CHECK_INSTANCE(self);
+	nusmv_assert(TimerBench_is_running(self));
 
-  self->acc_time += (now - self->start_time);
-  self->start_time = TIMER_BENCH_STOPPED;
+	self->acc_time += (now - self->start_time);
+	self->start_time = TIMER_BENCH_STOPPED;
 }
 
-void TimerBench_reset(TimerBench_ptr self) {
-  long now = util_cpu_time();
+void TimerBench_reset(TimerBench_ptr self)
+{
+	long now = util_cpu_time();
 
-  TIMER_BENCH_CHECK_INSTANCE(self);
+	TIMER_BENCH_CHECK_INSTANCE(self);
 
-  self->acc_time = 0;
-  self->laps = 0;
-  if (TimerBench_is_running(self))
-    self->start_time = now;
+	self->acc_time = 0;
+	self->laps = 0;
+	if (TimerBench_is_running(self))
+		self->start_time = now;
 }
 
-boolean TimerBench_is_running(const TimerBench_ptr self) {
-  TIMER_BENCH_CHECK_INSTANCE(self);
-  return (self->start_time != TIMER_BENCH_STOPPED);
+boolean TimerBench_is_running(const TimerBench_ptr self)
+{
+	TIMER_BENCH_CHECK_INSTANCE(self);
+	return (self->start_time != TIMER_BENCH_STOPPED);
 }
 
-long TimerBench_get_time(const TimerBench_ptr self) {
-  TIMER_BENCH_CHECK_INSTANCE(self);
+long TimerBench_get_time(const TimerBench_ptr self)
+{
+	TIMER_BENCH_CHECK_INSTANCE(self);
 
-  if (TimerBench_is_running(self)) {
-    long now = util_cpu_time();
-    return (now - self->start_time + self->acc_time);
-  }
+	if (TimerBench_is_running(self)) {
+		long now = util_cpu_time();
+		return (now - self->start_time + self->acc_time);
+	}
 
-  return self->acc_time;
+	return self->acc_time;
 }
 
-long TimerBench_get_laps(const TimerBench_ptr self) {
-  TIMER_BENCH_CHECK_INSTANCE(self);
-  return self->laps;
+long TimerBench_get_laps(const TimerBench_ptr self)
+{
+	TIMER_BENCH_CHECK_INSTANCE(self);
+	return self->laps;
 }
 
 /** Prints:
     TIMER name # msg # time # laps # status
     msg can be NULL */
-void TimerBench_print(const TimerBench_ptr self, FILE *file, const char *msg) {
-  long time;
+void TimerBench_print(const TimerBench_ptr self, FILE *file, const char *msg)
+{
+	long time;
 
-  TIMER_BENCH_CHECK_INSTANCE(self);
+	TIMER_BENCH_CHECK_INSTANCE(self);
 
-  time = TimerBench_get_time(self);
-  if (msg != NULL) {
-    fprintf(file, "TIMER %s # %s # %ld # ", self->name, msg, time);
-  } else
-    fprintf(file, "TIMER %s # # %ld # ", self->name, time);
+	time = TimerBench_get_time(self);
+	if (msg != NULL) {
+		fprintf(file, "TIMER %s # %s # %ld # ", self->name, msg, time);
+	} else
+		fprintf(file, "TIMER %s # # %ld # ", self->name, time);
 
-  fprintf(file, "%ld laps # ", TimerBench_get_laps(self));
+	fprintf(file, "%ld laps # ", TimerBench_get_laps(self));
 
-  if (TimerBench_is_running(self))
-    fprintf(file, "Running\n");
-  else
-    fprintf(file, "Stopped\n");
+	if (TimerBench_is_running(self))
+		fprintf(file, "Running\n");
+	else
+		fprintf(file, "Stopped\n");
 }

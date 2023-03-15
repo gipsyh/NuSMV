@@ -149,7 +149,7 @@ char *Utils_get_temp_filename_in_dir(const char *dir, const char *templ);
   \sa Utils_file_exists_in_directory
 */
 int Utils_file_exists_in_paths(const char *filename, const char *paths,
-                               const char *delimiters);
+			       const char *delimiters);
 
 /*!
   \brief Checks for the existence of a file within a directory.
@@ -277,7 +277,7 @@ void Utils_reset_timer(const NuSMVEnv_ptr env, const char *name);
   The timer must be already existing. msg can be NULL
 */
 void Utils_print_timer(const NuSMVEnv_ptr env, const char *name,
-                       const char *msg);
+		       const char *msg);
 
 /* Draft of an interface to cudd util subpackage ******************************/
 

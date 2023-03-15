@@ -61,8 +61,8 @@ typedef struct NormalizerPsl_TAG *NormalizerPsl_ptr;
 
   \todo Missing description
 */
-#define NORMALIZER_PSL_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(NORMALIZER_PSL(self) != NORMALIZER_PSL(NULL)))
+#define NORMALIZER_PSL_CHECK_INSTANCE(self) \
+	(nusmv_assert(NORMALIZER_PSL(self) != NORMALIZER_PSL(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,7 +79,7 @@ typedef struct NormalizerPsl_TAG *NormalizerPsl_ptr;
   \sa NormalizerPsl_destroy
 */
 NormalizerPsl_ptr NormalizerPsl_create(const NuSMVEnv_ptr env,
-                                       const char *name);
+				       const char *name);
 
 /**AutomaticEnd***************************************************************/
 

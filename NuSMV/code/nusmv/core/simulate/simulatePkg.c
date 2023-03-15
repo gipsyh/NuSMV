@@ -52,19 +52,22 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Simulate_Pkg_init(NuSMVEnv_ptr env) {
-  /* Does nothing, added for simmetry */
-  UNUSED_PARAM(env);
+void Simulate_Pkg_init(NuSMVEnv_ptr env)
+{
+	/* Does nothing, added for simmetry */
+	UNUSED_PARAM(env);
 }
 
-void Simulate_Pkg_quit(NuSMVEnv_ptr env) {
-  SimulateState_ptr current;
+void Simulate_Pkg_quit(NuSMVEnv_ptr env)
+{
+	SimulateState_ptr current;
 
-  if (NuSMVEnv_has_value(env, ENV_SIMULATE_STATE)) {
-    current = SIMULATE_STATE(NuSMVEnv_remove_value(env, ENV_SIMULATE_STATE));
-    SimulateState_destroy(current);
-    current = SIMULATE_STATE(NULL);
-  }
+	if (NuSMVEnv_has_value(env, ENV_SIMULATE_STATE)) {
+		current = SIMULATE_STATE(
+			NuSMVEnv_remove_value(env, ENV_SIMULATE_STATE));
+		SimulateState_destroy(current);
+		current = SIMULATE_STATE(NULL);
+	}
 }
 
 /*---------------------------------------------------------------------------*/

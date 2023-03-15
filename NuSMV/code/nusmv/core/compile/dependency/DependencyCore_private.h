@@ -52,16 +52,16 @@
 */
 
 typedef struct DependencyCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(DependencyBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(DependencyBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } DependencyCore;
 
@@ -78,7 +78,7 @@ typedef struct DependencyCore_TAG {
   \sa DependencyCore_create
 */
 void dependency_core_init(DependencyCore_ptr self, const NuSMVEnv_ptr env,
-                          const char *name, int low, size_t num);
+			  const char *name, int low, size_t num);
 
 /*!
   \methodof DependencyCore

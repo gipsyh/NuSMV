@@ -58,14 +58,14 @@
 */
 
 typedef struct Be_Manager_TAG {
-  NuSMVEnv_ptr environment;
+	NuSMVEnv_ptr environment;
 
-  void *spec_manager; /* the low-level manager */
-  void *support_data; /* any support structure can be stored here */
+	void *spec_manager; /* the low-level manager */
+	void *support_data; /* any support structure can be stored here */
 
-  /* Gateway: */
-  Be_Spec2Be_fun spec2be_converter;
-  Be_Be2Spec_fun be2spec_converter;
+	/* Gateway: */
+	Be_Spec2Be_fun spec2be_converter;
+	Be_Be2Spec_fun be2spec_converter;
 
 } Be_Manager;
 
@@ -102,8 +102,8 @@ typedef struct Be_Manager_TAG {
   \sa Be_RbcManager_Create, Be_Manager_Delete
 */
 Be_Manager_ptr Be_Manager_Create(const NuSMVEnv_ptr env, void *spec_manager,
-                                 Be_Spec2Be_fun spec2be_converter,
-                                 Be_Be2Spec_fun be2spec_converter);
+				 Be_Spec2Be_fun spec2be_converter,
+				 Be_Be2Spec_fun be2spec_converter);
 
 /*!
   \methodof Be_Manager

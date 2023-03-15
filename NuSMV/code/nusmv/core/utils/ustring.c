@@ -58,15 +58,17 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void init_string(NuSMVEnv_ptr env) {
-  UStringMgr_ptr mgr = UStringMgr_create();
+void init_string(NuSMVEnv_ptr env)
+{
+	UStringMgr_ptr mgr = UStringMgr_create();
 
-  NuSMVEnv_set_value(env, ENV_STRING_MGR, mgr);
+	NuSMVEnv_set_value(env, ENV_STRING_MGR, mgr);
 }
 
-void quit_string(NuSMVEnv_ptr env) {
-  UStringMgr_ptr mgr = NuSMVEnv_remove_value(env, ENV_STRING_MGR);
-  UStringMgr_destroy(mgr);
+void quit_string(NuSMVEnv_ptr env)
+{
+	UStringMgr_ptr mgr = NuSMVEnv_remove_value(env, ENV_STRING_MGR);
+	UStringMgr_destroy(mgr);
 }
 
 /*---------------------------------------------------------------------------*/

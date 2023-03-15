@@ -57,16 +57,15 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct Logger_TAG {
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	OStream_ptr stream;
 
-  OStream_ptr stream;
-
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } Logger;
 
@@ -100,110 +99,127 @@ static void logger_deinit(Logger_ptr self);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Logger_init(NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+void Logger_init(NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  Logger_ptr logger = Logger_create(errstream);
+	Logger_ptr logger = Logger_create(errstream);
 
-  NuSMVEnv_set_value(env, ENV_LOGGER, logger);
+	NuSMVEnv_set_value(env, ENV_LOGGER, logger);
 }
 
-void Logger_quit(NuSMVEnv_ptr env) {
-  Logger_ptr logger = LOGGER(NuSMVEnv_remove_value(env, ENV_LOGGER));
+void Logger_quit(NuSMVEnv_ptr env)
+{
+	Logger_ptr logger = LOGGER(NuSMVEnv_remove_value(env, ENV_LOGGER));
 
-  Logger_destroy(logger);
+	Logger_destroy(logger);
 }
 
-Logger_ptr Logger_create(FILE *stream) {
-  Logger_ptr self = ALLOC(Logger, 1);
-  LOGGER_CHECK_INSTANCE(self);
+Logger_ptr Logger_create(FILE *stream)
+{
+	Logger_ptr self = ALLOC(Logger, 1);
+	LOGGER_CHECK_INSTANCE(self);
 
-  logger_init(self, stream);
-  return self;
+	logger_init(self, stream);
+	return self;
 }
 
-void Logger_destroy(Logger_ptr self) {
-  LOGGER_CHECK_INSTANCE(self);
+void Logger_destroy(Logger_ptr self)
+{
+	LOGGER_CHECK_INSTANCE(self);
 
-  logger_deinit(self);
+	logger_deinit(self);
 
-  FREE(self);
+	FREE(self);
 }
 
-void Logger_log(const Logger_ptr self, const char *format, ...) {
-  va_list args;
+void Logger_log(const Logger_ptr self, const char *format, ...)
+{
+	va_list args;
 
-  va_start(args, format);
+	va_start(args, format);
 
-  OStream_vprintf(self->stream, format, args);
+	OStream_vprintf(self->stream, format, args);
 
-  va_end(args);
+	va_end(args);
 }
 
 void Logger_vlog(const Logger_ptr self, OptsHandler_ptr opts,
-                 const int verbose_level, const char *format, ...) {
-  if (opt_verbose_level_ge(opts, verbose_level)) {
-    va_list args;
+		 const int verbose_level, const char *format, ...)
+{
+	if (opt_verbose_level_ge(opts, verbose_level)) {
+		va_list args;
 
-    va_start(args, format);
+		va_start(args, format);
 
-    OStream_vprintf(self->stream, format, args);
+		OStream_vprintf(self->stream, format, args);
 
-    va_end(args);
-  }
+		va_end(args);
+	}
 }
 
 void Logger_nlog(const Logger_ptr self, const MasterPrinter_ptr node_printer,
-                 const char *format, ...) {
-  va_list args;
+		 const char *format, ...)
+{
+	va_list args;
 
-  va_start(args, format);
+	va_start(args, format);
 
-  OStream_nvprintf(self->stream, node_printer, format, args);
+	OStream_nvprintf(self->stream, node_printer, format, args);
 
-  va_end(args);
+	va_end(args);
 }
 
 void Logger_vnlog(const Logger_ptr self, const MasterPrinter_ptr node_printer,
-                  OptsHandler_ptr opts, const int verbose_level,
-                  const char *format, ...) {
-  if (opt_verbose_level_ge(opts, verbose_level)) {
-    va_list args;
+		  OptsHandler_ptr opts, const int verbose_level,
+		  const char *format, ...)
+{
+	if (opt_verbose_level_ge(opts, verbose_level)) {
+		va_list args;
 
-    va_start(args, format);
+		va_start(args, format);
 
-    OStream_nvprintf(self->stream, node_printer, format, args);
+		OStream_nvprintf(self->stream, node_printer, format, args);
 
-    va_end(args);
-  }
+		va_end(args);
+	}
 }
 
-FILE *Logger_get_stream(const Logger_ptr self) {
-  return OStream_get_stream(self->stream);
+FILE *Logger_get_stream(const Logger_ptr self)
+{
+	return OStream_get_stream(self->stream);
 }
 
-OStream_ptr Logger_get_ostream(const Logger_ptr self) { return self->stream; }
-
-void Logger_inc_indent_size(Logger_ptr self) {
-  OStream_inc_indent_size(self->stream);
+OStream_ptr Logger_get_ostream(const Logger_ptr self)
+{
+	return self->stream;
 }
 
-void Logger_dec_indent_size(Logger_ptr self) {
-  OStream_dec_indent_size(self->stream);
+void Logger_inc_indent_size(Logger_ptr self)
+{
+	OStream_inc_indent_size(self->stream);
 }
 
-int Logger_get_indent_size(const Logger_ptr self) {
-  return OStream_get_indent_size(self->stream);
+void Logger_dec_indent_size(Logger_ptr self)
+{
+	OStream_dec_indent_size(self->stream);
 }
 
-void Logger_reset_indent_size(Logger_ptr self) {
-  OStream_reset_indent_size(self->stream);
+int Logger_get_indent_size(const Logger_ptr self)
+{
+	return OStream_get_indent_size(self->stream);
 }
 
-void Logger_set_indent_size(Logger_ptr self, int n) {
-  OStream_set_indent_size(self->stream, n);
+void Logger_reset_indent_size(Logger_ptr self)
+{
+	OStream_reset_indent_size(self->stream);
+}
+
+void Logger_set_indent_size(Logger_ptr self, int n)
+{
+	OStream_set_indent_size(self->stream, n);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -221,10 +237,11 @@ void Logger_set_indent_size(Logger_ptr self, int n) {
 
   \sa Logger_create
 */
-static void logger_init(Logger_ptr self, FILE *stream) {
-  /* members initialization */
+static void logger_init(Logger_ptr self, FILE *stream)
+{
+	/* members initialization */
 
-  self->stream = OStream_create(stream);
+	self->stream = OStream_create(stream);
 }
 
 /*!
@@ -234,10 +251,11 @@ static void logger_init(Logger_ptr self, FILE *stream) {
 
   \sa Logger_destroy
 */
-static void logger_deinit(Logger_ptr self) {
-  /* members deinitialization */
+static void logger_deinit(Logger_ptr self)
+{
+	/* members deinitialization */
 
-  OStream_destroy(self->stream);
+	OStream_destroy(self->stream);
 }
 
 /**AutomaticEnd***************************************************************/

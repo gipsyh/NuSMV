@@ -76,9 +76,10 @@
 
   \todo Missing description
 */
-#define BDD_ELFWD_OPT_ALL                                                      \
-  (BDD_ELFWD_OPT_FORWARD_SEARCH | BDD_ELFWD_OPT_LTL_TABLEAU_FORWARD_SEARCH |   \
-   BDD_ELFWD_OPT_USE_REACHABLE_STATES | BDD_ELFWD_OPT_COUNTER_EXAMPLES)
+#define BDD_ELFWD_OPT_ALL                           \
+	(BDD_ELFWD_OPT_FORWARD_SEARCH |             \
+	 BDD_ELFWD_OPT_LTL_TABLEAU_FORWARD_SEARCH | \
+	 BDD_ELFWD_OPT_USE_REACHABLE_STATES | BDD_ELFWD_OPT_COUNTER_EXAMPLES)
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -172,17 +173,17 @@ typedef struct BddELFwdSavedOptions_TAG *BddELFwdSavedOptions_ptr;
 */
 
 enum BddOregJusticeEmptinessBddAlgorithmType_TAG {
-  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_INVALID = -1,
-  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD = 0,
-  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD,
+	BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_INVALID = -1,
+	BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD = 0,
+	BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD,
 
-  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_MIN_VALID =
-      BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD,
-  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_MAX_VALID =
-      BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD
+	BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_MIN_VALID =
+		BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD,
+	BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_MAX_VALID =
+		BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD
 };
 typedef enum BddOregJusticeEmptinessBddAlgorithmType_TAG
-    BddOregJusticeEmptinessBddAlgorithmType;
+	BddOregJusticeEmptinessBddAlgorithmType;
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -228,7 +229,7 @@ Bdd_BddOregJusticeEmptinessBddAlgorithmType_from_string(const char *name);
   \sa Bdd_BddOregJusticeEmptinessBddAlgorithmType_from_string
 */
 const char *Bdd_BddOregJusticeEmptinessBddAlgorithmType_to_string(
-    const BddOregJusticeEmptinessBddAlgorithmType self);
+	const BddOregJusticeEmptinessBddAlgorithmType self);
 
 /*!
   \brief Prints the BDD-based algorithms to check language
@@ -257,7 +258,7 @@ void Bdd_print_available_BddOregJusticeEmptinessBddAlgorithms(FILE *file);
   \se None.
 */
 boolean Bdd_elfwd_check_options(NuSMVEnv_ptr env, unsigned int which_options,
-                                boolean on_fail_print);
+				boolean on_fail_print);
 
 /*!
   \brief Checks, sets and saves previous values of options for
@@ -283,7 +284,7 @@ boolean Bdd_elfwd_check_options(NuSMVEnv_ptr env, unsigned int which_options,
 */
 BddELFwdSavedOptions_ptr
 Bdd_elfwd_check_set_and_save_options(NuSMVEnv_ptr env,
-                                     unsigned int which_options);
+				     unsigned int which_options);
 
 /*!
   \brief Restores previous values of options for forward
@@ -297,7 +298,7 @@ Bdd_elfwd_check_set_and_save_options(NuSMVEnv_ptr env,
   \sa Bdd_elfwd_check_set_and_save_options
 */
 void Bdd_elfwd_restore_options(NuSMVEnv_ptr env, unsigned int which_options,
-                               BddELFwdSavedOptions_ptr saved_options);
+			       BddELFwdSavedOptions_ptr saved_options);
 
 /**AutomaticEnd***************************************************************/
 

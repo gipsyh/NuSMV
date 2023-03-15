@@ -76,8 +76,8 @@ typedef struct TracePlugin_TAG *TracePlugin_ptr;
 
   \todo Missing description
 */
-#define TRACE_PLUGIN_CHECK_INSTANCE(x)                                         \
-  (nusmv_assert(TRACE_PLUGIN(x) != TRACE_PLUGIN(NULL)))
+#define TRACE_PLUGIN_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_PLUGIN(x) != TRACE_PLUGIN(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -95,7 +95,7 @@ typedef struct TracePlugin_TAG *TracePlugin_ptr;
   The return value is -1 in case of error.
 */
 VIRTUAL int TracePlugin_action(const TracePlugin_ptr self,
-                               const Trace_ptr trace, const TraceOpt_ptr opt);
+			       const Trace_ptr trace, const TraceOpt_ptr opt);
 
 /*!
   \methodof TracePlugin

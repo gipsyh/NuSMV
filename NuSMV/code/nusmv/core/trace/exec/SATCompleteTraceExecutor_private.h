@@ -37,7 +37,7 @@
 #ifndef __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_PRIVATE_H__
 
-#include "nusmv/core/trace/exec/CompleteTraceExecutor.h"         /* fix this */
+#include "nusmv/core/trace/exec/CompleteTraceExecutor.h" /* fix this */
 #include "nusmv/core/trace/exec/CompleteTraceExecutor_private.h" /* fix this */
 #include "nusmv/core/trace/exec/SATCompleteTraceExecutor.h"
 #include "nusmv/core/utils/utils.h"
@@ -52,21 +52,21 @@
 */
 
 typedef struct SATCompleteTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(CompleteTraceExecutor);
+	/* this MUST stay on the top */
+	INHERITS_FROM(CompleteTraceExecutor);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  BeFsm_ptr fsm;
-  BeEnc_ptr enc;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	BeFsm_ptr fsm;
+	BeEnc_ptr enc;
 
-  /* needed for booleanization */
-  BddEnc_ptr bdd_enc;
+	/* needed for booleanization */
+	BddEnc_ptr bdd_enc;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } SATCompleteTraceExecutor;
 
@@ -83,8 +83,8 @@ typedef struct SATCompleteTraceExecutor_TAG {
   \sa SATCompleteTraceExecutor_create
 */
 void sat_complete_trace_executor_init(SATCompleteTraceExecutor_ptr self,
-                                      const BeFsm_ptr fsm, const BeEnc_ptr enc,
-                                      const BddEnc_ptr bdd_enc);
+				      const BeFsm_ptr fsm, const BeEnc_ptr enc,
+				      const BddEnc_ptr bdd_enc);
 
 /*!
   \methodof SATCompleteTraceExecutor

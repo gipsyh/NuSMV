@@ -152,8 +152,8 @@ YY_BUFFER_STATE nusmv_yy_scan_string(const char *yy_str);
   This is called by the parser when needed
 */
 void parser_add_syntax_error(const NuSMVEnv_ptr env, const char *fname,
-                             int lineno, const char *token,
-                             const char *err_msg);
+			     int lineno, const char *token,
+			     const char *err_msg);
 
 /*!
   \brief Frees the list of structures containing the syntax

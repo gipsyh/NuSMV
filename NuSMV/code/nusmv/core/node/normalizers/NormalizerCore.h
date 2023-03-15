@@ -61,8 +61,8 @@ typedef struct NormalizerCore_TAG *NormalizerCore_ptr;
 
   \todo Missing description
 */
-#define NORMALIZER_CORE_CHECK_INSTANCE(self)                                   \
-  (nusmv_assert(NORMALIZER_CORE(self) != NORMALIZER_CORE(NULL)))
+#define NORMALIZER_CORE_CHECK_INSTANCE(self) \
+	(nusmv_assert(NORMALIZER_CORE(self) != NORMALIZER_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,7 +79,7 @@ typedef struct NormalizerCore_TAG *NormalizerCore_ptr;
   \sa NormalizerCore_destroy
 */
 NormalizerCore_ptr NormalizerCore_create(const NuSMVEnv_ptr env,
-                                         const char *name);
+					 const char *name);
 
 /**AutomaticEnd***************************************************************/
 

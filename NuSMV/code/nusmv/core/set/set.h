@@ -181,9 +181,9 @@ typedef ListIter_ptr Set_Iterator_t;
 
 
 */
-#define SET_FOREACH(set, iter)                                                 \
-  for (iter = Set_GetFirstIter(set); !Set_IsEndIter(iter);                     \
-       iter = Set_GetNextIter(iter))
+#define SET_FOREACH(set, iter)                                   \
+	for (iter = Set_GetFirstIter(set); !Set_IsEndIter(iter); \
+	     iter = Set_GetNextIter(iter))
 
 /*!
   \brief \todo Missing synopsis
@@ -411,8 +411,8 @@ node_ptr Set_Set2Node(const Set_t set, NodeMgr_ptr nodemgr);
   passed to the printer (can be NULL)
 */
 void Set_PrintSet(MasterPrinter_ptr mprinter, FILE *, const Set_t set,
-                  void (*printer)(FILE *file, Set_Element_t el, void *arg),
-                  void *printer_arg);
+		  void (*printer)(FILE *file, Set_Element_t el, void *arg),
+		  void *printer_arg);
 
 /* SubInterface: Set_Iterator_t ***********************************************/
 

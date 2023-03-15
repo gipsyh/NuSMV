@@ -62,8 +62,8 @@ typedef struct BoolSexpFsm_TAG *BoolSexpFsm_ptr;
 
   \todo Missing description
 */
-#define BOOL_SEXP_FSM_CHECK_INSTANCE(self)                                     \
-  (nusmv_assert(BOOL_SEXP_FSM(self) != BOOL_SEXP_FSM(NULL)))
+#define BOOL_SEXP_FSM_CHECK_INSTANCE(self) \
+	(nusmv_assert(BOOL_SEXP_FSM(self) != BOOL_SEXP_FSM(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -80,8 +80,8 @@ typedef struct BoolSexpFsm_TAG *BoolSexpFsm_ptr;
   \sa BoolSexpFsm_destroy
 */
 BoolSexpFsm_ptr BoolSexpFsm_create(const FlatHierarchy_ptr hierarchy,
-                                   const Set_t vars_set, BddEnc_ptr benc,
-                                   SymbLayer_ptr det_layer);
+				   const Set_t vars_set, BddEnc_ptr benc,
+				   SymbLayer_ptr det_layer);
 
 /*!
   \methodof BoolSexpFsm
@@ -95,8 +95,8 @@ BoolSexpFsm_ptr BoolSexpFsm_create(const FlatHierarchy_ptr hierarchy,
   \sa BoolSexpFsm_destroy
 */
 BoolSexpFsm_ptr BoolSexpFsm_create_from_scalar_fsm(const SexpFsm_ptr scalar_fsm,
-                                                   BddEnc_ptr benc,
-                                                   SymbLayer_ptr det_layer);
+						   BddEnc_ptr benc,
+						   SymbLayer_ptr det_layer);
 
 /*!
   \methodof BoolSexpFsm

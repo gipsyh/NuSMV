@@ -59,7 +59,7 @@
   \sa tc_lookup_expr_type
 */
 SymbType_ptr tc_set_expression_type(TypeChecker_ptr self, node_ptr expression,
-                                    SymbType_ptr type);
+				    SymbType_ptr type);
 
 /*!
   \brief Looks up the internal type memoizing for expression's type
@@ -101,8 +101,8 @@ SymbType_ptr tc_lookup_expr_type(TypeChecker_ptr self, node_ptr expression);
   \sa type_checking_violation_handler
 */
 SymbType_ptr type_checker_check_expression(TypeChecker_ptr self,
-                                           node_ptr expression,
-                                           node_ptr context);
+					   node_ptr expression,
+					   node_ptr context);
 
 /*!
   \methodof TypeChecker
@@ -114,7 +114,7 @@ SymbType_ptr type_checker_check_expression(TypeChecker_ptr self,
    and warnings occur
 */
 void type_checker_print_error_message(TypeChecker_ptr self, node_ptr expr,
-                                      boolean is_error);
+				      boolean is_error);
 
 /*!
   \methodof TypeChecker

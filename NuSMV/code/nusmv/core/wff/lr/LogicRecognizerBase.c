@@ -74,14 +74,15 @@ static void logic_recognizer_base_finalize(Object_ptr object, void *dummy);
 /*---------------------------------------------------------------------------*/
 
 LogicType LogicRecognizerBase_recognize(LogicRecognizerBase_ptr self,
-                                        node_ptr wff, node_ptr context) {
-  LogicType retval = EXP_NONE;
+					node_ptr wff, node_ptr context)
+{
+	LogicType retval = EXP_NONE;
 
-  LOGIC_RECOGNIZER_BASE_CHECK_INSTANCE(self);
+	LOGIC_RECOGNIZER_BASE_CHECK_INSTANCE(self);
 
-  retval = self->recognize(self, wff, context);
+	retval = self->recognize(self, wff, context);
 
-  return retval;
+	return retval;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -89,32 +90,36 @@ LogicType LogicRecognizerBase_recognize(LogicRecognizerBase_ptr self,
 /*---------------------------------------------------------------------------*/
 
 void logic_recognizer_base_init(LogicRecognizerBase_ptr self,
-                                const NuSMVEnv_ptr env, const char *name,
-                                int low, size_t num) {
-  /* base class initialization */
-  node_walker_init(NODE_WALKER(self), env, name, low, num, false);
+				const NuSMVEnv_ptr env, const char *name,
+				int low, size_t num)
+{
+	/* base class initialization */
+	node_walker_init(NODE_WALKER(self), env, name, low, num, false);
 
-  /* members initialization */
+	/* members initialization */
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = logic_recognizer_base_finalize;
-  OVERRIDE(LogicRecognizerBase, recognize) = logic_recognizer_base_recognize;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = logic_recognizer_base_finalize;
+	OVERRIDE(LogicRecognizerBase, recognize) =
+		logic_recognizer_base_recognize;
 }
 
-void logic_recognizer_base_deinit(LogicRecognizerBase_ptr self) {
-  /* members deinitialization */
+void logic_recognizer_base_deinit(LogicRecognizerBase_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  node_walker_deinit(NODE_WALKER(self));
+	/* base class deinitialization */
+	node_walker_deinit(NODE_WALKER(self));
 }
 
 LogicType logic_recognizer_base_recognize(LogicRecognizerBase_ptr self,
-                                          node_ptr wff, node_ptr context) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+					  node_ptr wff, node_ptr context)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  ErrorMgr_internal_error(errmgr, "%s: Pure virtual method\n", __func__);
+	ErrorMgr_internal_error(errmgr, "%s: Pure virtual method\n", __func__);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -126,11 +131,12 @@ LogicType logic_recognizer_base_recognize(LogicRecognizerBase_ptr self,
 
   Called by the class destructor
 */
-static void logic_recognizer_base_finalize(Object_ptr object, void *dummy) {
-  LogicRecognizerBase_ptr self = LOGIC_RECOGNIZER_BASE(object);
+static void logic_recognizer_base_finalize(Object_ptr object, void *dummy)
+{
+	LogicRecognizerBase_ptr self = LOGIC_RECOGNIZER_BASE(object);
 
-  logic_recognizer_base_deinit(self);
-  FREE(self);
+	logic_recognizer_base_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

@@ -58,21 +58,21 @@
 /*---------------------------------------------------------------------------*/
 /* possible Variable Ordering Types */
 typedef enum {
-  VARS_ORD_INPUTS_BEFORE,
-  VARS_ORD_INPUTS_AFTER,
-  VARS_ORD_TOPOLOGICAL,
-  VARS_ORD_INPUTS_BEFORE_BI, /* default */
-  VARS_ORD_INPUTS_AFTER_BI,
-  VARS_ORD_TOPOLOGICAL_BI,
-  VARS_ORD_UNKNOWN
+	VARS_ORD_INPUTS_BEFORE,
+	VARS_ORD_INPUTS_AFTER,
+	VARS_ORD_TOPOLOGICAL,
+	VARS_ORD_INPUTS_BEFORE_BI, /* default */
+	VARS_ORD_INPUTS_AFTER_BI,
+	VARS_ORD_TOPOLOGICAL_BI,
+	VARS_ORD_UNKNOWN
 
 } VarsOrdType;
 
 /* possible BDD Static Ordering Heuristics */
 typedef enum {
-  BDD_STATIC_ORDER_HEURISTICS_NONE,
-  BDD_STATIC_ORDER_HEURISTICS_BASIC,
-  BDD_STATIC_ORDER_HEURISTICS_ERROR, /* means an error has happened*/
+	BDD_STATIC_ORDER_HEURISTICS_NONE,
+	BDD_STATIC_ORDER_HEURISTICS_BASIC,
+	BDD_STATIC_ORDER_HEURISTICS_ERROR, /* means an error has happened*/
 } BddSohEnum;
 
 /*---------------------------------------------------------------------------*/

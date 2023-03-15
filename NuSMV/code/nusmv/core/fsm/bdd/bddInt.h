@@ -42,34 +42,34 @@
 
 /* members are public from within the bdd fsm */
 typedef struct BddFsmCache_TAG {
-  /* for sharing families (i.e. compatible instances): */
-  unsigned int *family_counter;
+	/* for sharing families (i.e. compatible instances): */
+	unsigned int *family_counter;
 
-  /* dd manager */
-  DDMgr_ptr dd;
+	/* dd manager */
+	DDMgr_ptr dd;
 
-  /* cached values */
-  BddStates fair_states;
-  BddStatesInputs fair_states_inputs;
-  BddStates revfair_states;
-  BddStatesInputs revfair_states_inputs;
+	/* cached values */
+	BddStates fair_states;
+	BddStatesInputs fair_states_inputs;
+	BddStates revfair_states;
+	BddStatesInputs revfair_states_inputs;
 
-  /* interface to this structure is private */
-  struct BddFsmReachable_TAG {
-    boolean computed;
-    BddStates *layers; /* array of bdds */
-    int diameter;
-    BddStates reachable_states; /* Used to hold the bdd representing the
+	/* interface to this structure is private */
+	struct BddFsmReachable_TAG {
+		boolean computed;
+		BddStates *layers; /* array of bdds */
+		int diameter;
+		BddStates reachable_states; /* Used to hold the bdd representing the
                                    whole set of reachable states of the
                                    BddFsm.  These may be computed for
                                    example by Guided Reachability */
-  } reachable;
+	} reachable;
 
-  BddStates successor_states;
-  BddStates not_successor_states;
-  BddStates deadlock_states;
-  BddStatesInputs legal_state_input;
-  BddStatesInputs monolithic_trans;
+	BddStates successor_states;
+	BddStates not_successor_states;
+	BddStates deadlock_states;
+	BddStatesInputs legal_state_input;
+	BddStatesInputs monolithic_trans;
 
 } BddFsmCache;
 
@@ -93,8 +93,8 @@ typedef struct BddFsmCache_TAG *BddFsmCache_ptr;
 
   \todo Missing description
 */
-#define BDD_FSM_CACHE_CHECK_INSTANCE(x)                                        \
-  (nusmv_assert(BDD_FSM_CACHE(x) != BDD_FSM_CACHE(NULL)))
+#define BDD_FSM_CACHE_CHECK_INSTANCE(x) \
+	(nusmv_assert(BDD_FSM_CACHE(x) != BDD_FSM_CACHE(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -177,7 +177,7 @@ BddFsmCache_ptr BddFsmCache_soft_copy(const BddFsmCache_ptr self);
   information between to FSMs
 */
 void BddFsmCache_copy_reachables(BddFsmCache_ptr self,
-                                 const BddFsmCache_ptr other);
+				 const BddFsmCache_ptr other);
 
 /*!
   \methodof BddFsmCache
@@ -190,7 +190,7 @@ void BddFsmCache_copy_reachables(BddFsmCache_ptr self,
                 rings ecc)
 */
 void BddFsmCache_set_reachable_states(BddFsmCache_ptr self,
-                                      BddStates reachable);
+				      BddStates reachable);
 
 /*!
   \methodof BddFsmCache
@@ -204,7 +204,7 @@ void BddFsmCache_set_reachable_states(BddFsmCache_ptr self,
   changes
 */
 void BddFsmCache_set_reachables(BddFsmCache_ptr self, node_ptr layers_list,
-                                const int diameter, boolean completed);
+				const int diameter, boolean completed);
 
 /*!
   \methodof BddFsmCache

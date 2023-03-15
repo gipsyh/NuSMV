@@ -108,7 +108,7 @@ typedef boolean (*BPFN)(node_ptr);
 typedef int (*custom_print_sexp_t)(FILE *, node_ptr);
 typedef int (*out_func_t)(void *, char *);
 typedef int (*custom_print_node_t)(out_func_t, FILE *, node_ptr, int *, char **,
-                                   int *, int *, int *);
+				   int *, int *, int *);
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -126,10 +126,10 @@ typedef int (*custom_print_node_t)(out_func_t, FILE *, node_ptr, int *, char **,
 */
 
 union value_ {
-  int inttype;
-  struct node *nodetype;
-  struct string_ *strtype;
-  void *bddtype;
+	int inttype;
+	struct node *nodetype;
+	struct string_ *strtype;
+	void *bddtype;
 };
 
 /*!
@@ -150,14 +150,14 @@ union value_ {
 */
 
 struct node {
-  struct node *link;
-  /*char locked; */ /* this field should be a bit into the others
+	struct node *link;
+	/*char locked; */ /* this field should be a bit into the others
                        (e.g. in type) */
-  short int type;
-  int lineno;
-  node_val left;
-  node_val right;
-  void *extra_data; /* added to handle rbc */
+	short int type;
+	int lineno;
+	node_val left;
+	node_val right;
+	void *extra_data; /* added to handle rbc */
 };
 
 /*!
@@ -185,8 +185,8 @@ typedef struct NodeMgr_TAG *NodeMgr_ptr;
 
   \todo Missing description
 */
-#define NODE_MGR_CHECK_INSTANCE(self)                                          \
-  (nusmv_assert(NODE_MGR(self) != NODE_MGR(NULL)))
+#define NODE_MGR_CHECK_INSTANCE(self) \
+	(nusmv_assert(NODE_MGR(self) != NODE_MGR(NULL)))
 
 /* shorthands to avoid columns explosions in code when building
    expressions. See relative NodeMgr methods */
@@ -210,8 +210,8 @@ typedef struct NodeMgr_TAG *NodeMgr_ptr;
 
   \todo Missing description
 */
-#define new_lined_node(mgr, t, l, r, lineno)                                   \
-  NodeMgr_new_lined_node(mgr, t, l, r, lineno)
+#define new_lined_node(mgr, t, l, r, lineno) \
+	NodeMgr_new_lined_node(mgr, t, l, r, lineno)
 
 /*!
   \brief \todo Missing synopsis
@@ -253,8 +253,8 @@ typedef struct NodeMgr_TAG *NodeMgr_ptr;
 
   \todo Missing description
 */
-#define NODEMGR_ASSERT_IS_NODE_NORMALIZED(nodemgr, node)                       \
-  (nusmv_assert(node == find_atom(nodemgr, node)))
+#define NODEMGR_ASSERT_IS_NODE_NORMALIZED(nodemgr, node) \
+	(nusmv_assert(node == find_atom(nodemgr, node)))
 
 /**AutomaticStart*************************************************************/
 
@@ -310,7 +310,7 @@ void NodeMgr_show_profile_stats(NodeMgr_ptr self, FILE *stream);
   \sa find_node
 */
 node_ptr NodeMgr_new_node(NodeMgr_ptr self, int type, node_ptr left,
-                          node_ptr right);
+			  node_ptr right);
 
 /*!
   \methodof NodeMgr
@@ -327,7 +327,7 @@ node_ptr NodeMgr_new_node(NodeMgr_ptr self, int type, node_ptr left,
   \sa new_node, find_node
 */
 node_ptr NodeMgr_new_lined_node(NodeMgr_ptr self, int type, node_ptr left,
-                                node_ptr right, int lineno);
+				node_ptr right, int lineno);
 
 /* Hashed nodes */
 

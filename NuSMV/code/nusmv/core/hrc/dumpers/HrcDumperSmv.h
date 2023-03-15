@@ -60,8 +60,8 @@ typedef struct HrcDumperSmv_TAG *HrcDumperSmv_ptr;
 
   \todo Missing description
 */
-#define HRC_DUMPER_SMV_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(HRC_DUMPER_SMV(self) != HRC_DUMPER_SMV(NULL)))
+#define HRC_DUMPER_SMV_CHECK_INSTANCE(self) \
+	(nusmv_assert(HRC_DUMPER_SMV(self) != HRC_DUMPER_SMV(NULL)))
 
 /**AutomaticStart*************************************************************/
 

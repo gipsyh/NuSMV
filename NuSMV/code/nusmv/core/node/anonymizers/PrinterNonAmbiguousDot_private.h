@@ -52,16 +52,16 @@
 */
 
 typedef struct PrinterNonAmbiguousDot_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PrinterBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PrinterBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } PrinterNonAmbiguousDot;
 
@@ -78,8 +78,8 @@ typedef struct PrinterNonAmbiguousDot_TAG {
   \sa PrinterNonAmbiguousDot_create
 */
 void printer_anon_map_entry_init(PrinterNonAmbiguousDot_ptr self,
-                                 const NuSMVEnv_ptr env, const char *name,
-                                 int low, size_t num);
+				 const NuSMVEnv_ptr env, const char *name,
+				 int low, size_t num);
 
 /*!
   \methodof PrinterNonAmbiguousDot
@@ -98,7 +98,7 @@ void printer_anon_map_entry_deinit(PrinterNonAmbiguousDot_ptr self);
 
 */
 int printer_anon_map_entry_print_node(PrinterBase_ptr self, node_ptr n,
-                                      int priority);
+				      int priority);
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_PRIVATE_H__  \
         */

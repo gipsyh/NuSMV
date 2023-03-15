@@ -60,8 +60,8 @@
   \sa SymbType_create, SymbType_destroy_memory_sharing_type
 */
 SymbType_ptr SymbType_create_memory_sharing_type(const NuSMVEnv_ptr env,
-                                                 SymbTypeTag tag,
-                                                 node_ptr body);
+						 SymbTypeTag tag,
+						 node_ptr body);
 
 /*!
   \methodof SymbType
@@ -77,8 +77,8 @@ SymbType_ptr SymbType_create_memory_sharing_type(const NuSMVEnv_ptr env,
   \sa SymbType_create, SymbType_destroy_memory_sharing_type
 */
 SymbType_ptr SymbType_create_memory_sharing_array_type(SymbType_ptr subtype,
-                                                       int lower_bound,
-                                                       int higher_bound);
+						       int lower_bound,
+						       int higher_bound);
 
 /*!
   \methodof SymbType

@@ -67,8 +67,8 @@ typedef enum { BMC_TRUE, BMC_FALSE, BMC_UNKNOWN, BMC_ERROR } Bmc_result;
   \sa optional
 */
 typedef enum {
-  BMC_INVAR_BACKWARD_CLOSURE,
-  BMC_INVAR_FORWARD_CLOSURE
+	BMC_INVAR_BACKWARD_CLOSURE,
+	BMC_INVAR_FORWARD_CLOSURE
 } bmc_invar_closure_strategy;
 
 /*---------------------------------------------------------------------------*/
@@ -99,9 +99,9 @@ typedef enum {
   \sa Bmc_GenSolve_Action
 */
 int Bmc_GenSolveLtl(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
-                    const int relative_loop, const boolean must_inc_length,
-                    const boolean must_solve, const Bmc_DumpType dump_type,
-                    const char *dump_fname_template);
+		    const int relative_loop, const boolean must_inc_length,
+		    const boolean must_solve, const Bmc_DumpType dump_type,
+		    const char *dump_fname_template);
 
 /*!
   \brief Generates DIMACS version and/or solve and INVARSPEC
@@ -113,8 +113,8 @@ int Bmc_GenSolveLtl(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
   \sa Bmc_GenSolvePbs
 */
 int Bmc_GenSolveInvar(NuSMVEnv_ptr env, Prop_ptr invarprop,
-                      const boolean must_solve, const Bmc_DumpType dump_type,
-                      const char *dump_fname_template);
+		      const boolean must_solve, const Bmc_DumpType dump_type,
+		      const char *dump_fname_template);
 
 /*!
   \brief Apply Induction algorithm on th given FSM to
@@ -127,8 +127,8 @@ int Bmc_GenSolveInvar(NuSMVEnv_ptr env, Prop_ptr invarprop,
                        stored in trace_index parameter.
 */
 Bmc_result Bmc_induction_algorithm(const NuSMVEnv_ptr env, BeFsm_ptr be_fsm,
-                                   node_ptr binvarspec, Trace_ptr *trace_index,
-                                   NodeList_ptr symbols);
+				   node_ptr binvarspec, Trace_ptr *trace_index,
+				   NodeList_ptr symbols);
 
 /*!
   \brief Solve and INVARSPEC problems by using
@@ -140,10 +140,10 @@ Bmc_result Bmc_induction_algorithm(const NuSMVEnv_ptr env, BeFsm_ptr be_fsm,
   \sa Bmc_GenSolvePbs
 */
 Bmc_result Bmc_een_sorensson_algorithm(
-    const NuSMVEnv_ptr env, BeFsm_ptr be_fsm, BoolSexpFsm_ptr bool_fsm,
-    node_ptr binvarspec, int max_k, const Bmc_DumpType dump_type,
-    const char *dump_fname_template, Prop_ptr pp, Prop_ptr oldprop,
-    boolean print_steps, boolean use_extra_step, Trace_ptr *trace);
+	const NuSMVEnv_ptr env, BeFsm_ptr be_fsm, BoolSexpFsm_ptr bool_fsm,
+	node_ptr binvarspec, int max_k, const Bmc_DumpType dump_type,
+	const char *dump_fname_template, Prop_ptr pp, Prop_ptr oldprop,
+	boolean print_steps, boolean use_extra_step, Trace_ptr *trace);
 
 /*!
   \brief Solve and INVARSPEC problems by using
@@ -155,8 +155,9 @@ Bmc_result Bmc_een_sorensson_algorithm(
   \sa Bmc_GenSolvePbs
 */
 Bmc_result Bmc_een_sorensson_algorithm_without_dump(
-    const NuSMVEnv_ptr env, BeFsm_ptr be_fsm, BoolSexpFsm_ptr bool_fsm,
-    node_ptr binvarspec, int max_k, boolean use_extra_step, Trace_ptr *trace);
+	const NuSMVEnv_ptr env, BeFsm_ptr be_fsm, BoolSexpFsm_ptr bool_fsm,
+	node_ptr binvarspec, int max_k, boolean use_extra_step,
+	Trace_ptr *trace);
 
 /*!
   \brief Solve and INVARSPEC problems by using
@@ -168,10 +169,10 @@ Bmc_result Bmc_een_sorensson_algorithm_without_dump(
   \sa Bmc_GenSolvePbs
 */
 int Bmc_GenSolveInvar_EenSorensson(NuSMVEnv_ptr env, Prop_ptr invarprop,
-                                   const int max_k,
-                                   const Bmc_DumpType dump_type,
-                                   const char *dump_fname_template,
-                                   boolean use_extra_step);
+				   const int max_k,
+				   const Bmc_DumpType dump_type,
+				   const char *dump_fname_template,
+				   boolean use_extra_step);
 
 /* incremental algorithms */
 
@@ -184,7 +185,7 @@ int Bmc_GenSolveInvar_EenSorensson(NuSMVEnv_ptr env, Prop_ptr invarprop,
   \sa Bmc_GenSolve_Action
 */
 int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
-                       const int relative_loop, const boolean must_inc_length);
+		       const int relative_loop, const boolean must_inc_length);
 
 /*!
   \brief Solve an INVARSPEC problems with algorithm
@@ -194,7 +195,7 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
   then if the problem is not proved the function just returns 0
 */
 int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop,
-                            const int max_k);
+			    const int max_k);
 
 /*!
   \brief Solve an INVARSPEC problems wiht algorithm Dual
@@ -207,7 +208,7 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop,
 
 */
 int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_k,
-                          bmc_invar_closure_strategy strategy);
+			  bmc_invar_closure_strategy strategy);
 
 /*!
   \brief Solve an INVARSPEC problems wiht algorithm Fasification
@@ -219,6 +220,6 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_k,
 
 */
 int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
-                                   const int max_k, int step_k);
+				   const int max_k, int step_k);
 
 #endif /* __NUSMV_CORE_BMC_BMC_BMC_H__ */

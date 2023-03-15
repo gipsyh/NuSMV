@@ -62,8 +62,8 @@ typedef struct PrinterSexpCore_TAG *PrinterSexpCore_ptr;
 
   \todo Missing description
 */
-#define PRINTER_SEXP_CORE_CHECK_INSTANCE(self)                                 \
-  (nusmv_assert(PRINTER_SEXP_CORE(self) != PRINTER_SEXP_CORE(NULL)))
+#define PRINTER_SEXP_CORE_CHECK_INSTANCE(self) \
+	(nusmv_assert(PRINTER_SEXP_CORE(self) != PRINTER_SEXP_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -80,7 +80,7 @@ typedef struct PrinterSexpCore_TAG *PrinterSexpCore_ptr;
   \sa PrinterSexpCore_destroy
 */
 PrinterSexpCore_ptr PrinterSexpCore_create(const NuSMVEnv_ptr env,
-                                           const char *name);
+					   const char *name);
 
 /**AutomaticEnd***************************************************************/
 

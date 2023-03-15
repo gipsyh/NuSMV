@@ -54,17 +54,17 @@
 */
 
 typedef struct NormalizerBase_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  node_ptr (*normalize_node)(NormalizerBase_ptr self, node_ptr n);
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	node_ptr (*normalize_node)(NormalizerBase_ptr self, node_ptr n);
 
 } NormalizerBase;
 
@@ -87,7 +87,7 @@ typedef struct NormalizerBase_TAG {
   \sa NormalizerBase_destroy
 */
 NormalizerBase_ptr NormalizerBase_create(const NuSMVEnv_ptr env,
-                                         const char *name, int low, size_t num);
+					 const char *name, int low, size_t num);
 
 /*!
   \methodof NormalizerBase
@@ -98,8 +98,8 @@ NormalizerBase_ptr NormalizerBase_create(const NuSMVEnv_ptr env,
   \sa NormalizerBase_create
 */
 void normalizer_base_init(NormalizerBase_ptr self, const NuSMVEnv_ptr env,
-                          const char *name, int low, size_t num,
-                          boolean can_handle_null);
+			  const char *name, int low, size_t num,
+			  boolean can_handle_null);
 
 /*!
   \methodof NormalizerBase
@@ -119,6 +119,6 @@ void normalizer_base_deinit(NormalizerBase_ptr self);
 
 */
 node_ptr normalizer_base_throw_normalize_node(NormalizerBase_ptr self,
-                                              node_ptr n);
+					      node_ptr n);
 
 #endif /* __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_BASE_PRIVATE_H__ */

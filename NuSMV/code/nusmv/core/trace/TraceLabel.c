@@ -41,7 +41,7 @@
 #include "nusmv/core/parser/symbols.h"
 
 #include "nusmv/core/utils/portability.h" /* for errno */
-#include <limits.h>                       /* for INT_MAX */
+#include <limits.h> /* for INT_MAX */
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -59,82 +59,88 @@
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr, int trace_id, int state_id) {
-  TraceLabel self;
+TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr, int trace_id, int state_id)
+{
+	TraceLabel self;
 
-  self = find_node(nodemgr, DOT,
-                   find_node(nodemgr, NUMBER, NODE_FROM_INT(trace_id), Nil),
-                   find_node(nodemgr, NUMBER, NODE_FROM_INT(state_id), Nil));
-  return self;
+	self = find_node(
+		nodemgr, DOT,
+		find_node(nodemgr, NUMBER, NODE_FROM_INT(trace_id), Nil),
+		find_node(nodemgr, NUMBER, NODE_FROM_INT(state_id), Nil));
+	return self;
 }
 
-TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr, const char *str) {
-  char *startptr;
-  char *endptr;
-  long traceno, stateno;
+TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr, const char *str)
+{
+	char *startptr;
+	char *endptr;
+	long traceno, stateno;
 
-  /* Start reading the string */
-  startptr = (char *)str;
+	/* Start reading the string */
+	startptr = (char *)str;
 
-  /* First number must be a positive integer */
-  errno = 0;
-  traceno = strtol(str, &endptr, 10);
+	/* First number must be a positive integer */
+	errno = 0;
+	traceno = strtol(str, &endptr, 10);
 
-  if ((startptr == endptr) || (errno == ERANGE) || (errno == EINVAL) ||
-      (traceno < 0) || (traceno > INT_MAX)) {
-    /*
+	if ((startptr == endptr) || (errno == ERANGE) || (errno == EINVAL) ||
+	    (traceno < 0) || (traceno > INT_MAX)) {
+		/*
       No chars read or error in reading or negative number or
       number too big
     */
-    return TRACE_LABEL_INVALID;
-  }
-  startptr = endptr;
+		return TRACE_LABEL_INVALID;
+	}
+	startptr = endptr;
 
-  /* We can have some spaces */
-  while (' ' == *startptr) {
-    startptr++;
-  }
+	/* We can have some spaces */
+	while (' ' == *startptr) {
+		startptr++;
+	}
 
-  /* Then we have a '.' char */
-  if ('.' == *startptr) {
-    startptr++;
-  } else {
-    /* We have something which is not a '.' */
-    return TRACE_LABEL_INVALID;
-  }
+	/* Then we have a '.' char */
+	if ('.' == *startptr) {
+		startptr++;
+	} else {
+		/* We have something which is not a '.' */
+		return TRACE_LABEL_INVALID;
+	}
 
-  /* And then the state number */
-  errno = 0;
-  stateno = strtol(startptr, &endptr, 10);
+	/* And then the state number */
+	errno = 0;
+	stateno = strtol(startptr, &endptr, 10);
 
-  if ((startptr == endptr) || (errno == ERANGE) || (errno == EINVAL) ||
-      (stateno > INT_MAX) || (stateno < INT_MIN)) {
-    /* No chars read or error in reading or invalid int */
-    return TRACE_LABEL_INVALID;
-  }
-  startptr = endptr;
+	if ((startptr == endptr) || (errno == ERANGE) || (errno == EINVAL) ||
+	    (stateno > INT_MAX) || (stateno < INT_MIN)) {
+		/* No chars read or error in reading or invalid int */
+		return TRACE_LABEL_INVALID;
+	}
+	startptr = endptr;
 
-  /* Skip final spaces */
-  while (' ' == *startptr) {
-    startptr++;
-  }
+	/* Skip final spaces */
+	while (' ' == *startptr) {
+		startptr++;
+	}
 
-  if ('\0' == *startptr) {
-    return TraceLabel_create(nodemgr, (int)(traceno - 1), (int)(stateno - 1));
-  } else {
-    /* Something unexpected at the end of the file */
-    return TRACE_LABEL_INVALID;
-  }
+	if ('\0' == *startptr) {
+		return TraceLabel_create(nodemgr, (int)(traceno - 1),
+					 (int)(stateno - 1));
+	} else {
+		/* Something unexpected at the end of the file */
+		return TRACE_LABEL_INVALID;
+	}
 }
 
-int TraceLabel_get_trace(TraceLabel self) {
-  int result = NODE_TO_INT(car(car((node_ptr)self)));
+int TraceLabel_get_trace(TraceLabel self)
+{
+	int result = NODE_TO_INT(car(car((node_ptr)self)));
 
-  return result;
+	return result;
 }
 
-int TraceLabel_get_state(TraceLabel self) {
-  int result = NODE_TO_INT(car(cdr((node_ptr)self)));
+int TraceLabel_get_state(TraceLabel self)
+{
+	int result = NODE_TO_INT(car(cdr((node_ptr)self)));
 
-  return result;
+	return result;
 }

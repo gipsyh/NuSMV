@@ -80,22 +80,25 @@ static int UsagePrintCurrentState(const NuSMVEnv_ptr env);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Simulate_Cmd_init(NuSMVEnv_ptr env) {
-  Cmd_CommandAdd(env, "simulate", CommandSimulate, 0, true);
-  Cmd_CommandAdd(env, "pick_state", CommandPickState, 0, true);
-  Cmd_CommandAdd(env, "goto_state", CommandGotoState, 0, true);
-  Cmd_CommandAdd(env, "print_current_state", CommandPrintCurrentState, 0, true);
+void Simulate_Cmd_init(NuSMVEnv_ptr env)
+{
+	Cmd_CommandAdd(env, "simulate", CommandSimulate, 0, true);
+	Cmd_CommandAdd(env, "pick_state", CommandPickState, 0, true);
+	Cmd_CommandAdd(env, "goto_state", CommandGotoState, 0, true);
+	Cmd_CommandAdd(env, "print_current_state", CommandPrintCurrentState, 0,
+		       true);
 }
 
-void Simulate_Cmd_quit(NuSMVEnv_ptr env) {
-  boolean status = true;
+void Simulate_Cmd_quit(NuSMVEnv_ptr env)
+{
+	boolean status = true;
 
-  status = status && Cmd_CommandRemove(env, "simulate");
-  status = status && Cmd_CommandRemove(env, "pick_state");
-  status = status && Cmd_CommandRemove(env, "goto_state");
-  status = status && Cmd_CommandRemove(env, "print_current_state");
+	status = status && Cmd_CommandRemove(env, "simulate");
+	status = status && Cmd_CommandRemove(env, "pick_state");
+	status = status && Cmd_CommandRemove(env, "goto_state");
+	status = status && Cmd_CommandRemove(env, "print_current_state");
 
-  nusmv_assert(status);
+	nusmv_assert(status);
 }
 
 /*!
@@ -143,149 +146,159 @@ void Simulate_Cmd_quit(NuSMVEnv_ptr env) {
   \sa goto_state simulate
 */
 
-int CommandPickState(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  TraceMgr_ptr const gtm = TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR));
-  DDMgr_ptr const dd_mgr = DD_MGR(NuSMVEnv_get_value(env, ENV_DD_MGR));
-  BddEnc_ptr bdd_enc = NULL;
-  NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+int CommandPickState(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	TraceMgr_ptr const gtm =
+		TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR));
+	DDMgr_ptr const dd_mgr = DD_MGR(NuSMVEnv_get_value(env, ENV_DD_MGR));
+	BddEnc_ptr bdd_enc = NULL;
+	NodeMgr_ptr const nodemgr =
+		NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  FILE *errstream = StreamMgr_get_error_stream(streams);
-  int res = 1;
-  int c = 0;
-  boolean verbose = false;
-  int display_all = 0;
-  char *strConstr = NIL(char);
-  char *strLabel = NIL(char);
-  Simulation_Mode mode = Deterministic;
-  short int usedMode = 0;
-  TraceLabel label = TRACE_LABEL_INVALID;
-  bdd_ptr bdd_constraints = NULL;
+	FILE *errstream = StreamMgr_get_error_stream(streams);
+	int res = 1;
+	int c = 0;
+	boolean verbose = false;
+	int display_all = 0;
+	char *strConstr = NIL(char);
+	char *strLabel = NIL(char);
+	Simulation_Mode mode = Deterministic;
+	short int usedMode = 0;
+	TraceLabel label = TRACE_LABEL_INVALID;
+	bdd_ptr bdd_constraints = NULL;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "hriavc:s:")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsagePickState(env);
-    case 'r':
-      if (++usedMode > 1)
-        goto simulate_cmd_pick_state_usage;
-      mode = Random;
-      break;
-    case 'i':
-      if (++usedMode > 1)
-        goto simulate_cmd_pick_state_usage;
-      mode = Interactive;
-      break;
-    case 'a':
-      display_all = 1;
-      break;
-    case 'v':
-      verbose = true;
-      break;
-    case 'c':
-      strConstr = util_strsav(util_optarg);
-      break;
-    case 's':
-      strLabel = util_strsav(util_optarg);
-      break;
-    default:
-      goto simulate_cmd_pick_state_usage;
-    }
-  }
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "hriavc:s:")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsagePickState(env);
+		case 'r':
+			if (++usedMode > 1)
+				goto simulate_cmd_pick_state_usage;
+			mode = Random;
+			break;
+		case 'i':
+			if (++usedMode > 1)
+				goto simulate_cmd_pick_state_usage;
+			mode = Interactive;
+			break;
+		case 'a':
+			display_all = 1;
+			break;
+		case 'v':
+			verbose = true;
+			break;
+		case 'c':
+			strConstr = util_strsav(util_optarg);
+			break;
+		case 's':
+			strLabel = util_strsav(util_optarg);
+			break;
+		default:
+			goto simulate_cmd_pick_state_usage;
+		}
+	}
 
-  if ((mode != Interactive) && (display_all == 1)) {
-    goto simulate_cmd_pick_state_usage;
-  }
+	if ((mode != Interactive) && (display_all == 1)) {
+		goto simulate_cmd_pick_state_usage;
+	}
 
-  if (argc != util_optind)
-    goto simulate_cmd_pick_state_usage;
+	if (argc != util_optind)
+		goto simulate_cmd_pick_state_usage;
 
-  /* pre-conditions */
-  if (Compile_check_if_model_was_built(env, errstream, true)) {
-    goto simulate_cmd_pick_state_free;
-  }
+	/* pre-conditions */
+	if (Compile_check_if_model_was_built(env, errstream, true)) {
+		goto simulate_cmd_pick_state_free;
+	}
 
-  if (strLabel != (char *)NULL && strConstr != (char *)NULL) {
-    StreamMgr_print_error(
-        streams, "Options -c and -s cannot be used at the same time\n");
-    res = 1;
-    goto simulate_cmd_pick_state_free;
-  }
+	if (strLabel != (char *)NULL && strConstr != (char *)NULL) {
+		StreamMgr_print_error(
+			streams,
+			"Options -c and -s cannot be used at the same time\n");
+		res = 1;
+		goto simulate_cmd_pick_state_free;
+	}
 
-  if (strLabel != (char *)NULL) {
-    label = TraceLabel_create_from_string(nodemgr, strLabel);
+	if (strLabel != (char *)NULL) {
+		label = TraceLabel_create_from_string(nodemgr, strLabel);
 
-    if (label == TRACE_LABEL_INVALID || !TraceMgr_is_label_valid(gtm, label)) {
+		if (label == TRACE_LABEL_INVALID ||
+		    !TraceMgr_is_label_valid(gtm, label)) {
+			StreamMgr_print_error(
+				streams, "Label \"%s\" is invalid\n", strLabel);
 
-      StreamMgr_print_error(streams, "Label \"%s\" is invalid\n", strLabel);
+			res = 1;
+			goto simulate_cmd_pick_state_free;
+		}
+	}
 
-      res = 1;
-      goto simulate_cmd_pick_state_free;
-    }
-  }
+	if (strConstr != NIL(char)) {
+		bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
+		bdd_constraints = simulate_get_constraints_from_string(
+			env, strConstr, bdd_enc, false, /* no nexts */
+			false /* only states*/);
 
-  if (strConstr != NIL(char)) {
-    bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-    bdd_constraints = simulate_get_constraints_from_string(
-        env, strConstr, bdd_enc, false, /* no nexts */
-        false /* only states*/);
+		if (bdd_constraints == (bdd_ptr)NULL) {
+			res = 1;
+			goto simulate_cmd_pick_state_free;
+		}
+	} /* end of constraints processing */
 
-    if (bdd_constraints == (bdd_ptr)NULL) {
-      res = 1;
-      goto simulate_cmd_pick_state_free;
-    }
-  } /* end of constraints processing */
+	res = Simulate_pick_state(env, label, mode, display_all, verbose,
+				  bdd_constraints);
 
-  res = Simulate_pick_state(env, label, mode, display_all, verbose,
-                            bdd_constraints);
-
-  goto simulate_cmd_pick_state_free;
+	goto simulate_cmd_pick_state_free;
 
 simulate_cmd_pick_state_usage:
-  res = UsagePickState(env);
+	res = UsagePickState(env);
 
 simulate_cmd_pick_state_free:
-  if (NIL(char) != strLabel) {
-    FREE(strLabel);
-  }
-  if (NIL(char) != strConstr) {
-    FREE(strConstr);
-  }
-  if (NULL != bdd_constraints)
-    bdd_free(dd_mgr, bdd_constraints);
+	if (NIL(char) != strLabel) {
+		FREE(strLabel);
+	}
+	if (NIL(char) != strConstr) {
+		FREE(strConstr);
+	}
+	if (NULL != bdd_constraints)
+		bdd_free(dd_mgr, bdd_constraints);
 
-  return res;
+	return res;
 }
 
-static int UsagePickState(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams, "usage: pick_state [-h] [-v] [-r | -i [-a]] "
-                                 "[-c \"constr\" | -s trace.state]\n");
-  StreamMgr_print_error(streams, "  -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams, "  -v \t\tVerbosely prints picked state.\n");
-  StreamMgr_print_error(
-      streams,
-      "  -r \t\tRandomly picks a state from the set of the initial states\n");
-  StreamMgr_print_error(streams,
-                        "     \t\t(otherwise choice is deterministic).\n");
-  StreamMgr_print_error(
-      streams, "  -i \t\tLets the user interactively pick a state from\n");
-  StreamMgr_print_error(streams, "     \t\tthe set of initial ones.\n");
-  StreamMgr_print_error(
-      streams, "  -a \t\tDisplays all the state variables (changed and\n");
-  StreamMgr_print_error(streams,
-                        "   \t\tunchanged) in an interactive session.\n");
-  StreamMgr_print_error(streams,
-                        "   \t\tIt works only together with -i option.\n");
-  StreamMgr_print_error(
-      streams,
-      "  -c \"constr\"   Sets constraints for the initial set of states.\n");
-  StreamMgr_print_error(streams,
-                        "  -s state\tPicks state from trace.state label.\n");
-  return 1;
+static int UsagePickState(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(streams,
+			      "usage: pick_state [-h] [-v] [-r | -i [-a]] "
+			      "[-c \"constr\" | -s trace.state]\n");
+	StreamMgr_print_error(streams, "  -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(streams,
+			      "  -v \t\tVerbosely prints picked state.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -r \t\tRandomly picks a state from the set of the initial states\n");
+	StreamMgr_print_error(
+		streams, "     \t\t(otherwise choice is deterministic).\n");
+	StreamMgr_print_error(
+		streams,
+		"  -i \t\tLets the user interactively pick a state from\n");
+	StreamMgr_print_error(streams, "     \t\tthe set of initial ones.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -a \t\tDisplays all the state variables (changed and\n");
+	StreamMgr_print_error(streams,
+			      "   \t\tunchanged) in an interactive session.\n");
+	StreamMgr_print_error(
+		streams, "   \t\tIt works only together with -i option.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -c \"constr\"   Sets constraints for the initial set of states.\n");
+	StreamMgr_print_error(
+		streams, "  -s state\tPicks state from trace.state label.\n");
+	return 1;
 }
 
 /*!
@@ -367,176 +380,184 @@ static int UsagePickState(const NuSMVEnv_ptr env) {
   \sa pick_state goto_state
 */
 
-int CommandSimulate(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+int CommandSimulate(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  BddEnc_ptr enc;
-  DDMgr_ptr dd;
-  bdd_ptr bdd_constraints = (bdd_ptr)NULL;
-  boolean isconstraint = false;
-  boolean printrace = false;
-  int display_all = 0;
-  int c = 0;
-  boolean only_changes = 1;
-  boolean time_shift = false;
-  int steps = get_default_simulation_steps(opts);
-  Simulation_Mode mode = Deterministic;
-  boolean k_specified = false;
-  /* the string of constraint to parsificate */
-  char *strConstr = NIL(char);
-  int res = 0;
+	BddEnc_ptr enc;
+	DDMgr_ptr dd;
+	bdd_ptr bdd_constraints = (bdd_ptr)NULL;
+	boolean isconstraint = false;
+	boolean printrace = false;
+	int display_all = 0;
+	int c = 0;
+	boolean only_changes = 1;
+	boolean time_shift = false;
+	int steps = get_default_simulation_steps(opts);
+	Simulation_Mode mode = Deterministic;
+	boolean k_specified = false;
+	/* the string of constraint to parsificate */
+	char *strConstr = NIL(char);
+	int res = 0;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "t:c:hpvriak:")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsageSimulate(env);
-    case 'p':
-      if (printrace == true)
-        return UsageSimulate(env);
-      printrace = true;
-      only_changes = true;
-      break;
-    case 'v':
-      if (printrace == true)
-        return UsageSimulate(env);
-      printrace = true;
-      only_changes = false;
-      break;
-    case 'r':
-      if (mode == Interactive)
-        return UsageSimulate(env);
-      mode = Random;
-      break;
-    case 'i':
-      if (mode == Random)
-        return UsageSimulate(env);
-      mode = Interactive;
-      break;
-    case 'a':
-      display_all = 1;
-      break;
-    case 'c':
-      if (NIL(char) != strConstr)
-        return UsageSimulate(env);
-      strConstr = util_strsav(util_optarg);
-      isconstraint = true;
-      time_shift = true;
-      break;
-    case 't':
-      if (NIL(char) != strConstr)
-        return UsageSimulate(env);
-      strConstr = util_strsav(util_optarg);
-      isconstraint = true;
-      time_shift = false;
-      break;
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "t:c:hpvriak:")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsageSimulate(env);
+		case 'p':
+			if (printrace == true)
+				return UsageSimulate(env);
+			printrace = true;
+			only_changes = true;
+			break;
+		case 'v':
+			if (printrace == true)
+				return UsageSimulate(env);
+			printrace = true;
+			only_changes = false;
+			break;
+		case 'r':
+			if (mode == Interactive)
+				return UsageSimulate(env);
+			mode = Random;
+			break;
+		case 'i':
+			if (mode == Random)
+				return UsageSimulate(env);
+			mode = Interactive;
+			break;
+		case 'a':
+			display_all = 1;
+			break;
+		case 'c':
+			if (NIL(char) != strConstr)
+				return UsageSimulate(env);
+			strConstr = util_strsav(util_optarg);
+			isconstraint = true;
+			time_shift = true;
+			break;
+		case 't':
+			if (NIL(char) != strConstr)
+				return UsageSimulate(env);
+			strConstr = util_strsav(util_optarg);
+			isconstraint = true;
+			time_shift = false;
+			break;
 
-    case 'k': {
-      char *strNumber;
+		case 'k': {
+			char *strNumber;
 
-      if (k_specified) {
-        StreamMgr_print_error(
-            streams, "Option -k cannot be specified more than once.\n");
-        return 1;
-      }
+			if (k_specified) {
+				StreamMgr_print_error(
+					streams,
+					"Option -k cannot be specified more than once.\n");
+				return 1;
+			}
 
-      strNumber = util_strsav(util_optarg);
+			strNumber = util_strsav(util_optarg);
 
-      if (util_str2int(strNumber, &steps) != 0) {
-        ErrorMgr_error_invalid_number(errmgr, strNumber);
-        FREE(strNumber);
-        return 1;
-      }
+			if (util_str2int(strNumber, &steps) != 0) {
+				ErrorMgr_error_invalid_number(errmgr,
+							      strNumber);
+				FREE(strNumber);
+				return 1;
+			}
 
-      if (steps < 0) {
-        ErrorMgr_error_invalid_number(errmgr, strNumber);
-        FREE(strNumber);
-        return 1;
-      }
+			if (steps < 0) {
+				ErrorMgr_error_invalid_number(errmgr,
+							      strNumber);
+				FREE(strNumber);
+				return 1;
+			}
 
-      FREE(strNumber);
-      k_specified = true;
-      break;
-    }
+			FREE(strNumber);
+			k_specified = true;
+			break;
+		}
 
-    default:
-      return UsageSimulate(env);
-    }
-  }
+		default:
+			return UsageSimulate(env);
+		}
+	}
 
-  if ((mode != Interactive) && (display_all == 1))
-    return UsageSimulate(env);
+	if ((mode != Interactive) && (display_all == 1))
+		return UsageSimulate(env);
 
-  if (argc == util_optind + 1) {
-    char *strNumber;
+	if (argc == util_optind + 1) {
+		char *strNumber;
 
-    StreamMgr_print_error(streams,
-                          "*** Warning: Parameter \"steps\" is deprecated. "
-                          "Use option \"-k\" instead\n");
+		StreamMgr_print_error(
+			streams,
+			"*** Warning: Parameter \"steps\" is deprecated. "
+			"Use option \"-k\" instead\n");
 
-    if (k_specified) {
-      StreamMgr_print_error(
-          streams, "Error: Parameter \"steps\" conflicts with option -k\n");
-      return 1;
-    }
+		if (k_specified) {
+			StreamMgr_print_error(
+				streams,
+				"Error: Parameter \"steps\" conflicts with option -k\n");
+			return 1;
+		}
 
-    strNumber = util_strsav(argv[util_optind]);
+		strNumber = util_strsav(argv[util_optind]);
 
-    if (util_str2int(strNumber, &steps) != 0) {
-      ErrorMgr_error_invalid_number(errmgr, strNumber);
-      FREE(strNumber);
-      return 1;
-    }
+		if (util_str2int(strNumber, &steps) != 0) {
+			ErrorMgr_error_invalid_number(errmgr, strNumber);
+			FREE(strNumber);
+			return 1;
+		}
 
-    if (steps < 0) {
-      ErrorMgr_error_invalid_number(errmgr, strNumber);
-      FREE(strNumber);
-      return 1;
-    }
+		if (steps < 0) {
+			ErrorMgr_error_invalid_number(errmgr, strNumber);
+			FREE(strNumber);
+			return 1;
+		}
 
-    FREE(strNumber);
-    k_specified = true;
-  } else if (argc != util_optind) {
-    return UsageSimulate(env);
-  }
+		FREE(strNumber);
+		k_specified = true;
+	} else if (argc != util_optind) {
+		return UsageSimulate(env);
+	}
 
-  /* pre-conditions */
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
+	/* pre-conditions */
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
 
-  if (!NuSMVEnv_has_value(env, ENV_SIMULATE_STATE)) {
-    StreamMgr_print_error(
-        streams, "No current state set. Use the \"pick_state\" command.\n");
-    return 1;
-  }
+	if (!NuSMVEnv_has_value(env, ENV_SIMULATE_STATE)) {
+		StreamMgr_print_error(
+			streams,
+			"No current state set. Use the \"pick_state\" command.\n");
+		return 1;
+	}
 
-  enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-  dd = BddEnc_get_dd_manager(enc);
+	enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
+	dd = BddEnc_get_dd_manager(enc);
 
-  if (isconstraint) {
-    bdd_constraints = simulate_get_constraints_from_string(
-        env, strConstr, enc, !time_shift, true /* inputs */);
-    if (bdd_constraints == (bdd_ptr)NULL)
-      res = 1;
-  } else
-    bdd_constraints = bdd_true(dd);
+	if (isconstraint) {
+		bdd_constraints = simulate_get_constraints_from_string(
+			env, strConstr, enc, !time_shift, true /* inputs */);
+		if (bdd_constraints == (bdd_ptr)NULL)
+			res = 1;
+	} else
+		bdd_constraints = bdd_true(dd);
 
-  if (0 == res) {
-    res = Simulate_simulate(env, time_shift, mode, steps, display_all,
-                            printrace, only_changes, bdd_constraints);
-  }
+	if (0 == res) {
+		res = Simulate_simulate(env, time_shift, mode, steps,
+					display_all, printrace, only_changes,
+					bdd_constraints);
+	}
 
-  FREE(strConstr);
-  if ((bdd_ptr)NULL != bdd_constraints)
-    bdd_free(dd, bdd_constraints);
+	FREE(strConstr);
+	if ((bdd_ptr)NULL != bdd_constraints)
+		bdd_free(dd, bdd_constraints);
 
-  return res;
+	return res;
 
 } /* Command Simulate */
 
@@ -545,39 +566,43 @@ int CommandSimulate(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsageSimulate(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(
-      streams, "usage: simulate [-h] [-p | -v] [-r | -i [-a]] [[-c \"constr\"] "
-               "| [-t \"constr\"]] [-k steps]\n");
-  StreamMgr_print_error(streams, "  -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(
-      streams,
-      "  -p \t\tPrints current generated trace (only changed variables).\n");
-  StreamMgr_print_error(
-      streams,
-      "  -v \t\tVerbosely prints current generated trace (all variables).\n");
-  StreamMgr_print_error(
-      streams,
-      "  -r \t\tSets picking mode to random (default is deterministic).\n");
-  StreamMgr_print_error(streams,
-                        "  -i \t\tEnters simulation's interactive mode.\n");
-  StreamMgr_print_error(
-      streams,
-      "  -a \t\tDisplays all the state variables (changed and unchanged)\n");
-  StreamMgr_print_error(streams,
-                        "     \t\tin every step of an interactive session.\n");
-  StreamMgr_print_error(streams,
-                        "     \t\tIt works only together with -i option.\n");
-  StreamMgr_print_error(streams, "  -c \"constr\"\tSets constraint (simple "
-                                 "expression) for the next steps.\n");
-  StreamMgr_print_error(streams, "  -t \"constr\"\tSets constraint (next "
-                                 "expression) for the next steps.\n");
-  StreamMgr_print_error(
-      streams, "  -k <length> \tSpecifies the simulation length\n"
-               "\t\tto be used when generating the simulated problem.\n");
-  return 1;
+static int UsageSimulate(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(
+		streams,
+		"usage: simulate [-h] [-p | -v] [-r | -i [-a]] [[-c \"constr\"] "
+		"| [-t \"constr\"]] [-k steps]\n");
+	StreamMgr_print_error(streams, "  -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -p \t\tPrints current generated trace (only changed variables).\n");
+	StreamMgr_print_error(
+		streams,
+		"  -v \t\tVerbosely prints current generated trace (all variables).\n");
+	StreamMgr_print_error(
+		streams,
+		"  -r \t\tSets picking mode to random (default is deterministic).\n");
+	StreamMgr_print_error(
+		streams, "  -i \t\tEnters simulation's interactive mode.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -a \t\tDisplays all the state variables (changed and unchanged)\n");
+	StreamMgr_print_error(
+		streams, "     \t\tin every step of an interactive session.\n");
+	StreamMgr_print_error(
+		streams, "     \t\tIt works only together with -i option.\n");
+	StreamMgr_print_error(streams,
+			      "  -c \"constr\"\tSets constraint (simple "
+			      "expression) for the next steps.\n");
+	StreamMgr_print_error(streams, "  -t \"constr\"\tSets constraint (next "
+				       "expression) for the next steps.\n");
+	StreamMgr_print_error(
+		streams,
+		"  -k <length> \tSpecifies the simulation length\n"
+		"\t\tto be used when generating the simulated problem.\n");
+	return 1;
 }
 
 /*!
@@ -598,60 +623,64 @@ static int UsageSimulate(const NuSMVEnv_ptr env) {
 
 */
 
-int CommandGotoState(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+int CommandGotoState(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const NodeMgr_ptr nodemgr =
+		NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  int c;
-  int status = 0;
-  TraceLabel label = NULL;
+	int c;
+	int status = 0;
+	TraceLabel label = NULL;
 
-  util_getopt_reset();
+	util_getopt_reset();
 
-  while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsageGotoState(env);
-    default:
-      return UsageGotoState(env);
-    }
-  }
-  if (argc == 1)
-    return UsageGotoState(env);
+	while ((c = util_getopt(argc, argv, "h")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsageGotoState(env);
+		default:
+			return UsageGotoState(env);
+		}
+	}
+	if (argc == 1)
+		return UsageGotoState(env);
 
-  /* pre-conditions */
-  if (Compile_check_if_model_was_built(env, errstream, true))
-    return 1;
+	/* pre-conditions */
+	if (Compile_check_if_model_was_built(env, errstream, true))
+		return 1;
 
-  argv += util_optind - 1;
-  argc -= util_optind - 1;
-  label = TraceLabel_create_from_string(nodemgr, argv[1]);
+	argv += util_optind - 1;
+	argc -= util_optind - 1;
+	label = TraceLabel_create_from_string(nodemgr, argv[1]);
 
-  if (label != TRACE_LABEL_INVALID) {
-    if (TraceMgr_is_label_valid(
-            TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)), label)) {
+	if (label != TRACE_LABEL_INVALID) {
+		if (TraceMgr_is_label_valid(
+			    TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)),
+			    label)) {
+			status = Simulate_goto_state(env, label);
 
-      status = Simulate_goto_state(env, label);
+		} else {
+			StreamMgr_print_error(streams,
+					      "The label %d.%d is invalid.\n",
+					      TraceLabel_get_trace(label) + 1,
+					      TraceLabel_get_state(label) + 1);
 
-    } else {
-      StreamMgr_print_error(streams, "The label %d.%d is invalid.\n",
-                            TraceLabel_get_trace(label) + 1,
-                            TraceLabel_get_state(label) + 1);
-
-      /* [MD] My opinion is that here should be an error status, but
+			/* [MD] My opinion is that here should be an error status, but
          discussion is needed */
-      status = 0;
-    }
-  } else {
-    StreamMgr_print_error(streams,
-                          "Parsing error: expected "
-                          "\"goto_state <trace_number>.<state_number>\".\n");
-    status = 1;
-  }
+			status = 0;
+		}
+	} else {
+		StreamMgr_print_error(
+			streams,
+			"Parsing error: expected "
+			"\"goto_state <trace_number>.<state_number>\".\n");
+		status = 1;
+	}
 
-  return status;
+	return status;
 }
 
 /*!
@@ -659,14 +688,15 @@ int CommandGotoState(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsageGotoState(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams, "usage: goto_state [-h] state\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,
-                        "   state \tSets current state to \"state\".\n");
-  return 1;
+static int UsageGotoState(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(streams, "usage: goto_state [-h] state\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(streams,
+			      "   state \tSets current state to \"state\".\n");
+	return 1;
 }
 
 /*!
@@ -686,50 +716,55 @@ static int UsageGotoState(const NuSMVEnv_ptr env) {
 
 */
 
-int CommandPrintCurrentState(NuSMVEnv_ptr env, int argc, char **argv) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  int c;
-  int Verbosely = 1;
-  SexpFsm_ptr scalar_fsm;
-  OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
+int CommandPrintCurrentState(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	int c;
+	int Verbosely = 1;
+	SexpFsm_ptr scalar_fsm;
+	OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "hv")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsagePrintCurrentState(env);
-    case 'v': {
-      Verbosely = 0;
-      break;
-    }
-    default:
-      return UsagePrintCurrentState(env);
-    }
-  }
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "hv")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsagePrintCurrentState(env);
+		case 'v': {
+			Verbosely = 0;
+			break;
+		}
+		default:
+			return UsagePrintCurrentState(env);
+		}
+	}
 
-  if (argc != util_optind)
-    return UsagePrintCurrentState(env);
+	if (argc != util_optind)
+		return UsagePrintCurrentState(env);
 
-  if (NuSMVEnv_has_value(env, ENV_SIMULATE_STATE)) {
-    return Simulate_print_current_state(env, Verbosely);
-  } else {
-    if (TraceMgr_get_current_trace_number(
-            TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR))) >= 0) {
-      StreamMgr_print_output(streams,
-                             "The current state has not yet been defined.\n");
-      StreamMgr_print_output(
-          streams, "Use \"goto_state\" to define the current state.\n");
-    } else {
-      StreamMgr_print_output(
-          streams, "There is no trace actually stored in the system.\n");
-      StreamMgr_print_output(
-          streams, "Use \"pick_state\" to define the current state.\n");
-    }
-    return 1;
-  }
+	if (NuSMVEnv_has_value(env, ENV_SIMULATE_STATE)) {
+		return Simulate_print_current_state(env, Verbosely);
+	} else {
+		if (TraceMgr_get_current_trace_number(TRACE_MGR(
+			    NuSMVEnv_get_value(env, ENV_TRACE_MGR))) >= 0) {
+			StreamMgr_print_output(
+				streams,
+				"The current state has not yet been defined.\n");
+			StreamMgr_print_output(
+				streams,
+				"Use \"goto_state\" to define the current state.\n");
+		} else {
+			StreamMgr_print_output(
+				streams,
+				"There is no trace actually stored in the system.\n");
+			StreamMgr_print_output(
+				streams,
+				"Use \"pick_state\" to define the current state.\n");
+		}
+		return 1;
+	}
 
-  return 0;
+	return 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -745,12 +780,15 @@ int CommandPrintCurrentState(NuSMVEnv_ptr env, int argc, char **argv) {
 
   \todo Missing description
 */
-static int UsagePrintCurrentState(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams, "usage: print_current_state [-h] [-v]\n");
-  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams, "   -v \t\tPrints the value of each state "
-                                 "variable in the current state.\n");
-  return 1;
+static int UsagePrintCurrentState(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(streams,
+			      "usage: print_current_state [-h] [-v]\n");
+	StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+	StreamMgr_print_error(streams,
+			      "   -v \t\tPrints the value of each state "
+			      "variable in the current state.\n");
+	return 1;
 }

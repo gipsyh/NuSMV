@@ -71,12 +71,12 @@
 */
 
 enum _Prop_Status {
-  Prop_NoStatus,
-  Prop_Unchecked,
-  Prop_True,
-  Prop_False,
-  Prop_Number,
-  Prop_Error
+	Prop_NoStatus,
+	Prop_Unchecked,
+	Prop_True,
+	Prop_False,
+	Prop_Number,
+	Prop_Error
 };
 
 /*!
@@ -122,17 +122,17 @@ enum _Prop_Status {
 
 /* warning [MD] Bad practice: downcase constants */
 enum _Prop_Type {
-  Prop_Prop_Type_First = 100, /* Do not touch this */
-  /* ---------------------------------------------------------------------- */
-  Prop_NoType,
-  Prop_Ctl,
-  Prop_Ltl,
-  Prop_Psl,
-  Prop_Invar,
-  Prop_Compute,
-  Prop_CompId, /* For properties names comparison */
-  /* ---------------------------------------------------------------------- */
-  Prop_Prop_Type_Last /* Do not touch this */
+	Prop_Prop_Type_First = 100, /* Do not touch this */
+	/* ---------------------------------------------------------------------- */
+	Prop_NoType,
+	Prop_Ctl,
+	Prop_Ltl,
+	Prop_Psl,
+	Prop_Invar,
+	Prop_Compute,
+	Prop_CompId, /* For properties names comparison */
+	/* ---------------------------------------------------------------------- */
+	Prop_Prop_Type_Last /* Do not touch this */
 };
 
 /*!
@@ -142,17 +142,17 @@ enum _Prop_Type {
 */
 
 enum _PropDb_PrintFmt {
-  PROPDB_PRINT_FMT_TABULAR,
-  PROPDB_PRINT_FMT_DEFAULT = PROPDB_PRINT_FMT_TABULAR,
-  PROPDB_PRINT_FMT_XML,
+	PROPDB_PRINT_FMT_TABULAR,
+	PROPDB_PRINT_FMT_DEFAULT = PROPDB_PRINT_FMT_TABULAR,
+	PROPDB_PRINT_FMT_XML,
 };
 
 enum _Prop_PrintFmt {
-  PROP_PRINT_FMT_FORMULA,
-  PROP_PRINT_FMT_FORMULA_TRUNC,
-  PROP_PRINT_FMT_INDEX,
-  PROP_PRINT_FMT_NAME,
-  PROP_PRINT_FMT_DEFAULT = PROP_PRINT_FMT_FORMULA
+	PROP_PRINT_FMT_FORMULA,
+	PROP_PRINT_FMT_FORMULA_TRUNC,
+	PROP_PRINT_FMT_INDEX,
+	PROP_PRINT_FMT_NAME,
+	PROP_PRINT_FMT_DEFAULT = PROP_PRINT_FMT_FORMULA
 };
 
 /*!
@@ -261,7 +261,7 @@ Prop_ptr Prop_create(const NuSMVEnv_ptr env);
                       property index within the db is not set.
 */
 Prop_ptr Prop_create_partial(const NuSMVEnv_ptr env, Expr_ptr expr,
-                             Prop_Type type);
+			     Prop_Type type);
 
 /*!
   \brief The Prop class copier
@@ -543,7 +543,7 @@ char *Prop_get_name_as_string(const Prop_ptr self);
   needed) and registered into self.
 */
 SexpFsm_ptr Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env,
-                                         const Prop_ptr self);
+					 const Prop_ptr self);
 
 /*!
   \brief Computes ground bdd fsm for property \"self\"
@@ -554,7 +554,7 @@ SexpFsm_ptr Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env,
   needed) and registered into self.
 */
 BddFsm_ptr Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env,
-                                       const Prop_ptr self);
+				       const Prop_ptr self);
 
 /*!
   \brief Computes ground be fsm for property \"self\"
@@ -563,7 +563,7 @@ BddFsm_ptr Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env,
   needed) and registered into self.
 */
 BeFsm_ptr Prop_compute_ground_be_fsm(const NuSMVEnv_ptr env,
-                                     const Prop_ptr self);
+				     const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -668,7 +668,7 @@ char *Prop_get_context_text(const Prop_ptr self);
                       The caller should free the returned set
 */
 Set_t Prop_compute_cone(const Prop_ptr self, FlatHierarchy_ptr hierarchy,
-                        SymbTable_ptr symb_table);
+			SymbTable_ptr symb_table);
 
 /*!
   \brief Applies cone of influence to the given property
@@ -755,11 +755,11 @@ void Prop_print_db(Prop_ptr self, OStream_ptr file, PropDb_PrintFmt);
 
 /* Miscellaneous **************************************************************/
 SexpFsm_ptr Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env,
-                                         const Prop_ptr self);
+					 const Prop_ptr self);
 BddFsm_ptr Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env,
-                                       const Prop_ptr self);
+				       const Prop_ptr self);
 BeFsm_ptr Prop_compute_ground_be_fsm(const NuSMVEnv_ptr env,
-                                     const Prop_ptr self);
+				     const Prop_ptr self);
 
 /*!
   \brief Sets the FSMs in the property from the environment
@@ -775,7 +775,7 @@ void Prop_set_environment_fsms(const NuSMVEnv_ptr env, Prop_ptr prop);
   The set must be freed by the caller
 */
 Set_t Prop_set_from_formula_list(NuSMVEnv_ptr env, node_ptr list,
-                                 Prop_Type type);
+				 Prop_Type type);
 
 /*!
   \methodof Prop

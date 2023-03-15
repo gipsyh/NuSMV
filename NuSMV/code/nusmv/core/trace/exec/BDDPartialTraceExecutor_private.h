@@ -38,7 +38,7 @@
 #define __NUSMV_CORE_TRACE_EXEC_BDDPARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 
 #include "nusmv/core/trace/exec/BDDPartialTraceExecutor.h"
-#include "nusmv/core/trace/exec/PartialTraceExecutor.h"         /* fix this */
+#include "nusmv/core/trace/exec/PartialTraceExecutor.h" /* fix this */
 #include "nusmv/core/trace/exec/PartialTraceExecutor_private.h" /* fix this */
 #include "nusmv/core/utils/utils.h"
 
@@ -52,18 +52,18 @@
 */
 
 typedef struct BDDPartialTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PartialTraceExecutor);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PartialTraceExecutor);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  BddFsm_ptr fsm;
-  BddEnc_ptr enc;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	BddFsm_ptr fsm;
+	BddEnc_ptr enc;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } BDDPartialTraceExecutor;
 
@@ -80,7 +80,7 @@ typedef struct BDDPartialTraceExecutor_TAG {
   \sa BDDPartialTraceExecutor_create
 */
 void bdd_partial_trace_executor_init(BDDPartialTraceExecutor_ptr self,
-                                     const BddFsm_ptr fsm, BddEnc_ptr enc);
+				     const BddFsm_ptr fsm, BddEnc_ptr enc);
 
 /*!
   \methodof BDDPartialTraceExecutor

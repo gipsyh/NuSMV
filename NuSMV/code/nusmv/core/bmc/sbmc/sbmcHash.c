@@ -77,76 +77,85 @@ static int find(hashPtr table, node_ptr);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-hashPtr Bmc_Hash_new_htable(const NuSMVEnv_ptr env) {
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  int i;
-  hashPtr hash_table = (hashPtr)ALLOC(struct htable, 1);
-  hash_table->alloc = HASH_TABLE_SIZE;
-  hash_table->occupied = 0;
+hashPtr Bmc_Hash_new_htable(const NuSMVEnv_ptr env)
+{
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	int i;
+	hashPtr hash_table = (hashPtr)ALLOC(struct htable, 1);
+	hash_table->alloc = HASH_TABLE_SIZE;
+	hash_table->occupied = 0;
 
-  hash_table->table =
-      (struct table_pair *)ALLOC(struct table_pair, hash_table->alloc);
-  if (hash_table->table == NULL) {
-    ErrorMgr_internal_error(errmgr, "Bmc_Hash_new_htable: Out of Memory\n");
-  }
+	hash_table->table = (struct table_pair *)ALLOC(struct table_pair,
+						       hash_table->alloc);
+	if (hash_table->table == NULL) {
+		ErrorMgr_internal_error(errmgr,
+					"Bmc_Hash_new_htable: Out of Memory\n");
+	}
 
-  for (i = 0; i < hash_table->alloc; ++i) {
-    hash_table->table[i].key = NULL;
-  }
-  return hash_table;
+	for (i = 0; i < hash_table->alloc; ++i) {
+		hash_table->table[i].key = NULL;
+	}
+	return hash_table;
 }
 
-int Bmc_Hash_find(hashPtr table, node_ptr node) {
-  int i = find(table, node);
-  if (table->table[i].key)
-    return table->table[i].data;
-  return BMC_HASH_NOTFOUND;
+int Bmc_Hash_find(hashPtr table, node_ptr node)
+{
+	int i = find(table, node);
+	if (table->table[i].key)
+		return table->table[i].data;
+	return BMC_HASH_NOTFOUND;
 }
 
-unsigned Bmc_Hash_size(hashPtr hash) { return hash->occupied; }
-
-void Bmc_Hash_insert(hashPtr table, node_ptr key, int data) {
-  int i = find(table, key);
-  if (table->table[i].key)
-    return; /**The node already is in the table*/
-  if ((table->occupied + 1) / table->alloc > 0.5) { /*a rehash is needed*/
-    unsigned j;
-    struct table_pair *temp = table->table;
-    table->alloc = (table->alloc) * 2;
-    table->table = (struct table_pair *)ALLOC(struct table_pair, table->alloc);
-    nusmv_assert(table->table != NULL);
-
-    /**reset new table*/
-    for (j = table->alloc; j--;) {
-      (table->table)[j].key = 0;
-    }
-
-    /**copy the old table to the one*/
-    for (j = (table->alloc) / 2; j--;) {
-      int index;
-      if (temp[j].key == 0) /**Empty slot*/
-        continue;
-
-      index = find(table, temp[j].key);
-      nusmv_assert((table->table)[index].key == 0);
-      (table->table)[index].data = temp[j].data;
-      (table->table)[index].key = temp[j].key;
-    }
-    FREE(temp);
-    Bmc_Hash_insert(table, key, data);
-    return;
-  }
-  nusmv_assert((table->table)[i].key == 0);
-  (table->table)[i].key = key;
-  (table->table)[i].data = data;
-  (table->occupied)++;
-  return;
+unsigned Bmc_Hash_size(hashPtr hash)
+{
+	return hash->occupied;
 }
 
-void Bmc_Hash_delete_table(hashPtr hash) {
-  FREE(hash->table);
-  FREE(hash);
+void Bmc_Hash_insert(hashPtr table, node_ptr key, int data)
+{
+	int i = find(table, key);
+	if (table->table[i].key)
+		return; /**The node already is in the table*/
+	if ((table->occupied + 1) / table->alloc > 0.5) { /*a rehash is needed*/
+		unsigned j;
+		struct table_pair *temp = table->table;
+		table->alloc = (table->alloc) * 2;
+		table->table = (struct table_pair *)ALLOC(struct table_pair,
+							  table->alloc);
+		nusmv_assert(table->table != NULL);
+
+		/**reset new table*/
+		for (j = table->alloc; j--;) {
+			(table->table)[j].key = 0;
+		}
+
+		/**copy the old table to the one*/
+		for (j = (table->alloc) / 2; j--;) {
+			int index;
+			if (temp[j].key == 0) /**Empty slot*/
+				continue;
+
+			index = find(table, temp[j].key);
+			nusmv_assert((table->table)[index].key == 0);
+			(table->table)[index].data = temp[j].data;
+			(table->table)[index].key = temp[j].key;
+		}
+		FREE(temp);
+		Bmc_Hash_insert(table, key, data);
+		return;
+	}
+	nusmv_assert((table->table)[i].key == 0);
+	(table->table)[i].key = key;
+	(table->table)[i].data = data;
+	(table->occupied)++;
+	return;
+}
+
+void Bmc_Hash_delete_table(hashPtr hash)
+{
+	FREE(hash->table);
+	FREE(hash);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -158,8 +167,9 @@ void Bmc_Hash_delete_table(hashPtr hash) {
 
   \todo Missing description
 */
-static int table_hash_fun(node_ptr key, int size) {
-  return (int)((nusmv_ptruint)(key) % size);
+static int table_hash_fun(node_ptr key, int size)
+{
+	return (int)((nusmv_ptruint)(key) % size);
 }
 
 /*!
@@ -167,14 +177,20 @@ static int table_hash_fun(node_ptr key, int size) {
 
   \todo Missing description
 */
-static int node_eq_fun(node_ptr a1, node_ptr a2) { return ((a1) == (a2)); }
+static int node_eq_fun(node_ptr a1, node_ptr a2)
+{
+	return ((a1) == (a2));
+}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-static int node_neq_fun(node_ptr a1, node_ptr a2) { return ((a1) != (a2)); }
+static int node_neq_fun(node_ptr a1, node_ptr a2)
+{
+	return ((a1) != (a2));
+}
 
 /*!
   \brief Return index of node, a free index if the node is not in the table
@@ -183,17 +199,18 @@ static int node_neq_fun(node_ptr a1, node_ptr a2) { return ((a1) != (a2)); }
 
   \se None
 */
-static int find(hashPtr table, node_ptr node) {
-  int hash = table_hash_fun(node, table->alloc);
-  int i;
-  for (i = hash;;) {
-    if ((table->table)[i].key) {
-      if (node_eq_fun(node, (table->table)[i].key))
-        return i;
-    } else {
-      break;
-    }
-    i = (i + 1) % (table->alloc);
-  }
-  return i;
+static int find(hashPtr table, node_ptr node)
+{
+	int hash = table_hash_fun(node, table->alloc);
+	int i;
+	for (i = hash;;) {
+		if ((table->table)[i].key) {
+			if (node_eq_fun(node, (table->table)[i].key))
+				return i;
+		} else {
+			break;
+		}
+		i = (i + 1) % (table->alloc);
+	}
+	return i;
 }

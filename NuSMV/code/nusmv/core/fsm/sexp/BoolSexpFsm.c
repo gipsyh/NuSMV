@@ -80,60 +80,65 @@ static void bool_sexp_fsm_finalize(Object_ptr object, void *dummy);
 static Object_ptr bool_sexp_fsm_copy(const Object_ptr object);
 
 static Expr_ptr bool_sexp_fsm_booleanize_expr(const BoolSexpFsm_ptr self,
-                                              Expr_ptr expr);
+					      Expr_ptr expr);
 
 static void bool_sexp_fsm_build_input_state_mask(BoolSexpFsm_ptr self,
-                                                 Expr_ptr *input,
-                                                 Expr_ptr *state);
+						 Expr_ptr *input,
+						 Expr_ptr *state);
 static boolean
 bool_sexp_fsm_set_contains_infinite_variables(const SymbTable_ptr st,
-                                              const Set_t vars);
+					      const Set_t vars);
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 BoolSexpFsm_ptr BoolSexpFsm_create(const FlatHierarchy_ptr hierarchy,
-                                   const Set_t vars_set, BddEnc_ptr benc,
-                                   SymbLayer_ptr det_layer) {
-  BoolSexpFsm_ptr self = ALLOC(BoolSexpFsm, 1);
+				   const Set_t vars_set, BddEnc_ptr benc,
+				   SymbLayer_ptr det_layer)
+{
+	BoolSexpFsm_ptr self = ALLOC(BoolSexpFsm, 1);
 
-  BOOL_SEXP_FSM_CHECK_INSTANCE(self);
+	BOOL_SEXP_FSM_CHECK_INSTANCE(self);
 
-  bool_sexp_fsm_init(self, hierarchy, vars_set, benc, det_layer);
-  return self;
+	bool_sexp_fsm_init(self, hierarchy, vars_set, benc, det_layer);
+	return self;
 }
 
 BoolSexpFsm_ptr BoolSexpFsm_create_from_scalar_fsm(const SexpFsm_ptr scalar_fsm,
-                                                   BddEnc_ptr benc,
-                                                   SymbLayer_ptr det_layer) {
-  BoolSexpFsm_ptr self;
+						   BddEnc_ptr benc,
+						   SymbLayer_ptr det_layer)
+{
+	BoolSexpFsm_ptr self;
 
-  if (SexpFsm_is_boolean(scalar_fsm)) {
-    /* the instance is already a BoolSexpFsm */
-    return BOOL_SEXP_FSM(SexpFsm_copy(scalar_fsm));
-  }
+	if (SexpFsm_is_boolean(scalar_fsm)) {
+		/* the instance is already a BoolSexpFsm */
+		return BOOL_SEXP_FSM(SexpFsm_copy(scalar_fsm));
+	}
 
-  self = ALLOC(BoolSexpFsm, 1);
-  BOOL_SEXP_FSM_CHECK_INSTANCE(self);
+	self = ALLOC(BoolSexpFsm, 1);
+	BOOL_SEXP_FSM_CHECK_INSTANCE(self);
 
-  bool_sexp_fsm_init(self, scalar_fsm->hierarchy, scalar_fsm->vars_set, benc,
-                     det_layer);
-  return self;
+	bool_sexp_fsm_init(self, scalar_fsm->hierarchy, scalar_fsm->vars_set,
+			   benc, det_layer);
+	return self;
 }
 
-BoolSexpFsm_ptr BoolSexpFsm_copy(BoolSexpFsm_ptr self) {
-  BOOL_SEXP_FSM_CHECK_INSTANCE(self);
-  return BOOL_SEXP_FSM(Object_copy(OBJECT(self)));
+BoolSexpFsm_ptr BoolSexpFsm_copy(BoolSexpFsm_ptr self)
+{
+	BOOL_SEXP_FSM_CHECK_INSTANCE(self);
+	return BOOL_SEXP_FSM(Object_copy(OBJECT(self)));
 }
 
-VIRTUAL void BoolSexpFsm_destroy(BoolSexpFsm_ptr self) {
-  BOOL_SEXP_FSM_CHECK_INSTANCE(self);
-  Object_destroy(OBJECT(self), NULL);
+VIRTUAL void BoolSexpFsm_destroy(BoolSexpFsm_ptr self)
+{
+	BOOL_SEXP_FSM_CHECK_INSTANCE(self);
+	Object_destroy(OBJECT(self), NULL);
 }
 
-BoolEnc_ptr BoolSexpFsm_get_bool_enc(const BoolSexpFsm_ptr self) {
-  BOOL_SEXP_FSM_CHECK_INSTANCE(self);
-  return BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self->enc));
+BoolEnc_ptr BoolSexpFsm_get_bool_enc(const BoolSexpFsm_ptr self)
+{
+	BOOL_SEXP_FSM_CHECK_INSTANCE(self);
+	return BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self->enc));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -141,109 +146,115 @@ BoolEnc_ptr BoolSexpFsm_get_bool_enc(const BoolSexpFsm_ptr self) {
 /*---------------------------------------------------------------------------*/
 
 void bool_sexp_fsm_init(BoolSexpFsm_ptr self, const FlatHierarchy_ptr hierarchy,
-                        const Set_t vars_set, BddEnc_ptr enc,
-                        SymbLayer_ptr det_layer) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+			const Set_t vars_set, BddEnc_ptr enc,
+			SymbLayer_ptr det_layer)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	const ExprMgr_ptr exprs =
+		EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-  FlatHierarchy_ptr fh;
-  int curr_verbosity;
-  Expr_ptr inputs_mask = ExprMgr_true(exprs);
-  Expr_ptr states_mask = ExprMgr_true(exprs);
-  SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(enc));
+	FlatHierarchy_ptr fh;
+	int curr_verbosity;
+	Expr_ptr inputs_mask = ExprMgr_true(exprs);
+	Expr_ptr states_mask = ExprMgr_true(exprs);
+	SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(enc));
 
-  if (bool_sexp_fsm_set_contains_infinite_variables(st, vars_set)) {
-    ErrorMgr_rpterr(errmgr, "Impossible to build a boolean FSM"
-                            " with infinite precision variables");
-  }
+	if (bool_sexp_fsm_set_contains_infinite_variables(st, vars_set)) {
+		ErrorMgr_rpterr(errmgr, "Impossible to build a boolean FSM"
+					" with infinite precision variables");
+	}
 
-  if (SymbTable_get_functions_num(st) > 0) {
-    ErrorMgr_rpterr(errmgr, "Impossible to build a boolean FSM"
-                            " with uninterpreted functions");
-  }
+	if (SymbTable_get_functions_num(st) > 0) {
+		ErrorMgr_rpterr(errmgr, "Impossible to build a boolean FSM"
+					" with uninterpreted functions");
+	}
 
-  /* base class initialization. Here sele is made a copy of the
+	/* base class initialization. Here sele is made a copy of the
      scalar fsm is done. Later on the copy will be booleanized. */
-  sexp_fsm_init(SEXP_FSM(self), hierarchy, vars_set);
+	sexp_fsm_init(SEXP_FSM(self), hierarchy, vars_set);
 
-  /* local members */
-  self->enc = enc;
-  self->det_layer = det_layer;
+	/* local members */
+	self->enc = enc;
+	self->det_layer = det_layer;
 
-  /* here we get the hierarchy instead of using the one passed as
+	/* here we get the hierarchy instead of using the one passed as
      formal parameter, as we need to use the local copy within the
      base class */
-  fh = SexpFsm_get_hierarchy(SEXP_FSM(self));
+	fh = SexpFsm_get_hierarchy(SEXP_FSM(self));
 
-  /* marks the sexp fsm to be a boolean fsm */
-  SEXP_FSM(self)->is_boolean = true;
+	/* marks the sexp fsm to be a boolean fsm */
+	SEXP_FSM(self)->is_boolean = true;
 
-  /* We set the verbose level to 0 and then we restore the original
+	/* We set the verbose level to 0 and then we restore the original
      value. This because booleanization uses eval */
-  curr_verbosity = get_verbose_level(opts);
-  set_verbose_level(opts, 0);
+	curr_verbosity = get_verbose_level(opts);
+	set_verbose_level(opts, 0);
 
-  /*
+	/*
      input and state mask for the FSM are computed and added to the
      model: input mask is added to the transition relation, while
      state mask is added to the invar.
   */
-  bool_sexp_fsm_build_input_state_mask(self, &inputs_mask, &states_mask);
+	bool_sexp_fsm_build_input_state_mask(self, &inputs_mask, &states_mask);
 
-  /* here the flat hierarchy gets booleanized */
+	/* here the flat hierarchy gets booleanized */
 
-  /* init */
-  FlatHierarchy_set_init(
-      fh, bool_sexp_fsm_booleanize_expr(self, FlatHierarchy_get_init(fh)));
+	/* init */
+	FlatHierarchy_set_init(fh, bool_sexp_fsm_booleanize_expr(
+					   self, FlatHierarchy_get_init(fh)));
 
-  /* invar */
-  FlatHierarchy_set_invar(fh,
-                          ExprMgr_and(exprs, states_mask,
-                                      bool_sexp_fsm_booleanize_expr(
-                                          self, FlatHierarchy_get_invar(fh))));
+	/* invar */
+	FlatHierarchy_set_invar(
+		fh, ExprMgr_and(exprs, states_mask,
+				bool_sexp_fsm_booleanize_expr(
+					self, FlatHierarchy_get_invar(fh))));
 
-  /* trans */
-  FlatHierarchy_set_trans(fh,
-                          ExprMgr_and(exprs, inputs_mask,
-                                      bool_sexp_fsm_booleanize_expr(
-                                          self, FlatHierarchy_get_trans(fh))));
+	/* trans */
+	FlatHierarchy_set_trans(
+		fh, ExprMgr_and(exprs, inputs_mask,
+				bool_sexp_fsm_booleanize_expr(
+					self, FlatHierarchy_get_trans(fh))));
 
-  /* justice */
-  FlatHierarchy_set_justice(
-      fh, bool_sexp_fsm_booleanize_expr(self, FlatHierarchy_get_justice(fh)));
+	/* justice */
+	FlatHierarchy_set_justice(fh,
+				  bool_sexp_fsm_booleanize_expr(
+					  self, FlatHierarchy_get_justice(fh)));
 
-  /* compassion */
-  FlatHierarchy_set_compassion(fh, bool_sexp_fsm_booleanize_expr(
-                                       self, FlatHierarchy_get_compassion(fh)));
+	/* compassion */
+	FlatHierarchy_set_compassion(
+		fh, bool_sexp_fsm_booleanize_expr(
+			    self, FlatHierarchy_get_compassion(fh)));
 
-  /* restores the verbosity level */
-  set_verbose_level(opts, curr_verbosity);
+	/* restores the verbosity level */
+	set_verbose_level(opts, curr_verbosity);
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = bool_sexp_fsm_finalize;
-  OVERRIDE(Object, copy) = bool_sexp_fsm_copy;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = bool_sexp_fsm_finalize;
+	OVERRIDE(Object, copy) = bool_sexp_fsm_copy;
 }
 
-void bool_sexp_fsm_deinit(BoolSexpFsm_ptr self) {
-  /* members deinitialization */
+void bool_sexp_fsm_deinit(BoolSexpFsm_ptr self)
+{
+	/* members deinitialization */
 
-  /* base class deinitialization */
-  sexp_fsm_deinit(SEXP_FSM(self));
+	/* base class deinitialization */
+	sexp_fsm_deinit(SEXP_FSM(self));
 }
 
-void bool_sexp_fsm_copy_aux(const BoolSexpFsm_ptr self, BoolSexpFsm_ptr copy) {
-  /* copies the base class: */
-  sexp_fsm_copy_aux(SEXP_FSM(self), SEXP_FSM(copy));
+void bool_sexp_fsm_copy_aux(const BoolSexpFsm_ptr self, BoolSexpFsm_ptr copy)
+{
+	/* copies the base class: */
+	sexp_fsm_copy_aux(SEXP_FSM(self), SEXP_FSM(copy));
 
-  /* copies private members */
-  copy->enc = self->enc;
-  copy->det_layer = self->det_layer;
+	/* copies private members */
+	copy->enc = self->enc;
+	copy->det_layer = self->det_layer;
 
-  /* copies local virtual methods */
+	/* copies local virtual methods */
 }
 
 /*---------------------------------------------------------------------------*/
@@ -255,17 +266,18 @@ void bool_sexp_fsm_copy_aux(const BoolSexpFsm_ptr self, BoolSexpFsm_ptr copy) {
 
 
 */
-static Object_ptr bool_sexp_fsm_copy(const Object_ptr object) {
-  BoolSexpFsm_ptr self = BOOL_SEXP_FSM(object);
-  BoolSexpFsm_ptr copy;
+static Object_ptr bool_sexp_fsm_copy(const Object_ptr object)
+{
+	BoolSexpFsm_ptr self = BOOL_SEXP_FSM(object);
+	BoolSexpFsm_ptr copy;
 
-  BOOL_SEXP_FSM_CHECK_INSTANCE(self);
+	BOOL_SEXP_FSM_CHECK_INSTANCE(self);
 
-  copy = ALLOC(BoolSexpFsm, 1);
-  BOOL_SEXP_FSM_CHECK_INSTANCE(copy);
+	copy = ALLOC(BoolSexpFsm, 1);
+	BOOL_SEXP_FSM_CHECK_INSTANCE(copy);
 
-  bool_sexp_fsm_copy_aux(self, copy);
-  return OBJECT(copy);
+	bool_sexp_fsm_copy_aux(self, copy);
+	return OBJECT(copy);
 }
 
 /*!
@@ -273,11 +285,12 @@ static Object_ptr bool_sexp_fsm_copy(const Object_ptr object) {
 
   Called by the class destructor
 */
-static void bool_sexp_fsm_finalize(Object_ptr object, void *dummy) {
-  BoolSexpFsm_ptr self = BOOL_SEXP_FSM(object);
+static void bool_sexp_fsm_finalize(Object_ptr object, void *dummy)
+{
+	BoolSexpFsm_ptr self = BOOL_SEXP_FSM(object);
 
-  bool_sexp_fsm_deinit(self);
-  FREE(self);
+	bool_sexp_fsm_deinit(self);
+	FREE(self);
 }
 
 /*!
@@ -288,28 +301,33 @@ static void bool_sexp_fsm_finalize(Object_ptr object, void *dummy) {
   returned
 */
 static Expr_ptr bool_sexp_fsm_booleanize_expr(BoolSexpFsm_ptr self,
-                                              Expr_ptr expr) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->enc));
-  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  Expr_ptr result;
+					      Expr_ptr expr)
+{
+	const NuSMVEnv_ptr env =
+		EnvObject_get_environment(ENV_OBJECT(self->enc));
+	const ExprMgr_ptr exprs =
+		EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+	Expr_ptr result;
 
-  if (expr == NODE_PTR(NULL))
-    return NODE_PTR(NULL);
+	if (expr == NODE_PTR(NULL))
+		return NODE_PTR(NULL);
 
-  switch (node_get_type(NODE_PTR(expr))) {
-  case AND: {
-    Expr_ptr left = bool_sexp_fsm_booleanize_expr(self, car(NODE_PTR(expr)));
-    Expr_ptr right = bool_sexp_fsm_booleanize_expr(self, cdr(NODE_PTR(expr)));
-    result = ExprMgr_and(exprs, left, right);
-    break;
-  }
+	switch (node_get_type(NODE_PTR(expr))) {
+	case AND: {
+		Expr_ptr left = bool_sexp_fsm_booleanize_expr(
+			self, car(NODE_PTR(expr)));
+		Expr_ptr right = bool_sexp_fsm_booleanize_expr(
+			self, cdr(NODE_PTR(expr)));
+		result = ExprMgr_and(exprs, left, right);
+		break;
+	}
 
-  default:
-    result =
-        EXPR(Compile_expr2bexpr(self->enc, self->det_layer, NODE_PTR(expr)));
-  } /* switch */
+	default:
+		result = EXPR(Compile_expr2bexpr(self->enc, self->det_layer,
+						 NODE_PTR(expr)));
+	} /* switch */
 
-  return result;
+	return result;
 }
 
 /*!
@@ -320,34 +338,38 @@ static Expr_ptr bool_sexp_fsm_booleanize_expr(BoolSexpFsm_ptr self,
   of the variable being respectively input or state.
 */
 static void bool_sexp_fsm_build_input_state_mask(BoolSexpFsm_ptr self,
-                                                 Expr_ptr *input,
-                                                 Expr_ptr *state) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->enc));
-  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  Set_t vars = SexpFsm_get_vars(SEXP_FSM(self));
-  node_ptr var, mask;
-  Set_Iterator_t iter;
-  SymbTable_ptr st = SexpFsm_get_symb_table(SEXP_FSM(self));
-  BoolEnc_ptr bool_enc = BoolSexpFsm_get_bool_enc(self);
+						 Expr_ptr *input,
+						 Expr_ptr *state)
+{
+	const NuSMVEnv_ptr env =
+		EnvObject_get_environment(ENV_OBJECT(self->enc));
+	const ExprMgr_ptr exprs =
+		EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+	Set_t vars = SexpFsm_get_vars(SEXP_FSM(self));
+	node_ptr var, mask;
+	Set_Iterator_t iter;
+	SymbTable_ptr st = SexpFsm_get_symb_table(SEXP_FSM(self));
+	BoolEnc_ptr bool_enc = BoolSexpFsm_get_bool_enc(self);
 
-  SET_FOREACH(vars, iter) {
-    var = Set_GetMember(vars, iter);
+	SET_FOREACH(vars, iter)
+	{
+		var = Set_GetMember(vars, iter);
 
-    if (SymbTable_is_symbol_state_var(st, var)) {
-      mask = BoolEnc_get_var_mask(bool_enc, var);
-      *state = ExprMgr_and(exprs, *state, mask);
-    } else if (SymbTable_is_symbol_input_var(st, var)) {
-      mask = BoolEnc_get_var_mask(bool_enc, var);
-      *input = ExprMgr_and(exprs, *input, mask);
-    }
-  }
+		if (SymbTable_is_symbol_state_var(st, var)) {
+			mask = BoolEnc_get_var_mask(bool_enc, var);
+			*state = ExprMgr_and(exprs, *state, mask);
+		} else if (SymbTable_is_symbol_input_var(st, var)) {
+			mask = BoolEnc_get_var_mask(bool_enc, var);
+			*input = ExprMgr_and(exprs, *input, mask);
+		}
+	}
 #if defined BOOL_FSM_DEBUG_MASK && BOOL_FSM_DEBUG_MASK
-  StreamMgr_print_error(streams, "Input mask is: ");
-  StreamMgr_nprint_error(streams, wffprint, "%N", *input);
-  StreamMgr_print_error(streams, "\n");
-  StreamMgr_print_error(streams, "State mask is: ");
-  StreamMgr_nprint_error(streams, wffprint, "%N", *state);
-  StreamMgr_print_error(streams, "\n");
+	StreamMgr_print_error(streams, "Input mask is: ");
+	StreamMgr_nprint_error(streams, wffprint, "%N", *input);
+	StreamMgr_print_error(streams, "\n");
+	StreamMgr_print_error(streams, "State mask is: ");
+	StreamMgr_nprint_error(streams, wffprint, "%N", *state);
+	StreamMgr_print_error(streams, "\n");
 #endif
 }
 
@@ -360,24 +382,26 @@ static void bool_sexp_fsm_build_input_state_mask(BoolSexpFsm_ptr self,
 */
 static boolean
 bool_sexp_fsm_set_contains_infinite_variables(const SymbTable_ptr st,
-                                              const Set_t vars) {
-  Set_Iterator_t iter;
+					      const Set_t vars)
+{
+	Set_Iterator_t iter;
 
-  SET_FOREACH(vars, iter) {
-    node_ptr var = Set_GetMember(vars, iter);
-    SymbType_ptr type;
+	SET_FOREACH(vars, iter)
+	{
+		node_ptr var = Set_GetMember(vars, iter);
+		SymbType_ptr type;
 
-    nusmv_assert(SymbTable_is_symbol_var(st, var));
+		nusmv_assert(SymbTable_is_symbol_var(st, var));
 
-    type = SymbTable_get_var_type(st, var);
+		type = SymbTable_get_var_type(st, var);
 
-    if (SymbType_is_infinite_precision(type) || SymbType_is_wordarray(type) ||
-        SymbType_is_intarray(type)) {
-      return true;
-    }
-  }
+		if (SymbType_is_infinite_precision(type) ||
+		    SymbType_is_wordarray(type) || SymbType_is_intarray(type)) {
+			return true;
+		}
+	}
 
-  return false;
+	return false;
 }
 
 /**AutomaticEnd***************************************************************/

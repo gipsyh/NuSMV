@@ -75,8 +75,8 @@ typedef struct TraceXmlLoader_TAG *TraceXmlLoader_ptr;
 
   \todo Missing description
 */
-#define TRACE_XML_LOADER_CHECK_INSTANCE(x)                                     \
-  (nusmv_assert(TRACE_XML_LOADER(x) != TRACE_XML_LOADER(NULL)))
+#define TRACE_XML_LOADER_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_XML_LOADER(x) != TRACE_XML_LOADER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -91,8 +91,8 @@ typedef struct TraceXmlLoader_TAG *TraceXmlLoader_ptr;
 
 */
 TraceXmlLoader_ptr TraceXmlLoader_create(const char *xml_filename,
-                                         boolean halt_on_undefined_symbols,
-                                         boolean halt_on_wrong_section);
+					 boolean halt_on_undefined_symbols,
+					 boolean halt_on_wrong_section);
 
 /**AutomaticEnd***************************************************************/
 

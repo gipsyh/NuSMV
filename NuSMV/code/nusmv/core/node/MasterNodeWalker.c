@@ -75,139 +75,153 @@ static void master_node_walker_finalize(Object_ptr object, void *dummy);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-MasterNodeWalker_ptr MasterNodeWalker_create(const NuSMVEnv_ptr env) {
-  MasterNodeWalker_ptr self = ALLOC(MasterNodeWalker, 1);
-  MASTER_NODE_WALKER_CHECK_INSTANCE(self);
+MasterNodeWalker_ptr MasterNodeWalker_create(const NuSMVEnv_ptr env)
+{
+	MasterNodeWalker_ptr self = ALLOC(MasterNodeWalker, 1);
+	MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
-  master_node_walker_init(self, env);
-  return self;
+	master_node_walker_init(self, env);
+	return self;
 }
 
-void MasterNodeWalker_destroy(MasterNodeWalker_ptr self) {
-  MASTER_NODE_WALKER_CHECK_INSTANCE(self);
-  Object_destroy(OBJECT(self), NULL);
+void MasterNodeWalker_destroy(MasterNodeWalker_ptr self)
+{
+	MASTER_NODE_WALKER_CHECK_INSTANCE(self);
+	Object_destroy(OBJECT(self), NULL);
 }
 
 boolean MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
-                                         NodeWalker_ptr walker) {
-  ListIter_ptr iter;
+					 NodeWalker_ptr walker)
+{
+	ListIter_ptr iter;
 
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  MASTER_NODE_WALKER_CHECK_INSTANCE(self);
+	MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
-  if (opt_verbose_level_gt(opts, 3)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "MasterNodeWalker: registering walker '%s'...",
-               NodeWalker_get_name(walker));
-  }
+	if (opt_verbose_level_gt(opts, 3)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger,
+			   "MasterNodeWalker: registering walker '%s'...",
+			   NodeWalker_get_name(walker));
+	}
 
-  iter = NodeList_get_first_iter(self->walkers);
-  while (!ListIter_is_end(iter)) {
-    NodeWalker_ptr pr = NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
+	iter = NodeList_get_first_iter(self->walkers);
+	while (!ListIter_is_end(iter)) {
+		NodeWalker_ptr pr =
+			NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
 
-    if (pr == walker)
-      return false; /* already registered */
+		if (pr == walker)
+			return false; /* already registered */
 
-    if (NodeWalker_collides(walker, pr)) {
-      ErrorMgr_rpterr(errmgr,
-                      "The walker '%s' partition collides with the "
-                      "registered walker '%s'\n",
-                      NodeWalker_get_name(walker), NodeWalker_get_name(pr));
-    }
+		if (NodeWalker_collides(walker, pr)) {
+			ErrorMgr_rpterr(
+				errmgr,
+				"The walker '%s' partition collides with the "
+				"registered walker '%s'\n",
+				NodeWalker_get_name(walker),
+				NodeWalker_get_name(pr));
+		}
 
-    iter = ListIter_get_next(iter);
-  }
+		iter = ListIter_get_next(iter);
+	}
 
-  /* ok, not found and valid partition: appends and sets it up */
-  NodeList_append(self->walkers, (node_ptr)walker);
-  node_walker_set_master(walker, self);
+	/* ok, not found and valid partition: appends and sets it up */
+	NodeList_append(self->walkers, (node_ptr)walker);
+	node_walker_set_master(walker, self);
 
-  if (opt_verbose_level_gt(opts, 3)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, " ok\n");
-  }
-  return true;
+	if (opt_verbose_level_gt(opts, 3)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, " ok\n");
+	}
+	return true;
 }
 
 NodeWalker_ptr MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
-                                                  const char *name) {
-  ListIter_ptr iter;
+						  const char *name)
+{
+	ListIter_ptr iter;
 
-  MASTER_NODE_WALKER_CHECK_INSTANCE(self);
+	MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
-  iter = NodeList_get_first_iter(self->walkers);
-  while (!ListIter_is_end(iter)) {
-    NodeWalker_ptr pr = NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
+	iter = NodeList_get_first_iter(self->walkers);
+	while (!ListIter_is_end(iter)) {
+		NodeWalker_ptr pr =
+			NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
 
-    if (strcmp(NodeWalker_get_name(pr), name) == 0) {
-      NodeList_remove_elem_at(self->walkers, iter); /* unregistration */
-      node_walker_set_master(pr, MASTER_NODE_WALKER(NULL));
-      return pr;
-    }
-    iter = ListIter_get_next(iter);
-  }
+		if (strcmp(NodeWalker_get_name(pr), name) == 0) {
+			NodeList_remove_elem_at(self->walkers,
+						iter); /* unregistration */
+			node_walker_set_master(pr, MASTER_NODE_WALKER(NULL));
+			return pr;
+		}
+		iter = ListIter_get_next(iter);
+	}
 
-  return NODE_WALKER(NULL); /* not found */
+	return NODE_WALKER(NULL); /* not found */
 }
 
 NodeWalker_ptr MasterNodeWalker_get_walker(MasterNodeWalker_ptr self,
-                                           const char *name) {
-  ListIter_ptr iter;
+					   const char *name)
+{
+	ListIter_ptr iter;
 
-  MASTER_NODE_WALKER_CHECK_INSTANCE(self);
+	MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
-  iter = NodeList_get_first_iter(self->walkers);
-  while (!ListIter_is_end(iter)) {
-    NodeWalker_ptr pr = NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
+	iter = NodeList_get_first_iter(self->walkers);
+	while (!ListIter_is_end(iter)) {
+		NodeWalker_ptr pr =
+			NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
 
-    if (strcmp(NodeWalker_get_name(pr), name) == 0)
-      return pr;
-    iter = ListIter_get_next(iter);
-  }
+		if (strcmp(NodeWalker_get_name(pr), name) == 0)
+			return pr;
+		iter = ListIter_get_next(iter);
+	}
 
-  return NODE_WALKER(NULL); /* not found */
+	return NODE_WALKER(NULL); /* not found */
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void master_node_walker_init(MasterNodeWalker_ptr self,
-                             const NuSMVEnv_ptr env) {
-  /* base class initialization */
-  env_object_init(ENV_OBJECT(self), env);
+void master_node_walker_init(MasterNodeWalker_ptr self, const NuSMVEnv_ptr env)
+{
+	/* base class initialization */
+	env_object_init(ENV_OBJECT(self), env);
 
-  /* members initialization */
-  self->walkers = NodeList_create();
+	/* members initialization */
+	self->walkers = NodeList_create();
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = master_node_walker_finalize;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = master_node_walker_finalize;
 }
 
-void master_node_walker_deinit(MasterNodeWalker_ptr self) {
-  /* members deinitialization */
-  ListIter_ptr iter = NodeList_get_first_iter(self->walkers);
-  while (!ListIter_is_end(iter)) {
-    NodeWalker_ptr w = NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
+void master_node_walker_deinit(MasterNodeWalker_ptr self)
+{
+	/* members deinitialization */
+	ListIter_ptr iter = NodeList_get_first_iter(self->walkers);
+	while (!ListIter_is_end(iter)) {
+		NodeWalker_ptr w =
+			NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
 
-    /* Prepare the iterator ready to point the next iterator, since
+		/* Prepare the iterator ready to point the next iterator, since
        this element will be removed from the self->walkers list by the
        node_walker_deinit function, which unregisters itself from this
        master walker */
-    iter = ListIter_get_next(iter);
+		iter = ListIter_get_next(iter);
 
-    NodeWalker_destroy(w);
-  }
+		NodeWalker_destroy(w);
+	}
 
-  NodeList_destroy(self->walkers);
+	NodeList_destroy(self->walkers);
 
-  /* base class initialization */
-  env_object_deinit(ENV_OBJECT(self));
+	/* base class initialization */
+	env_object_deinit(ENV_OBJECT(self));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -219,11 +233,12 @@ void master_node_walker_deinit(MasterNodeWalker_ptr self) {
 
   Called by the class destructor
 */
-static void master_node_walker_finalize(Object_ptr object, void *dummy) {
-  MasterNodeWalker_ptr self = MASTER_NODE_WALKER(object);
+static void master_node_walker_finalize(Object_ptr object, void *dummy)
+{
+	MasterNodeWalker_ptr self = MASTER_NODE_WALKER(object);
 
-  master_node_walker_deinit(self);
-  FREE(self);
+	master_node_walker_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

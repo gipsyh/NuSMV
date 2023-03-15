@@ -171,7 +171,7 @@ be_ptr Bmc_Model_GetFairness(const BeFsm_ptr be_fsm, const int k, const int l);
                       next variables is a specific implementation aspect
 */
 be_ptr Bmc_Model_Invar_Dual_forward_unrolling(const BeFsm_ptr be_fsm,
-                                              const be_ptr invarspec, int i);
+					      const be_ptr invarspec, int i);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_BMC_BMC_MODEL_H__ */

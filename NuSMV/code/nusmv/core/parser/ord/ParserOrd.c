@@ -53,9 +53,9 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct ParserOrd_TAG {
-  INHERITS_FROM(EnvObject);
+	INHERITS_FROM(EnvObject);
 
-  NodeList_ptr vars_list;
+	NodeList_ptr vars_list;
 } ParserOrd;
 
 /*---------------------------------------------------------------------------*/
@@ -77,147 +77,166 @@ static void parser_ord_finalize(Object_ptr object, void *dummy);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-ParserOrd_ptr ParserOrd_create(const NuSMVEnv_ptr env) {
-  ParserOrd_ptr self = ALLOC(ParserOrd, 1);
-  PARSER_ORD_CHECK_INSTANCE(self);
+ParserOrd_ptr ParserOrd_create(const NuSMVEnv_ptr env)
+{
+	ParserOrd_ptr self = ALLOC(ParserOrd, 1);
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  parser_ord_init(self, env);
-  return self;
+	parser_ord_init(self, env);
+	return self;
 }
 
-void ParserOrd_destroy(ParserOrd_ptr self) {
-  PARSER_ORD_CHECK_INSTANCE(self);
+void ParserOrd_destroy(ParserOrd_ptr self)
+{
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  Object_destroy(OBJECT(self), NULL);
+	Object_destroy(OBJECT(self), NULL);
 }
 
-void ParserOrd_parse_from_file(ParserOrd_ptr self, FILE *f) {
-  StreamMgr_ptr streams;
-  NuSMVEnv_ptr env;
-  YY_BUFFER_STATE buf;
+void ParserOrd_parse_from_file(ParserOrd_ptr self, FILE *f)
+{
+	StreamMgr_ptr streams;
+	NuSMVEnv_ptr env;
+	YY_BUFFER_STATE buf;
 
-  PARSER_ORD_CHECK_INSTANCE(self);
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  parser_ord_set_global_parser(self);
+	parser_ord_set_global_parser(self);
 
-  env = EnvObject_get_environment(ENV_OBJECT(self));
-  streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	env = EnvObject_get_environment(ENV_OBJECT(self));
+	streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  if (f == (FILE *)NULL)
-    parser_ord_in = StreamMgr_get_input_stream(streams);
-  else
-    parser_ord_in = f;
+	if (f == (FILE *)NULL)
+		parser_ord_in = StreamMgr_get_input_stream(streams);
+	else
+		parser_ord_in = f;
 
-  buf = parser_ord__create_buffer(parser_ord_in, 16384);
-  parser_ord__switch_to_buffer(buf);
-  parser_ord_restart(parser_ord_in);
-  (void)parser_ord_parse();
-  parser_ord__delete_buffer(buf);
+	buf = parser_ord__create_buffer(parser_ord_in, 16384);
+	parser_ord__switch_to_buffer(buf);
+	parser_ord_restart(parser_ord_in);
+	(void)parser_ord_parse();
+	parser_ord__delete_buffer(buf);
 
-  parser_ord_reset_global_parser(self);
+	parser_ord_reset_global_parser(self);
 }
 
-void ParserOrd_parse_from_string(ParserOrd_ptr self, const char *str) {
-  YY_BUFFER_STATE buf;
+void ParserOrd_parse_from_string(ParserOrd_ptr self, const char *str)
+{
+	YY_BUFFER_STATE buf;
 
-  PARSER_ORD_CHECK_INSTANCE(self);
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  parser_ord_set_global_parser(self);
+	parser_ord_set_global_parser(self);
 
-  buf = parser_ord__scan_string(str);
-  (void)parser_ord_parse();
-  parser_ord__delete_buffer(buf);
+	buf = parser_ord__scan_string(str);
+	(void)parser_ord_parse();
+	parser_ord__delete_buffer(buf);
 
-  parser_ord_reset_global_parser(self);
+	parser_ord_reset_global_parser(self);
 }
 
-NodeList_ptr ParserOrd_get_vars_list(const ParserOrd_ptr self) {
-  PARSER_ORD_CHECK_INSTANCE(self);
-  return self->vars_list;
+NodeList_ptr ParserOrd_get_vars_list(const ParserOrd_ptr self)
+{
+	PARSER_ORD_CHECK_INSTANCE(self);
+	return self->vars_list;
 }
 
-void ParserOrd_reset(ParserOrd_ptr self) {
-  PARSER_ORD_CHECK_INSTANCE(self);
+void ParserOrd_reset(ParserOrd_ptr self)
+{
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  NodeList_destroy(self->vars_list);
-  self->vars_list = NodeList_create();
+	NodeList_destroy(self->vars_list);
+	self->vars_list = NodeList_create();
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void parser_ord_add_var(ParserOrd_ptr self, node_ptr name) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+void parser_ord_add_var(ParserOrd_ptr self, node_ptr name)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  PARSER_ORD_CHECK_INSTANCE(self);
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  if (NodeList_belongs_to(self->vars_list, name)) {
-    ErrorMgr_warning_var_appear_twice_in_order_file(errmgr, name);
-  } else {
-    NodeList_prepend(self->vars_list, name);
-  }
+	if (NodeList_belongs_to(self->vars_list, name)) {
+		ErrorMgr_warning_var_appear_twice_in_order_file(errmgr, name);
+	} else {
+		NodeList_prepend(self->vars_list, name);
+	}
 }
 
-node_ptr parser_ord_mk_dot(ParserOrd_ptr self, node_ptr left, node_ptr right) {
-  PARSER_ORD_CHECK_INSTANCE(self);
-  {
-    const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+node_ptr parser_ord_mk_dot(ParserOrd_ptr self, node_ptr left, node_ptr right)
+{
+	PARSER_ORD_CHECK_INSTANCE(self);
+	{
+		const NuSMVEnv_ptr env =
+			EnvObject_get_environment(ENV_OBJECT(self));
+		const NodeMgr_ptr nodemgr =
+			NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-    return find_node(nodemgr, DOT, left, right);
-  }
+		return find_node(nodemgr, DOT, left, right);
+	}
 }
 
-node_ptr parser_ord_mk_array(ParserOrd_ptr self, node_ptr left,
-                             node_ptr right) {
-  PARSER_ORD_CHECK_INSTANCE(self);
-  {
-    const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+node_ptr parser_ord_mk_array(ParserOrd_ptr self, node_ptr left, node_ptr right)
+{
+	PARSER_ORD_CHECK_INSTANCE(self);
+	{
+		const NuSMVEnv_ptr env =
+			EnvObject_get_environment(ENV_OBJECT(self));
+		const NodeMgr_ptr nodemgr =
+			NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-    return find_node(nodemgr, ARRAY, left, right);
-  }
+		return find_node(nodemgr, ARRAY, left, right);
+	}
 }
 
-node_ptr parser_ord_mk_bit(ParserOrd_ptr self, node_ptr left, int suffix) {
-  PARSER_ORD_CHECK_INSTANCE(self);
-  {
-    const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+node_ptr parser_ord_mk_bit(ParserOrd_ptr self, node_ptr left, int suffix)
+{
+	PARSER_ORD_CHECK_INSTANCE(self);
+	{
+		const NuSMVEnv_ptr env =
+			EnvObject_get_environment(ENV_OBJECT(self));
+		const NodeMgr_ptr nodemgr =
+			NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-    return find_node(nodemgr, BIT, left, NODE_FROM_INT(suffix));
-  }
+		return find_node(nodemgr, BIT, left, NODE_FROM_INT(suffix));
+	}
 }
 
-node_ptr parser_ord_mk_atom(ParserOrd_ptr self, const char *name) {
-  NuSMVEnv_ptr env;
-  UStringMgr_ptr strings;
-  NodeMgr_ptr nodemgr;
-  node_ptr atom;
+node_ptr parser_ord_mk_atom(ParserOrd_ptr self, const char *name)
+{
+	NuSMVEnv_ptr env;
+	UStringMgr_ptr strings;
+	NodeMgr_ptr nodemgr;
+	node_ptr atom;
 
-  PARSER_ORD_CHECK_INSTANCE(self);
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  env = EnvObject_get_environment(ENV_OBJECT(self));
-  strings = USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
-  nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+	env = EnvObject_get_environment(ENV_OBJECT(self));
+	strings = USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
+	nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  atom =
-      find_node(nodemgr, ATOM,
-                (node_ptr)UStringMgr_find_string(strings, (char *)name), Nil);
-  return atom;
+	atom = find_node(
+		nodemgr, ATOM,
+		(node_ptr)UStringMgr_find_string(strings, (char *)name), Nil);
+	return atom;
 }
 
-node_ptr parser_ord_mk_num(ParserOrd_ptr self, const int num) {
-  PARSER_ORD_CHECK_INSTANCE(self);
+node_ptr parser_ord_mk_num(ParserOrd_ptr self, const int num)
+{
+	PARSER_ORD_CHECK_INSTANCE(self);
 
-  {
-    const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-    return find_node(nodemgr, NUMBER, NODE_FROM_INT(num), Nil);
-  }
+	{
+		const NuSMVEnv_ptr env =
+			EnvObject_get_environment(ENV_OBJECT(self));
+		const NodeMgr_ptr nodemgr =
+			NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+		return find_node(nodemgr, NUMBER, NODE_FROM_INT(num), Nil);
+	}
 }
 
 /*---------------------------------------------------------------------------*/
@@ -229,12 +248,13 @@ node_ptr parser_ord_mk_num(ParserOrd_ptr self, const int num) {
 
 
 */
-static void parser_ord_init(ParserOrd_ptr self, const NuSMVEnv_ptr env) {
-  env_object_init(ENV_OBJECT(self), env);
+static void parser_ord_init(ParserOrd_ptr self, const NuSMVEnv_ptr env)
+{
+	env_object_init(ENV_OBJECT(self), env);
 
-  self->vars_list = NodeList_create();
+	self->vars_list = NodeList_create();
 
-  OVERRIDE(Object, finalize) = parser_ord_finalize;
+	OVERRIDE(Object, finalize) = parser_ord_finalize;
 }
 
 /*!
@@ -242,10 +262,11 @@ static void parser_ord_init(ParserOrd_ptr self, const NuSMVEnv_ptr env) {
 
 
 */
-static void parser_ord_deinit(ParserOrd_ptr self) {
-  NodeList_destroy(self->vars_list);
+static void parser_ord_deinit(ParserOrd_ptr self)
+{
+	NodeList_destroy(self->vars_list);
 
-  env_object_deinit(ENV_OBJECT(self));
+	env_object_deinit(ENV_OBJECT(self));
 }
 
 /*!
@@ -253,12 +274,13 @@ static void parser_ord_deinit(ParserOrd_ptr self) {
 
 
 */
-static void parser_ord_finalize(Object_ptr object, void *dummy) {
-  ParserOrd_ptr self = PARSER_ORD(object);
+static void parser_ord_finalize(Object_ptr object, void *dummy)
+{
+	ParserOrd_ptr self = PARSER_ORD(object);
 
-  UNUSED_PARAM(dummy);
+	UNUSED_PARAM(dummy);
 
-  parser_ord_deinit(self);
+	parser_ord_deinit(self);
 
-  FREE(self);
+	FREE(self);
 }

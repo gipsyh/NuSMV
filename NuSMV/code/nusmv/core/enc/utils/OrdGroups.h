@@ -64,8 +64,8 @@ typedef struct OrdGroups_TAG *OrdGroups_ptr;
 
   \todo Missing description
 */
-#define ORD_GROUPS_CHECK_INSTANCE(x)                                           \
-  (nusmv_assert(ORD_GROUPS(x) != ORD_GROUPS(NULL)))
+#define ORD_GROUPS_CHECK_INSTANCE(x) \
+	(nusmv_assert(ORD_GROUPS(x) != ORD_GROUPS(NULL)))
 
 /*!
   \methodof OrdGroups

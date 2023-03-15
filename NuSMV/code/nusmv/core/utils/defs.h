@@ -78,9 +78,9 @@
 #ifndef ARGS
 #if defined(__STDC__) || defined(__cplusplus) || defined(_MSC_VER)
 #define ARGS(protos) protos /* ANSI C */
-#else                   /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
+#else /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
 #define ARGS(protos) () /* K&R C */
-#endif                  /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
+#endif /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
 #endif
 #endif
 
@@ -300,12 +300,12 @@ typedef enum { false = 0, true = 1 } boolean;
 /* MD If OUTCOME_SUCCESS would have the value 0 it would be consistent with
    the usual boolean representation */
 typedef enum Outcome_TAG {
-  OUTCOME_GENERIC_ERROR,
-  OUTCOME_PARSER_ERROR,
-  OUTCOME_SYNTAX_ERROR,
-  OUTCOME_FILE_ERROR,
-  OUTCOME_SUCCESS_REQUIRED_HELP,
-  OUTCOME_SUCCESS
+	OUTCOME_GENERIC_ERROR,
+	OUTCOME_PARSER_ERROR,
+	OUTCOME_SYNTAX_ERROR,
+	OUTCOME_FILE_ERROR,
+	OUTCOME_SUCCESS_REQUIRED_HELP,
+	OUTCOME_SUCCESS
 } Outcome;
 
 /* to avoid warnings */
@@ -329,8 +329,8 @@ typedef enum Outcome_TAG {
 
   \todo Missing description
 */
-#define ENUM_CHECK(value, first, last)                                         \
-  nusmv_assert(first < value && value < last)
+#define ENUM_CHECK(value, first, last) \
+	nusmv_assert(first < value && value < last)
 
 /* useful placeholders ********************************************************/
 /*!

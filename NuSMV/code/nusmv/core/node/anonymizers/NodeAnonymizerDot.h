@@ -61,8 +61,8 @@ typedef struct NodeAnonymizerDot_TAG *NodeAnonymizerDot_ptr;
 
   \todo Missing description
 */
-#define NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self)                               \
-  (nusmv_assert(NODE_ANONYMIZER_DOT(self) != NODE_ANONYMIZER_DOT(NULL)))
+#define NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self) \
+	(nusmv_assert(NODE_ANONYMIZER_DOT(self) != NODE_ANONYMIZER_DOT(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -79,8 +79,8 @@ typedef struct NodeAnonymizerDot_TAG *NodeAnonymizerDot_ptr;
   \sa NodeAnonymizerDot_destroy
 */
 NodeAnonymizerDot_ptr NodeAnonymizerDot_create(NuSMVEnv_ptr env,
-                                               const char *default_prefix,
-                                               size_t memoization_threshold);
+					       const char *default_prefix,
+					       size_t memoization_threshold);
 
 /*!
   \methodof NodeAnonymizerDot

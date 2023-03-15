@@ -60,14 +60,14 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct MasterNormalizer_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(MasterNodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(MasterNodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  hash_ptr cache;
+	hash_ptr cache;
 
 } MasterNormalizer;
 
@@ -86,7 +86,7 @@ typedef struct MasterNormalizer_TAG {
 /*---------------------------------------------------------------------------*/
 
 static void master_normalizer_init(MasterNormalizer_ptr self,
-                                   const NuSMVEnv_ptr env);
+				   const NuSMVEnv_ptr env);
 static void master_normalizer_deinit(MasterNormalizer_ptr self);
 static void master_normalizer_finalize(Object_ptr object, void *dummy);
 
@@ -94,21 +94,22 @@ static void master_normalizer_finalize(Object_ptr object, void *dummy);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-MasterNormalizer_ptr MasterNormalizer_create(const NuSMVEnv_ptr env) {
-  MasterNormalizer_ptr self = ALLOC(MasterNormalizer, 1);
-  MASTER_NORMALIZER_CHECK_INSTANCE(self);
+MasterNormalizer_ptr MasterNormalizer_create(const NuSMVEnv_ptr env)
+{
+	MasterNormalizer_ptr self = ALLOC(MasterNormalizer, 1);
+	MASTER_NORMALIZER_CHECK_INSTANCE(self);
 
-  master_normalizer_init(self, env);
-  return self;
+	master_normalizer_init(self, env);
+	return self;
 }
 
-node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self,
-                                         node_ptr n) {
-  node_ptr res;
-  MASTER_NORMALIZER_CHECK_INSTANCE(self);
-  res = master_normalizer_normalize_node(self, n);
+node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n)
+{
+	node_ptr res;
+	MASTER_NORMALIZER_CHECK_INSTANCE(self);
+	res = master_normalizer_normalize_node(self, n);
 
-  /* Clear the memoization cache at each call. See issue #1960 for
+	/* Clear the memoization cache at each call. See issue #1960 for
      further details.  A possible scenario that demonstrates that the
      cache has to be cleared is the following:
 
@@ -126,43 +127,44 @@ node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self,
      the memoization we obtain a wrong result.
   */
 
-  clear_assoc(self->cache);
+	clear_assoc(self->cache);
 
-  return res;
+	return res;
 }
 
-node_ptr MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n) {
-  MASTER_NORMALIZER_CHECK_INSTANCE(self);
-  return find_assoc(self->cache, n);
+node_ptr MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n)
+{
+	MASTER_NORMALIZER_CHECK_INSTANCE(self);
+	return find_assoc(self->cache, n);
 }
 
 void MasterNormalizer_insert_cache(MasterNormalizer_ptr self, node_ptr n,
-                                   node_ptr norm) {
-  MASTER_NORMALIZER_CHECK_INSTANCE(self);
-  insert_assoc(self->cache, n, norm);
+				   node_ptr norm)
+{
+	MASTER_NORMALIZER_CHECK_INSTANCE(self);
+	insert_assoc(self->cache, n, norm);
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-node_ptr master_normalizer_normalize_node(MasterNormalizer_ptr self,
-                                          node_ptr n) {
-  ListIter_ptr iter;
-  iter = NodeList_get_first_iter(MASTER_NODE_WALKER(self)->walkers);
-  while (!ListIter_is_end(iter)) {
-    NormalizerBase_ptr pr = NORMALIZER_BASE(
-        NodeList_get_elem_at(MASTER_NODE_WALKER(self)->walkers, iter));
+node_ptr master_normalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n)
+{
+	ListIter_ptr iter;
+	iter = NodeList_get_first_iter(MASTER_NODE_WALKER(self)->walkers);
+	while (!ListIter_is_end(iter)) {
+		NormalizerBase_ptr pr = NORMALIZER_BASE(NodeList_get_elem_at(
+			MASTER_NODE_WALKER(self)->walkers, iter));
 
-    if (NodeWalker_can_handle(NODE_WALKER(pr), n)) {
+		if (NodeWalker_can_handle(NODE_WALKER(pr), n)) {
+			return NormalizerBase_normalize_node(pr, n);
+		}
 
-      return NormalizerBase_normalize_node(pr, n);
-    }
+		iter = ListIter_get_next(iter);
+	}
 
-    iter = ListIter_get_next(iter);
-  }
-
-  return Nil;
+	return Nil;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -177,14 +179,15 @@ node_ptr master_normalizer_normalize_node(MasterNormalizer_ptr self,
   \sa MasterNormalizer_create
 */
 static void master_normalizer_init(MasterNormalizer_ptr self,
-                                   const NuSMVEnv_ptr env) {
-  /* base class initialization */
-  master_node_walker_init(MASTER_NODE_WALKER(self), env);
+				   const NuSMVEnv_ptr env)
+{
+	/* base class initialization */
+	master_node_walker_init(MASTER_NODE_WALKER(self), env);
 
-  /* virtual methods settings */
-  OVERRIDE(Object, finalize) = master_normalizer_finalize;
+	/* virtual methods settings */
+	OVERRIDE(Object, finalize) = master_normalizer_finalize;
 
-  self->cache = new_assoc();
+	self->cache = new_assoc();
 }
 
 /*!
@@ -194,11 +197,12 @@ static void master_normalizer_init(MasterNormalizer_ptr self,
 
   \sa Object_destroy
 */
-static void master_normalizer_deinit(MasterNormalizer_ptr self) {
-  /* base class deinitialization */
-  master_node_walker_deinit(MASTER_NODE_WALKER(self));
+static void master_normalizer_deinit(MasterNormalizer_ptr self)
+{
+	/* base class deinitialization */
+	master_node_walker_deinit(MASTER_NODE_WALKER(self));
 
-  free_assoc(self->cache);
+	free_assoc(self->cache);
 }
 
 /*!
@@ -206,11 +210,12 @@ static void master_normalizer_deinit(MasterNormalizer_ptr self) {
 
   Called by the class destructor
 */
-static void master_normalizer_finalize(Object_ptr object, void *dummy) {
-  MasterNormalizer_ptr self = MASTER_NORMALIZER(object);
+static void master_normalizer_finalize(Object_ptr object, void *dummy)
+{
+	MasterNormalizer_ptr self = MASTER_NORMALIZER(object);
 
-  master_normalizer_deinit(self);
-  FREE(self);
+	master_normalizer_deinit(self);
+	FREE(self);
 }
 
 /**AutomaticEnd***************************************************************/

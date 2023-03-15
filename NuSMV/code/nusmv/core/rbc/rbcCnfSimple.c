@@ -58,10 +58,10 @@
 */
 
 struct CnfDfsData {
-  Rbc_Manager_t *rbcManager;
-  Slist_ptr clauses;
-  Slist_ptr vars;
-  int result;
+	Rbc_Manager_t *rbcManager;
+	Slist_ptr clauses;
+	Slist_ptr vars;
+	int result;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -139,33 +139,34 @@ static lsGeneric SwapSign(lsGeneric data);
 */
 
 int Rbc_Convert2CnfSimple(Rbc_Manager_t *rbcManager, Rbc_t *f,
-                          Slist_ptr clauses, Slist_ptr vars,
-                          int *literalAssignedToWholeFormula) {
-  Dag_DfsFunctions_t cnfFunctions;
-  CnfDfsData_t cnfData;
+			  Slist_ptr clauses, Slist_ptr vars,
+			  int *literalAssignedToWholeFormula)
+{
+	Dag_DfsFunctions_t cnfFunctions;
+	CnfDfsData_t cnfData;
 
-  /* The caller will ensure this */
-  nusmv_assert(*literalAssignedToWholeFormula == INT_MAX);
+	/* The caller will ensure this */
+	nusmv_assert(*literalAssignedToWholeFormula == INT_MAX);
 
-  /* Setting up the DFS functions. */
-  cnfFunctions.Set = (PF_IVPCPI)CnfSet;
-  cnfFunctions.FirstVisit = (PF_VPVPCPI)CnfFirst;
-  cnfFunctions.BackVisit = (PF_VPVPCPI)CnfBack;
-  cnfFunctions.LastVisit = (PF_VPVPCPI)CnfLast;
+	/* Setting up the DFS functions. */
+	cnfFunctions.Set = (PF_IVPCPI)CnfSet;
+	cnfFunctions.FirstVisit = (PF_VPVPCPI)CnfFirst;
+	cnfFunctions.BackVisit = (PF_VPVPCPI)CnfBack;
+	cnfFunctions.LastVisit = (PF_VPVPCPI)CnfLast;
 
-  /* Setting up the DFS data. */
-  cnfData.rbcManager = rbcManager;
-  cnfData.clauses = clauses;
-  cnfData.vars = vars;
-  cnfData.result = 0;
+	/* Setting up the DFS data. */
+	cnfData.rbcManager = rbcManager;
+	cnfData.clauses = clauses;
+	cnfData.vars = vars;
+	cnfData.result = 0;
 
-  /* Calling DFS on f. */
-  Dag_Dfs(f, &cnfFunctions, (char *)(&cnfData));
+	/* Calling DFS on f. */
+	Dag_Dfs(f, &cnfFunctions, (char *)(&cnfData));
 
-  /* Remember the unit clause (literal) that stands for the whole formula f */
-  *literalAssignedToWholeFormula = cnfData.result;
+	/* Remember the unit clause (literal) that stands for the whole formula f */
+	*literalAssignedToWholeFormula = cnfData.result;
 
-  return rbcManager->maxCnfVariable;
+	return rbcManager->maxCnfVariable;
 
 } /* End of Rbc_Convert2CnfSimple. */
 
@@ -181,14 +182,15 @@ int Rbc_Convert2CnfSimple(Rbc_Manager_t *rbcManager, Rbc_t *f,
   \se None
 */
 
-static int CnfSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
-  CnfDfsData_t *cd = (CnfDfsData_t *)cnfData;
+static int CnfSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign)
+{
+	CnfDfsData_t *cd = (CnfDfsData_t *)cnfData;
 
-  /* Set the current integer reference as result. */
-  cd->result = (sign != 0 ? -1 * (f->iRef) : f->iRef);
+	/* Set the current integer reference as result. */
+	cd->result = (sign != 0 ? -1 * (f->iRef) : f->iRef);
 
-  /* All nodes should be visited once and only once. */
-  return 0;
+	/* All nodes should be visited once and only once. */
+	return 0;
 } /* End of CnfSet. */
 
 /*!
@@ -199,11 +201,12 @@ static int CnfSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
   \se None
 */
 
-static void CnfFirst(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
-  if (f->symbol != RBCVAR) {
-    /* Create a temporary list (use vertex's own general reference). */
-    f->gRef = (char *)lsCreate();
-  }
+static void CnfFirst(Rbc_t *f, char *cnfData, nusmv_ptrint sign)
+{
+	if (f->symbol != RBCVAR) {
+		/* Create a temporary list (use vertex's own general reference). */
+		f->gRef = (char *)lsCreate();
+	}
 } /* End of CnfFirst. */
 
 /*!
@@ -214,14 +217,15 @@ static void CnfFirst(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
   \se None
 */
 
-static void CnfBack(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
-  CnfDfsData_t *cd = (CnfDfsData_t *)cnfData;
+static void CnfBack(Rbc_t *f, char *cnfData, nusmv_ptrint sign)
+{
+	CnfDfsData_t *cd = (CnfDfsData_t *)cnfData;
 
-  /* Get the current result and add it (negated) to the temporary list. */
-  (void)lsNewEnd((lsList)(f->gRef), PTR_FROM_INT(lsGeneric, -1 * (cd->result)),
-                 LS_NH);
+	/* Get the current result and add it (negated) to the temporary list. */
+	(void)lsNewEnd((lsList)(f->gRef),
+		       PTR_FROM_INT(lsGeneric, -1 * (cd->result)), LS_NH);
 
-  return;
+	return;
 
 } /* End of CnfBack. */
 
@@ -233,183 +237,184 @@ static void CnfBack(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
   \se None
 */
 
-static void CnfLast(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
-  lsGen gen;
-  nusmv_ptrint s;
-  int pol;
+static void CnfLast(Rbc_t *f, char *cnfData, nusmv_ptrint sign)
+{
+	lsGen gen;
+	nusmv_ptrint s;
+	int pol;
 
-  CnfDfsData_t *cd = (CnfDfsData_t *)cnfData;
-  lsList sons = (lsList)(f->gRef);
+	CnfDfsData_t *cd = (CnfDfsData_t *)cnfData;
+	lsList sons = (lsList)(f->gRef);
 
-  int cnfVar =
-      Rbc_get_node_cnf(cd->rbcManager, f, &cd->rbcManager->maxCnfVariable);
+	int cnfVar = Rbc_get_node_cnf(cd->rbcManager, f,
+				      &cd->rbcManager->maxCnfVariable);
 
-  const NuSMVEnv_ptr env = Rbc_ManagerGetEnvironment(cd->rbcManager);
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const NuSMVEnv_ptr env = Rbc_ManagerGetEnvironment(cd->rbcManager);
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  f->iRef = cnfVar;
+	f->iRef = cnfVar;
 
-  if (f->symbol == RBCVAR) {
+	if (f->symbol == RBCVAR) {
+		/* Fill in the list of 'original' model vars converted into CNF vars */
+		Slist_push(cd->vars, PTR_FROM_INT(void *, cnfVar));
+	} else {
+		/* Generate and append clauses. */
+		if (f->symbol == RBCAND) {
+			int j = 0;
+			int clause_size = lsLength(sons) + 2;
+			int *tmpCl1 = (int *)NULL;
+			int *tmpCl2 = (int *)NULL;
 
-    /* Fill in the list of 'original' model vars converted into CNF vars */
-    Slist_push(cd->vars, PTR_FROM_INT(void *, cnfVar));
-  } else {
+			/* Compute the binary clauses {-f s_i} */
+			/* Compute the clause {f -s_1 -s_2} */
+			tmpCl1 = ALLOC(int, clause_size);
+			gen = lsStart(sons);
+			while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
+				tmpCl1[j++] = (int)s;
+				tmpCl2 = ALLOC(int, 3);
+				tmpCl2[0] = -1 * cnfVar;
+				tmpCl2[1] = -1 * (int)s;
+				tmpCl2[2] = 0;
+				/* Add the binary clauses {-f s_i} */
+				Slist_push(cd->clauses, (void *)tmpCl2);
+				tmpCl2 = (int *)
+					NULL; /* to avoid possible problems */
+			}
+			lsFinish(gen);
+			tmpCl1[j++] = cnfVar;
+			tmpCl1[j++] = 0;
+			nusmv_assert(j == clause_size);
+			/* Add the clause {f -s_1 -s_2} */
+			Slist_push(cd->clauses, (void *)tmpCl1);
 
-    /* Generate and append clauses. */
-    if (f->symbol == RBCAND) {
-      int j = 0;
-      int clause_size = lsLength(sons) + 2;
-      int *tmpCl1 = (int *)NULL;
-      int *tmpCl2 = (int *)NULL;
+			lsDestroy(sons, NULL);
 
-      /* Compute the binary clauses {-f s_i} */
-      /* Compute the clause {f -s_1 -s_2} */
-      tmpCl1 = ALLOC(int, clause_size);
-      gen = lsStart(sons);
-      while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
-        tmpCl1[j++] = (int)s;
-        tmpCl2 = ALLOC(int, 3);
-        tmpCl2[0] = -1 * cnfVar;
-        tmpCl2[1] = -1 * (int)s;
-        tmpCl2[2] = 0;
-        /* Add the binary clauses {-f s_i} */
-        Slist_push(cd->clauses, (void *)tmpCl2);
-        tmpCl2 = (int *)NULL; /* to avoid possible problems */
-      }
-      lsFinish(gen);
-      tmpCl1[j++] = cnfVar;
-      tmpCl1[j++] = 0;
-      nusmv_assert(j == clause_size);
-      /* Add the clause {f -s_1 -s_2} */
-      Slist_push(cd->clauses, (void *)tmpCl1);
+		} else if (f->symbol == RBCIFF) {
+			int i;
+			int *tmpCl1 = (int *)NULL;
+			int *tmpCl2 = (int *)NULL;
+			int clause_size = lsLength(sons) + 2;
 
-      lsDestroy(sons, NULL);
+			/* Compute clause {-f s_1 -s_2} */
+			tmpCl1 = ALLOC(int, clause_size);
+			i = 0;
+			tmpCl1[i++] = -1 * cnfVar;
+			pol = -1;
+			gen = lsStart(sons);
+			while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
+				tmpCl1[i++] = (int)s * pol;
+				pol *= -1;
+			}
+			lsFinish(gen);
+			tmpCl1[i++] = 0;
+			nusmv_assert(i == clause_size);
+			/* Add the clause {-f s_1 -s_2} */
+			Slist_push(cd->clauses, (void *)tmpCl1);
 
-    } else if (f->symbol == RBCIFF) {
-      int i;
-      int *tmpCl1 = (int *)NULL;
-      int *tmpCl2 = (int *)NULL;
-      int clause_size = lsLength(sons) + 2;
+			/* Compute clause {-f -s_1 s_2} */
+			tmpCl1 = ALLOC(int, clause_size);
+			i = 0;
+			tmpCl1[i++] = -1 * cnfVar;
+			pol = 1;
+			gen = lsStart(sons);
+			while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
+				tmpCl1[i++] = pol * (int)s;
+				pol *= -1;
+			}
+			lsFinish(gen);
+			tmpCl1[i++] = 0;
+			nusmv_assert(i == clause_size);
+			/* Add the clause {-f -s_1 s_2} */
+			Slist_push(cd->clauses, (void *)tmpCl1);
 
-      /* Compute clause {-f s_1 -s_2} */
-      tmpCl1 = ALLOC(int, clause_size);
-      i = 0;
-      tmpCl1[i++] = -1 * cnfVar;
-      pol = -1;
-      gen = lsStart(sons);
-      while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
-        tmpCl1[i++] = (int)s * pol;
-        pol *= -1;
-      }
-      lsFinish(gen);
-      tmpCl1[i++] = 0;
-      nusmv_assert(i == clause_size);
-      /* Add the clause {-f s_1 -s_2} */
-      Slist_push(cd->clauses, (void *)tmpCl1);
+			/* Compute clause {f s_1 s_2} */
+			/* Compute clause {f -s_1 -s_2} */
+			tmpCl1 = ALLOC(int, clause_size);
+			tmpCl2 = ALLOC(int, clause_size);
+			i = 0;
+			gen = lsStart(sons);
+			while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
+				tmpCl1[i] = -1 * (int)s;
+				tmpCl2[i] = (int)s;
+				i++;
+			}
+			lsFinish(gen);
+			tmpCl1[i] = cnfVar;
+			tmpCl2[i] = cnfVar;
+			i++;
+			tmpCl1[i] = 0;
+			tmpCl2[i] = 0;
+			i++;
+			nusmv_assert(i == clause_size);
 
-      /* Compute clause {-f -s_1 s_2} */
-      tmpCl1 = ALLOC(int, clause_size);
-      i = 0;
-      tmpCl1[i++] = -1 * cnfVar;
-      pol = 1;
-      gen = lsStart(sons);
-      while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
-        tmpCl1[i++] = pol * (int)s;
-        pol *= -1;
-      }
-      lsFinish(gen);
-      tmpCl1[i++] = 0;
-      nusmv_assert(i == clause_size);
-      /* Add the clause {-f -s_1 s_2} */
-      Slist_push(cd->clauses, (void *)tmpCl1);
+			/* Add the clause {f s_1 s_2} */
+			Slist_push(cd->clauses, (void *)tmpCl1);
+			/* Add the clause {f -s_1 -s_2} */
+			Slist_push(cd->clauses, (void *)tmpCl2);
 
-      /* Compute clause {f s_1 s_2} */
-      /* Compute clause {f -s_1 -s_2} */
-      tmpCl1 = ALLOC(int, clause_size);
-      tmpCl2 = ALLOC(int, clause_size);
-      i = 0;
-      gen = lsStart(sons);
-      while (lsNext(gen, (lsGeneric *)&s, LS_NH) == LS_OK) {
-        tmpCl1[i] = -1 * (int)s;
-        tmpCl2[i] = (int)s;
-        i++;
-      }
-      lsFinish(gen);
-      tmpCl1[i] = cnfVar;
-      tmpCl2[i] = cnfVar;
-      i++;
-      tmpCl1[i] = 0;
-      tmpCl2[i] = 0;
-      i++;
-      nusmv_assert(i == clause_size);
+			lsDestroy(sons, NULL);
 
-      /* Add the clause {f s_1 s_2} */
-      Slist_push(cd->clauses, (void *)tmpCl1);
-      /* Add the clause {f -s_1 -s_2} */
-      Slist_push(cd->clauses, (void *)tmpCl2);
+		} else if (f->symbol == RBCITE) {
+			int *tmpCl = (int *)NULL;
+			nusmv_ptrint i, t, e;
 
-      lsDestroy(sons, NULL);
+			gen = lsStart(sons);
+			/* Should have three children */
+			if (lsNext(gen, (lsGeneric *)&i, LS_NH) != LS_OK)
+				error_unreachable_code();
+			if (lsNext(gen, (lsGeneric *)&t, LS_NH) != LS_OK)
+				error_unreachable_code();
+			if (lsNext(gen, (lsGeneric *)&e, LS_NH) != LS_OK)
+				error_unreachable_code();
+			lsFinish(gen);
 
-    } else if (f->symbol == RBCITE) {
-      int *tmpCl = (int *)NULL;
-      nusmv_ptrint i, t, e;
+			/* Compute the clause {-f -i t} */
+			tmpCl = ALLOC(int, 4);
+			tmpCl[0] = -1 * cnfVar;
+			tmpCl[1] = (int)i;
+			tmpCl[2] = -1 * (int)t;
+			tmpCl[3] = 0;
+			/* Add the clause {-f -i t} */
+			Slist_push(cd->clauses, (void *)tmpCl);
 
-      gen = lsStart(sons);
-      /* Should have three children */
-      if (lsNext(gen, (lsGeneric *)&i, LS_NH) != LS_OK)
-        error_unreachable_code();
-      if (lsNext(gen, (lsGeneric *)&t, LS_NH) != LS_OK)
-        error_unreachable_code();
-      if (lsNext(gen, (lsGeneric *)&e, LS_NH) != LS_OK)
-        error_unreachable_code();
-      lsFinish(gen);
+			/* Compute the clause {-f i e} */
+			tmpCl = ALLOC(int, 4);
+			tmpCl[0] = -1 * cnfVar;
+			tmpCl[1] = -1 * (int)i;
+			tmpCl[2] = -1 * (int)e;
+			tmpCl[3] = 0;
+			/* Add the clause {-f i e} */
+			Slist_push(cd->clauses, (void *)tmpCl);
 
-      /* Compute the clause {-f -i t} */
-      tmpCl = ALLOC(int, 4);
-      tmpCl[0] = -1 * cnfVar;
-      tmpCl[1] = (int)i;
-      tmpCl[2] = -1 * (int)t;
-      tmpCl[3] = 0;
-      /* Add the clause {-f -i t} */
-      Slist_push(cd->clauses, (void *)tmpCl);
+			/* Compute the clause {f -i -t} */
+			tmpCl = ALLOC(int, 4);
+			tmpCl[0] = cnfVar;
+			tmpCl[1] = (int)i;
+			tmpCl[2] = (int)t;
+			tmpCl[3] = 0;
+			/* Add the clause {f -i -t} */
+			Slist_push(cd->clauses, (void *)tmpCl);
 
-      /* Compute the clause {-f i e} */
-      tmpCl = ALLOC(int, 4);
-      tmpCl[0] = -1 * cnfVar;
-      tmpCl[1] = -1 * (int)i;
-      tmpCl[2] = -1 * (int)e;
-      tmpCl[3] = 0;
-      /* Add the clause {-f i e} */
-      Slist_push(cd->clauses, (void *)tmpCl);
+			/* Compute the clause {f i -e} */
+			tmpCl = ALLOC(int, 4);
+			tmpCl[0] = cnfVar;
+			tmpCl[1] = -1 * (int)i;
+			tmpCl[2] = (int)e;
+			tmpCl[3] = 0;
+			/* Add the clause {f i -e} */
+			Slist_push(cd->clauses, (void *)tmpCl);
 
-      /* Compute the clause {f -i -t} */
-      tmpCl = ALLOC(int, 4);
-      tmpCl[0] = cnfVar;
-      tmpCl[1] = (int)i;
-      tmpCl[2] = (int)t;
-      tmpCl[3] = 0;
-      /* Add the clause {f -i -t} */
-      Slist_push(cd->clauses, (void *)tmpCl);
+			lsDestroy(sons, NULL);
+		} else
+			ErrorMgr_internal_error(errmgr,
+						"CnfLast: unkown RBC symbol");
+	}
 
-      /* Compute the clause {f i -e} */
-      tmpCl = ALLOC(int, 4);
-      tmpCl[0] = cnfVar;
-      tmpCl[1] = -1 * (int)i;
-      tmpCl[2] = (int)e;
-      tmpCl[3] = 0;
-      /* Add the clause {f i -e} */
-      Slist_push(cd->clauses, (void *)tmpCl);
+	/* Adjust the sign of the result. */
+	cd->result = (sign != 0 ? -1 * (f->iRef) : f->iRef);
 
-      lsDestroy(sons, NULL);
-    } else
-      ErrorMgr_internal_error(errmgr, "CnfLast: unkown RBC symbol");
-  }
-
-  /* Adjust the sign of the result. */
-  cd->result = (sign != 0 ? -1 * (f->iRef) : f->iRef);
-
-  return;
+	return;
 
 } /* End of CnfLast. */
 
@@ -421,6 +426,7 @@ static void CnfLast(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
   \se None
 */
 
-static lsGeneric SwapSign(lsGeneric data) {
-  return PTR_FROM_INT(lsGeneric, -1 * PTR_TO_INT(data));
+static lsGeneric SwapSign(lsGeneric data)
+{
+	return PTR_FROM_INT(lsGeneric, -1 * PTR_TO_INT(data));
 } /* End of CnfSwapSign. */

@@ -59,8 +59,8 @@ typedef struct TimerBench_TAG *TimerBench_ptr;
 
   \todo Missing description
 */
-#define TIMER_BENCH_CHECK_INSTANCE(self)                                       \
-  (nusmv_assert(TIMER_BENCH(self) != TIMER_BENCH(NULL)))
+#define TIMER_BENCH_CHECK_INSTANCE(self) \
+	(nusmv_assert(TIMER_BENCH(self) != TIMER_BENCH(NULL)))
 
 /*!
   \methodof TimerBench

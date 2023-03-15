@@ -56,11 +56,11 @@
   \todo Missing description
 */
 typedef enum {
-  sv_string,
-  sv_integer,
-  sv_floating,
-  sv_pointer,
-  sv_undef
+	sv_string,
+	sv_integer,
+	sv_floating,
+	sv_pointer,
+	sv_undef
 } SubstValueType;
 
 /*!
@@ -72,13 +72,13 @@ typedef enum {
 */
 
 typedef struct SubstValue_TAG {
-  SubstValueType type;
-  union {
-    const char *string;
-    int integer;
-    double floating;
-    void *pointer;
-  } assign;
+	SubstValueType type;
+	union {
+		const char *string;
+		int integer;
+		double floating;
+		void *pointer;
+	} assign;
 } SubstValue;
 
 /*!
@@ -93,9 +93,9 @@ typedef struct SubstValue_TAG {
 */
 
 typedef struct SubstString_TAG {
-  const char *symbol;
-  SubstValue value;
-  const char *format;
+	const char *symbol;
+	SubstValue value;
+	const char *format;
 } SubstString;
 
 /*---------------------------------------------------------------------------*/
@@ -119,8 +119,10 @@ typedef struct SubstString_TAG {
 
   \sa SYMBOL_ASSIGN, apply_string_macro_expansion
 */
-#define SYMBOL_CREATE()                                                        \
-  { "\0", {sv_undef, {NULL}}, "" }
+#define SYMBOL_CREATE()                          \
+	{                                        \
+		"\0", { sv_undef, { NULL } }, "" \
+	}
 
 /*!
   \brief SYMBOL_ASSIGN helps to fill the fields of the SubstString
@@ -139,11 +141,11 @@ typedef struct SubstString_TAG {
 
   \sa SYMBOL_CREATE, apply_string_macro_expansion
 */
-#define SYMBOL_ASSIGN(_subst, _symbol, _type, _format, _value)                 \
-  _subst.symbol = _symbol;                                                     \
-  _subst.value.type = sv_##_type;                                              \
-  _subst.format = _format;                                                     \
-  _subst.value.assign._type = _value
+#define SYMBOL_ASSIGN(_subst, _symbol, _type, _format, _value) \
+	_subst.symbol = _symbol;                               \
+	_subst.value.type = sv_##_type;                        \
+	_subst.format = _format;                               \
+	_subst.value.assign._type = _value
 
 /**AutomaticStart*************************************************************/
 
@@ -193,7 +195,7 @@ typedef struct SubstString_TAG {
   \sa SYMBOL_CREATE, SYMBOL_ASSIGN, SubstString
 */
 void apply_string_macro_expansion(const SubstString *const subst, char *string,
-                                  size_t buf_len);
+				  size_t buf_len);
 
 /*!
   \brief Converts a given string representing a number (base 10)

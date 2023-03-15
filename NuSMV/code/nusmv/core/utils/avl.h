@@ -57,10 +57,10 @@
 */
 typedef struct avl_node_struct avl_node;
 struct avl_node_struct {
-  avl_node *left, *right;
-  char *key;
-  char *value;
-  int height;
+	avl_node *left, *right;
+	char *key;
+	char *value;
+	int height;
 };
 
 /*!
@@ -71,10 +71,10 @@ struct avl_node_struct {
 */
 typedef struct avl_tree_struct avl_tree;
 struct avl_tree_struct {
-  avl_node *root;
-  int (*compar)(char *, char *);
-  int num_entries;
-  int modified;
+	avl_node *root;
+	int (*compar)(char *, char *);
+	int num_entries;
+	int modified;
 };
 
 /*!
@@ -85,9 +85,9 @@ struct avl_tree_struct {
 */
 typedef struct avl_generator_struct avl_generator;
 struct avl_generator_struct {
-  avl_tree *tree;
-  avl_node **nodelist;
-  int count;
+	avl_tree *tree;
+	avl_node **nodelist;
+	int count;
 };
 
 /*!
@@ -214,8 +214,8 @@ avl_generator *avl_init_gen(avl_tree *, int);
 
   \todo Missing description
 */
-#define avl_foreach_item(table, gen, dir, key_p, value_p)                      \
-  for (gen = avl_init_gen(table, dir);                                         \
-       avl_gen(gen, key_p, value_p) || (avl_free_gen(gen), 0);)
+#define avl_foreach_item(table, gen, dir, key_p, value_p) \
+	for (gen = avl_init_gen(table, dir);              \
+	     avl_gen(gen, key_p, value_p) || (avl_free_gen(gen), 0);)
 
 #endif

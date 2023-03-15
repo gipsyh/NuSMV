@@ -77,8 +77,8 @@ typedef struct SatIncSolver_TAG *SatIncSolver_ptr;
 
   \todo Missing description
 */
-#define SAT_INC_SOLVER_CHECK_INSTANCE(x)                                       \
-  (nusmv_assert(SAT_INC_SOLVER(x) != SAT_INC_SOLVER(NULL)))
+#define SAT_INC_SOLVER_CHECK_INSTANCE(x) \
+	(nusmv_assert(SAT_INC_SOLVER(x) != SAT_INC_SOLVER(NULL)))
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/
@@ -117,7 +117,7 @@ VIRTUAL SatSolverGroup SatIncSolver_create_group(const SatIncSolver_ptr self);
   \sa SatIncSolver_create_group
 */
 VIRTUAL void SatIncSolver_destroy_group(const SatIncSolver_ptr self,
-                                        SatSolverGroup group);
+					SatSolverGroup group);
 
 /*!
   \methodof SatIncSolver
@@ -132,7 +132,7 @@ VIRTUAL void SatIncSolver_destroy_group(const SatIncSolver_ptr self,
 */
 VIRTUAL void
 SatIncSolver_move_to_permanent_and_destroy_group(const SatIncSolver_ptr self,
-                                                 SatSolverGroup group);
+						 SatSolverGroup group);
 
 /*!
   \methodof SatIncSolver
@@ -146,7 +146,7 @@ SatIncSolver_move_to_permanent_and_destroy_group(const SatIncSolver_ptr self,
   SatIncSolver_create_group, SatSolver_get_model
 */
 VIRTUAL SatSolverResult SatIncSolver_solve_groups(const SatIncSolver_ptr self,
-                                                  const Olist_ptr groups);
+						  const Olist_ptr groups);
 
 /*!
   \methodof SatIncSolver
@@ -161,7 +161,7 @@ VIRTUAL SatSolverResult SatIncSolver_solve_groups(const SatIncSolver_ptr self,
   SatIncSolver_create_group, SatSolver_get_model
 */
 VIRTUAL SatSolverResult SatIncSolver_solve_without_groups(
-    const SatIncSolver_ptr self, const Olist_ptr groups);
+	const SatIncSolver_ptr self, const Olist_ptr groups);
 
 /**AutomaticEnd***************************************************************/
 

@@ -62,8 +62,8 @@ typedef struct OStream_TAG *OStream_ptr;
 
   \todo Missing description
 */
-#define OSTREAM_CHECK_INSTANCE(self)                                           \
-  (nusmv_assert(OSTREAM(self) != OSTREAM(NULL)))
+#define OSTREAM_CHECK_INSTANCE(self) \
+	(nusmv_assert(OSTREAM(self) != OSTREAM(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -158,8 +158,8 @@ void OStream_printf(const OStream_ptr self, const char *format, ...);
                       Supports node printing (using '%N')
 */
 void OStream_nprintf(const OStream_ptr self,
-                     const MasterPrinter_ptr node_printer, const char *format,
-                     ...);
+		     const MasterPrinter_ptr node_printer, const char *format,
+		     ...);
 
 /*!
   \methodof OStream
@@ -179,8 +179,8 @@ void OStream_vprintf(const OStream_ptr self, const char *format, va_list args);
                       Supports node printing (using '%N')
 */
 void OStream_nvprintf(const OStream_ptr self,
-                      const MasterPrinter_ptr node_printer, const char *format,
-                      va_list args);
+		      const MasterPrinter_ptr node_printer, const char *format,
+		      va_list args);
 
 /*!
   \methodof OStream

@@ -56,13 +56,13 @@
 */
 
 typedef struct MasterNodeWalker_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  NodeList_ptr walkers;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	NodeList_ptr walkers;
 
 } MasterNodeWalker;
 

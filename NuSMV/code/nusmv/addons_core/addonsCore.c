@@ -78,37 +78,40 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void AddonsCore_Init(NuSMVEnv_ptr env) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void AddonsCore_Init(NuSMVEnv_ptr env)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 2)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Initializing core addons...\n");
-  }
+	if (opt_verbose_level_gt(opts, 2)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Initializing core addons...\n");
+	}
 #if NUSMV_HAVE_COMPASS
-  Compass_init(env);
+	Compass_init(env);
 #endif
 }
 
-void AddonsCore_Reset(NuSMVEnv_ptr env) {
-  /*-------- DE-INITIALIZATION ------------ */
+void AddonsCore_Reset(NuSMVEnv_ptr env)
+{
+	/*-------- DE-INITIALIZATION ------------ */
 #if NUSMV_HAVE_COMPASS
-  Compass_reset(env);
+	Compass_reset(env);
 #endif
-  /*-------- INITIALIZATION ------------ */
+	/*-------- INITIALIZATION ------------ */
 }
 
-void AddonsCore_Quit(NuSMVEnv_ptr env) {
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void AddonsCore_Quit(NuSMVEnv_ptr env)
+{
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if (opt_verbose_level_gt(opts, 2)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Quitting core addons...\n");
-  }
+	if (opt_verbose_level_gt(opts, 2)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Quitting core addons...\n");
+	}
 #if NUSMV_HAVE_COMPASS
-  Compass_quit(env);
+	Compass_quit(env);
 #endif
 }
 

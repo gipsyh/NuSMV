@@ -102,7 +102,7 @@ int TracePkg_test_package(FILE *out, FILE *err);
   \sa TraceMgr_is_visible_symbol
 */
 NodeList_ptr TracePkg_get_filtered_symbols(TraceMgr_ptr gtm,
-                                           const NodeList_ptr symbols);
+					   const NodeList_ptr symbols);
 
 /* Trace Manager */
 
@@ -133,7 +133,7 @@ boolean TracePkg_set_default_trace_plugin(TraceMgr_ptr gtm, int dp);
   \se None
 */
 int Trace_execute_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
-                        const CompleteTraceExecutor_ptr exec_info);
+			const CompleteTraceExecutor_ptr exec_info);
 
 /*!
   \brief Partial trace re-execution and fill-in
@@ -151,8 +151,8 @@ int Trace_execute_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
   \se None
 */
 int Trace_execute_partial_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
-                                const PartialTraceExecutor_ptr exec_info,
-                                const NodeList_ptr language);
+				const PartialTraceExecutor_ptr exec_info,
+				const NodeList_ptr language);
 
 /* Custom value fetch functions */
 
@@ -167,8 +167,8 @@ int Trace_execute_partial_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
                Remarks: returned bdd is referenced
 */
 bdd_ptr TraceUtils_fetch_as_bdd(Trace_ptr trace, TraceIter step,
-                                TraceIteratorType iter_type,
-                                BddEnc_ptr bdd_enc);
+				TraceIteratorType iter_type,
+				BddEnc_ptr bdd_enc);
 
 /*!
   \brief Extracts assignments in (trace, step) to a set of symbols
@@ -179,8 +179,8 @@ bdd_ptr TraceUtils_fetch_as_bdd(Trace_ptr trace, TraceIter step,
                the TraceIteratorType for possible sets.
 */
 be_ptr TraceUtils_fetch_as_be(Trace_ptr trace, TraceIter step,
-                              TraceIteratorType iter_type, BeEnc_ptr be_enc,
-                              BddEnc_ptr bdd_enc);
+			      TraceIteratorType iter_type, BeEnc_ptr be_enc,
+			      BddEnc_ptr bdd_enc);
 
 /*!
   \brief Extracts assignments in (trace, step) to a set of symbols
@@ -195,7 +195,7 @@ be_ptr TraceUtils_fetch_as_be(Trace_ptr trace, TraceIter step,
   \sa TraceUtils_fetch_as_big_and
 */
 Expr_ptr TraceUtils_fetch_as_sexp(Trace_ptr trace, TraceIter step,
-                                  TraceIteratorType iter_type);
+				  TraceIteratorType iter_type);
 
 /*!
   \brief Extracts assignments in (trace, step) to a set of symbols
@@ -206,7 +206,7 @@ Expr_ptr TraceUtils_fetch_as_sexp(Trace_ptr trace, TraceIter step,
   \sa TraceUtils_fetch_as_sexp
 */
 Expr_ptr TraceUtils_fetch_as_big_and(Trace_ptr trace, TraceIter step,
-                                     TraceIteratorType iter_type);
+				     TraceIteratorType iter_type);
 
 /*!
   \brief Force the evaluation of the defines of the trace
@@ -222,8 +222,8 @@ void Trace_Eval_evaluate_defines(Trace_ptr trace);
   stored in the tracemgr, that has the ownership
 */
 Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env, SexpFsm_ptr sexp_fsm,
-                              const char *filename, boolean halt_if_undef,
-                              boolean halt_if_wrong_section);
+			      const char *filename, boolean halt_if_undef,
+			      boolean halt_if_wrong_section);
 
 /*!
   \brief Executes traces stored in the Trace Manager
@@ -232,8 +232,8 @@ Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env, SexpFsm_ptr sexp_fsm,
   executed
 */
 int TracePkg_execute_traces(NuSMVEnv_ptr env, TraceMgr_ptr trace_mgr,
-                            FILE *output_stream, char *engine, int verbosity,
-                            int trace_no);
+			    FILE *output_stream, char *engine, int verbosity,
+			    int trace_no);
 
 /*!
   \brief Executes traces stored in the Trace Manager
@@ -242,8 +242,8 @@ int TracePkg_execute_traces(NuSMVEnv_ptr env, TraceMgr_ptr trace_mgr,
   executed
 */
 int TracePkg_execute_partial_traces(NuSMVEnv_ptr env, TraceMgr_ptr trace_mgr,
-                                    FILE *output_stream, char *engine,
-                                    int verbosity, int trace_no);
+				    FILE *output_stream, char *engine,
+				    int verbosity, int trace_no);
 
 /**AutomaticEnd***************************************************************/
 

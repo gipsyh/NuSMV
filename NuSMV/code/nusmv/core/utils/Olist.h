@@ -71,8 +71,9 @@ typedef struct Olist_TAG *Olist_ptr;
 
   \todo Missing description
 */
-#define OLIST_FOREACH(list, iter)                                              \
-  for (iter = Olist_first(list); !Oiter_is_end(iter); iter = Oiter_next(iter))
+#define OLIST_FOREACH(list, iter)                           \
+	for (iter = Olist_first(list); !Oiter_is_end(iter); \
+	     iter = Oiter_next(iter))
 
 /* internal type. it cannot be used outside. */
 
@@ -86,7 +87,7 @@ typedef struct Onode_TAG *Onode_ptr;
 /* here a struct definition is used only to create a new type. Thus
    C type checker will be able to catch incorrect use of iterators */
 typedef struct Oiter_TAG {
-  Onode_ptr *node;
+	Onode_ptr *node;
 } Oiter;
 
 /* ---------------------------------------------------------------------- */
@@ -461,7 +462,7 @@ boolean Olist_remove(Olist_ptr self, const void *element);
   extra is a user parameter that is passed to every invocation of cmp
 */
 void Olist_sort(Olist_ptr self, int (*cmp)(void *el1, void *el2, void *extra),
-                void *extra);
+		void *extra);
 
 /*!
   \methodof Olist

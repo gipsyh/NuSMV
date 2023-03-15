@@ -61,8 +61,8 @@ typedef struct ParserProb_TAG *ParserProb_ptr;
 
   \todo Missing description
 */
-#define PARSER_PROB_CHECK_INSTANCE(x)                                          \
-  (nusmv_assert(PARSER_PROB(x) != PARSER_PROB(NULL)))
+#define PARSER_PROB_CHECK_INSTANCE(x) \
+	(nusmv_assert(PARSER_PROB(x) != PARSER_PROB(NULL)))
 
 /*!
   \methodof ParserProb

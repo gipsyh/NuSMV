@@ -110,8 +110,8 @@ typedef struct PredicateExtractor_TAG *PredicateExtractor_ptr;
 
   \todo Missing description
 */
-#define PREDICATE_EXTRACTOR_CHECK_INSTANCE(x)                                  \
-  (nusmv_assert(PREDICATE_EXTRACTOR(x) != PREDICATE_EXTRACTOR(NULL)))
+#define PREDICATE_EXTRACTOR_CHECK_INSTANCE(x) \
+	(nusmv_assert(PREDICATE_EXTRACTOR(x) != PREDICATE_EXTRACTOR(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -135,7 +135,7 @@ typedef struct PredicateExtractor_TAG *PredicateExtractor_ptr;
    expressions (free or reuse nodes with care).
 */
 PredicateExtractor_ptr PredicateExtractor_create(SymbTable_ptr st,
-                                                 boolean use_approx);
+						 boolean use_approx);
 
 /*!
   \methodof PredicateExtractor
@@ -174,7 +174,7 @@ void PredicateExtractor_destroy(PredicateExtractor_ptr self);
    PredicateExtractor_get_all_clusters.
 */
 void PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
-                                      node_ptr expr);
+				      node_ptr expr);
 
 /*!
   \methodof PredicateExtractor
@@ -185,7 +185,7 @@ void PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
    the hierarchy, i.e. contains all the required symbols
 */
 void PredicateExtractor_compute_preds_from_hierarchy(
-    PredicateExtractor_ptr self, FlatHierarchy_ptr fh);
+	PredicateExtractor_ptr self, FlatHierarchy_ptr fh);
 
 /*!
   \methodof PredicateExtractor
@@ -238,7 +238,7 @@ Set_t PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self);
    data returned by this function invalid.
 */
 Set_t PredicateExtractor_get_var_cluster(const PredicateExtractor_ptr self,
-                                         node_ptr var);
+					 node_ptr var);
 
 /*!
   \methodof PredicateExtractor
@@ -256,7 +256,7 @@ Set_t PredicateExtractor_get_var_cluster(const PredicateExtractor_ptr self,
    PredicateExtractor_get_all_clusters invalid.
 */
 Set_t PredicateExtractor_get_preds_of_a_cluster(
-    const PredicateExtractor_ptr self, Set_t cluster);
+	const PredicateExtractor_ptr self, Set_t cluster);
 
 /*!
   \methodof PredicateExtractor
@@ -278,6 +278,6 @@ Set_t PredicateExtractor_get_preds_of_a_cluster(
 
 */
 void PredicateExtractor_print(const PredicateExtractor_ptr self, FILE *stream,
-                              boolean printPredicates, boolean printClusters);
+			      boolean printPredicates, boolean printClusters);
 
 #endif /* __NUSMV_CORE_COMPILE_PREDICATE_EXTRACTOR_H__ */

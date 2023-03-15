@@ -52,20 +52,20 @@
 */
 
 typedef struct BaseEvaluator_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(Object);
+	/* this MUST stay on the top */
+	INHERITS_FROM(Object);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  SymbTable_ptr st;
-  hash_ptr env;
-  hash_ptr cache;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	SymbTable_ptr st;
+	hash_ptr env;
+	hash_ptr cache;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  Expr_ptr (*resolve)(BaseEvaluator_ptr self, const Expr_ptr const_expr);
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	Expr_ptr (*resolve)(BaseEvaluator_ptr self, const Expr_ptr const_expr);
 
 } BaseEvaluator;
 
@@ -103,6 +103,6 @@ void base_evaluator_deinit(BaseEvaluator_ptr self);
   extra types
 */
 Expr_ptr base_evaluator_resolve(const BaseEvaluator_ptr self,
-                                const Expr_ptr const_expr);
+				const Expr_ptr const_expr);
 
 #endif /* __NUSMV_CORE_TRACE_EVAL_BASE_EVALUATOR_PRIVATE_H__ */

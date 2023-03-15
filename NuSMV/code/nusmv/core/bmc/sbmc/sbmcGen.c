@@ -76,95 +76,106 @@
 /*---------------------------------------------------------------------------*/
 
 be_ptr Bmc_Gen_SBMCProblem(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
-                           const int k, const int l) {
-  Be_Manager_ptr be_mgr = BeEnc_get_be_manager(BeFsm_get_be_encoding(be_fsm));
-  be_ptr res = NULL;
-  be_ptr path_k = Bmc_Model_GetPathWithInit(be_fsm, k);
+			   const int k, const int l)
+{
+	Be_Manager_ptr be_mgr =
+		BeEnc_get_be_manager(BeFsm_get_be_encoding(be_fsm));
+	be_ptr res = NULL;
+	be_ptr path_k = Bmc_Model_GetPathWithInit(be_fsm, k);
 
-  if (Bmc_Utils_IsAllLoopbacks(l)) {
-    /* Generates the problem with all possible loopbacks: */
-    be_ptr tableau_loops = NULL;
+	if (Bmc_Utils_IsAllLoopbacks(l)) {
+		/* Generates the problem with all possible loopbacks: */
+		be_ptr tableau_loops = NULL;
 
-    tableau_loops = Bmc_SBMCTableau_GetAllLoops(be_fsm, ltl_wff, k, l);
-    res = Be_And(be_mgr, path_k, tableau_loops);
-  } else if (Bmc_Utils_IsNoLoopback(l)) {
-    /* Generates the problem with no loopback: */
-    be_ptr tableau = Bmc_SBMCTableau_GetNoLoop(be_fsm, ltl_wff, k);
-    res = Be_And(be_mgr, path_k, tableau);
-  } else {
-    /* one loopback: */
-    be_ptr tableau_loopback = NULL;
+		tableau_loops =
+			Bmc_SBMCTableau_GetAllLoops(be_fsm, ltl_wff, k, l);
+		res = Be_And(be_mgr, path_k, tableau_loops);
+	} else if (Bmc_Utils_IsNoLoopback(l)) {
+		/* Generates the problem with no loopback: */
+		be_ptr tableau = Bmc_SBMCTableau_GetNoLoop(be_fsm, ltl_wff, k);
+		res = Be_And(be_mgr, path_k, tableau);
+	} else {
+		/* one loopback: */
+		be_ptr tableau_loopback = NULL;
 
-    nusmv_assert(Bmc_Utils_IsSingleLoopback(l)); /* no other choices */
+		nusmv_assert(
+			Bmc_Utils_IsSingleLoopback(l)); /* no other choices */
 
-    tableau_loopback = Bmc_SBMCTableau_GetSingleLoop(be_fsm, ltl_wff, k, l);
-    res = Be_And(be_mgr, path_k, tableau_loopback);
-  }
+		tableau_loopback =
+			Bmc_SBMCTableau_GetSingleLoop(be_fsm, ltl_wff, k, l);
+		res = Be_And(be_mgr, path_k, tableau_loopback);
+	}
 
-  return res;
+	return res;
 }
 
 int Sbmc_Gen_check_psl_property(NuSMVEnv_ptr env, Prop_ptr prop,
-                                boolean dump_prob, boolean inc_sat,
-                                boolean do_completeness_check,
-                                boolean do_virtual_unrolling,
-                                boolean is_single_prob, int k, int rel_loop) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+				boolean dump_prob, boolean inc_sat,
+				boolean do_completeness_check,
+				boolean do_virtual_unrolling,
+				boolean is_single_prob, int k, int rel_loop)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  nusmv_assert(prop != PROP(NULL));
-  nusmv_assert(Prop_get_type(prop) == Prop_Psl);
+	nusmv_assert(prop != PROP(NULL));
+	nusmv_assert(Prop_get_type(prop) == Prop_Psl);
 
-  if (!Prop_is_psl_ltl(prop)) {
-    StreamMgr_print_error(streams,
-                          "SBMC can be used only with Psl/ltl properies.\n");
-    return 1;
-  }
+	if (!Prop_is_psl_ltl(prop)) {
+		StreamMgr_print_error(
+			streams,
+			"SBMC can be used only with Psl/ltl properies.\n");
+		return 1;
+	}
 
-  if (inc_sat) {
+	if (inc_sat) {
 #if NUSMV_HAVE_INCREMENTAL_SAT
-    return Bmc_GenSolveLtlInc(env, prop, k, rel_loop, !is_single_prob);
+		return Bmc_GenSolveLtlInc(env, prop, k, rel_loop,
+					  !is_single_prob);
 #else
-    {
-      const ErrorMgr_ptr errmgr =
-          ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-      ErrorMgr_internal_error(errmgr,
-                              "Sbmc_Gen_check_psl_property: Inc SAT Solving "
-                              "requested when not supported.\n");
-    }
+		{
+			const ErrorMgr_ptr errmgr = ERROR_MGR(
+				NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+			ErrorMgr_internal_error(
+				errmgr,
+				"Sbmc_Gen_check_psl_property: Inc SAT Solving "
+				"requested when not supported.\n");
+		}
 #endif
-  }
+	}
 
-  if (is_single_prob && inc_sat) {
-    StreamMgr_print_error(
-        streams,
-        "Error: single problem generation (option -1) with incremental "
-        "solvers is an unsupported feature of SBMC.\n");
-    return 1;
-  }
+	if (is_single_prob && inc_sat) {
+		StreamMgr_print_error(
+			streams,
+			"Error: single problem generation (option -1) with incremental "
+			"solvers is an unsupported feature of SBMC.\n");
+		return 1;
+	}
 
-  if (dump_prob && inc_sat) {
-    StreamMgr_print_error(streams, "Error: problem cannot be dumped when "
-                                   "incremental sat solving is used.\n");
-    return 1;
-  }
+	if (dump_prob && inc_sat) {
+		StreamMgr_print_error(streams,
+				      "Error: problem cannot be dumped when "
+				      "incremental sat solving is used.\n");
+		return 1;
+	}
 
-  if (inc_sat) {
-    if (Sbmc_zigzag_incr(env, prop, k, do_virtual_unrolling,
-                         do_completeness_check) != 0)
-      return 1;
-  } else {
-    if (Bmc_SBMCGenSolveLtl(env, prop, k, rel_loop, !is_single_prob,
-                            BMC_HAS_TO_SOLVE,
-                            (dump_prob) ? BMC_DUMP_DIMACS : BMC_DUMP_NONE,
-                            get_bmc_dimacs_filename(opts)) != 0) {
-      return 1;
-    }
-  }
+	if (inc_sat) {
+		if (Sbmc_zigzag_incr(env, prop, k, do_virtual_unrolling,
+				     do_completeness_check) != 0)
+			return 1;
+	} else {
+		if (Bmc_SBMCGenSolveLtl(env, prop, k, rel_loop, !is_single_prob,
+					BMC_HAS_TO_SOLVE,
+					(dump_prob) ? BMC_DUMP_DIMACS :
+						      BMC_DUMP_NONE,
+					get_bmc_dimacs_filename(opts)) != 0) {
+			return 1;
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
 /*---------------------------------------------------------------------------*/

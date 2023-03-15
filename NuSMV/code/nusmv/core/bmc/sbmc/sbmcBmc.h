@@ -81,8 +81,8 @@
   \sa Bmc_GenSolve_Action
 */
 int Bmc_SBMCGenSolveLtl(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
-                        const int relative_loop, const boolean must_inc_length,
-                        const boolean must_solve, const Bmc_DumpType dump_type,
-                        const char *dump_fname_template);
+			const int relative_loop, const boolean must_inc_length,
+			const boolean must_solve, const Bmc_DumpType dump_type,
+			const char *dump_fname_template);
 
 #endif /* __NUSMV_CORE_BMC_SBMC_SBMC_BMC_H__ */

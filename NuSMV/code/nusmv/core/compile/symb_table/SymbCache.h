@@ -68,8 +68,8 @@ typedef struct SymbCache_TAG *SymbCache_ptr;
 
   \todo Missing description
 */
-#define SYMB_CACHE_CHECK_INSTANCE(x)                                           \
-  (nusmv_assert(SYMB_CACHE(x) != SYMB_CACHE(NULL)))
+#define SYMB_CACHE_CHECK_INSTANCE(x) \
+	(nusmv_assert(SYMB_CACHE(x) != SYMB_CACHE(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Class SymbCache's public methods                                       */
@@ -90,7 +90,7 @@ NuSMVEnv_ptr SymbCache_get_environment(const SymbCache_ptr self);
   "name" must be a variable
 */
 SymbType_ptr SymbCache_get_var_type(const SymbCache_ptr self,
-                                    const node_ptr name);
+				    const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -99,7 +99,7 @@ SymbType_ptr SymbCache_get_var_type(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_define_body(const SymbCache_ptr self,
-                                   const node_ptr name);
+				   const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -108,7 +108,7 @@ node_ptr SymbCache_get_define_body(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_actual_parameter(const SymbCache_ptr self,
-                                        const node_ptr name);
+					const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -117,7 +117,7 @@ node_ptr SymbCache_get_actual_parameter(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_array_define_body(const SymbCache_ptr self,
-                                         const node_ptr name);
+					 const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -126,14 +126,14 @@ node_ptr SymbCache_get_array_define_body(const SymbCache_ptr self,
 
 */
 SymbType_ptr SymbCache_get_variable_array_type(const SymbCache_ptr self,
-                                               const node_ptr name);
+					       const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the type of a function
 */
 SymbType_ptr SymbCache_get_function_type(const SymbCache_ptr self,
-                                         const node_ptr name);
+					 const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -142,7 +142,7 @@ SymbType_ptr SymbCache_get_function_type(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_define_flatten_body(const SymbCache_ptr self,
-                                           const node_ptr name);
+					   const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -152,7 +152,7 @@ node_ptr SymbCache_get_define_flatten_body(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_flatten_actual_parameter(const SymbCache_ptr self,
-                                                const node_ptr name);
+						const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -161,7 +161,7 @@ node_ptr SymbCache_get_flatten_actual_parameter(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_define_context(const SymbCache_ptr self,
-                                      const node_ptr name);
+				      const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -170,7 +170,7 @@ node_ptr SymbCache_get_define_context(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_function_context(const SymbCache_ptr self,
-                                        const node_ptr name);
+					const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -180,7 +180,7 @@ node_ptr SymbCache_get_function_context(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_actual_parameter_context(const SymbCache_ptr self,
-                                                const node_ptr name);
+						const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -189,7 +189,7 @@ node_ptr SymbCache_get_actual_parameter_context(const SymbCache_ptr self,
 
 */
 node_ptr SymbCache_get_array_define_context(const SymbCache_ptr self,
-                                            const node_ptr name);
+					    const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -198,7 +198,7 @@ node_ptr SymbCache_get_array_define_context(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_state_var(const SymbCache_ptr self,
-                                      const node_ptr name);
+				      const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -208,7 +208,7 @@ boolean SymbCache_is_symbol_state_var(const SymbCache_ptr self,
   change its value during transitions.
 */
 boolean SymbCache_is_symbol_frozen_var(const SymbCache_ptr self,
-                                       const node_ptr name);
+				       const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -218,7 +218,7 @@ boolean SymbCache_is_symbol_frozen_var(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_state_frozen_var(const SymbCache_ptr self,
-                                             const node_ptr name);
+					     const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -228,7 +228,7 @@ boolean SymbCache_is_symbol_state_frozen_var(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_input_var(const SymbCache_ptr self,
-                                      const node_ptr name);
+				      const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -246,7 +246,7 @@ boolean SymbCache_is_symbol_var(const SymbCache_ptr self, const node_ptr name);
 
 */
 boolean SymbCache_is_symbol_declared(const SymbCache_ptr self,
-                                     const node_ptr name);
+				     const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -256,7 +256,7 @@ boolean SymbCache_is_symbol_declared(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_define(const SymbCache_ptr self,
-                                   const node_ptr name);
+				   const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -266,7 +266,7 @@ boolean SymbCache_is_symbol_define(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_function(const SymbCache_ptr self,
-                                     const node_ptr name);
+				     const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -276,7 +276,7 @@ boolean SymbCache_is_symbol_function(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_parameter(const SymbCache_ptr self,
-                                      const node_ptr name);
+				      const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -286,7 +286,7 @@ boolean SymbCache_is_symbol_parameter(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_array_define(const SymbCache_ptr self,
-                                         const node_ptr name);
+					 const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -296,7 +296,7 @@ boolean SymbCache_is_symbol_array_define(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_variable_array(const SymbCache_ptr self,
-                                           const node_ptr name);
+					   const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -306,7 +306,7 @@ boolean SymbCache_is_symbol_variable_array(const SymbCache_ptr self,
 
 */
 boolean SymbCache_is_symbol_constant(const SymbCache_ptr self,
-                                     const node_ptr name);
+				     const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -317,7 +317,7 @@ boolean SymbCache_is_symbol_constant(const SymbCache_ptr self,
   variable is found
 */
 boolean SymbCache_list_contains_input_var(const SymbCache_ptr self,
-                                          const NodeList_ptr var_list);
+					  const NodeList_ptr var_list);
 
 /*!
   \methodof SymbCache
@@ -328,7 +328,7 @@ boolean SymbCache_list_contains_input_var(const SymbCache_ptr self,
   a state or frozen variable is found
 */
 boolean SymbCache_list_contains_state_frozen_var(const SymbCache_ptr self,
-                                                 const NodeList_ptr var_list);
+						 const NodeList_ptr var_list);
 
 /*!
   \methodof SymbCache
@@ -339,6 +339,6 @@ boolean SymbCache_list_contains_state_frozen_var(const SymbCache_ptr self,
   checking each one to see if it is one undeclared variable.
 */
 boolean SymbCache_list_contains_undef_var(const SymbCache_ptr self,
-                                          const NodeList_ptr var_list);
+					  const NodeList_ptr var_list);
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_CACHE_H__ */

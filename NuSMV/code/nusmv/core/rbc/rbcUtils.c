@@ -54,8 +54,8 @@
 */
 
 typedef struct DepDfsData_TAG {
-  Rbc_Manager_t *mgr;
-  Slist_ptr list;
+	Rbc_Manager_t *mgr;
+	Slist_ptr list;
 } DepDfsData;
 
 /*---------------------------------------------------------------------------*/
@@ -84,49 +84,56 @@ static void rbc_dep_last(Rbc_t *f, char *_data, nusmv_ptrint sign);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Rbc_pkg_init() {}
+void Rbc_pkg_init()
+{
+}
 
-void Rbc_pkg_quit() {}
+void Rbc_pkg_quit()
+{
+}
 
 Slist_ptr RbcUtils_get_dependencies(Rbc_Manager_t *rbcManager, Rbc_t *f,
-                                    boolean reset_dag) {
-  Dag_DfsFunctions_t funcs;
-  DepDfsData data;
+				    boolean reset_dag)
+{
+	Dag_DfsFunctions_t funcs;
+	DepDfsData data;
 
-  /* lazy evaluation */
-  if ((f == rbcManager->one) || (f == rbcManager->zero)) {
-    return Slist_create();
-  }
+	/* lazy evaluation */
+	if ((f == rbcManager->one) || (f == rbcManager->zero)) {
+		return Slist_create();
+	}
 
-  /* clears the user fields. */
-  if (reset_dag) {
-    Dag_Dfs(f, Rbc_ManagerGetDfsCleanFun(rbcManager), (char *)NULL);
-  }
+	/* clears the user fields. */
+	if (reset_dag) {
+		Dag_Dfs(f, Rbc_ManagerGetDfsCleanFun(rbcManager), (char *)NULL);
+	}
 
-  /* sets up the DFS functions */
-  funcs.Set = (PF_IVPCPI)rbc_dep_set;
-  funcs.FirstVisit = (PF_VPVPCPI)rbc_dep_first;
-  funcs.BackVisit = (PF_VPVPCPI)rbc_dep_back;
-  funcs.LastVisit = (PF_VPVPCPI)rbc_dep_last;
+	/* sets up the DFS functions */
+	funcs.Set = (PF_IVPCPI)rbc_dep_set;
+	funcs.FirstVisit = (PF_VPVPCPI)rbc_dep_first;
+	funcs.BackVisit = (PF_VPVPCPI)rbc_dep_back;
+	funcs.LastVisit = (PF_VPVPCPI)rbc_dep_last;
 
-  /* sets up the DFS data */
-  data.mgr = rbcManager;
-  data.list = Slist_create();
+	/* sets up the DFS data */
+	data.mgr = rbcManager;
+	data.list = Slist_create();
 
-  /* Calling DFS on f. */
-  Dag_Dfs(f, &funcs, (char *)(&data));
+	/* Calling DFS on f. */
+	Dag_Dfs(f, &funcs, (char *)(&data));
 
-  /* processes result */
-  return data.list;
+	/* processes result */
+	return data.list;
 }
 
 void Rbc_Dfs_exported(Rbc_t *rbc, RbcDfsFunctions_t *dfsFun, void *dfsData,
-                      Rbc_Manager_t *rbc_manager) {
-  Dag_Dfs((Dag_Vertex_t *)rbc, dfsFun, (char *)dfsData);
+		      Rbc_Manager_t *rbc_manager)
+{
+	Dag_Dfs((Dag_Vertex_t *)rbc, dfsFun, (char *)dfsData);
 }
 
-void Rbc_Dfs_clean_exported(Rbc_t *rbc, Rbc_Manager_t *rbc_manager) {
-  Dag_Dfs(rbc, Rbc_ManagerGetDfsCleanFun(rbc_manager), (char *)NULL);
+void Rbc_Dfs_clean_exported(Rbc_t *rbc, Rbc_Manager_t *rbc_manager)
+{
+	Dag_Dfs(rbc, Rbc_ManagerGetDfsCleanFun(rbc_manager), (char *)NULL);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -145,9 +152,16 @@ void Rbc_Dfs_clean_exported(Rbc_t *rbc, Rbc_Manager_t *rbc_manager) {
   \se None
 */
 
-static int rbc_dep_set(Rbc_t *f, char *_data, nusmv_ptrint sign) { return 0; }
-static void rbc_dep_first(Rbc_t *f, char *_data, nusmv_ptrint sign) {}
-static void rbc_dep_back(Rbc_t *f, char *_data, nusmv_ptrint sign) {}
+static int rbc_dep_set(Rbc_t *f, char *_data, nusmv_ptrint sign)
+{
+	return 0;
+}
+static void rbc_dep_first(Rbc_t *f, char *_data, nusmv_ptrint sign)
+{
+}
+static void rbc_dep_back(Rbc_t *f, char *_data, nusmv_ptrint sign)
+{
+}
 
 /*!
   \brief
@@ -157,10 +171,11 @@ static void rbc_dep_back(Rbc_t *f, char *_data, nusmv_ptrint sign) {}
   \se None
 */
 
-static void rbc_dep_last(Rbc_t *f, char *_data, nusmv_ptrint sign) {
-  DepDfsData *data = (DepDfsData *)_data;
+static void rbc_dep_last(Rbc_t *f, char *_data, nusmv_ptrint sign)
+{
+	DepDfsData *data = (DepDfsData *)_data;
 
-  if (f->symbol == RBCVAR) {
-    Slist_push(data->list, (void *)f);
-  }
+	if (f->symbol == RBCVAR) {
+		Slist_push(data->list, (void *)f);
+	}
 }

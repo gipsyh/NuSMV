@@ -53,24 +53,24 @@
 */
 
 typedef struct PartialTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(BaseTraceExecutor);
+	/* this MUST stay on the top */
+	INHERITS_FROM(BaseTraceExecutor);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
-  /* executes the given trace, returns a complete trace complete on
+	/* executes the given trace, returns a complete trace complete on
    given language iff trace was succesfully completed. The number of
    performed steps is stored in *n_steps, if non-NULL (-1 if no
    initial feasible state exists) */
-  VIRTUAL Trace_ptr (*execute)(const PartialTraceExecutor_ptr self,
-                               const Trace_ptr trace, NodeList_ptr language,
-                               int *n_steps);
+	VIRTUAL Trace_ptr (*execute)(const PartialTraceExecutor_ptr self,
+				     const Trace_ptr trace,
+				     NodeList_ptr language, int *n_steps);
 
 } PartialTraceExecutor;
 
@@ -87,7 +87,7 @@ typedef struct PartialTraceExecutor_TAG {
   \sa PartialTraceExecutor_create
 */
 void partial_trace_executor_init(PartialTraceExecutor_ptr self,
-                                 const NuSMVEnv_ptr env);
+				 const NuSMVEnv_ptr env);
 
 /*!
   \methodof PartialTraceExecutor
@@ -112,8 +112,8 @@ void partial_trace_executor_deinit(PartialTraceExecutor_ptr self);
 */
 boolean
 partial_trace_executor_check_loopbacks(const PartialTraceExecutor_ptr self,
-                                       const Trace_ptr orig_trace,
-                                       const Trace_ptr complete_trace);
+				       const Trace_ptr orig_trace,
+				       const Trace_ptr complete_trace);
 
 /*!
   \methodof PartialTraceExecutor
@@ -125,7 +125,7 @@ partial_trace_executor_check_loopbacks(const PartialTraceExecutor_ptr self,
 */
 boolean
 partial_trace_executor_is_complete_state(const PartialTraceExecutor_ptr self,
-                                         const Trace_ptr trace,
-                                         const TraceIter step);
+					 const Trace_ptr trace,
+					 const TraceIter step);
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_PARTIAL_TRACE_EXECUTOR_PRIVATE_H__ */

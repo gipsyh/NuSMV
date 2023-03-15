@@ -60,38 +60,43 @@ static void trace_loader_finalize(Object_ptr object, void *dummy);
 /*---------------------------------------------------------------------------*/
 
 Trace_ptr TraceLoader_load_trace(TraceLoader_ptr self, const SymbTable_ptr st,
-                                 const NodeList_ptr symbols) {
-  TRACE_LOADER_CHECK_INSTANCE(self);
+				 const NodeList_ptr symbols)
+{
+	TRACE_LOADER_CHECK_INSTANCE(self);
 
-  return self->load(self, st, symbols);
+	return self->load(self, st, symbols);
 }
 
-char *TraceLoader_get_desc(const TraceLoader_ptr self) {
-  TRACE_LOADER_CHECK_INSTANCE(self);
+char *TraceLoader_get_desc(const TraceLoader_ptr self)
+{
+	TRACE_LOADER_CHECK_INSTANCE(self);
 
-  return self->desc;
+	return self->desc;
 }
 
 Trace_ptr trace_loader_load(TraceLoader_ptr self, const SymbTable_ptr st,
-                            const NodeList_ptr symbols) {
-  error_unreachable_code(); /* Pure Virtual Member Function */
-  return 0;
+			    const NodeList_ptr symbols)
+{
+	error_unreachable_code(); /* Pure Virtual Member Function */
+	return 0;
 }
 
-void trace_loader_init(TraceLoader_ptr self, char *desc) {
-  object_init(OBJECT(self));
+void trace_loader_init(TraceLoader_ptr self, char *desc)
+{
+	object_init(OBJECT(self));
 
-  OVERRIDE(Object, finalize) = trace_loader_finalize;
-  OVERRIDE(TraceLoader, load) = trace_loader_load;
+	OVERRIDE(Object, finalize) = trace_loader_finalize;
+	OVERRIDE(TraceLoader, load) = trace_loader_load;
 
-  self->desc = ALLOC(char, strlen(desc) + 1);
-  nusmv_assert(self->desc != (char *)NULL);
-  strncpy(self->desc, desc, strlen(desc) + 1);
+	self->desc = ALLOC(char, strlen(desc) + 1);
+	nusmv_assert(self->desc != (char *)NULL);
+	strncpy(self->desc, desc, strlen(desc) + 1);
 }
 
-void trace_loader_deinit(TraceLoader_ptr self) {
-  FREE(self->desc);
-  object_deinit(OBJECT(self));
+void trace_loader_deinit(TraceLoader_ptr self)
+{
+	FREE(self->desc);
+	object_deinit(OBJECT(self));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -103,9 +108,10 @@ void trace_loader_deinit(TraceLoader_ptr self) {
 
   Pure virtual function. This must be refined by derived classes.
 */
-static void trace_loader_finalize(Object_ptr object, void *dummy) {
-  TraceLoader_ptr self = TRACE_LOADER(object);
+static void trace_loader_finalize(Object_ptr object, void *dummy)
+{
+	TraceLoader_ptr self = TRACE_LOADER(object);
 
-  trace_loader_deinit(self);
-  error_unreachable_code();
+	trace_loader_deinit(self);
+	error_unreachable_code();
 }

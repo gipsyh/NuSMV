@@ -55,11 +55,11 @@
 */
 
 /* WARNING [MD] This macro should take self as parameter */
-#define _THROW(exp, ctx)                                                       \
-  (NodeWalker_can_handle(NODE_WALKER(self), exp)                               \
-       ? CHECKER_BASE(self)->check_expr(self, exp, ctx)                        \
-       : type_checker_check_expression(                                        \
-             TYPE_CHECKER(NODE_WALKER(self)->master), exp, ctx))
+#define _THROW(exp, ctx)                                          \
+	(NodeWalker_can_handle(NODE_WALKER(self), exp) ?          \
+		 CHECKER_BASE(self)->check_expr(self, exp, ctx) : \
+		 type_checker_check_expression(                   \
+			 TYPE_CHECKER(NODE_WALKER(self)->master), exp, ctx))
 
 /*!
   \brief CheckerBase class definition derived from
@@ -71,18 +71,19 @@
 */
 
 typedef struct CheckerBase_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  TypeCheckingViolationHandler_ptr viol_handler;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	TypeCheckingViolationHandler_ptr viol_handler;
 
-  SymbType_ptr (*check_expr)(CheckerBase_ptr self, node_ptr exp, node_ptr ctx);
+	SymbType_ptr (*check_expr)(CheckerBase_ptr self, node_ptr exp,
+				   node_ptr ctx);
 
 } CheckerBase;
 
@@ -105,7 +106,7 @@ typedef struct CheckerBase_TAG {
   \sa NodeWalker_destroy
 */
 CheckerBase_ptr CheckerBase_create(const NuSMVEnv_ptr env, const char *name,
-                                   int low, size_t num);
+				   int low, size_t num);
 
 /*!
   \methodof CheckerBase
@@ -116,7 +117,7 @@ CheckerBase_ptr CheckerBase_create(const NuSMVEnv_ptr env, const char *name,
   \sa CheckerBase_create
 */
 void checker_base_init(CheckerBase_ptr self, const NuSMVEnv_ptr env,
-                       const char *name, int low, size_t num);
+		       const char *name, int low, size_t num);
 
 /*!
   \methodof CheckerBase
@@ -138,8 +139,8 @@ void checker_base_deinit(CheckerBase_ptr self);
   readability (at least as main tentative idea)
 */
 VIRTUAL boolean checker_base_manage_violation(CheckerBase_ptr self,
-                                              TypeSystemViolation violation,
-                                              node_ptr expression);
+					      TypeSystemViolation violation,
+					      node_ptr expression);
 
 /*!
   \methodof CheckerBase
@@ -148,7 +149,7 @@ VIRTUAL boolean checker_base_manage_violation(CheckerBase_ptr self,
   \todo Missing description
 */
 void checker_base_print_type(CheckerBase_ptr self, FILE *output_stream,
-                             node_ptr expression, node_ptr context);
+			     node_ptr expression, node_ptr context);
 
 #endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_PRIVATE_H__ \
         */

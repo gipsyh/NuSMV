@@ -161,8 +161,8 @@
 /* typedef void  (*Dag_ProcPtr_t)(); */ /* Procedures. */
 /* typedef int   (*Dag_IntPtr_t)();  */ /* Functions returning int. */
 
-typedef struct DagManager Dag_Manager_t;            /* The dag manager. */
-typedef struct Dag_Vertex Dag_Vertex_t;             /* The vertices. */
+typedef struct DagManager Dag_Manager_t; /* The dag manager. */
+typedef struct Dag_Vertex Dag_Vertex_t; /* The vertices. */
 typedef struct Dag_DfsFunctions Dag_DfsFunctions_t; /* Depth First Search. */
 
 /*!
@@ -214,19 +214,19 @@ typedef void (*PF_VPCP)(char *);
 */
 
 struct Dag_Vertex {
-  int symbol;
-  char *data;
+	int symbol;
+	char *data;
 
-  Dag_Vertex_t **outList;
-  unsigned numSons;
+	Dag_Vertex_t **outList;
+	unsigned numSons;
 
-  Dag_Manager_t *dag;
-  int mark;
-  int visit;
-  lsHandle vHandle;
+	Dag_Manager_t *dag;
+	int mark;
+	int visit;
+	lsHandle vHandle;
 
-  char *gRef;
-  int iRef;
+	char *gRef;
+	int iRef;
 };
 
 /*!
@@ -260,10 +260,10 @@ struct Dag_Vertex {
 /* }; */
 
 struct Dag_DfsFunctions {
-  PF_IVPCPI Set;
-  PF_VPVPCPI FirstVisit;
-  PF_VPVPCPI BackVisit;
-  PF_VPVPCPI LastVisit;
+	PF_IVPCPI Set;
+	PF_VPVPCPI FirstVisit;
+	PF_VPVPCPI BackVisit;
+	PF_VPVPCPI LastVisit;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -282,8 +282,8 @@ struct Dag_DfsFunctions {
 
   \se none
 */
-#define Dag_VertexGetRef(p)                                                    \
-  ((Dag_Vertex_t *)((nusmv_ptrint)p & (~DAG_ANNOTATION_BIT)))
+#define Dag_VertexGetRef(p) \
+	((Dag_Vertex_t *)((nusmv_ptrint)p & (~DAG_ANNOTATION_BIT)))
 
 /*!
   \brief Sets (forces) a bit annotation to 1.
@@ -293,8 +293,8 @@ struct Dag_DfsFunctions {
 
   \se The value of p changes to the purified value.
 */
-#define Dag_VertexSet(p)                                                       \
-  (p = (Dag_Vertex_t *)((nusmv_ptrint)p | DAG_ANNOTATION_BIT))
+#define Dag_VertexSet(p) \
+	(p = (Dag_Vertex_t *)((nusmv_ptrint)p | DAG_ANNOTATION_BIT))
 
 /*!
   \brief Clears (forces) a bit annotation to 0.
@@ -304,8 +304,8 @@ struct Dag_DfsFunctions {
 
   \se The value of p changes to the purified value.
 */
-#define Dag_VertexClear(p)                                                     \
-  (p = (Dag_Vertex_t *)((nusmv_ptrint)p & (~DAG_ANNOTATION_BIT)))
+#define Dag_VertexClear(p) \
+	(p = (Dag_Vertex_t *)((nusmv_ptrint)p & (~DAG_ANNOTATION_BIT)))
 
 /*!
   \brief Tests if the edge is annotated.
@@ -363,7 +363,7 @@ Dag_Manager_t *Dag_ManagerAlloc(void);
   \todo Missing description
 */
 Dag_Manager_t *Dag_ManagerAllocWithParams(int dagInitVerticesNo, int maxDensity,
-                                          int growthFactor);
+					  int growthFactor);
 
 /*!
   \brief Deallocates a DAG manager.
@@ -379,7 +379,7 @@ Dag_Manager_t *Dag_ManagerAllocWithParams(int dagInitVerticesNo, int maxDensity,
   \sa Dag_ManagerGC
 */
 void Dag_ManagerFree(Dag_Manager_t *dagManager, PF_VPCP freeData,
-                     PF_VPCP freeGen);
+		     PF_VPCP freeGen);
 
 /*!
   \brief Garbage collects the DAG manager.
@@ -400,7 +400,7 @@ void Dag_ManagerFree(Dag_Manager_t *dagManager, PF_VPCP freeData,
   \sa Dag_ManagerFree
 */
 void Dag_ManagerGC(Dag_Manager_t *dagManager, PF_VPCP freeData,
-                   PF_VPCP freeGen);
+		   PF_VPCP freeGen);
 
 Dag_DfsFunctions_t *Dag_ManagerGetDfsCleanFun(Dag_Manager_t *dagManager);
 
@@ -439,8 +439,8 @@ void Dag_PrintStats(Dag_Manager_t *dagManager, int clustSz, FILE *outFile);
   \se none
 */
 Dag_Vertex_t *Dag_VertexLookup(Dag_Manager_t *dagManager, int vSymb,
-                               char *vData, Dag_Vertex_t **vSons,
-                               unsigned numSons);
+			       char *vData, Dag_Vertex_t **vSons,
+			       unsigned numSons);
 
 /*!
   \brief Vertex insert.
@@ -458,8 +458,8 @@ Dag_Vertex_t *Dag_VertexLookup(Dag_Manager_t *dagManager, int vSymb,
   \se none
 */
 Dag_Vertex_t *Dag_VertexInsert(Dag_Manager_t *dagManager, int vSymb,
-                               char *vData, Dag_Vertex_t **vSons,
-                               unsigned numSons);
+			       char *vData, Dag_Vertex_t **vSons,
+			       unsigned numSons);
 
 /*!
   \brief Marks a vertex as permanent.

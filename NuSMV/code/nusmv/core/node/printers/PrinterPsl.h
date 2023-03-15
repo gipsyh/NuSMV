@@ -61,8 +61,8 @@ typedef struct PrinterPsl_TAG *PrinterPsl_ptr;
 
   \todo Missing description
 */
-#define PRINTER_PSL_CHECK_INSTANCE(self)                                       \
-  (nusmv_assert(PRINTER_PSL(self) != PRINTER_PSL(NULL)))
+#define PRINTER_PSL_CHECK_INSTANCE(self) \
+	(nusmv_assert(PRINTER_PSL(self) != PRINTER_PSL(NULL)))
 
 /**AutomaticStart*************************************************************/
 

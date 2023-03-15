@@ -75,8 +75,8 @@ typedef struct TraceExplainer_TAG *TraceExplainer_ptr;
 
   \todo Missing description
 */
-#define TRACE_EXPLAINER_CHECK_INSTANCE(x)                                      \
-  (nusmv_assert(TRACE_EXPLAINER(x) != TRACE_EXPLAINER(NULL)))
+#define TRACE_EXPLAINER_CHECK_INSTANCE(x) \
+	(nusmv_assert(TRACE_EXPLAINER(x) != TRACE_EXPLAINER(NULL)))
 
 /**AutomaticStart*************************************************************/
 

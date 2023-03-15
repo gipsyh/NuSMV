@@ -72,8 +72,8 @@ typedef struct SimulateTransSet_TAG *SimulateTransSet_ptr;
 
   \todo Missing description
 */
-#define SIMULATE_TRANS_SET_CHECK_INSTANCE(x)                                   \
-  (nusmv_assert(SIMULATE_TRANS_SET(x) != SIMULATE_TRANS_SET(NULL)))
+#define SIMULATE_TRANS_SET_CHECK_INSTANCE(x) \
+	(nusmv_assert(SIMULATE_TRANS_SET(x) != SIMULATE_TRANS_SET(NULL)))
 
 /*--------------------------------------------------------------------------*/
 /* Methods prototypes                                                       */
@@ -87,9 +87,9 @@ typedef struct SimulateTransSet_TAG *SimulateTransSet_ptr;
   must be queried. next_states_count is checked to be in (1,INT_MAX)
 */
 SimulateTransSet_ptr SimulateTransSet_create(BddFsm_ptr fsm, BddEnc_ptr enc,
-                                             bdd_ptr from_state,
-                                             bdd_ptr next_states_set,
-                                             double next_states_count);
+					     bdd_ptr from_state,
+					     bdd_ptr next_states_set,
+					     double next_states_count);
 
 /*!
   \methodof SimulateTransSet
@@ -123,7 +123,7 @@ int SimulateTransSet_get_next_state_num(const SimulateTransSet_ptr self);
   Returned BDD is referenced
 */
 bdd_ptr SimulateTransSet_get_next_state(const SimulateTransSet_ptr self,
-                                        int state_index);
+					int state_index);
 
 /*!
   \methodof SimulateTransSet
@@ -134,7 +134,7 @@ bdd_ptr SimulateTransSet_get_next_state(const SimulateTransSet_ptr self,
   if self represent the initial states set
 */
 int SimulateTransSet_get_inputs_num_at_state(const SimulateTransSet_ptr self,
-                                             int state_index);
+					     int state_index);
 
 /*!
   \methodof SimulateTransSet
@@ -144,7 +144,7 @@ int SimulateTransSet_get_inputs_num_at_state(const SimulateTransSet_ptr self,
 
 */
 bdd_ptr SimulateTransSet_get_input_at_state(const SimulateTransSet_ptr self,
-                                            int state_index, int input_index);
+					    int state_index, int input_index);
 
 /*!
   \methodof SimulateTransSet
@@ -154,7 +154,7 @@ bdd_ptr SimulateTransSet_get_input_at_state(const SimulateTransSet_ptr self,
   user in interactive mode
 */
 int SimulateTransSet_print(const SimulateTransSet_ptr self,
-                           boolean show_changes_only, OStream_ptr output);
+			   boolean show_changes_only, OStream_ptr output);
 
 /*!
   \methodof SimulateTransSet
@@ -166,8 +166,8 @@ int SimulateTransSet_print(const SimulateTransSet_ptr self,
   state-input pair, but input might be NULL for the initial state
 */
 void SimulateTransSet_get_state_input_at(const SimulateTransSet_ptr self,
-                                         int index, bdd_ptr *state,
-                                         bdd_ptr *input);
+					 int index, bdd_ptr *state,
+					 bdd_ptr *input);
 
 /*!
   \methodof SimulateTransSet
@@ -176,7 +176,7 @@ void SimulateTransSet_get_state_input_at(const SimulateTransSet_ptr self,
 
 */
 void SimulateTransSet_get_state_input_rand(const SimulateTransSet_ptr self,
-                                           bdd_ptr *state, bdd_ptr *input);
+					   bdd_ptr *state, bdd_ptr *input);
 
 /*!
   \methodof SimulateTransSet
@@ -185,6 +185,6 @@ void SimulateTransSet_get_state_input_rand(const SimulateTransSet_ptr self,
 
 */
 void SimulateTransSet_get_state_input_det(const SimulateTransSet_ptr self,
-                                          bdd_ptr *state, bdd_ptr *input);
+					  bdd_ptr *state, bdd_ptr *input);
 
 #endif /* __NUSMV_CORE_SIMULATE_SIMULATE_TRANS_SET_H__ */

@@ -116,56 +116,56 @@ typedef void (*Prop_verify_method)(Prop_ptr);
 typedef Prop_ptr (*Prop_convert_to_invar_method)(Prop_ptr);
 
 typedef void (*Prop_set_environment_fsms_method)(const NuSMVEnv_ptr env,
-                                                 Prop_ptr);
+						 Prop_ptr);
 
 /* The class itself. */
 typedef struct Prop_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  unsigned int index; /* Progressive number */
-  Expr_ptr prop;      /* property formula (s-expression) */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	unsigned int index; /* Progressive number */
+	Expr_ptr prop; /* property formula (s-expression) */
 
-  /* AM -> Support for property name */
-  node_ptr name;
+	/* AM -> Support for property name */
+	node_ptr name;
 
-  Set_t cone;         /* The cone of influence */
-  Prop_Type type;     /* type of specification */
-  Prop_Status status; /* verification status */
-  int number;         /* The result of a quantitative spec */
-  int trace;          /* the counterexample number (if any) */
+	Set_t cone; /* The cone of influence */
+	Prop_Type type; /* type of specification */
+	Prop_Status status; /* verification status */
+	int number; /* The result of a quantitative spec */
+	int trace; /* the counterexample number (if any) */
 
-  FsmBuilder_ptr fsm_mgr; /* Used to produce FSMs from cone */
+	FsmBuilder_ptr fsm_mgr; /* Used to produce FSMs from cone */
 
-  SexpFsm_ptr scalar_fsm;   /* the scalar FSM */
-  BoolSexpFsm_ptr bool_fsm; /* The scalar FSM converted in Boolean */
-  BddFsm_ptr bdd_fsm;       /* The BDD FSM */
-  BeFsm_ptr be_fsm;         /* The BE FSM */
+	SexpFsm_ptr scalar_fsm; /* the scalar FSM */
+	BoolSexpFsm_ptr bool_fsm; /* The scalar FSM converted in Boolean */
+	BddFsm_ptr bdd_fsm; /* The BDD FSM */
+	BeFsm_ptr be_fsm; /* The BE FSM */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  /* Expr_ptr (*)(const Prop_ptr) */
-  Prop_get_expr_method get_expr;
-  /* const char* (*)(const Prop_ptr) */
-  Prop_get_type_as_string_method get_type_as_string;
-  /* void (*)(const Prop_ptr, FILE*) */
-  Prop_print_method print;
-  /* void (*)(const Prop_ptr, FILE*) */
-  Prop_print_method print_truncated;
-  /* void (*)(const Prop_ptr, FILE*) */
-  Prop_print_db_method print_db_tabular;
-  /* void (*)(const Prop_ptr, FILE*) */
-  Prop_print_db_method print_db_xml;
-  /* void (*)(Prop_ptr) */
-  Prop_verify_method verify;
-  Prop_convert_to_invar_method convert_to_invar;
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	/* Expr_ptr (*)(const Prop_ptr) */
+	Prop_get_expr_method get_expr;
+	/* const char* (*)(const Prop_ptr) */
+	Prop_get_type_as_string_method get_type_as_string;
+	/* void (*)(const Prop_ptr, FILE*) */
+	Prop_print_method print;
+	/* void (*)(const Prop_ptr, FILE*) */
+	Prop_print_method print_truncated;
+	/* void (*)(const Prop_ptr, FILE*) */
+	Prop_print_db_method print_db_tabular;
+	/* void (*)(const Prop_ptr, FILE*) */
+	Prop_print_db_method print_db_xml;
+	/* void (*)(Prop_ptr) */
+	Prop_verify_method verify;
+	Prop_convert_to_invar_method convert_to_invar;
 
-  /* void (*)(const NuSMVEnv_ptr env, Prop_ptr) */
-  Prop_set_environment_fsms_method set_environment_fsms;
+	/* void (*)(const NuSMVEnv_ptr env, Prop_ptr) */
+	Prop_set_environment_fsms_method set_environment_fsms;
 
 } Prop;
 
@@ -237,13 +237,13 @@ void prop_verify(Prop_ptr self);
   \todo
 */
 void prop_set_scalar_sexp_fsm(Prop_ptr self, SexpFsm_ptr fsm,
-                              const boolean duplicate);
+			      const boolean duplicate);
 /*!
   \methodof Prop
   \todo
 */
 void prop_set_bool_sexp_fsm(Prop_ptr self, BoolSexpFsm_ptr fsm,
-                            const boolean duplicate);
+			    const boolean duplicate);
 /*!
   \methodof Prop
   \todo

@@ -65,8 +65,8 @@ typedef struct WordNumberMgr_TAG *WordNumberMgr_ptr;
 
   \todo Missing description
 */
-#define WORD_NUMBER_MGR_CHECK_INSTANCE(self)                                   \
-  (nusmv_assert(WORD_NUMBER_MGR(self) != WORD_NUMBER_MGR(NULL)))
+#define WORD_NUMBER_MGR_CHECK_INSTANCE(self) \
+	(nusmv_assert(WORD_NUMBER_MGR(self) != WORD_NUMBER_MGR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -110,7 +110,7 @@ int WordNumberMgr_max_width(void);
 
 */
 WordNumber_ptr WordNumberMgr_max_unsigned_value(WordNumberMgr_ptr self,
-                                                int width);
+						int width);
 
 /*!
   \methodof WordNumberMgr
@@ -120,7 +120,7 @@ WordNumber_ptr WordNumberMgr_max_unsigned_value(WordNumberMgr_ptr self,
 
 */
 WordNumber_ptr WordNumberMgr_max_signed_value(WordNumberMgr_ptr self,
-                                              int width);
+					      int width);
 
 /*!
   \methodof WordNumberMgr
@@ -130,7 +130,7 @@ WordNumber_ptr WordNumberMgr_max_signed_value(WordNumberMgr_ptr self,
 
 */
 WordNumber_ptr WordNumberMgr_min_signed_value(WordNumberMgr_ptr self,
-                                              int width);
+					      int width);
 
 /*!
   \methodof WordNumberMgr
@@ -149,7 +149,7 @@ WordNumber_ptr WordNumberMgr_min_signed_value(WordNumberMgr_ptr self,
   (this is important for node_ptr hashing)
 */
 WordNumber_ptr WordNumberMgr_string_to_word_number(WordNumberMgr_ptr self,
-                                                   char *str, int base);
+						   char *str, int base);
 
 /*!
   \methodof WordNumberMgr
@@ -166,8 +166,8 @@ WordNumber_ptr WordNumberMgr_string_to_word_number(WordNumberMgr_ptr self,
   (this is important for node_ptr hashing)
 */
 WordNumber_ptr WordNumberMgr_sized_string_to_word_number(WordNumberMgr_ptr self,
-                                                         char *str, int base,
-                                                         int width);
+							 char *str, int base,
+							 int width);
 
 /*!
   \methodof WordNumberMgr
@@ -192,7 +192,7 @@ WordNumber_ptr WordNumberMgr_sized_string_to_word_number(WordNumberMgr_ptr self,
 */
 WordNumber_ptr
 WordNumberMgr_parsed_string_to_word_number(WordNumberMgr_ptr self, char *str,
-                                           char **errorString);
+					   char **errorString);
 
 /*!
   \methodof WordNumberMgr
@@ -208,8 +208,8 @@ WordNumberMgr_parsed_string_to_word_number(WordNumberMgr_ptr self, char *str,
   \sa WordNumber_from_signed_integer
 */
 WordNumber_ptr WordNumberMgr_integer_to_word_number(WordNumberMgr_ptr self,
-                                                    WordNumberValue value,
-                                                    int width);
+						    WordNumberValue value,
+						    int width);
 
 /*!
   \methodof WordNumberMgr
@@ -230,7 +230,7 @@ WordNumber_ptr WordNumberMgr_integer_to_word_number(WordNumberMgr_ptr self,
 */
 WordNumber_ptr
 WordNumberMgr_signed_integer_to_word_number(WordNumberMgr_ptr self,
-                                            WordNumberValue value, int width);
+					    WordNumberValue value, int width);
 
 /*!
   \methodof WordNumberMgr
@@ -239,7 +239,7 @@ WordNumberMgr_signed_integer_to_word_number(WordNumberMgr_ptr self,
   \todo Missing description
 */
 WordNumber_ptr WordNumberMgr_normalize_word_number(WordNumberMgr_ptr self,
-                                                   WordNumber_ptr v);
+						   WordNumber_ptr v);
 
 /*!
   \methodof WordNumberMgr
@@ -248,7 +248,7 @@ WordNumber_ptr WordNumberMgr_normalize_word_number(WordNumberMgr_ptr self,
 
 */
 WordNumber_ptr WordNumberMgr_unary_minus(WordNumberMgr_ptr self,
-                                         WordNumber_ptr v);
+					 WordNumber_ptr v);
 
 /*!
   \methodof WordNumberMgr
@@ -257,7 +257,7 @@ WordNumber_ptr WordNumberMgr_unary_minus(WordNumberMgr_ptr self,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_plus(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                  WordNumber_ptr v2);
+				  WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -266,7 +266,7 @@ WordNumber_ptr WordNumberMgr_plus(WordNumberMgr_ptr self, WordNumber_ptr v1,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_minus(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                   WordNumber_ptr v2);
+				   WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -275,7 +275,7 @@ WordNumber_ptr WordNumberMgr_minus(WordNumberMgr_ptr self, WordNumber_ptr v1,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_times(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                   WordNumber_ptr v2);
+				   WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -285,8 +285,8 @@ WordNumber_ptr WordNumberMgr_times(WordNumberMgr_ptr self, WordNumber_ptr v1,
   right operand should not be 0.
 */
 WordNumber_ptr WordNumberMgr_unsigned_divide(WordNumberMgr_ptr self,
-                                             WordNumber_ptr v1,
-                                             WordNumber_ptr v2);
+					     WordNumber_ptr v1,
+					     WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -296,8 +296,8 @@ WordNumber_ptr WordNumberMgr_unsigned_divide(WordNumberMgr_ptr self,
   right operand should not be 0
 */
 WordNumber_ptr WordNumberMgr_signed_divide(WordNumberMgr_ptr self,
-                                           WordNumber_ptr v1,
-                                           WordNumber_ptr v2);
+					   WordNumber_ptr v1,
+					   WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -308,7 +308,7 @@ WordNumber_ptr WordNumberMgr_signed_divide(WordNumberMgr_ptr self,
   Note: numbers are considered as unsigned.
 */
 WordNumber_ptr WordNumberMgr_unsigned_mod(WordNumberMgr_ptr self,
-                                          WordNumber_ptr v1, WordNumber_ptr v2);
+					  WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -318,7 +318,7 @@ WordNumber_ptr WordNumberMgr_unsigned_mod(WordNumberMgr_ptr self,
   operand should not be 0
 */
 WordNumber_ptr WordNumberMgr_signed_mod(WordNumberMgr_ptr self,
-                                        WordNumber_ptr v1, WordNumber_ptr v2);
+					WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -335,7 +335,7 @@ WordNumber_ptr WordNumberMgr_not(WordNumberMgr_ptr self, WordNumber_ptr v);
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_and(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                 WordNumber_ptr v2);
+				 WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -344,7 +344,7 @@ WordNumber_ptr WordNumberMgr_and(WordNumberMgr_ptr self, WordNumber_ptr v1,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_or(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                WordNumber_ptr v2);
+				WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -353,7 +353,7 @@ WordNumber_ptr WordNumberMgr_or(WordNumberMgr_ptr self, WordNumber_ptr v1,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_xor(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                 WordNumber_ptr v2);
+				 WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -362,7 +362,7 @@ WordNumber_ptr WordNumberMgr_xor(WordNumberMgr_ptr self, WordNumber_ptr v1,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_xnor(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                  WordNumber_ptr v2);
+				  WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -371,7 +371,7 @@ WordNumber_ptr WordNumberMgr_xnor(WordNumberMgr_ptr self, WordNumber_ptr v1,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_implies(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                     WordNumber_ptr v2);
+				     WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -380,7 +380,7 @@ WordNumber_ptr WordNumberMgr_implies(WordNumberMgr_ptr self, WordNumber_ptr v1,
   the width of operands should be equal
 */
 WordNumber_ptr WordNumberMgr_iff(WordNumberMgr_ptr self, WordNumber_ptr v1,
-                                 WordNumber_ptr v2);
+				 WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -389,7 +389,7 @@ WordNumber_ptr WordNumberMgr_iff(WordNumberMgr_ptr self, WordNumber_ptr v1,
 
 */
 WordNumber_ptr WordNumberMgr_concatenate(WordNumberMgr_ptr self,
-                                         WordNumber_ptr v1, WordNumber_ptr v2);
+					 WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \methodof WordNumberMgr
@@ -400,8 +400,8 @@ WordNumber_ptr WordNumberMgr_concatenate(WordNumberMgr_ptr self,
   equal to lowBit. lowBit should be greater or equal to 0.
 */
 WordNumber_ptr WordNumberMgr_bit_select(WordNumberMgr_ptr self,
-                                        WordNumber_ptr v, int highBit,
-                                        int lowBit);
+					WordNumber_ptr v, int highBit,
+					int lowBit);
 
 /*!
   \methodof WordNumberMgr
@@ -411,8 +411,8 @@ WordNumber_ptr WordNumberMgr_bit_select(WordNumberMgr_ptr self,
   \[0, width\]. The word is padded with zeros.
 */
 WordNumber_ptr WordNumberMgr_unsigned_right_shift(WordNumberMgr_ptr self,
-                                                  WordNumber_ptr v,
-                                                  int numberOfBits);
+						  WordNumber_ptr v,
+						  int numberOfBits);
 
 /*!
   \methodof WordNumberMgr
@@ -422,8 +422,8 @@ WordNumber_ptr WordNumberMgr_unsigned_right_shift(WordNumberMgr_ptr self,
   \[0, width\]. The word is padded with zeros.
 */
 WordNumber_ptr WordNumberMgr_signed_right_shift(WordNumberMgr_ptr self,
-                                                WordNumber_ptr v,
-                                                int numberOfBits);
+						WordNumber_ptr v,
+						int numberOfBits);
 
 /*!
   \methodof WordNumberMgr
@@ -433,7 +433,7 @@ WordNumber_ptr WordNumberMgr_signed_right_shift(WordNumberMgr_ptr self,
   \[0, width\]. The word is padded with zeros.
 */
 WordNumber_ptr WordNumberMgr_left_shift(WordNumberMgr_ptr self,
-                                        WordNumber_ptr v, int numberOfBits);
+					WordNumber_ptr v, int numberOfBits);
 
 /*!
   \methodof WordNumberMgr
@@ -443,7 +443,7 @@ WordNumber_ptr WordNumberMgr_left_shift(WordNumberMgr_ptr self,
   \[0, width\].
 */
 WordNumber_ptr WordNumberMgr_right_rotate(WordNumberMgr_ptr self,
-                                          WordNumber_ptr v, int numberOfBits);
+					  WordNumber_ptr v, int numberOfBits);
 
 /*!
   \methodof WordNumberMgr
@@ -453,7 +453,7 @@ WordNumber_ptr WordNumberMgr_right_rotate(WordNumberMgr_ptr self,
   \[0, width\].
 */
 WordNumber_ptr WordNumberMgr_left_rotate(WordNumberMgr_ptr self,
-                                         WordNumber_ptr v, int numberOfBits);
+					 WordNumber_ptr v, int numberOfBits);
 
 /*!
   \methodof WordNumberMgr
@@ -463,7 +463,7 @@ WordNumber_ptr WordNumberMgr_left_rotate(WordNumberMgr_ptr self,
 
 */
 WordNumber_ptr WordNumberMgr_signed_extend(WordNumberMgr_ptr self,
-                                           WordNumber_ptr v, int numberOfTimes);
+					   WordNumber_ptr v, int numberOfTimes);
 
 /*!
   \methodof WordNumberMgr
@@ -472,8 +472,8 @@ WordNumber_ptr WordNumberMgr_signed_extend(WordNumberMgr_ptr self,
 
 */
 WordNumber_ptr WordNumberMgr_unsigned_extend(WordNumberMgr_ptr self,
-                                             WordNumber_ptr v,
-                                             int numberOfTimes);
+					     WordNumber_ptr v,
+					     int numberOfTimes);
 
 /**AutomaticEnd***************************************************************/
 

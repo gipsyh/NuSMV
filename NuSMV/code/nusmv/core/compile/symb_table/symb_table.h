@@ -164,7 +164,7 @@ SymbType_ptr SymbTablePkg_signed_word_type(const NuSMVEnv_ptr env, int width);
   subtype. De-initialisation of the package destroys this type.
 */
 SymbType_ptr SymbTablePkg_wordarray_type(const NuSMVEnv_ptr env, int awidth,
-                                         SymbType_ptr subtype);
+					 SymbType_ptr subtype);
 
 /*!
   \brief returns an array type.
@@ -175,7 +175,7 @@ SymbType_ptr SymbTablePkg_wordarray_type(const NuSMVEnv_ptr env, int awidth,
   function.
 */
 SymbType_ptr SymbTablePkg_array_type(SymbType_ptr subtype, int lower_bound,
-                                     int upper_bound);
+				     int upper_bound);
 
 /*!
   \brief returns an unsigned Word type (with a given width)
@@ -185,7 +185,7 @@ SymbType_ptr SymbTablePkg_array_type(SymbType_ptr subtype, int lower_bound,
 
 */
 SymbType_ptr SymbTablePkg_intarray_type(const NuSMVEnv_ptr env,
-                                        SymbType_ptr subtype);
+					SymbType_ptr subtype);
 
 /*!
   \brief returns a boolean-set type.

@@ -69,8 +69,8 @@ typedef struct BoolEnc_TAG *BoolEnc_ptr;
 
   \todo Missing description
 */
-#define BOOL_ENC_CHECK_INSTANCE(self)                                          \
-  (nusmv_assert(BOOL_ENC(self) != BOOL_ENC(NULL)))
+#define BOOL_ENC_CHECK_INSTANCE(self) \
+	(nusmv_assert(BOOL_ENC(self) != BOOL_ENC(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -204,7 +204,7 @@ node_ptr BoolEnc_get_var_encoding(const BoolEnc_ptr self, node_ptr name);
   \sa BoolEnc_get_var_encoding
 */
 node_ptr BoolEnc_get_values_bool_encoding(const BoolEnc_ptr self,
-                                          node_ptr values, Set_t *bits);
+					  node_ptr values, Set_t *bits);
 
 /*!
   \methodof BoolEnc
@@ -214,7 +214,7 @@ node_ptr BoolEnc_get_values_bool_encoding(const BoolEnc_ptr self,
   Returned string should NOT be modified or freed.
 */
 const char *BoolEnc_scalar_layer_to_bool_layer(const BoolEnc_ptr self,
-                                               const char *layer_name);
+					       const char *layer_name);
 
 /*!
   \brief Determines if a layer name corresponds to a bool layer
@@ -239,7 +239,7 @@ boolean BoolEnc_is_bool_layer(const char *layer_name);
   etc. depending on the kind of variable.
 */
 node_ptr BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
-                                         const BitValues_ptr bit_values);
+					 const BitValues_ptr bit_values);
 
 /*!
   \methodof BoolEnc

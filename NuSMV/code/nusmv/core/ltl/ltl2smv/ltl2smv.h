@@ -55,9 +55,9 @@
   \brief
 */
 typedef struct Ltl2SmvPrefixes_TAG {
-  char *pre_prefix;
-  char *prefix_name;
-  char *ltl_module_base_name;
+	char *pre_prefix;
+	char *prefix_name;
+	char *ltl_module_base_name;
 } Ltl2SmvPrefixes;
 
 /*---------------------------------------------------------------------------*/
@@ -139,8 +139,8 @@ node_ptr ltl2smv(NuSMVEnv_ptr env, unsigned int uniqueId, node_ptr in_ltl_expr);
 
 */
 node_ptr ltl2smv_core(NuSMVEnv_ptr env, unsigned int uniqueId,
-                      node_ptr in_ltl_expr, boolean single_justice,
-                      const Ltl2SmvPrefixes *prefixes);
+		      node_ptr in_ltl_expr, boolean single_justice,
+		      const Ltl2SmvPrefixes *prefixes);
 
 /*!
   \brief The routine converting an LTL formula to am SMV Module.
@@ -168,6 +168,6 @@ node_ptr ltl2smv_core(NuSMVEnv_ptr env, unsigned int uniqueId,
 
 */
 node_ptr ltl2smv_single_justice(NuSMVEnv_ptr env, unsigned int uniqueId,
-                                node_ptr in_ltl_expr);
+				node_ptr in_ltl_expr);
 
 #endif /* __NUSMV_CORE_LTL_LTL2SMV_LTL2SMV_H__ */

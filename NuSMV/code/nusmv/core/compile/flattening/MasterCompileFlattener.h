@@ -56,8 +56,8 @@ typedef struct MasterCompileFlattener_TAG *MasterCompileFlattener_ptr;
 */
 
 typedef enum MasterCompileFlattener_def_mode_type_TAG {
-  Flattener_Get_Def_Mode,
-  Flattener_Expand_Def_Mode
+	Flattener_Get_Def_Mode,
+	Flattener_Expand_Def_Mode
 } MasterCompileFlattener_def_mode;
 
 /*!
@@ -73,9 +73,9 @@ typedef enum MasterCompileFlattener_def_mode_type_TAG {
 
   \todo Missing description
 */
-#define MASTER_COMPILE_FLATTENER_CHECK_INSTANCE(self)                          \
-  (nusmv_assert(MASTER_COMPILE_FLATTENER(self) !=                              \
-                MASTER_COMPILE_FLATTENER(NULL)))
+#define MASTER_COMPILE_FLATTENER_CHECK_INSTANCE(self)   \
+	(nusmv_assert(MASTER_COMPILE_FLATTENER(self) != \
+		      MASTER_COMPILE_FLATTENER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -113,8 +113,8 @@ void MasterCompileFlattener_destroy(MasterCompileFlattener_ptr self);
   corresponding body.
 */
 node_ptr MasterCompileFlattener_flatten(MasterCompileFlattener_ptr self,
-                                        SymbTable_ptr symb_table, node_ptr sexp,
-                                        node_ptr context);
+					SymbTable_ptr symb_table, node_ptr sexp,
+					node_ptr context);
 
 /*!
   \methodof MasterCompileFlattener
@@ -126,8 +126,8 @@ node_ptr MasterCompileFlattener_flatten(MasterCompileFlattener_ptr self,
 */
 node_ptr
 MasterCompileFlattener_flatten_expand_define(MasterCompileFlattener_ptr self,
-                                             SymbTable_ptr symb_table,
-                                             node_ptr sexp, node_ptr context);
+					     SymbTable_ptr symb_table,
+					     node_ptr sexp, node_ptr context);
 
 /*!
   \methodof MasterCompileFlattener
@@ -143,8 +143,8 @@ MasterCompileFlattener_flatten_expand_define(MasterCompileFlattener_ptr self,
 */
 node_ptr
 MasterCompileFlattener_get_definition(MasterCompileFlattener_ptr self,
-                                      SymbTable_ptr symb_table, node_ptr sexp,
-                                      MasterCompileFlattener_def_mode mode);
+				      SymbTable_ptr symb_table, node_ptr sexp,
+				      MasterCompileFlattener_def_mode mode);
 
 /*!
   \methodof MasterCompileFlattener
@@ -154,8 +154,8 @@ MasterCompileFlattener_get_definition(MasterCompileFlattener_ptr self,
 
 */
 void MasterCompileFlattener_remove_define_info(MasterCompileFlattener_ptr self,
-                                               SymbTable_ptr symb_table,
-                                               node_ptr name);
+					       SymbTable_ptr symb_table,
+					       node_ptr name);
 
 /**AutomaticEnd***************************************************************/
 

@@ -64,8 +64,8 @@ typedef struct Prop_Rewriter_TAG *Prop_Rewriter_ptr;
 
   \todo Missing description
 */
-#define PROP_REWRITER_CHECK_INSTANCE(self)                                     \
-  (nusmv_assert(PROP_REWRITER(self) != PROP_REWRITER(NULL)))
+#define PROP_REWRITER_CHECK_INSTANCE(self) \
+	(nusmv_assert(PROP_REWRITER(self) != PROP_REWRITER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,9 +86,9 @@ typedef struct Prop_Rewriter_TAG *Prop_Rewriter_ptr;
   \sa Prop_Rewriter_destroy
 */
 Prop_Rewriter_ptr Prop_Rewriter_create(NuSMVEnv_ptr env, Prop_ptr prop,
-                                       WffRewriteMethod method,
-                                       WffRewriterExpectedProperty expprop,
-                                       FsmType fsm_type, BddEnc_ptr bddenc);
+				       WffRewriteMethod method,
+				       WffRewriterExpectedProperty expprop,
+				       FsmType fsm_type, BddEnc_ptr bddenc);
 
 /*!
   \methodof Prop_Rewriter

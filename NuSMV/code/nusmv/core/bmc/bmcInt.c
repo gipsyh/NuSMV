@@ -71,12 +71,13 @@
 /*---------------------------------------------------------------------------*/
 
 be_ptr Bmc_GetTestTableau(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
-                          const int k, const int l) {
-  const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+			  const int k, const int l)
+{
+	const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  return (isPureFuture(ltl_wff) && !opt_bmc_force_pltl_tableau(opts))
-             ? BmcInt_Tableau_GetAtTime(be_enc, ltl_wff, 0, k, l)
-             : Bmc_TableauPLTL_GetTableau(be_enc, ltl_wff, k, l);
+	return (isPureFuture(ltl_wff) && !opt_bmc_force_pltl_tableau(opts)) ?
+		       BmcInt_Tableau_GetAtTime(be_enc, ltl_wff, 0, k, l) :
+		       Bmc_TableauPLTL_GetTableau(be_enc, ltl_wff, k, l);
 }

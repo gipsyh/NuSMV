@@ -38,7 +38,7 @@
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_PRIVATE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_PRIVATE_H__
 
-#include "nusmv/core/node/printers/PrinterBase.h"         /* fix this */
+#include "nusmv/core/node/printers/PrinterBase.h" /* fix this */
 #include "nusmv/core/node/printers/PrinterBase_private.h" /* fix this */
 #include "nusmv/core/node/printers/PrinterWffCore.h"
 #include "nusmv/core/utils/utils.h"
@@ -53,16 +53,16 @@
 */
 
 typedef struct PrinterWffCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PrinterBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PrinterBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } PrinterWffCore;
 
@@ -79,7 +79,7 @@ typedef struct PrinterWffCore_TAG {
   \sa PrinterWffCore_create
 */
 void printer_wff_core_init(PrinterWffCore_ptr self, const NuSMVEnv_ptr env,
-                           const char *name, int low, size_t num);
+			   const char *name, int low, size_t num);
 
 /*!
   \methodof PrinterWffCore

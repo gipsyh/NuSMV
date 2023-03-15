@@ -43,29 +43,29 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct Cluster_TAG {
-  INHERITS_FROM(Object);
+	INHERITS_FROM(Object);
 
-  /* The current Cluster */
-  bdd_ptr curr_cluster; /* was Ti */
+	/* The current Cluster */
+	bdd_ptr curr_cluster; /* was Ti */
 
-  /* Variables that can be existentially quantified when curr_cluster is
+	/* Variables that can be existentially quantified when curr_cluster is
      multiplied in the product (state and input vars) */
-  bdd_ptr ex_state_input; /* was Ei_StateInput */
+	bdd_ptr ex_state_input; /* was Ei_StateInput */
 
-  /* Variables that can be existentially quantified when curr_cluster is
+	/* Variables that can be existentially quantified when curr_cluster is
      multiplied in the product (only state vars) */
-  bdd_ptr ex_state; /* was Ei_State */
+	bdd_ptr ex_state; /* was Ei_State */
 
-  /* ---------------------------------------------------------------------- */
-  /*     Virtual Methods                                                    */
-  /* ---------------------------------------------------------------------- */
+	/* ---------------------------------------------------------------------- */
+	/*     Virtual Methods                                                    */
+	/* ---------------------------------------------------------------------- */
 
 } Cluster;
 
 typedef struct ClusterIwls95_TAG {
-  INHERITS_FROM(Cluster);
+	INHERITS_FROM(Cluster);
 
-  double benefit;
+	double benefit;
 
 } ClusterIwls95;
 
@@ -80,11 +80,11 @@ static Object_ptr cluster_copy(const Object_ptr object);
 static void cluster_copy_aux(const Cluster_ptr object, Cluster_ptr copy);
 
 static void cluster_iwls95_init(ClusterIwls95_ptr self, DDMgr_ptr dd,
-                                const ClusterOptions_ptr cl_options,
-                                const double v_c, const double w_c,
-                                const double x_c, const double y_c,
-                                const double z_c, const double min_c,
-                                const double max_c);
+				const ClusterOptions_ptr cl_options,
+				const double v_c, const double w_c,
+				const double x_c, const double y_c,
+				const double z_c, const double min_c,
+				const double max_c);
 
 static void cluster_iwls95_deinit(ClusterIwls95_ptr self, DDMgr_ptr dd);
 static void cluster_iwls95_finalize(Object_ptr object, void *arg);
@@ -92,115 +92,125 @@ static void cluster_iwls95_finalize(Object_ptr object, void *arg);
 static Object_ptr cluster_iwls95_copy(const Object_ptr object);
 
 static void cluster_iwls95_copy_aux(const ClusterIwls95_ptr object,
-                                    ClusterIwls95_ptr copy);
+				    ClusterIwls95_ptr copy);
 
-Cluster_ptr Cluster_create(DDMgr_ptr dd) {
-  Cluster_ptr self = ALLOC(Cluster, 1);
-  CLUSTER_CHECK_INSTANCE(self);
+Cluster_ptr Cluster_create(DDMgr_ptr dd)
+{
+	Cluster_ptr self = ALLOC(Cluster, 1);
+	CLUSTER_CHECK_INSTANCE(self);
 
-  cluster_init(self, dd);
-  return self;
+	cluster_init(self, dd);
+	return self;
 }
 
-boolean Cluster_is_equal(const Cluster_ptr self, const Cluster_ptr other) {
-  CLUSTER_CHECK_INSTANCE(self);
-  CLUSTER_CHECK_INSTANCE(other);
+boolean Cluster_is_equal(const Cluster_ptr self, const Cluster_ptr other)
+{
+	CLUSTER_CHECK_INSTANCE(self);
+	CLUSTER_CHECK_INSTANCE(other);
 
-  return (self->curr_cluster == other->curr_cluster);
+	return (self->curr_cluster == other->curr_cluster);
 }
 
-bdd_ptr Cluster_get_trans(const Cluster_ptr self) {
-  bdd_ptr tmp = (bdd_ptr)NULL;
+bdd_ptr Cluster_get_trans(const Cluster_ptr self)
+{
+	bdd_ptr tmp = (bdd_ptr)NULL;
 
-  CLUSTER_CHECK_INSTANCE(self);
-  if (self->curr_cluster != (bdd_ptr)NULL) {
-    tmp = bdd_dup(self->curr_cluster);
-  }
+	CLUSTER_CHECK_INSTANCE(self);
+	if (self->curr_cluster != (bdd_ptr)NULL) {
+		tmp = bdd_dup(self->curr_cluster);
+	}
 
-  return tmp;
+	return tmp;
 }
 
-void Cluster_set_trans(Cluster_ptr self, DDMgr_ptr dd, bdd_ptr current) {
-  CLUSTER_CHECK_INSTANCE(self);
+void Cluster_set_trans(Cluster_ptr self, DDMgr_ptr dd, bdd_ptr current)
+{
+	CLUSTER_CHECK_INSTANCE(self);
 
-  if (self->curr_cluster != (bdd_ptr)NULL) {
-    bdd_free(dd, self->curr_cluster);
-    self->curr_cluster = (bdd_ptr)NULL;
-  }
-  if (current != (bdd_ptr)NULL) {
-    self->curr_cluster = bdd_dup(current);
-  }
+	if (self->curr_cluster != (bdd_ptr)NULL) {
+		bdd_free(dd, self->curr_cluster);
+		self->curr_cluster = (bdd_ptr)NULL;
+	}
+	if (current != (bdd_ptr)NULL) {
+		self->curr_cluster = bdd_dup(current);
+	}
 }
 
-bdd_ptr Cluster_get_quantification_state_input(const Cluster_ptr self) {
-  bdd_ptr tmp = (bdd_ptr)NULL;
+bdd_ptr Cluster_get_quantification_state_input(const Cluster_ptr self)
+{
+	bdd_ptr tmp = (bdd_ptr)NULL;
 
-  CLUSTER_CHECK_INSTANCE(self);
-  if (self->ex_state_input != (bdd_ptr)NULL) {
-    tmp = bdd_dup(self->ex_state_input);
-  }
+	CLUSTER_CHECK_INSTANCE(self);
+	if (self->ex_state_input != (bdd_ptr)NULL) {
+		tmp = bdd_dup(self->ex_state_input);
+	}
 
-  return tmp;
+	return tmp;
 }
 
 void Cluster_set_quantification_state_input(Cluster_ptr self, DDMgr_ptr dd,
-                                            bdd_ptr new) {
-  CLUSTER_CHECK_INSTANCE(self);
+					    bdd_ptr new)
+{
+	CLUSTER_CHECK_INSTANCE(self);
 
-  if (self->ex_state_input != (bdd_ptr)NULL) {
-    bdd_free(dd, self->ex_state_input);
-    self->ex_state_input = (bdd_ptr)NULL;
-  }
-  if (new != (bdd_ptr)NULL) {
-    self->ex_state_input = bdd_dup(new);
-  }
+	if (self->ex_state_input != (bdd_ptr)NULL) {
+		bdd_free(dd, self->ex_state_input);
+		self->ex_state_input = (bdd_ptr)NULL;
+	}
+	if (new != (bdd_ptr)NULL) {
+		self->ex_state_input = bdd_dup(new);
+	}
 }
 
-bdd_ptr Cluster_get_quantification_state(const Cluster_ptr self) {
-  bdd_ptr tmp = (bdd_ptr)NULL;
+bdd_ptr Cluster_get_quantification_state(const Cluster_ptr self)
+{
+	bdd_ptr tmp = (bdd_ptr)NULL;
 
-  CLUSTER_CHECK_INSTANCE(self);
-  if (self->ex_state != (bdd_ptr)NULL) {
-    tmp = bdd_dup(self->ex_state);
-  }
+	CLUSTER_CHECK_INSTANCE(self);
+	if (self->ex_state != (bdd_ptr)NULL) {
+		tmp = bdd_dup(self->ex_state);
+	}
 
-  return tmp;
+	return tmp;
 }
 
 void Cluster_set_quantification_state(Cluster_ptr self, DDMgr_ptr dd,
-                                      bdd_ptr new) {
-  CLUSTER_CHECK_INSTANCE(self);
+				      bdd_ptr new)
+{
+	CLUSTER_CHECK_INSTANCE(self);
 
-  if (self->ex_state != (bdd_ptr)NULL) {
-    bdd_free(dd, self->ex_state);
-    self->ex_state = (bdd_ptr)NULL;
-  }
+	if (self->ex_state != (bdd_ptr)NULL) {
+		bdd_free(dd, self->ex_state);
+		self->ex_state = (bdd_ptr)NULL;
+	}
 
-  if (new != (bdd_ptr)NULL) {
-    self->ex_state = bdd_dup(new);
-  }
+	if (new != (bdd_ptr)NULL) {
+		self->ex_state = bdd_dup(new);
+	}
 }
 
 /* ====================================================================== */
 
 ClusterIwls95_ptr ClusterIwls95_create(DDMgr_ptr dd,
-                                       const ClusterOptions_ptr cl_options,
-                                       const double v_c, const double w_c,
-                                       const double x_c, const double y_c,
-                                       const double z_c, const double min_c,
-                                       const double max_c) {
-  ClusterIwls95_ptr self = ALLOC(ClusterIwls95, 1);
+				       const ClusterOptions_ptr cl_options,
+				       const double v_c, const double w_c,
+				       const double x_c, const double y_c,
+				       const double z_c, const double min_c,
+				       const double max_c)
+{
+	ClusterIwls95_ptr self = ALLOC(ClusterIwls95, 1);
 
-  CLUSTER_IWLS95_CHECK_INSTANCE(self);
+	CLUSTER_IWLS95_CHECK_INSTANCE(self);
 
-  cluster_iwls95_init(self, dd, cl_options, v_c, w_c, x_c, y_c, z_c, min_c,
-                      max_c);
-  return self;
+	cluster_iwls95_init(self, dd, cl_options, v_c, w_c, x_c, y_c, z_c,
+			    min_c, max_c);
+	return self;
 }
 
-double ClusterIwls95_get_benefit(const ClusterIwls95_ptr self) {
-  CLUSTER_IWLS95_CHECK_INSTANCE(self);
-  return self->benefit;
+double ClusterIwls95_get_benefit(const ClusterIwls95_ptr self)
+{
+	CLUSTER_IWLS95_CHECK_INSTANCE(self);
+	return self->benefit;
 }
 
 /*!
@@ -208,15 +218,16 @@ double ClusterIwls95_get_benefit(const ClusterIwls95_ptr self) {
 
 
 */
-static void cluster_init(Cluster_ptr self, DDMgr_ptr dd) {
-  object_init(OBJECT(self));
+static void cluster_init(Cluster_ptr self, DDMgr_ptr dd)
+{
+	object_init(OBJECT(self));
 
-  self->curr_cluster = bdd_true(dd);
-  self->ex_state_input = bdd_true(dd);
-  self->ex_state = bdd_true(dd);
+	self->curr_cluster = bdd_true(dd);
+	self->ex_state_input = bdd_true(dd);
+	self->ex_state = bdd_true(dd);
 
-  OVERRIDE(Object, finalize) = cluster_finalize;
-  OVERRIDE(Object, copy) = cluster_copy;
+	OVERRIDE(Object, finalize) = cluster_finalize;
+	OVERRIDE(Object, copy) = cluster_copy;
 }
 
 /*!
@@ -224,16 +235,17 @@ static void cluster_init(Cluster_ptr self, DDMgr_ptr dd) {
 
   Releases the contained bdds.
 */
-static void cluster_deinit(Cluster_ptr self, DDMgr_ptr dd) {
-  object_deinit(OBJECT(self));
+static void cluster_deinit(Cluster_ptr self, DDMgr_ptr dd)
+{
+	object_deinit(OBJECT(self));
 
-  /* Releases contained bdds: */
-  if (self->curr_cluster != (bdd_ptr)NULL)
-    bdd_free(dd, self->curr_cluster);
-  if (self->ex_state_input != (bdd_ptr)NULL)
-    bdd_free(dd, self->ex_state_input);
-  if (self->ex_state != (bdd_ptr)NULL)
-    bdd_free(dd, self->ex_state);
+	/* Releases contained bdds: */
+	if (self->curr_cluster != (bdd_ptr)NULL)
+		bdd_free(dd, self->curr_cluster);
+	if (self->ex_state_input != (bdd_ptr)NULL)
+		bdd_free(dd, self->ex_state_input);
+	if (self->ex_state != (bdd_ptr)NULL)
+		bdd_free(dd, self->ex_state);
 }
 
 /*!
@@ -241,11 +253,12 @@ static void cluster_deinit(Cluster_ptr self, DDMgr_ptr dd) {
 
 
 */
-static void cluster_finalize(Object_ptr object, void *arg) {
-  Cluster_ptr self = CLUSTER(object);
+static void cluster_finalize(Object_ptr object, void *arg)
+{
+	Cluster_ptr self = CLUSTER(object);
 
-  cluster_deinit(self, (DDMgr_ptr)arg);
-  FREE(self);
+	cluster_deinit(self, (DDMgr_ptr)arg);
+	FREE(self);
 }
 
 /*!
@@ -256,15 +269,16 @@ static void cluster_finalize(Object_ptr object, void *arg) {
 
   \sa cluster_copy_aux
 */
-static Object_ptr cluster_copy(const Object_ptr object) {
-  Cluster_ptr self = CLUSTER(object);
-  Cluster_ptr copy = CLUSTER(NULL);
+static Object_ptr cluster_copy(const Object_ptr object)
+{
+	Cluster_ptr self = CLUSTER(object);
+	Cluster_ptr copy = CLUSTER(NULL);
 
-  copy = ALLOC(Cluster, 1);
-  CLUSTER_CHECK_INSTANCE(copy);
+	copy = ALLOC(Cluster, 1);
+	CLUSTER_CHECK_INSTANCE(copy);
 
-  cluster_copy_aux(self, copy);
-  return OBJECT(copy);
+	cluster_copy_aux(self, copy);
+	return OBJECT(copy);
 }
 
 /*!
@@ -274,14 +288,15 @@ static Object_ptr cluster_copy(const Object_ptr object) {
 
   \sa cluster_copy
 */
-static void cluster_copy_aux(const Cluster_ptr self, Cluster_ptr copy) {
-  /* copies the base class: */
-  object_copy_aux(OBJECT(self), OBJECT(copy));
+static void cluster_copy_aux(const Cluster_ptr self, Cluster_ptr copy)
+{
+	/* copies the base class: */
+	object_copy_aux(OBJECT(self), OBJECT(copy));
 
-  /* copies class members: */
-  copy->curr_cluster = bdd_dup(self->curr_cluster);
-  copy->ex_state_input = bdd_dup(self->ex_state_input);
-  copy->ex_state = bdd_dup(self->ex_state);
+	/* copies class members: */
+	copy->curr_cluster = bdd_dup(self->curr_cluster);
+	copy->ex_state_input = bdd_dup(self->ex_state_input);
+	copy->ex_state = bdd_dup(self->ex_state);
 }
 
 /*!
@@ -291,35 +306,36 @@ static void cluster_copy_aux(const Cluster_ptr self, Cluster_ptr copy) {
   to cluster options and different factors (v_c, w_c, x_c, y_c, z_c, min_c and
   max_c) as explained in IWLS95 paper.
 */
-static void
-cluster_iwls95_init(ClusterIwls95_ptr self, DDMgr_ptr dd,
-                    const ClusterOptions_ptr cl_options, const double v_c,
-                    const double w_c, const double x_c, const double y_c,
-                    const double z_c, const double min_c, const double max_c)
+static void cluster_iwls95_init(ClusterIwls95_ptr self, DDMgr_ptr dd,
+				const ClusterOptions_ptr cl_options,
+				const double v_c, const double w_c,
+				const double x_c, const double y_c,
+				const double z_c, const double min_c,
+				const double max_c)
 
 {
-  double w1;
-  double w2;
+	double w1;
+	double w2;
 
-  cluster_init(CLUSTER(self), dd);
+	cluster_init(CLUSTER(self), dd);
 
-  w1 = (double)ClusterOptions_get_w1(cl_options);
-  w2 = (double)ClusterOptions_get_w2(cl_options);
+	w1 = (double)ClusterOptions_get_w1(cl_options);
+	w2 = (double)ClusterOptions_get_w2(cl_options);
 
-  if (w_c != 0)
-    self->benefit = (v_c / w_c) * w1;
-  else
-    self->benefit = 0.0;
+	if (w_c != 0)
+		self->benefit = (v_c / w_c) * w1;
+	else
+		self->benefit = 0.0;
 
-  if (x_c != 0)
-    self->benefit += (w_c / x_c) * w2;
-  if (z_c != 0)
-    self->benefit -= (y_c / z_c) * w2;
-  if (max_c != 0)
-    self->benefit += (min_c / max_c) * w2;
+	if (x_c != 0)
+		self->benefit += (w_c / x_c) * w2;
+	if (z_c != 0)
+		self->benefit -= (y_c / z_c) * w2;
+	if (max_c != 0)
+		self->benefit += (min_c / max_c) * w2;
 
-  OVERRIDE(Object, finalize) = cluster_iwls95_finalize;
-  OVERRIDE(Object, copy) = cluster_iwls95_copy;
+	OVERRIDE(Object, finalize) = cluster_iwls95_finalize;
+	OVERRIDE(Object, copy) = cluster_iwls95_copy;
 }
 
 /*!
@@ -327,9 +343,10 @@ cluster_iwls95_init(ClusterIwls95_ptr self, DDMgr_ptr dd,
 
 
 */
-static void cluster_iwls95_deinit(ClusterIwls95_ptr self, DDMgr_ptr dd) {
-  /* nothing to clean up in self */
-  cluster_deinit(CLUSTER(self), dd);
+static void cluster_iwls95_deinit(ClusterIwls95_ptr self, DDMgr_ptr dd)
+{
+	/* nothing to clean up in self */
+	cluster_deinit(CLUSTER(self), dd);
 }
 
 /*!
@@ -338,10 +355,11 @@ static void cluster_iwls95_deinit(ClusterIwls95_ptr self, DDMgr_ptr dd) {
    The virtual destructor calls this method to destroy the
   instance self.
 */
-static void cluster_iwls95_finalize(Object_ptr object, void *arg) {
-  ClusterIwls95_ptr self = CLUSTER_IWLS95(object);
-  cluster_iwls95_deinit(self, (DDMgr_ptr)arg);
-  FREE(self);
+static void cluster_iwls95_finalize(Object_ptr object, void *arg)
+{
+	ClusterIwls95_ptr self = CLUSTER_IWLS95(object);
+	cluster_iwls95_deinit(self, (DDMgr_ptr)arg);
+	FREE(self);
 }
 
 /*!
@@ -352,15 +370,16 @@ static void cluster_iwls95_finalize(Object_ptr object, void *arg) {
 
   \sa cluster_iwls95_copy_aux
 */
-static Object_ptr cluster_iwls95_copy(const Object_ptr object) {
-  ClusterIwls95_ptr self = CLUSTER_IWLS95(object);
-  ClusterIwls95_ptr copy;
+static Object_ptr cluster_iwls95_copy(const Object_ptr object)
+{
+	ClusterIwls95_ptr self = CLUSTER_IWLS95(object);
+	ClusterIwls95_ptr copy;
 
-  copy = ALLOC(ClusterIwls95, 1);
-  CLUSTER_IWLS95_CHECK_INSTANCE(copy);
+	copy = ALLOC(ClusterIwls95, 1);
+	CLUSTER_IWLS95_CHECK_INSTANCE(copy);
 
-  cluster_iwls95_copy_aux(self, copy);
-  return OBJECT(copy);
+	cluster_iwls95_copy_aux(self, copy);
+	return OBJECT(copy);
 }
 
 /*!
@@ -371,8 +390,9 @@ static Object_ptr cluster_iwls95_copy(const Object_ptr object) {
   \sa cluster_iwls95_copy
 */
 static void cluster_iwls95_copy_aux(const ClusterIwls95_ptr self,
-                                    ClusterIwls95_ptr copy) {
-  cluster_copy_aux(CLUSTER(self), CLUSTER(copy));
+				    ClusterIwls95_ptr copy)
+{
+	cluster_copy_aux(CLUSTER(self), CLUSTER(copy));
 
-  copy->benefit = self->benefit;
+	copy->benefit = self->benefit;
 }

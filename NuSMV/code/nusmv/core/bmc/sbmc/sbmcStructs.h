@@ -282,7 +282,7 @@ void sbmc_state_vars_set_formula_input_vars(state_vars_struct *ss, lsList f);
   \se None
 */
 void sbmc_state_vars_set_simple_path_system_vars(state_vars_struct *ss,
-                                                 lsList f);
+						 lsList f);
 
 /*!
   \brief Print a state_vars_struct

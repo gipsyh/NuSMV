@@ -65,9 +65,9 @@ typedef struct SATCompleteTraceExecutor_TAG *SATCompleteTraceExecutor_ptr;
 
   \todo Missing description
 */
-#define SAT_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                       \
-  (nusmv_assert(SAT_COMPLETE_TRACE_EXECUTOR(self) !=                           \
-                SAT_COMPLETE_TRACE_EXECUTOR(NULL)))
+#define SAT_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)   \
+	(nusmv_assert(SAT_COMPLETE_TRACE_EXECUTOR(self) != \
+		      SAT_COMPLETE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,7 +85,7 @@ typedef struct SATCompleteTraceExecutor_TAG *SATCompleteTraceExecutor_ptr;
 */
 SATCompleteTraceExecutor_ptr
 SATCompleteTraceExecutor_create(const BeFsm_ptr fsm, const BeEnc_ptr enc,
-                                const BddEnc_ptr bdd_enc);
+				const BddEnc_ptr bdd_enc);
 
 /*!
   \methodof SATCompleteTraceExecutor

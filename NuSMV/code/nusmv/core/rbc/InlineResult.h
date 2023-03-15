@@ -61,8 +61,8 @@ typedef struct InlineResult_TAG *InlineResult_ptr;
 
   \todo Missing description
 */
-#define INLINE_RESULT_CHECK_INSTANCE(self)                                     \
-  (nusmv_assert(INLINE_RESULT(self) != INLINE_RESULT(NULL)))
+#define INLINE_RESULT_CHECK_INSTANCE(self) \
+	(nusmv_assert(INLINE_RESULT(self) != INLINE_RESULT(NULL)))
 
 /**AutomaticStart*************************************************************/
 

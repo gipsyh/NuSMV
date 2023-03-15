@@ -46,10 +46,10 @@
 */
 
 typedef enum FsmType_TAG {
-  FSM_TYPE_SEXP = 1,
-  FSM_TYPE_BOOL_SEXP = FSM_TYPE_SEXP << 1,
-  FSM_TYPE_BDD = FSM_TYPE_SEXP << 2,
-  FSM_TYPE_BE = FSM_TYPE_SEXP << 3,
+	FSM_TYPE_SEXP = 1,
+	FSM_TYPE_BOOL_SEXP = FSM_TYPE_SEXP << 1,
+	FSM_TYPE_BDD = FSM_TYPE_SEXP << 2,
+	FSM_TYPE_BE = FSM_TYPE_SEXP << 3,
 } FsmType;
 
 /*---------------------------------------------------------------------------*/

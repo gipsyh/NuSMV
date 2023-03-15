@@ -19,20 +19,22 @@ FILE *def_outstream;
 options_ptr options = (opts_ptr)NULL;
 cmp_struct_ptr cmps = (cmp_struct_ptr)NULL;
 
-void init_globals() {
-  nusmv_stdin = stdin;
-  outstream = stdout;
-  errstream = stderr;
+void init_globals()
+{
+	nusmv_stdin = stdin;
+	outstream = stdout;
+	errstream = stderr;
 }
 
-int main() {
-  node_pkg_init();
-  init_string();
-  init_globals();
+int main()
+{
+	node_pkg_init();
+	init_string();
+	init_globals();
 
-  test_ParserOrd();
+	test_ParserOrd();
 
-  quit_string();
-  node_pkg_quit();
-  return 0;
+	quit_string();
+	node_pkg_quit();
+	return 0;
 }

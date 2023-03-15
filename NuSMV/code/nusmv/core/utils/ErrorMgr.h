@@ -55,10 +55,10 @@
 typedef struct ErrorMgr_TAG *ErrorMgr_ptr;
 
 typedef enum FailureKind_TAG {
-  FAILURE_DIV_BY_ZERO,
-  FAILURE_CASE_NOT_EXHAUSTIVE,
-  FAILURE_ARRAY_OUT_OF_BOUNDS,
-  FAILURE_UNSPECIFIED
+	FAILURE_DIV_BY_ZERO,
+	FAILURE_CASE_NOT_EXHAUSTIVE,
+	FAILURE_ARRAY_OUT_OF_BOUNDS,
+	FAILURE_UNSPECIFIED
 } FailureKind;
 
 /*!
@@ -74,8 +74,8 @@ typedef enum FailureKind_TAG {
 
   \todo Missing description
 */
-#define ERROR_MGR_CHECK_INSTANCE(self)                                         \
-  (nusmv_assert(ERROR_MGR(self) != ERROR_MGR(NULL)))
+#define ERROR_MGR_CHECK_INSTANCE(self) \
+	(nusmv_assert(ERROR_MGR(self) != ERROR_MGR(NULL)))
 
 /*@-skipposixheaders@*/
 /*@-skipisoheaders@*/
@@ -160,16 +160,15 @@ typedef enum FailureKind_TAG {
   \todo Missing description
 */
 #define CATCH(err) if (ErrorMgr_set_long_jmp(err) == 0) {
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FAIL(err)                                                              \
-  ErrorMgr_cancel_long_jmp(err);                                               \
-  }                                                                            \
-  else
+#define FAIL(err)                      \
+	ErrorMgr_cancel_long_jmp(err); \
+	}                              \
+	else
 
 /**AutomaticStart*************************************************************/
 
@@ -340,7 +339,7 @@ void ErrorMgr_nusmv_exit(ErrorMgr_ptr self, int n) NUSMV_FUNCATTR_NORETURN;
                       fmt is not NULL or the empty string
 */
 void ErrorMgr_rpterr(ErrorMgr_ptr self, const char *fmt,
-                     ...) NUSMV_FUNCATTR_NORETURN;
+		     ...) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -353,7 +352,7 @@ void ErrorMgr_rpterr(ErrorMgr_ptr self, const char *fmt,
                       function print_node
 */
 void ErrorMgr_rpterr_node(ErrorMgr_ptr self, node_ptr node, const char *fmt,
-                          ...) NUSMV_FUNCATTR_NORETURN;
+			  ...) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -424,7 +423,7 @@ void ErrorMgr_print_io_atom_stack(ErrorMgr_ptr self);
                       those of the printf.
 */
 void ErrorMgr_internal_error(ErrorMgr_ptr self, const char *fmt,
-                             ...) NUSMV_FUNCATTR_NORETURN;
+			     ...) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -433,7 +432,7 @@ void ErrorMgr_internal_error(ErrorMgr_ptr self, const char *fmt,
 
 */
 void ErrorMgr_error_multiple_substitution(ErrorMgr_ptr self, node_ptr nodep)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -442,7 +441,7 @@ void ErrorMgr_error_multiple_substitution(ErrorMgr_ptr self, node_ptr nodep)
   n must be a FAILURE node
 */
 void ErrorMgr_report_failure_node(ErrorMgr_ptr self,
-                                  node_ptr n) NUSMV_FUNCATTR_NORETURN;
+				  node_ptr n) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -475,7 +474,7 @@ void ErrorMgr_warning_possible_div_by_zero(ErrorMgr_ptr self, node_ptr failure);
 
 */
 void ErrorMgr_warning_possible_array_out_of_bounds(ErrorMgr_ptr self,
-                                                   node_ptr failure);
+						   node_ptr failure);
 
 /*!
   \methodof ErrorMgr
@@ -484,7 +483,7 @@ void ErrorMgr_warning_possible_array_out_of_bounds(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_array_out_of_bounds(ErrorMgr_ptr self, int index, int low,
-                                        int high) NUSMV_FUNCATTR_NORETURN;
+					int high) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -493,7 +492,7 @@ void ErrorMgr_error_array_out_of_bounds(ErrorMgr_ptr self, int index, int low,
 
 */
 void ErrorMgr_error_lhs_of_index_is_not_array(ErrorMgr_ptr self)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -502,7 +501,7 @@ void ErrorMgr_error_lhs_of_index_is_not_array(ErrorMgr_ptr self)
 
 */
 void ErrorMgr_error_div_by_zero(ErrorMgr_ptr self,
-                                node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+				node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -511,7 +510,7 @@ void ErrorMgr_error_div_by_zero(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_div_by_nonconst(ErrorMgr_ptr self,
-                                    node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+				    node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -536,7 +535,7 @@ void ErrorMgr_type_error(ErrorMgr_ptr self, node_ptr n) NUSMV_FUNCATTR_NORETURN;
 
 */
 void ErrorMgr_range_error(ErrorMgr_ptr self, node_ptr n,
-                          node_ptr var) NUSMV_FUNCATTR_NORETURN;
+			  node_ptr var) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -553,7 +552,7 @@ void ErrorMgr_range_warning(ErrorMgr_ptr self, node_ptr n, node_ptr var);
 
 */
 void ErrorMgr_error_multiple_assignment(ErrorMgr_ptr self,
-                                        node_ptr t1) NUSMV_FUNCATTR_NORETURN;
+					node_ptr t1) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -562,7 +561,7 @@ void ErrorMgr_error_multiple_assignment(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_empty_range(ErrorMgr_ptr self, node_ptr name, int dim1,
-                                int dim2) NUSMV_FUNCATTR_NORETURN;
+				int dim2) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -571,7 +570,7 @@ void ErrorMgr_error_empty_range(ErrorMgr_ptr self, node_ptr name, int dim1,
 
 */
 void ErrorMgr_error_not_word_wsizeof(ErrorMgr_ptr self,
-                                     node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+				     node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -580,7 +579,7 @@ void ErrorMgr_error_not_word_wsizeof(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_not_constant_extend_width(
-    ErrorMgr_ptr self, const node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, const node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -589,7 +588,7 @@ void ErrorMgr_error_not_constant_extend_width(
 
 */
 void ErrorMgr_error_not_constant_resize_width(
-    ErrorMgr_ptr self, const node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, const node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -598,7 +597,7 @@ void ErrorMgr_error_not_constant_resize_width(
 
 */
 void ErrorMgr_error_not_constant_wtoint(ErrorMgr_ptr self, const node_ptr expr)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -607,7 +606,7 @@ void ErrorMgr_error_not_constant_wtoint(ErrorMgr_ptr self, const node_ptr expr)
 
 */
 void ErrorMgr_error_not_constant_width_of_word_type(
-    ErrorMgr_ptr self, node_ptr name) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr name) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -616,7 +615,7 @@ void ErrorMgr_error_not_constant_width_of_word_type(
 
 */
 void ErrorMgr_error_not_constant_width_of_word_array_type(
-    ErrorMgr_ptr self, node_ptr name) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr name) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -625,7 +624,7 @@ void ErrorMgr_error_not_constant_width_of_word_array_type(
 
 */
 void ErrorMgr_error_not_constant_width_of_array_type(
-    ErrorMgr_ptr self, node_ptr name) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr name) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -634,7 +633,7 @@ void ErrorMgr_error_not_constant_width_of_array_type(
 
 */
 void ErrorMgr_error_wrong_word_operand(ErrorMgr_ptr self, const char *msg,
-                                       node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+				       node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -643,8 +642,8 @@ void ErrorMgr_error_wrong_word_operand(ErrorMgr_ptr self, const char *msg,
 
 */
 void ErrorMgr_error_assign_both(ErrorMgr_ptr self, node_ptr v, node_ptr v1,
-                                int lineno,
-                                int lineno2) NUSMV_FUNCATTR_NORETURN;
+				int lineno,
+				int lineno2) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -653,7 +652,7 @@ void ErrorMgr_error_assign_both(ErrorMgr_ptr self, node_ptr v, node_ptr v1,
 
 */
 void ErrorMgr_error_unknown_var_in_order_file(ErrorMgr_ptr self, node_ptr n)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -678,7 +677,7 @@ void ErrorMgr_warning_missing_variable(ErrorMgr_ptr self, node_ptr vname);
 
 */
 void ErrorMgr_warning_missing_variables(ErrorMgr_ptr self,
-                                        NodeList_ptr vars_list);
+					NodeList_ptr vars_list);
 
 /*!
   \methodof ErrorMgr
@@ -735,7 +734,7 @@ void ErrorMgr_warning_fsm_init_and_fairness_empty(ErrorMgr_ptr self);
 
 */
 void ErrorMgr_error_var_appear_twice_in_order_file(
-    ErrorMgr_ptr self, node_ptr n) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr n) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -744,7 +743,7 @@ void ErrorMgr_error_var_appear_twice_in_order_file(
 
 */
 void ErrorMgr_warning_var_appear_twice_in_order_file(ErrorMgr_ptr self,
-                                                     node_ptr n);
+						     node_ptr n);
 
 /*!
   \methodof ErrorMgr
@@ -753,7 +752,7 @@ void ErrorMgr_warning_var_appear_twice_in_order_file(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_warning_id_appears_twice_in_idlist_file(ErrorMgr_ptr self,
-                                                      node_ptr n);
+						      node_ptr n);
 
 /*!
   \methodof ErrorMgr
@@ -762,7 +761,7 @@ void ErrorMgr_warning_id_appears_twice_in_idlist_file(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_var_not_in_order_file(ErrorMgr_ptr self,
-                                          node_ptr n) NUSMV_FUNCATTR_NORETURN;
+					  node_ptr n) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -771,7 +770,7 @@ void ErrorMgr_error_var_not_in_order_file(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_not_proper_number(ErrorMgr_ptr self, const char *op,
-                                      node_ptr n) NUSMV_FUNCATTR_NORETURN;
+				      node_ptr n) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -780,8 +779,8 @@ void ErrorMgr_error_not_proper_number(ErrorMgr_ptr self, const char *op,
 
 */
 void ErrorMgr_error_not_proper_numbers(ErrorMgr_ptr self, const char *op,
-                                       node_ptr n1,
-                                       node_ptr n2) NUSMV_FUNCATTR_NORETURN;
+				       node_ptr n1,
+				       node_ptr n2) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -790,7 +789,7 @@ void ErrorMgr_error_not_proper_numbers(ErrorMgr_ptr self, const char *op,
 
 */
 void ErrorMgr_error_ambiguous(ErrorMgr_ptr self,
-                              node_ptr s) NUSMV_FUNCATTR_NORETURN;
+			      node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -799,7 +798,7 @@ void ErrorMgr_error_ambiguous(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_undefined(ErrorMgr_ptr self,
-                              node_ptr s) NUSMV_FUNCATTR_NORETURN;
+			      node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -808,7 +807,7 @@ void ErrorMgr_error_undefined(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_shadowing(ErrorMgr_ptr self,
-                              node_ptr s) NUSMV_FUNCATTR_NORETURN;
+			      node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -817,7 +816,7 @@ void ErrorMgr_error_shadowing(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_redefining(ErrorMgr_ptr self,
-                               node_ptr s) NUSMV_FUNCATTR_NORETURN;
+			       node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -826,7 +825,7 @@ void ErrorMgr_error_redefining(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_redefining_operational_symbol(ErrorMgr_ptr self, node_ptr s)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -835,7 +834,7 @@ void ErrorMgr_error_redefining_operational_symbol(ErrorMgr_ptr self, node_ptr s)
 
 */
 void ErrorMgr_error_redefining_input_var(ErrorMgr_ptr self,
-                                         node_ptr s) NUSMV_FUNCATTR_NORETURN;
+					 node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -844,7 +843,7 @@ void ErrorMgr_error_redefining_input_var(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_reassigning(ErrorMgr_ptr self,
-                                node_ptr s) NUSMV_FUNCATTR_NORETURN;
+				node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -853,7 +852,7 @@ void ErrorMgr_error_reassigning(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_assign_input_var(ErrorMgr_ptr self,
-                                     node_ptr s) NUSMV_FUNCATTR_NORETURN;
+				     node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -862,7 +861,7 @@ void ErrorMgr_error_assign_input_var(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_assign_frozen_var(ErrorMgr_ptr self,
-                                      node_ptr s) NUSMV_FUNCATTR_NORETURN;
+				      node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -871,7 +870,7 @@ void ErrorMgr_error_assign_frozen_var(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_assign_expected_var(ErrorMgr_ptr self,
-                                        node_ptr s) NUSMV_FUNCATTR_NORETURN;
+					node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -880,7 +879,7 @@ void ErrorMgr_error_assign_expected_var(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_circular(ErrorMgr_ptr self,
-                             node_ptr s) NUSMV_FUNCATTR_NORETURN;
+			     node_ptr s) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -897,7 +896,7 @@ void ErrorMgr_error_too_many_vars(ErrorMgr_ptr self) NUSMV_FUNCATTR_NORETURN;
 
 */
 void ErrorMgr_error_out_of_memory(ErrorMgr_ptr self,
-                                  size_t size) NUSMV_FUNCATTR_NORETURN;
+				  size_t size) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -906,7 +905,7 @@ void ErrorMgr_error_out_of_memory(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_invalid_subrange(ErrorMgr_ptr self,
-                                     node_ptr range) NUSMV_FUNCATTR_NORETURN;
+				     node_ptr range) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -915,7 +914,7 @@ void ErrorMgr_error_invalid_subrange(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_invalid_bool_cast(ErrorMgr_ptr self,
-                                      node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+				      node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -924,7 +923,7 @@ void ErrorMgr_error_invalid_bool_cast(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_out_of_bounds_word_toint_cast(
-    ErrorMgr_ptr self, node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -933,7 +932,7 @@ void ErrorMgr_error_out_of_bounds_word_toint_cast(
 
 */
 void ErrorMgr_error_invalid_toint_cast(ErrorMgr_ptr self,
-                                       node_ptr expr) NUSMV_FUNCATTR_NORETURN;
+				       node_ptr expr) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -942,7 +941,7 @@ void ErrorMgr_error_invalid_toint_cast(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_invalid_count_operator(ErrorMgr_ptr self, node_ptr expr)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -951,7 +950,7 @@ void ErrorMgr_error_invalid_count_operator(ErrorMgr_ptr self, node_ptr expr)
 
 */
 void ErrorMgr_error_invalid_enum_value(ErrorMgr_ptr self,
-                                       node_ptr value) NUSMV_FUNCATTR_NORETURN;
+				       node_ptr value) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -960,7 +959,7 @@ void ErrorMgr_error_invalid_enum_value(ErrorMgr_ptr self,
   TODO[AMA] This should not stay here, see issue 4485
 */
 void ErrorMgr_error_game_definition_contains_input_vars(
-    ErrorMgr_ptr self, node_ptr var_name) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr var_name) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -969,7 +968,7 @@ void ErrorMgr_error_game_definition_contains_input_vars(
 
 */
 void ErrorMgr_error_property_contains_input_vars(
-    ErrorMgr_ptr self, Prop_ptr prop) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, Prop_ptr prop) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -978,7 +977,7 @@ void ErrorMgr_error_property_contains_input_vars(
 
 */
 void ErrorMgr_error_assign_exp_contains_input_vars(
-    ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -987,7 +986,7 @@ void ErrorMgr_error_assign_exp_contains_input_vars(
 
 */
 void ErrorMgr_error_next_exp_contains_input_vars(
-    ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -996,7 +995,7 @@ void ErrorMgr_error_next_exp_contains_input_vars(
 
 */
 void ErrorMgr_error_invar_exp_contains_input_vars(
-    ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1005,7 +1004,7 @@ void ErrorMgr_error_invar_exp_contains_input_vars(
 
 */
 void ErrorMgr_error_init_exp_contains_input_vars(
-    ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, node_ptr exp) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1014,7 +1013,7 @@ void ErrorMgr_error_init_exp_contains_input_vars(
   TODO[AMA] This should not stay here, see issue 4485
 */
 void ErrorMgr_error_second_player_var(ErrorMgr_ptr self,
-                                      node_ptr exp) NUSMV_FUNCATTR_NORETURN;
+				      node_ptr exp) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1023,7 +1022,7 @@ void ErrorMgr_error_second_player_var(ErrorMgr_ptr self,
   TODO[AMA] This should not stay here, see issue 4485
 */
 void ErrorMgr_error_second_player_next_var(ErrorMgr_ptr self, node_ptr exp)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1032,7 +1031,7 @@ void ErrorMgr_error_second_player_next_var(ErrorMgr_ptr self, node_ptr exp)
 
 */
 void ErrorMgr_error_unknown_preprocessor(
-    ErrorMgr_ptr self, const char *prep_name) NUSMV_FUNCATTR_NORETURN;
+	ErrorMgr_ptr self, const char *prep_name) NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1041,7 +1040,7 @@ void ErrorMgr_error_unknown_preprocessor(
 
 */
 void ErrorMgr_error_set_preprocessor(ErrorMgr_ptr self, const char *name,
-                                     boolean is_warning);
+				     boolean is_warning);
 
 /*!
   \methodof ErrorMgr
@@ -1050,7 +1049,7 @@ void ErrorMgr_error_set_preprocessor(ErrorMgr_ptr self, const char *name,
 
 */
 void ErrorMgr_error_type_system_violation(ErrorMgr_ptr self)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1059,7 +1058,7 @@ void ErrorMgr_error_type_system_violation(ErrorMgr_ptr self)
 
 */
 void ErrorMgr_error_psl_not_supported_feature(ErrorMgr_ptr self)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1068,7 +1067,7 @@ void ErrorMgr_error_psl_not_supported_feature(ErrorMgr_ptr self)
 
 */
 void ErrorMgr_error_psl_not_supported_feature_next_number(ErrorMgr_ptr self)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1077,7 +1076,7 @@ void ErrorMgr_error_psl_not_supported_feature_next_number(ErrorMgr_ptr self)
 
 */
 void ErrorMgr_error_not_supported_feature(ErrorMgr_ptr self, const char *msg)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1094,7 +1093,7 @@ void ErrorMgr_error_expected_number(ErrorMgr_ptr self) NUSMV_FUNCATTR_NORETURN;
 
 */
 void ErrorMgr_warning_psl_not_supported_feature(ErrorMgr_ptr self,
-                                                node_ptr psl_spec, int index);
+						node_ptr psl_spec, int index);
 
 /*!
   \methodof ErrorMgr
@@ -1103,7 +1102,7 @@ void ErrorMgr_warning_psl_not_supported_feature(ErrorMgr_ptr self,
 
 */
 void ErrorMgr_error_psl_repeated_replicator_id(ErrorMgr_ptr self)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1120,7 +1119,7 @@ void ErrorMgr_error_invalid_number(ErrorMgr_ptr self, const char *szNumber);
 
 */
 void ErrorMgr_error_bmc_invalid_k_l(ErrorMgr_ptr self, const int k,
-                                    const int l);
+				    const int l);
 
 /*!
   \methodof ErrorMgr
@@ -1136,8 +1135,9 @@ void ErrorMgr_error_property_already_specified(ErrorMgr_ptr self);
 
 
 */
-void ErrorMgr_error_invalid_numeric_value(
-    ErrorMgr_ptr self, int value, const char *reason) NUSMV_FUNCATTR_NORETURN;
+void ErrorMgr_error_invalid_numeric_value(ErrorMgr_ptr self, int value,
+					  const char *reason)
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1146,7 +1146,7 @@ void ErrorMgr_error_invalid_numeric_value(
 
 */
 void ErrorMgr_error_file_not_found(ErrorMgr_ptr self, const char *filename)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1155,7 +1155,7 @@ void ErrorMgr_error_file_not_found(ErrorMgr_ptr self, const char *filename)
 
 */
 void ErrorMgr_error_file_clobbering(ErrorMgr_ptr self, const char *filename)
-    NUSMV_FUNCATTR_NORETURN;
+	NUSMV_FUNCATTR_NORETURN;
 
 /*!
   \methodof ErrorMgr
@@ -1172,7 +1172,7 @@ void ErrorMgr_warning_processes_deprecated(ErrorMgr_ptr self);
 
 */
 node_ptr ErrorMgr_failure_make(ErrorMgr_ptr self, const char *msg,
-                               FailureKind kind, int lineno);
+			       FailureKind kind, int lineno);
 
 /*!
   \methodof ErrorMgr

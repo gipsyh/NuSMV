@@ -72,99 +72,106 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-int Parser_read_model(NuSMVEnv_ptr env, char *ifile) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  FILE *errstream = StreamMgr_get_error_stream(streams);
+int Parser_read_model(NuSMVEnv_ptr env, char *ifile)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  if (NULL != ifile) {
-    set_input_file(opts, ifile);
-  }
+	if (NULL != ifile) {
+		set_input_file(opts, ifile);
+	}
 
-  /* Parse the input file */
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Parsing file \"%s\" ..... ", get_input_file(opts));
-  }
+	/* Parse the input file */
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Parsing file \"%s\" ..... ",
+			   get_input_file(opts));
+	}
 
-  if (Parser_ReadSMVFromFile(env, get_input_file(opts))) {
-    ErrorMgr_nusmv_exit(errmgr, 1);
-  }
+	if (Parser_ReadSMVFromFile(env, get_input_file(opts))) {
+		ErrorMgr_nusmv_exit(errmgr, 1);
+	}
 
-  { /* dumps erros if there are any */
-    node_ptr errors = Parser_get_syntax_errors_list(env);
-    if (Nil != errors) {
-      StreamMgr_print_error(streams, "\n");
-      fflush(NULL); /* to flush all existing messages before outputting */
+	{ /* dumps erros if there are any */
+		node_ptr errors = Parser_get_syntax_errors_list(env);
+		if (Nil != errors) {
+			StreamMgr_print_error(streams, "\n");
+			fflush(NULL); /* to flush all existing messages before outputting */
 
-      while (Nil != errors) {
-        Parser_print_syntax_error(car(errors), errstream);
-        errors = cdr(errors);
-      }
-    }
-  }
+			while (Nil != errors) {
+				Parser_print_syntax_error(car(errors),
+							  errstream);
+				errors = cdr(errors);
+			}
+		}
+	}
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "done.\n");
-    fflush(errstream);
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "done.\n");
+		fflush(errstream);
+	}
 
-  cmp_struct_set_read_model(cmps);
+	cmp_struct_set_read_model(cmps);
 
-  return 0;
+	return 0;
 }
 
-int Parser_skip_multiline_comment(int (*read_function)(void)) {
-  register int c;
-  int comment[3] = {0, 0, 0};
-  int comment_value[3] = {'/', '-', '-'};
-  register int k;
+int Parser_skip_multiline_comment(int (*read_function)(void))
+{
+	register int c;
+	int comment[3] = { 0, 0, 0 };
+	int comment_value[3] = { '/', '-', '-' };
+	register int k;
 
-  do {
-    c = read_function();
+	do {
+		c = read_function();
 
-    for (k = (sizeof(comment) / sizeof(comment[0]) - 1); k > 0; --k) {
-      comment[k] = comment[k - 1];
-    }
-    comment[0] = c;
-    /* On Mac OS X, input return 0 instead of EOF, see
+		for (k = (sizeof(comment) / sizeof(comment[0]) - 1); k > 0;
+		     --k) {
+			comment[k] = comment[k - 1];
+		}
+		comment[0] = c;
+		/* On Mac OS X, input return 0 instead of EOF, see
        https://gitlab.fbk.eu/es-tools-dev/ESTools/issues/66 */
 #if __APPLE__
-  } while (memcmp(comment, comment_value, sizeof(comment)) != 0 && c != EOF &&
-           c != 0);
+	} while (memcmp(comment, comment_value, sizeof(comment)) != 0 &&
+		 c != EOF && c != 0);
 #else
-  } while (memcmp(comment, comment_value, sizeof(comment)) != 0 && c != EOF);
+	} while (memcmp(comment, comment_value, sizeof(comment)) != 0 &&
+		 c != EOF);
 #endif
 
 #if __APPLE__
-  if (EOF == c || 0 == c) {
+	if (EOF == c || 0 == c) {
 #else
-  if (EOF == c) {
+	if (EOF == c) {
 #endif
-    printf("\n Warning: There is no terminator for multiline comment!\n");
-  }
+		printf("\n Warning: There is no terminator for multiline comment!\n");
+	}
 
-  return 0;
+	return 0;
 }
 
-int Parser_skip_one_line_comment(int (*read_function)(void)) {
-  register int c;
+int Parser_skip_one_line_comment(int (*read_function)(void))
+{
+	register int c;
 
-  do {
-    c = read_function();
-    /* On Mac OS X, input return 0 instead of EOF, see
+	do {
+		c = read_function();
+		/* On Mac OS X, input return 0 instead of EOF, see
        https://gitlab.fbk.eu/es-tools-dev/ESTools/issues/66 */
 #if __APPLE__
-  } while (c != '\n' && c != EOF && c != 0);
+	} while (c != '\n' && c != EOF && c != 0);
 #else
-  } while (c != '\n' && c != EOF);
+	} while (c != '\n' && c != EOF);
 #endif
-  return (0);
+	return (0);
 }
 
 /*---------------------------------------------------------------------------*/

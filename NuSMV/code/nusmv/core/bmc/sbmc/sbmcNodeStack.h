@@ -66,12 +66,12 @@ typedef struct nodeStack *Bmc_Stack_ptr;
 /*---------------------------------------------------------------------------*/
 
 struct nodeStack {
-  /**Number of slots allocated*/
-  unsigned alloc;
-  /**Number of slots occupied*/
-  unsigned first_free;
-  /**The table*/
-  node_ptr *table;
+	/**Number of slots allocated*/
+	unsigned alloc;
+	/**Number of slots occupied*/
+	unsigned first_free;
+	/**The table*/
+	node_ptr *table;
 };
 
 /*---------------------------------------------------------------------------*/

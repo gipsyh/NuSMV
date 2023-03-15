@@ -63,8 +63,8 @@ typedef struct NormalizerBase_TAG *NormalizerBase_ptr;
 
   \todo Missing description
 */
-#define NORMALIZER_BASE_CHECK_INSTANCE(self)                                   \
-  (nusmv_assert(NORMALIZER_BASE(self) != NORMALIZER_BASE(NULL)))
+#define NORMALIZER_BASE_CHECK_INSTANCE(self) \
+	(nusmv_assert(NORMALIZER_BASE(self) != NORMALIZER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,7 +85,7 @@ typedef struct NormalizerBase_TAG *NormalizerBase_ptr;
   \sa NormalizerBase_can_handle
 */
 VIRTUAL node_ptr NormalizerBase_normalize_node(NormalizerBase_ptr self,
-                                               node_ptr n);
+					       node_ptr n);
 
 /**AutomaticEnd***************************************************************/
 

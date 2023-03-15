@@ -57,75 +57,74 @@
 */
 
 typedef struct SatSolver_TAG {
-  INHERITS_FROM(EnvObject);
+	INHERITS_FROM(EnvObject);
 
-  char *name;          /* name of the solver */
-  long solvingTime;    /* time of the last solving */
-  Slist_ptr model;     /* the model created during last successful solving */
-  Slist_ptr conflicts; /* the conflict generated after last call to solve
+	char *name; /* name of the solver */
+	long solvingTime; /* time of the last solving */
+	Slist_ptr model; /* the model created during last successful solving */
+	Slist_ptr conflicts; /* the conflict generated after last call to solve
                        under assumption */
-  /* groups belonging to the solver. The permanent group is always the first
+	/* groups belonging to the solver. The permanent group is always the first
      in the list!
   */
-  Olist_ptr existingGroups;
-  Olist_ptr
-      unsatisfiableGroups; /* groups which contains unsatisfiable formulas */
+	Olist_ptr existingGroups;
+	Olist_ptr unsatisfiableGroups; /* groups which contains unsatisfiable formulas */
 
-  boolean interpolation; /* true when interpolation is used */
+	boolean interpolation; /* true when interpolation is used */
 
-  /* ---------------------------------------------------------------------- */
-  /* Virtual Methods                                                        */
-  /* ---------------------------------------------------------------------- */
-  /* adds a set of CNF clauses in the solver, but not specifies the polarity
+	/* ---------------------------------------------------------------------- */
+	/* Virtual Methods                                                        */
+	/* ---------------------------------------------------------------------- */
+	/* adds a set of CNF clauses in the solver, but not specifies the polarity
      of formula */
-  VIRTUAL void (*add)(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
-                      SatSolverGroup group);
+	VIRTUAL void (*add)(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
+			    SatSolverGroup group);
 
-  /* sets the polarity of a formula in a group */
-  VIRTUAL void (*set_polarity)(const SatSolver_ptr self,
-                               const Be_Cnf_ptr cnfProb, int polarity,
-                               SatSolverGroup group);
+	/* sets the polarity of a formula in a group */
+	VIRTUAL void (*set_polarity)(const SatSolver_ptr self,
+				     const Be_Cnf_ptr cnfProb, int polarity,
+				     SatSolverGroup group);
 
-  /* sets the preferred variables in the solver */
-  VIRTUAL void (*set_preferred_variables)(const SatSolver_ptr self,
-                                          const Slist_ptr cnfVars);
+	/* sets the preferred variables in the solver */
+	VIRTUAL void (*set_preferred_variables)(const SatSolver_ptr self,
+						const Slist_ptr cnfVars);
 
-  /* clears the preferred variables in the solver */
-  VIRTUAL void (*clear_preferred_variables)(const SatSolver_ptr self);
+	/* clears the preferred variables in the solver */
+	VIRTUAL void (*clear_preferred_variables)(const SatSolver_ptr self);
 
-  /* solves formulas in the groups 'groupList' beloning to the solver */
-  VIRTUAL SatSolverResult (*solve_all_groups)(const SatSolver_ptr self);
+	/* solves formulas in the groups 'groupList' beloning to the solver */
+	VIRTUAL SatSolverResult (*solve_all_groups)(const SatSolver_ptr self);
 
-  /* solves formulas in the groups 'groupList' beloning to the solver
+	/* solves formulas in the groups 'groupList' beloning to the solver
      under assumptions */
-  VIRTUAL SatSolverResult (*solve_all_groups_assume)(const SatSolver_ptr self,
-                                                     Slist_ptr assumption);
+	VIRTUAL SatSolverResult (*solve_all_groups_assume)(
+		const SatSolver_ptr self, Slist_ptr assumption);
 
-  /* creates the model. The previous call to 'solve' must return SATISFIABLE */
-  VIRTUAL Slist_ptr (*make_model)(const SatSolver_ptr self);
+	/* creates the model. The previous call to 'solve' must return SATISFIABLE */
+	VIRTUAL Slist_ptr (*make_model)(const SatSolver_ptr self);
 
-  /* converts an internal minisat literal into a cnf literal. This is used by
+	/* converts an internal minisat literal into a cnf literal. This is used by
      interpolation based algorithms */
-  VIRTUAL int (*get_cnf_var)(const SatSolver_ptr self, int lit);
+	VIRTUAL int (*get_cnf_var)(const SatSolver_ptr self, int lit);
 
-  /* creates the conflicts, solving under assumptions must be invoked before */
-  VIRTUAL Slist_ptr (*get_conflicts)(const SatSolver_ptr self);
+	/* creates the conflicts, solving under assumptions must be invoked before */
+	VIRTUAL Slist_ptr (*get_conflicts)(const SatSolver_ptr self);
 
-  /* Random polarity and polarity mode setter/getter */
-  VIRTUAL void (*set_random_mode)(SatSolver_ptr self, double seed);
-  VIRTUAL void (*set_polarity_mode)(SatSolver_ptr self, int mode);
-  VIRTUAL int (*get_polarity_mode)(const SatSolver_ptr self);
+	/* Random polarity and polarity mode setter/getter */
+	VIRTUAL void (*set_random_mode)(SatSolver_ptr self, double seed);
+	VIRTUAL void (*set_polarity_mode)(SatSolver_ptr self, int mode);
+	VIRTUAL int (*get_polarity_mode)(const SatSolver_ptr self);
 
-  /* Interpolation groups management */
-  VIRTUAL SatSolverItpGroup (*curr_itp_group)(SatSolver_ptr self);
-  VIRTUAL SatSolverItpGroup (*new_itp_group)(SatSolver_ptr self);
+	/* Interpolation groups management */
+	VIRTUAL SatSolverItpGroup (*curr_itp_group)(SatSolver_ptr self);
+	VIRTUAL SatSolverItpGroup (*new_itp_group)(SatSolver_ptr self);
 
-  /* callback-based interpolator (available only when using custom MiniSat) */
-  VIRTUAL
-      Term (*extract_interpolant)(SatSolver_ptr self, int nof_ga_groups,
-                                  SatSolverItpGroup *ga_groups,
-                                  TermFactoryCallbacks_ptr callbacks,
-                                  TermFactoryCallbacksUserData_ptr user_data);
+	/* callback-based interpolator (available only when using custom MiniSat) */
+	VIRTUAL
+	Term (*extract_interpolant)(SatSolver_ptr self, int nof_ga_groups,
+				    SatSolverItpGroup *ga_groups,
+				    TermFactoryCallbacks_ptr callbacks,
+				    TermFactoryCallbacksUserData_ptr user_data);
 } SatSolver;
 
 /**AutomaticStart*************************************************************/
@@ -138,7 +137,7 @@ typedef struct SatSolver_TAG {
   \todo
 */
 void sat_solver_init(SatSolver_ptr self, const NuSMVEnv_ptr env,
-                     const char *name);
+		     const char *name);
 
 /*!
   \methodof SatSolver
@@ -152,22 +151,22 @@ void sat_solver_deinit(SatSolver_ptr self);
   \todo
 */
 void sat_solver_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfClause,
-                    SatSolverGroup group);
+		    SatSolverGroup group);
 
 /*!
   \methodof SatSolver
   \todo
 */
 void sat_solver_set_polarity(const SatSolver_ptr self,
-                             const Be_Cnf_ptr cnfClause, int polarity,
-                             SatSolverGroup group);
+			     const Be_Cnf_ptr cnfClause, int polarity,
+			     SatSolverGroup group);
 
 /*!
   \methodof SatSolver
   \todo
 */
 void sat_solver_set_preferred_variables(const SatSolver_ptr self,
-                                        const Slist_ptr cnfVars);
+					const Slist_ptr cnfVars);
 
 /*!
   \methodof SatSolver
@@ -185,7 +184,7 @@ SatSolverResult sat_solver_solve_all_groups(const SatSolver_ptr self);
   \todo
 */
 SatSolverResult sat_solver_solve_all_groups_assume(const SatSolver_ptr self,
-                                                   Slist_ptr assumptions);
+						   Slist_ptr assumptions);
 
 /*!
   \methodof SatSolver

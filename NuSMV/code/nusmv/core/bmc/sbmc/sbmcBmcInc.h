@@ -77,8 +77,8 @@
   \sa optional
 */
 int Sbmc_zigzag_incr(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int max_k,
-                     const int opt_do_virtual_unrolling,
-                     const int opt_do_completeness_check);
+		     const int opt_do_virtual_unrolling,
+		     const int opt_do_completeness_check);
 
 /*!
   \brief High level function that performs incremental
@@ -92,9 +92,9 @@ int Sbmc_zigzag_incr(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int max_k,
   \sa optional
 */
 int Sbmc_zigzag_incr_assume(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int max_k,
-                            const int opt_do_virtual_unrolling,
-                            const int opt_do_completeness_check,
-                            Slist_ptr assumptions, Slist_ptr *conflict);
+			    const int opt_do_virtual_unrolling,
+			    const int opt_do_completeness_check,
+			    Slist_ptr assumptions, Slist_ptr *conflict);
 
 /**AutomaticEnd***************************************************************/
 

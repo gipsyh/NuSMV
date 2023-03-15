@@ -38,7 +38,7 @@
 #define __NUSMV_CORE_TRACE_EXEC_BDDCOMPLETE_TRACE_EXECUTOR_PRIVATE_H__
 
 #include "nusmv/core/trace/exec/BDDCompleteTraceExecutor.h"
-#include "nusmv/core/trace/exec/CompleteTraceExecutor.h"         /* fix this */
+#include "nusmv/core/trace/exec/CompleteTraceExecutor.h" /* fix this */
 #include "nusmv/core/trace/exec/CompleteTraceExecutor_private.h" /* fix this */
 #include "nusmv/core/utils/utils.h"
 
@@ -52,18 +52,18 @@
 */
 
 typedef struct BDDCompleteTraceExecutor_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(CompleteTraceExecutor);
+	/* this MUST stay on the top */
+	INHERITS_FROM(CompleteTraceExecutor);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  BddFsm_ptr fsm;
-  BddEnc_ptr enc;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	BddFsm_ptr fsm;
+	BddEnc_ptr enc;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } BDDCompleteTraceExecutor;
 
@@ -80,8 +80,8 @@ typedef struct BDDCompleteTraceExecutor_TAG {
   \sa BDDCompleteTraceExecutor_create
 */
 void bdd_complete_trace_executor_init(BDDCompleteTraceExecutor_ptr self,
-                                      const BddFsm_ptr fsm,
-                                      const BddEnc_ptr enc);
+				      const BddFsm_ptr fsm,
+				      const BddEnc_ptr enc);
 
 /*!
   \methodof BDDCompleteTraceExecutor

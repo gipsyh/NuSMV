@@ -53,16 +53,16 @@
 */
 
 typedef struct LogicRecognizerCore_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(LogicRecognizerBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(LogicRecognizerBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } LogicRecognizerCore;
 
@@ -79,8 +79,8 @@ typedef struct LogicRecognizerCore_TAG {
   \sa LogicRecognizerCore_create
 */
 void logic_recognizer_core_init(LogicRecognizerCore_ptr self,
-                                const NuSMVEnv_ptr env, const char *name,
-                                int low, size_t num);
+				const NuSMVEnv_ptr env, const char *name,
+				int low, size_t num);
 
 /*!
   \methodof LogicRecognizerCore
@@ -104,6 +104,6 @@ void logic_recognizer_core_deinit(LogicRecognizerCore_ptr self);
   * LTL operators
 */
 LogicType logic_recognizer_core_recognize(LogicRecognizerBase_ptr self,
-                                          node_ptr wff, node_ptr context);
+					  node_ptr wff, node_ptr context);
 
 #endif /* __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_CORE_PRIVATE_H__ */

@@ -43,15 +43,15 @@ typedef struct BiMap_TAG *BiMap_ptr;
 
 #ifndef BI_MAP_FAST_ITERATOR
 typedef struct BiMapIter_TAG {
-  st_generator gen;
-  char *key_p;
-  char *value_p;
-  int end;
+	st_generator gen;
+	char *key_p;
+	char *value_p;
+	int end;
 } BiMapIter;
 #else
 typedef struct BiMapIter_TAG {
-  ListIter_ptr d_iter;
-  ListIter_ptr c_iter;
+	ListIter_ptr d_iter;
+	ListIter_ptr c_iter;
 } BiMapIter;
 #endif
 
@@ -75,9 +75,9 @@ typedef struct BiMapIter_TAG {
 
   \todo Missing description
 */
-#define BI_MAP_FOREACH(self, iter)                                             \
-  for (BiMap_gen_iter(self, &iter); !BiMap_iter_is_end(self, &iter);           \
-       BiMap_iter_next(self, &iter))
+#define BI_MAP_FOREACH(self, iter)                                         \
+	for (BiMap_gen_iter(self, &iter); !BiMap_iter_is_end(self, &iter); \
+	     BiMap_iter_next(self, &iter))
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -112,7 +112,7 @@ void BiMap_destroy(BiMap_ptr self);
                in the respective domains.
 */
 void BiMap_put(BiMap_ptr self, node_ptr domain_element,
-               node_ptr codomain_element);
+	       node_ptr codomain_element);
 
 /*!
   \methodof BiMap

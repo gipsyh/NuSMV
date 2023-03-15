@@ -60,8 +60,8 @@ typedef struct FlattenerCore_TAG *FlattenerCore_ptr;
 
   \todo Missing description
 */
-#define FLATTENER_CORE_CHECK_INSTANCE(self)                                    \
-  (nusmv_assert(FLATTENER_CORE(self) != FLATTENER_CORE(NULL)))
+#define FLATTENER_CORE_CHECK_INSTANCE(self) \
+	(nusmv_assert(FLATTENER_CORE(self) != FLATTENER_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -76,7 +76,7 @@ typedef struct FlattenerCore_TAG *FlattenerCore_ptr;
   The FlattenerCore class constructor
 */
 FlattenerCore_ptr FlattenerCore_create(const NuSMVEnv_ptr env,
-                                       const char *name);
+				       const char *name);
 
 /**AutomaticEnd***************************************************************/
 

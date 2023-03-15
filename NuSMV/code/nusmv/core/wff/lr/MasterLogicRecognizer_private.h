@@ -54,17 +54,17 @@
 */
 
 typedef struct MasterLogicRecognizer_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(MasterNodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(MasterNodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  hash_ptr expr2logic; /* memoization */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	hash_ptr expr2logic; /* memoization */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } MasterLogicRecognizer;
 
@@ -81,7 +81,7 @@ typedef struct MasterLogicRecognizer_TAG {
   \sa MasterLogicRecognizer_create
 */
 void master_logic_recognizer_init(MasterLogicRecognizer_ptr self,
-                                  NuSMVEnv_ptr env);
+				  NuSMVEnv_ptr env);
 
 /*!
   \methodof MasterLogicRecognizer
@@ -100,8 +100,8 @@ void master_logic_recognizer_deinit(MasterLogicRecognizer_ptr self);
   internal method
 */
 LogicType master_logic_recognizer_recognize(MasterLogicRecognizer_ptr self,
-                                            node_ptr expression,
-                                            node_ptr context);
+					    node_ptr expression,
+					    node_ptr context);
 
 /*!
   \methodof MasterLogicRecognizer
@@ -110,8 +110,8 @@ LogicType master_logic_recognizer_recognize(MasterLogicRecognizer_ptr self,
 
 */
 void master_logic_recognizer_insert(MasterLogicRecognizer_ptr self,
-                                    node_ptr expression, node_ptr context,
-                                    LogicType logic);
+				    node_ptr expression, node_ptr context,
+				    LogicType logic);
 
 /*!
   \methodof MasterLogicRecognizer
@@ -120,7 +120,7 @@ void master_logic_recognizer_insert(MasterLogicRecognizer_ptr self,
 
 */
 LogicType master_logic_recognizer_lookup(MasterLogicRecognizer_ptr self,
-                                         node_ptr expression, node_ptr context);
+					 node_ptr expression, node_ptr context);
 
 /*!
   \brief Given two LogicType returns the more general one
@@ -128,6 +128,6 @@ LogicType master_logic_recognizer_lookup(MasterLogicRecognizer_ptr self,
   Non compatible LogicType are not allowed
 */
 LogicType master_logic_recognizer_merge(MasterLogicRecognizer_ptr master,
-                                        LogicType left, LogicType right);
+					LogicType left, LogicType right);
 
 #endif /* __NUSMV_CORE_WFF_LR_MASTER_LOGIC_RECOGNIZER_PRIVATE_H__ */

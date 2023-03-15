@@ -54,17 +54,17 @@ version 2. Copyright (C) 2006 by FBK-irst.
 */
 
 typedef struct CheckerStatement_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(CheckerCore);
+	/* this MUST stay on the top */
+	INHERITS_FROM(CheckerCore);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  boolean inside_attime; /* to check ATTIME is not nested */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	boolean inside_attime; /* to check ATTIME is not nested */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } CheckerStatement;
 

@@ -53,42 +53,42 @@
 */
 
 typedef struct HrcNode_TAG {
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  INHERITS_FROM(EnvObject);
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	INHERITS_FROM(EnvObject);
 
-  SymbTable_ptr st;            /* The symbol table */
-  int lineno;                  /* line number of the module */
-  node_ptr name;               /* The name of the module */
-  node_ptr instance_name;      /* The instance name */
-  HrcNode_ptr parent;          /* The pointer to the parent node */
-  Olist_ptr formal_parameters; /* formal parameters */
-  Olist_ptr actual_parameters; /* actual parameters */
-  Olist_ptr state_variables;   /* state variables */
-  Olist_ptr input_variables;   /* input variables */
-  Olist_ptr frozen_variables;  /* frozen variables */
-  Olist_ptr state_functions;   /* state functions */
-  Olist_ptr frozen_functions;  /* frozen functions */
-  Olist_ptr defines;           /* DEFINE x := */
-  Olist_ptr array_defines;     /* ARRAY DEFINE x := */
-  Olist_ptr init_expr;         /* init expression INIT */
-  Olist_ptr init_assign;       /* init assignements init(x) :=.. */
-  Olist_ptr invar_expr;        /* init expression INVAR */
-  Olist_ptr invar_assign;      /* init assignements x :=.. */
-  Olist_ptr next_expr;         /* init expression TRANS */
-  Olist_ptr next_assign;       /* init assignements next(x) :=.. */
-  Olist_ptr justice;           /* JUSTICE/FAIRNESS */
-  Olist_ptr compassion;        /* COMPASSION */
-  Olist_ptr constants;         /* CONSTANTS */
-  Olist_ptr invar_props;       /* INVARSPEC */
-  Olist_ptr ctl_props;         /* CTLSPEC */
-  Olist_ptr ltl_props;         /* LTLSPEC */
-  Olist_ptr psl_props;         /* PSLSPEC */
-  Olist_ptr compute_props;     /* COMPUTE */
-  Slist_ptr childs;            /* List of sub-childs */
-  hash_ptr assigns_table;      /* Assignments hash (left part -> right part) */
-  void *undef;                 /* For programmers use. Here additional
+	SymbTable_ptr st; /* The symbol table */
+	int lineno; /* line number of the module */
+	node_ptr name; /* The name of the module */
+	node_ptr instance_name; /* The instance name */
+	HrcNode_ptr parent; /* The pointer to the parent node */
+	Olist_ptr formal_parameters; /* formal parameters */
+	Olist_ptr actual_parameters; /* actual parameters */
+	Olist_ptr state_variables; /* state variables */
+	Olist_ptr input_variables; /* input variables */
+	Olist_ptr frozen_variables; /* frozen variables */
+	Olist_ptr state_functions; /* state functions */
+	Olist_ptr frozen_functions; /* frozen functions */
+	Olist_ptr defines; /* DEFINE x := */
+	Olist_ptr array_defines; /* ARRAY DEFINE x := */
+	Olist_ptr init_expr; /* init expression INIT */
+	Olist_ptr init_assign; /* init assignements init(x) :=.. */
+	Olist_ptr invar_expr; /* init expression INVAR */
+	Olist_ptr invar_assign; /* init assignements x :=.. */
+	Olist_ptr next_expr; /* init expression TRANS */
+	Olist_ptr next_assign; /* init assignements next(x) :=.. */
+	Olist_ptr justice; /* JUSTICE/FAIRNESS */
+	Olist_ptr compassion; /* COMPASSION */
+	Olist_ptr constants; /* CONSTANTS */
+	Olist_ptr invar_props; /* INVARSPEC */
+	Olist_ptr ctl_props; /* CTLSPEC */
+	Olist_ptr ltl_props; /* LTLSPEC */
+	Olist_ptr psl_props; /* PSLSPEC */
+	Olist_ptr compute_props; /* COMPUTE */
+	Slist_ptr childs; /* List of sub-childs */
+	hash_ptr assigns_table; /* Assignments hash (left part -> right part) */
+	void *undef; /* For programmers use. Here additional
                                   information can be attached for
                                   several use without having to modify
                                   the structure */
@@ -101,9 +101,9 @@ typedef struct HrcNode_TAG {
 
   \se List is freed.
 */
-#define FREELIST_AND_SET_TO_NIL(list)                                          \
-  Olist_destroy(list);                                                         \
-  list = OLIST(NULL);
+#define FREELIST_AND_SET_TO_NIL(list) \
+	Olist_destroy(list);          \
+	list = OLIST(NULL);
 
 /*!
   \brief Free a list and all its elements, settin the list
@@ -114,12 +114,13 @@ typedef struct HrcNode_TAG {
 
   \se Elements in list are freed, list is freed.
 */
-#define FREE_LIST_AND_SET_TO_NIL(self, list)                                   \
-  hrc_node_free_elements_in_list_and_list(                                     \
-      NODE_MGR(NuSMVEnv_get_value(ENV_OBJECT_GET_ENV(self), ENV_NODE_MGR)),    \
-      list);                                                                   \
-  Olist_destroy(list);                                                         \
-  list = OLIST(NULL);
+#define FREE_LIST_AND_SET_TO_NIL(self, list)                          \
+	hrc_node_free_elements_in_list_and_list(                      \
+		NODE_MGR(NuSMVEnv_get_value(ENV_OBJECT_GET_ENV(self), \
+					    ENV_NODE_MGR)),           \
+		list);                                                \
+	Olist_destroy(list);                                          \
+	list = OLIST(NULL);
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */

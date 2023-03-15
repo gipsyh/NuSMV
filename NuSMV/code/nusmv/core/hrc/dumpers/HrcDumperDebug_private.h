@@ -52,16 +52,16 @@
 */
 
 typedef struct HrcDumperDebug_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(HrcDumper);
+	/* this MUST stay on the top */
+	INHERITS_FROM(HrcDumper);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } HrcDumperDebug;
 
@@ -78,7 +78,7 @@ typedef struct HrcDumperDebug_TAG {
   \sa HrcDumperDebug_create
 */
 void hrc_dumper_debug_init(HrcDumperDebug_ptr self, const NuSMVEnv_ptr env,
-                           FILE *fout);
+			   FILE *fout);
 
 /*!
   \methodof HrcDumperDebug
@@ -97,6 +97,6 @@ void hrc_dumper_debug_deinit(HrcDumperDebug_ptr self);
 
 */
 void hrc_dumper_debug_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
-                                   const HrcDumperInfo *info);
+				   const HrcDumperInfo *info);
 
 #endif /* __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_DEBUG_PRIVATE_H__ */

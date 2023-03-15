@@ -162,26 +162,26 @@
 */
 
 struct RbcManager {
-  NuSMVEnv_ptr environment;
-  Dag_Manager_t *dagManager;
-  Rbc_t **varTable;
-  int varCapacity;
-  Rbc_t *one;
-  Rbc_t *zero;
+	NuSMVEnv_ptr environment;
+	Dag_Manager_t *dagManager;
+	Rbc_t **varTable;
+	int varCapacity;
+	Rbc_t *one;
+	Rbc_t *zero;
 
-  LRUCache_ptr inlining_cache;
+	LRUCache_ptr inlining_cache;
 
-  /* splitted cache mapping in two sets (model, cnf) */
-  hash_ptr rbcNode2cnfVar_model;
-  hash_ptr rbcNode2cnfVar_cnf;
+	/* splitted cache mapping in two sets (model, cnf) */
+	hash_ptr rbcNode2cnfVar_model;
+	hash_ptr rbcNode2cnfVar_cnf;
 
-  hash_ptr cnfVar2rbcNode_model;
-  hash_ptr cnfVar2rbcNode_cnf;
+	hash_ptr cnfVar2rbcNode_model;
+	hash_ptr cnfVar2rbcNode_cnf;
 
-  int maxUnchangedRbcVariable;
-  int maxCnfVariable;
+	int maxUnchangedRbcVariable;
+	int maxCnfVariable;
 
-  int stats[RBCMAX_STAT];
+	int stats[RBCMAX_STAT];
 };
 
 /*---------------------------------------------------------------------------*/
@@ -264,12 +264,12 @@ struct RbcManager {
 /*---------------------------------------------------------------------------*/
 
 int Rbc_Convert2CnfSimple(Rbc_Manager_t *rbcManager, Rbc_t *f,
-                          Slist_ptr clauses, Slist_ptr vars,
-                          int *literalAssignedToWholeFormula);
+			  Slist_ptr clauses, Slist_ptr vars,
+			  int *literalAssignedToWholeFormula);
 
 int Rbc_Convert2CnfCompact(Rbc_Manager_t *rbcManager, Rbc_t *f, int polarity,
-                           Slist_ptr clauses, Slist_ptr vars,
-                           int *literalAssignedToWholeFormula);
+			   Slist_ptr clauses, Slist_ptr vars,
+			   int *literalAssignedToWholeFormula);
 
 int Rbc_get_node_cnf(Rbc_Manager_t *rbcm, Rbc_t *f, int *maxvar);
 
@@ -284,15 +284,15 @@ void rbc_inlining_cache_quit(Rbc_Manager_t *);
   it belongs to the cache.
 */
 InlineResult_ptr rbc_inlining_cache_lookup_result(Rbc_Manager_t *rbcm,
-                                                  Rbc_t *f);
+						  Rbc_t *f);
 
 void Rbc_Dfs(Rbc_t *dfsRoot, RbcDfsFunctions_t *dfsFun, void *dfsData,
-             Rbc_Manager_t *manager);
+	     Rbc_Manager_t *manager);
 
 void Rbc_Dfs_clean(Rbc_t *dfsRoot, Rbc_Manager_t *manager);
 
 void Rbc_Dfs_do_only_last_visit(Rbc_t *dfsRoot, RbcDfsFunctions_t *dfsFun,
-                                void *dfsData, Rbc_Manager_t *manager);
+				void *dfsData, Rbc_Manager_t *manager);
 
 /**AutomaticEnd***************************************************************/
 

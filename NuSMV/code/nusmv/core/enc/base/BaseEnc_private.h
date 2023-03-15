@@ -58,21 +58,21 @@
 */
 
 typedef struct BaseEnc_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(EnvObject);
+	/* this MUST stay on the top */
+	INHERITS_FROM(EnvObject);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
-  SymbTable_ptr symb_table;
-  NodeList_ptr committed_layers;
-  array_t *layer_names;
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
+	SymbTable_ptr symb_table;
+	NodeList_ptr committed_layers;
+	array_t *layer_names;
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  void (*commit_layer)(BaseEnc_ptr self, const char *layer_name);
-  void (*remove_layer)(BaseEnc_ptr self, const char *layer_name);
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	void (*commit_layer)(BaseEnc_ptr self, const char *layer_name);
+	void (*remove_layer)(BaseEnc_ptr self, const char *layer_name);
 
 } BaseEnc;
 

@@ -55,15 +55,15 @@ This file is part of the ``rbc.clg'' package
 /*---------------------------------------------------------------------------*/
 
 typedef struct ClgManager_TAG {
-  clause_graph *clgs; /* All of the clause graphs. */
-  int clg_count;      /* How many clgs have been allocated */
-  int max_clg_count;  /* size of *clgs */
+	clause_graph *clgs; /* All of the clause graphs. */
+	int clg_count; /* How many clgs have been allocated */
+	int max_clg_count; /* size of *clgs */
 } ClgManager;
 
 typedef struct Extract_Elem {
-  clause_graph head;
-  node_ptr follow;
-  int clause_size;
+	clause_graph head;
+	node_ptr follow;
+	int clause_size;
 } Extract_Elem;
 
 /*---------------------------------------------------------------------------*/
@@ -79,22 +79,22 @@ typedef struct Extract_Elem {
 
   \todo Missing description
 */
-#define extract_array_push(extract_array, head, follow, clause_size, index)    \
-  {                                                                            \
-    Extract_Elem ee = {head, follow, clause_size};                             \
-    array_insert(Extract_Elem, extract_array, index, ee);                      \
-    ++index;                                                                   \
-  }
+#define extract_array_push(extract_array, head, follow, clause_size, index) \
+	{                                                                   \
+		Extract_Elem ee = { head, follow, clause_size };            \
+		array_insert(Extract_Elem, extract_array, index, ee);       \
+		++index;                                                    \
+	}
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define extract_array_pop(extract_array, index, elem, tmp)                     \
-  (--index, tmp = array_fetch_p(Extract_Elem, extract_array, index),           \
-   elem->head = tmp->head, elem->follow = tmp->follow,                         \
-   elem->clause_size = tmp->clause_size)
+#define extract_array_pop(extract_array, index, elem, tmp)                 \
+	(--index, tmp = array_fetch_p(Extract_Elem, extract_array, index), \
+	 elem->head = tmp->head, elem->follow = tmp->follow,               \
+	 elem->clause_size = tmp->clause_size)
 
 /**AutomaticStart*************************************************************/
 
@@ -102,10 +102,10 @@ typedef struct Extract_Elem {
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 static void Extract(const NuSMVEnv_ptr env, clause_graph head, node_ptr follow,
-                    int clause_size, int type, Clg_Commit commit, void *data);
+		    int clause_size, int type, Clg_Commit commit, void *data);
 
 static int AddToClause(int **clause, int *max_clause_size, int pos_lit,
-                       int neg_lit, int size);
+		       int neg_lit, int size);
 
 static clause_graph new_clg(ClgManager_ptr clgmanager);
 
@@ -115,80 +115,87 @@ static clause_graph new_clg(ClgManager_ptr clgmanager);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-ClgManager_ptr ClgManager_create() {
-  ClgManager_ptr self = ALLOC(ClgManager, 1);
+ClgManager_ptr ClgManager_create()
+{
+	ClgManager_ptr self = ALLOC(ClgManager, 1);
 
-  self->clg_count = 0;
-  self->clgs = NULL;
-  self->max_clg_count = 0;
+	self->clg_count = 0;
+	self->clgs = NULL;
+	self->max_clg_count = 0;
 
-  return self;
+	return self;
 }
 
-void ClgManager_destroy(ClgManager_ptr clgmgr) {
-  for (; clgmgr->clg_count > 0; clgmgr->clg_count--) {
-    FREE(clgmgr->clgs[(clgmgr->clg_count) - 1]);
-    clgmgr->clgs[(clgmgr->clg_count) - 1] = (clause_graph)NULL;
-  }
-  FREE(clgmgr->clgs);
-  clgmgr->clgs = (clause_graph *)NULL;
-  FREE(clgmgr);
+void ClgManager_destroy(ClgManager_ptr clgmgr)
+{
+	for (; clgmgr->clg_count > 0; clgmgr->clg_count--) {
+		FREE(clgmgr->clgs[(clgmgr->clg_count) - 1]);
+		clgmgr->clgs[(clgmgr->clg_count) - 1] = (clause_graph)NULL;
+	}
+	FREE(clgmgr->clgs);
+	clgmgr->clgs = (clause_graph *)NULL;
+	FREE(clgmgr);
 }
 
-clause_graph Clg_Lit(ClgManager_ptr clgmanager, int literal) {
-  clause_graph lit;
+clause_graph Clg_Lit(ClgManager_ptr clgmanager, int literal)
+{
+	clause_graph lit;
 
-  nusmv_assert(0 != literal);
+	nusmv_assert(0 != literal);
 
-  lit = new_clg(clgmanager);
-  lit->label = literal;
-  lit->size = 1;
-  lit->left = NULL;
-  lit->right = NULL;
+	lit = new_clg(clgmanager);
+	lit->label = literal;
+	lit->size = 1;
+	lit->left = NULL;
+	lit->right = NULL;
 
-  return lit;
+	return lit;
 }
 
 clause_graph Clg_Conj(ClgManager_ptr clgmanager, clause_graph left,
-                      clause_graph right) {
-  clause_graph vtx;
-  if (left == NULL)
-    return right;
-  if (right == NULL)
-    return left;
-  vtx = new_clg(clgmanager);
-  vtx->label = CLG_CONJ;
-  vtx->size = left->size + right->size;
-  vtx->left = left;
-  vtx->right = right;
+		      clause_graph right)
+{
+	clause_graph vtx;
+	if (left == NULL)
+		return right;
+	if (right == NULL)
+		return left;
+	vtx = new_clg(clgmanager);
+	vtx->label = CLG_CONJ;
+	vtx->size = left->size + right->size;
+	vtx->left = left;
+	vtx->right = right;
 
-  return vtx;
+	return vtx;
 }
 
 clause_graph Clg_Disj(ClgManager_ptr clgmanager, clause_graph left,
-                      clause_graph right) {
-  clause_graph vtx;
-  if (left == NULL)
-    return right;
-  if (right == NULL)
-    return left;
-  vtx = new_clg(clgmanager);
-  vtx->label = CLG_DISJ;
-  vtx->size = left->size * right->size;
-  vtx->left = left;
-  vtx->right = right;
+		      clause_graph right)
+{
+	clause_graph vtx;
+	if (left == NULL)
+		return right;
+	if (right == NULL)
+		return left;
+	vtx = new_clg(clgmanager);
+	vtx->label = CLG_DISJ;
+	vtx->size = left->size * right->size;
+	vtx->left = left;
+	vtx->right = right;
 
-  return vtx;
+	return vtx;
 }
 
-int Clg_Size(clause_graph graph) {
-  nusmv_assert(graph != (clause_graph)NULL);
-  return graph->size;
+int Clg_Size(clause_graph graph)
+{
+	nusmv_assert(graph != (clause_graph)NULL);
+	return graph->size;
 }
 
 void Clg_Extract(const NuSMVEnv_ptr env, clause_graph head, int type,
-                 Clg_Commit commit, void *data) {
-  Extract(env, head, Nil, 0, type, commit, data);
+		 Clg_Commit commit, void *data)
+{
+	Extract(env, head, Nil, 0, type, commit, data);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -208,130 +215,169 @@ void Clg_Extract(const NuSMVEnv_ptr env, clause_graph head, int type,
 */
 
 static void Extract(const NuSMVEnv_ptr env, clause_graph head, node_ptr follow,
-                    int clause_size, int type, Clg_Commit commit, void *data) {
-  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+		    int clause_size, int type, Clg_Commit commit, void *data)
+{
+	const NodeMgr_ptr nodemgr =
+		NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+	const ErrorMgr_ptr errmgr =
+		ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  array_t *extract_array = NULL;
-  int index = 0;
-  int array_size = 10;
+	array_t *extract_array = NULL;
+	int index = 0;
+	int array_size = 10;
 
-  Extract_Elem *elem = NULL;
-  Extract_Elem *tmp = NULL;
+	Extract_Elem *elem = NULL;
+	Extract_Elem *tmp = NULL;
 
-  int max_clause_size = 256;
-  int *clause = ALLOC(int, max_clause_size);
+	int max_clause_size = 256;
+	int *clause = ALLOC(int, max_clause_size);
 
-  nusmv_assert(clause != (int *)NULL);
-  nusmv_assert(head != NULL);
+	nusmv_assert(clause != (int *)NULL);
+	nusmv_assert(head != NULL);
 
-  elem = ALLOC(Extract_Elem, 1);
+	elem = ALLOC(Extract_Elem, 1);
 
-  extract_array = array_alloc(Extract_Elem, array_size);
+	extract_array = array_alloc(Extract_Elem, array_size);
 
-  extract_array_push(extract_array, head, follow, clause_size, index);
+	extract_array_push(extract_array, head, follow, clause_size, index);
 
-  while (index > 0) {
+	while (index > 0) {
+		extract_array_pop(extract_array, index, elem, tmp);
 
-    extract_array_pop(extract_array, index, elem, tmp);
-
-    if (elem->head == (clause_graph)NULL) {
-      free_node(nodemgr, elem->follow);
-    } else {
-
-      /* Check for leaf node */
-      /* literals are such that both left and right are NULL. A better
+		if (elem->head == (clause_graph)NULL) {
+			free_node(nodemgr, elem->follow);
+		} else {
+			/* Check for leaf node */
+			/* literals are such that both left and right are NULL. A better
          approach would be to add a field type or kind to the clg_graph so
          that it can be LITERAL, CONJ, DISJ */
-      if (elem->head->left == NULL && elem->head->right == NULL) {
+			if (elem->head->left == NULL &&
+			    elem->head->right == NULL) {
+				switch (type) {
+				case CLG_DIMACS:
+				case CLG_NUSMV:
+					clause_size = AddToClause(
+						&clause, &max_clause_size,
+						elem->head->label,
+						-(elem->head->label),
+						elem->clause_size);
+					break;
 
-        switch (type) {
-        case CLG_DIMACS:
-        case CLG_NUSMV:
-          clause_size =
-              AddToClause(&clause, &max_clause_size, elem->head->label,
-                          -(elem->head->label), elem->clause_size);
-          break;
+				case CLG_ZCHAFF:
+					if (elem->head->label < 0) {
+						clause_size = AddToClause(
+							&clause,
+							&max_clause_size,
+							1 - (elem->head->label) *
+									2,
+							-(elem->head->label) *
+								2,
+							elem->clause_size);
+					} else {
+						clause_size = AddToClause(
+							&clause,
+							&max_clause_size,
+							(elem->head->label) * 2,
+							1 + (elem->head->label) *
+									2,
+							elem->clause_size);
+					}
+					break;
 
-        case CLG_ZCHAFF:
-          if (elem->head->label < 0) {
-            clause_size = AddToClause(
-                &clause, &max_clause_size, 1 - (elem->head->label) * 2,
-                -(elem->head->label) * 2, elem->clause_size);
-          } else {
-            clause_size =
-                AddToClause(&clause, &max_clause_size, (elem->head->label) * 2,
-                            1 + (elem->head->label) * 2, elem->clause_size);
-          }
-          break;
+				default:
+					ErrorMgr_internal_error(
+						errmgr,
+						"Clg_Extract: Bad extract type\n");
+				}
 
-        default:
-          ErrorMgr_internal_error(errmgr, "Clg_Extract: Bad extract type\n");
-        }
+				if (clause_size == 0) {
+					/* All clauses from here on would be redundant, so backtrack now */
+					continue;
+				}
+				if (elem->follow == Nil) {
+					/* Nothing else to do: commit this clause! */
+					commit(data, clause, clause_size);
+				} else {
+					/* Follow the follow list */
+					extract_array_push(
+						extract_array,
+						(clause_graph)car(elem->follow),
+						cdr(elem->follow), clause_size,
+						index);
+				}
+			} /* if (elem->head->left == NULL && elem->head->right == NULL) */
 
-        if (clause_size == 0) {
-          /* All clauses from here on would be redundant, so backtrack now */
-          continue;
-        }
-        if (elem->follow == Nil) {
-          /* Nothing else to do: commit this clause! */
-          commit(data, clause, clause_size);
-        } else {
-          /* Follow the follow list */
-          extract_array_push(extract_array, (clause_graph)car(elem->follow),
-                             cdr(elem->follow), clause_size, index);
-        }
-      } /* if (elem->head->left == NULL && elem->head->right == NULL) */
+			else if (elem->head->label == CLG_CONJ) {
+				/* Internal conjunction node: branch */
+				extract_array_push(extract_array,
+						   elem->head->right,
+						   elem->follow,
+						   elem->clause_size, index);
 
-      else if (elem->head->label == CLG_CONJ) {
+				extract_array_push(extract_array,
+						   elem->head->left,
+						   elem->follow,
+						   elem->clause_size, index);
+			}
 
-        /* Internal conjunction node: branch */
-        extract_array_push(extract_array, elem->head->right, elem->follow,
-                           elem->clause_size, index);
+			else if (elem->head->label == CLG_DISJ) {
+				node_ptr nfollow;
 
-        extract_array_push(extract_array, elem->head->left, elem->follow,
-                           elem->clause_size, index);
-      }
+				/* Internal disjunction node: chain */
+				/* Heuristic to speed up search */
+				nusmv_assert(elem->head->left !=
+					     (clause_graph)NULL);
+				nusmv_assert(elem->head->right !=
+					     (clause_graph)NULL);
 
-      else if (elem->head->label == CLG_DISJ) {
-        node_ptr nfollow;
+				if (elem->head->left->size <
+				    elem->head->right->size) {
+					nfollow = cons(
+						nodemgr,
+						(node_ptr)(elem->head->right),
+						elem->follow);
 
-        /* Internal disjunction node: chain */
-        /* Heuristic to speed up search */
-        nusmv_assert(elem->head->left != (clause_graph)NULL);
-        nusmv_assert(elem->head->right != (clause_graph)NULL);
+					extract_array_push(extract_array, NULL,
+							   nfollow,
+							   elem->clause_size,
+							   index);
 
-        if (elem->head->left->size < elem->head->right->size) {
-          nfollow = cons(nodemgr, (node_ptr)(elem->head->right), elem->follow);
+					extract_array_push(extract_array,
+							   elem->head->left,
+							   nfollow,
+							   elem->clause_size,
+							   index);
+				} else {
+					nfollow = cons(
+						nodemgr,
+						(node_ptr)(elem->head->left),
+						elem->follow);
 
-          extract_array_push(extract_array, NULL, nfollow, elem->clause_size,
-                             index);
+					extract_array_push(extract_array, NULL,
+							   nfollow,
+							   elem->clause_size,
+							   index);
 
-          extract_array_push(extract_array, elem->head->left, nfollow,
-                             elem->clause_size, index);
-        } else {
-          nfollow = cons(nodemgr, (node_ptr)(elem->head->left), elem->follow);
+					extract_array_push(extract_array,
+							   elem->head->right,
+							   nfollow,
+							   elem->clause_size,
+							   index);
+				}
+			}
 
-          extract_array_push(extract_array, NULL, nfollow, elem->clause_size,
-                             index);
+			else {
+				/* Something's wrong */
+				ErrorMgr_internal_error(
+					errmgr,
+					"Clg_Extract: Nonsense clause graph vertex\n");
+			}
+		}
+	}
 
-          extract_array_push(extract_array, elem->head->right, nfollow,
-                             elem->clause_size, index);
-        }
-      }
-
-      else {
-        /* Something's wrong */
-        ErrorMgr_internal_error(errmgr,
-                                "Clg_Extract: Nonsense clause graph vertex\n");
-      }
-    }
-  }
-
-  FREE(elem);
-  array_free(extract_array);
-  FREE(clause);
+	FREE(elem);
+	array_free(extract_array);
+	FREE(clause);
 }
 
 /*!
@@ -344,30 +390,31 @@ static void Extract(const NuSMVEnv_ptr env, clause_graph head, node_ptr follow,
 */
 
 static int AddToClause(int **clause, int *max_clause_size, int pos_lit,
-                       int neg_lit, int size) {
-  int i;
+		       int neg_lit, int size)
+{
+	int i;
 
-  nusmv_assert((*max_clause_size) > 0);
+	nusmv_assert((*max_clause_size) > 0);
 
-  /* Check size and reallocate if necessary */
-  if (size + 1 == (*max_clause_size)) {
-    (*max_clause_size) *= 2;
-    nusmv_assert(*clause != (int *)NULL);
-    *clause = REALLOC(int, *clause, (*max_clause_size));
-    nusmv_assert(*clause != (int *)NULL);
-  }
+	/* Check size and reallocate if necessary */
+	if (size + 1 == (*max_clause_size)) {
+		(*max_clause_size) *= 2;
+		nusmv_assert(*clause != (int *)NULL);
+		*clause = REALLOC(int, *clause, (*max_clause_size));
+		nusmv_assert(*clause != (int *)NULL);
+	}
 
-  /* O(n) method for inserting... but who cares? */
-  for (i = 0; i < size; i++) {
-    if ((*clause)[i] == pos_lit) {
-      return size;
-    }
-    if ((*clause)[i] == neg_lit) {
-      return 0;
-    }
-  }
-  (*clause)[i] = pos_lit;
-  return size + 1;
+	/* O(n) method for inserting... but who cares? */
+	for (i = 0; i < size; i++) {
+		if ((*clause)[i] == pos_lit) {
+			return size;
+		}
+		if ((*clause)[i] == neg_lit) {
+			return 0;
+		}
+	}
+	(*clause)[i] = pos_lit;
+	return size + 1;
 }
 
 /*!
@@ -376,26 +423,27 @@ static int AddToClause(int **clause, int *max_clause_size, int pos_lit,
 
 */
 
-static clause_graph new_clg(ClgManager_ptr clgmanager) {
-  clause_graph result;
+static clause_graph new_clg(ClgManager_ptr clgmanager)
+{
+	clause_graph result;
 
-  if (clgmanager->clg_count == 0) {
-    clgmanager->clgs = ALLOC(clause_graph, 4096);
-    nusmv_assert(clgmanager->clgs != (clause_graph *)NULL);
-    clgmanager->max_clg_count = 4096;
-  }
-  if ((clgmanager->clg_count) + 1 >= clgmanager->max_clg_count) {
-    clgmanager->max_clg_count *= 2;
-    clgmanager->clgs =
-        REALLOC(clause_graph, clgmanager->clgs, clgmanager->max_clg_count);
-    nusmv_assert(clgmanager->clgs != (clause_graph *)NULL);
-  }
+	if (clgmanager->clg_count == 0) {
+		clgmanager->clgs = ALLOC(clause_graph, 4096);
+		nusmv_assert(clgmanager->clgs != (clause_graph *)NULL);
+		clgmanager->max_clg_count = 4096;
+	}
+	if ((clgmanager->clg_count) + 1 >= clgmanager->max_clg_count) {
+		clgmanager->max_clg_count *= 2;
+		clgmanager->clgs = REALLOC(clause_graph, clgmanager->clgs,
+					   clgmanager->max_clg_count);
+		nusmv_assert(clgmanager->clgs != (clause_graph *)NULL);
+	}
 
-  result = ALLOC(struct Clg_Vertex, 1);
-  nusmv_assert(result != (struct Clg_Vertex *)NULL);
+	result = ALLOC(struct Clg_Vertex, 1);
+	nusmv_assert(result != (struct Clg_Vertex *)NULL);
 
-  clgmanager->clgs[clgmanager->clg_count] = result;
-  clgmanager->clg_count++;
+	clgmanager->clgs[clgmanager->clg_count] = result;
+	clgmanager->clg_count++;
 
-  return result;
+	return result;
 }

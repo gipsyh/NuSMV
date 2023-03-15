@@ -53,11 +53,11 @@
 */
 
 typedef struct McCheckInvarOpts_TAG {
-  Check_Strategy strategy;
-  FB_Heuristic fb_heuristic;
-  Bdd2bmc_Heuristic bdd2bmc_heuristic;
-  int threshold;
-  int bmc_length;
+	Check_Strategy strategy;
+	FB_Heuristic fb_heuristic;
+	Bdd2bmc_Heuristic bdd2bmc_heuristic;
+	int threshold;
+	int bmc_length;
 } McCheckInvarOpts;
 
 void McCheckInvarOpts_init(McCheckInvarOpts *options, NuSMVEnv_ptr env);
@@ -140,8 +140,8 @@ void Mc_CheckInvarSilently(NuSMVEnv_ptr env, Prop_ptr prop, Trace_ptr *trace);
   \sa check_ctlspec check_ltlspec Mc_CheckInvar
 */
 void Mc_CheckInvar_With_Strategy(NuSMVEnv_ptr env, Prop_ptr prop,
-                                 Check_Strategy strategy, Trace_ptr *trace,
-                                 boolean silent);
+				 Check_Strategy strategy, Trace_ptr *trace,
+				 boolean silent);
 
 /*!
   \brief Verifies that M,s0 |= AG alpha with the specified strategy
@@ -160,9 +160,9 @@ void Mc_CheckInvar_With_Strategy(NuSMVEnv_ptr env, Prop_ptr prop,
   \sa check_ctlspec check_ltlspec Mc_CheckInvar
 */
 void Mc_CheckInvar_With_Strategy_And_Symbols(NuSMVEnv_ptr env, Prop_ptr prop,
-                                             Check_Strategy strategy,
-                                             Trace_ptr *trace, boolean silent,
-                                             NodeList_ptr symbols);
+					     Check_Strategy strategy,
+					     Trace_ptr *trace, boolean silent,
+					     NodeList_ptr symbols);
 
 /*!
   \brief Compute quantitative characteristics on the model.
@@ -214,7 +214,7 @@ int Mc_check_psl_property(NuSMVEnv_ptr env, Prop_ptr prop);
   mc_check_language_emptiness_el_fwd
 */
 void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env, const BddFsm_ptr fsm,
-                               boolean allinit, boolean verbose);
+			       boolean allinit, boolean verbose);
 /* mcTrace.c */
 
 /*!
@@ -231,10 +231,10 @@ void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env, const BddFsm_ptr fsm,
                 Mc_fill_trace_from_bdd_state_input_list
 */
 Trace_ptr Mc_create_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
-                                                    const NodeList_ptr symbols,
-                                                    const char *desc,
-                                                    const TraceType type,
-                                                    node_ptr path);
+						    const NodeList_ptr symbols,
+						    const char *desc,
+						    const TraceType type,
+						    node_ptr path);
 
 /*!
   \brief Fills the given trace out of a < S (i, S)* >  bdd list
@@ -248,8 +248,8 @@ Trace_ptr Mc_create_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
   \sa Trace_create, Bmc_fill_trace_from_cnf_model
 */
 Trace_ptr Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
-                                                  Trace_ptr trace,
-                                                  node_ptr path);
+						  Trace_ptr trace,
+						  node_ptr path);
 
 /*!
   \brief Populates a trace step with state assignments
@@ -259,7 +259,7 @@ Trace_ptr Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
   \se none
 */
 void Mc_trace_step_put_state_from_bdd(Trace_ptr trace, TraceIter step,
-                                      BddEnc_ptr bdd_enc, bdd_ptr bdd);
+				      BddEnc_ptr bdd_enc, bdd_ptr bdd);
 
 /*!
   \brief Populates a trace step with input assignments
@@ -269,7 +269,7 @@ void Mc_trace_step_put_state_from_bdd(Trace_ptr trace, TraceIter step,
   \se none
 */
 void Mc_trace_step_put_input_from_bdd(Trace_ptr trace, TraceIter step,
-                                      BddEnc_ptr bdd_enc, bdd_ptr bdd);
+				      BddEnc_ptr bdd_enc, bdd_ptr bdd);
 
 /*!
   \brief Prints out a CTL specification

@@ -58,9 +58,9 @@
 */
 
 typedef struct TraceXmlDumper_TAG {
-  INHERITS_FROM(TracePlugin);
+	INHERITS_FROM(TracePlugin);
 
-  boolean is_embedded;
+	boolean is_embedded;
 
 } TraceXmlDumper;
 
@@ -105,7 +105,7 @@ void trace_xml_dumper_print_symbol(TracePlugin_ptr self, node_ptr symb);
   \todo
 */
 void trace_xml_dumper_print_assignment(TracePlugin_ptr self, node_ptr symb,
-                                       node_ptr val);
+				       node_ptr val);
 
 /**AutomaticEnd***************************************************************/
 

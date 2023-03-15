@@ -136,7 +136,7 @@ node if there is one
   \sa optional
 */
 PslNode_ptr psl_new_node(NodeMgr_ptr nodemgr, PslOp _type, PslNode_ptr left,
-                         PslNode_ptr right);
+			 PslNode_ptr right);
 
 /*!
   \brief Sets the given expression's left branch
@@ -191,7 +191,7 @@ system.
   \se None
 */
 boolean psl_node_is_handled_star(const NuSMVEnv_ptr env, PslNode_ptr expr,
-                                 boolean toplevel);
+				 boolean toplevel);
 
 /*!
   \brief Returns the count of a starred sere.
@@ -307,7 +307,7 @@ This means that psl_conv_op must be called to convert tokens before.
   \se None
 */
 PslNode_ptr psl_node_make_sere_compound(NodeMgr_ptr nodemgr, PslNode_ptr seq1,
-                                        PslOp op, PslNode_ptr seq2);
+					PslOp op, PslNode_ptr seq2);
 
 /*!
   \brief Returns true if the given expression is a sere compound
@@ -414,7 +414,7 @@ boolean psl_node_sere_is_concat_fusion_holes_free(PslNode_ptr e);
   \se None
 */
 PslNode_ptr psl_node_prune(NodeMgr_ptr nodemgr, PslNode_ptr tree,
-                           PslNode_ptr branch);
+			   PslNode_ptr branch);
 
 /*!
   \brief Returns true if the given expression is a propositional
@@ -445,7 +445,7 @@ the list for next
   \se None
 */
 PslNode_ptr psl_node_make_cons(NodeMgr_ptr nodemgr, PslNode_ptr elem,
-                               PslNode_ptr next);
+			       PslNode_ptr next);
 
 /*!
   \brief Maker for a list, does not use find_node
@@ -456,7 +456,7 @@ the list for next
   \se None
 */
 PslNode_ptr psl_node_make_cons_new(NodeMgr_ptr nodemgr, PslNode_ptr elem,
-                                   PslNode_ptr next);
+				   PslNode_ptr next);
 
 /*!
   \brief Returns true if the given node is a list
@@ -650,8 +650,8 @@ This means that psl_conv_op must be called to convert tokens before.
   \se None
 */
 PslNode_ptr psl_node_make_extended_next(NodeMgr_ptr nodemgr, PslOp op,
-                                        PslNode_ptr expr, PslNode_ptr when,
-                                        PslNode_ptr condition);
+					PslNode_ptr expr, PslNode_ptr when,
+					PslNode_ptr condition);
 
 /*!
   \brief Given a psl node returns true iff the expression belongs to

@@ -133,7 +133,7 @@ void purify_all_inuse();
 
 */
 void Cmd_CommandAdd(NuSMVEnv_ptr env, char *name, PFI funcFp, int changes,
-                    boolean reentrant);
+		    boolean reentrant);
 
 /*!
   \brief Removes given command from the command table.
@@ -176,7 +176,7 @@ int Cmd_SecureCommandExecute(NuSMVEnv_ptr env, char *command);
   is a pointer which should be free'd when you are done with it.
 */
 FILE *Cmd_FileOpen(const NuSMVEnv_ptr env, char *fileName, char *mode,
-                   char **realFileName_p, int silent);
+		   char **realFileName_p, int silent);
 
 /*!
   \brief Initializes the command package.
@@ -250,7 +250,7 @@ void CmdCloseFile(FILE *file);
   \se outstream is changed
 */
 Outcome Cmd_Misc_open_pipe_or_file(NuSMVEnv_ptr const env,
-                                   const char *dbgFileName, FILE **outstream);
+				   const char *dbgFileName, FILE **outstream);
 
 /*!
   \brief Open a file or a pipe and sets them into the StreamMgr
@@ -263,7 +263,7 @@ Outcome Cmd_Misc_open_pipe_or_file(NuSMVEnv_ptr const env,
   \sa Cmd_Misc_restore_global_out_stream
 */
 int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env, char *filename,
-                                   boolean useMore, FILE **prev_outstream);
+				   boolean useMore, FILE **prev_outstream);
 
 /*!
   \brief Closes the outstream in the stream mgr, previously opened
@@ -275,8 +275,8 @@ int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env, char *filename,
   \sa Cmd_Misc_set_global_out_stream
 */
 void Cmd_Misc_restore_global_out_stream(NuSMVEnv_ptr env, char *filename,
-                                        boolean use_a_pipe,
-                                        FILE *prev_outstream);
+					boolean use_a_pipe,
+					FILE *prev_outstream);
 
 /*!
   \brief Sources the .nusmvrc file.

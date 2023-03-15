@@ -53,17 +53,17 @@
 */
 
 typedef struct PrinterBase_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(NodeWalker);
+	/* this MUST stay on the top */
+	INHERITS_FROM(NodeWalker);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
-  int (*print_node)(PrinterBase_ptr self, node_ptr n, int priority);
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
+	int (*print_node)(PrinterBase_ptr self, node_ptr n, int priority);
 
 } PrinterBase;
 
@@ -86,7 +86,7 @@ typedef struct PrinterBase_TAG {
   \sa PrinterBase_destroy
 */
 PrinterBase_ptr PrinterBase_create(const NuSMVEnv_ptr env, const char *name,
-                                   int low, size_t num);
+				   int low, size_t num);
 
 /*!
   \methodof PrinterBase
@@ -97,8 +97,8 @@ PrinterBase_ptr PrinterBase_create(const NuSMVEnv_ptr env, const char *name,
   \sa PrinterBase_create
 */
 void printer_base_init(PrinterBase_ptr self, const NuSMVEnv_ptr env,
-                       const char *name, int low, size_t num,
-                       boolean can_handle_null);
+		       const char *name, int low, size_t num,
+		       boolean can_handle_null);
 
 /*!
   \methodof PrinterBase
@@ -118,7 +118,7 @@ void printer_base_deinit(PrinterBase_ptr self);
 
 */
 int printer_base_throw_print_node(PrinterBase_ptr self, node_ptr n,
-                                  int priority);
+				  int priority);
 
 /*!
   \methodof PrinterBase

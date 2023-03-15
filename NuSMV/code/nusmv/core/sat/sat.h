@@ -96,7 +96,7 @@
   if requested sat solver is not available.
 */
 SatSolver_ptr Sat_CreateNonIncSolver(const NuSMVEnv_ptr env,
-                                     const char *satSolver);
+				     const char *satSolver);
 
 /*!
   \brief Creates a SAT solver (non-incremental) of a given
@@ -107,7 +107,7 @@ SatSolver_ptr Sat_CreateNonIncSolver(const NuSMVEnv_ptr env,
   available only with MiniSat.
 */
 SatSolver_ptr Sat_CreateNonIncProofSolver(const NuSMVEnv_ptr env,
-                                          const char *satSolver);
+					  const char *satSolver);
 
 /*!
   \brief Creates an incremental SAT solver instance of a given
@@ -117,7 +117,7 @@ SatSolver_ptr Sat_CreateNonIncProofSolver(const NuSMVEnv_ptr env,
   if requested sat solver is not available.
 */
 SatIncSolver_ptr Sat_CreateIncSolver(const NuSMVEnv_ptr env,
-                                     const char *satSolver);
+				     const char *satSolver);
 
 /*!
   \brief Creates an incremental proof logging SAT solver instance
@@ -127,7 +127,7 @@ SatIncSolver_ptr Sat_CreateIncSolver(const NuSMVEnv_ptr env,
   if requested sat solver is not available.
 */
 SatIncSolver_ptr Sat_CreateIncProofSolver(const NuSMVEnv_ptr env,
-                                          const char *satSolver);
+					  const char *satSolver);
 
 /*!
   \brief Given a string representing the name of a sat solver,

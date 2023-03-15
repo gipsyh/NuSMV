@@ -60,12 +60,12 @@ typedef struct UStringMgr_TAG *UStringMgr_ptr;
 
   \todo Missing description
 */
-#define USTRING_MGR_CHECK_INSTANCE(self)                                       \
-  (nusmv_assert(USTRING_MGR(self) != USTRING_MGR(NULL)))
+#define USTRING_MGR_CHECK_INSTANCE(self) \
+	(nusmv_assert(USTRING_MGR(self) != USTRING_MGR(NULL)))
 
 typedef struct string_ {
-  struct string_ *link;
-  const char *text;
+	struct string_ *link;
+	const char *text;
 } string_rec;
 
 /*!

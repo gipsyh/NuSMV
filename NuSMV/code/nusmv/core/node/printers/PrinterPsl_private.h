@@ -37,7 +37,7 @@
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_PSL_PRIVATE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_PSL_PRIVATE_H__
 
-#include "nusmv/core/node/printers/PrinterBase.h"         /* fix this */
+#include "nusmv/core/node/printers/PrinterBase.h" /* fix this */
 #include "nusmv/core/node/printers/PrinterBase_private.h" /* fix this */
 #include "nusmv/core/node/printers/PrinterPsl.h"
 #include "nusmv/core/utils/utils.h"
@@ -52,16 +52,16 @@
 */
 
 typedef struct PrinterPsl_TAG {
-  /* this MUST stay on the top */
-  INHERITS_FROM(PrinterBase);
+	/* this MUST stay on the top */
+	INHERITS_FROM(PrinterBase);
 
-  /* -------------------------------------------------- */
-  /*                  Private members                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Private members                   */
+	/* -------------------------------------------------- */
 
-  /* -------------------------------------------------- */
-  /*                  Virtual methods                   */
-  /* -------------------------------------------------- */
+	/* -------------------------------------------------- */
+	/*                  Virtual methods                   */
+	/* -------------------------------------------------- */
 
 } PrinterPsl;
 
@@ -78,7 +78,7 @@ typedef struct PrinterPsl_TAG {
   \sa PrinterPsl_create
 */
 void printer_psl_init(PrinterPsl_ptr self, const NuSMVEnv_ptr env,
-                      const char *name, int low, size_t num);
+		      const char *name, int low, size_t num);
 
 /*!
   \methodof PrinterPsl

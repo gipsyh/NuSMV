@@ -61,8 +61,9 @@ typedef struct LogicRecognizerCore_TAG *LogicRecognizerCore_ptr;
 
   \todo Missing description
 */
-#define LOGIC_RECOGNIZER_CORE_CHECK_INSTANCE(self)                             \
-  (nusmv_assert(LOGIC_RECOGNIZER_CORE(self) != LOGIC_RECOGNIZER_CORE(NULL)))
+#define LOGIC_RECOGNIZER_CORE_CHECK_INSTANCE(self)   \
+	(nusmv_assert(LOGIC_RECOGNIZER_CORE(self) != \
+		      LOGIC_RECOGNIZER_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 

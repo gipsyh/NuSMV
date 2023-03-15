@@ -91,29 +91,30 @@ typedef OA_HASH_FREE_FUN LRU_CACHE_FREE_FUN;
 
   \todo Missing description
 */
-#define LRU_CACHE_CHECK_INSTANCE(self)                                         \
-  (nusmv_assert(LRU_CACHE(self) != LRU_CACHE(NULL)))
+#define LRU_CACHE_CHECK_INSTANCE(self) \
+	(nusmv_assert(LRU_CACHE(self) != LRU_CACHE(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LRU_CACHE_FOREACH(self, iter)                                          \
-  for (iter = LRUCache_get_first_iter(self);                                   \
-       !LRUCache_iter_is_end(self, iter);                                      \
-       iter = LRUCache_iter_next(self, iter))
+#define LRU_CACHE_FOREACH(self, iter)              \
+	for (iter = LRUCache_get_first_iter(self); \
+	     !LRUCache_iter_is_end(self, iter);    \
+	     iter = LRUCache_iter_next(self, iter))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LRU_CACHE_FOREACH_ENTRY(self, iter, key, value)                        \
-  for (iter = LRUCache_get_first_iter(self);                                   \
-       !LRUCache_iter_is_end(self, iter) &&                                    \
-       (LRUCache_iter_values(self, iter, (void **)key, (void **)value), true); \
-       iter = LRUCache_iter_next(self, iter))
+#define LRU_CACHE_FOREACH_ENTRY(self, iter, key, value)                       \
+	for (iter = LRUCache_get_first_iter(self);                            \
+	     !LRUCache_iter_is_end(self, iter) &&                             \
+	     (LRUCache_iter_values(self, iter, (void **)key, (void **)value), \
+	      true);                                                          \
+	     iter = LRUCache_iter_next(self, iter))
 
 /* Export some functionalities from the OAHash, that don't need any
    overriding */
@@ -144,8 +145,8 @@ typedef OA_HASH_FREE_FUN LRU_CACHE_FREE_FUN;
 
   \todo Missing description
 */
-#define LRUCache_iter_next(self, iter)                                         \
-  OAHash_iter_next(OA_HASH(self), (OAHashIter)iter)
+#define LRUCache_iter_next(self, iter) \
+	OAHash_iter_next(OA_HASH(self), (OAHashIter)iter)
 
 /* boolean LRUCache_iter_is_end (const LRUCache_ptr self,
    const LRUCacheIter iter) */
@@ -155,8 +156,8 @@ typedef OA_HASH_FREE_FUN LRU_CACHE_FREE_FUN;
 
   \todo Missing description
 */
-#define LRUCache_iter_is_end(self, iter)                                       \
-  OAHash_iter_is_end(OA_HASH(self), (OAHashIter)iter)
+#define LRUCache_iter_is_end(self, iter) \
+	OAHash_iter_is_end(OA_HASH(self), (OAHashIter)iter)
 
 /* size_t LRUCache_get_size (const LRUCache_ptr self) */
 
@@ -188,9 +189,9 @@ typedef OA_HASH_FREE_FUN LRU_CACHE_FREE_FUN;
   \sa LRUCache_destroy, OAHash_create
 */
 LRUCache_ptr LRUCache_create(size_t threshold, LRU_CACHE_EQ_FUN key_eq_fun,
-                             LRU_CACHE_HASH_FUN key_hash_fun,
-                             LRU_CACHE_FREE_FUN free_entry_fun,
-                             void *custom_arg);
+			     LRU_CACHE_HASH_FUN key_hash_fun,
+			     LRU_CACHE_FREE_FUN free_entry_fun,
+			     void *custom_arg);
 
 /*!
   \methodof LRUCache
@@ -250,7 +251,7 @@ void LRUCache_clear(LRUCache_ptr self);
                       be NULL
 */
 void LRUCache_iter_values(const LRUCache_ptr self, const LRUCacheIter iter,
-                          void **k, void **v);
+			  void **k, void **v);
 
 /**AutomaticEnd***************************************************************/
 

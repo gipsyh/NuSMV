@@ -62,29 +62,32 @@
                      TraceXMLTag
 */
 
-TraceXmlTag TraceXmlTag_from_string(const char *tag) {
-  static char *tag_names[] = {
-      TRACE_XML_CNTX_TAG_STRING,  TRACE_XML_NODE_TAG_STRING,
-      TRACE_XML_STATE_TAG_STRING, TRACE_XML_COMB_TAG_STRING,
-      TRACE_XML_INPUT_TAG_STRING, TRACE_XML_VALUE_TAG_STRING,
-      TRACE_XML_LOOPS_TAG_STRING};
+TraceXmlTag TraceXmlTag_from_string(const char *tag)
+{
+	static char *tag_names[] = {
+		TRACE_XML_CNTX_TAG_STRING,  TRACE_XML_NODE_TAG_STRING,
+		TRACE_XML_STATE_TAG_STRING, TRACE_XML_COMB_TAG_STRING,
+		TRACE_XML_INPUT_TAG_STRING, TRACE_XML_VALUE_TAG_STRING,
+		TRACE_XML_LOOPS_TAG_STRING
+	};
 
-  static TraceXmlTag tag_value[] = {TRACE_XML_CNTX_TAG,  TRACE_XML_NODE_TAG,
-                                    TRACE_XML_STATE_TAG, TRACE_XML_COMB_TAG,
-                                    TRACE_XML_INPUT_TAG, TRACE_XML_VALUE_TAG,
-                                    TRACE_XML_LOOPS_TAG, TRACE_XML_INVALID_TAG};
+	static TraceXmlTag tag_value[] = {
+		TRACE_XML_CNTX_TAG,  TRACE_XML_NODE_TAG,   TRACE_XML_STATE_TAG,
+		TRACE_XML_COMB_TAG,  TRACE_XML_INPUT_TAG,  TRACE_XML_VALUE_TAG,
+		TRACE_XML_LOOPS_TAG, TRACE_XML_INVALID_TAG
+	};
 
-  TraceXmlTag ret_val = TRACE_XML_INVALID_TAG;
-  int i;
+	TraceXmlTag ret_val = TRACE_XML_INVALID_TAG;
+	int i;
 
-  for (i = 0; i < sizeof(tag_names) / sizeof(tag_names[0]); i++) {
-    if (strncmp(tag, tag_names[i], strlen(tag)) == 0) {
-      ret_val = tag_value[i];
-      break;
-    }
-  }
+	for (i = 0; i < sizeof(tag_names) / sizeof(tag_names[0]); i++) {
+		if (strncmp(tag, tag_names[i], strlen(tag)) == 0) {
+			ret_val = tag_value[i];
+			break;
+		}
+	}
 
-  return ret_val;
+	return ret_val;
 }
 
 /*!
@@ -94,12 +97,14 @@ TraceXmlTag TraceXmlTag_from_string(const char *tag) {
                      a string
 */
 
-const char *TraceXmlTag_to_string(TraceXmlTag tag) {
-  static char *tag_names[] = {
-      TRACE_XML_CNTX_TAG_STRING,  TRACE_XML_NODE_TAG_STRING,
-      TRACE_XML_STATE_TAG_STRING, TRACE_XML_COMB_TAG_STRING,
-      TRACE_XML_INPUT_TAG_STRING, TRACE_XML_VALUE_TAG_STRING,
-      TRACE_XML_LOOPS_TAG_STRING};
+const char *TraceXmlTag_to_string(TraceXmlTag tag)
+{
+	static char *tag_names[] = {
+		TRACE_XML_CNTX_TAG_STRING,  TRACE_XML_NODE_TAG_STRING,
+		TRACE_XML_STATE_TAG_STRING, TRACE_XML_COMB_TAG_STRING,
+		TRACE_XML_INPUT_TAG_STRING, TRACE_XML_VALUE_TAG_STRING,
+		TRACE_XML_LOOPS_TAG_STRING
+	};
 
-  return tag_names[tag];
+	return tag_names[tag];
 }

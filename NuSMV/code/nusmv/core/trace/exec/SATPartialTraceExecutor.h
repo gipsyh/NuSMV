@@ -65,9 +65,9 @@ typedef struct SATPartialTraceExecutor_TAG *SATPartialTraceExecutor_ptr;
 
   \todo Missing description
 */
-#define SAT_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)                        \
-  (nusmv_assert(SAT_PARTIAL_TRACE_EXECUTOR(self) !=                            \
-                SAT_PARTIAL_TRACE_EXECUTOR(NULL)))
+#define SAT_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)   \
+	(nusmv_assert(SAT_PARTIAL_TRACE_EXECUTOR(self) != \
+		      SAT_PARTIAL_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,7 +85,7 @@ typedef struct SATPartialTraceExecutor_TAG *SATPartialTraceExecutor_ptr;
 */
 SATPartialTraceExecutor_ptr
 SATPartialTraceExecutor_create(const BeFsm_ptr fsm, const BeEnc_ptr enc,
-                               const BddEnc_ptr bdd_enc, boolean use_restart);
+			       const BddEnc_ptr bdd_enc, boolean use_restart);
 
 /*!
   \methodof SATPartialTraceExecutor

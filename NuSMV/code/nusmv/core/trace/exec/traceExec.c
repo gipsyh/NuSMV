@@ -60,72 +60,80 @@
 /*---------------------------------------------------------------------------*/
 
 int Trace_execute_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
-                        const CompleteTraceExecutor_ptr executor) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  boolean success = true;
+			const CompleteTraceExecutor_ptr executor)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	boolean success = true;
 
-  SexpFsm_ptr sexp_fsm = SEXP_FSM(NuSMVEnv_get_value(env, ENV_SEXP_FSM));
+	SexpFsm_ptr sexp_fsm = SEXP_FSM(NuSMVEnv_get_value(env, ENV_SEXP_FSM));
 
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  SEXP_FSM_CHECK_INSTANCE(sexp_fsm);
+	SEXP_FSM_CHECK_INSTANCE(sexp_fsm);
 
-  if (!Trace_is_complete(trace, SexpFsm_get_vars_list(sexp_fsm), true)) {
-    StreamMgr_print_error(streams, "Error: cannot execute incomplete trace.\n");
-    success = false;
-  }
+	if (!Trace_is_complete(trace, SexpFsm_get_vars_list(sexp_fsm), true)) {
+		StreamMgr_print_error(
+			streams, "Error: cannot execute incomplete trace.\n");
+		success = false;
+	}
 
-  else {
-    if (opt_verbose_level_gt(opts, 0)) {
-      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      Logger_log(logger, "Executing trace of length %d\n",
-                 Trace_get_length(trace));
-    }
+	else {
+		if (opt_verbose_level_gt(opts, 0)) {
+			Logger_ptr logger =
+				LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+			Logger_log(logger, "Executing trace of length %d\n",
+				   Trace_get_length(trace));
+		}
 
-    /* execute the trace using given executor. */
-    success = CompleteTraceExecutor_execute(executor, trace, NIL(int));
-  }
+		/* execute the trace using given executor. */
+		success = CompleteTraceExecutor_execute(executor, trace,
+							NIL(int));
+	}
 
-  return success ? 0 : 1;
+	return success ? 0 : 1;
 }
 
 int Trace_execute_partial_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
-                                const PartialTraceExecutor_ptr executor,
-                                const NodeList_ptr language) {
-  const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  boolean success = true;
+				const PartialTraceExecutor_ptr executor,
+				const NodeList_ptr language)
+{
+	const StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	boolean success = true;
 
-  const OptsHandler_ptr opts =
-      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+	const OptsHandler_ptr opts =
+		OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  TRACE_CHECK_INSTANCE(trace);
-  PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(executor);
-  NODE_LIST_CHECK_INSTANCE(language);
+	TRACE_CHECK_INSTANCE(trace);
+	PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(executor);
+	NODE_LIST_CHECK_INSTANCE(language);
 
-  if (opt_verbose_level_gt(opts, 0)) {
-    Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Executing trace of length %d\n",
-               Trace_get_length(trace));
-  }
+	if (opt_verbose_level_gt(opts, 0)) {
+		Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+		Logger_log(logger, "Executing trace of length %d\n",
+			   Trace_get_length(trace));
+	}
 
-  { /* execute a partial trace using given executor, register complete
+	{ /* execute a partial trace using given executor, register complete
        trace upon succesful completion */
-    Trace_ptr complete_trace =
-        PartialTraceExecutor_execute(executor, trace, language, NIL(int));
+		Trace_ptr complete_trace = PartialTraceExecutor_execute(
+			executor, trace, language, NIL(int));
 
-    if (TRACE(NULL) != complete_trace) {
-      int trace_id = TraceMgr_register_trace(
-          TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)), complete_trace);
-      StreamMgr_print_output(streams,
-                             "-- New complete trace is stored at %d index.\n",
-                             1 + trace_id);
-    } else {
-      success = false;
-    }
-  }
+		if (TRACE(NULL) != complete_trace) {
+			int trace_id = TraceMgr_register_trace(
+				TRACE_MGR(
+					NuSMVEnv_get_value(env, ENV_TRACE_MGR)),
+				complete_trace);
+			StreamMgr_print_output(
+				streams,
+				"-- New complete trace is stored at %d index.\n",
+				1 + trace_id);
+		} else {
+			success = false;
+		}
+	}
 
-  return success ? 0 : 1;
+	return success ? 0 : 1;
 }

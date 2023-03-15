@@ -86,18 +86,20 @@ static int CommandUtilsTestNodeList(NuSMVEnv_ptr env, int argc, char **argv);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Utils_init_cmd(NuSMVEnv_ptr env) {
+void Utils_init_cmd(NuSMVEnv_ptr env)
+{
 #ifndef NDEBUG
-  Cmd_CommandAdd(env, "_utils_test_sset", CommandUtilsTestSset, 0, false);
-  Cmd_CommandAdd(env, "_utils_test_nodelist", CommandUtilsTestNodeList, 0,
-                 false);
+	Cmd_CommandAdd(env, "_utils_test_sset", CommandUtilsTestSset, 0, false);
+	Cmd_CommandAdd(env, "_utils_test_nodelist", CommandUtilsTestNodeList, 0,
+		       false);
 #endif
 }
 
-void Utils_quit_cmd(NuSMVEnv_ptr env) {
+void Utils_quit_cmd(NuSMVEnv_ptr env)
+{
 #ifndef NDEBUG
-  Cmd_CommandRemove(env, "_utils_test_sset");
-  Cmd_CommandRemove(env, "_utils_test_nodelist");
+	Cmd_CommandRemove(env, "_utils_test_sset");
+	Cmd_CommandRemove(env, "_utils_test_nodelist");
 #endif
 }
 
@@ -110,22 +112,23 @@ void Utils_quit_cmd(NuSMVEnv_ptr env) {
 */
 
 #ifndef NDEBUG
-int CommandUtilsTestSset(NuSMVEnv_ptr env, int argc, char **argv) {
-  int c = 0;
+int CommandUtilsTestSset(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	int c = 0;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsageUtilsTestSset(env);
-    default:
-      break;
-    }
-  }
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "h")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsageUtilsTestSset(env);
+		default:
+			break;
+		}
+	}
 
-  Sset_test(env);
+	Sset_test(env);
 
-  return 0;
+	return 0;
 }
 #endif
 
@@ -138,47 +141,50 @@ int CommandUtilsTestSset(NuSMVEnv_ptr env, int argc, char **argv) {
 */
 
 #ifndef NDEBUG
-static int CommandUtilsTestNodeList(NuSMVEnv_ptr env, int argc, char **argv) {
-  int c = 0;
-  int retval = 1;
+static int CommandUtilsTestNodeList(NuSMVEnv_ptr env, int argc, char **argv)
+{
+	int c = 0;
+	int retval = 1;
 
-  util_getopt_reset();
-  while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch (c) {
-    case 'h':
-      return UsageUtilsTestNodeList(env);
-    default:
-      break;
-    }
-  }
+	util_getopt_reset();
+	while ((c = util_getopt(argc, argv, "h")) != EOF) {
+		switch (c) {
+		case 'h':
+			return UsageUtilsTestNodeList(env);
+		default:
+			break;
+		}
+	}
 
-  retval = NodeList_test(env);
+	retval = NodeList_test(env);
 
-  return retval;
+	return retval;
 }
 #endif
 
 int Utils_check_non_option_args(NuSMVEnv_ptr env, int argc,
-                                unsigned int expected_args,
-                                int (*usage)(void *arg), void *arg) {
-  StreamMgr_ptr const streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+				unsigned int expected_args,
+				int (*usage)(void *arg), void *arg)
+{
+	StreamMgr_ptr const streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  nusmv_assert(NULL == usage || NULL != arg);
+	nusmv_assert(NULL == usage || NULL != arg);
 
-  if (argc != (util_optind + expected_args)) {
-    StreamMgr_print_error(streams,
-                          "Error: wrong number of non option arguments; "
-                          "given %d but expected %d.\n",
-                          argc - util_optind, expected_args);
+	if (argc != (util_optind + expected_args)) {
+		StreamMgr_print_error(
+			streams,
+			"Error: wrong number of non option arguments; "
+			"given %d but expected %d.\n",
+			argc - util_optind, expected_args);
 
-    if (NULL != usage)
-      return (*usage)(arg);
-    else
-      return 1;
-  }
+		if (NULL != usage)
+			return (*usage)(arg);
+		else
+			return 1;
+	}
 
-  return 0;
+	return 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -195,12 +201,13 @@ int Utils_check_non_option_args(NuSMVEnv_ptr env, int argc,
 
   \todo Missing description
 */
-static int UsageUtilsTestSset(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams, "usage: _utils_test_sset [-h]\n");
+static int UsageUtilsTestSset(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(streams, "usage: _utils_test_sset [-h]\n");
 
-  return 1;
+	return 1;
 }
 #endif
 
@@ -211,11 +218,12 @@ static int UsageUtilsTestSset(const NuSMVEnv_ptr env) {
 
   \todo Missing description
 */
-static int UsageUtilsTestNodeList(const NuSMVEnv_ptr env) {
-  StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams, "usage: _utils_test_nodelist [-h]\n");
+static int UsageUtilsTestNodeList(const NuSMVEnv_ptr env)
+{
+	StreamMgr_ptr streams =
+		STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+	StreamMgr_print_error(streams, "usage: _utils_test_nodelist [-h]\n");
 
-  return 1;
+	return 1;
 }
 #endif

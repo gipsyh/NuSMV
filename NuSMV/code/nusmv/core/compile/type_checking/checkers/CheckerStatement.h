@@ -61,8 +61,8 @@ typedef struct CheckerStatement_TAG *CheckerStatement_ptr;
 
   \todo Missing description
 */
-#define CHECKER_STATEMENT_CHECK_INSTANCE(self)                                 \
-  (nusmv_assert(CHECKER_STATEMENT(self) != CHECKER_STATEMENT(NULL)))
+#define CHECKER_STATEMENT_CHECK_INSTANCE(self) \
+	(nusmv_assert(CHECKER_STATEMENT(self) != CHECKER_STATEMENT(NULL)))
 
 /**AutomaticStart*************************************************************/
 

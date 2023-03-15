@@ -99,7 +99,7 @@ void Bmc_Cmd_quit(NuSMVEnv_ptr env);
   \se l is changed
 */
 Outcome Bmc_Cmd_compute_rel_loop(NuSMVEnv_ptr const env, int *const rel_loop,
-                                 const char *str_loop, const int k);
+				 const char *str_loop, const int k);
 
 /*!
   \command{bmc_setup} Builds the model in a Boolean Epression format.
@@ -297,7 +297,7 @@ int Bmc_CommandBmcPickState(NuSMVEnv_ptr env, int argc, char **argv);
 
 */
 int Bmc_CommandBmcSimulateCheckFeasibleConstraints(NuSMVEnv_ptr env, int argc,
-                                                   char **argv);
+						   char **argv);
 
 /*!
   \command{gen_ltlspec_bmc} Dumps into one or more dimacs files the given LTL
@@ -689,10 +689,10 @@ int Bmc_CommandCheckInvarBmc(NuSMVEnv_ptr env, int argc, char **argv);
   \se Result parameters might change
 */
 Outcome Bmc_cmd_options_handling(NuSMVEnv_ptr env, int argc, char **argv,
-                                 Prop_Type prop_type, Prop_ptr *res_prop,
-                                 int *res_k, int *res_l, char **res_a,
-                                 char **res_s, char **res_o, boolean *res_e,
-                                 int *res_step_k);
+				 Prop_Type prop_type, Prop_ptr *res_prop,
+				 int *res_k, int *res_l, char **res_a,
+				 char **res_s, char **res_o, boolean *res_e,
+				 int *res_step_k);
 
 #if NUSMV_HAVE_INCREMENTAL_SAT
 
