@@ -21,7 +21,7 @@ This file is part of the ``sbmc'' package of NuSMV version 2.
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,33 +34,32 @@ This file is part of the ``sbmc'' package of NuSMV version 2.
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
-#include <stdlib.h>
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
+#include "nusmv/core/bmc/bmcInt.h"
 #include "nusmv/core/bmc/sbmc/sbmcStructs.h"
-#include "nusmv/core/bmc/sbmc/sbmcUtils.h"
 #include "nusmv/core/bmc/sbmc/sbmcTableauInc.h"
 #include "nusmv/core/bmc/sbmc/sbmcTableauIncLTLformula.h"
-#include "nusmv/core/bmc/bmcInt.h"
+#include "nusmv/core/bmc/sbmc/sbmcUtils.h"
 
-#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/array.h"
+#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/list.h"
 
-#include "nusmv/core/enc/enc.h"
 #include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/enc/enc.h"
 
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/be/be.h"
+#include "nusmv/core/node/node.h"
 #include "nusmv/core/opt/opt.h"
 #include "nusmv/core/parser/symbols.h"
 
@@ -90,7 +89,6 @@ This file is part of the ``sbmc'' package of NuSMV version 2.
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticEnd***************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -100,26 +98,23 @@ This file is part of the ``sbmc'' package of NuSMV version 2.
 /*
  */
 
-lsList sbmc_unroll_base(const BeEnc_ptr be_enc,
-                               const node_ptr ltlspec,
-                               const hash_ptr info_map,
-                               const be_ptr be_LoopExists,
-                               const int do_optimization)
-{
+lsList sbmc_unroll_base(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                        const hash_ptr info_map, const be_ptr be_LoopExists,
+                        const int do_optimization) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   hash_ptr visit_cache = (hash_ptr)NULL;
-  lsList   unprocessed_nodes = (lsList)NULL;
-  lsList   created_constraints = (lsList)NULL;
+  lsList unprocessed_nodes = (lsList)NULL;
+  lsList created_constraints = (lsList)NULL;
   Be_Manager_ptr be_mgr;
   SymbTable_ptr st = (SymbTable_ptr)NULL;
 
@@ -146,1045 +141,1013 @@ lsList sbmc_unroll_base(const BeEnc_ptr be_enc,
   unprocessed_nodes = lsCreate();
   lsNewBegin(unprocessed_nodes, (lsGeneric)ltlspec, LS_NH);
 
-  while(lsLength(unprocessed_nodes) > 0) {
+  while (lsLength(unprocessed_nodes) > 0) {
     node_ptr node, lsf, rsf;
-    sbmc_node_info * info, *lsf_info, *rsf_info;
+    sbmc_node_info *info, *lsf_info, *rsf_info;
     array_t *E_past_array = (array_t *)NULL, *L_past_array = (array_t *)NULL;
     int has_unprocessed_children;
 
     /* Get node */
-    if ((lsFirstItem(unprocessed_nodes, (lsGeneric*)&node, LS_NH) != LS_OK) ||
+    if ((lsFirstItem(unprocessed_nodes, (lsGeneric *)&node, LS_NH) != LS_OK) ||
         ((node_ptr)NULL == node))
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
     /* Get info */
     info = sbmc_node_info_assoc_find(info_map, node);
-    if ((sbmc_node_info * )NULL == info)
+    if ((sbmc_node_info *)NULL == info)
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
     /* Get past_array */
     /* sbmc_init_state_vector should have allocated trans_bes[i] before */
     if (sbmc_node_info_get_trans_bes(info)) {
       nusmv_assert(array_n(sbmc_node_info_get_trans_bes(info)) >= 2);
-      L_past_array = array_fetch(array_t *, sbmc_node_info_get_trans_bes(info), sbmc_L_state());
+      L_past_array = array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
+                                 sbmc_L_state());
       nusmv_assert((array_t *)NULL != L_past_array);
-      E_past_array = array_fetch(array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
+      E_past_array = array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
+                                 sbmc_E_state());
       nusmv_assert((array_t *)NULL != E_past_array);
     }
 
     /* Already build? */
     if (sbmc_set_is_in(visit_cache, node)) {
       /* Remove node from unprocessed stack */
-      if (lsDelBegin(unprocessed_nodes, (lsGeneric*)&node) != LS_OK)
+      if (lsDelBegin(unprocessed_nodes, (lsGeneric *)&node) != LS_OK)
         ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
       continue;
     }
-
 
     /* Traverse children and build info */
     lsf = car(node);
     rsf = cdr(node);
     has_unprocessed_children = 0;
-    switch(node_get_type(node))
-      {
+    switch (node_get_type(node)) {
 
-      case ATOM:
-      case BIT:
-      case DOT:
-      case ARRAY: {
-        if (do_optimization && !SymbTable_is_symbol_input_var(st, node)) {
-          /* Optimization:
-             If p is not an input variable, add [[p]]_E^d <=> p_E */
-          be_ptr be_result = 0;
-          nusmv_assert(sbmc_node_info_get_past_depth(info) == 0);
-          if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
-            /* Definitional translation.
-               Already done by sbmc_init_state_vector. */
-            nusmv_assert(array_fetch(be_ptr, E_past_array, 0) != (be_ptr)NULL);
-          }
-          else {
-            /* Formula variable translation: Build [[p]]_E^0 <=> p_E */
-            be_ptr be_p_E_0, be_realp_E;
+    case ATOM:
+    case BIT:
+    case DOT:
+    case ARRAY: {
+      if (do_optimization && !SymbTable_is_symbol_input_var(st, node)) {
+        /* Optimization:
+           If p is not an input variable, add [[p]]_E^d <=> p_E */
+        be_ptr be_result = 0;
+        nusmv_assert(sbmc_node_info_get_past_depth(info) == 0);
+        if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
+          /* Definitional translation.
+             Already done by sbmc_init_state_vector. */
+          nusmv_assert(array_fetch(be_ptr, E_past_array, 0) != (be_ptr)NULL);
+        } else {
+          /* Formula variable translation: Build [[p]]_E^0 <=> p_E */
+          be_ptr be_p_E_0, be_realp_E;
 
-            be_p_E_0 = array_fetch(be_ptr, E_past_array, 0);
-            nusmv_assert((be_ptr)NULL != be_p_E_0);
-            be_realp_E = BeEnc_name_to_timed(be_enc, node, sbmc_E_state());
-            nusmv_assert((be_ptr)NULL != be_realp_E);
+          be_p_E_0 = array_fetch(be_ptr, E_past_array, 0);
+          nusmv_assert((be_ptr)NULL != be_p_E_0);
+          be_realp_E = BeEnc_name_to_timed(be_enc, node, sbmc_E_state());
+          nusmv_assert((be_ptr)NULL != be_realp_E);
 
-            be_result = Be_Iff(be_mgr, be_p_E_0, be_realp_E);
-            nusmv_assert((be_ptr)NULL != be_result);
+          be_result = Be_Iff(be_mgr, be_p_E_0, be_realp_E);
+          nusmv_assert((be_ptr)NULL != be_result);
 
-            /* Save the created constraint */
-            lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[p]]_E^0 <=> p_E: ");
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, "  [[p]]_E^0 <=> p_E: ");
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
         }
-        break;
       }
+      break;
+    }
 
-      case TRUEEXP: {
-        if (do_optimization) {
-          be_ptr be_result;
-
-          nusmv_assert(sbmc_node_info_get_past_depth(info) == 0);
-
-          if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
-            /* Definitional translation already done by state vector init */
-            nusmv_assert(array_fetch(be_ptr, E_past_array, 0) != (be_ptr)NULL);
-          }
-          else {
-            /* Formula variable translation */
-            /* Build [[TRUE]]_E^0 <=> TRUE */
-            be_ptr be_TRUE_E_0 = array_fetch(be_ptr, E_past_array, 0);
-
-            nusmv_assert((be_ptr)NULL != be_TRUE_E_0);
-
-            be_result = Be_Iff(be_mgr, be_TRUE_E_0, Be_Truth(be_mgr));
-            nusmv_assert((be_ptr)NULL != be_result);
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[TRUE]]_E^0 <=> TRUE: ");
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-        }
-        break;
-      }
-
-      case FALSEEXP: {
-        if (do_optimization) {
-          be_ptr be_result;
-
-          nusmv_assert(sbmc_node_info_get_past_depth(info) == 0);
-
-          if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
-            /* Definitional translation already done by state vector init */
-            nusmv_assert(array_fetch(be_ptr, E_past_array, 0) != 0);
-          }
-          else {
-            /* Formula variable translation: build [[FALSE]]_E^0 <=> FALSE */
-            be_ptr be_FALSE_E_0 = array_fetch(be_ptr, E_past_array, 0);
-
-            nusmv_assert((be_ptr)NULL != be_FALSE_E_0);
-
-            be_result = Be_Iff(be_mgr, be_FALSE_E_0, Be_Falsity(be_mgr));
-            nusmv_assert((be_ptr)NULL != be_result);
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[FALSE]]_E^0 <=> FALSE: ");
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-        }
-        break;
-      }
-
-      case XOR:
-      case XNOR:
-      case IMPLIES:
-      case IFF: {
-        ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__, __LINE__);
-        break;
-      }
-
-      case OR: {
-          unsigned int d;
-          array_t *past_array_f_E, *past_array_g_E;
-
-          if (!sbmc_set_is_in(visit_cache, lsf)) {
-            lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-            has_unprocessed_children = 1;
-          }
-          if (!sbmc_set_is_in(visit_cache, rsf)) {
-            lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
-            has_unprocessed_children = 1;
-          }
-          if (has_unprocessed_children)
-            break;
-
-          lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-          nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-          past_array_f_E = array_fetch(array_t *,
-                                       sbmc_node_info_get_trans_bes(lsf_info),
-                                       sbmc_E_state());
-          nusmv_assert((array_t *)NULL != past_array_f_E);
-
-          rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
-          nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-          past_array_g_E = array_fetch(array_t *,
-                                       sbmc_node_info_get_trans_bes(rsf_info),
-                                       sbmc_E_state());
-          nusmv_assert((array_t *)NULL != past_array_g_E);
-
-          if (do_optimization) {
-            /* Add [[f | g]]_E^d <=> [[f]]_E^d | [[g]]_E^d */
-            if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
-              /* Definitional translation already done by state vector init */
-              for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
-                nusmv_assert(array_fetch(be_ptr, E_past_array, d) != (be_ptr)NULL);
-            }
-            else {
-              for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-                be_ptr be_fORg_E_d, be_f_E_d, be_g_E_d, be_result;
-                const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-                const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
-
-                be_fORg_E_d = array_fetch(be_ptr, E_past_array, d);
-                nusmv_assert((be_ptr)NULL != be_fORg_E_d);
-                be_f_E_d = array_fetch(be_ptr, past_array_f_E, d_lsf);
-                nusmv_assert((be_ptr)NULL != be_f_E_d);
-                be_g_E_d = array_fetch(be_ptr, past_array_g_E, d_rsf);
-                nusmv_assert((be_ptr)NULL != be_g_E_d);
-                be_result = Be_Iff(be_mgr, be_fORg_E_d,
-                                   Be_Or(be_mgr, be_f_E_d, be_g_E_d));
-                nusmv_assert((be_ptr)NULL != be_result);
-
-                /* Save the created constraint */
-                lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-                if (opt_verbose_level_ge(opts, 6)) {
-                  Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                  Logger_log(logger,
-                          "  [[f | g]]_E^%d <=> [[f]]_E^%d | [[g]]_E^%d: ",
-                          d, d_lsf, d_rsf);
-                  Be_DumpSexpr(be_mgr, be_result, errstream);
-                  Logger_log(logger, "\n");
-                }
-              }
-            }
-          }
-          break;
-        }
-
-      case AND: {
-        unsigned int d;
-        array_t *past_array_f_E, *past_array_g_E;
-
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (!sbmc_set_is_in(visit_cache, rsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
-
-        lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-        nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-        past_array_f_E = array_fetch(array_t *,
-                                     sbmc_node_info_get_trans_bes(lsf_info),
-                                     sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_f_E);
-
-        rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
-        nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-        past_array_g_E = array_fetch(array_t *,
-                                     sbmc_node_info_get_trans_bes(rsf_info),
-                                     sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_g_E);
-
-        if (do_optimization) {
-          /* Add [[f & g]]_E^d <=> [[f]]_E^d & [[g]]_E^d */
-          if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
-            /* Definitional translation already done by
-               state vector init */
-            for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
-              nusmv_assert(array_fetch(be_ptr, E_past_array, d) != (be_ptr)NULL);
-          }
-          else {
-            for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-              be_ptr be_fANDg_E_d, be_f_E_d, be_g_E_d, be_result;
-              const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-              const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
-
-              be_fANDg_E_d = array_fetch(be_ptr, E_past_array, d);
-              nusmv_assert((be_ptr)NULL != be_fANDg_E_d);
-              be_f_E_d = array_fetch(be_ptr, past_array_f_E, d_lsf);
-              nusmv_assert((be_ptr)NULL != be_f_E_d);
-              be_g_E_d = array_fetch(be_ptr, past_array_g_E, d_rsf);
-              nusmv_assert((be_ptr)NULL != be_g_E_d);
-              be_result = Be_Iff(be_mgr, be_fANDg_E_d,
-                                 Be_And(be_mgr, be_f_E_d, be_g_E_d));
-              nusmv_assert((be_ptr)NULL != be_result);
-
-              /* Save the created constraint */
-              lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-              if (opt_verbose_level_ge(opts, 6)) {
-                Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                Logger_log(logger,
-                        "  [[f & g]]_E^%d <=> [[f]]_E^%d & [[g]]_E^%d: ",
-                        d, d_lsf, d_rsf);
-                Be_DumpSexpr(be_mgr, be_result, errstream);
-                Logger_log(logger, "\n");
-              }
-            }
-          }
-        }
-        break;
-      }
-
-      case NOT: {
-        unsigned int d;
-        array_t * past_array_f_E;
-
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
+    case TRUEEXP: {
+      if (do_optimization) {
+        be_ptr be_result;
 
         nusmv_assert(sbmc_node_info_get_past_depth(info) == 0);
 
-        lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-        nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-        past_array_f_E = array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                                     sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_f_E);
+        if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
+          /* Definitional translation already done by state vector init */
+          nusmv_assert(array_fetch(be_ptr, E_past_array, 0) != (be_ptr)NULL);
+        } else {
+          /* Formula variable translation */
+          /* Build [[TRUE]]_E^0 <=> TRUE */
+          be_ptr be_TRUE_E_0 = array_fetch(be_ptr, E_past_array, 0);
 
-        if (do_optimization && !SymbTable_is_symbol_input_var(st, lsf)) {
-          /* Optimization:
-             if f is not an input variable, add [[!f]]_E^d <=> ![[f]]_E^d */
-          if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
-            /* Definitional translation already done by state vector init */
-            for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
-              nusmv_assert(array_fetch(be_ptr, E_past_array, d) != (be_ptr)NULL);
+          nusmv_assert((be_ptr)NULL != be_TRUE_E_0);
+
+          be_result = Be_Iff(be_mgr, be_TRUE_E_0, Be_Truth(be_mgr));
+          nusmv_assert((be_ptr)NULL != be_result);
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, "  [[TRUE]]_E^0 <=> TRUE: ");
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
-          else {
-            /* Formula variable translation */
-            for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-              be_ptr be_notf_E_d, be_f_E_d, be_result;
+        }
+      }
+      break;
+    }
 
-              be_notf_E_d = array_fetch(be_ptr, E_past_array, d);
-              nusmv_assert((be_ptr)NULL != be_notf_E_d);
-              be_f_E_d = array_fetch(be_ptr, past_array_f_E, d);
-              nusmv_assert((be_ptr)NULL != be_f_E_d);
-              be_result = Be_Iff(be_mgr, be_notf_E_d,
-                                 Be_Not(be_mgr, be_f_E_d));
-              nusmv_assert((be_ptr)NULL != be_result);
+    case FALSEEXP: {
+      if (do_optimization) {
+        be_ptr be_result;
 
-              /* Save the created constraint */
-              lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+        nusmv_assert(sbmc_node_info_get_past_depth(info) == 0);
 
-              if (opt_verbose_level_ge(opts, 6)) {
-                Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                Logger_log(logger, "  [!f]]_E^%d <=> ![[f]]_E^%d: ",
-                        d, d);
-                Be_DumpSexpr(be_mgr, be_result, errstream);
-                Logger_log(logger, "\n");
-              }
+        if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
+          /* Definitional translation already done by state vector init */
+          nusmv_assert(array_fetch(be_ptr, E_past_array, 0) != 0);
+        } else {
+          /* Formula variable translation: build [[FALSE]]_E^0 <=> FALSE */
+          be_ptr be_FALSE_E_0 = array_fetch(be_ptr, E_past_array, 0);
+
+          nusmv_assert((be_ptr)NULL != be_FALSE_E_0);
+
+          be_result = Be_Iff(be_mgr, be_FALSE_E_0, Be_Falsity(be_mgr));
+          nusmv_assert((be_ptr)NULL != be_result);
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, "  [[FALSE]]_E^0 <=> FALSE: ");
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
+        }
+      }
+      break;
+    }
+
+    case XOR:
+    case XNOR:
+    case IMPLIES:
+    case IFF: {
+      ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__,
+                              __LINE__);
+      break;
+    }
+
+    case OR: {
+      unsigned int d;
+      array_t *past_array_f_E, *past_array_g_E;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (!sbmc_set_is_in(visit_cache, rsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
+        break;
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      past_array_f_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_f_E);
+
+      rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
+      nusmv_assert((sbmc_node_info *)NULL != rsf_info);
+      past_array_g_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(rsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_g_E);
+
+      if (do_optimization) {
+        /* Add [[f | g]]_E^d <=> [[f]]_E^d | [[g]]_E^d */
+        if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
+          /* Definitional translation already done by state vector init */
+          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
+            nusmv_assert(array_fetch(be_ptr, E_past_array, d) != (be_ptr)NULL);
+        } else {
+          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+            be_ptr be_fORg_E_d, be_f_E_d, be_g_E_d, be_result;
+            const unsigned int d_lsf =
+                min(d, sbmc_node_info_get_past_depth(lsf_info));
+            const unsigned int d_rsf =
+                min(d, sbmc_node_info_get_past_depth(rsf_info));
+
+            be_fORg_E_d = array_fetch(be_ptr, E_past_array, d);
+            nusmv_assert((be_ptr)NULL != be_fORg_E_d);
+            be_f_E_d = array_fetch(be_ptr, past_array_f_E, d_lsf);
+            nusmv_assert((be_ptr)NULL != be_f_E_d);
+            be_g_E_d = array_fetch(be_ptr, past_array_g_E, d_rsf);
+            nusmv_assert((be_ptr)NULL != be_g_E_d);
+            be_result =
+                Be_Iff(be_mgr, be_fORg_E_d, Be_Or(be_mgr, be_f_E_d, be_g_E_d));
+            nusmv_assert((be_ptr)NULL != be_result);
+
+            /* Save the created constraint */
+            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+            if (opt_verbose_level_ge(opts, 6)) {
+              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+              Logger_log(logger,
+                         "  [[f | g]]_E^%d <=> [[f]]_E^%d | [[g]]_E^%d: ", d,
+                         d_lsf, d_rsf);
+              Be_DumpSexpr(be_mgr, be_result, errstream);
+              Logger_log(logger, "\n");
             }
           }
         }
+      }
+      break;
+    }
 
+    case AND: {
+      unsigned int d;
+      array_t *past_array_f_E, *past_array_g_E;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (!sbmc_set_is_in(visit_cache, rsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
         break;
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      past_array_f_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_f_E);
+
+      rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
+      nusmv_assert((sbmc_node_info *)NULL != rsf_info);
+      past_array_g_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(rsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_g_E);
+
+      if (do_optimization) {
+        /* Add [[f & g]]_E^d <=> [[f]]_E^d & [[g]]_E^d */
+        if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
+          /* Definitional translation already done by
+             state vector init */
+          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
+            nusmv_assert(array_fetch(be_ptr, E_past_array, d) != (be_ptr)NULL);
+        } else {
+          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+            be_ptr be_fANDg_E_d, be_f_E_d, be_g_E_d, be_result;
+            const unsigned int d_lsf =
+                min(d, sbmc_node_info_get_past_depth(lsf_info));
+            const unsigned int d_rsf =
+                min(d, sbmc_node_info_get_past_depth(rsf_info));
+
+            be_fANDg_E_d = array_fetch(be_ptr, E_past_array, d);
+            nusmv_assert((be_ptr)NULL != be_fANDg_E_d);
+            be_f_E_d = array_fetch(be_ptr, past_array_f_E, d_lsf);
+            nusmv_assert((be_ptr)NULL != be_f_E_d);
+            be_g_E_d = array_fetch(be_ptr, past_array_g_E, d_rsf);
+            nusmv_assert((be_ptr)NULL != be_g_E_d);
+            be_result = Be_Iff(be_mgr, be_fANDg_E_d,
+                               Be_And(be_mgr, be_f_E_d, be_g_E_d));
+            nusmv_assert((be_ptr)NULL != be_result);
+
+            /* Save the created constraint */
+            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+            if (opt_verbose_level_ge(opts, 6)) {
+              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+              Logger_log(logger,
+                         "  [[f & g]]_E^%d <=> [[f]]_E^%d & [[g]]_E^%d: ", d,
+                         d_lsf, d_rsf);
+              Be_DumpSexpr(be_mgr, be_result, errstream);
+              Logger_log(logger, "\n");
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case NOT: {
+      unsigned int d;
+      array_t *past_array_f_E;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
+        break;
+
+      nusmv_assert(sbmc_node_info_get_past_depth(info) == 0);
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      past_array_f_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_f_E);
+
+      if (do_optimization && !SymbTable_is_symbol_input_var(st, lsf)) {
+        /* Optimization:
+           if f is not an input variable, add [[!f]]_E^d <=> ![[f]]_E^d */
+        if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
+          /* Definitional translation already done by state vector init */
+          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
+            nusmv_assert(array_fetch(be_ptr, E_past_array, d) != (be_ptr)NULL);
+        } else {
+          /* Formula variable translation */
+          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+            be_ptr be_notf_E_d, be_f_E_d, be_result;
+
+            be_notf_E_d = array_fetch(be_ptr, E_past_array, d);
+            nusmv_assert((be_ptr)NULL != be_notf_E_d);
+            be_f_E_d = array_fetch(be_ptr, past_array_f_E, d);
+            nusmv_assert((be_ptr)NULL != be_f_E_d);
+            be_result = Be_Iff(be_mgr, be_notf_E_d, Be_Not(be_mgr, be_f_E_d));
+            nusmv_assert((be_ptr)NULL != be_result);
+
+            /* Save the created constraint */
+            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+            if (opt_verbose_level_ge(opts, 6)) {
+              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+              Logger_log(logger, "  [!f]]_E^%d <=> ![[f]]_E^%d: ", d, d);
+              Be_DumpSexpr(be_mgr, be_result, errstream);
+              Logger_log(logger, "\n");
+            }
+          }
+        }
       }
 
-      case OP_FUTURE: {
-        unsigned int  d;
-        array_t * lsf_E_past_array;
+      break;
+    }
 
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
+    case OP_FUTURE: {
+      unsigned int d;
+      array_t *lsf_E_past_array;
 
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
+        break;
 
-        lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-        nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-        nusmv_assert(sbmc_node_info_get_past_depth(lsf_info) ==
-                     sbmc_node_info_get_past_depth(info));
-        lsf_E_past_array = array_fetch(array_t *,
-                                       sbmc_node_info_get_trans_bes(lsf_info),
-                                       sbmc_E_state());
-        nusmv_assert((array_t *)NULL != lsf_E_past_array);
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      nusmv_assert(sbmc_node_info_get_past_depth(lsf_info) ==
+                   sbmc_node_info_get_past_depth(info));
+      lsf_E_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != lsf_E_past_array);
+
+      if (opt_verbose_level_ge(opts, 6)) {
+        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+        Logger_nlog(logger, wffprint, " %N\n", node);
+      }
+
+      {
+        /* Add LoopExists => ([[Ff]]_E^pd(Gf) => <<Ff>>_E) */
+        be_ptr be_Ff_E_pd, be_auxFf_E, be_result;
+        be_Ff_E_pd = array_fetch(be_ptr, E_past_array,
+                                 sbmc_node_info_get_past_depth(info));
+
+        nusmv_assert((be_ptr)NULL != be_Ff_E_pd);
+        nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_F_node(lsf_info));
+        be_auxFf_E = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_F_node(lsf_info), sbmc_E_state());
+        nusmv_assert((be_ptr)NULL != be_auxFf_E);
+        be_result = Be_Implies(be_mgr, be_LoopExists,
+                               Be_Implies(be_mgr, be_Ff_E_pd, be_auxFf_E));
+
+        /* Save the created constraint */
+        lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_nlog(logger, wffprint, " %N\n", node);
+          Logger_log(logger, "  LoopExists => ([[Ff]]_E^%d => <<Ff>>_E): ",
+                     sbmc_node_info_get_past_depth(info));
+          Be_DumpSexpr(be_mgr, be_result, errstream);
+          Logger_log(logger, "\n");
         }
+      }
 
+      if (do_optimization) {
+        /* Optimization: Add [[Ff]]_E^d <=> [[f]]_E^d | [[Ff]]_L^min(d+1,pd(f))
+         */
+        for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_aux, be_lsf, be_aux_next, be_result;
+
+          be_aux = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_aux);
+          be_lsf = array_fetch(be_ptr, lsf_E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_lsf);
+          be_aux_next =
+              array_fetch(be_ptr, L_past_array,
+                          min(d + 1, sbmc_node_info_get_past_depth(info)));
+          nusmv_assert((be_ptr)NULL != be_aux_next);
+          be_result =
+              Be_Iff(be_mgr, be_aux, Be_Or(be_mgr, be_lsf, be_aux_next));
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger,
+                       "  [[Ff]]_E^%d <=> [[f]]_E^%d | [[Ff]]_L^min(%d,%d): ",
+                       d, d, d + 1, sbmc_node_info_get_past_depth(info));
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
+        }
+        /* Optimization: Add [[Ff]]_E^d+1 => [[Ff]]_E^d */
+        for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_Ff_E_d, be_Ff_E_dP1, be_result;
+
+          be_Ff_E_d = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_Ff_E_d);
+          be_Ff_E_dP1 = array_fetch(be_ptr, E_past_array, d + 1);
+          nusmv_assert((be_ptr)NULL != be_Ff_E_dP1);
+          be_result = Be_Implies(be_mgr, be_Ff_E_dP1, be_Ff_E_d);
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, " [[Ff]]_E^%u => [[Ff]]_E^%u: ", d + 1, d);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
+        }
         {
-          /* Add LoopExists => ([[Ff]]_E^pd(Gf) => <<Ff>>_E) */
+          /* Optimization: Add <<Ff>>_E => [[Ff]]_E^pd(Ff) */
           be_ptr be_Ff_E_pd, be_auxFf_E, be_result;
           be_Ff_E_pd = array_fetch(be_ptr, E_past_array,
                                    sbmc_node_info_get_past_depth(info));
-
           nusmv_assert((be_ptr)NULL != be_Ff_E_pd);
-          nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_F_node(lsf_info));
-          be_auxFf_E = BeEnc_name_to_timed(be_enc,
-                                           sbmc_node_info_get_aux_F_node(lsf_info),
-                                           sbmc_E_state());
+          nusmv_assert(sbmc_node_info_get_aux_F_node(lsf_info));
+          be_auxFf_E = BeEnc_name_to_timed(
+              be_enc, sbmc_node_info_get_aux_F_node(lsf_info), sbmc_E_state());
           nusmv_assert((be_ptr)NULL != be_auxFf_E);
-          be_result = Be_Implies(be_mgr,
-                                 be_LoopExists,
-                                 Be_Implies(be_mgr,
-                                            be_Ff_E_pd,
-                                            be_auxFf_E));
+          be_result = Be_Implies(be_mgr, be_auxFf_E, be_Ff_E_pd);
 
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger,
-                    "  LoopExists => ([[Ff]]_E^%d => <<Ff>>_E): ",
-                    sbmc_node_info_get_past_depth(info));
-            Be_DumpSexpr(be_mgr, be_result, errstream);
-            Logger_log(logger, "\n");
-          }
-        }
-
-        if (do_optimization) {
-          /* Optimization: Add [[Ff]]_E^d <=> [[f]]_E^d | [[Ff]]_L^min(d+1,pd(f)) */
-          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-            be_ptr be_aux, be_lsf, be_aux_next, be_result;
-
-            be_aux = array_fetch(be_ptr, E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_aux);
-            be_lsf = array_fetch(be_ptr, lsf_E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_lsf);
-            be_aux_next = array_fetch(be_ptr, L_past_array,
-                                      min(d+1, sbmc_node_info_get_past_depth(info)));
-            nusmv_assert((be_ptr)NULL != be_aux_next);
-            be_result = Be_Iff(be_mgr, be_aux,
-                               Be_Or(be_mgr, be_lsf, be_aux_next));
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[Ff]]_E^%d <=> [[f]]_E^%d | [[Ff]]_L^min(%d,%d): ",
-                      d, d, d+1, sbmc_node_info_get_past_depth(info));
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-          /* Optimization: Add [[Ff]]_E^d+1 => [[Ff]]_E^d */
-          for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
-            be_ptr be_Ff_E_d, be_Ff_E_dP1, be_result;
-
-            be_Ff_E_d = array_fetch(be_ptr, E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_Ff_E_d);
-            be_Ff_E_dP1 = array_fetch(be_ptr, E_past_array, d+1);
-            nusmv_assert((be_ptr)NULL != be_Ff_E_dP1);
-            be_result = Be_Implies(be_mgr, be_Ff_E_dP1, be_Ff_E_d);
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, " [[Ff]]_E^%u => [[Ff]]_E^%u: ",
-                      d+1, d);
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-          {
-            /* Optimization: Add <<Ff>>_E => [[Ff]]_E^pd(Ff) */
-            be_ptr be_Ff_E_pd, be_auxFf_E, be_result;
-            be_Ff_E_pd = array_fetch(be_ptr, E_past_array,
-                                     sbmc_node_info_get_past_depth(info));
-            nusmv_assert((be_ptr)NULL != be_Ff_E_pd);
-            nusmv_assert(sbmc_node_info_get_aux_F_node(lsf_info));
-            be_auxFf_E = BeEnc_name_to_timed(be_enc,
-                                             sbmc_node_info_get_aux_F_node(lsf_info),
-                                             sbmc_E_state());
-            nusmv_assert((be_ptr)NULL != be_auxFf_E);
-            be_result = Be_Implies(be_mgr, be_auxFf_E, be_Ff_E_pd);
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger,
-                      "   <<Ff>>_E => [[Ff]]_E^%d: ",
-                      sbmc_node_info_get_past_depth(info));
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-        }
-        break;
-      }
-
-      case OP_GLOBAL: {
-          unsigned int  d;
-          array_t *      lsf_E_past_array;
-
-          if (!sbmc_set_is_in(visit_cache, lsf)) {
-            lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-            has_unprocessed_children = 1;
-          }
-          if (has_unprocessed_children)
-            break;
-
-          nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-          nusmv_assert((array_t *)NULL != L_past_array);
-          nusmv_assert((array_t *)NULL != E_past_array);
-
-          lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-          nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-          nusmv_assert(sbmc_node_info_get_past_depth(lsf_info) ==
+            Logger_log(logger, "   <<Ff>>_E => [[Ff]]_E^%d: ",
                        sbmc_node_info_get_past_depth(info));
-          lsf_E_past_array = array_fetch(array_t *,
-                                         sbmc_node_info_get_trans_bes(lsf_info),
-                                         sbmc_E_state());
-          nusmv_assert((array_t *)NULL != lsf_E_past_array);
-
-          if (opt_verbose_level_ge(opts, 6)) {
-            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_nlog(logger, wffprint, " %N\n", node);
-          }
-
-          {
-            /* Add LoopExists => ([[Gf]]_E^pd(Gf) <= <<Gf>>_E) */
-            be_ptr be_Gf_E_pd, be_auxGf_E, be_result;
-
-            be_Gf_E_pd = array_fetch(be_ptr, E_past_array,
-                                     sbmc_node_info_get_past_depth(info));
-            nusmv_assert((be_ptr)NULL != be_Gf_E_pd);
-            nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_G_node(lsf_info));
-            be_auxGf_E = BeEnc_name_to_timed(be_enc,
-                                             sbmc_node_info_get_aux_G_node(lsf_info),
-                                             sbmc_E_state());
-            nusmv_assert((be_ptr)NULL != be_auxGf_E);
-            be_result = Be_Implies(be_mgr,
-                                   be_LoopExists,
-                                   Be_Implies(be_mgr,
-                                              be_auxGf_E,
-                                              be_Gf_E_pd));
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger,
-                      "  LoopExists => ([[Gf]]_E^%d <= <<Gf>>_E^%d): ",
-                      sbmc_node_info_get_past_depth(info), sbmc_node_info_get_past_depth(info));
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-
-          if (do_optimization) {
-            /* Optimization: Add [[Gf]]_E^d <=> [[f]]_E^d & [[Gf]]_L^min(d+1,pd(f)) */
-            for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-              be_ptr be_aux, be_lsf, be_aux_next, be_result;
-
-              be_aux = array_fetch(be_ptr, E_past_array, d);
-              nusmv_assert((be_ptr)NULL != be_aux);
-              be_lsf = array_fetch(be_ptr, lsf_E_past_array, d);
-              nusmv_assert((be_ptr)NULL != be_lsf);
-              be_aux_next = array_fetch(be_ptr, L_past_array,
-                                        min(d+1, sbmc_node_info_get_past_depth(info)));
-              nusmv_assert((be_ptr)NULL != be_aux_next);
-              be_result = Be_Iff(be_mgr, be_aux,
-                                 Be_And(be_mgr, be_lsf, be_aux_next));
-
-              /* Save the created constraint */
-              lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-              if (opt_verbose_level_ge(opts, 6)) {
-                Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                Logger_log(logger, "  [[Gf]]_E^%u <=> [[f]]_E^%u & [[Gf]]_L^min(%u+1,%u))",
-                        d, d, d, sbmc_node_info_get_past_depth(info));
-                Be_DumpSexpr(be_mgr, be_result, errstream);
-                Logger_log(logger, "\n");
-              }
-            }
-            /* Optimization: Add [[Gf]]_E^d => [[Gf]]_E^d+1 */
-            for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
-              be_ptr be_Gf_E_d, be_Gf_E_dP1, be_result;
-
-              be_Gf_E_d = array_fetch(be_ptr, E_past_array, d);
-              nusmv_assert((be_ptr)NULL != be_Gf_E_d);
-              be_Gf_E_dP1 = array_fetch(be_ptr, E_past_array, d+1);
-              nusmv_assert((be_ptr)NULL != be_Gf_E_dP1);
-              be_result = Be_Implies(be_mgr, be_Gf_E_d, be_Gf_E_dP1);
-
-              /* Save the created constraint */
-              lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-              if (opt_verbose_level_ge(opts, 6)) {
-                Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                Logger_log(logger, " [[Gf]]_E^%u => [[Gf]]_E^%u: ",
-                        d, d+1);
-                Be_DumpSexpr(be_mgr, be_result, errstream);
-                Logger_log(logger, "\n");
-              }
-            }
-            {
-              /* Optimization: Add [[Gf]]_E^pd(Gf) => <<Gf>>_E */
-              be_ptr be_Gf_E_pd, be_auxGf_E, be_result;
-
-              be_Gf_E_pd = array_fetch(be_ptr,E_past_array,
-                                       sbmc_node_info_get_past_depth(info));
-              nusmv_assert((be_ptr)NULL != be_Gf_E_pd);
-              nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_G_node(lsf_info));
-              be_auxGf_E = BeEnc_name_to_timed(be_enc,
-                                               sbmc_node_info_get_aux_G_node(lsf_info),
-                                               sbmc_E_state());
-              nusmv_assert((be_ptr)NULL != be_auxGf_E);
-              be_result = Be_Implies(be_mgr, be_Gf_E_pd, be_auxGf_E);
-
-              /* Save the created constraint */
-              lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-              if (opt_verbose_level_ge(opts, 6)) {
-                Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                Logger_log(logger,
-                        "  [[Gf]]_E^%d => <<Gf>>_E): ",
-                        sbmc_node_info_get_past_depth(info));
-                Be_DumpSexpr(be_mgr, be_result, errstream);
-                Logger_log(logger, "\n");
-              }
-            }
-          }
-          break;
-        }
-
-      case UNTIL: {
-        unsigned int  d;
-        array_t *      past_array_f_E;
-        array_t *      past_array_g_E;
-
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (!sbmc_set_is_in(visit_cache, rsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
-
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
-
-        lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-        nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-        past_array_f_E = array_fetch(array_t *,
-                                     sbmc_node_info_get_trans_bes(lsf_info),
-                                     sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_f_E);
-
-        rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
-        nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-        past_array_g_E = array_fetch(array_t *,
-                                     sbmc_node_info_get_trans_bes(rsf_info),
-                                     sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_g_E);
-
-
-        if (opt_verbose_level_ge(opts, 6)) {
-          Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_nlog(logger, wffprint, " %N\n", node);
-        }
-
-        {
-          /* Add LoopExists => ([[fUg]]_E^pd(Gf) => <<Fg>>_E) */
-          be_ptr be_fUg_E_pd, be_auxFg_E, be_result;
-
-          be_fUg_E_pd = array_fetch(be_ptr,E_past_array,
-                                    sbmc_node_info_get_past_depth(info));
-          nusmv_assert((be_ptr)NULL != be_fUg_E_pd);
-          nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_F_node(rsf_info));
-          be_auxFg_E = BeEnc_name_to_timed(be_enc,
-                                           sbmc_node_info_get_aux_F_node(rsf_info),
-                                           sbmc_E_state());
-          nusmv_assert((be_ptr)NULL != be_auxFg_E);
-          be_result = Be_Implies(be_mgr,
-                                 be_LoopExists,
-                                 Be_Implies(be_mgr,
-                                            be_fUg_E_pd,
-                                            be_auxFg_E));
-
-          /* Save the created constraint */
-          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-          if (opt_verbose_level_ge(opts, 6)) {
-            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger,
-                    "  LoopExists => ([[fUg]]_E^%u => <<Fg>>_E): ",
-                    sbmc_node_info_get_past_depth(info));
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
         }
+      }
+      break;
+    }
 
-        if (do_optimization) {
-          /* Optimization: [[fUg]]_E^d <=>
-           * [[g]]_E^d | ([[f]]_E^d  & [[fUg]]_L^min(d+1,pd(fUg))) */
-          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-            be_ptr be_fUg_E_d, be_f_E_d, be_g_E_d, be_fUg_L_dP1, be_result;
+    case OP_GLOBAL: {
+      unsigned int d;
+      array_t *lsf_E_past_array;
 
-            be_fUg_E_d = array_fetch(be_ptr, E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_fUg_E_d);
-
-            be_f_E_d = array_fetch(be_ptr, past_array_f_E,
-                                   min(d, sbmc_node_info_get_past_depth(lsf_info)));
-            nusmv_assert((be_ptr)NULL != be_f_E_d);
-
-            be_g_E_d = array_fetch(be_ptr, past_array_g_E,
-                                   min(d, sbmc_node_info_get_past_depth(rsf_info)));
-            nusmv_assert((be_ptr)NULL != be_g_E_d);
-
-            be_fUg_L_dP1 = array_fetch(be_ptr, L_past_array,
-                                       min(d+1, sbmc_node_info_get_past_depth(info)));
-            nusmv_assert((be_ptr)NULL != be_fUg_L_dP1);
-
-            be_result = Be_Iff(be_mgr,
-                               be_fUg_E_d,
-                               Be_Or(be_mgr,
-                                     be_g_E_d,
-                                     Be_And(be_mgr,
-                                            be_f_E_d,
-                                            be_fUg_L_dP1)));
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[fUg]]_E^%u <=> [[g]]_E^%u | ([[f]]_E^%u & [[fUg]]_L^min(%u,%u)): ",
-                      d, min(d, sbmc_node_info_get_past_depth(rsf_info)),
-                      min(d, sbmc_node_info_get_past_depth(lsf_info)),
-                      d+1, sbmc_node_info_get_past_depth(info));
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-        }
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
         break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      nusmv_assert(sbmc_node_info_get_past_depth(lsf_info) ==
+                   sbmc_node_info_get_past_depth(info));
+      lsf_E_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != lsf_E_past_array);
+
+      if (opt_verbose_level_ge(opts, 6)) {
+        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+        Logger_nlog(logger, wffprint, " %N\n", node);
       }
 
-      case RELEASES: {
-        unsigned int  d;
-        array_t *      past_array_f_E;
-        array_t *      past_array_g_E;
+      {
+        /* Add LoopExists => ([[Gf]]_E^pd(Gf) <= <<Gf>>_E) */
+        be_ptr be_Gf_E_pd, be_auxGf_E, be_result;
 
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (!sbmc_set_is_in(visit_cache, rsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
+        be_Gf_E_pd = array_fetch(be_ptr, E_past_array,
+                                 sbmc_node_info_get_past_depth(info));
+        nusmv_assert((be_ptr)NULL != be_Gf_E_pd);
+        nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_G_node(lsf_info));
+        be_auxGf_E = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_G_node(lsf_info), sbmc_E_state());
+        nusmv_assert((be_ptr)NULL != be_auxGf_E);
+        be_result = Be_Implies(be_mgr, be_LoopExists,
+                               Be_Implies(be_mgr, be_auxGf_E, be_Gf_E_pd));
 
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
-
-        lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-        nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-        past_array_f_E = array_fetch(array_t *,
-                                     sbmc_node_info_get_trans_bes(lsf_info),
-                                     sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_f_E);
-
-        rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
-        nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-        past_array_g_E = array_fetch(array_t *,
-                                     sbmc_node_info_get_trans_bes(rsf_info),
-                                     sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_g_E);
+        /* Save the created constraint */
+        lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_nlog(logger, wffprint, " %N\n", node);
-        }
-
-        {
-          /* Add LoopExists => ([[fRg]]_E^pd(Gf) <= <<Gg>>_E) */
-          be_ptr be_fRg_E_pd, be_auxGg_E, be_result;
-
-          be_fRg_E_pd = array_fetch(be_ptr, E_past_array,
-                                    sbmc_node_info_get_past_depth(info));
-          nusmv_assert((be_ptr)NULL != be_fRg_E_pd);
-          nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_G_node(rsf_info));
-          be_auxGg_E = BeEnc_name_to_timed(be_enc,
-                                           sbmc_node_info_get_aux_G_node(rsf_info),
-                                           sbmc_E_state());
-          nusmv_assert((be_ptr)NULL != be_auxGg_E);
-          be_result = Be_Implies(be_mgr,
-                                 be_LoopExists,
-                                 Be_Implies(be_mgr,
-                                            be_auxGg_E,
-                                            be_fRg_E_pd));
-
-          /* Save the created constraint */
-          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-          if (opt_verbose_level_ge(opts, 6)) {
-            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger,
-                    "  LoopExists => ([[fRg]]_E^%u <= <<Gg>>_E): ",
-                    sbmc_node_info_get_past_depth(info));
-            Be_DumpSexpr(be_mgr, be_result, errstream);
-            Logger_log(logger, "\n");
-          }
-        }
-
-
-        if (do_optimization) {
-          /* Optimization: [[fRg]]_E^d <=>
-           * [[g]]_E^d & ([[f]]_E^d  | [[fRg]]_L^min(d+1,pd(fUg))) */
-          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-            be_ptr be_fRg_E_d, be_f_E_d, be_g_E_d, be_fRg_L_dP1, be_result;
-
-            be_fRg_E_d = array_fetch(be_ptr, E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_fRg_E_d);
-
-            be_f_E_d = array_fetch(be_ptr, past_array_f_E,
-                                   min(d, sbmc_node_info_get_past_depth(lsf_info)));
-            nusmv_assert((be_ptr)NULL != be_f_E_d);
-
-            be_g_E_d = array_fetch(be_ptr, past_array_g_E,
-                                   min(d, sbmc_node_info_get_past_depth(rsf_info)));
-            nusmv_assert((be_ptr)NULL != be_g_E_d);
-
-            be_fRg_L_dP1 = array_fetch(be_ptr, L_past_array,
-                                       min(d+1, sbmc_node_info_get_past_depth(info)));
-            nusmv_assert((be_ptr)NULL != be_fRg_L_dP1);
-
-            be_result = Be_Iff(be_mgr,
-                               be_fRg_E_d,
-                               Be_And(be_mgr,
-                                      be_g_E_d,
-                                      Be_Or(be_mgr,
-                                            be_f_E_d,
-                                            be_fRg_L_dP1)));
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[fRg]]_E^%u <=> [[g]]_E^%u & ([[f]]_E^%u | [[fRg]]_L^min(%u,%u)): ",
-                      d, min(d, sbmc_node_info_get_past_depth(rsf_info)),
-                      min(d, sbmc_node_info_get_past_depth(lsf_info)),
-                      d+1, sbmc_node_info_get_past_depth(info));
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-        }
-        break;
-      }
-
-      case OP_NEXT: {
-        unsigned int  d;
-        array_t *      lsf_L_past_array;
-
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
-
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
-
-        lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
-        nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-        nusmv_assert(sbmc_node_info_get_past_depth(lsf_info) ==
+          Logger_log(logger, "  LoopExists => ([[Gf]]_E^%d <= <<Gf>>_E^%d): ",
+                     sbmc_node_info_get_past_depth(info),
                      sbmc_node_info_get_past_depth(info));
-        lsf_L_past_array = array_fetch(array_t *,
-                                       sbmc_node_info_get_trans_bes(lsf_info), sbmc_L_state());
-        nusmv_assert((array_t *)NULL != lsf_L_past_array);
+          Be_DumpSexpr(be_mgr, be_result, errstream);
+          Logger_log(logger, "\n");
+        }
+      }
+
+      if (do_optimization) {
+        /* Optimization: Add [[Gf]]_E^d <=> [[f]]_E^d & [[Gf]]_L^min(d+1,pd(f))
+         */
+        for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_aux, be_lsf, be_aux_next, be_result;
+
+          be_aux = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_aux);
+          be_lsf = array_fetch(be_ptr, lsf_E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_lsf);
+          be_aux_next =
+              array_fetch(be_ptr, L_past_array,
+                          min(d + 1, sbmc_node_info_get_past_depth(info)));
+          nusmv_assert((be_ptr)NULL != be_aux_next);
+          be_result =
+              Be_Iff(be_mgr, be_aux, Be_And(be_mgr, be_lsf, be_aux_next));
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger,
+                       "  [[Gf]]_E^%u <=> [[f]]_E^%u & [[Gf]]_L^min(%u+1,%u))",
+                       d, d, d, sbmc_node_info_get_past_depth(info));
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
+        }
+        /* Optimization: Add [[Gf]]_E^d => [[Gf]]_E^d+1 */
+        for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_Gf_E_d, be_Gf_E_dP1, be_result;
+
+          be_Gf_E_d = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_Gf_E_d);
+          be_Gf_E_dP1 = array_fetch(be_ptr, E_past_array, d + 1);
+          nusmv_assert((be_ptr)NULL != be_Gf_E_dP1);
+          be_result = Be_Implies(be_mgr, be_Gf_E_d, be_Gf_E_dP1);
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, " [[Gf]]_E^%u => [[Gf]]_E^%u: ", d, d + 1);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
+        }
+        {
+          /* Optimization: Add [[Gf]]_E^pd(Gf) => <<Gf>>_E */
+          be_ptr be_Gf_E_pd, be_auxGf_E, be_result;
+
+          be_Gf_E_pd = array_fetch(be_ptr, E_past_array,
+                                   sbmc_node_info_get_past_depth(info));
+          nusmv_assert((be_ptr)NULL != be_Gf_E_pd);
+          nusmv_assert((node_ptr)NULL !=
+                       sbmc_node_info_get_aux_G_node(lsf_info));
+          be_auxGf_E = BeEnc_name_to_timed(
+              be_enc, sbmc_node_info_get_aux_G_node(lsf_info), sbmc_E_state());
+          nusmv_assert((be_ptr)NULL != be_auxGf_E);
+          be_result = Be_Implies(be_mgr, be_Gf_E_pd, be_auxGf_E);
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, "  [[Gf]]_E^%d => <<Gf>>_E): ",
+                       sbmc_node_info_get_past_depth(info));
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
+        }
+      }
+      break;
+    }
+
+    case UNTIL: {
+      unsigned int d;
+      array_t *past_array_f_E;
+      array_t *past_array_g_E;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (!sbmc_set_is_in(visit_cache, rsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
+        break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      past_array_f_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_f_E);
+
+      rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
+      nusmv_assert((sbmc_node_info *)NULL != rsf_info);
+      past_array_g_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(rsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_g_E);
+
+      if (opt_verbose_level_ge(opts, 6)) {
+        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+        Logger_nlog(logger, wffprint, " %N\n", node);
+      }
+
+      {
+        /* Add LoopExists => ([[fUg]]_E^pd(Gf) => <<Fg>>_E) */
+        be_ptr be_fUg_E_pd, be_auxFg_E, be_result;
+
+        be_fUg_E_pd = array_fetch(be_ptr, E_past_array,
+                                  sbmc_node_info_get_past_depth(info));
+        nusmv_assert((be_ptr)NULL != be_fUg_E_pd);
+        nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_F_node(rsf_info));
+        be_auxFg_E = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_F_node(rsf_info), sbmc_E_state());
+        nusmv_assert((be_ptr)NULL != be_auxFg_E);
+        be_result = Be_Implies(be_mgr, be_LoopExists,
+                               Be_Implies(be_mgr, be_fUg_E_pd, be_auxFg_E));
+
+        /* Save the created constraint */
+        lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_nlog(logger, wffprint, " %N\n", node);
+          Logger_log(logger, "  LoopExists => ([[fUg]]_E^%u => <<Fg>>_E): ",
+                     sbmc_node_info_get_past_depth(info));
+          Be_DumpSexpr(be_mgr, be_result, errstream);
+          Logger_log(logger, "\n");
         }
+      }
 
-        if (do_optimization) {
-          /* Add [[Xf]]_E^d <=> [[f]]_L^min(d+1,pd(f)) */
-          for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-            be_ptr be_aux, be_lsf_next, be_result;
+      if (do_optimization) {
+        /* Optimization: [[fUg]]_E^d <=>
+         * [[g]]_E^d | ([[f]]_E^d  & [[fUg]]_L^min(d+1,pd(fUg))) */
+        for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_fUg_E_d, be_f_E_d, be_g_E_d, be_fUg_L_dP1, be_result;
 
-            be_aux = array_fetch(be_ptr, E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_aux);
-            be_lsf_next = array_fetch(be_ptr, lsf_L_past_array,
-                                      min(d+1, sbmc_node_info_get_past_depth(info)));
-            nusmv_assert((be_ptr)NULL != be_lsf_next);
-            be_result = Be_Iff(be_mgr, be_aux, be_lsf_next);
+          be_fUg_E_d = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_fUg_E_d);
 
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+          be_f_E_d =
+              array_fetch(be_ptr, past_array_f_E,
+                          min(d, sbmc_node_info_get_past_depth(lsf_info)));
+          nusmv_assert((be_ptr)NULL != be_f_E_d);
 
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger,
-                      " [[Xf]]_E^%u <=> [[f]]_L^min(%u+1,%u): ",
-                      d, d, sbmc_node_info_get_past_depth(lsf_info));
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
+          be_g_E_d =
+              array_fetch(be_ptr, past_array_g_E,
+                          min(d, sbmc_node_info_get_past_depth(rsf_info)));
+          nusmv_assert((be_ptr)NULL != be_g_E_d);
+
+          be_fUg_L_dP1 =
+              array_fetch(be_ptr, L_past_array,
+                          min(d + 1, sbmc_node_info_get_past_depth(info)));
+          nusmv_assert((be_ptr)NULL != be_fUg_L_dP1);
+
+          be_result = Be_Iff(
+              be_mgr, be_fUg_E_d,
+              Be_Or(be_mgr, be_g_E_d, Be_And(be_mgr, be_f_E_d, be_fUg_L_dP1)));
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger,
+                       "  [[fUg]]_E^%u <=> [[g]]_E^%u | ([[f]]_E^%u & "
+                       "[[fUg]]_L^min(%u,%u)): ",
+                       d, min(d, sbmc_node_info_get_past_depth(rsf_info)),
+                       min(d, sbmc_node_info_get_past_depth(lsf_info)), d + 1,
+                       sbmc_node_info_get_past_depth(info));
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
         }
+      }
+      break;
+    }
+
+    case RELEASES: {
+      unsigned int d;
+      array_t *past_array_f_E;
+      array_t *past_array_g_E;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (!sbmc_set_is_in(visit_cache, rsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
         break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      past_array_f_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_f_E);
+
+      rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
+      nusmv_assert((sbmc_node_info *)NULL != rsf_info);
+      past_array_g_E = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(rsf_info), sbmc_E_state());
+      nusmv_assert((array_t *)NULL != past_array_g_E);
+
+      if (opt_verbose_level_ge(opts, 6)) {
+        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+        Logger_nlog(logger, wffprint, " %N\n", node);
       }
 
-      case OP_HISTORICAL: {
-        unsigned int d;
+      {
+        /* Add LoopExists => ([[fRg]]_E^pd(Gf) <= <<Gg>>_E) */
+        be_ptr be_fRg_E_pd, be_auxGg_E, be_result;
 
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
+        be_fRg_E_pd = array_fetch(be_ptr, E_past_array,
+                                  sbmc_node_info_get_past_depth(info));
+        nusmv_assert((be_ptr)NULL != be_fRg_E_pd);
+        nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_G_node(rsf_info));
+        be_auxGg_E = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_G_node(rsf_info), sbmc_E_state());
+        nusmv_assert((be_ptr)NULL != be_auxGg_E);
+        be_result = Be_Implies(be_mgr, be_LoopExists,
+                               Be_Implies(be_mgr, be_auxGg_E, be_fRg_E_pd));
+
+        /* Save the created constraint */
+        lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+        if (opt_verbose_level_ge(opts, 6)) {
+          Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+          Logger_log(logger, "  LoopExists => ([[fRg]]_E^%u <= <<Gg>>_E): ",
+                     sbmc_node_info_get_past_depth(info));
+          Be_DumpSexpr(be_mgr, be_result, errstream);
+          Logger_log(logger, "\n");
         }
-        if (has_unprocessed_children)
-          break;
+      }
 
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
+      if (do_optimization) {
+        /* Optimization: [[fRg]]_E^d <=>
+         * [[g]]_E^d & ([[f]]_E^d  | [[fRg]]_L^min(d+1,pd(fUg))) */
+        for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_fRg_E_d, be_f_E_d, be_g_E_d, be_fRg_L_dP1, be_result;
 
-        if (do_optimization) {
-          /* Optimization: Add [[Hf]]_E^d+1 => [[Hf]]_E^d */
-          for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
-            be_ptr be_Hf_E_d, be_Hf_E_dP1, be_result;
+          be_fRg_E_d = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_fRg_E_d);
 
-            be_Hf_E_d = array_fetch(be_ptr, E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_Hf_E_d);
-            be_Hf_E_dP1 = array_fetch(be_ptr, E_past_array, d+1);
-            nusmv_assert((be_ptr)NULL != be_Hf_E_dP1);
-            be_result = Be_Implies(be_mgr, be_Hf_E_dP1, be_Hf_E_d);
+          be_f_E_d =
+              array_fetch(be_ptr, past_array_f_E,
+                          min(d, sbmc_node_info_get_past_depth(lsf_info)));
+          nusmv_assert((be_ptr)NULL != be_f_E_d);
 
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+          be_g_E_d =
+              array_fetch(be_ptr, past_array_g_E,
+                          min(d, sbmc_node_info_get_past_depth(rsf_info)));
+          nusmv_assert((be_ptr)NULL != be_g_E_d);
 
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, " [[Hf]]_E^%u => [[Hf]]_E^%u: ",
-                      d+1, d);
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
+          be_fRg_L_dP1 =
+              array_fetch(be_ptr, L_past_array,
+                          min(d + 1, sbmc_node_info_get_past_depth(info)));
+          nusmv_assert((be_ptr)NULL != be_fRg_L_dP1);
+
+          be_result = Be_Iff(
+              be_mgr, be_fRg_E_d,
+              Be_And(be_mgr, be_g_E_d, Be_Or(be_mgr, be_f_E_d, be_fRg_L_dP1)));
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger,
+                       "  [[fRg]]_E^%u <=> [[g]]_E^%u & ([[f]]_E^%u | "
+                       "[[fRg]]_L^min(%u,%u)): ",
+                       d, min(d, sbmc_node_info_get_past_depth(rsf_info)),
+                       min(d, sbmc_node_info_get_past_depth(lsf_info)), d + 1,
+                       sbmc_node_info_get_past_depth(info));
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
         }
+      }
+      break;
+    }
+
+    case OP_NEXT: {
+      unsigned int d;
+      array_t *lsf_L_past_array;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
         break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+
+      lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
+      nusmv_assert((sbmc_node_info *)NULL != lsf_info);
+      nusmv_assert(sbmc_node_info_get_past_depth(lsf_info) ==
+                   sbmc_node_info_get_past_depth(info));
+      lsf_L_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), sbmc_L_state());
+      nusmv_assert((array_t *)NULL != lsf_L_past_array);
+
+      if (opt_verbose_level_ge(opts, 6)) {
+        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+        Logger_nlog(logger, wffprint, " %N\n", node);
       }
 
-      case OP_ONCE: {
-        unsigned int  d;
+      if (do_optimization) {
+        /* Add [[Xf]]_E^d <=> [[f]]_L^min(d+1,pd(f)) */
+        for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_aux, be_lsf_next, be_result;
 
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
+          be_aux = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_aux);
+          be_lsf_next =
+              array_fetch(be_ptr, lsf_L_past_array,
+                          min(d + 1, sbmc_node_info_get_past_depth(info)));
+          nusmv_assert((be_ptr)NULL != be_lsf_next);
+          be_result = Be_Iff(be_mgr, be_aux, be_lsf_next);
 
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
-        if (do_optimization) {
-          /* Optimization: Add [[Of]]_E^d => [[Of]]_E^d+1 */
-          for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
-            be_ptr be_Of_E_d, be_Of_E_dP1, be_result;
-
-            be_Of_E_d = array_fetch(be_ptr, E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_Of_E_d);
-            be_Of_E_dP1 = array_fetch(be_ptr, E_past_array, d+1);
-            nusmv_assert((be_ptr)NULL != be_Of_E_dP1);
-            be_result = Be_Implies(be_mgr, be_Of_E_d, be_Of_E_dP1);
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, " [[Of]]_E^%u => [[Of]]_E^%u: ", d, d+1);
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, " [[Xf]]_E^%u <=> [[f]]_L^min(%u+1,%u): ", d, d,
+                       sbmc_node_info_get_past_depth(lsf_info));
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
         }
-        break;
       }
+      break;
+    }
 
-      case OP_PREC:
-      case OP_NOTPRECNOT: {
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
+    case OP_HISTORICAL: {
+      unsigned int d;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
+        break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+
+      if (do_optimization) {
+        /* Optimization: Add [[Hf]]_E^d+1 => [[Hf]]_E^d */
+        for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_Hf_E_d, be_Hf_E_dP1, be_result;
+
+          be_Hf_E_d = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_Hf_E_d);
+          be_Hf_E_dP1 = array_fetch(be_ptr, E_past_array, d + 1);
+          nusmv_assert((be_ptr)NULL != be_Hf_E_dP1);
+          be_result = Be_Implies(be_mgr, be_Hf_E_dP1, be_Hf_E_d);
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, " [[Hf]]_E^%u => [[Hf]]_E^%u: ", d + 1, d);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
         }
-        if (has_unprocessed_children)
-          break;
-
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
-        break;
       }
+      break;
+    }
 
-      case TRIGGERED:
-      case SINCE: {
-        if (!sbmc_set_is_in(visit_cache, lsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
-          has_unprocessed_children = 1;
+    case OP_ONCE: {
+      unsigned int d;
+
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
+        break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+
+      if (do_optimization) {
+        /* Optimization: Add [[Of]]_E^d => [[Of]]_E^d+1 */
+        for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_Of_E_d, be_Of_E_dP1, be_result;
+
+          be_Of_E_d = array_fetch(be_ptr, E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_Of_E_d);
+          be_Of_E_dP1 = array_fetch(be_ptr, E_past_array, d + 1);
+          nusmv_assert((be_ptr)NULL != be_Of_E_dP1);
+          be_result = Be_Implies(be_mgr, be_Of_E_d, be_Of_E_dP1);
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, " [[Of]]_E^%u => [[Of]]_E^%u: ", d, d + 1);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
         }
-        if (!sbmc_set_is_in(visit_cache, rsf)) {
-          lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
-          has_unprocessed_children = 1;
-        }
-        if (has_unprocessed_children)
-          break;
-
-        nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-        nusmv_assert((array_t *)NULL != L_past_array);
-        nusmv_assert((array_t *)NULL != E_past_array);
-        break;
       }
+      break;
+    }
 
-      default:
-        print_node(wffprint, stderr, node);
-        ErrorMgr_internal_error(errmgr, sbmc_SNYI_text, __FILE__, __LINE__);
-        break;
+    case OP_PREC:
+    case OP_NOTPRECNOT: {
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
       }
+      if (has_unprocessed_children)
+        break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+      break;
+    }
+
+    case TRIGGERED:
+    case SINCE: {
+      if (!sbmc_set_is_in(visit_cache, lsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (!sbmc_set_is_in(visit_cache, rsf)) {
+        lsNewBegin(unprocessed_nodes, (lsGeneric)rsf, LS_NH);
+        has_unprocessed_children = 1;
+      }
+      if (has_unprocessed_children)
+        break;
+
+      nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
+      nusmv_assert((array_t *)NULL != L_past_array);
+      nusmv_assert((array_t *)NULL != E_past_array);
+      break;
+    }
+
+    default:
+      print_node(wffprint, stderr, node);
+      ErrorMgr_internal_error(errmgr, sbmc_SNYI_text, __FILE__, __LINE__);
+      break;
+    }
     if (has_unprocessed_children)
       continue;
 
     /* Remove node from unprocessed stack */
-    if (lsDelBegin(unprocessed_nodes, (lsGeneric*)&node) != LS_OK)
+    if (lsDelBegin(unprocessed_nodes, (lsGeneric *)&node) != LS_OK)
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
     /* Mark visited */
@@ -1204,8 +1167,7 @@ lsList sbmc_unroll_base(const BeEnc_ptr be_enc,
 
         be_f_L_d = array_fetch(be_ptr, L_past_array, d);
         nusmv_assert((be_ptr)NULL != be_f_L_d);
-        be_result = Be_Implies(be_mgr,
-                               Be_Not(be_mgr, be_LoopExists),
+        be_result = Be_Implies(be_mgr, Be_Not(be_mgr, be_LoopExists),
                                Be_Not(be_mgr, be_f_L_d));
 
         /* Save the created constraint */
@@ -1214,8 +1176,7 @@ lsList sbmc_unroll_base(const BeEnc_ptr be_enc,
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_nlog(logger, wffprint, " f: %N\n", node);
-          Logger_log(logger,
-                  "  !LoopExists => ([[f]]_L^%d <=> FALSE): ", d);
+          Logger_log(logger, "  !LoopExists => ([[f]]_L^%d <=> FALSE): ", d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -1910,34 +1871,30 @@ lsList sbmc_unroll_invariant_propositional(const BeEnc_ptr be_enc,
 }
 #endif
 
-lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
-                               const node_ptr ltlspec,
+lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc, const node_ptr ltlspec,
                                const unsigned int i_model,
                                const hash_ptr info_map,
-                               const be_ptr be_InLoop_i,
-                               const be_ptr be_l_i,
+                               const be_ptr be_InLoop_i, const be_ptr be_l_i,
                                const be_ptr be_LastState_i,
                                const be_ptr be_LoopExists,
-                               const int do_optimization)
-{
+                               const int do_optimization) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   unsigned int d;
   Be_Manager_ptr be_mgr;
   SymbTable_ptr st = (SymbTable_ptr)NULL;
   hash_ptr visit_cache = (hash_ptr)NULL;
-  lsList   unprocessed_nodes = (lsList)NULL;
-  lsList   created_constraints = (lsList)NULL;
+  lsList unprocessed_nodes = (lsList)NULL;
+  lsList created_constraints = (lsList)NULL;
   const unsigned int i_real = sbmc_real_k(i_model);
   /* Some verbose stuff */
   char *str_debug1 = " Translating formula %N at timestep %u\n";
@@ -1961,23 +1918,22 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
   if (opt_verbose_level_ge(opts, 2)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Unrolling k-invariant future stuff at time %u\n",
-            i_model);
+               i_model);
     fflush(errstream);
   }
-
 
   visit_cache = sbmc_set_create();
   unprocessed_nodes = lsCreate();
   lsNewBegin(unprocessed_nodes, (lsGeneric)ltlspec, LS_NH);
 
-  while(lsLength(unprocessed_nodes) > 0) {
+  while (lsLength(unprocessed_nodes) > 0) {
     node_ptr node, lsf, rsf;
     sbmc_node_info *info, *lsf_info, *rsf_info;
     array_t *past_array, *lsf_past_array, *rsf_past_array;
     int has_unprocessed_children;
 
     /* Get node */
-    if ((lsFirstItem(unprocessed_nodes, (lsGeneric*)&node, LS_NH) != LS_OK) ||
+    if ((lsFirstItem(unprocessed_nodes, (lsGeneric *)&node, LS_NH) != LS_OK) ||
         ((node_ptr)NULL == node))
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
@@ -1989,9 +1945,9 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     /* Get past_array, i.e., sbmc_node_info_get_trans_bes(info)[i] */
     /* sbmc_init_state_vector should have built trans_bes[i] before */
     nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-    nusmv_assert(array_n(sbmc_node_info_get_trans_bes(info)) >= i_real+1);
-    past_array = array_fetch(array_t *,
-                             sbmc_node_info_get_trans_bes(info), i_real);
+    nusmv_assert(array_n(sbmc_node_info_get_trans_bes(info)) >= i_real + 1);
+    past_array =
+        array_fetch(array_t *, sbmc_node_info_get_trans_bes(info), i_real);
     nusmv_assert((array_t *)NULL != past_array);
 
     /* Already translated? */
@@ -2000,7 +1956,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
         nusmv_assert(array_fetch(be_ptr, past_array, d) != (be_ptr)NULL);
       /* Remove node from unprocessed stack */
-      if (lsDelBegin(unprocessed_nodes, (lsGeneric*)&node) != LS_OK)
+      if (lsDelBegin(unprocessed_nodes, (lsGeneric *)&node) != LS_OK)
         ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
       continue;
     }
@@ -2009,7 +1965,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     lsf = car(node);
     rsf = cdr(node);
     has_unprocessed_children = 0;
-    switch(node_get_type(node)) {
+    switch (node_get_type(node)) {
     case ATOM:
     case BIT:
     case DOT:
@@ -2025,67 +1981,60 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Definitional translation. */
         /* Should already be constructed in sbmc_init_state_vector. */
         nusmv_assert(array_fetch(be_ptr, past_array, 0) != (be_ptr)NULL);
-      }
-      else {
+      } else {
         /* Formula variable translation. */
-        if(SymbTable_is_symbol_input_var(st, node))
-          {
-            /* An input variable */
-            /* Build [[p]]_i^0 <=> p_i & (!LastState_i | LoopExists) */
-            be_ptr be_p_i_0, be_realp_i, be_result;
-            nusmv_assert(be_LastState_i != (be_ptr)NULL);
+        if (SymbTable_is_symbol_input_var(st, node)) {
+          /* An input variable */
+          /* Build [[p]]_i^0 <=> p_i & (!LastState_i | LoopExists) */
+          be_ptr be_p_i_0, be_realp_i, be_result;
+          nusmv_assert(be_LastState_i != (be_ptr)NULL);
 
-            be_p_i_0 = array_fetch(be_ptr, past_array, 0);
-            nusmv_assert((be_ptr)NULL != be_p_i_0);
-            be_realp_i = BeEnc_name_to_timed(be_enc, node, i_real);
-            nusmv_assert((be_ptr)NULL != be_realp_i);
-            be_result = Be_Iff(be_mgr,
-                               be_p_i_0,
-                               Be_And(be_mgr,
-                                      be_realp_i,
-                                      Be_Or(be_mgr,
-                                            Be_Not(be_mgr, be_LastState_i),
-                                            be_LoopExists)));
-            nusmv_assert((be_ptr)NULL != be_result);
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger,
-                      "  [[p]]_%d^0 <=> p_%d & (LastState_%d | LoopExists): ",
-                      i_model, i_model, i_model);
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
+          be_p_i_0 = array_fetch(be_ptr, past_array, 0);
+          nusmv_assert((be_ptr)NULL != be_p_i_0);
+          be_realp_i = BeEnc_name_to_timed(be_enc, node, i_real);
+          nusmv_assert((be_ptr)NULL != be_realp_i);
+          be_result =
+              Be_Iff(be_mgr, be_p_i_0,
+                     Be_And(be_mgr, be_realp_i,
+                            Be_Or(be_mgr, Be_Not(be_mgr, be_LastState_i),
+                                  be_LoopExists)));
+          nusmv_assert((be_ptr)NULL != be_result);
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger,
+                       "  [[p]]_%d^0 <=> p_%d & (LastState_%d | LoopExists): ",
+                       i_model, i_model, i_model);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
-        else
-          {
-            /* A state variable */
-            /* Build [[p]]_i^0 <=> p_i */
-            be_ptr be_p_i_0, be_realp_i, be_result;
+        } else {
+          /* A state variable */
+          /* Build [[p]]_i^0 <=> p_i */
+          be_ptr be_p_i_0, be_realp_i, be_result;
 
-            be_p_i_0 = array_fetch(be_ptr, past_array, 0);
-            nusmv_assert((be_ptr)NULL != be_p_i_0);
-            be_realp_i = BeEnc_name_to_timed(be_enc, node, i_real);
-            nusmv_assert((be_ptr)NULL != be_realp_i);
-            be_result = Be_Iff(be_mgr, be_p_i_0, be_realp_i);
-            nusmv_assert((be_ptr)NULL != be_result);
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[p]]_%d^0 <=> p_%d: ",
-                      i_model, i_model);
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
+          be_p_i_0 = array_fetch(be_ptr, past_array, 0);
+          nusmv_assert((be_ptr)NULL != be_p_i_0);
+          be_realp_i = BeEnc_name_to_timed(be_enc, node, i_real);
+          nusmv_assert((be_ptr)NULL != be_realp_i);
+          be_result = Be_Iff(be_mgr, be_p_i_0, be_realp_i);
+          nusmv_assert((be_ptr)NULL != be_result);
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, "  [[p]]_%d^0 <=> p_%d: ", i_model, i_model);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
+        }
       }
       break;
     }
 
     case TRUEEXP: {
-      if (opt_verbose_level_ge(opts, 6))  {
+      if (opt_verbose_level_ge(opts, 6)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_nlog(logger, wffprint, str_debug1, node, i_model);
       }
@@ -2096,8 +2045,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Definitional translation. */
         /* Should already be constructed in sbmc_init_state_vector. */
         nusmv_assert(array_fetch(be_ptr, past_array, 0) != (be_ptr)NULL);
-      }
-      else {
+      } else {
         /*
          * Build [[TRUE]]_i^0 <=> TRUE
          */
@@ -2135,8 +2083,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Definitional translation. */
         /* Should already be constructed in sbmc_init_state_vector. */
         nusmv_assert(array_fetch(be_ptr, past_array, 0) != (be_ptr)NULL);
-      }
-      else {
+      } else {
         /*
          * Build [[FALSE]]_i^0 <=> FALSE
          */
@@ -2154,7 +2101,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger,"  [[FALSE]]_%d^0 <=> FALSE: ",i_model);
+          Logger_log(logger, "  [[FALSE]]_%d^0 <=> FALSE: ", i_model);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2166,7 +2113,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     case XNOR:
     case IMPLIES:
     case IFF: {
-      ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__, __LINE__);
+      ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__,
+                              __LINE__);
       break;
     }
 
@@ -2182,23 +2130,21 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       if (has_unprocessed_children)
         break;
 
-      if (opt_verbose_level_ge(opts, 6))  {
+      if (opt_verbose_level_ge(opts, 6)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_nlog(logger, wffprint, str_debug1, node, i_model);
       }
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(array_t *,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert(lsf_past_array);
 
       rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
       nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-      rsf_past_array = array_fetch(array_t *,
-                                   sbmc_node_info_get_trans_bes(rsf_info),
-                                   i_real);
+      rsf_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(rsf_info), i_real);
       nusmv_assert((array_t *)NULL != rsf_past_array);
 
       if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
@@ -2206,13 +2152,14 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Should already be constructed in sbmc_init_state_vector. */
         for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
           nusmv_assert(array_fetch(be_ptr, past_array, d) != (be_ptr)NULL);
-      }
-      else {
+      } else {
         for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
           /* [[f | g]]_i^d <=> [[f]]_i^d | [[g]]_i^d */
           be_ptr be_fORg_i_d, be_f_i_d, be_g_i_d, be_result;
-          const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-          const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+          const unsigned int d_lsf =
+              min(d, sbmc_node_info_get_past_depth(lsf_info));
+          const unsigned int d_rsf =
+              min(d, sbmc_node_info_get_past_depth(rsf_info));
 
           be_fORg_i_d = array_fetch(be_ptr, past_array, d);
           nusmv_assert((be_ptr)NULL != be_fORg_i_d);
@@ -2220,18 +2167,18 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
           nusmv_assert((be_ptr)NULL != be_f_i_d);
           be_g_i_d = array_fetch(be_ptr, rsf_past_array, d_rsf);
           nusmv_assert((be_ptr)NULL != be_g_i_d);
-          be_result = Be_Iff(be_mgr, be_fORg_i_d,
-                             Be_Or(be_mgr, be_f_i_d, be_g_i_d));
+          be_result =
+              Be_Iff(be_mgr, be_fORg_i_d, Be_Or(be_mgr, be_f_i_d, be_g_i_d));
           nusmv_assert((be_ptr)NULL != be_result);
 
           /* Save the created constraint */
-          lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
             Logger_log(logger,
-                    "  [[f | g]]_%d^%d <=> [[f]]_%d^%d | [[g]]_%d^%d: ",
-                    i_model, d, i_model, d_lsf, i_model, d_rsf);
+                       "  [[f | g]]_%d^%d <=> [[f]]_%d^%d | [[g]]_%d^%d: ",
+                       i_model, d, i_model, d_lsf, i_model, d_rsf);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
@@ -2259,14 +2206,14 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(array_t *,sbmc_node_info_get_trans_bes(lsf_info),i_real);
+      lsf_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
       nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-      rsf_past_array = array_fetch(array_t *,
-                                   sbmc_node_info_get_trans_bes(rsf_info),
-                                   i_real);
+      rsf_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(rsf_info), i_real);
       nusmv_assert(rsf_past_array);
 
       if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
@@ -2274,13 +2221,14 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Should already be constructed in sbmc_init_state_vector. */
         for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
           nusmv_assert(array_fetch(be_ptr, past_array, d) != (be_ptr)NULL);
-      }
-      else {
+      } else {
         for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
           /* [[f & g]]_i^d <=> [[f]]_i^d & [[g]]_i^d */
           be_ptr be_fANDg_i_d, be_f_i_d, be_g_i_d, be_result;
-          const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-          const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+          const unsigned int d_lsf =
+              min(d, sbmc_node_info_get_past_depth(lsf_info));
+          const unsigned int d_rsf =
+              min(d, sbmc_node_info_get_past_depth(rsf_info));
 
           be_fANDg_i_d = array_fetch(be_ptr, past_array, d);
           nusmv_assert((be_ptr)NULL != be_fANDg_i_d);
@@ -2288,18 +2236,18 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
           nusmv_assert((be_ptr)NULL != be_f_i_d);
           be_g_i_d = array_fetch(be_ptr, rsf_past_array, d_rsf);
           nusmv_assert((be_ptr)NULL != be_g_i_d);
-          be_result = Be_Iff(be_mgr,
-                             be_fANDg_i_d,
-                             Be_And(be_mgr, be_f_i_d, be_g_i_d));
+          be_result =
+              Be_Iff(be_mgr, be_fANDg_i_d, Be_And(be_mgr, be_f_i_d, be_g_i_d));
           nusmv_assert((be_ptr)NULL != be_result);
 
           /* Save the created constraint */
-          lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger, "  [[f & g]]_%d^%d <=> [[f]]_%d^%d & [[g]]_%d^%d: ",
-                    i_model, d, i_model, d_lsf, i_model, d_rsf);
+            Logger_log(logger,
+                       "  [[f & g]]_%d^%d <=> [[f]]_%d^%d & [[g]]_%d^%d: ",
+                       i_model, d, i_model, d_lsf, i_model, d_rsf);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
@@ -2325,9 +2273,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(array_t *,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       if (sbmc_node_info_get_trans_vars(info) == (array_t *)NULL) {
@@ -2335,74 +2282,68 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Should already be constructed in sbmc_init_state_vector. */
         for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
           nusmv_assert(array_fetch(be_ptr, past_array, d) != (be_ptr)NULL);
-      }
-      else {
+      } else {
         /* Formula variable translation. */
         for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
-          if(SymbTable_is_symbol_input_var(st, lsf))
-            {
-              /* An input variable. */
-              /* [[!f]]_i^0 <=> ![[f]]_i^d & (!LastState_i | LoopExists) */
-              be_ptr be_notf_i_d, be_f_i_d, be_result;
-              nusmv_assert(be_LastState_i != (be_ptr)NULL);
+          if (SymbTable_is_symbol_input_var(st, lsf)) {
+            /* An input variable. */
+            /* [[!f]]_i^0 <=> ![[f]]_i^d & (!LastState_i | LoopExists) */
+            be_ptr be_notf_i_d, be_f_i_d, be_result;
+            nusmv_assert(be_LastState_i != (be_ptr)NULL);
 
-              be_notf_i_d = array_fetch(be_ptr, past_array, d);
-              nusmv_assert((be_ptr)NULL != be_notf_i_d);
-              be_f_i_d = array_fetch(be_ptr, lsf_past_array, d);
-              nusmv_assert((be_ptr)NULL != be_f_i_d);
-              be_result = Be_Iff(be_mgr,
-                                 be_notf_i_d,
-                                 Be_And(be_mgr,
-                                        Be_Not(be_mgr, be_f_i_d),
-                                        Be_Or(be_mgr,
-                                              Be_Not(be_mgr, be_LastState_i),
-                                              be_LoopExists)));
-              nusmv_assert((be_ptr)NULL != be_result);
+            be_notf_i_d = array_fetch(be_ptr, past_array, d);
+            nusmv_assert((be_ptr)NULL != be_notf_i_d);
+            be_f_i_d = array_fetch(be_ptr, lsf_past_array, d);
+            nusmv_assert((be_ptr)NULL != be_f_i_d);
+            be_result =
+                Be_Iff(be_mgr, be_notf_i_d,
+                       Be_And(be_mgr, Be_Not(be_mgr, be_f_i_d),
+                              Be_Or(be_mgr, Be_Not(be_mgr, be_LastState_i),
+                                    be_LoopExists)));
+            nusmv_assert((be_ptr)NULL != be_result);
 
-              /* Save the created constraint */
-              lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+            /* Save the created constraint */
+            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
-              if (opt_verbose_level_ge(opts, 6)) {
-                Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                Logger_log(logger,
-                        "  [!f]]_%d^%d <=> ![[f]]_%d^%d & (!LastState_%d | LoopExists): ",
-                        i_model, d, i_model, d, i_model);
-                Be_DumpSexpr(be_mgr, be_result, errstream);
-                Logger_log(logger, "\n");
-              }
+            if (opt_verbose_level_ge(opts, 6)) {
+              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+              Logger_log(logger,
+                         "  [!f]]_%d^%d <=> ![[f]]_%d^%d & (!LastState_%d | "
+                         "LoopExists): ",
+                         i_model, d, i_model, d, i_model);
+              Be_DumpSexpr(be_mgr, be_result, errstream);
+              Logger_log(logger, "\n");
             }
-          else
-            {
-              /* A state variable. */
-              /* [[!f]]_i^d <=> ![[f]]_i^d */
-              be_ptr be_notf_i_d, be_f_i_d, be_result;
+          } else {
+            /* A state variable. */
+            /* [[!f]]_i^d <=> ![[f]]_i^d */
+            be_ptr be_notf_i_d, be_f_i_d, be_result;
 
-              be_notf_i_d = array_fetch(be_ptr, past_array, d);
-              nusmv_assert((be_ptr)NULL != be_notf_i_d);
-              be_f_i_d = array_fetch(be_ptr, lsf_past_array, d);
-              nusmv_assert((be_ptr)NULL != be_f_i_d);
-              be_result = Be_Iff(be_mgr, be_notf_i_d,
-                                 Be_Not(be_mgr, be_f_i_d));
-              nusmv_assert((be_ptr)NULL != be_result);
+            be_notf_i_d = array_fetch(be_ptr, past_array, d);
+            nusmv_assert((be_ptr)NULL != be_notf_i_d);
+            be_f_i_d = array_fetch(be_ptr, lsf_past_array, d);
+            nusmv_assert((be_ptr)NULL != be_f_i_d);
+            be_result = Be_Iff(be_mgr, be_notf_i_d, Be_Not(be_mgr, be_f_i_d));
+            nusmv_assert((be_ptr)NULL != be_result);
 
-              /* Save the created constraint */
-              lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+            /* Save the created constraint */
+            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
-              if (opt_verbose_level_ge(opts, 6)) {
-                Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-                Logger_log(logger, "  [!f]]_%d^%d <=> ![[f]]_%d^%d: ",
-                        i_model, d, i_model, d);
-                Be_DumpSexpr(be_mgr, be_result, errstream);
-                Logger_log(logger, "\n");
-              }
+            if (opt_verbose_level_ge(opts, 6)) {
+              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+              Logger_log(logger, "  [!f]]_%d^%d <=> ![[f]]_%d^%d: ", i_model, d,
+                         i_model, d);
+              Be_DumpSexpr(be_mgr, be_result, errstream);
+              Logger_log(logger, "\n");
             }
+          }
         }
       }
       break;
     }
 
     case OP_NEXT: {
-      array_t * lsf_next_past_array;
+      array_t *lsf_next_past_array;
 
       if (!sbmc_set_is_in(visit_cache, lsf)) {
         lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
@@ -2418,10 +2359,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_next_past_array =
-        array_fetch(array_t *,
-                    sbmc_node_info_get_trans_bes(lsf_info),
-                    i_real + 1);
+      lsf_next_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real + 1);
       nusmv_assert((array_t *)NULL != lsf_next_past_array);
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
@@ -2440,8 +2379,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  [Xf]]_%d^%d <=> [[f]]_%d^%d: ",
-                  i_model, d, i_model+1, d);
+          Logger_log(logger, "  [Xf]]_%d^%d <=> [[f]]_%d^%d: ", i_model, d,
+                     i_model + 1, d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2450,7 +2389,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     }
 
     case OP_FUTURE: {
-      array_t * next_past_array;
+      array_t *next_past_array;
 
       if (!sbmc_set_is_in(visit_cache, lsf)) {
         lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
@@ -2466,14 +2405,12 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array =
-        array_fetch(array_t *,
-                    sbmc_node_info_get_trans_bes(lsf_info), i_real);
+      lsf_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
-      next_past_array = array_fetch(array_t *,
-                                    sbmc_node_info_get_trans_bes(info),
-                                    i_real+1);
+      next_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(info), i_real + 1);
       nusmv_assert((array_t *)NULL != next_past_array);
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
@@ -2486,17 +2423,15 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         nusmv_assert((be_ptr)NULL != be_lsf);
         be_aux_next = array_fetch(be_ptr, next_past_array, d);
         nusmv_assert((be_ptr)NULL != be_aux_next);
-        be_result = Be_Iff(be_mgr, be_aux,
-                           Be_Or(be_mgr, be_lsf, be_aux_next));
+        be_result = Be_Iff(be_mgr, be_aux, Be_Or(be_mgr, be_lsf, be_aux_next));
 
         /* Save the created constraint */
         lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger,
-                  " [[F f]]_%d^%d <=> [[f]]_%d^%d | [[F f]]_%d^%d: ",
-                  i_model, d, i_model, d, i_model+1, d);
+          Logger_log(logger, " [[F f]]_%d^%d <=> [[f]]_%d^%d | [[F f]]_%d^%d: ",
+                     i_model, d, i_model, d, i_model + 1, d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2506,12 +2441,9 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Optimization: <<Ff>>_i => [[Ff]]_i^pd(Ff) */
         be_ptr be_Ff_i_pd, be_auxFf_i, be_result;
 
-        nusmv_assert((node_ptr)NULL !=
-                     sbmc_node_info_get_aux_F_node(lsf_info));
-        be_auxFf_i =
-          BeEnc_name_to_timed(be_enc,
-                              sbmc_node_info_get_aux_F_node(lsf_info),
-                              i_real);
+        nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_F_node(lsf_info));
+        be_auxFf_i = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_F_node(lsf_info), i_real);
         nusmv_assert((be_ptr)NULL != be_auxFf_i);
 
         be_Ff_i_pd = array_fetch(be_ptr, past_array,
@@ -2525,8 +2457,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  <<Ff>>_%u => [[Ff]]_%u^%u: ",
-                  i_model, i_model, sbmc_node_info_get_past_depth(info));
+          Logger_log(logger, "  <<Ff>>_%u => [[Ff]]_%u^%u: ", i_model, i_model,
+                     sbmc_node_info_get_past_depth(info));
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2534,17 +2466,14 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
           be_ptr be_Ff_i_dP1, be_Ff_i_d, be_result;
 
-          be_Ff_i_dP1 = array_fetch(be_ptr, past_array, d+1);
+          be_Ff_i_dP1 = array_fetch(be_ptr, past_array, d + 1);
           nusmv_assert((be_ptr)NULL != be_Ff_i_dP1);
 
           be_Ff_i_d = array_fetch(be_ptr, past_array, d);
           nusmv_assert((be_ptr)NULL != be_Ff_i_d);
 
-          be_result = Be_Implies(be_mgr,
-                                 be_InLoop_i,
-                                 Be_Implies(be_mgr,
-                                            be_Ff_i_dP1,
-                                            be_Ff_i_d));
+          be_result = Be_Implies(be_mgr, be_InLoop_i,
+                                 Be_Implies(be_mgr, be_Ff_i_dP1, be_Ff_i_d));
 
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
@@ -2552,18 +2481,16 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
             Logger_log(logger,
-                    "  InLoop_%u => ([[Ff]]_%u^%d => [[Ff]]_%u^%d): ",
-                    i_model, i_model, d+1, i_model, d);
+                       "  InLoop_%u => ([[Ff]]_%u^%d => [[Ff]]_%u^%d): ",
+                       i_model, i_model, d + 1, i_model, d);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
         }
         {
           /* Optimization: [[Ff]]_E^d => [[Ff]]_i^d */
-          array_t * past_array_Ff_E =
-            array_fetch(array_t *,
-                        sbmc_node_info_get_trans_bes(info),
-                        sbmc_E_state());
+          array_t *past_array_Ff_E = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert(past_array_Ff_E);
 
           for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
@@ -2582,8 +2509,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
             if (opt_verbose_level_ge(opts, 6)) {
               Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[Ff]]_E^%u => [[Ff]]_%u^%u: ",
-                      d, i_model, d);
+              Logger_log(logger, "  [[Ff]]_E^%u => [[Ff]]_%u^%u: ", d, i_model,
+                         d);
               Be_DumpSexpr(be_mgr, be_result, errstream);
               Logger_log(logger, "\n");
             }
@@ -2594,7 +2521,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     }
 
     case OP_GLOBAL: {
-      array_t * next_past_array;
+      array_t *next_past_array;
 
       if (!sbmc_set_is_in(visit_cache, lsf)) {
         lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
@@ -2610,14 +2537,12 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(array_t *,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
-      next_past_array = array_fetch(array_t *,
-                                    sbmc_node_info_get_trans_bes(info),
-                                    i_real+1);
+      next_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(info), i_real + 1);
       nusmv_assert((array_t *)NULL != next_past_array);
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
@@ -2630,8 +2555,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         nusmv_assert((be_ptr)NULL != be_f_i_d);
         be_Gf_ip1_d = array_fetch(be_ptr, next_past_array, d);
         nusmv_assert((be_ptr)NULL != be_Gf_ip1_d);
-        be_result = Be_Iff(be_mgr, be_Gf_i_d,
-                           Be_And(be_mgr, be_f_i_d, be_Gf_ip1_d));
+        be_result =
+            Be_Iff(be_mgr, be_Gf_i_d, Be_And(be_mgr, be_f_i_d, be_Gf_ip1_d));
 
         /* Save the created constraint */
         lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
@@ -2639,8 +2564,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_log(logger,
-                  "  [[Gf]]_%u^%d <=> [[f]]_%u^%d & [[Gf]]_%u^%d: ",
-                  i_model, d, i_model, d, i_model+1, d);
+                     "  [[Gf]]_%u^%d <=> [[f]]_%u^%d & [[Gf]]_%u^%d: ", i_model,
+                     d, i_model, d, i_model + 1, d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2650,26 +2575,24 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         /* Optimization: [[Gf]]_i^pd(Ff) => <<Gf>>_i */
         be_ptr be_Gf_i_pd, be_auxGf_i, be_result;
 
-        nusmv_assert((node_ptr)NULL !=
-                     sbmc_node_info_get_aux_G_node(lsf_info));
-        be_auxGf_i =
-          BeEnc_name_to_timed(be_enc,
-                              sbmc_node_info_get_aux_G_node(lsf_info),
-                              i_real);
+        nusmv_assert((node_ptr)NULL != sbmc_node_info_get_aux_G_node(lsf_info));
+        be_auxGf_i = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_G_node(lsf_info), i_real);
         nusmv_assert(be_auxGf_i);
 
-        be_Gf_i_pd = array_fetch(be_ptr, past_array, sbmc_node_info_get_past_depth(info));
+        be_Gf_i_pd = array_fetch(be_ptr, past_array,
+                                 sbmc_node_info_get_past_depth(info));
         nusmv_assert(be_Gf_i_pd);
 
         be_result = Be_Implies(be_mgr, be_Gf_i_pd, be_auxGf_i);
 
         /* Save the created constraint */
-        lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+        lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  [[Gf]]_%u^%u => <<Gf>>_%u: ",
-                  i_model, sbmc_node_info_get_past_depth(info), i_model);
+          Logger_log(logger, "  [[Gf]]_%u^%u => <<Gf>>_%u: ", i_model,
+                     sbmc_node_info_get_past_depth(info), i_model);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2680,30 +2603,27 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
           be_Gf_i_d = array_fetch(be_ptr, past_array, d);
           nusmv_assert(be_Gf_i_d);
 
-          be_Gf_i_dP1 = array_fetch(be_ptr, past_array, d+1);
+          be_Gf_i_dP1 = array_fetch(be_ptr, past_array, d + 1);
           nusmv_assert(be_Gf_i_dP1);
 
-          be_result = Be_Implies(be_mgr,
-                                 be_InLoop_i,
-                                 Be_Implies(be_mgr,
-                                            be_Gf_i_d,
-                                            be_Gf_i_dP1));
+          be_result = Be_Implies(be_mgr, be_InLoop_i,
+                                 Be_Implies(be_mgr, be_Gf_i_d, be_Gf_i_dP1));
 
           /* Save the created constraint */
-          lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6))
-            StreamMgr_print_error(streams,  "  InLoop_%u => ([[Gf]]_%u^%d => [[Gf]]_%u^%d): ",
-                    i_model, i_model, d, i_model, d+1),
-              Be_DumpSexpr(be_mgr, be_result, errstream),
-              StreamMgr_print_error(streams,  "\n");
+            StreamMgr_print_error(
+                streams,
+                "  InLoop_%u => ([[Gf]]_%u^%d => [[Gf]]_%u^%d): ", i_model,
+                i_model, d, i_model, d + 1),
+                Be_DumpSexpr(be_mgr, be_result, errstream),
+                StreamMgr_print_error(streams, "\n");
         }
         {
           /* Optimization: [[Gf]]_i^d => [[Gf]]_E^d */
-          array_t * past_array_Gf_E =
-            array_fetch(array_t *,
-                        sbmc_node_info_get_trans_bes(info),
-                        sbmc_E_state());
+          array_t *past_array_Gf_E = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert((array_t *)NULL != past_array_Gf_E);
 
           for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
@@ -2722,8 +2642,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
             if (opt_verbose_level_ge(opts, 6)) {
               Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger, "  [[Gf]]_%u^%u => [[Gf]]_E^%u: ",
-                      i_model, d, d);
+              Logger_log(logger, "  [[Gf]]_%u^%u => [[Gf]]_E^%u: ", i_model, d,
+                         d);
               Be_DumpSexpr(be_mgr, be_result, errstream);
               Logger_log(logger, "\n");
             }
@@ -2734,7 +2654,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     }
 
     case UNTIL: {
-      array_t * next_past_array;
+      array_t *next_past_array;
 
       if (!sbmc_set_is_in(visit_cache, lsf)) {
         lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
@@ -2754,21 +2674,18 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
       nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-      rsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(rsf_info),
-                                   i_real);
+      rsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(rsf_info), i_real);
       nusmv_assert((array_t *)NULL != rsf_past_array);
 
-      next_past_array = array_fetch(array_t *,
-                                    sbmc_node_info_get_trans_bes(info),
-                                    i_real+1);
+      next_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(info), i_real + 1);
       nusmv_assert((array_t *)NULL != next_past_array);
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
@@ -2776,8 +2693,10 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
          *     [[g]]_i^d | ([[f]]_i^d & [[f U g]]_{i+1}^d)
          */
         be_ptr be_fUg_i_d, be_f_i_d, be_g_i_d, be_fUg_iP1_d, be_result;
-        const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-        const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+        const unsigned int d_lsf =
+            min(d, sbmc_node_info_get_past_depth(lsf_info));
+        const unsigned int d_rsf =
+            min(d, sbmc_node_info_get_past_depth(rsf_info));
 
         be_fUg_i_d = array_fetch(be_ptr, past_array, d);
         nusmv_assert((be_ptr)NULL != be_fUg_i_d);
@@ -2787,13 +2706,9 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         nusmv_assert((be_ptr)NULL != be_g_i_d);
         be_fUg_iP1_d = array_fetch(be_ptr, next_past_array, d);
         nusmv_assert((be_ptr)NULL != be_fUg_iP1_d);
-        be_result = Be_Iff(be_mgr,
-                           be_fUg_i_d,
-                           Be_Or(be_mgr,
-                                 be_g_i_d,
-                                 Be_And(be_mgr,
-                                        be_f_i_d,
-                                        be_fUg_iP1_d)));
+        be_result = Be_Iff(
+            be_mgr, be_fUg_i_d,
+            Be_Or(be_mgr, be_g_i_d, Be_And(be_mgr, be_f_i_d, be_fUg_iP1_d)));
 
         /* Save the created constraint */
         lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
@@ -2801,8 +2716,9 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_log(logger,
-                  " [[f U g]]_%u^%d <=> [[g]]_%u^%d | ([[f]]_%u^%d & [[f U g]]_%u^%d): ",
-                  i_model, d, i_model, d, i_model, d, i_model+1, d);
+                     " [[f U g]]_%u^%d <=> [[g]]_%u^%d | ([[f]]_%u^%d & [[f U "
+                     "g]]_%u^%d): ",
+                     i_model, d, i_model, d, i_model, d, i_model + 1, d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2811,7 +2727,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     }
 
     case RELEASES: {
-      array_t * next_past_array;
+      array_t *next_past_array;
 
       if (!sbmc_set_is_in(visit_cache, lsf)) {
         lsNewBegin(unprocessed_nodes, (lsGeneric)lsf, LS_NH);
@@ -2824,35 +2740,34 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       if (has_unprocessed_children)
         break;
 
-      if (opt_verbose_level_ge(opts, 6))  {
+      if (opt_verbose_level_ge(opts, 6)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_nlog(logger, wffprint, str_debug1, node, i_model);
       }
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
       nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-      rsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(rsf_info),
-                                   i_real);
+      rsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(rsf_info), i_real);
       nusmv_assert((array_t *)NULL != rsf_past_array);
 
-      next_past_array = array_fetch(array_t *,
-                                    sbmc_node_info_get_trans_bes(info),
-                                    i_real+1);
+      next_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(info), i_real + 1);
       nusmv_assert((array_t *)NULL != next_past_array);
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
         /* Add [[f R g]]_i^d <=> [[g]]_i^d & ([[f]]_i^d | [[f R g]]_{i+1}^d) */
         be_ptr be_fRg_i_d, be_f_i_d, be_g_i_d, be_fRg_iP1_d, be_result;
-        const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-        const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+        const unsigned int d_lsf =
+            min(d, sbmc_node_info_get_past_depth(lsf_info));
+        const unsigned int d_rsf =
+            min(d, sbmc_node_info_get_past_depth(rsf_info));
 
         be_fRg_i_d = array_fetch(be_ptr, past_array, d);
         nusmv_assert((be_ptr)NULL != be_fRg_i_d);
@@ -2862,13 +2777,9 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         nusmv_assert((be_ptr)NULL != be_g_i_d);
         be_fRg_iP1_d = array_fetch(be_ptr, next_past_array, d);
         nusmv_assert((be_ptr)NULL != be_fRg_iP1_d);
-        be_result = Be_Iff(be_mgr,
-                           be_fRg_i_d,
-                           Be_And(be_mgr,
-                                  be_g_i_d,
-                                  Be_Or(be_mgr,
-                                        be_f_i_d,
-                                        be_fRg_iP1_d)));
+        be_result = Be_Iff(
+            be_mgr, be_fRg_i_d,
+            Be_And(be_mgr, be_g_i_d, Be_Or(be_mgr, be_f_i_d, be_fRg_iP1_d)));
 
         /* Save the created constraint */
         lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
@@ -2876,8 +2787,9 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_log(logger,
-                  " [[f R g]]_%u^%d <=> [[g]]_%u^%d & ([[f]]_%u^%d | [[f R g]]_%u^%d): ",
-                  i_model, d, i_model, d, i_model, d, i_model+1, d);
+                     " [[f R g]]_%u^%d <=> [[g]]_%u^%d & ([[f]]_%u^%d | [[f R "
+                     "g]]_%u^%d): ",
+                     i_model, d, i_model, d, i_model, d, i_model + 1, d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2935,17 +2847,18 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       break;
     } /* switch */
     if (has_unprocessed_children)
-    continue;
+      continue;
 
     /* Do the auxiliary translations if necessary */
     if ((node_ptr)NULL != sbmc_node_info_get_aux_F_node(info)) {
       be_ptr be_aux_i, be_aux_i_minus_1, be_f_i_pd, be_result;
 
       if (opt_verbose_level_ge(opts, 6))
-        sbmc_print_node(env, errstream, " Doing <<F f>> translation for ",
-                        node, "\n");
+        sbmc_print_node(env, errstream, " Doing <<F f>> translation for ", node,
+                        "\n");
 
-      be_aux_i = BeEnc_name_to_timed(be_enc, sbmc_node_info_get_aux_F_node(info), i_real);
+      be_aux_i = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_F_node(info), i_real);
       nusmv_assert((be_ptr)NULL != be_aux_i);
 
       if (i_model == 0) {
@@ -2958,29 +2871,25 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
-      }
-      else {
+      } else {
         /* <<F f>>_i <=> <<F f>>_{i-1} | (InLoop_i & [[f]]_i^PD(f)) */
-        be_aux_i_minus_1 =
-          BeEnc_name_to_timed(be_enc,
-                              sbmc_node_info_get_aux_F_node(info), i_real-1);
+        be_aux_i_minus_1 = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_F_node(info), i_real - 1);
         nusmv_assert((be_ptr)NULL != be_aux_i_minus_1);
         be_f_i_pd = array_fetch(be_ptr, past_array,
                                 sbmc_node_info_get_past_depth(info));
         nusmv_assert((be_ptr)NULL != be_f_i_pd);
-        be_result = Be_Iff(be_mgr,
-                           be_aux_i,
-                           Be_Or(be_mgr,
-                                 be_aux_i_minus_1,
-                                 Be_And(be_mgr,
-                                        be_InLoop_i,
-                                        be_f_i_pd)));
+        be_result = Be_Iff(be_mgr, be_aux_i,
+                           Be_Or(be_mgr, be_aux_i_minus_1,
+                                 Be_And(be_mgr, be_InLoop_i, be_f_i_pd)));
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger,
-                  "  <<F f>>_%u <=> <<F f>>_%u | (InLoop_%u & [[f]]_%u^%d): ",
-                  i_model, i_model-1, i_model, i_model, sbmc_node_info_get_past_depth(info));
+          Logger_log(
+              logger,
+              "  <<F f>>_%u <=> <<F f>>_%u | (InLoop_%u & [[f]]_%u^%d): ",
+              i_model, i_model - 1, i_model, i_model,
+              sbmc_node_info_get_past_depth(info));
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -2994,14 +2903,12 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       /* Optimization: add <<Ff>>_i => <<Ff>>_E */
       be_ptr be_aux_i, be_aux_E, be_result;
 
-      be_aux_i = BeEnc_name_to_timed(be_enc,
-                                     sbmc_node_info_get_aux_F_node(info),
-                                     i_real);
+      be_aux_i = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_F_node(info), i_real);
       nusmv_assert((be_ptr)NULL != be_aux_i);
 
-      be_aux_E = BeEnc_name_to_timed(be_enc,
-                                     sbmc_node_info_get_aux_F_node(info),
-                                     sbmc_E_state());
+      be_aux_E = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_F_node(info), sbmc_E_state());
       nusmv_assert((be_ptr)NULL != be_aux_E);
 
       be_result = Be_Implies(be_mgr, be_aux_i, be_aux_E);
@@ -3012,8 +2919,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       if (opt_verbose_level_ge(opts, 6)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_log(logger, "  <<F f>>_%u <=> <<F f>>_E: ", i_model);
-      Be_DumpSexpr(be_mgr, be_result, errstream);
-      Logger_log(logger, "\n");
+        Be_DumpSexpr(be_mgr, be_result, errstream);
+        Logger_log(logger, "\n");
       }
     }
 
@@ -3021,10 +2928,11 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       be_ptr be_aux_i, be_aux_i_minus_1, be_f_i_pd, be_result;
 
       if (opt_verbose_level_ge(opts, 6))
-        sbmc_print_node(env, errstream, " Doing <<G f>> translation for ",
-                        node, "\n");
+        sbmc_print_node(env, errstream, " Doing <<G f>> translation for ", node,
+                        "\n");
 
-      be_aux_i = BeEnc_name_to_timed(be_enc, sbmc_node_info_get_aux_G_node(info), i_real);
+      be_aux_i = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_G_node(info), i_real);
       nusmv_assert((be_ptr)NULL != be_aux_i);
 
       if (i_model == 0) {
@@ -3037,29 +2945,26 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
-      }
-      else {
+      } else {
         /* <<G f>>_i <=> <<G f>>_{i-1} & (!InLoop_i | [[f]]_i^PD(f)) */
-        be_aux_i_minus_1
-          = BeEnc_name_to_timed(be_enc,
-                                sbmc_node_info_get_aux_G_node(info),
-                                i_real-1);
+        be_aux_i_minus_1 = BeEnc_name_to_timed(
+            be_enc, sbmc_node_info_get_aux_G_node(info), i_real - 1);
         nusmv_assert((be_ptr)NULL != be_aux_i_minus_1);
         be_f_i_pd = array_fetch(be_ptr, past_array,
                                 sbmc_node_info_get_past_depth(info));
         nusmv_assert((be_ptr)NULL != be_f_i_pd);
-        be_result = Be_Iff(be_mgr,
-                           be_aux_i,
-                           Be_And(be_mgr,
-                                  be_aux_i_minus_1,
-                                  Be_Or(be_mgr,
-                                        Be_Not(be_mgr, be_InLoop_i),
-                                        be_f_i_pd)));
+        be_result = Be_Iff(
+            be_mgr, be_aux_i,
+            Be_And(be_mgr, be_aux_i_minus_1,
+                   Be_Or(be_mgr, Be_Not(be_mgr, be_InLoop_i), be_f_i_pd)));
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  <<G f>>_%u <=> <<G f>>_%u & (!InLoop_%u | [[f]]_%u^%d): ",
-                  i_model, i_model-1, i_model, i_model, sbmc_node_info_get_past_depth(info));
+          Logger_log(
+              logger,
+              "  <<G f>>_%u <=> <<G f>>_%u & (!InLoop_%u | [[f]]_%u^%d): ",
+              i_model, i_model - 1, i_model, i_model,
+              sbmc_node_info_get_past_depth(info));
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -3072,14 +2977,12 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       /* Optimization: add <<Gf>>_E => <<Gf>>_i */
       be_ptr be_aux_i, be_aux_E, be_result;
 
-      be_aux_i = BeEnc_name_to_timed(be_enc,
-                                     sbmc_node_info_get_aux_G_node(info),
-                                     i_real);
+      be_aux_i = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_G_node(info), i_real);
       nusmv_assert((be_ptr)NULL != be_aux_i);
 
-      be_aux_E = BeEnc_name_to_timed(be_enc,
-                                     sbmc_node_info_get_aux_G_node(info),
-                                     sbmc_E_state());
+      be_aux_E = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_G_node(info), sbmc_E_state());
       nusmv_assert((be_ptr)NULL != be_aux_E);
 
       be_result = Be_Implies(be_mgr, be_aux_E, be_aux_i);
@@ -3103,9 +3006,8 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
       unsigned int d;
       array_t *f_L_past_array;
 
-      f_L_past_array =
-        array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                    sbmc_L_state());
+      f_L_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(info), sbmc_L_state());
       nusmv_assert((array_t *)NULL != f_L_past_array);
 
       if (opt_verbose_level_ge(opts, 6)) {
@@ -3122,17 +3024,17 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
         be_f_L_d = array_fetch(be_ptr, f_L_past_array, d);
         nusmv_assert((be_ptr)NULL != be_f_L_d);
 
-        be_result = Be_Implies(be_mgr,
-                               be_l_i,
-                               Be_Iff(be_mgr, be_f_L_d, be_f_i_d));
+        be_result =
+            Be_Implies(be_mgr, be_l_i, Be_Iff(be_mgr, be_f_L_d, be_f_i_d));
 
         /* Save the created constraint */
         lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  l_%u => ([[f]]_L_%d <=> [[f]]_%u^%d): ",
-                  i_model, d, i_model, d);
+          Logger_log(logger,
+                     "  l_%u => ([[f]]_L_%d <=> [[f]]_%u^%d): ", i_model, d,
+                     i_model, d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -3140,7 +3042,7 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
     }
 
     /* Remove node from unprocessed stack */
-    if (lsDelBegin(unprocessed_nodes, (lsGeneric*)&node) != LS_OK)
+    if (lsDelBegin(unprocessed_nodes, (lsGeneric *)&node) != LS_OK)
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
     /* Mark visited */
@@ -3155,31 +3057,27 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
   return created_constraints;
 }
 
-lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
-                                      const node_ptr ltlspec,
-                                      const unsigned int i_model,
-                                      const hash_ptr info_map,
-                                      const be_ptr be_InLoop_i,
-                                      const be_ptr be_l_i,
-                                      const int do_optimization)
-{
+lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                               const unsigned int i_model,
+                               const hash_ptr info_map,
+                               const be_ptr be_InLoop_i, const be_ptr be_l_i,
+                               const int do_optimization) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   unsigned int d;
   Be_Manager_ptr be_mgr;
   hash_ptr visit_cache = (hash_ptr)NULL;
-  lsList   unprocessed_nodes = (lsList)NULL;
-  lsList   created_constraints = (lsList)NULL;
+  lsList unprocessed_nodes = (lsList)NULL;
+  lsList created_constraints = (lsList)NULL;
   const unsigned int i_real = sbmc_real_k(i_model);
   /* Some verbose stuff */
   char *str_debug1 = " Translating formula %N at timestep %u\n";
@@ -3199,7 +3097,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
   if (opt_verbose_level_gt(opts, 1)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Unrolling k-invariant past stuff at time %u\n",
-            i_model);
+               i_model);
     fflush(errstream);
   }
 
@@ -3207,14 +3105,14 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
   unprocessed_nodes = lsCreate();
   lsNewBegin(unprocessed_nodes, (lsGeneric)ltlspec, LS_NH);
 
-  while(lsLength(unprocessed_nodes) > 0) {
+  while (lsLength(unprocessed_nodes) > 0) {
     node_ptr node, lsf, rsf;
-    sbmc_node_info * info, * lsf_info, * rsf_info;
-    array_t * past_array, * lsf_past_array, * rsf_past_array;
+    sbmc_node_info *info, *lsf_info, *rsf_info;
+    array_t *past_array, *lsf_past_array, *rsf_past_array;
     int has_unprocessed_children;
 
     /* Get node */
-    if ((lsFirstItem(unprocessed_nodes, (lsGeneric*)&node, LS_NH) != LS_OK) ||
+    if ((lsFirstItem(unprocessed_nodes, (lsGeneric *)&node, LS_NH) != LS_OK) ||
         ((node_ptr)NULL == node))
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
@@ -3226,9 +3124,9 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
     /* Get past_array */
     /* sbmc_init_state_vector should have built trans_bes[i] before */
     nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
-    nusmv_assert(array_n(sbmc_node_info_get_trans_bes(info)) >= i_real+1);
-    past_array = array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                             i_real);
+    nusmv_assert(array_n(sbmc_node_info_get_trans_bes(info)) >= i_real + 1);
+    past_array =
+        array_fetch(array_t *, sbmc_node_info_get_trans_bes(info), i_real);
     nusmv_assert((array_t *)NULL != past_array);
 
     /* Already translated? */
@@ -3236,7 +3134,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++)
         nusmv_assert(array_fetch(be_ptr, past_array, d) != (be_ptr)NULL);
       /* Remove node from unprocessed stack */
-      if (lsDelBegin(unprocessed_nodes, (lsGeneric*)&node) != LS_OK)
+      if (lsDelBegin(unprocessed_nodes, (lsGeneric *)&node) != LS_OK)
         ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
       continue;
     }
@@ -3245,7 +3143,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
     lsf = car(node);
     rsf = cdr(node);
     has_unprocessed_children = 0;
-    switch(node_get_type(node)) {
+    switch (node_get_type(node)) {
     case ATOM:
     case BIT:
     case DOT:
@@ -3266,7 +3164,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
     case XNOR:
     case IMPLIES:
     case IFF: {
-      ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__, __LINE__);
+      ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__,
+                              __LINE__);
       break;
     }
 
@@ -3336,19 +3235,19 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
-      if (opt_verbose_level_ge(opts, 6))  {
+      if (opt_verbose_level_ge(opts, 6)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_nlog(logger, wffprint, str_debug1, node, i_model);
       }
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
         be_ptr be_Of_i_d, be_result;
-        const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
+        const unsigned int d_lsf =
+            min(d, sbmc_node_info_get_past_depth(lsf_info));
 
         be_Of_i_d = array_fetch(be_ptr, past_array, d);
         nusmv_assert((be_ptr)NULL != be_Of_i_d);
@@ -3358,110 +3257,98 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_ptr be_f_0_0 = array_fetch(be_ptr, lsf_past_array, 0);
           nusmv_assert((be_ptr)NULL != be_f_0_0);
           be_result = Be_Iff(be_mgr, be_Of_i_d, be_f_0_0);
-        }
-        else if (i_model >= 1 && d == 0) {
+        } else if (i_model >= 1 && d == 0) {
           /* Add [[O f]]_i^0 <=> [[f]]_i^0 | [[O f]]_{i-1}^0*/
           be_ptr be_f_i_d, be_Of_iM1_d;
-          array_t * past_array_Of_iM1;
+          array_t *past_array_Of_iM1;
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
 
-          past_array_Of_iM1 = array_fetch(array_t *,
-                                          sbmc_node_info_get_trans_bes(info),
-                                          i_real - 1);
+          past_array_Of_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_Of_iM1);
           be_Of_iM1_d = array_fetch(be_ptr, past_array_Of_iM1, d);
           nusmv_assert((be_ptr)NULL != be_Of_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Of_i_d,
-                             Be_Or(be_mgr, be_f_i_d, be_Of_iM1_d));
-        }
-        else if (i_model >= 1 && d > 0) {
+          be_result =
+              Be_Iff(be_mgr, be_Of_i_d, Be_Or(be_mgr, be_f_i_d, be_Of_iM1_d));
+        } else if (i_model >= 1 && d > 0) {
           /*
-           * Add [[O f]]_i^d <=> * [[f]]_i^d | ITE(l_i,[[O f]]_E^{d-1},[[O f]]_{i-1}^d)
+           * Add [[O f]]_i^d <=> * [[f]]_i^d | ITE(l_i,[[O f]]_E^{d-1},[[O
+           * f]]_{i-1}^d)
            */
           be_ptr be_prev, be_E, be_f_i_d;
-          array_t * prev_past_array;
-          array_t * E_past_array;
+          array_t *prev_past_array;
+          array_t *E_past_array;
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
 
-          prev_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info), i_real-1);
+          prev_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != prev_past_array);
           be_prev = array_fetch(be_ptr, prev_past_array, d);
           nusmv_assert((be_ptr)NULL != be_prev);
 
-          E_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
+          E_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert((array_t *)NULL != E_past_array);
-          be_E = array_fetch(be_ptr, E_past_array, d-1);
+          be_E = array_fetch(be_ptr, E_past_array, d - 1);
           nusmv_assert((be_ptr)NULL != be_E);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Of_i_d,
-                             Be_Or(be_mgr,
-                                   be_f_i_d,
-                                   Be_Ite(be_mgr,
-                                          be_l_i, be_E, be_prev)));
-        }
-        else
-          ErrorMgr_internal_error(errmgr, sbmc_SNH_text,__FILE__,__LINE__);
+          be_result = Be_Iff(
+              be_mgr, be_Of_i_d,
+              Be_Or(be_mgr, be_f_i_d, Be_Ite(be_mgr, be_l_i, be_E, be_prev)));
+        } else
+          ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
         /* Save the created constraint */
         lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  Adding constraint at depth %u: ",d);
+          Logger_log(logger, "  Adding constraint at depth %u: ", d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
 
-
         /* An additional constraint ensuring that the past formula has
          * stabilized at the last unrolling depth */
-        if ((i_model >= 1) &&( d == sbmc_node_info_get_past_depth(info))) {
+        if ((i_model >= 1) && (d == sbmc_node_info_get_past_depth(info))) {
           /*
-           * Add [[O f]]_i^d <=> * [[f]]_i^d | ITE(l_i,[[O f]]_E^d,[[O f]]_{i-1}^d)
+           * Add [[O f]]_i^d <=> * [[f]]_i^d | ITE(l_i,[[O f]]_E^d,[[O
+           * f]]_{i-1}^d)
            */
           be_ptr be_Of_iM1_d, be_Of_E_d, be_f_i_d;
-          array_t * Of_iM1_past_array, * Of_E_past_array;
+          array_t *Of_iM1_past_array, *Of_E_past_array;
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
 
-          Of_iM1_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          Of_iM1_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != Of_iM1_past_array);
           be_Of_iM1_d = array_fetch(be_ptr, Of_iM1_past_array, d);
           nusmv_assert((be_ptr)NULL != be_Of_iM1_d);
 
-          Of_E_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
+          Of_E_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert((array_t *)NULL != Of_E_past_array);
           be_Of_E_d = array_fetch(be_ptr, Of_E_past_array, d);
           nusmv_assert((be_ptr)NULL != be_Of_E_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Of_i_d,
-                             Be_Or(be_mgr,
-                                   be_f_i_d,
-                                   Be_Ite(be_mgr,
-                                          be_l_i,
-                                          be_Of_E_d,
-                                          be_Of_iM1_d)));
+          be_result =
+              Be_Iff(be_mgr, be_Of_i_d,
+                     Be_Or(be_mgr, be_f_i_d,
+                           Be_Ite(be_mgr, be_l_i, be_Of_E_d, be_Of_iM1_d)));
 
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger, "  Adding constraint at depth %u: ",d);
+            Logger_log(logger, "  Adding constraint at depth %u: ", d);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
@@ -3471,9 +3358,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
       if (do_optimization) {
         /* Optimization: InLoop_i => ([[Of]]_i^d => [[Of]]_i^d+1) */
         /* Optimization: InLoop_i => ([[Of]]_i^d => [[Of]]_E^d) */
-        array_t * past_array_Of_E =
-          array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                      sbmc_E_state());
+        array_t *past_array_Of_E = array_fetch(
+            array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
         nusmv_assert((array_t *)NULL != past_array_Of_E);
 
         for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
@@ -3482,33 +3368,28 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_Of_i_d = array_fetch(be_ptr, past_array, d);
           nusmv_assert((be_ptr)NULL != be_Of_i_d);
 
-          be_Of_i_dP1 = array_fetch(be_ptr, past_array, d+1);
+          be_Of_i_dP1 = array_fetch(be_ptr, past_array, d + 1);
           nusmv_assert((be_ptr)NULL != be_Of_i_dP1);
 
-          be_result = Be_Implies(be_mgr,
-                                 be_InLoop_i,
-                                 Be_Implies(be_mgr,
-                                            be_Of_i_d,
-                                            be_Of_i_dP1));
+          be_result = Be_Implies(be_mgr, be_InLoop_i,
+                                 Be_Implies(be_mgr, be_Of_i_d, be_Of_i_dP1));
 
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger, "  InLoop_%u => ([[Of]]_%d^%d => [[Of]]_%d^%d): ",
-                    i_model, i_model, d, i_model, d+1);
+            Logger_log(logger,
+                       "  InLoop_%u => ([[Of]]_%d^%d => [[Of]]_%d^%d): ",
+                       i_model, i_model, d, i_model, d + 1);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
 
           be_Of_E_d = array_fetch(be_ptr, past_array_Of_E, d);
           nusmv_assert((be_ptr)NULL != be_Of_E_d);
-          be_result = Be_Implies(be_mgr,
-                                 be_InLoop_i,
-                                 Be_Implies(be_mgr,
-                                            be_Of_i_d,
-                                            be_Of_E_d));
+          be_result = Be_Implies(be_mgr, be_InLoop_i,
+                                 Be_Implies(be_mgr, be_Of_i_d, be_Of_E_d));
 
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
@@ -3516,7 +3397,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
             Logger_log(logger, "  InLoop_%u => ([[Of]]_%d^%d => [[Of]]_E^%d): ",
-                    i_model, i_model, d, d);
+                       i_model, i_model, d, d);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
@@ -3535,19 +3416,19 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
-      if (opt_verbose_level_ge(opts, 6))  {
+      if (opt_verbose_level_ge(opts, 6)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_nlog(logger, wffprint, str_debug1, node, i_model);
       }
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
         be_ptr be_Hf_i_d, be_lsf, be_result;
-        const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
+        const unsigned int d_lsf =
+            min(d, sbmc_node_info_get_past_depth(lsf_info));
 
         be_Hf_i_d = array_fetch(be_ptr, past_array, d);
         nusmv_assert(be_Hf_i_d);
@@ -3560,50 +3441,40 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_ptr be_f_0_0 = array_fetch(be_ptr, lsf_past_array, 0);
           nusmv_assert(be_f_0_0);
           be_result = Be_Iff(be_mgr, be_Hf_i_d, be_f_0_0);
-        }
-        else if (i_model >= 1 && d == 0) {
+        } else if (i_model >= 1 && d == 0) {
           /* Add [[H f]]_i^0 <=> [[f]]_i^0 & [[H f]]_{i-1}^0*/
           be_ptr be_prev;
-          array_t * prev_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          array_t *prev_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != prev_past_array);
           be_prev = array_fetch(be_ptr, prev_past_array, d);
           nusmv_assert((be_ptr)NULL != be_prev);
-          be_result = Be_Iff(be_mgr,
-                             be_Hf_i_d,
-                             Be_And(be_mgr, be_lsf, be_prev));
-        }
-        else if (i_model >= 1 && d > 0) {
+          be_result =
+              Be_Iff(be_mgr, be_Hf_i_d, Be_And(be_mgr, be_lsf, be_prev));
+        } else if (i_model >= 1 && d > 0) {
           /*
            * Add [[H f]]_i^d <=>
            * [[f]]_i^d & ITE(l_i,[[H f]]_E^{d-1},[[H f]]_{i-1}^d)
            */
           be_ptr be_prev, be_E;
-          array_t * prev_past_array, * E_past_array;
+          array_t *prev_past_array, *E_past_array;
 
-          prev_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          prev_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != prev_past_array);
           be_prev = array_fetch(be_ptr, prev_past_array, d);
           nusmv_assert((be_ptr)NULL != be_prev);
 
-          E_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        sbmc_E_state());
+          E_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert((array_t *)NULL != E_past_array);
-          be_E = array_fetch(be_ptr, E_past_array, d-1);
+          be_E = array_fetch(be_ptr, E_past_array, d - 1);
           nusmv_assert((be_ptr)NULL != be_E);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Hf_i_d,
-                             Be_And(be_mgr,
-                                    be_lsf,
-                                    Be_Ite(be_mgr,
-                                           be_l_i, be_E, be_prev)));
-        }
-        else
+          be_result = Be_Iff(
+              be_mgr, be_Hf_i_d,
+              Be_And(be_mgr, be_lsf, Be_Ite(be_mgr, be_l_i, be_E, be_prev)));
+        } else
           ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
         /* Save the created constraint */
@@ -3611,7 +3482,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  Adding constraint at depth %u: ",d);
+          Logger_log(logger, "  Adding constraint at depth %u: ", d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -3619,100 +3490,86 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
         /* An additional constraint ensuring that the past formula has
          * stabilized at the last unrolling depth */
         if ((i_model >= 1) && (d == sbmc_node_info_get_past_depth(info))) {
-            /*
-             * Add [[H f]]_i^d <=> * [[f]]_i^d & ITE(l_i,[[H f]]_E^d,[[H f]]_{i-1}^d)
-             */
-            be_ptr be_Hf_iM1_d, be_Hf_E_d;
-            array_t * Hf_iM1_past_array, * Hf_E_past_array;
+          /*
+           * Add [[H f]]_i^d <=> * [[f]]_i^d & ITE(l_i,[[H f]]_E^d,[[H
+           * f]]_{i-1}^d)
+           */
+          be_ptr be_Hf_iM1_d, be_Hf_E_d;
+          array_t *Hf_iM1_past_array, *Hf_E_past_array;
 
-            Hf_iM1_past_array =
-              array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                          i_real-1);
-            nusmv_assert((array_t *)NULL != Hf_iM1_past_array);
-            be_Hf_iM1_d = array_fetch(be_ptr, Hf_iM1_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_Hf_iM1_d);
+          Hf_iM1_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
+          nusmv_assert((array_t *)NULL != Hf_iM1_past_array);
+          be_Hf_iM1_d = array_fetch(be_ptr, Hf_iM1_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_Hf_iM1_d);
 
-            Hf_E_past_array =
-              array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                          sbmc_E_state());
-            nusmv_assert((array_t *)NULL != Hf_E_past_array);
-            be_Hf_E_d = array_fetch(be_ptr, Hf_E_past_array, d);
-            nusmv_assert((be_ptr)NULL != be_Hf_E_d);
+          Hf_E_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
+          nusmv_assert((array_t *)NULL != Hf_E_past_array);
+          be_Hf_E_d = array_fetch(be_ptr, Hf_E_past_array, d);
+          nusmv_assert((be_ptr)NULL != be_Hf_E_d);
 
-            be_result = Be_Iff(be_mgr,
-                               be_Hf_i_d,
-                               Be_And(be_mgr,
-                                      be_lsf,
-                                      Be_Ite(be_mgr,
-                                             be_l_i,
-                                             be_Hf_E_d,
-                                             be_Hf_iM1_d)));
-
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
-
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger,
-                      "  Adding constraint at depth %u: ",d);
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
-          }
-      }        /* for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) */
-
-      if (do_optimization) {
-        /* Optimization: InLoop_i => ([[Hf]]_i^d+1 => [[Hf]]_i^d) */
-        /* Optimization: InLoop_i => ([[Hf]]_E^d => [[Hf]]_i^d) */
-        array_t * past_array_Hf_E =
-          array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                      sbmc_E_state());
-        nusmv_assert((array_t *)NULL != past_array_Hf_E);
-
-        for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
-          be_ptr be_Hf_i_d, be_Hf_i_dP1, be_Hf_E_d, be_result;
-
-          be_Hf_i_d = array_fetch(be_ptr, past_array, d);
-          nusmv_assert((be_ptr)NULL !=  be_Hf_i_d);
-
-          be_Hf_i_dP1 = array_fetch(be_ptr, past_array, d+1);
-          nusmv_assert((be_ptr)NULL != be_Hf_i_dP1);
-
-          be_result = Be_Implies(be_mgr,
-                                 be_InLoop_i,
-                                 Be_Implies(be_mgr,
-                                            be_Hf_i_dP1,
-                                            be_Hf_i_d));
+          be_result =
+              Be_Iff(be_mgr, be_Hf_i_d,
+                     Be_And(be_mgr, be_lsf,
+                            Be_Ite(be_mgr, be_l_i, be_Hf_E_d, be_Hf_iM1_d)));
 
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger, "  InLoop_%u => ([[Hf]]_%d^%d => [[Hf]]_%d^%d): ",
-                    i_model, i_model, d+1, i_model, d);
+            Logger_log(logger, "  Adding constraint at depth %u: ", d);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
+        }
+      } /* for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) */
 
+      if (do_optimization) {
+        /* Optimization: InLoop_i => ([[Hf]]_i^d+1 => [[Hf]]_i^d) */
+        /* Optimization: InLoop_i => ([[Hf]]_E^d => [[Hf]]_i^d) */
+        array_t *past_array_Hf_E = array_fetch(
+            array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
+        nusmv_assert((array_t *)NULL != past_array_Hf_E);
 
-          be_Hf_E_d = array_fetch(be_ptr, past_array_Hf_E, d);
-          nusmv_assert((be_ptr)NULL != be_Hf_E_d);
+        for (d = 0; d < sbmc_node_info_get_past_depth(info); d++) {
+          be_ptr be_Hf_i_d, be_Hf_i_dP1, be_Hf_E_d, be_result;
 
-          be_result = Be_Implies(be_mgr,
-                                 be_InLoop_i,
-                                 Be_Implies(be_mgr,
-                                            be_Hf_E_d,
-                                            be_Hf_i_d));
+          be_Hf_i_d = array_fetch(be_ptr, past_array, d);
+          nusmv_assert((be_ptr)NULL != be_Hf_i_d);
+
+          be_Hf_i_dP1 = array_fetch(be_ptr, past_array, d + 1);
+          nusmv_assert((be_ptr)NULL != be_Hf_i_dP1);
+
+          be_result = Be_Implies(be_mgr, be_InLoop_i,
+                                 Be_Implies(be_mgr, be_Hf_i_dP1, be_Hf_i_d));
 
           /* Save the created constraint */
-          lsNewBegin(created_constraints,(lsGeneric)be_result,LS_NH);
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
           if (opt_verbose_level_ge(opts, 6)) {
             Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
             Logger_log(logger,
-                    "  InLoop_%u => ([[Hf]]_E^%d => [[Hf]]_%d^%d): ",
-                    i_model, d, i_model, d);
+                       "  InLoop_%u => ([[Hf]]_%d^%d => [[Hf]]_%d^%d): ",
+                       i_model, i_model, d + 1, i_model, d);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
+          }
+
+          be_Hf_E_d = array_fetch(be_ptr, past_array_Hf_E, d);
+          nusmv_assert((be_ptr)NULL != be_Hf_E_d);
+
+          be_result = Be_Implies(be_mgr, be_InLoop_i,
+                                 Be_Implies(be_mgr, be_Hf_E_d, be_Hf_i_d));
+
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, "  InLoop_%u => ([[Hf]]_E^%d => [[Hf]]_%d^%d): ",
+                       i_model, d, i_model, d);
             Be_DumpSexpr(be_mgr, be_result, errstream);
             Logger_log(logger, "\n");
           }
@@ -3735,16 +3592,14 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
       nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-      rsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(rsf_info),
-                                   i_real);
+      rsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(rsf_info), i_real);
       nusmv_assert((array_t *)NULL != rsf_past_array);
 
       if (opt_verbose_level_ge(opts, 6)) {
@@ -3763,11 +3618,10 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_ptr be_g_0_0 = array_fetch(be_ptr, rsf_past_array, 0);
           nusmv_assert((be_ptr)NULL != be_g_0_0);
           be_result = Be_Iff(be_mgr, be_fSg_i_d, be_g_0_0);
-        }
-        else if (i_model >= 1 && d == 0) {
+        } else if (i_model >= 1 && d == 0) {
           /* Add [[f S g]]_i^0 <=> [[g]]_i^0 | ([[f]]_i^0 & [[f S g]]_{i-1}^0)*/
           be_ptr be_f_i_d, be_g_i_d, be_fSg_iM1_d;
-          array_t * past_array_fSg_iM1;
+          array_t *past_array_fSg_iM1;
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
@@ -3775,31 +3629,27 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_g_i_d = array_fetch(be_ptr, rsf_past_array, d);
           nusmv_assert((be_ptr)NULL != be_g_i_d);
 
-          past_array_fSg_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          past_array_fSg_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_fSg_iM1);
           be_fSg_iM1_d = array_fetch(be_ptr, past_array_fSg_iM1, d);
           nusmv_assert((be_ptr)NULL != be_fSg_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_fSg_i_d,
-                             Be_Or(be_mgr,
-                                   be_g_i_d,
-                                   Be_And(be_mgr,
-                                          be_f_i_d,
-                                          be_fSg_iM1_d)));
-        }
-        else if ((i_model >= 1) && (d > 0)) {
+          be_result = Be_Iff(
+              be_mgr, be_fSg_i_d,
+              Be_Or(be_mgr, be_g_i_d, Be_And(be_mgr, be_f_i_d, be_fSg_iM1_d)));
+        } else if ((i_model >= 1) && (d > 0)) {
           /*
            * Add [[f S g]]_i^d <=>
            * [[g]]_i^d | ([[f]]_i_d &
            *              ITE(l_i,[[fSg]]_E^{d-1},[[fSg]]_{i-1}^d))
            */
           be_ptr be_f_i_d, be_g_i_d, be_fSg_E_dM1, be_fSg_iM1_d;
-          array_t * past_array_fSg_iM1, * past_array_fSg_E;
-          const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-          const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+          array_t *past_array_fSg_iM1, *past_array_fSg_E;
+          const unsigned int d_lsf =
+              min(d, sbmc_node_info_get_past_depth(lsf_info));
+          const unsigned int d_rsf =
+              min(d, sbmc_node_info_get_past_depth(rsf_info));
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
@@ -3807,32 +3657,24 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_g_i_d = array_fetch(be_ptr, rsf_past_array, d_rsf);
           nusmv_assert((be_ptr)NULL != be_g_i_d);
 
-          past_array_fSg_E =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        sbmc_E_state());
+          past_array_fSg_E = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert((array_t *)NULL != past_array_fSg_E);
-          be_fSg_E_dM1 = array_fetch(be_ptr, past_array_fSg_E, d-1);
+          be_fSg_E_dM1 = array_fetch(be_ptr, past_array_fSg_E, d - 1);
           nusmv_assert((be_ptr)NULL != be_fSg_E_dM1);
 
-          past_array_fSg_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          past_array_fSg_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_fSg_iM1);
           be_fSg_iM1_d = array_fetch(be_ptr, past_array_fSg_iM1, d);
           nusmv_assert((be_ptr)NULL != be_fSg_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_fSg_i_d,
-                             Be_Or(be_mgr,
-                                   be_g_i_d,
-                                   Be_And(be_mgr,
-                                          be_f_i_d,
-                                          Be_Ite(be_mgr,
-                                                 be_l_i,
-                                                 be_fSg_E_dM1,
+          be_result = Be_Iff(be_mgr, be_fSg_i_d,
+                             Be_Or(be_mgr, be_g_i_d,
+                                   Be_And(be_mgr, be_f_i_d,
+                                          Be_Ite(be_mgr, be_l_i, be_fSg_E_dM1,
                                                  be_fSg_iM1_d))));
-        }
-        else
+        } else
           ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
         /* Save the created constraint */
@@ -3840,7 +3682,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  Adding constraint at depth %u: ",d);
+          Logger_log(logger, "  Adding constraint at depth %u: ", d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -3848,57 +3690,51 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
         /* An additional constraint ensuring that the past formula has
          * stabilized at the last unrolling depth */
         if ((i_model >= 1) && (d == sbmc_node_info_get_past_depth(info))) {
-            /* Add [[f S g]]_i^d <=>
-             * [[g]]_i^d | ([[f]]_i_d &
-             *              ITE(l_i,[[fSg]]_E^d,[[fSg]]_{i-1}^d))
-             */
-            be_ptr be_f_i_d, be_g_i_d, be_fSg_E_d, be_fSg_iM1_d;
-            array_t * past_array_fSg_iM1, * past_array_fSg_E;
-            const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-            const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+          /* Add [[f S g]]_i^d <=>
+           * [[g]]_i^d | ([[f]]_i_d &
+           *              ITE(l_i,[[fSg]]_E^d,[[fSg]]_{i-1}^d))
+           */
+          be_ptr be_f_i_d, be_g_i_d, be_fSg_E_d, be_fSg_iM1_d;
+          array_t *past_array_fSg_iM1, *past_array_fSg_E;
+          const unsigned int d_lsf =
+              min(d, sbmc_node_info_get_past_depth(lsf_info));
+          const unsigned int d_rsf =
+              min(d, sbmc_node_info_get_past_depth(rsf_info));
 
-            be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
-            nusmv_assert((be_ptr)NULL != be_f_i_d);
+          be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
+          nusmv_assert((be_ptr)NULL != be_f_i_d);
 
-            be_g_i_d = array_fetch(be_ptr, rsf_past_array, d_rsf);
-            nusmv_assert((be_ptr)NULL != be_g_i_d);
+          be_g_i_d = array_fetch(be_ptr, rsf_past_array, d_rsf);
+          nusmv_assert((be_ptr)NULL != be_g_i_d);
 
-            past_array_fSg_E =
-              array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                          sbmc_E_state());
-            nusmv_assert((array_t *)NULL != past_array_fSg_E);
-            be_fSg_E_d = array_fetch(be_ptr, past_array_fSg_E, d);
-            nusmv_assert((be_ptr)NULL != be_fSg_E_d);
+          past_array_fSg_E = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
+          nusmv_assert((array_t *)NULL != past_array_fSg_E);
+          be_fSg_E_d = array_fetch(be_ptr, past_array_fSg_E, d);
+          nusmv_assert((be_ptr)NULL != be_fSg_E_d);
 
-            past_array_fSg_iM1 =
-              array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                          i_real-1);
-            nusmv_assert((array_t *)NULL != past_array_fSg_iM1);
-            be_fSg_iM1_d = array_fetch(be_ptr, past_array_fSg_iM1, d);
-            nusmv_assert((be_ptr)NULL != be_fSg_iM1_d);
+          past_array_fSg_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
+          nusmv_assert((array_t *)NULL != past_array_fSg_iM1);
+          be_fSg_iM1_d = array_fetch(be_ptr, past_array_fSg_iM1, d);
+          nusmv_assert((be_ptr)NULL != be_fSg_iM1_d);
 
-            be_result = Be_Iff(be_mgr,
-                               be_fSg_i_d,
-                               Be_Or(be_mgr,
-                                     be_g_i_d,
-                                     Be_And(be_mgr,
-                                            be_f_i_d,
-                                            Be_Ite(be_mgr,
-                                                   be_l_i,
-                                                   be_fSg_E_d,
-                                                   be_fSg_iM1_d))));
+          be_result = Be_Iff(
+              be_mgr, be_fSg_i_d,
+              Be_Or(be_mgr, be_g_i_d,
+                    Be_And(be_mgr, be_f_i_d,
+                           Be_Ite(be_mgr, be_l_i, be_fSg_E_d, be_fSg_iM1_d))));
 
-            /* Save the created constraint */
-            lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
+          /* Save the created constraint */
+          lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
-            if (opt_verbose_level_ge(opts, 6)) {
-              Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-              Logger_log(logger,
-                      "  Adding constraint at depth %u: ",d);
-              Be_DumpSexpr(be_mgr, be_result, errstream);
-              Logger_log(logger, "\n");
-            }
+          if (opt_verbose_level_ge(opts, 6)) {
+            Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+            Logger_log(logger, "  Adding constraint at depth %u: ", d);
+            Be_DumpSexpr(be_mgr, be_result, errstream);
+            Logger_log(logger, "\n");
           }
+        }
       } /*for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) */
       break;
     }
@@ -3917,16 +3753,14 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info)
-                                   , i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       rsf_info = sbmc_node_info_assoc_find(info_map, rsf);
       nusmv_assert((sbmc_node_info *)NULL != rsf_info);
-      rsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(rsf_info),
-                                   i_real);
+      rsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(rsf_info), i_real);
       nusmv_assert((array_t *)NULL != rsf_past_array);
 
       if (opt_verbose_level_ge(opts, 6)) {
@@ -3945,12 +3779,11 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_ptr be_g_0_0 = array_fetch(be_ptr, rsf_past_array, 0);
           nusmv_assert((be_ptr)NULL != be_g_0_0);
           be_result = Be_Iff(be_mgr, be_fTg_i_d, be_g_0_0);
-        }
-        else if ((i_model >= 1) && (d == 0)) {
+        } else if ((i_model >= 1) && (d == 0)) {
           /* Add [[f T g]]_i^0 <=>
              [[g]]_i^0 & ([[f]]_i^0 | [[f T g]]_{i-1}^0)*/
           be_ptr be_f_i_d, be_g_i_d, be_fTg_iM1_d;
-          array_t * past_array_fTg_iM1;
+          array_t *past_array_fTg_iM1;
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
@@ -3958,31 +3791,27 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_g_i_d = array_fetch(be_ptr, rsf_past_array, d);
           nusmv_assert((be_ptr)NULL != be_g_i_d);
 
-          past_array_fTg_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          past_array_fTg_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_fTg_iM1);
           be_fTg_iM1_d = array_fetch(be_ptr, past_array_fTg_iM1, d);
           nusmv_assert((be_ptr)NULL != be_fTg_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_fTg_i_d,
-                             Be_And(be_mgr,
-                                    be_g_i_d,
-                                    Be_Or(be_mgr,
-                                          be_f_i_d,
-                                          be_fTg_iM1_d)));
-        }
-        else if ((i_model >= 1) && (d > 0)) {
+          be_result = Be_Iff(
+              be_mgr, be_fTg_i_d,
+              Be_And(be_mgr, be_g_i_d, Be_Or(be_mgr, be_f_i_d, be_fTg_iM1_d)));
+        } else if ((i_model >= 1) && (d > 0)) {
           /*
            * Add [[f T g]]_i^d <=>
            * [[g]]_i^d & ([[f]]_i_d |
            *              ITE(l_i,[[fTg]]_E^{d-1},[[fTg]]_{i-1}^d))
            */
           be_ptr be_f_i_d, be_g_i_d, be_fTg_E_dM1, be_fTg_iM1_d;
-          array_t * past_array_fTg_iM1, * past_array_fTg_E;
-          const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-          const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+          array_t *past_array_fTg_iM1, *past_array_fTg_E;
+          const unsigned int d_lsf =
+              min(d, sbmc_node_info_get_past_depth(lsf_info));
+          const unsigned int d_rsf =
+              min(d, sbmc_node_info_get_past_depth(rsf_info));
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
@@ -3990,32 +3819,24 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_g_i_d = array_fetch(be_ptr, rsf_past_array, d_rsf);
           nusmv_assert((be_ptr)NULL != be_g_i_d);
 
-          past_array_fTg_E =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        sbmc_E_state());
+          past_array_fTg_E = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert((array_t *)NULL != past_array_fTg_E);
-          be_fTg_E_dM1 = array_fetch(be_ptr, past_array_fTg_E, d-1);
+          be_fTg_E_dM1 = array_fetch(be_ptr, past_array_fTg_E, d - 1);
           nusmv_assert((be_ptr)NULL != be_fTg_E_dM1);
 
-          past_array_fTg_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          past_array_fTg_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_fTg_iM1);
           be_fTg_iM1_d = array_fetch(be_ptr, past_array_fTg_iM1, d);
           nusmv_assert((be_ptr)NULL != be_fTg_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_fTg_i_d,
-                             Be_And(be_mgr,
-                                    be_g_i_d,
-                                    Be_Or(be_mgr,
-                                          be_f_i_d,
-                                          Be_Ite(be_mgr,
-                                                 be_l_i,
-                                                 be_fTg_E_dM1,
+          be_result = Be_Iff(be_mgr, be_fTg_i_d,
+                             Be_And(be_mgr, be_g_i_d,
+                                    Be_Or(be_mgr, be_f_i_d,
+                                          Be_Ite(be_mgr, be_l_i, be_fTg_E_dM1,
                                                  be_fTg_iM1_d))));
-        }
-        else
+        } else
           ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
         /* Save the created constraint */
@@ -4023,7 +3844,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "  Adding constraint at depth %u: ",d);
+          Logger_log(logger, "  Adding constraint at depth %u: ", d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -4038,9 +3859,11 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
            *              ITE(l_i,[[fTg]]_E^d,[[fTg]]_{i-1}^d))
            */
           be_ptr be_f_i_d, be_g_i_d, be_fTg_E_d, be_fTg_iM1_d;
-          array_t * past_array_fTg_iM1, * past_array_fTg_E;
-          const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
-          const unsigned int d_rsf = min(d, sbmc_node_info_get_past_depth(rsf_info));
+          array_t *past_array_fTg_iM1, *past_array_fTg_E;
+          const unsigned int d_lsf =
+              min(d, sbmc_node_info_get_past_depth(lsf_info));
+          const unsigned int d_rsf =
+              min(d, sbmc_node_info_get_past_depth(rsf_info));
 
           be_f_i_d = array_fetch(be_ptr, lsf_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_i_d);
@@ -4048,30 +3871,23 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
           be_g_i_d = array_fetch(be_ptr, rsf_past_array, d_rsf);
           nusmv_assert((be_ptr)NULL != be_g_i_d);
 
-          past_array_fTg_E =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        sbmc_E_state());
+          past_array_fTg_E = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), sbmc_E_state());
           nusmv_assert((array_t *)NULL != past_array_fTg_E);
           be_fTg_E_d = array_fetch(be_ptr, past_array_fTg_E, d);
           nusmv_assert((be_ptr)NULL != be_fTg_E_d);
 
-          past_array_fTg_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                        i_real-1);
+          past_array_fTg_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_fTg_iM1);
           be_fTg_iM1_d = array_fetch(be_ptr, past_array_fTg_iM1, d);
           nusmv_assert((be_ptr)NULL != be_fTg_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_fTg_i_d,
-                             Be_And(be_mgr,
-                                    be_g_i_d,
-                                    Be_Or(be_mgr,
-                                          be_f_i_d,
-                                          Be_Ite(be_mgr,
-                                                 be_l_i,
-                                                 be_fTg_E_d,
-                                                 be_fTg_iM1_d))));
+          be_result = Be_Iff(
+              be_mgr, be_fTg_i_d,
+              Be_And(be_mgr, be_g_i_d,
+                     Be_Or(be_mgr, be_f_i_d,
+                           Be_Ite(be_mgr, be_l_i, be_fTg_E_d, be_fTg_iM1_d))));
 
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
@@ -4096,9 +3912,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       if (opt_verbose_level_ge(opts, 6)) {
@@ -4108,7 +3923,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
         be_ptr be_Yf_i_d, be_result;
-        const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
+        const unsigned int d_lsf =
+            min(d, sbmc_node_info_get_past_depth(lsf_info));
 
         be_Yf_i_d = array_fetch(be_ptr, past_array, d);
         nusmv_assert((be_ptr)NULL != be_Yf_i_d);
@@ -4116,47 +3932,38 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
         if (i_model == 0) {
           /* Add [[Y f]]_0^d <=> FALSE */
           be_result = Be_Iff(be_mgr, be_Yf_i_d, Be_Falsity(be_mgr));
-        }
-        else if ((i_model >= 1) && (d == 0)) {
+        } else if ((i_model >= 1) && (d == 0)) {
           /* Add [[Y f]]_i^0 <=> [[f]]_{i-1}^0 */
           be_ptr be_f_iM1_0;
-          array_t * past_array_f_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        i_real-1);
+          array_t *past_array_f_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_f_iM1);
           be_f_iM1_0 = array_fetch(be_ptr, past_array_f_iM1, d);
           nusmv_assert((be_ptr)NULL != be_f_iM1_0);
           be_result = Be_Iff(be_mgr, be_Yf_i_d, be_f_iM1_0);
-        }
-        else if ((i_model >= 1) && (d > 0)) {
+        } else if ((i_model >= 1) && (d > 0)) {
           /*
            * Add [[Y f]]_i^d <=> ITE(l_i,[[f]]_E^{d-1},[[f]]_{i-1}^min(d,pd(f)))
            */
           be_ptr be_f_iM1_d, be_f_E_dM1;
-          array_t * past_array_f_iM1, * past_array_f_E;
+          array_t *past_array_f_iM1, *past_array_f_E;
 
           past_array_f_E =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        sbmc_E_state());
+              array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
+                          sbmc_E_state());
           nusmv_assert((array_t *)NULL != past_array_f_E);
-          be_f_E_dM1 = array_fetch(be_ptr, past_array_f_E, d-1);
+          be_f_E_dM1 = array_fetch(be_ptr, past_array_f_E, d - 1);
           nusmv_assert((be_ptr)NULL != be_f_E_dM1);
 
-          past_array_f_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        i_real-1);
+          past_array_f_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_f_iM1);
           be_f_iM1_d = array_fetch(be_ptr, past_array_f_iM1, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Yf_i_d,
-                             Be_Ite(be_mgr,
-                                    be_l_i,
-                                    be_f_E_dM1,
-                                    be_f_iM1_d));
-        }
-        else
+          be_result = Be_Iff(be_mgr, be_Yf_i_d,
+                             Be_Ite(be_mgr, be_l_i, be_f_E_dM1, be_f_iM1_d));
+        } else
           ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
         /* Save the created constraint */
@@ -4164,8 +3971,7 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger,
-                  "  Adding constraint at depth %u: ", d);
+          Logger_log(logger, "  Adding constraint at depth %u: ", d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -4177,28 +3983,23 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
            * Add [[Y f]]_i^d <=> ITE(l_i,[[f]]_E^d,[[f]]_{i-1}^d)
            */
           be_ptr be_f_iM1_d, be_f_E_d;
-          array_t * past_array_f_iM1, * past_array_f_E;
+          array_t *past_array_f_iM1, *past_array_f_E;
 
           past_array_f_E =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        sbmc_E_state());
+              array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
+                          sbmc_E_state());
           nusmv_assert((array_t *)NULL != past_array_f_E);
           be_f_E_d = array_fetch(be_ptr, past_array_f_E, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_E_d);
 
-          past_array_f_iM1 =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        i_real-1);
+          past_array_f_iM1 = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real - 1);
           nusmv_assert((array_t *)NULL != past_array_f_iM1);
           be_f_iM1_d = array_fetch(be_ptr, past_array_f_iM1, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Yf_i_d,
-                             Be_Ite(be_mgr,
-                                    be_l_i,
-                                    be_f_E_d,
-                                    be_f_iM1_d));
+          be_result = Be_Iff(be_mgr, be_Yf_i_d,
+                             Be_Ite(be_mgr, be_l_i, be_f_E_d, be_f_iM1_d));
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
@@ -4223,9 +4024,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       lsf_info = sbmc_node_info_assoc_find(info_map, lsf);
       nusmv_assert((sbmc_node_info *)NULL != lsf_info);
-      lsf_past_array = array_fetch(be_ptr,
-                                   sbmc_node_info_get_trans_bes(lsf_info),
-                                   i_real);
+      lsf_past_array =
+          array_fetch(be_ptr, sbmc_node_info_get_trans_bes(lsf_info), i_real);
       nusmv_assert((array_t *)NULL != lsf_past_array);
 
       if (opt_verbose_level_ge(opts, 6)) {
@@ -4235,7 +4035,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
         be_ptr be_Zf_i_d, be_result;
-        const unsigned int d_lsf = min(d, sbmc_node_info_get_past_depth(lsf_info));
+        const unsigned int d_lsf =
+            min(d, sbmc_node_info_get_past_depth(lsf_info));
 
         be_Zf_i_d = array_fetch(be_ptr, past_array, d);
         nusmv_assert((be_ptr)NULL != be_Zf_i_d);
@@ -4243,49 +4044,40 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
         if (i_model == 0) {
           /* Add [[Z f]]_0^d <=> TRUE */
           be_result = Be_Iff(be_mgr, be_Zf_i_d, Be_Truth(be_mgr));
-        }
-        else if ((i_model >= 1) && (d == 0)) {
+        } else if ((i_model >= 1) && (d == 0)) {
           /* Add [[Z f]]_i^0 <=> [[f]]_{i-1}^0 */
           be_ptr be_f_iM1_0;
-          array_t * lsf_prev_past_array;
+          array_t *lsf_prev_past_array;
 
-          lsf_prev_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        i_real-1);
+          lsf_prev_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real - 1);
           nusmv_assert((array_t *)NULL != lsf_prev_past_array);
           be_f_iM1_0 = array_fetch(be_ptr, lsf_prev_past_array, d);
           nusmv_assert((be_ptr)NULL != be_f_iM1_0);
           be_result = Be_Iff(be_mgr, be_Zf_i_d, be_f_iM1_0);
-        }
-        else if ((i_model >= 1) && (d > 0)) {
+        } else if ((i_model >= 1) && (d > 0)) {
           /*
            * Add [[Z f]]_i^d <=> ITE(l_i,[[f]]_E^{d-1},[[f]]_{i-1}^min(d,pd(f)))
            */
           be_ptr be_f_iM1_d, be_f_E_dM1;
-          array_t * lsf_prev_past_array, * lsf_E_past_array;
+          array_t *lsf_prev_past_array, *lsf_E_past_array;
 
           lsf_E_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        sbmc_E_state());
+              array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
+                          sbmc_E_state());
           nusmv_assert((array_t *)NULL != lsf_E_past_array);
-          be_f_E_dM1 = array_fetch(be_ptr, lsf_E_past_array, d-1);
+          be_f_E_dM1 = array_fetch(be_ptr, lsf_E_past_array, d - 1);
           nusmv_assert((be_ptr)NULL != be_f_E_dM1);
 
-          lsf_prev_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        i_real-1);
+          lsf_prev_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real - 1);
           nusmv_assert((array_t *)NULL != lsf_prev_past_array);
-          be_f_iM1_d = array_fetch(be_ptr,lsf_prev_past_array,d_lsf);
+          be_f_iM1_d = array_fetch(be_ptr, lsf_prev_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Zf_i_d,
-                             Be_Ite(be_mgr,
-                                    be_l_i,
-                                    be_f_E_dM1,
-                                    be_f_iM1_d));
-        }
-        else
+          be_result = Be_Iff(be_mgr, be_Zf_i_d,
+                             Be_Ite(be_mgr, be_l_i, be_f_E_dM1, be_f_iM1_d));
+        } else
           ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
         /* Save the created constraint */
@@ -4303,28 +4095,23 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
         if ((i_model >= 1) && (d == sbmc_node_info_get_past_depth(info))) {
           /* Add [[Z f]]_i^d <=>  ITE(l_i,[[f]]_E^d,[[f]]_{i-1}^d) */
           be_ptr be_f_iM1_d, be_f_E_d;
-          array_t * lsf_prev_past_array, * lsf_E_past_array;
+          array_t *lsf_prev_past_array, *lsf_E_past_array;
 
           lsf_E_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        sbmc_E_state());
+              array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
+                          sbmc_E_state());
           nusmv_assert((array_t *)NULL != lsf_E_past_array);
           be_f_E_d = array_fetch(be_ptr, lsf_E_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_E_d);
 
-          lsf_prev_past_array =
-            array_fetch(array_t *, sbmc_node_info_get_trans_bes(lsf_info),
-                        i_real-1);
+          lsf_prev_past_array = array_fetch(
+              array_t *, sbmc_node_info_get_trans_bes(lsf_info), i_real - 1);
           nusmv_assert((array_t *)NULL != lsf_prev_past_array);
-          be_f_iM1_d = array_fetch(be_ptr,lsf_prev_past_array,d_lsf);
+          be_f_iM1_d = array_fetch(be_ptr, lsf_prev_past_array, d_lsf);
           nusmv_assert((be_ptr)NULL != be_f_iM1_d);
 
-          be_result = Be_Iff(be_mgr,
-                             be_Zf_i_d,
-                             Be_Ite(be_mgr,
-                                    be_l_i,
-                                    be_f_E_d,
-                                    be_f_iM1_d));
+          be_result = Be_Iff(be_mgr, be_Zf_i_d,
+                             Be_Ite(be_mgr, be_l_i, be_f_E_d, be_f_iM1_d));
           /* Save the created constraint */
           lsNewBegin(created_constraints, (lsGeneric)be_result, LS_NH);
 
@@ -4348,8 +4135,8 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
       continue;
 
     /* Remove node from unprocessed stack */
-    if (lsDelBegin(unprocessed_nodes, (lsGeneric*)&node) != LS_OK)
-      ErrorMgr_internal_error(errmgr, sbmc_SNH_text,__FILE__,__LINE__);
+    if (lsDelBegin(unprocessed_nodes, (lsGeneric *)&node) != LS_OK)
+      ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
     /* Mark visited */
     sbmc_set_insert(visit_cache, node);
@@ -4362,26 +4149,24 @@ lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
   return created_constraints;
 }
 
-lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
-                                     const node_ptr ltlspec,
-                                     const unsigned int k_model,
-                                     const hash_ptr info_map)
-{
+lsList sbmc_formula_dependent(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                              const unsigned int k_model,
+                              const hash_ptr info_map) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
   Be_Manager_ptr be_mgr;
   hash_ptr visit_cache = (hash_ptr)NULL;
-  lsList   unprocessed_nodes = (lsList)NULL;
-  lsList   created_constraints = (lsList)NULL;
+  lsList unprocessed_nodes = (lsList)NULL;
+  lsList created_constraints = (lsList)NULL;
 
   nusmv_assert((BeEnc_ptr)NULL != be_enc);
   nusmv_assert((node_ptr)NULL != ltlspec);
@@ -4397,25 +4182,25 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
   /* Debug output */
   if (opt_verbose_level_gt(opts, 1)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-            "Creating the formula specific k-dependent constraints for k=%d\n",
-            k_model);
+    Logger_log(
+        logger,
+        "Creating the formula specific k-dependent constraints for k=%d\n",
+        k_model);
     fflush(errstream);
   }
-
 
   visit_cache = sbmc_set_create();
   unprocessed_nodes = lsCreate();
   lsNewBegin(unprocessed_nodes, (lsGeneric)ltlspec, LS_NH);
 
-  while(lsLength(unprocessed_nodes) > 0) {
+  while (lsLength(unprocessed_nodes) > 0) {
     node_ptr node;
     sbmc_node_info *info;
     array_t *f_E_past_array, *f_L_past_array;
     int has_unprocessed_children;
 
     /* Get node */
-    if ((lsFirstItem(unprocessed_nodes, (lsGeneric*)&node, LS_NH) != LS_OK) ||
+    if ((lsFirstItem(unprocessed_nodes, (lsGeneric *)&node, LS_NH) != LS_OK) ||
         ((node_ptr)NULL == node))
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
@@ -4428,18 +4213,16 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
     /* sbmc_make_state_vector should have built trans_bes[i] before */
     nusmv_assert((array_t *)NULL != sbmc_node_info_get_trans_bes(info));
     nusmv_assert(array_n(sbmc_node_info_get_trans_bes(info)) >= 2);
-    f_L_past_array = array_fetch(array_t *,
-                                 sbmc_node_info_get_trans_bes(info),
+    f_L_past_array = array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
                                  sbmc_L_state());
     nusmv_assert((array_t *)NULL != f_L_past_array);
-    f_E_past_array = array_fetch(array_t *,
-                                 sbmc_node_info_get_trans_bes(info),
+    f_E_past_array = array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
                                  sbmc_E_state());
     nusmv_assert((array_t *)NULL != f_E_past_array);
 
     /* Traverse children */
     has_unprocessed_children = 0;
-    switch(node_get_type(node)) {
+    switch (node_get_type(node)) {
     case ATOM:
     case BIT:
     case DOT:
@@ -4453,7 +4236,8 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
     case XNOR:
     case IMPLIES:
     case IFF:
-      ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__, __LINE__);
+      ErrorMgr_internal_error(errmgr, "%s:%d: Formula not in NNF\n", __FILE__,
+                              __LINE__);
       break;
 
     case NOT:
@@ -4490,14 +4274,15 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
 
     default:
       print_node(wffprint, stderr, node);
-      ErrorMgr_internal_error(errmgr, "%s:%d: Something not implemented", __FILE__, __LINE__);
+      ErrorMgr_internal_error(errmgr, "%s:%d: Something not implemented",
+                              __FILE__, __LINE__);
       break;
     }
     if (has_unprocessed_children)
       continue;
 
     /* Remove node from unprocessed stack */
-    if (lsDelBegin(unprocessed_nodes, (lsGeneric*)&node) != LS_OK)
+    if (lsDelBegin(unprocessed_nodes, (lsGeneric *)&node) != LS_OK)
       ErrorMgr_internal_error(errmgr, sbmc_SNH_text, __FILE__, __LINE__);
 
     /* Mark visited */
@@ -4506,9 +4291,8 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
     if ((array_t *)NULL != sbmc_node_info_get_trans_vars(info)) {
       /* * Add [[f]]_E^d <=> [[f]]_k^d */
       int d;
-      array_t * f_k_past_array =
-        array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                    sbmc_real_k(k_model));
+      array_t *f_k_past_array = array_fetch(
+          array_t *, sbmc_node_info_get_trans_bes(info), sbmc_real_k(k_model));
       nusmv_assert((array_t *)NULL != f_k_past_array);
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
@@ -4526,8 +4310,7 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_nlog(logger, wffprint, " f: %N\n", node);
-          Logger_log(logger, "  ([[f]]_E^%d <=> [[f]]_%u^%d): ",
-                     d, k_model, d);
+          Logger_log(logger, "  ([[f]]_E^%d <=> [[f]]_%u^%d): ", d, k_model, d);
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -4537,9 +4320,9 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
     if ((array_t *)NULL != sbmc_node_info_get_trans_vars(info)) {
       /* Add [[f]]_{k+1}^d <=> [[f]]_L^min(d+1,pd(f)) */
       int d;
-      array_t * f_kP1_past_array =
-        array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
-                    sbmc_real_k(k_model+1));
+      array_t *f_kP1_past_array =
+          array_fetch(array_t *, sbmc_node_info_get_trans_bes(info),
+                      sbmc_real_k(k_model + 1));
       nusmv_assert((array_t *)NULL != f_kP1_past_array);
 
       for (d = 0; d <= sbmc_node_info_get_past_depth(info); d++) {
@@ -4547,9 +4330,9 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
 
         be_f_kP1_d = array_fetch(be_ptr, f_kP1_past_array, d);
         nusmv_assert((be_ptr)NULL != be_f_kP1_d);
-        be_f_L_dP1
-          = array_fetch(be_ptr, f_L_past_array,
-                        min(d+1, sbmc_node_info_get_past_depth(info)));
+        be_f_L_dP1 =
+            array_fetch(be_ptr, f_L_past_array,
+                        min(d + 1, sbmc_node_info_get_past_depth(info)));
         nusmv_assert((be_ptr)NULL != be_f_L_dP1);
         be_result = Be_Iff(be_mgr, be_f_kP1_d, be_f_L_dP1);
 
@@ -4559,8 +4342,8 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
         if (opt_verbose_level_ge(opts, 6)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_nlog(logger, wffprint, " f: %N\n", node);
-          Logger_log(logger, "  ([[f]]_%d^%d <=> [[f]]_L^%d): ",
-                  k_model+1, d, min(d+1,sbmc_node_info_get_past_depth(info)));
+          Logger_log(logger, "  ([[f]]_%d^%d <=> [[f]]_L^%d): ", k_model + 1, d,
+                     min(d + 1, sbmc_node_info_get_past_depth(info)));
           Be_DumpSexpr(be_mgr, be_result, errstream);
           Logger_log(logger, "\n");
         }
@@ -4571,14 +4354,12 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
       /* Add <<Ff>>_E <=> <<Ff>>_k */
       be_ptr be_auxFf_E, be_auxFf_k, be_result;
 
-      be_auxFf_E = BeEnc_name_to_timed(be_enc,
-                                       sbmc_node_info_get_aux_F_node(info),
-                                       sbmc_E_state());
+      be_auxFf_E = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_F_node(info), sbmc_E_state());
       nusmv_assert((be_ptr)NULL != be_auxFf_E);
 
-      be_auxFf_k = BeEnc_name_to_timed(be_enc,
-                                       sbmc_node_info_get_aux_F_node(info),
-                                       sbmc_real_k(k_model));
+      be_auxFf_k = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_F_node(info), sbmc_real_k(k_model));
       nusmv_assert(be_auxFf_k);
 
       be_result = Be_Iff(be_mgr, be_auxFf_E, be_auxFf_k);
@@ -4594,19 +4375,16 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
       }
     }
 
-
     if (sbmc_node_info_get_aux_G_node(info)) {
       /* Add <<Gf>>_E <=> <<Gf>>_k */
       be_ptr be_auxGf_E, be_auxGf_k, be_result;
 
-      be_auxGf_E = BeEnc_name_to_timed(be_enc,
-                                       sbmc_node_info_get_aux_G_node(info),
-                                       sbmc_E_state());
+      be_auxGf_E = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_G_node(info), sbmc_E_state());
       nusmv_assert((be_ptr)NULL != be_auxGf_E);
 
-      be_auxGf_k = BeEnc_name_to_timed(be_enc,
-                                       sbmc_node_info_get_aux_G_node(info),
-                                       sbmc_real_k(k_model));
+      be_auxGf_k = BeEnc_name_to_timed(
+          be_enc, sbmc_node_info_get_aux_G_node(info), sbmc_real_k(k_model));
       nusmv_assert((be_ptr)NULL != be_auxGf_k);
 
       be_result = Be_Iff(be_mgr, be_auxGf_E, be_auxGf_k);
@@ -4621,7 +4399,6 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
         Logger_log(logger, "\n");
       }
     }
-
   }
 
   lsDestroy(unprocessed_nodes, NULL);
@@ -4632,16 +4409,12 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
   return created_constraints;
 }
 
-lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc,
-                                    const node_ptr bltlspec,
-                                    const int previous_k,
-                                    const int new_k,
-                                    const state_vars_struct *state_vars,
-                                    array_t * InLoop_array,
-                                    const hash_ptr info_map,
-                                    const be_ptr be_LoopExists,
-                                    const int opt_do_optimization)
-{
+lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc, const node_ptr bltlspec,
+                             const int previous_k, const int new_k,
+                             const state_vars_struct *state_vars,
+                             array_t *InLoop_array, const hash_ptr info_map,
+                             const be_ptr be_LoopExists,
+                             const int opt_do_optimization) {
   int i;
   lsList created_constraints = lsCreate();
 
@@ -4654,38 +4427,27 @@ lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc,
     be_InLoop_i = array_fetch(be_ptr, InLoop_array, i);
     nusmv_assert((be_ptr)NULL != be_InLoop_i);
 
-    be_l_i = BeEnc_name_to_timed(be_enc,
-                                 sbmc_state_vars_get_l_var(state_vars),
+    be_l_i = BeEnc_name_to_timed(be_enc, sbmc_state_vars_get_l_var(state_vars),
                                  sbmc_real_k(i));
     nusmv_assert((be_ptr)NULL != be_l_i);
 
-    be_LastState_i = BeEnc_name_to_timed(be_enc,
-                              sbmc_state_vars_get_LastState_var(state_vars),
-                              sbmc_real_k(i));
+    be_LastState_i = BeEnc_name_to_timed(
+        be_enc, sbmc_state_vars_get_LastState_var(state_vars), sbmc_real_k(i));
     nusmv_assert((be_ptr)NULL != be_LastState_i);
 
     {
       /* Future fragment */
-      lsList new_constraints =
-        sbmc_unroll_invariant_f(be_enc,
-                                bltlspec,
-                                i,
-                                info_map,
-                                be_InLoop_i,
-                                be_l_i,
-                                be_LastState_i,
-                                be_LoopExists,
-                                opt_do_optimization);
+      lsList new_constraints = sbmc_unroll_invariant_f(
+          be_enc, bltlspec, i, info_map, be_InLoop_i, be_l_i, be_LastState_i,
+          be_LoopExists, opt_do_optimization);
       lsJoin(created_constraints, new_constraints, 0);
       lsDestroy(new_constraints, NULL);
     }
     {
       /* Past fragment */
       lsList new_constraints =
-        sbmc_unroll_invariant_p(be_enc, bltlspec,
-                                    i, info_map,
-                                    be_InLoop_i, be_l_i,
-                                    opt_do_optimization);
+          sbmc_unroll_invariant_p(be_enc, bltlspec, i, info_map, be_InLoop_i,
+                                  be_l_i, opt_do_optimization);
       lsJoin(created_constraints, new_constraints, 0);
       lsDestroy(new_constraints, NULL);
     }
@@ -4693,20 +4455,16 @@ lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc,
   return created_constraints;
 }
 
-lsList sbmc_dependent(const BeEnc_ptr be_enc,
-                             const node_ptr bltlspec,
-                             const int k,
-                             const state_vars_struct *state_vars,
-                             array_t *InLoop_array,
-                             const be_ptr be_LoopExists,
-                             const hash_ptr info_map)
-{
+lsList sbmc_dependent(const BeEnc_ptr be_enc, const node_ptr bltlspec,
+                      const int k, const state_vars_struct *state_vars,
+                      array_t *InLoop_array, const be_ptr be_LoopExists,
+                      const hash_ptr info_map) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
   Be_Manager_ptr be_mgr;
   lsList created_constraints = lsCreate();
@@ -4725,10 +4483,8 @@ lsList sbmc_dependent(const BeEnc_ptr be_enc,
    * Add and force the constraint l_{k+1} <=> FALSE
    */
   {
-    be_ptr be_l_kP1 =
-      BeEnc_name_to_timed(be_enc,
-                          sbmc_state_vars_get_l_var(state_vars),
-                          sbmc_real_k(k+1));
+    be_ptr be_l_kP1 = BeEnc_name_to_timed(
+        be_enc, sbmc_state_vars_get_l_var(state_vars), sbmc_real_k(k + 1));
     be_ptr be_constraint;
 
     nusmv_assert((be_ptr)NULL != be_l_kP1);
@@ -4740,7 +4496,7 @@ lsList sbmc_dependent(const BeEnc_ptr be_enc,
 
     if (opt_verbose_level_gt(opts, 1)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      Logger_log(logger, "Forced (l_%d <=> FALSE)", k+1);
+      Logger_log(logger, "Forced (l_%d <=> FALSE)", k + 1);
       if (opt_verbose_level_ge(opts, 6)) {
         Logger_log(logger, ": ");
         Be_DumpSexpr(be_mgr, be_constraint, errstream);
@@ -4753,10 +4509,9 @@ lsList sbmc_dependent(const BeEnc_ptr be_enc,
    * Add and force the constraint s_E = s_k
    */
   {
-    be_ptr be_constraint =
-      sbmc_equal_vectors_formula(be_enc,
-                                 sbmc_state_vars_get_simple_path_system_vars(state_vars),
-                                 sbmc_E_state(), sbmc_real_k(k));
+    be_ptr be_constraint = sbmc_equal_vectors_formula(
+        be_enc, sbmc_state_vars_get_simple_path_system_vars(state_vars),
+        sbmc_E_state(), sbmc_real_k(k));
 
     lsNewEnd(created_constraints, be_constraint, LS_NH);
 
@@ -4798,7 +4553,7 @@ lsList sbmc_dependent(const BeEnc_ptr be_enc,
    */
   {
     lsList new_constraints =
-      sbmc_formula_dependent(be_enc, bltlspec, k, info_map);
+        sbmc_formula_dependent(be_enc, bltlspec, k, info_map);
     lsJoin(created_constraints, new_constraints, 0);
     lsDestroy(new_constraints, NULL);
   }

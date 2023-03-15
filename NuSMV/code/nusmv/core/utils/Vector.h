@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -57,7 +57,7 @@
  *
  * - void prefix_destroy(name v)
  *      destroy the vector
- *      
+ *
  * - void prefix_push(name v, type elem)
  *      append elem at the end of v
  *
@@ -73,7 +73,7 @@
  *
  * - void prefix_shrink(name v, size_t newsz)
  *      shrink the vector reducing also the memory occupied
- *      
+ *
  * - void prefix_reserve(name v, size_t cap)
  *      reserve space for "cap" elements, but do not resize the vector
  *
@@ -112,247 +112,220 @@
 #include "nusmv/core/utils/defs.h"
 #include <string.h>
 
-
-#define DECLARE_VECTOR__impl_(qual, type, name, prefix)                 \
-  struct name {                                                         \
-    type *data_;                                                        \
-    size_t size_;                                                       \
-    size_t capacity_;                                                   \
-  };                                                                    \
-  typedef struct name *name;                                            \
-  qual name prefix ## _create(void);                                    \
-  qual void prefix ## _destroy(name v);                                 \
-  qual void prefix ## _push(name v, type elem);                         \
-  qual void prefix ## _pop(name v);                                     \
-  qual void prefix ## _append(name v1, name v2);                        \
-  qual void prefix ## _resize(name v, size_t newsz);                    \
-  qual void prefix ## _shrink(name v, size_t newsz);                    \
-  qual void prefix ## _reserve(name v, size_t cap);                     \
-  qual void prefix ## _clear(name v);                                   \
-  qual void prefix ## _copy(name src, name dest);                       \
-  qual void prefix ## _swap(name v1, name v2);                          \
-  qual void prefix ## _sort(name v, int (*cmp)(type a, type b, void *p), \
-                            void *p);                                   \
-  qual void prefix ## _acquire(name v, type *arr, size_t sz);           \
-  qual type *prefix ## _release(name v);
+#define DECLARE_VECTOR__impl_(qual, type, name, prefix)                        \
+  struct name {                                                                \
+    type *data_;                                                               \
+    size_t size_;                                                              \
+    size_t capacity_;                                                          \
+  };                                                                           \
+  typedef struct name *name;                                                   \
+  qual name prefix##_create(void);                                             \
+  qual void prefix##_destroy(name v);                                          \
+  qual void prefix##_push(name v, type elem);                                  \
+  qual void prefix##_pop(name v);                                              \
+  qual void prefix##_append(name v1, name v2);                                 \
+  qual void prefix##_resize(name v, size_t newsz);                             \
+  qual void prefix##_shrink(name v, size_t newsz);                             \
+  qual void prefix##_reserve(name v, size_t cap);                              \
+  qual void prefix##_clear(name v);                                            \
+  qual void prefix##_copy(name src, name dest);                                \
+  qual void prefix##_swap(name v1, name v2);                                   \
+  qual void prefix##_sort(name v, int (*cmp)(type a, type b, void *p),         \
+                          void *p);                                            \
+  qual void prefix##_acquire(name v, type *arr, size_t sz);                    \
+  qual type *prefix##_release(name v);
 
 #define VECTOR_SIZE(v) ((v)->size_)
 #define VECTOR_CAPACITY(v) ((v)->capacity_)
 #define VECTOR_ARRAY(v) ((v)->data_)
 #define VECTOR_FIRST(v) (VECTOR_ARRAY(v)[0])
-#define VECTOR_AT(v,i) (VECTOR_ARRAY(v)[i])
-#define VECTOR_LAST(v) (VECTOR_ARRAY(v)[VECTOR_SIZE(v)-1])
+#define VECTOR_AT(v, i) (VECTOR_ARRAY(v)[i])
+#define VECTOR_LAST(v) (VECTOR_ARRAY(v)[VECTOR_SIZE(v) - 1])
 
 #define EMPTY__nusmv_utils_vector__
 
-#define DECLARE_VECTOR(type, name, prefix)              \
+#define DECLARE_VECTOR(type, name, prefix)                                     \
   DECLARE_VECTOR__impl_(EMPTY__nusmv_utils_vector__, type, name, prefix)
 
-#define DEFINE_VECTOR__impl_(qual, type, name, prefix)                  \
-  qual name prefix ## _create(void)                                     \
-  {                                                                     \
-    name ret = ALLOC(struct name, 1);                                   \
-    ret->data_ = NULL;                                                  \
-    ret->size_ = 0;                                                     \
-    ret->capacity_ = 0;                                                 \
-                                                                        \
-    return ret;                                                         \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _destroy(name v)                                  \
-  {                                                                     \
-    if (v->data_) {                                                     \
-      FREE(v->data_);                                                   \
-    }                                                                   \
-    FREE(v);                                                            \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _push(name v, type elem)                          \
-  {                                                                     \
-    while (v->size_ >= v->capacity_) {                                  \
-      prefix ## _reserve(v, v->capacity_ ? v->capacity_ * 2 : 2);       \
-    }                                                                   \
-    v->data_[v->size_++] = elem;                                        \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _pop(name v)                                      \
-  {                                                                     \
-    nusmv_assert(v->size_ > 0);                                         \
-    --v->size_;                                                         \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _append(name v1, name v2)                         \
-  {                                                                     \
-    prefix ## _reserve(v1, v1->size_ + v2->size_);                      \
-    memcpy(v1->data_ + v1->size_, v2->data_, sizeof(type) * v2->size_); \
-    v1->size_ += v2->size_;                                             \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _resize(name v, size_t newsz)                     \
-  {                                                                     \
-    if (v->size_ >= newsz) {                                            \
-      v->size_ = newsz;                                                 \
-    } else {                                                            \
-      size_t i;                                                         \
-      prefix ## _reserve(v, newsz);                                     \
-      for (i = v->size_; i < newsz; ++i) {                              \
-        v->data_[i] = 0;                                                \
-      }                                                                 \
-      v->size_ = newsz;                                                 \
-    }                                                                   \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _shrink(name v, size_t newsz)                     \
-  {                                                                     \
-    if (newsz == 0) {                                                   \
-      prefix ## _clear(v);                                              \
-    } else if (newsz < v->size_) {                                      \
-      v->data_ = REALLOC(type, v->data_, newsz);                        \
-      v->size_ = newsz;                                                 \
-      v->capacity_ = newsz;                                             \
-    }                                                                   \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _reserve(name v, size_t cap)                      \
-  {                                                                     \
-    if (cap > 0 && v->capacity_ < cap) {                                \
-      v->data_ = REALLOC(type, v->data_, cap);                          \
-      v->capacity_ = cap;                                               \
-    }                                                                   \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _clear(name v)                                    \
-  {                                                                     \
-    v->size_ = 0;                                                       \
-    v->capacity_ = 0;                                                   \
-    if (v->data_) {                                                     \
-      FREE(v->data_);                                                   \
-      v->data_ = NULL;                                                  \
-    }                                                                   \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _copy(name src, name dest)                        \
-  {                                                                     \
-    prefix ## _resize(dest, src->size_);                                \
-    dest->size_ = src->size_;                                           \
-    if (src->data_ != NULL) {                                           \
-      memcpy(dest->data_, src->data_, sizeof(type) * src->size_);       \
-    }                                                                   \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _swap(name v1, name v2)                           \
-  {                                                                     \
-    size_t tmp1;                                                        \
-    type *tmp2;                                                         \
-                                                                        \
-    tmp1 = v1->size_;                                                   \
-    v1->size_ = v2->size_;                                              \
-    v2->size_ = tmp1;                                                   \
-                                                                        \
-    tmp1 = v1->capacity_;                                               \
-    v1->capacity_ = v2->capacity_;                                      \
-    v2->capacity_ = tmp1;                                               \
-                                                                        \
-    tmp2 = v1->data_;                                                   \
-    v1->data_ = v2->data_;                                              \
-    v2->data_ = tmp2;                                                   \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  static void prefix ## _sort_impl(                                     \
-    type *arr, size_t size,                                             \
-    int (*cmp)(type a, type b, void *p), void *p)                       \
-  {                                                                     \
-    /* sorting algorithm taken from minisat */                          \
-    if (size <= 15) {                                                   \
-      /* selection sort */                                              \
-      size_t i, j, best_i;                                              \
-      type tmp;                                                         \
-                                                                        \
-      for (i = 1; i < size; ++i){                                       \
-        best_i = i-1;                                                   \
-        for (j = i; j < size; ++j) {                                    \
-          if (cmp(arr[j], arr[best_i], p) < 0) {                        \
-            best_i = j;                                                 \
-          }                                                             \
-        }                                                               \
-        tmp = arr[i-1];                                                 \
-        arr[i-1] = arr[best_i];                                         \
-        arr[best_i] = tmp;                                              \
-      }                                                                 \
-    } else {                                                            \
-      size_t i, j;                                                      \
-      type pivot;                                                       \
-      type tmp;                                                         \
-      pivot = arr[size / 2];                                            \
-      i = (size_t)-1;                                                   \
-      j = size;                                                         \
-                                                                        \
-      for (;;) {                                                        \
-        do i++; while(cmp(arr[i], pivot, p) < 0);                       \
-        do j--; while(cmp(pivot, arr[j], p) < 0);                       \
-                                                                        \
-        if (i >= j) break;                                              \
-                                                                        \
-        tmp = arr[i];                                                   \
-        arr[i] = arr[j];                                                \
-        arr[j] = tmp;                                                   \
-      }                                                                 \
-                                                                        \
-      prefix ## _sort_impl(arr, i, cmp, p);                             \
-      prefix ## _sort_impl(&arr[i], size-i, cmp, p);                    \
-    }                                                                   \
-  }                                                                     \
-                                                                        \
-  qual void prefix ## _sort(name v, int (*cmp)(type a, type b, void *p), \
-                            void *p)                                    \
-  {                                                                     \
-    prefix ## _sort_impl(v->data_, v->size_, cmp, p);                   \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual void prefix ## _acquire(name v, type *arr, size_t sz)            \
-  {                                                                     \
-    if (v->data_) {                                                     \
-      FREE(v->data_);                                                   \
-    }                                                                   \
-    v->data_ = arr;                                                     \
-    v->size_ = sz;                                                      \
-    v->capacity_ = sz;                                                  \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  qual type *prefix ## _release(name v)                                 \
-  {                                                                     \
-    type *ret = v->data_;                                               \
-    v->data_ = NULL;                                                    \
-    v->size_ = 0;                                                       \
-    v->capacity_ = 0;                                                   \
-    return ret;                                                         \
+#define DEFINE_VECTOR__impl_(qual, type, name, prefix)                         \
+  qual name prefix##_create(void) {                                            \
+    name ret = ALLOC(struct name, 1);                                          \
+    ret->data_ = NULL;                                                         \
+    ret->size_ = 0;                                                            \
+    ret->capacity_ = 0;                                                        \
+                                                                               \
+    return ret;                                                                \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_destroy(name v) {                                         \
+    if (v->data_) {                                                            \
+      FREE(v->data_);                                                          \
+    }                                                                          \
+    FREE(v);                                                                   \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_push(name v, type elem) {                                 \
+    while (v->size_ >= v->capacity_) {                                         \
+      prefix##_reserve(v, v->capacity_ ? v->capacity_ * 2 : 2);                \
+    }                                                                          \
+    v->data_[v->size_++] = elem;                                               \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_pop(name v) {                                             \
+    nusmv_assert(v->size_ > 0);                                                \
+    --v->size_;                                                                \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_append(name v1, name v2) {                                \
+    prefix##_reserve(v1, v1->size_ + v2->size_);                               \
+    memcpy(v1->data_ + v1->size_, v2->data_, sizeof(type) * v2->size_);        \
+    v1->size_ += v2->size_;                                                    \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_resize(name v, size_t newsz) {                            \
+    if (v->size_ >= newsz) {                                                   \
+      v->size_ = newsz;                                                        \
+    } else {                                                                   \
+      size_t i;                                                                \
+      prefix##_reserve(v, newsz);                                              \
+      for (i = v->size_; i < newsz; ++i) {                                     \
+        v->data_[i] = 0;                                                       \
+      }                                                                        \
+      v->size_ = newsz;                                                        \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_shrink(name v, size_t newsz) {                            \
+    if (newsz == 0) {                                                          \
+      prefix##_clear(v);                                                       \
+    } else if (newsz < v->size_) {                                             \
+      v->data_ = REALLOC(type, v->data_, newsz);                               \
+      v->size_ = newsz;                                                        \
+      v->capacity_ = newsz;                                                    \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_reserve(name v, size_t cap) {                             \
+    if (cap > 0 && v->capacity_ < cap) {                                       \
+      v->data_ = REALLOC(type, v->data_, cap);                                 \
+      v->capacity_ = cap;                                                      \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_clear(name v) {                                           \
+    v->size_ = 0;                                                              \
+    v->capacity_ = 0;                                                          \
+    if (v->data_) {                                                            \
+      FREE(v->data_);                                                          \
+      v->data_ = NULL;                                                         \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_copy(name src, name dest) {                               \
+    prefix##_resize(dest, src->size_);                                         \
+    dest->size_ = src->size_;                                                  \
+    if (src->data_ != NULL) {                                                  \
+      memcpy(dest->data_, src->data_, sizeof(type) * src->size_);              \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_swap(name v1, name v2) {                                  \
+    size_t tmp1;                                                               \
+    type *tmp2;                                                                \
+                                                                               \
+    tmp1 = v1->size_;                                                          \
+    v1->size_ = v2->size_;                                                     \
+    v2->size_ = tmp1;                                                          \
+                                                                               \
+    tmp1 = v1->capacity_;                                                      \
+    v1->capacity_ = v2->capacity_;                                             \
+    v2->capacity_ = tmp1;                                                      \
+                                                                               \
+    tmp2 = v1->data_;                                                          \
+    v1->data_ = v2->data_;                                                     \
+    v2->data_ = tmp2;                                                          \
+  }                                                                            \
+                                                                               \
+  static void prefix##_sort_impl(                                              \
+      type *arr, size_t size, int (*cmp)(type a, type b, void *p), void *p) {  \
+    /* sorting algorithm taken from minisat */                                 \
+    if (size <= 15) {                                                          \
+      /* selection sort */                                                     \
+      size_t i, j, best_i;                                                     \
+      type tmp;                                                                \
+                                                                               \
+      for (i = 1; i < size; ++i) {                                             \
+        best_i = i - 1;                                                        \
+        for (j = i; j < size; ++j) {                                           \
+          if (cmp(arr[j], arr[best_i], p) < 0) {                               \
+            best_i = j;                                                        \
+          }                                                                    \
+        }                                                                      \
+        tmp = arr[i - 1];                                                      \
+        arr[i - 1] = arr[best_i];                                              \
+        arr[best_i] = tmp;                                                     \
+      }                                                                        \
+    } else {                                                                   \
+      size_t i, j;                                                             \
+      type pivot;                                                              \
+      type tmp;                                                                \
+      pivot = arr[size / 2];                                                   \
+      i = (size_t)-1;                                                          \
+      j = size;                                                                \
+                                                                               \
+      for (;;) {                                                               \
+        do                                                                     \
+          i++;                                                                 \
+        while (cmp(arr[i], pivot, p) < 0);                                     \
+        do                                                                     \
+          j--;                                                                 \
+        while (cmp(pivot, arr[j], p) < 0);                                     \
+                                                                               \
+        if (i >= j)                                                            \
+          break;                                                               \
+                                                                               \
+        tmp = arr[i];                                                          \
+        arr[i] = arr[j];                                                       \
+        arr[j] = tmp;                                                          \
+      }                                                                        \
+                                                                               \
+      prefix##_sort_impl(arr, i, cmp, p);                                      \
+      prefix##_sort_impl(&arr[i], size - i, cmp, p);                           \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_sort(name v, int (*cmp)(type a, type b, void *p),         \
+                          void *p) {                                           \
+    prefix##_sort_impl(v->data_, v->size_, cmp, p);                            \
+  }                                                                            \
+                                                                               \
+  qual void prefix##_acquire(name v, type *arr, size_t sz) {                   \
+    if (v->data_) {                                                            \
+      FREE(v->data_);                                                          \
+    }                                                                          \
+    v->data_ = arr;                                                            \
+    v->size_ = sz;                                                             \
+    v->capacity_ = sz;                                                         \
+  }                                                                            \
+                                                                               \
+  qual type *prefix##_release(name v) {                                        \
+    type *ret = v->data_;                                                      \
+    v->data_ = NULL;                                                           \
+    v->size_ = 0;                                                              \
+    v->capacity_ = 0;                                                          \
+    return ret;                                                                \
   }
 
-
-#define DEFINE_VECTOR(type, name, prefix)       \
+#define DEFINE_VECTOR(type, name, prefix)                                      \
   DEFINE_VECTOR__impl_(EMPTY__nusmv_utils_vector__, type, name, prefix)
 
-#define DEFINE_STATIC_VECTOR(type, name, prefix)        \
-  DECLARE_VECTOR__impl_(static, type, name, prefix)     \
-  DEFINE_VECTOR__impl_(static, type, name, prefix)
+#define DEFINE_STATIC_VECTOR(type, name, prefix)                               \
+  DECLARE_VECTOR__impl_(static, type, name, prefix)                            \
+      DEFINE_VECTOR__impl_(static, type, name, prefix)
 
 /* predefined vectors */
-DECLARE_VECTOR(void *, Vector_ptr, Vector) 
+DECLARE_VECTOR(void *, Vector_ptr, Vector)
 DECLARE_VECTOR(int, IntVector_ptr, IntVector)
 DECLARE_VECTOR(double, DoubleVector_ptr, DoubleVector)
-
 
 #endif /* __NUSMV_CORE_UTILS_VECTOR_H__ */

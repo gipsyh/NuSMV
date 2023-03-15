@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_BASE_H__
 #define __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_BASE_H__
-
 
 #include "nusmv/core/compile/flattening/MasterCompileFlattener.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
@@ -50,9 +47,9 @@
   \struct FlattenerBase
   \brief Definition of the public accessor for class FlattenerBase
 
-  
+
 */
-typedef struct FlattenerBase_TAG*  FlattenerBase_ptr;
+typedef struct FlattenerBase_TAG *FlattenerBase_ptr;
 
 /*!
   \brief To cast and check instances of class FlattenerBase
@@ -60,18 +57,15 @@ typedef struct FlattenerBase_TAG*  FlattenerBase_ptr;
   These macros must be used respectively to cast and to check
   instances of class FlattenerBase
 */
-#define FLATTENER_BASE(self) \
-         ((FlattenerBase_ptr) self)
+#define FLATTENER_BASE(self) ((FlattenerBase_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FLATTENER_BASE_CHECK_INSTANCE(self) \
-         (nusmv_assert(FLATTENER_BASE(self) != FLATTENER_BASE(NULL)))
-
-
+#define FLATTENER_BASE_CHECK_INSTANCE(self)                                    \
+  (nusmv_assert(FLATTENER_BASE(self) != FLATTENER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -90,15 +84,11 @@ typedef struct FlattenerBase_TAG*  FlattenerBase_ptr;
   handle sexp.
 */
 VIRTUAL node_ptr FlattenerBase_flatten(FlattenerBase_ptr self,
-                                              SymbTable_ptr symb_table,
-                                              hash_ptr def_hash,
-                                              node_ptr sexp,
-                                              node_ptr context,
-                                              MasterCompileFlattener_def_mode mode);
-
+                                       SymbTable_ptr symb_table,
+                                       hash_ptr def_hash, node_ptr sexp,
+                                       node_ptr context,
+                                       MasterCompileFlattener_def_mode mode);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_BASE_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_TABLEAU_LTLFORMULA_H__
 #define __NUSMV_CORE_BMC_SBMC_SBMC_TABLEAU_LTLFORMULA_H__
 
 #include "nusmv/core/fsm/be/BeFsm.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/node/node.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -65,7 +63,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -83,9 +80,9 @@
 
   \sa AtMostOnce, Loop, get_f_at_time
 */
-be_ptr
-BmcInt_SBMCTableau_GetAtTime(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
-                             const int time, const int k, const int l);
+be_ptr BmcInt_SBMCTableau_GetAtTime(const BeEnc_ptr be_enc,
+                                    const node_ptr ltl_wff, const int time,
+                                    const int k, const int l);
 
 /**AutomaticEnd***************************************************************/
 

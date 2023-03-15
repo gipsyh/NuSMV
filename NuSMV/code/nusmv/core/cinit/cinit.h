@@ -33,7 +33,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_CINIT_CINIT_H__
 #define __NUSMV_CORE_CINIT_CINIT_H__
 
@@ -41,9 +40,9 @@
 /* Nested includes                                                           */
 /*---------------------------------------------------------------------------*/
 #include "cudd/util.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/opt/OptsHandler.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/opt/OptsHandler.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -109,7 +108,6 @@
 #define NUSMV_LIBRARY_BUGREPORT "Please report bugs to <nusmv-users@fbk.eu>"
 #endif
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -140,7 +138,7 @@ typedef void (*FP_V_E)(NuSMVEnv_ptr);
 
   \sa CInit_NuSMVObtainLibrary
 */
-char * CInit_NuSMVReadVersion(void);
+char *CInit_NuSMVReadVersion(void);
 
 /*!
   \brief Returns the NuSMV library path.
@@ -153,14 +151,14 @@ char * CInit_NuSMVReadVersion(void);
 
   \sa CInit_NuSMVReadVersion
 */
-char * CInit_NuSMVObtainLibrary(void);
+char *CInit_NuSMVObtainLibrary(void);
 
 /*!
   \brief Prints the banner of NuSMV.
 
 
 */
-void CInit_BannerPrint(FILE * file);
+void CInit_BannerPrint(FILE *file);
 
 /*!
   \brief Prints the COMPLETE banner of the NuSMV library.
@@ -170,7 +168,7 @@ void CInit_BannerPrint(FILE * file);
                need a special banner print function and you are
                linking against NuSMV
 */
-void CInit_BannerPrintLibrary(FILE * file);
+void CInit_BannerPrintLibrary(FILE *file);
 
 /*!
   \brief Prints the banner of the NuSMV library.
@@ -178,28 +176,28 @@ void CInit_BannerPrintLibrary(FILE * file);
   To be used by tools linking against the NuSMV library
                and using custom banner function
 */
-void CInit_BannerPrint_nusmv_library(FILE * file);
+void CInit_BannerPrint_nusmv_library(FILE *file);
 
 /*!
   \brief Prints the banner of cudd.
 
 
 */
-void CInit_BannerPrint_cudd(FILE * file);
+void CInit_BannerPrint_cudd(FILE *file);
 
 /*!
   \brief Prints the banner of minisat.
 
 
 */
-void CInit_BannerPrint_minisat(FILE * file);
+void CInit_BannerPrint_minisat(FILE *file);
 
 /*!
   \brief Prints the banner of zchaff.
 
 
 */
-void CInit_BannerPrint_zchaff(FILE * file);
+void CInit_BannerPrint_zchaff(FILE *file);
 
 /*!
   \brief Gets the command line call for the specified pre-processor
@@ -208,7 +206,7 @@ void CInit_BannerPrint_zchaff(FILE * file);
 
   \todo Missing description
 */
-char* get_preprocessor_call(const NuSMVEnv_ptr env, const char* name);
+char *get_preprocessor_call(const NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief Gets the actual program name of the specified pre-processor.
@@ -217,7 +215,7 @@ char* get_preprocessor_call(const NuSMVEnv_ptr env, const char* name);
 
   \todo Missing description
 */
-char* get_preprocessor_filename(const NuSMVEnv_ptr env, const char* name);
+char *get_preprocessor_filename(const NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief Gets the names of the avaliable pre-processors. Returned
@@ -225,7 +223,7 @@ char* get_preprocessor_filename(const NuSMVEnv_ptr env, const char* name);
 
   \todo Missing description
 */
-char* get_preprocessor_names(const NuSMVEnv_ptr env);
+char *get_preprocessor_names(const NuSMVEnv_ptr env);
 
 /*!
   \brief Returns the number of available proprocessors
@@ -241,7 +239,7 @@ int get_preprocessors_num(const NuSMVEnv_ptr env);
 
   \sa NuSMVCore_set_tool_name
 */
-char* NuSMVCore_get_tool_name(void);
+char *NuSMVCore_get_tool_name(void);
 
 /*!
   \brief The Sm tool rc file name field getter
@@ -250,7 +248,7 @@ char* NuSMVCore_get_tool_name(void);
 
   \sa NuSMVCore_set_tool_name
 */
-char* NuSMVCore_get_tool_rc_file_name(void);
+char *NuSMVCore_get_tool_rc_file_name(void);
 
 /*!
   \brief The Sm tool_name field setter
@@ -259,7 +257,7 @@ char* NuSMVCore_get_tool_rc_file_name(void);
 
   \sa NuSMVCore_get_tool_name
 */
-void NuSMVCore_set_tool_name(char* tool_name);
+void NuSMVCore_set_tool_name(char *tool_name);
 
 /*!
   \brief The Sm tool_version field getter
@@ -268,7 +266,7 @@ void NuSMVCore_set_tool_name(char* tool_name);
 
   \sa NuSMVCore_set_tool_version
 */
-char* NuSMVCore_get_tool_version(void);
+char *NuSMVCore_get_tool_version(void);
 
 /*!
   \brief The Sm tool_version field setter
@@ -277,7 +275,7 @@ char* NuSMVCore_get_tool_version(void);
 
   \sa NuSMVCore_get_tool_version
 */
-void NuSMVCore_set_tool_version(char* tool_version);
+void NuSMVCore_set_tool_version(char *tool_version);
 
 /*!
   \brief The Sm build_date field getter
@@ -286,7 +284,7 @@ void NuSMVCore_set_tool_version(char* tool_version);
 
   \sa NuSMVCore_set_build_date
 */
-char* NuSMVCore_get_build_date(void);
+char *NuSMVCore_get_build_date(void);
 
 /*!
   \brief The Sm build_date field setter
@@ -295,7 +293,7 @@ char* NuSMVCore_get_build_date(void);
 
   \sa NuSMVCore_get_build_date
 */
-void NuSMVCore_set_build_date(char* build_date);
+void NuSMVCore_set_build_date(char *build_date);
 
 /*!
   \brief The Sm prompt_string field getter
@@ -304,7 +302,7 @@ void NuSMVCore_set_build_date(char* build_date);
 
   \sa NuSMVCore_set_prompt_string
 */
-char* NuSMVCore_get_prompt_string(void);
+char *NuSMVCore_get_prompt_string(void);
 
 /*!
   \brief The Sm prompt_string field setter
@@ -313,7 +311,7 @@ char* NuSMVCore_get_prompt_string(void);
 
   \sa NuSMVCore_get_prompt_string
 */
-void NuSMVCore_set_prompt_string(char* prompt_string);
+void NuSMVCore_set_prompt_string(char *prompt_string);
 
 /*!
   \brief The Sm email field getter
@@ -322,7 +320,7 @@ void NuSMVCore_set_prompt_string(char* prompt_string);
 
   \sa NuSMVCore_set_email
 */
-char* NuSMVCore_get_email(void);
+char *NuSMVCore_get_email(void);
 
 /*!
   \brief The Sm email field setter
@@ -331,7 +329,7 @@ char* NuSMVCore_get_email(void);
 
   \sa NuSMVCore_get_email
 */
-void NuSMVCore_set_email(char* email);
+void NuSMVCore_set_email(char *email);
 
 /*!
   \brief The Sm website field getter
@@ -340,7 +338,7 @@ void NuSMVCore_set_email(char* email);
 
   \sa NuSMVCore_set_website
 */
-char* NuSMVCore_get_website(void);
+char *NuSMVCore_get_website(void);
 
 /*!
   \brief The Sm website field setter
@@ -349,7 +347,7 @@ char* NuSMVCore_get_website(void);
 
   \sa NuSMVCore_get_website
 */
-void NuSMVCore_set_website(char* website);
+void NuSMVCore_set_website(char *website);
 
 /*!
   \brief The Sm bug_report_message field getter
@@ -358,7 +356,7 @@ void NuSMVCore_set_website(char* website);
 
   \sa NuSMVCore_set_bug_report_message
 */
-char* NuSMVCore_get_bug_report_message(void);
+char *NuSMVCore_get_bug_report_message(void);
 
 /*!
   \brief The Sm bug_report_message field setter
@@ -367,7 +365,7 @@ char* NuSMVCore_get_bug_report_message(void);
 
   \sa NuSMVCore_get_bug_report_message
 */
-void NuSMVCore_set_bug_report_message(char* bug_report_message);
+void NuSMVCore_set_bug_report_message(char *bug_report_message);
 
 /*!
   \brief The Sm linked_addons field getter
@@ -376,7 +374,7 @@ void NuSMVCore_set_bug_report_message(char* bug_report_message);
 
   \sa NuSMVCore_set_linked_addons
 */
-char* NuSMVCore_get_linked_addons(void);
+char *NuSMVCore_get_linked_addons(void);
 
 /*!
   \brief The Sm linked_addons field setter
@@ -385,7 +383,7 @@ char* NuSMVCore_get_linked_addons(void);
 
   \sa NuSMVCore_get_linked_addons
 */
-void NuSMVCore_set_linked_addons(char* linked_addons);
+void NuSMVCore_set_linked_addons(char *linked_addons);
 
 /*!
   \brief The Sm library_name field getter
@@ -394,7 +392,7 @@ void NuSMVCore_set_linked_addons(char* linked_addons);
 
   \sa NuSMVCore_get_tool_name
 */
-char* NuSMVCore_get_library_name(void);
+char *NuSMVCore_get_library_name(void);
 
 /*!
   \brief The Sm library_name field getter
@@ -403,7 +401,7 @@ char* NuSMVCore_get_library_name(void);
 
   \sa NuSMVCore_get_tool_name
 */
-void  NuSMVCore_set_library_name(const char *);
+void NuSMVCore_set_library_name(const char *);
 
 /*!
   \brief The Sm library_version field getter
@@ -412,7 +410,7 @@ void  NuSMVCore_set_library_name(const char *);
 
   \sa NuSMVCore_get_tool_version
 */
-char* NuSMVCore_get_library_version(void);
+char *NuSMVCore_get_library_version(void);
 
 /*!
   \brief The Sm library_build_date field getter
@@ -421,7 +419,7 @@ char* NuSMVCore_get_library_version(void);
 
   \sa NuSMVCore_get_build_date
 */
-char* NuSMVCore_get_library_build_date(void);
+char *NuSMVCore_get_library_build_date(void);
 
 /*!
   \brief The Sm library_build_date field getter
@@ -430,7 +428,7 @@ char* NuSMVCore_get_library_build_date(void);
 
   \sa NuSMVCore_get_build_date
 */
-void  NuSMVCore_set_library_build_date(const char *);
+void NuSMVCore_set_library_build_date(const char *);
 
 /*!
   \brief The Sm library_email field getter
@@ -439,7 +437,7 @@ void  NuSMVCore_set_library_build_date(const char *);
 
   \sa NuSMVCore_get_email
 */
-char* NuSMVCore_get_library_email(void);
+char *NuSMVCore_get_library_email(void);
 
 /*!
   \brief The Sm library_email field getter
@@ -448,7 +446,7 @@ char* NuSMVCore_get_library_email(void);
 
   \sa NuSMVCore_get_email
 */
-void  NuSMVCore_set_library_email(const char *);
+void NuSMVCore_set_library_email(const char *);
 
 /*!
   \brief The Sm library_website field getter
@@ -457,7 +455,7 @@ void  NuSMVCore_set_library_email(const char *);
 
   \sa NuSMVCore_get_website
 */
-char* NuSMVCore_get_library_website(void);
+char *NuSMVCore_get_library_website(void);
 
 /*!
   \brief The Sm library_website field setter
@@ -466,7 +464,7 @@ char* NuSMVCore_get_library_website(void);
 
   \sa NuSMVCore_get_website
 */
-void  NuSMVCore_set_library_website(const char *);
+void NuSMVCore_set_library_website(const char *);
 
 /*!
   \brief The Sm library_bug_report_message field getter
@@ -475,7 +473,7 @@ void  NuSMVCore_set_library_website(const char *);
 
   \sa NuSMVCore_get_bug_report_message
 */
-char* NuSMVCore_get_library_bug_report_message(void);
+char *NuSMVCore_get_library_bug_report_message(void);
 
 /*!
   \brief The Sm banner_print_fun field setter
@@ -484,7 +482,7 @@ char* NuSMVCore_get_library_bug_report_message(void);
 
   \sa NuSMVCore_get_banner_print_fun
 */
-void NuSMVCore_set_banner_print_fun(void (*banner_print_fun)(FILE*));
+void NuSMVCore_set_banner_print_fun(void (*banner_print_fun)(FILE *));
 
 /*!
   \brief The Sm batch fun field setter
@@ -569,14 +567,11 @@ void NuSMVCore_set_batch_fun(void (*batch_fun)(NuSMVEnv_ptr));
 
   \sa NuSMVCore_add_command_line_option
 */
-void NuSMVCore_add_env_command_line_option(char* name,
-                                           char* usage,
-                                           char* parameter,
-                                           char* env_var,
+void NuSMVCore_add_env_command_line_option(char *name, char *usage,
+                                           char *parameter, char *env_var,
                                            boolean is_deprecated,
-                                           boolean is_public,
-                                           char* dependency,
-                                           char* conflict);
+                                           boolean is_public, char *dependency,
+                                           char *conflict);
 
 /*!
   \brief Adds a command line option to the system.
@@ -615,15 +610,10 @@ void NuSMVCore_add_env_command_line_option(char* name,
 
   \sa NuSMVCore_add_env_command_line_option
 */
-void
-NuSMVCore_add_command_line_option(char* name,
-                                  char* usage,
-                                  char* parameter,
-                                  boolean (*check_and_apply)(OptsHandler_ptr, char*, NuSMVEnv_ptr),
-                                  boolean is_deprecated,
-                                  boolean is_public,
-                                  char* dependency,
-                                  char* conflict);
+void NuSMVCore_add_command_line_option(
+    char *name, char *usage, char *parameter,
+    boolean (*check_and_apply)(OptsHandler_ptr, char *, NuSMVEnv_ptr),
+    boolean is_deprecated, boolean is_public, char *dependency, char *conflict);
 
 /*!
   \brief Initializes the NuSMVCore data. This  function has to be called
@@ -667,8 +657,7 @@ void NuSMVCore_init(NuSMVEnv_ptr env, FP_V_E fns[][2], int);
 
   \sa NuSMVCore_init NuSMVCore_quit
 */
-boolean NuSMVCore_main(NuSMVEnv_ptr env, int argc,
-                              char ** argv, int* status);
+boolean NuSMVCore_main(NuSMVEnv_ptr env, int argc, char **argv, int *status);
 
 /*!
   \brief Initializes all NuSMV library command line options
@@ -732,8 +721,7 @@ void NuSMVCore_quit(NuSMVEnv_ptr env);
 
   \sa NuSMVCore_set_reset_first_fun NuSMVCore_set_reset_last_fun
 */
-void NuSMVCore_quit_extended(NuSMVEnv_ptr env,
-                                    const boolean keep_core_data);
+void NuSMVCore_quit_extended(NuSMVEnv_ptr env, const boolean keep_core_data);
 
 /*!
   \brief Initializes information about the pre-processors avaliable.

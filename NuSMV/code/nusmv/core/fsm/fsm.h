@@ -34,10 +34,8 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_FSM_FSM_H__
 #define __NUSMV_CORE_FSM_FSM_H__
-
 
 #include "nusmv/core/utils/utils.h"
 

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,17 +34,15 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_CACHE_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_CACHE_PRIVATE_H__
-
 
 #include "nusmv/core/compile/symb_table/SymbCache.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/compile/symb_table/NFunction.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type definitions                                                          */
@@ -61,8 +59,7 @@
   Callable only by the SymbTable instance that owns self.
   The caller keeps the ownership of given SymbTable instance
 */
-SymbCache_ptr SymbCache_create(SymbTable_ptr symb_table,
-                                      NuSMVEnv_ptr env);
+SymbCache_ptr SymbCache_create(SymbTable_ptr symb_table, NuSMVEnv_ptr env);
 
 /*!
   \methodof SymbCache
@@ -79,9 +76,8 @@ void SymbCache_destroy(SymbCache_ptr self);
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_new_input_var(SymbCache_ptr self,
-                        node_ptr var, SymbType_ptr type);
+void SymbCache_new_input_var(SymbCache_ptr self, node_ptr var,
+                             SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -90,9 +86,8 @@ SymbCache_new_input_var(SymbCache_ptr self,
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_new_state_var(SymbCache_ptr self,
-                        node_ptr var, SymbType_ptr type);
+void SymbCache_new_state_var(SymbCache_ptr self, node_ptr var,
+                             SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -103,9 +98,8 @@ SymbCache_new_state_var(SymbCache_ptr self,
 
   \sa SymbCache_redeclare_state_as_frozen_var
 */
-void
-SymbCache_new_frozen_var(SymbCache_ptr self,
-                          node_ptr var, SymbType_ptr type);
+void SymbCache_new_frozen_var(SymbCache_ptr self, node_ptr var,
+                              SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -118,9 +112,7 @@ SymbCache_new_frozen_var(SymbCache_ptr self,
 
   \sa SymbCache_new_frozen_var
 */
-void
-SymbCache_redeclare_state_as_frozen_var(SymbCache_ptr self,
-                                        node_ptr var);
+void SymbCache_redeclare_state_as_frozen_var(SymbCache_ptr self, node_ptr var);
 
 /*!
   \methodof SymbCache
@@ -130,8 +122,7 @@ SymbCache_redeclare_state_as_frozen_var(SymbCache_ptr self,
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_remove_var(SymbCache_ptr self, node_ptr var);
+void SymbCache_remove_var(SymbCache_ptr self, node_ptr var);
 
 /*!
   \methodof SymbCache
@@ -140,10 +131,8 @@ SymbCache_remove_var(SymbCache_ptr self, node_ptr var);
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_new_define(SymbCache_ptr self,
-                     node_ptr name,
-                     node_ptr context, node_ptr definition);
+void SymbCache_new_define(SymbCache_ptr self, node_ptr name, node_ptr context,
+                          node_ptr definition);
 
 /*!
   \methodof SymbCache
@@ -152,9 +141,8 @@ SymbCache_new_define(SymbCache_ptr self,
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_new_function(SymbCache_ptr self, node_ptr name,
-                       node_ptr context, SymbType_ptr type);
+void SymbCache_new_function(SymbCache_ptr self, node_ptr name, node_ptr context,
+                            SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -163,10 +151,8 @@ SymbCache_new_function(SymbCache_ptr self, node_ptr name,
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_new_parameter(SymbCache_ptr self,
-                        node_ptr formal,
-                        node_ptr context, node_ptr actual);
+void SymbCache_new_parameter(SymbCache_ptr self, node_ptr formal,
+                             node_ptr context, node_ptr actual);
 
 /*!
   \methodof SymbCache
@@ -176,9 +162,8 @@ SymbCache_new_parameter(SymbCache_ptr self,
   otherwise the resulting status will be corrupted.
   Internally we use ARRAY_DEF node to recognize a define array.
 */
-void
-SymbCache_new_array_define(SymbCache_ptr self, node_ptr name,
-                            node_ptr ctx, node_ptr definition);
+void SymbCache_new_array_define(SymbCache_ptr self, node_ptr name, node_ptr ctx,
+                                node_ptr definition);
 
 /*!
   \methodof SymbCache
@@ -187,9 +172,8 @@ SymbCache_new_array_define(SymbCache_ptr self, node_ptr name,
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_new_variable_array(SymbCache_ptr self, node_ptr name,
-                             SymbType_ptr type);
+void SymbCache_new_variable_array(SymbCache_ptr self, node_ptr name,
+                                  SymbType_ptr type);
 
 /*!
   \methodof SymbCache
@@ -199,8 +183,7 @@ SymbCache_new_variable_array(SymbCache_ptr self, node_ptr name,
   This (private) method can be used only by SymbLayer,
   otherwise the resulting status will be corrupted.
 */
-void
-SymbCache_remove_define(SymbCache_ptr self, node_ptr define);
+void SymbCache_remove_define(SymbCache_ptr self, node_ptr define);
 
 /*!
   \methodof SymbCache
@@ -210,8 +193,7 @@ SymbCache_remove_define(SymbCache_ptr self, node_ptr define);
                       SymbLayer, otherwise the resulting status
                       will be corrupted.
 */
-void
-SymbCache_remove_function(SymbCache_ptr self, node_ptr name);
+void SymbCache_remove_function(SymbCache_ptr self, node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -222,8 +204,7 @@ SymbCache_remove_function(SymbCache_ptr self, node_ptr name);
   declared constant are accepted, and a reference count is kept to deal with
   them
 */
-void
-SymbCache_new_constant(SymbCache_ptr self, node_ptr name);
+void SymbCache_new_constant(SymbCache_ptr self, node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -235,8 +216,7 @@ SymbCache_new_constant(SymbCache_ptr self, node_ptr name);
   (private) method can be used only by SymbLayer, otherwise the
   resulting status will be corrupted.
 */
-void
-SymbCache_remove_constant(SymbCache_ptr self, node_ptr constant);
+void SymbCache_remove_constant(SymbCache_ptr self, node_ptr constant);
 
 /*!
   \methodof SymbCache
@@ -245,10 +225,8 @@ SymbCache_remove_constant(SymbCache_ptr self, node_ptr constant);
   Removes all the symbols in the array in
                       linear time
 */
-void
-SymbCache_remove_symbols(SymbCache_ptr self,
-                         const node_ptr* symbols,
-                         const unsigned int size);
+void SymbCache_remove_symbols(SymbCache_ptr self, const node_ptr *symbols,
+                              const unsigned int size);
 
 /*!
   \methodof SymbCache
@@ -257,9 +235,8 @@ SymbCache_remove_symbols(SymbCache_ptr self,
   Get the symbol type. The symbol must be declared
                       in the cache
 */
-SymbTableType
-SymbCache_get_symbol_type(const SymbCache_ptr self,
-                          const node_ptr symbol);
+SymbTableType SymbCache_get_symbol_type(const SymbCache_ptr self,
+                                        const node_ptr symbol);
 
 /*!
   \methodof SymbCache
@@ -269,10 +246,8 @@ SymbCache_get_symbol_type(const SymbCache_ptr self,
                       The iterator will ignore all symbols that do not
                       satisfy the mask
 */
-void
-SymbCache_gen_iter(const SymbCache_ptr self,
-                   SymbTableIter* iter,
-                   const unsigned int mask);
+void SymbCache_gen_iter(const SymbCache_ptr self, SymbTableIter *iter,
+                        const unsigned int mask);
 
 /*!
   \methodof SymbCache
@@ -282,9 +257,7 @@ SymbCache_gen_iter(const SymbCache_ptr self,
                       regarding to the mask given when built using
                       SymbCache_gen_iter
 */
-void
-SymbCache_next_iter(const SymbCache_ptr self,
-                    SymbTableIter* iter);
+void SymbCache_next_iter(const SymbCache_ptr self, SymbTableIter *iter);
 
 /*!
   \methodof SymbCache
@@ -293,7 +266,7 @@ SymbCache_next_iter(const SymbCache_ptr self,
   Checks if the iterator is at it's end
 */
 boolean SymbCache_is_iter_end(const SymbCache_ptr self,
-                                     const SymbTableIter* iter);
+                              const SymbTableIter *iter);
 
 /*!
   \methodof SymbCache
@@ -302,7 +275,7 @@ boolean SymbCache_is_iter_end(const SymbCache_ptr self,
   Get the symbol pointed by the iterator
 */
 node_ptr SymbCache_iter_get_symbol(const SymbCache_ptr self,
-                                          const SymbTableIter* iter);
+                                   const SymbTableIter *iter);
 
 /*!
   \methodof SymbCache
@@ -314,16 +287,14 @@ node_ptr SymbCache_iter_get_symbol(const SymbCache_ptr self,
                       in order to point to a symbol that satisfies
                       both the mask and the filter
 */
-void SymbCache_iter_set_filter(const SymbCache_ptr self,
-                                      SymbTableIter* iter,
-                                      SymbTableIterFilterFun filter,
-                                      void* arg);
+void SymbCache_iter_set_filter(const SymbCache_ptr self, SymbTableIter *iter,
+                               SymbTableIterFilterFun filter, void *arg);
 
 /*!
   \methodof SymbCache
   \brief Returns the number of declared contants
 
-  
+
 */
 int SymbCache_get_constants_num(const SymbCache_ptr self);
 
@@ -331,7 +302,7 @@ int SymbCache_get_constants_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of declared state variables.
 
-  
+
 */
 int SymbCache_get_state_vars_num(const SymbCache_ptr self);
 
@@ -339,7 +310,7 @@ int SymbCache_get_state_vars_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of declared frozen variables.
 
-  
+
 */
 int SymbCache_get_frozen_vars_num(const SymbCache_ptr self);
 
@@ -347,7 +318,7 @@ int SymbCache_get_frozen_vars_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of declared input variables
 
-  
+
 */
 int SymbCache_get_input_vars_num(const SymbCache_ptr self);
 
@@ -355,7 +326,7 @@ int SymbCache_get_input_vars_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of DEFINEs.
 
-  
+
 */
 int SymbCache_get_defines_num(const SymbCache_ptr self);
 
@@ -363,7 +334,7 @@ int SymbCache_get_defines_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of NFunctions.
 
-  
+
 */
 int SymbCache_get_functions_num(const SymbCache_ptr self);
 
@@ -371,7 +342,7 @@ int SymbCache_get_functions_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of parameters.
 
-  
+
 */
 int SymbCache_get_parameters_num(const SymbCache_ptr self);
 
@@ -379,7 +350,7 @@ int SymbCache_get_parameters_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of define arrays.
 
-  
+
 */
 int SymbCache_get_array_defines_num(const SymbCache_ptr self);
 
@@ -387,7 +358,7 @@ int SymbCache_get_array_defines_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of Symbol Types.
 
-  
+
 */
 int SymbCache_get_variable_arrays_num(const SymbCache_ptr self);
 
@@ -395,10 +366,9 @@ int SymbCache_get_variable_arrays_num(const SymbCache_ptr self);
   \methodof SymbCache
   \brief Returns the number of symbols.
 
-  
+
 */
 int SymbCache_get_symbols_num(const SymbCache_ptr self);
-
 
 /*!
   \methodof SymbCache
@@ -436,11 +406,10 @@ int SymbCache_get_symbols_num(const SymbCache_ptr self);
 
   \sa SymbCache_remove_trigger
 */
-void
-SymbCache_add_trigger(const SymbCache_ptr self,
-                      SymbTableTriggerFun trigger,
-                      SymbTableTriggerAction action,
-                      void* arg1, boolean must_free_arg);
+void SymbCache_add_trigger(const SymbCache_ptr self,
+                           SymbTableTriggerFun trigger,
+                           SymbTableTriggerAction action, void *arg1,
+                           boolean must_free_arg);
 
 /*!
   \methodof SymbCache
@@ -450,11 +419,9 @@ SymbCache_add_trigger(const SymbCache_ptr self,
 
   \sa SymbCache_add_trigger
 */
-void
-SymbCache_remove_trigger(const SymbCache_ptr self,
-                         SymbTableTriggerFun trigger,
-                         SymbTableTriggerAction action);
-
+void SymbCache_remove_trigger(const SymbCache_ptr self,
+                              SymbTableTriggerFun trigger,
+                              SymbTableTriggerAction action);
 
 /*!
   \methodof SymbCache
@@ -473,6 +440,5 @@ void SymbCache_remove_parameter(SymbCache_ptr self, node_ptr formal);
   otherwise the resulting status will be corrupted.
 */
 void SymbCache_remove_variable_array(SymbCache_ptr self, node_ptr symbol);
-
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_CACHE_PRIVATE_H__ */

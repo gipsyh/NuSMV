@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,28 +35,26 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_DAG_DAG_H__
 #define __NUSMV_CORE_DAG_DAG_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
-
 
 /* Standard includes. */
 #if NUSMV_HAVE_MALLOC_H
-# if NUSMV_HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-# endif
-# include <malloc.h>
+#if NUSMV_HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#include <malloc.h>
 #elif defined(NUSMV_HAVE_SYS_MALLOC_H) && NUSMV_HAVE_SYS_MALLOC_H
-# if NUSMV_HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-# endif
-# include <sys/malloc.h>
+#if NUSMV_HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#include <sys/malloc.h>
 #elif NUSMV_HAVE_STDLIB_H
-# include <stdlib.h>
+#include <stdlib.h>
 #endif
 
 #if NUSMV_HAVE_UNISTD_H
@@ -64,10 +62,10 @@
 #endif
 
 /* GLU library includes. */
-#include "nusmv/core/utils/utils.h"
-#include "cudd/util.h"
 #include "cudd/st.h"
+#include "cudd/util.h"
 #include "nusmv/core/utils/list.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -80,21 +78,21 @@
 
   \todo Missing description
 */
-#define DAG_DEFAULT_VERTICES_NO    65537
+#define DAG_DEFAULT_VERTICES_NO 65537
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DAG_DEFAULT_DENSITY           20
+#define DAG_DEFAULT_DENSITY 20
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DAG_DEFAULT_GROWTH           1.5
+#define DAG_DEFAULT_GROWTH 1.5
 
 /* Constants for setting and clearing pointer annotation bit which is
    lowest (rightmost) bit.
@@ -124,13 +122,12 @@
    enough for us.  However in some case additional compilation options
    (e.g. -malign-double) may be required to force proper alignment.
 */
-# define DAG_ANNOTATION_BIT  ((nusmv_ptrint) 1)
+#define DAG_ANNOTATION_BIT ((nusmv_ptrint)1)
 #else
 /* this fallback setting is for 32-bit only */
 /* Size of pointers and long are different (may hide a serious problem) */
-# define DAG_ANNOTATION_BIT   ((nusmv_ptrint) 1)
+#define DAG_ANNOTATION_BIT ((nusmv_ptrint)1)
 #endif
-
 
 /* Dag statistics. */
 
@@ -139,21 +136,21 @@
 
   \todo Missing description
 */
-#define DAG_NODE_NO  (int)  0  /* How many nodes created (overall). */
+#define DAG_NODE_NO (int)0 /* How many nodes created (overall). */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DAG_GC_NO    (int)  1  /* How many nodes collected. */
+#define DAG_GC_NO (int)1 /* How many nodes collected. */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DAG_MAX_STAT (int)  2
+#define DAG_MAX_STAT (int)2
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -161,27 +158,27 @@
 
 /* WARNING [MD] BAD! Using those we lose the check on function parameters!
    They should be substituted */
-/* typedef void  (*Dag_ProcPtr_t)(); */   /* Procedures. */
-/* typedef int   (*Dag_IntPtr_t)();  */   /* Functions returning int. */
+/* typedef void  (*Dag_ProcPtr_t)(); */ /* Procedures. */
+/* typedef int   (*Dag_IntPtr_t)();  */ /* Functions returning int. */
 
-typedef struct DagManager       Dag_Manager_t;       /* The dag manager. */
-typedef struct Dag_Vertex       Dag_Vertex_t;        /* The vertices. */
-typedef struct Dag_DfsFunctions Dag_DfsFunctions_t;  /* Depth First Search. */
-
-/*!
-  \brief \todo Missing synopsis
-
-  \todo Missing description
-*/
-typedef void (*PF_VPVPCPI)(void*, char*, nusmv_ptrint);
+typedef struct DagManager Dag_Manager_t;            /* The dag manager. */
+typedef struct Dag_Vertex Dag_Vertex_t;             /* The vertices. */
+typedef struct Dag_DfsFunctions Dag_DfsFunctions_t; /* Depth First Search. */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef int (*PF_IVPCPI)(void*, char*, nusmv_ptrint);
-typedef void (*PF_VPCP)(char*);
+typedef void (*PF_VPVPCPI)(void *, char *, nusmv_ptrint);
+
+/*!
+  \brief \todo Missing synopsis
+
+  \todo Missing description
+*/
+typedef int (*PF_IVPCPI)(void *, char *, nusmv_ptrint);
+typedef void (*PF_VPCP)(char *);
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -217,21 +214,20 @@ typedef void (*PF_VPCP)(char*);
 */
 
 struct Dag_Vertex {
-  int             symbol;
-  char          * data;
+  int symbol;
+  char *data;
 
-  Dag_Vertex_t* * outList;
-  unsigned        numSons;
+  Dag_Vertex_t **outList;
+  unsigned numSons;
 
-  Dag_Manager_t * dag;
-  int             mark;
-  int             visit;
-  lsHandle        vHandle;
+  Dag_Manager_t *dag;
+  int mark;
+  int visit;
+  lsHandle vHandle;
 
-  char          * gRef;
-  int             iRef;
+  char *gRef;
+  int iRef;
 };
-
 
 /*!
   \brief DFS function struct.
@@ -286,8 +282,8 @@ struct Dag_DfsFunctions {
 
   \se none
 */
-#define Dag_VertexGetRef(p)\
-((Dag_Vertex_t*)((nusmv_ptrint)p & (~ DAG_ANNOTATION_BIT)))
+#define Dag_VertexGetRef(p)                                                    \
+  ((Dag_Vertex_t *)((nusmv_ptrint)p & (~DAG_ANNOTATION_BIT)))
 
 /*!
   \brief Sets (forces) a bit annotation to 1.
@@ -297,8 +293,8 @@ struct Dag_DfsFunctions {
 
   \se The value of p changes to the purified value.
 */
-#define Dag_VertexSet(p)\
-(p = (Dag_Vertex_t*)((nusmv_ptrint)p | DAG_ANNOTATION_BIT))
+#define Dag_VertexSet(p)                                                       \
+  (p = (Dag_Vertex_t *)((nusmv_ptrint)p | DAG_ANNOTATION_BIT))
 
 /*!
   \brief Clears (forces) a bit annotation to 0.
@@ -308,8 +304,8 @@ struct Dag_DfsFunctions {
 
   \se The value of p changes to the purified value.
 */
-#define Dag_VertexClear(p)\
-(p = (Dag_Vertex_t*)((nusmv_ptrint)p & (~ DAG_ANNOTATION_BIT)))
+#define Dag_VertexClear(p)                                                     \
+  (p = (Dag_Vertex_t *)((nusmv_ptrint)p & (~DAG_ANNOTATION_BIT)))
 
 /*!
   \brief Tests if the edge is annotated.
@@ -320,8 +316,7 @@ struct Dag_DfsFunctions {
 
   \se none
 */
-#define Dag_VertexIsSet(p)\
-((nusmv_ptrint)p & DAG_ANNOTATION_BIT)
+#define Dag_VertexIsSet(p) ((nusmv_ptrint)p & DAG_ANNOTATION_BIT)
 
 /*!
   \brief Controls the sign of a dag.
@@ -334,8 +329,7 @@ struct Dag_DfsFunctions {
 
   \se none
 */
-#define DagId(r,s) \
-  (Dag_Vertex_t*)((nusmv_ptrint)s ^ (nusmv_ptrint)r)
+#define DagId(r, s) (Dag_Vertex_t *)((nusmv_ptrint)s ^ (nusmv_ptrint)r)
 
 /**AutomaticStart*************************************************************/
 
@@ -348,8 +342,7 @@ struct Dag_DfsFunctions {
 
   \todo Missing description
 */
-void
-Dag_Dfs(Dag_Vertex_t* dfsRoot, Dag_DfsFunctions_t* dfsFun, char* dfsData);
+void Dag_Dfs(Dag_Vertex_t *dfsRoot, Dag_DfsFunctions_t *dfsFun, char *dfsData);
 
 /*!
   \brief Creates a new DAG manager.
@@ -362,16 +355,15 @@ Dag_Dfs(Dag_Vertex_t* dfsRoot, Dag_DfsFunctions_t* dfsFun, char* dfsData);
 
   \sa Dag_ManagerAllocWithParams Dag_ManagerFree
 */
-Dag_Manager_t* Dag_ManagerAlloc(void);
+Dag_Manager_t *Dag_ManagerAlloc(void);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-Dag_Manager_t*
-Dag_ManagerAllocWithParams(int dagInitVerticesNo, int maxDensity,
-                           int growthFactor);
+Dag_Manager_t *Dag_ManagerAllocWithParams(int dagInitVerticesNo, int maxDensity,
+                                          int growthFactor);
 
 /*!
   \brief Deallocates a DAG manager.
@@ -386,9 +378,8 @@ Dag_ManagerAllocWithParams(int dagInitVerticesNo, int maxDensity,
 
   \sa Dag_ManagerGC
 */
-void
-Dag_ManagerFree(Dag_Manager_t* dagManager, PF_VPCP freeData,
-                PF_VPCP freeGen);
+void Dag_ManagerFree(Dag_Manager_t *dagManager, PF_VPCP freeData,
+                     PF_VPCP freeGen);
 
 /*!
   \brief Garbage collects the DAG manager.
@@ -408,11 +399,10 @@ Dag_ManagerFree(Dag_Manager_t* dagManager, PF_VPCP freeData,
 
   \sa Dag_ManagerFree
 */
-void
-Dag_ManagerGC(Dag_Manager_t* dagManager, PF_VPCP freeData,
-              PF_VPCP freeGen);
+void Dag_ManagerGC(Dag_Manager_t *dagManager, PF_VPCP freeData,
+                   PF_VPCP freeGen);
 
-Dag_DfsFunctions_t* Dag_ManagerGetDfsCleanFun(Dag_Manager_t* dagManager);
+Dag_DfsFunctions_t *Dag_ManagerGetDfsCleanFun(Dag_Manager_t *dagManager);
 
 /*!
   \brief Prints various statistics.
@@ -422,17 +412,16 @@ Dag_DfsFunctions_t* Dag_ManagerGetDfsCleanFun(Dag_Manager_t* dagManager);
                <li> the number of entries found in every chunk of
                     `clustSz' bins (if `clustSz' is 1 then the number
                     of entries per bin is given, if `clustSz' is 0 no
-		    such information is displayed);
+                    such information is displayed);
                <li> the number of shared vertices, i.e., the number
                     of v's such that v -> mark > 1;
-	       <li> the average entries per bin and the variance;
-	       <li> min and max entries per bin.
+               <li> the average entries per bin and the variance;
+               <li> min and max entries per bin.
                </ul>
 
   \se none
 */
-void Dag_PrintStats(Dag_Manager_t* dagManager, int clustSz,
-                           FILE* outFile);
+void Dag_PrintStats(Dag_Manager_t *dagManager, int clustSz, FILE *outFile);
 
 /*!
   \brief Vertex lookup.
@@ -444,17 +433,14 @@ void Dag_PrintStats(Dag_Manager_t* dagManager, int clustSz,
                <li> vData is a pointer to generic user data;
                <li> vSons is a list of vertices (possibly NULL).
                </ul>
-               Returns NIL(Dag_vertex_t) if there is no dagManager and 
+               Returns NIL(Dag_vertex_t) if there is no dagManager and
                if vSymb is negative.
 
   \se none
 */
-Dag_Vertex_t*
-Dag_VertexLookup(Dag_Manager_t* dagManager,
-                 int vSymb,
-                 char* vData,
-                 Dag_Vertex_t** vSons,
-                 unsigned numSons);
+Dag_Vertex_t *Dag_VertexLookup(Dag_Manager_t *dagManager, int vSymb,
+                               char *vData, Dag_Vertex_t **vSons,
+                               unsigned numSons);
 
 /*!
   \brief Vertex insert.
@@ -471,12 +457,9 @@ Dag_VertexLookup(Dag_Manager_t* dagManager,
 
   \se none
 */
-Dag_Vertex_t*
-Dag_VertexInsert(Dag_Manager_t* dagManager,
-                 int vSymb,
-                 char* vData,
-                 Dag_Vertex_t** vSons,
-                 unsigned numSons);
+Dag_Vertex_t *Dag_VertexInsert(Dag_Manager_t *dagManager, int vSymb,
+                               char *vData, Dag_Vertex_t **vSons,
+                               unsigned numSons);
 
 /*!
   \brief Marks a vertex as permanent.
@@ -486,7 +469,7 @@ Dag_VertexInsert(Dag_Manager_t* dagManager,
 
   \se none
 */
-void Dag_VertexMark(Dag_Vertex_t* v);
+void Dag_VertexMark(Dag_Vertex_t *v);
 
 /*!
   \brief Unmarks a vertex (makes it volatile).
@@ -496,7 +479,7 @@ void Dag_VertexMark(Dag_Vertex_t* v);
 
   \se none
 */
-void Dag_VertexUnmark(Dag_Vertex_t* v);
+void Dag_VertexUnmark(Dag_Vertex_t *v);
 
 /*!
   \brief Visit a DAG to compute some statistics
@@ -505,11 +488,8 @@ void Dag_VertexUnmark(Dag_Vertex_t* v);
                       the struct Statistics.
                       Then calls _PrintStat to print out them.
 */
-void PrintStat(Dag_Vertex_t* dfsRoot, FILE* statFile, char* prefix);
+void PrintStat(Dag_Vertex_t *dfsRoot, FILE *statFile, char *prefix);
 
 /**AutomaticEnd***************************************************************/
-
-
-
 
 #endif /* __NUSMV_CORE_DAG_DAG_H__ */

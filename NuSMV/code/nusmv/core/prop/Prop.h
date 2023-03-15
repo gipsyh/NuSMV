@@ -39,8 +39,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_PROP_PROP_H__
 #define __NUSMV_CORE_PROP_PROP_H__
 
@@ -49,17 +47,16 @@
 #endif
 
 #include "nusmv/core/fsm/FsmBuilder.h"
-#include "nusmv/core/wff/ExprMgr.h"
-#include "nusmv/core/set/set.h"
-#include "nusmv/core/fsm/sexp/SexpFsm.h"
-#include "nusmv/core/fsm/sexp/BoolSexpFsm.h"
 #include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/fsm/be/BeFsm.h"
+#include "nusmv/core/fsm/sexp/BoolSexpFsm.h"
+#include "nusmv/core/fsm/sexp/SexpFsm.h"
+#include "nusmv/core/set/set.h"
+#include "nusmv/core/wff/ExprMgr.h"
 
+#include "nusmv/core/utils/OStream.h"
 #include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/OStream.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -73,8 +70,14 @@
   \sa optional
 */
 
-enum _Prop_Status {Prop_NoStatus, Prop_Unchecked, Prop_True, Prop_False,
-                   Prop_Number, Prop_Error};
+enum _Prop_Status {
+  Prop_NoStatus,
+  Prop_Unchecked,
+  Prop_True,
+  Prop_False,
+  Prop_Number,
+  Prop_Error
+};
 
 /*!
   \brief \todo Missing synopsis
@@ -111,14 +114,13 @@ enum _Prop_Status {Prop_NoStatus, Prop_Unchecked, Prop_True, Prop_False,
 */
 #define PROP_NUMBER_STRING "Number"
 
-
 /*!
   \brief Enumerates the different types of a specification
 
   Enumerates the different types of a specification
 */
 
- /* warning [MD] Bad practice: downcase constants */
+/* warning [MD] Bad practice: downcase constants */
 enum _Prop_Type {
   Prop_Prop_Type_First = 100, /* Do not touch this */
   /* ---------------------------------------------------------------------- */
@@ -132,7 +134,6 @@ enum _Prop_Type {
   /* ---------------------------------------------------------------------- */
   Prop_Prop_Type_Last /* Do not touch this */
 };
-
 
 /*!
   \brief Format used when printing
@@ -210,7 +211,7 @@ typedef enum _Prop_PrintFmt Prop_PrintFmt;
 
 
 */
-typedef struct Prop_TAG*  Prop_ptr;
+typedef struct Prop_TAG *Prop_ptr;
 
 /*!
   \brief To cast and check instances of class Prop
@@ -218,18 +219,14 @@ typedef struct Prop_TAG*  Prop_ptr;
   These macros must be used respectively to cast and to check
   instances of class Prop
 */
-#define PROP(self) \
-         ((Prop_ptr) self)
+#define PROP(self) ((Prop_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PROP_CHECK_INSTANCE(self) \
-         (nusmv_assert(PROP(self) != PROP(NULL)))
-
-
+#define PROP_CHECK_INSTANCE(self) (nusmv_assert(PROP(self) != PROP(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -263,8 +260,8 @@ Prop_ptr Prop_create(const NuSMVEnv_ptr env);
                       property and property type fields. The
                       property index within the db is not set.
 */
-Prop_ptr Prop_create_partial(const NuSMVEnv_ptr env,
-                             Expr_ptr expr, Prop_Type type);
+Prop_ptr Prop_create_partial(const NuSMVEnv_ptr env, Expr_ptr expr,
+                             Prop_Type type);
 
 /*!
   \brief The Prop class copier
@@ -283,7 +280,7 @@ Prop_ptr Prop_copy(Prop_ptr input);
 
   Returns NULL on failure
 */
-Prop_ptr Prop_create_from_string(NuSMVEnv_ptr env, char* str, Prop_Type type);
+Prop_ptr Prop_create_from_string(NuSMVEnv_ptr env, char *str, Prop_Type type);
 
 /*!
   \methodof Prop
@@ -297,7 +294,6 @@ Prop_ptr Prop_create_from_string(NuSMVEnv_ptr env, char* str, Prop_Type type);
   \sa Prop_create
 */
 void Prop_destroy(Prop_ptr self);
-
 
 /* Getters and Setters ********************************************************/
 
@@ -361,7 +357,7 @@ Expr_ptr Prop_get_flattened_expr(const Prop_ptr self, SymbTable_ptr st);
   If the cone of influence of a property has been
                       computed, this function returns it.
 */
-Set_t    Prop_get_cone(const Prop_ptr self);
+Set_t Prop_get_cone(const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -388,7 +384,7 @@ Prop_Type Prop_get_type(const Prop_ptr self);
                       for printing it. Returned string must NOT be
                       deleted
 */
-const char* Prop_get_type_as_string(Prop_ptr self);
+const char *Prop_get_type_as_string(Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -404,7 +400,7 @@ node_ptr Prop_get_name(const Prop_ptr self);
 
   Get the property name as a string, must be freed
 */
-char* Prop_get_name_as_string(const Prop_ptr self);
+char *Prop_get_name_as_string(const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -441,7 +437,7 @@ Prop_Status Prop_get_status(const Prop_ptr self);
                       free the returned string, dince it is a
                       constant.
 */
-const char* Prop_get_status_as_string(const Prop_ptr self);
+const char *Prop_get_status_as_string(const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -461,7 +457,7 @@ int Prop_get_number(const Prop_ptr self);
                       returned string is dynamically created, and
                       caller must free it.
 */
-char* Prop_get_number_as_string(const Prop_ptr self);
+char *Prop_get_number_as_string(const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -536,7 +532,7 @@ void Prop_set_index(Prop_ptr self, const int index);
   \methodof Prop
   \todo
 */
-char* Prop_get_name_as_string(const Prop_ptr self);
+char *Prop_get_name_as_string(const Prop_ptr self);
 
 /*!
   \brief Computes ground scalar sexp fsm for property \"self\"
@@ -546,8 +542,8 @@ char* Prop_get_name_as_string(const Prop_ptr self);
   \se Ground sexp fsm is computed (taking COI into account if
   needed) and registered into self.
 */
-SexpFsm_ptr
-Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
+SexpFsm_ptr Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env,
+                                         const Prop_ptr self);
 
 /*!
   \brief Computes ground bdd fsm for property \"self\"
@@ -557,8 +553,8 @@ Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
   \se Ground bdd fsm is computed (taking COI into account if
   needed) and registered into self.
 */
-BddFsm_ptr
-Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
+BddFsm_ptr Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env,
+                                       const Prop_ptr self);
 
 /*!
   \brief Computes ground be fsm for property \"self\"
@@ -566,8 +562,8 @@ Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
   Ground be fsm is computed (taking COI into account if
   needed) and registered into self.
 */
-BeFsm_ptr
-Prop_compute_ground_be_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
+BeFsm_ptr Prop_compute_ground_be_fsm(const NuSMVEnv_ptr env,
+                                     const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -596,7 +592,7 @@ BoolSexpFsm_ptr Prop_get_bool_sexp_fsm(const Prop_ptr self);
   Returns the BDD FSM associated to the property. Self
                       keeps the ownership of the given fsm
 */
-BddFsm_ptr  Prop_get_bdd_fsm(const Prop_ptr self);
+BddFsm_ptr Prop_get_bdd_fsm(const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -650,7 +646,7 @@ void Prop_set_be_fsm(Prop_ptr self, BeFsm_ptr fsm);
 
   The returned string must be deleted by the caller.
 */
-char* Prop_get_text(const Prop_ptr self);
+char *Prop_get_text(const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -660,8 +656,7 @@ char* Prop_get_text(const Prop_ptr self);
                       be returned. The returned string must be
                       deleted by the caller.
 */
-char* Prop_get_context_text(const Prop_ptr self);
-
+char *Prop_get_context_text(const Prop_ptr self);
 
 /* COI ************************************************************************/
 
@@ -672,9 +667,8 @@ char* Prop_get_context_text(const Prop_ptr self);
   Computes the COI for the given property.
                       The caller should free the returned set
 */
-Set_t Prop_compute_cone(const Prop_ptr self,
-                               FlatHierarchy_ptr hierarchy,
-                               SymbTable_ptr symb_table);
+Set_t Prop_compute_cone(const Prop_ptr self, FlatHierarchy_ptr hierarchy,
+                        SymbTable_ptr symb_table);
 
 /*!
   \brief Applies cone of influence to the given property
@@ -683,8 +677,7 @@ Set_t Prop_compute_cone(const Prop_ptr self,
 
   \se Internal Scalar FSM is computed
 */
-void
-Prop_apply_coi_for_scalar(const NuSMVEnv_ptr env, Prop_ptr self);
+void Prop_apply_coi_for_scalar(const NuSMVEnv_ptr env, Prop_ptr self);
 
 /*!
   \brief Applies cone of influence to the given property
@@ -697,8 +690,7 @@ Prop_apply_coi_for_scalar(const NuSMVEnv_ptr env, Prop_ptr self);
 
   \se Internal FSMs are computed
 */
-void
-Prop_apply_coi_for_bdd(const NuSMVEnv_ptr env, Prop_ptr self);
+void Prop_apply_coi_for_bdd(const NuSMVEnv_ptr env, Prop_ptr self);
 
 /*!
   \brief Applies cone of influence to the given property
@@ -719,8 +711,7 @@ Prop_apply_coi_for_bdd(const NuSMVEnv_ptr env, Prop_ptr self);
 
   \se Internal FSMs are computed
 */
-void
-Prop_apply_coi_for_bmc(const NuSMVEnv_ptr env, Prop_ptr self);
+void Prop_apply_coi_for_bmc(const NuSMVEnv_ptr env, Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -735,7 +726,6 @@ Prop_apply_coi_for_bmc(const NuSMVEnv_ptr env, Prop_ptr self);
   \se Prop_apply_coi_for_bmc
 */
 void Prop_destroy_coi_for_bmc(Prop_ptr self);
-
 
 /* Printers *******************************************************************/
 
@@ -763,14 +753,13 @@ void Prop_print(Prop_ptr self, OStream_ptr file, Prop_PrintFmt fmt);
 */
 void Prop_print_db(Prop_ptr self, OStream_ptr file, PropDb_PrintFmt);
 
-
 /* Miscellaneous **************************************************************/
-SexpFsm_ptr
-Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
-BddFsm_ptr
-Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
-BeFsm_ptr
-Prop_compute_ground_be_fsm(const NuSMVEnv_ptr env, const Prop_ptr self);
+SexpFsm_ptr Prop_compute_ground_sexp_fsm(const NuSMVEnv_ptr env,
+                                         const Prop_ptr self);
+BddFsm_ptr Prop_compute_ground_bdd_fsm(const NuSMVEnv_ptr env,
+                                       const Prop_ptr self);
+BeFsm_ptr Prop_compute_ground_be_fsm(const NuSMVEnv_ptr env,
+                                     const Prop_ptr self);
 
 /*!
   \brief Sets the FSMs in the property from the environment
@@ -785,7 +774,8 @@ void Prop_set_environment_fsms(const NuSMVEnv_ptr env, Prop_ptr prop);
 
   The set must be freed by the caller
 */
-Set_t Prop_set_from_formula_list(NuSMVEnv_ptr env, node_ptr list, Prop_Type type);
+Set_t Prop_set_from_formula_list(NuSMVEnv_ptr env, node_ptr list,
+                                 Prop_Type type);
 
 /*!
   \methodof Prop
@@ -795,7 +785,6 @@ Set_t Prop_set_from_formula_list(NuSMVEnv_ptr env, node_ptr list, Prop_Type type
 */
 Prop_ptr Prop_convert_to_invar(Prop_ptr self);
 
-
 /* Queries ********************************************************************/
 
 /*!
@@ -803,8 +792,7 @@ Prop_ptr Prop_convert_to_invar(Prop_ptr self);
 
   \todo Missing description
 */
-boolean Prop_needs_rewriting(SymbTable_ptr st,
-                                    const Prop_ptr self);
+boolean Prop_needs_rewriting(SymbTable_ptr st, const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -846,7 +834,6 @@ void Prop_verify(Prop_ptr self);
 */
 int Prop_check_type(const Prop_ptr self, Prop_Type type);
 
-
 /* PropType sub-interface *****************************************************/
 
 /*!
@@ -856,7 +843,7 @@ int Prop_check_type(const Prop_ptr self, Prop_Type type);
                       for printing it. Returned string must NOT be
                       deleted
 */
-const char* PropType_to_string(const Prop_Type type);
+const char *PropType_to_string(const Prop_Type type);
 
 /*!
   \brief Returns the parsing type given the property type
@@ -864,7 +851,7 @@ const char* PropType_to_string(const Prop_Type type);
   Returns the parsing type given the property type.
   The returned string must NOT be freed.
 */
-const char* PropType_to_parsing_string(const Prop_Type type);
+const char *PropType_to_parsing_string(const Prop_Type type);
 
 /*!
   \brief
@@ -873,9 +860,6 @@ const char* PropType_to_parsing_string(const Prop_Type type);
 */
 short int PropType_to_node_type(const Prop_Type type);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_PROP_PROP_H__ */

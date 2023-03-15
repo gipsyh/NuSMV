@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``compile.type_checking.checkers'' package of NuSMV version 2.
-  Copyright (C) 2006 by FBK-irst.
+  This file is part of the ``compile.type_checking.checkers'' package of NuSMV
+version 2. Copyright (C) 2006 by FBK-irst.
 
   NuSMV version 2 is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_STATEMENT_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_STATEMENT_PRIVATE_H__
-
 
 #include "nusmv/core/compile/type_checking/checkers/CheckerStatement.h"
 
@@ -47,18 +44,16 @@
 
 #include "nusmv/core/utils/utils.h"
 
-
 /*!
   \brief CheckerStatement class definition derived from
                class CheckerCore
 
-  
+
 
   \sa Base class CheckerCore
 */
 
-typedef struct CheckerStatement_TAG
-{
+typedef struct CheckerStatement_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(CheckerCore);
 
@@ -73,8 +68,6 @@ typedef struct CheckerStatement_TAG
 
 } CheckerStatement;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -87,8 +80,7 @@ typedef struct CheckerStatement_TAG
 
   \sa CheckerStatement_create
 */
-void checker_statement_init(CheckerStatement_ptr self,
-                                   const NuSMVEnv_ptr env);
+void checker_statement_init(CheckerStatement_ptr self, const NuSMVEnv_ptr env);
 
 /*!
   \methodof CheckerStatement
@@ -100,6 +92,5 @@ void checker_statement_init(CheckerStatement_ptr self,
 */
 void checker_statement_deinit(CheckerStatement_ptr self);
 
-
-
-#endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_STATEMENT_PRIVATE_H__ */
+#endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_STATEMENT_PRIVATE_H__ \
+        */

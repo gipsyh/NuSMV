@@ -35,39 +35,38 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/bmc/bmcBmc.h"
-#include "nusmv/core/bmc/bmcInt.h"
-#include "nusmv/core/bmc/bmcGen.h"
-#include "nusmv/core/bmc/bmcTableau.h"
 #include "nusmv/core/bmc/bmcConv.h"
 #include "nusmv/core/bmc/bmcDump.h"
+#include "nusmv/core/bmc/bmcGen.h"
+#include "nusmv/core/bmc/bmcInt.h"
 #include "nusmv/core/bmc/bmcModel.h"
-#include "nusmv/core/wff/wff.h"
-#include "nusmv/core/wff/w2w/w2w.h"
+#include "nusmv/core/bmc/bmcTableau.h"
 #include "nusmv/core/bmc/bmcUtils.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/wff/w2w/w2w.h"
+#include "nusmv/core/wff/wff.h"
 
-#include "nusmv/core/enc/enc.h"
-#include "nusmv/core/enc/be/BeEnc.h"
 #include "nusmv/core/be/be.h"
+#include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/enc/enc.h"
 
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/dag/dag.h"
+#include "nusmv/core/node/node.h"
 #include "nusmv/core/prop/propPkg.h"
 
 #include "nusmv/core/mc/mc.h" /* for print_spec */
 
-#include "nusmv/core/sat/sat.h" /* for solver and result */
-#include "nusmv/core/sat/SatSolver.h"
-#include "nusmv/core/sat/SatIncSolver.h"
 #include "nusmv/core/prop/propProp.h"
+#include "nusmv/core/sat/SatIncSolver.h"
+#include "nusmv/core/sat/SatSolver.h"
+#include "nusmv/core/sat/sat.h" /* for solver and result */
 
 #include "nusmv/core/utils/bmc_profiler.h"
 #include "nusmv/core/utils/watchdog_util.h"
@@ -108,21 +107,18 @@
 /* Functions                                                                 */
 /*---------------------------------------------------------------------------*/
 inline static Be_Cnf_ptr
-bmc_add_be_into_solver(SatSolver_ptr solver,
-                       SatSolverGroup group,
-                       be_ptr prob, int polarity,
-                       Be_CnfAlgorithm cnf_alg,
-                       BeEnc_ptr be_enc);
+bmc_add_be_into_solver(SatSolver_ptr solver, SatSolverGroup group, be_ptr prob,
+                       int polarity, Be_CnfAlgorithm cnf_alg, BeEnc_ptr be_enc);
 
-inline static void
-bmc_add_be_into_solver_positively(SatSolver_ptr solver,
-                                  SatSolverGroup group,
-                                  be_ptr prob, BeEnc_ptr be_enc,
-                                  Be_CnfAlgorithm cnf_alg);
+inline static void bmc_add_be_into_solver_positively(SatSolver_ptr solver,
+                                                     SatSolverGroup group,
+                                                     be_ptr prob,
+                                                     BeEnc_ptr be_enc,
+                                                     Be_CnfAlgorithm cnf_alg);
 
-static be_ptr
-bmc_build_uniqueness(const BeFsm_ptr be_fsm, const lsList state_vars,
-                     const int init_state, const int last_state);
+static be_ptr bmc_build_uniqueness(const BeFsm_ptr be_fsm,
+                                   const lsList state_vars,
+                                   const int init_state, const int last_state);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -130,26 +126,22 @@ bmc_build_uniqueness(const BeFsm_ptr be_fsm, const lsList state_vars,
 
 /**AutomaticStart*************************************************************/
 
-
 /**AutomaticEnd***************************************************************/
 
-int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
-                       const int k, const int relative_loop,
-                       const boolean must_inc_length)
-{
+int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
+                       const int relative_loop, const boolean must_inc_length) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   const Be_CnfAlgorithm cnf_alg = get_rbc2cnf_algorithm(opts);
 
   BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-  node_ptr bltlspec;  /* Its booleanization */
+  node_ptr bltlspec;               /* Its booleanization */
   BeFsm_ptr be_fsm = BE_FSM(NULL); /* The corresponding be fsm */
   BeEnc_ptr be_enc;
   /* sat solver instance */
@@ -169,8 +161,8 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
   Prop_ptr inputprop = ltlprop;
   Prop_Rewriter_ptr rewriter = NULL;
 
-
-  if (!must_inc_length) k_min = k_max;
+  if (!must_inc_length)
+    k_min = k_max;
 
   /* checks that a property was selected: */
   nusmv_assert(ltlprop != PROP(NULL));
@@ -182,8 +174,9 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
   /* solver construction: */
   solver = Sat_CreateIncSolver(env, get_sat_solver(opts));
   if (solver == SAT_INC_SOLVER(NULL)) {
-    StreamMgr_print_error(streams,  "Incremental sat solver '%s' is not available.\n",
-            get_sat_solver(opts));
+    StreamMgr_print_error(streams,
+                          "Incremental sat solver '%s' is not available.\n",
+                          get_sat_solver(opts));
     return 1;
   }
 
@@ -193,23 +186,21 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
 
   be_enc = BeFsm_get_be_encoding(be_fsm);
 
-  rewriter = Prop_Rewriter_create(env, ltlprop,
-                                  WFF_REWRITE_METHOD_DEADLOCK_FREE,
-                                  WFF_REWRITER_REWRITE_INPUT_NEXT,
-                                  FSM_TYPE_BE, bdd_enc);
+  rewriter = Prop_Rewriter_create(
+      env, ltlprop, WFF_REWRITE_METHOD_DEADLOCK_FREE,
+      WFF_REWRITER_REWRITE_INPUT_NEXT, FSM_TYPE_BE, bdd_enc);
   ltlprop = Prop_Rewriter_rewrite(rewriter);
   be_fsm = Prop_get_be_fsm(ltlprop);
 
   /* Booleanizes, negates and NNFs the LTL formula: */
-  bltlspec =
-    Wff2Nnf(env, Wff_make_not(nodemgr, Compile_detexpr2bexpr(bdd_enc,
-                                              Prop_get_expr_core(ltlprop))));
+  bltlspec = Wff2Nnf(
+      env, Wff_make_not(nodemgr, Compile_detexpr2bexpr(
+                                     bdd_enc, Prop_get_expr_core(ltlprop))));
 
   /* insert initial conditions into the sat solver permanently */
   beInit = Bmc_Model_GetInit0(be_fsm);
   bmc_add_be_into_solver_positively(
-      SAT_SOLVER(solver),
-      SatSolver_get_permanent_group(SAT_SOLVER(solver)),
+      SAT_SOLVER(solver), SatSolver_get_permanent_group(SAT_SOLVER(solver)),
       beInit, be_enc, cnf_alg);
 
   /* Start problems generations: */
@@ -217,7 +208,7 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
        ++increasingK) {
     int l;
     char szLoop[16]; /* to keep loopback string */
-     /* additional group in sat solver */
+                     /* additional group in sat solver */
     SatSolverGroup additionalGroup = SatIncSolver_create_group(solver);
     SatSolverResult satResult;
 
@@ -233,20 +224,19 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       if (Bmc_Utils_IsNoLoopback(l)) {
         Logger_log(logger,
-                "\nGenerating problem with bound %d, no loopback...\n",
-                increasingK);
-      }
-      else if (Bmc_Utils_IsAllLoopbacks(l)) {
-        Logger_log(logger,
-                "\nGenerating problem with bound %d, all possible loopbacks...\n",
-                increasingK);
-      }
-      else {
+                   "\nGenerating problem with bound %d, no loopback...\n",
+                   increasingK);
+      } else if (Bmc_Utils_IsAllLoopbacks(l)) {
+        Logger_log(
+            logger,
+            "\nGenerating problem with bound %d, all possible loopbacks...\n",
+            increasingK);
+      } else {
         /* l can be negative iff loopback from the user pov is < -length */
         if ((l < increasingK) && (l >= 0)) {
           Logger_log(logger,
-                  "\nGenerating problem with bound %d, loopback %s...\n",
-                  increasingK, szLoop);
+                     "\nGenerating problem with bound %d, loopback %s...\n",
+                     increasingK, szLoop);
         }
       }
     } /* verbose message */
@@ -254,72 +244,65 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
     /* checks for loopback vs k compatibility */
     if (Bmc_Utils_IsSingleLoopback(l) && ((l >= increasingK) || (l < 0))) {
       StreamMgr_print_error(streams,
-              "\nWarning: problem with bound %d and loopback %s is not allowed: skipped\n",
-              increasingK, szLoop);
+                            "\nWarning: problem with bound %d and loopback %s "
+                            "is not allowed: skipped\n",
+                            increasingK, szLoop);
       continue;
     }
 
     /* Unroll the transition relation to the fixed frame 0 */
     if (previousIncreasingK < increasingK) {
-      beProb = Bmc_Model_GetUnrolling(be_fsm,
-                                      previousIncreasingK,
-                                      increasingK);
+      beProb = Bmc_Model_GetUnrolling(be_fsm, previousIncreasingK, increasingK);
 
       bmc_add_be_into_solver_positively(
-          SAT_SOLVER(solver),
-          SatSolver_get_permanent_group(SAT_SOLVER(solver)),
+          SAT_SOLVER(solver), SatSolver_get_permanent_group(SAT_SOLVER(solver)),
           beProb, be_enc, cnf_alg);
       previousIncreasingK = increasingK;
     }
 
     /* add LTL tableau to an additional group of a solver */
     beProb = Bmc_Tableau_GetLtlTableau(be_fsm, bltlspec, increasingK, l);
-    bmc_add_be_into_solver_positively(SAT_SOLVER(solver),
-                                       additionalGroup,
-                                       beProb, be_enc, cnf_alg);
+    bmc_add_be_into_solver_positively(SAT_SOLVER(solver), additionalGroup,
+                                      beProb, be_enc, cnf_alg);
 
     satResult = SatSolver_solve_all_groups(SAT_SOLVER(solver));
-
 
     /* Processes the result: */
     switch (satResult) {
 
-    case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
-      {
-        char szLoopMsg[16]; /* for loopback part of message */
-        memset(szLoopMsg, 0, sizeof(szLoopMsg));
+    case SAT_SOLVER_UNSATISFIABLE_PROBLEM: {
+      char szLoopMsg[16]; /* for loopback part of message */
+      memset(szLoopMsg, 0, sizeof(szLoopMsg));
 
-        if (Bmc_Utils_IsAllLoopbacks(l)) {
-          strncpy(szLoopMsg, "", sizeof(szLoopMsg)-1);
-        }
-        else if (Bmc_Utils_IsNoLoopback(l)) {
-          strncpy(szLoopMsg, " and no loop", sizeof(szLoopMsg)-1);
-        }
-        else {
-          /* loop is Natural: */
-          strncpy(szLoopMsg, " and loop at ", sizeof(szLoopMsg)-1);
-          strncat(szLoopMsg, szLoop, sizeof(szLoopMsg)-1-strlen(szLoopMsg));
-        }
-
-        StreamMgr_print_output(streams,
-                "-- no counterexample found with bound %d%s",
-                increasingK, szLoopMsg);
-        if (opt_verbose_level_gt(opts, 2)) {
-          Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, " for ");
-          print_spec(Logger_get_ostream(logger), inputprop,
-              (Prop_PrintFmt) get_prop_print_method(opts));
-        }
-        StreamMgr_print_output(streams,  "\n");
-
-        break;
+      if (Bmc_Utils_IsAllLoopbacks(l)) {
+        strncpy(szLoopMsg, "", sizeof(szLoopMsg) - 1);
+      } else if (Bmc_Utils_IsNoLoopback(l)) {
+        strncpy(szLoopMsg, " and no loop", sizeof(szLoopMsg) - 1);
+      } else {
+        /* loop is Natural: */
+        strncpy(szLoopMsg, " and loop at ", sizeof(szLoopMsg) - 1);
+        strncat(szLoopMsg, szLoop, sizeof(szLoopMsg) - 1 - strlen(szLoopMsg));
       }
 
+      StreamMgr_print_output(streams,
+                             "-- no counterexample found with bound %d%s",
+                             increasingK, szLoopMsg);
+      if (opt_verbose_level_gt(opts, 2)) {
+        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+        Logger_log(logger, " for ");
+        print_spec(Logger_get_ostream(logger), inputprop,
+                   (Prop_PrintFmt)get_prop_print_method(opts));
+      }
+      StreamMgr_print_output(streams, "\n");
+
+      break;
+    }
+
     case SAT_SOLVER_SATISFIABLE_PROBLEM:
-      StreamMgr_print_output(streams,  "-- ");
-      print_spec(StreamMgr_get_output_ostream(streams),
-                 inputprop, (Prop_PrintFmt) get_prop_print_method(opts));
-      StreamMgr_print_output(streams,  "  is false\n");
+      StreamMgr_print_output(streams, "-- ");
+      print_spec(StreamMgr_get_output_ostream(streams), inputprop,
+                 (Prop_PrintFmt)get_prop_print_method(opts));
+      StreamMgr_print_output(streams, "  is false\n");
       Prop_set_status(ltlprop, Prop_False);
 
       found_solution = true;
@@ -331,27 +314,24 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
 
         bsexp_fsm = Prop_get_bool_sexp_fsm(ltlprop);
         if (BOOL_SEXP_FSM(NULL) == bsexp_fsm) {
-          bsexp_fsm = \
-            BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
+          bsexp_fsm = BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
           BOOL_SEXP_FSM_CHECK_INSTANCE(bsexp_fsm);
         }
 
-        trace = \
-          Bmc_Utils_generate_and_print_cntexample(be_enc, tm,
-                                                  SAT_SOLVER(solver),
+        trace = Bmc_Utils_generate_and_print_cntexample(
+            be_enc, tm, SAT_SOLVER(solver),
 
-                                     /* empty (arbitrary) model is output only if
-                                        both init and tableau are constants.
-                                        Unrolling is not required because if both
-                                        init and tableau are constant only one
-                                        state will be output and transition
-                                        relation will be of no importance.
-                                     */
-                                     Be_And(BeEnc_get_be_manager(be_enc),
-                                            beInit, beProb), increasingK,
-                                            "BMC Counterexample",
+            /* empty (arbitrary) model is output only if
+               both init and tableau are constants.
+               Unrolling is not required because if both
+               init and tableau are constant only one
+               state will be output and transition
+               relation will be of no importance.
+            */
+            Be_And(BeEnc_get_be_manager(be_enc), beInit, beProb), increasingK,
+            "BMC Counterexample",
 
-                                 SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
+            SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
 
         Prop_set_trace(ltlprop, Trace_get_id(trace));
       }
@@ -359,19 +339,22 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
       break;
 
     case SAT_SOLVER_INTERNAL_ERROR:
-      ErrorMgr_internal_error(errmgr, "Sorry, solver answered with a fatal Internal "
-                     "Failure during problem solving.\n");
+      ErrorMgr_internal_error(errmgr,
+                              "Sorry, solver answered with a fatal Internal "
+                              "Failure during problem solving.\n");
       break;
 
     case SAT_SOLVER_TIMEOUT:
     case SAT_SOLVER_MEMOUT:
-      ErrorMgr_internal_error(errmgr, "Sorry, solver ran out of resources and aborted "
-                     "the execution.\n");
+      ErrorMgr_internal_error(errmgr,
+                              "Sorry, solver ran out of resources and aborted "
+                              "the execution.\n");
       break;
 
     default:
-      ErrorMgr_internal_error(errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
-                     __FILE__, __LINE__, __func__, satResult);
+      ErrorMgr_internal_error(errmgr,
+                              "%s:%d:%s: Unexpected value in satResult (%d)",
+                              __FILE__, __LINE__, __func__, satResult);
     } /* switch */
 
     SatIncSolver_destroy_group(solver, additionalGroup);
@@ -381,26 +364,26 @@ int Bmc_GenSolveLtlInc(NuSMVEnv_ptr env, Prop_ptr ltlprop,
   SatIncSolver_destroy(solver);
 
   Prop_Rewriter_update_original_property(rewriter);
-  Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+  Prop_Rewriter_destroy(rewriter);
+  rewriter = NULL;
 
   return 0;
 }
 
-
-int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_k)
-{
+int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop,
+                            const int max_k) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   const Be_CnfAlgorithm cnf_alg = get_rbc2cnf_algorithm(opts);
 
   BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-  node_ptr binvarspec;  /* Its booleanization */
-  BeFsm_ptr be_fsm; /* The corresponding be fsm */
+  node_ptr binvarspec; /* Its booleanization */
+  BeFsm_ptr be_fsm;    /* The corresponding be fsm */
   BeEnc_ptr be_enc;
   Be_Manager_ptr be_mgr;
 
@@ -410,8 +393,7 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
   /* outputs the name of the algorithm */
   if (opt_verbose_level_gt(opts, 2)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-            "The invariant solving algorithm is ZigZag\n");
+    Logger_log(logger, "The invariant solving algorithm is ZigZag\n");
   }
   /* checks that a property was selected: */
   nusmv_assert(invarprop != PROP(NULL));
@@ -423,18 +405,17 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
   be_fsm = Prop_compute_ground_be_fsm(env, invarprop);
   BE_FSM_CHECK_INSTANCE(be_fsm);
 
-  rewriter = Prop_Rewriter_create(env, invarprop,
-                                  WFF_REWRITE_METHOD_DEADLOCK_FREE,
-                                  WFF_REWRITER_REWRITE_INPUT_NEXT,
-                                  FSM_TYPE_BE, bdd_enc);
+  rewriter = Prop_Rewriter_create(
+      env, invarprop, WFF_REWRITE_METHOD_DEADLOCK_FREE,
+      WFF_REWRITER_REWRITE_INPUT_NEXT, FSM_TYPE_BE, bdd_enc);
   invarprop = Prop_Rewriter_rewrite(rewriter);
   be_fsm = Prop_get_be_fsm(invarprop);
 
   be_enc = BeFsm_get_be_encoding(be_fsm);
 
   /* Booleanizes, negates and NNFs the invariant formula: */
-  binvarspec = Wff2Nnf(env, Compile_detexpr2bexpr(bdd_enc,
-                                           Prop_get_expr_core(invarprop)));
+  binvarspec = Wff2Nnf(
+      env, Compile_detexpr2bexpr(bdd_enc, Prop_get_expr_core(invarprop)));
 
   be_mgr = BeEnc_get_be_manager(be_enc);
 
@@ -457,11 +438,13 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
     /* Initialiaze the incremental SAT solver */
     solver = Sat_CreateIncSolver(env, get_sat_solver(opts));
     if (solver == SAT_INC_SOLVER(NULL)) {
-      StreamMgr_print_error(streams,  "Incremental sat solver '%s' is not available.\n",
-              get_sat_solver(opts));
+      StreamMgr_print_error(streams,
+                            "Incremental sat solver '%s' is not available.\n",
+                            get_sat_solver(opts));
 
       Prop_Rewriter_update_original_property(rewriter);
-      Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+      Prop_Rewriter_destroy(rewriter);
+      rewriter = NULL;
 
       return 1;
     }
@@ -469,22 +452,21 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
     /* retrieves the list of bool variables needed to calculate the
        state uniqueness, taking into account of coi if enabled. */
     crnt_state_be_vars =
-      Bmc_Utils_get_vars_list_for_uniqueness(be_enc, invarprop);
+        Bmc_Utils_get_vars_list_for_uniqueness(be_enc, invarprop);
 
     be_invar = Bmc_Conv_Bexp2Be(be_enc, binvarspec);
 
     /* create a group for CNF of initial states and a list for this group */
     group_init = SatIncSolver_create_group(solver);
     group_list_init = Olist_create();
-    Olist_prepend(group_list_init, (void*)group_init);
+    Olist_prepend(group_list_init, (void *)group_init);
 
     /* insert initial state into a special group */
-    bmc_add_be_into_solver_positively( SAT_SOLVER(solver),
-                                       group_init,
-                                       Bmc_Model_GetInit0(be_fsm),
-                                       be_enc, cnf_alg);
+    bmc_add_be_into_solver_positively(SAT_SOLVER(solver), group_init,
+                                      Bmc_Model_GetInit0(be_fsm), be_enc,
+                                      cnf_alg);
 
-    for (stepN=0; stepN <= max_k; ++stepN) {
+    for (stepN = 0; stepN <= max_k; ++stepN) {
       SatSolverResult satResult;
       SatSolverGroup additionalGroup;
       int l;
@@ -505,10 +487,8 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
 
       /* Insert the invariant at time k  but not set the polarity */
       cnf_prob_k = bmc_add_be_into_solver(
-          SAT_SOLVER(solver),
-          SatSolver_get_permanent_group(SAT_SOLVER(solver)),
-          prob_k,
-          0, /* Consider both polarities during conversion */
+          SAT_SOLVER(solver), SatSolver_get_permanent_group(SAT_SOLVER(solver)),
+          prob_k, 0, /* Consider both polarities during conversion */
           cnf_alg, be_enc);
 
       /* Set the polarity at time k to flase in the additiona group */
@@ -522,10 +502,10 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
       switch (satResult) {
 
       case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
-        StreamMgr_print_output(streams,  "-- ");
-        print_invar(StreamMgr_get_output_ostream(streams),
-                    oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
-        StreamMgr_print_output(streams,  "  is true\n");
+        StreamMgr_print_output(streams, "-- ");
+        print_invar(StreamMgr_get_output_ostream(streams), oldprop,
+                    (Prop_PrintFmt)get_prop_print_method(opts));
+        StreamMgr_print_output(streams, "  is true\n");
         Prop_set_status(invarprop, Prop_True);
 
         Be_Cnf_Delete(cnf_prob_k);
@@ -537,7 +517,8 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
         SatIncSolver_destroy(solver);
 
         Prop_Rewriter_update_original_property(rewriter);
-        Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+        Prop_Rewriter_destroy(rewriter);
+        rewriter = NULL;
 
         return 0;
 
@@ -545,17 +526,20 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
         break;
 
       case SAT_SOLVER_INTERNAL_ERROR:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver answered with a fatal Internal "
-                       "Failure during problem solving.\n");
+        ErrorMgr_internal_error(errmgr,
+                                "Sorry, solver answered with a fatal Internal "
+                                "Failure during problem solving.\n");
 
       case SAT_SOLVER_TIMEOUT:
       case SAT_SOLVER_MEMOUT:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver ran out of resources and aborted "
-                       "the execution.\n");
+        ErrorMgr_internal_error(
+            errmgr, "Sorry, solver ran out of resources and aborted "
+                    "the execution.\n");
 
       default:
-        ErrorMgr_internal_error(errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
-                       __FILE__, __LINE__, __func__, satResult);
+        ErrorMgr_internal_error(errmgr,
+                                "%s:%d:%s: Unexpected value in satResult (%d)",
+                                __FILE__, __LINE__, __func__, satResult);
       } /* switch */
 
       if (opt_verbose_level_gt(opts, 0)) {
@@ -570,10 +554,10 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
       switch (satResult) {
 
       case SAT_SOLVER_SATISFIABLE_PROBLEM:
-        StreamMgr_print_output(streams,  "-- ");
-        print_invar(StreamMgr_get_output_ostream(streams),
-                    oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
-        StreamMgr_print_output(streams,  "  is false\n");
+        StreamMgr_print_output(streams, "-- ");
+        print_invar(StreamMgr_get_output_ostream(streams), oldprop,
+                    (Prop_PrintFmt)get_prop_print_method(opts));
+        StreamMgr_print_output(streams, "  is false\n");
         Prop_set_status(invarprop, Prop_False);
 
         if (opt_counter_examples(opts)) {
@@ -583,16 +567,14 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
 
           bsexp_fsm = Prop_get_bool_sexp_fsm(invarprop);
           if (BOOL_SEXP_FSM(NULL) == bsexp_fsm) {
-            bsexp_fsm = \
-              BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
+            bsexp_fsm = BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
             BOOL_SEXP_FSM_CHECK_INSTANCE(bsexp_fsm);
           }
 
-          trace = \
-            Bmc_Utils_generate_and_print_cntexample(be_enc, tm, SAT_SOLVER(solver),
-                                                    prob_k, stepN,
-                                                    "BMC Counterexample",
-                                  SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
+          trace = Bmc_Utils_generate_and_print_cntexample(
+              be_enc, tm, SAT_SOLVER(solver), prob_k, stepN,
+              "BMC Counterexample",
+              SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
 
           Prop_set_trace(invarprop, Trace_get_id(trace));
         }
@@ -606,7 +588,8 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
         SatIncSolver_destroy(solver);
 
         Prop_Rewriter_update_original_property(rewriter);
-        Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+        Prop_Rewriter_destroy(rewriter);
+        rewriter = NULL;
 
         return 0;
 
@@ -614,22 +597,25 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
         if (opt_verbose_level_gt(opts, 0)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_log(logger, "No counter-example path of length %d found\n",
-                  stepN);
+                     stepN);
         }
         break;
 
       case SAT_SOLVER_INTERNAL_ERROR:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver answered with a fatal Internal "
-                       "Failure during problem solving.\n");
+        ErrorMgr_internal_error(errmgr,
+                                "Sorry, solver answered with a fatal Internal "
+                                "Failure during problem solving.\n");
 
       case SAT_SOLVER_TIMEOUT:
       case SAT_SOLVER_MEMOUT:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver ran out of resources and aborted "
-                       "the execution.\n");
+        ErrorMgr_internal_error(
+            errmgr, "Sorry, solver ran out of resources and aborted "
+                    "the execution.\n");
 
       default:
-        ErrorMgr_internal_error(errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
-                       __FILE__, __LINE__, __func__, satResult);
+        ErrorMgr_internal_error(errmgr,
+                                "%s:%d:%s: Unexpected value in satResult (%d)",
+                                __FILE__, __LINE__, __func__, satResult);
 
       } /* switch */
 
@@ -642,12 +628,12 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
       Be_Cnf_Delete(cnf_prob_k);
 
       { /* Insert transition relation (stepN,stepN+1) permanently */
-        be_ptr unrolling = Bmc_Model_GetUnrolling(be_fsm, stepN, stepN+1);
+        be_ptr unrolling = Bmc_Model_GetUnrolling(be_fsm, stepN, stepN + 1);
 
         bmc_add_be_into_solver_positively(
             SAT_SOLVER(solver),
-            SatSolver_get_permanent_group(SAT_SOLVER(solver)),
-            unrolling, be_enc, cnf_alg);
+            SatSolver_get_permanent_group(SAT_SOLVER(solver)), unrolling,
+            be_enc, cnf_alg);
       }
 
       /* Insert and force to true not_equal(i,stepN) for each 0 <= i <
@@ -660,28 +646,27 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
 
         lsForEachItem(crnt_state_be_vars, gen, be_var) {
           be_ptr be_xor =
-            Be_Xor(be_mgr,
-                   BeEnc_untimed_expr_to_timed(be_enc, be_var, l),
-                   BeEnc_untimed_expr_to_timed(be_enc, be_var, stepN));
+              Be_Xor(be_mgr, BeEnc_untimed_expr_to_timed(be_enc, be_var, l),
+                     BeEnc_untimed_expr_to_timed(be_enc, be_var, stepN));
           not_equal = Be_Or(be_mgr, not_equal, be_xor);
         }
 
         bmc_add_be_into_solver_positively(
             SAT_SOLVER(solver),
-            SatSolver_get_permanent_group(SAT_SOLVER(solver)),
-            not_equal, be_enc, cnf_alg);
+            SatSolver_get_permanent_group(SAT_SOLVER(solver)), not_equal,
+            be_enc, cnf_alg);
       } /* for loop */
 
       /* Print out the current state of solving */
-      StreamMgr_print_output(streams,
-              "-- no proof or counterexample found with bound %d", stepN);
+      StreamMgr_print_output(
+          streams, "-- no proof or counterexample found with bound %d", stepN);
       if (opt_verbose_level_gt(opts, 2)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_log(logger, " for ");
-        print_invar(Logger_get_ostream(logger),
-                    oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
+        print_invar(Logger_get_ostream(logger), oldprop,
+                    (Prop_PrintFmt)get_prop_print_method(opts));
       }
-      StreamMgr_print_output(streams,  "\n");
+      StreamMgr_print_output(streams, "\n");
 
     } /* for loop on stepN */
 
@@ -695,28 +680,26 @@ int Bmc_GenSolveInvarZigzag(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_
   } /* end of ZifZag algorithm */
 
   Prop_Rewriter_update_original_property(rewriter);
-  Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+  Prop_Rewriter_destroy(rewriter);
+  rewriter = NULL;
 
   return 0;
 }
 
-
-int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
-                          Prop_ptr invarprop, const int max_k,
-                          bmc_invar_closure_strategy strategy)
-{
+int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env, Prop_ptr invarprop, const int max_k,
+                          bmc_invar_closure_strategy strategy) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   const Be_CnfAlgorithm cnf_alg = get_rbc2cnf_algorithm(opts);
 
   BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-  node_ptr binvarspec;  /* Its booleanization */
-  be_ptr be_invar;  /* Its BE representation */
+  node_ptr binvarspec;             /* Its booleanization */
+  be_ptr be_invar;                 /* Its BE representation */
   BeFsm_ptr be_fsm = BE_FSM(NULL); /* The corresponding be fsm */
 
   BeEnc_ptr be_enc;
@@ -728,14 +711,16 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
   /* outputs the name of the algorithm */
   if (opt_verbose_level_gt(opts, 2)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-            "The invariant solving algorithm is Dual\n");
+    Logger_log(logger, "The invariant solving algorithm is Dual\n");
     switch (strategy) {
-      case BMC_INVAR_BACKWARD_CLOSURE: Logger_log(logger,
-            "using backward closure strategy\n"); break;
-      case BMC_INVAR_FORWARD_CLOSURE: Logger_log(logger,
-            "using forward closure strategy\n"); break;
-      default: error_unreachable_code(); /* unexpected */
+    case BMC_INVAR_BACKWARD_CLOSURE:
+      Logger_log(logger, "using backward closure strategy\n");
+      break;
+    case BMC_INVAR_FORWARD_CLOSURE:
+      Logger_log(logger, "using forward closure strategy\n");
+      break;
+    default:
+      error_unreachable_code(); /* unexpected */
     }
   }
 
@@ -749,18 +734,17 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
   be_fsm = Prop_compute_ground_be_fsm(env, invarprop);
   BE_FSM_CHECK_INSTANCE(be_fsm);
 
-  rewriter = Prop_Rewriter_create(env, invarprop,
-                                  WFF_REWRITE_METHOD_DEADLOCK_FREE,
-                                  WFF_REWRITER_REWRITE_INPUT_NEXT,
-                                  FSM_TYPE_BE, bdd_enc);
+  rewriter = Prop_Rewriter_create(
+      env, invarprop, WFF_REWRITE_METHOD_DEADLOCK_FREE,
+      WFF_REWRITER_REWRITE_INPUT_NEXT, FSM_TYPE_BE, bdd_enc);
   invarprop = Prop_Rewriter_rewrite(rewriter);
   be_fsm = Prop_get_be_fsm(invarprop);
 
   be_enc = BeFsm_get_be_encoding(be_fsm);
 
   /* Booleanizes, negates and NNFs the invariant formula: */
-  binvarspec = Wff2Nnf(env, Compile_detexpr2bexpr(bdd_enc,
-                                           Prop_get_expr_core(invarprop)));
+  binvarspec = Wff2Nnf(
+      env, Compile_detexpr2bexpr(bdd_enc, Prop_get_expr_core(invarprop)));
 
   be_mgr = BeEnc_get_be_manager(be_enc);
 
@@ -773,13 +757,14 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
   if (BMC_INVAR_BACKWARD_CLOSURE == strategy &&
       BeEnc_get_input_vars_num(be_enc) > 0) {
     StreamMgr_print_error(streams,
-             "Dual algorithm with backward closure strategy\n"
-             "can not be used when the model being checked\n"
-             "contains input variables. Use forward strategy\n"
-             "instead.\n");
+                          "Dual algorithm with backward closure strategy\n"
+                          "can not be used when the model being checked\n"
+                          "contains input variables. Use forward strategy\n"
+                          "instead.\n");
 
     Prop_Rewriter_update_original_property(rewriter);
-    Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+    Prop_Rewriter_destroy(rewriter);
+    rewriter = NULL;
 
     return 1;
   }
@@ -802,11 +787,13 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
     /* Initialiaze two incremental SAT solvers */
     solver_base = Sat_CreateIncSolver(env, get_sat_solver(opts));
     if (solver_base == SAT_INC_SOLVER(NULL)) {
-      StreamMgr_print_error(streams,  "Incremental sat solver '%s' is not available.\n",
-              get_sat_solver(opts));
+      StreamMgr_print_error(streams,
+                            "Incremental sat solver '%s' is not available.\n",
+                            get_sat_solver(opts));
 
       Prop_Rewriter_update_original_property(rewriter);
-      Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+      Prop_Rewriter_destroy(rewriter);
+      rewriter = NULL;
 
       return 1;
     }
@@ -815,12 +802,13 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
       solver_step = Sat_CreateIncSolver(env, get_sat_solver(opts));
       if (solver_step == SAT_INC_SOLVER(NULL)) {
         StreamMgr_print_error(streams,
-                "Incremental sat solver '%s' is not available.\n",
-                get_sat_solver(opts));
+                              "Incremental sat solver '%s' is not available.\n",
+                              get_sat_solver(opts));
         SatIncSolver_destroy(solver_base);
 
         Prop_Rewriter_update_original_property(rewriter);
-        Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+        Prop_Rewriter_destroy(rewriter);
+        rewriter = NULL;
 
         return 1;
       }
@@ -829,7 +817,7 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
     /* retrieves the list of bool variables needed to calculate the
        state uniqueness, taking into account of coi if enabled. */
     crnt_state_be_vars =
-      Bmc_Utils_get_vars_list_for_uniqueness(be_enc, invarprop);
+        Bmc_Utils_get_vars_list_for_uniqueness(be_enc, invarprop);
 
     be_invar = Bmc_Conv_Bexp2Be(be_enc, binvarspec);
 
@@ -841,32 +829,34 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
 
     /* 'step' solver setup depends on the closure strategy */
     switch (strategy) {
-    case BMC_INVAR_BACKWARD_CLOSURE:
-      {
-        /* Insert the negative invariant property at time 0 to 'step' solver */
-        be_ptr invar = BeEnc_untimed_expr_to_timed(be_enc, be_invar, 0);
+    case BMC_INVAR_BACKWARD_CLOSURE: {
+      /* Insert the negative invariant property at time 0 to 'step' solver */
+      be_ptr invar = BeEnc_untimed_expr_to_timed(be_enc, be_invar, 0);
 
-        /* Consider both polarities during conversion */
-        cnf = bmc_add_be_into_solver(
-            SAT_SOLVER(solver_step),
-            SatSolver_get_permanent_group(SAT_SOLVER(solver_step)),
-            invar, 0, cnf_alg, be_enc);
+      /* Consider both polarities during conversion */
+      cnf = bmc_add_be_into_solver(
+          SAT_SOLVER(solver_step),
+          SatSolver_get_permanent_group(SAT_SOLVER(solver_step)), invar, 0,
+          cnf_alg, be_enc);
 
-        /* negative polarity */
-        SatSolver_set_polarity(SAT_SOLVER(solver_step), cnf, -1,
-                  SatSolver_get_permanent_group(SAT_SOLVER(solver_step)));
+      /* negative polarity */
+      SatSolver_set_polarity(
+          SAT_SOLVER(solver_step), cnf, -1,
+          SatSolver_get_permanent_group(SAT_SOLVER(solver_step)));
 
-        Be_Cnf_Delete(cnf);
-        break;
-      }
+      Be_Cnf_Delete(cnf);
+      break;
+    }
 
     /* no setup necessary for forward closure strategy */
-    case BMC_INVAR_FORWARD_CLOSURE: break;
+    case BMC_INVAR_FORWARD_CLOSURE:
+      break;
 
-    default: error_unreachable_code(); /* unexpected */
-    } /*  switch */
+    default:
+      error_unreachable_code(); /* unexpected */
+    }                           /*  switch */
 
-    for (stepN=0; stepN <= max_k; ++stepN) {
+    for (stepN = 0; stepN <= max_k; ++stepN) {
       be_ptr prob_k;
       be_ptr unrolling;
 
@@ -888,10 +878,10 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
       prob_k = BeEnc_untimed_expr_to_timed(be_enc, be_invar, stepN);
 
       /* Insert the invariant at time k  but not set the polarity */
-      cnf =  bmc_add_be_into_solver(
+      cnf = bmc_add_be_into_solver(
           SAT_SOLVER(solver_base),
-          SatSolver_get_permanent_group(SAT_SOLVER(solver_base)),
-          prob_k, 0, cnf_alg, be_enc);
+          SatSolver_get_permanent_group(SAT_SOLVER(solver_base)), prob_k, 0,
+          cnf_alg, be_enc);
 
       /* Set negative polarity at time k in the additional group */
       SatSolver_set_polarity(SAT_SOLVER(solver_base), cnf, -1, additionalGroup);
@@ -903,10 +893,10 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
       switch (satResult) {
 
       case SAT_SOLVER_SATISFIABLE_PROBLEM:
-        StreamMgr_print_output(streams,  "-- ");
-        print_invar(StreamMgr_get_output_ostream(streams),
-                    oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
-        StreamMgr_print_output(streams,  "  is false\n");
+        StreamMgr_print_output(streams, "-- ");
+        print_invar(StreamMgr_get_output_ostream(streams), oldprop,
+                    (Prop_PrintFmt)get_prop_print_method(opts));
+        StreamMgr_print_output(streams, "  is false\n");
         Prop_set_status(invarprop, Prop_False);
 
         if (opt_counter_examples(opts)) {
@@ -916,17 +906,14 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
 
           bsexp_fsm = Prop_get_bool_sexp_fsm(invarprop);
           if (BOOL_SEXP_FSM(NULL) == bsexp_fsm) {
-            bsexp_fsm = \
-              BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
+            bsexp_fsm = BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
             BOOL_SEXP_FSM_CHECK_INSTANCE(bsexp_fsm);
           }
 
-          trace = \
-            Bmc_Utils_generate_and_print_cntexample(be_enc, tm,
-                                                    SAT_SOLVER(solver_base),
-                                                    prob_k, stepN,
-                                                    "BMC Counterexample",
-                                  SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
+          trace = Bmc_Utils_generate_and_print_cntexample(
+              be_enc, tm, SAT_SOLVER(solver_base), prob_k, stepN,
+              "BMC Counterexample",
+              SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
 
           Prop_set_trace(invarprop, Trace_get_id(trace));
         }
@@ -939,206 +926,212 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
         lsDestroy(crnt_state_be_vars, NULL);
 
         Prop_Rewriter_update_original_property(rewriter);
-        Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+        Prop_Rewriter_destroy(rewriter);
+        rewriter = NULL;
 
         return 0;
 
-      case  SAT_SOLVER_UNSATISFIABLE_PROBLEM:
+      case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
         if (opt_verbose_level_gt(opts, 0)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_log(logger, "No counter-example path of length %d found\n",
-                  stepN);
+                     stepN);
         }
         break;
 
       case SAT_SOLVER_INTERNAL_ERROR:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver answered with a fatal Internal "
-                       "Failure during problem solving.\n");
+        ErrorMgr_internal_error(errmgr,
+                                "Sorry, solver answered with a fatal Internal "
+                                "Failure during problem solving.\n");
 
       case SAT_SOLVER_TIMEOUT:
       case SAT_SOLVER_MEMOUT:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver ran out of resources and aborted "
-                       "the execution.\n");
+        ErrorMgr_internal_error(
+            errmgr, "Sorry, solver ran out of resources and aborted "
+                    "the execution.\n");
 
-      default: ErrorMgr_internal_error(errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
-                              __FILE__, __LINE__, __func__, satResult);
+      default:
+        ErrorMgr_internal_error(errmgr,
+                                "%s:%d:%s: Unexpected value in satResult (%d)",
+                                __FILE__, __LINE__, __func__, satResult);
       } /* switch */
 
       /* Destroy existing additional group with polarity of prob_k */
       SatIncSolver_destroy_group(solver_base, additionalGroup);
 
       /* Set positive polarity of prob_k permanently */
-      SatSolver_set_polarity(SAT_SOLVER(solver_base), cnf, 1,
-                SatSolver_get_permanent_group(SAT_SOLVER(solver_base)));
+      SatSolver_set_polarity(
+          SAT_SOLVER(solver_base), cnf, 1,
+          SatSolver_get_permanent_group(SAT_SOLVER(solver_base)));
 
       Be_Cnf_Delete(cnf);
 
       /* Insert transition relation (stepN,stepN+1) permanently */
-      unrolling = Bmc_Model_GetUnrolling(be_fsm, stepN, stepN+1);
+      unrolling = Bmc_Model_GetUnrolling(be_fsm, stepN, stepN + 1);
 
       bmc_add_be_into_solver_positively(
           SAT_SOLVER(solver_base),
-          SatSolver_get_permanent_group(SAT_SOLVER(solver_base)),
-          unrolling, be_enc, cnf_alg);
+          SatSolver_get_permanent_group(SAT_SOLVER(solver_base)), unrolling,
+          be_enc, cnf_alg);
 
       /* ---------------------- */
       /* --- Extending step --- */
       /* ---------------------- */
       if (opt_verbose_level_gt(opts, 0)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-            Logger_log(logger,
-                    "\nExtending the step to k=%d\n", stepN);
+        Logger_log(logger, "\nExtending the step to k=%d\n", stepN);
       }
 
       switch (strategy) {
-      case BMC_INVAR_BACKWARD_CLOSURE:
+      case BMC_INVAR_BACKWARD_CLOSURE: {
+
+        /* Note: because the transpose of the transition relation is used,
+           the bad goal state is state 0 and the current "initial" state is
+           state stepN */
+
+        /* SAT problem solving (backward step) */
+        satResult = SatSolver_solve_all_groups(SAT_SOLVER(solver_step));
+
+        /* Processes the result: */
+        switch (satResult) {
+
+        case SAT_SOLVER_SATISFIABLE_PROBLEM:
+          break;
+
+        case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
+          StreamMgr_print_output(streams, "-- ");
+          print_invar(StreamMgr_get_output_ostream(streams), oldprop,
+                      (Prop_PrintFmt)get_prop_print_method(opts));
+          StreamMgr_print_output(streams, "  is true\n");
+          Prop_set_status(invarprop, Prop_True);
+
+          /* freeing all existing object in the function */
+          SatIncSolver_destroy(solver_step);
+          SatIncSolver_destroy(solver_base);
+          lsDestroy(crnt_state_be_vars, NULL);
+
+          Prop_Rewriter_update_original_property(rewriter);
+          Prop_Rewriter_destroy(rewriter);
+          rewriter = NULL;
+
+          return 0;
+
+        case SAT_SOLVER_INTERNAL_ERROR:
+          ErrorMgr_internal_error(
+              errmgr, "Sorry, solver answered with a fatal Internal "
+                      "Failure during problem solving.\n");
+
+        case SAT_SOLVER_TIMEOUT:
+        case SAT_SOLVER_MEMOUT:
+          ErrorMgr_internal_error(
+              errmgr, "Sorry, solver ran out of resources and aborted "
+                      "the execution.\n");
+
+        default:
+          ErrorMgr_internal_error(
+              errmgr, "%s:%d:%s: Unexpected value in satResult (%d)", __FILE__,
+              __LINE__, __func__, satResult);
+        } /* switch */
+
+        { /* Insert the transion (stepN+1,stepN) to 'step' solver */
+
+          /* below it the code code from Bmc_Model_GetUnrolling (we
+             cannot use it directly, because k must be greater then j,
+             see Bmc_Model_GetUnrolling) */
+          be_ptr invar;
+          be_ptr trans;
+
+          /* restore the code below */
+          trans = BeEnc_untimed_expr_to_times(be_enc, BeFsm_get_trans(be_fsm),
+                                              stepN + 1, stepN + 1, stepN + 1,
+                                              stepN);
+          /* invars at step stepN */
+          invar = BeEnc_untimed_expr_to_timed(be_enc, BeFsm_get_invar(be_fsm),
+                                              stepN);
+
+          trans = Be_And(be_mgr, trans, invar);
+
+          /* invars at step stepN+1 */
+          invar = BeEnc_untimed_expr_to_timed(be_enc, BeFsm_get_invar(be_fsm),
+                                              stepN + 1);
+
+          trans = Be_And(be_mgr, trans, invar);
+
+          bmc_add_be_into_solver_positively(
+              SAT_SOLVER(solver_step),
+              SatSolver_get_permanent_group(SAT_SOLVER(solver_step)), trans,
+              be_enc, cnf_alg);
+        }
+
         {
+          be_ptr invar;
 
-          /* Note: because the transpose of the transition relation is used,
-             the bad goal state is state 0 and the current "initial" state is
-             state stepN */
+          invar = BeEnc_untimed_expr_to_timed(be_enc, be_invar, stepN + 1);
 
-          /* SAT problem solving (backward step) */
+          /* Insert the invariant at time stepN+1 to 'step' solver */
+          bmc_add_be_into_solver_positively(
+              SAT_SOLVER(solver_step),
+              SatSolver_get_permanent_group(SAT_SOLVER(solver_step)), invar,
+              be_enc, cnf_alg);
+        }
+
+        /* Insert and force to true not_equal(i,stepN+1) for each
+           0 < i < stepN+1 to 'step solver Note: we do not need to care
+           about state 0 because it is bad, therefore can not be equal
+           to all other states, which are good */
+        if (1 < stepN) {
+          be_ptr not_equal =
+              bmc_build_uniqueness(be_fsm, crnt_state_be_vars, 1, 1 + stepN);
+
+          bmc_add_be_into_solver_positively(
+              SAT_SOLVER(solver_step),
+              SatSolver_get_permanent_group(SAT_SOLVER(solver_step)), not_equal,
+              be_enc, cnf_alg);
+        }
+        break;
+      } /* BACKWARD CLOSURE */
+
+      case BMC_INVAR_FORWARD_CLOSURE: {
+        { /* push unrolling (permanent) */
+          be_ptr unrolling =
+              Bmc_Model_Invar_Dual_forward_unrolling(be_fsm, be_invar, stepN);
+
+          bmc_add_be_into_solver_positively(
+              SAT_SOLVER(solver_step),
+              SatSolver_get_permanent_group(SAT_SOLVER(solver_step)), unrolling,
+              be_enc, cnf_alg);
+        }
+
+        if (0 < stepN) {
+          /* push uniqueness (permanent) */
+          be_ptr uniqueness =
+              bmc_build_uniqueness(be_fsm, crnt_state_be_vars, 0, stepN);
+
+          bmc_add_be_into_solver_positively(
+              SAT_SOLVER(solver_step),
+              SatSolver_get_permanent_group(SAT_SOLVER(solver_step)),
+              uniqueness, be_enc, cnf_alg);
+        }
+
+        { /* push bug (temporarily) */
+          SatSolverGroup bugGroup = SatIncSolver_create_group(solver_step);
+
+          /* Insert the invariant at time k  but not set the polarity */
+          cnf = bmc_add_be_into_solver(
+              SAT_SOLVER(solver_step), bugGroup,
+              BeEnc_untimed_expr_to_timed(be_enc, be_invar, stepN), 0, cnf_alg,
+              be_enc);
+
+          /* Set negative polarity at time k in the additional group */
+          SatSolver_set_polarity(SAT_SOLVER(solver_step), cnf, -1, bugGroup);
+
+          /* SAT problem solving (forward step) */
           satResult = SatSolver_solve_all_groups(SAT_SOLVER(solver_step));
 
           /* Processes the result: */
           switch (satResult) {
 
-          case SAT_SOLVER_SATISFIABLE_PROBLEM: break;
-
-          case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
-            StreamMgr_print_output(streams,  "-- ");
-            print_invar(StreamMgr_get_output_ostream(streams),
-                        oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
-            StreamMgr_print_output(streams,  "  is true\n");
-            Prop_set_status(invarprop, Prop_True);
-
-            /* freeing all existing object in the function */
-            SatIncSolver_destroy(solver_step);
-            SatIncSolver_destroy(solver_base);
-            lsDestroy(crnt_state_be_vars, NULL);
-
-            Prop_Rewriter_update_original_property(rewriter);
-            Prop_Rewriter_destroy(rewriter); rewriter = NULL;
-
-            return 0;
-
-          case SAT_SOLVER_INTERNAL_ERROR:
-            ErrorMgr_internal_error(errmgr, "Sorry, solver answered with a fatal Internal "
-                           "Failure during problem solving.\n");
-
-          case SAT_SOLVER_TIMEOUT:
-          case SAT_SOLVER_MEMOUT:
-            ErrorMgr_internal_error(errmgr, "Sorry, solver ran out of resources and aborted "
-                           "the execution.\n");
-
-          default:
-            ErrorMgr_internal_error(errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
-                       __FILE__, __LINE__, __func__, satResult);
-          } /* switch */
-
-          { /* Insert the transion (stepN+1,stepN) to 'step' solver */
-
-            /* below it the code code from Bmc_Model_GetUnrolling (we
-               cannot use it directly, because k must be greater then j,
-               see Bmc_Model_GetUnrolling) */
-            be_ptr invar;
-            be_ptr trans;
-
-            /* restore the code below */
-            trans = BeEnc_untimed_expr_to_times(be_enc,
-                          BeFsm_get_trans(be_fsm), stepN+1, stepN+1,
-                                                stepN+1, stepN);
-            /* invars at step stepN */
-            invar = BeEnc_untimed_expr_to_timed(be_enc,
-                                                BeFsm_get_invar(be_fsm),
-                                                stepN);
-
-            trans = Be_And(be_mgr, trans, invar);
-
-            /* invars at step stepN+1 */
-            invar = BeEnc_untimed_expr_to_timed(be_enc,
-                                                BeFsm_get_invar(be_fsm),
-                                                stepN+1);
-
-            trans = Be_And(be_mgr, trans, invar);
-
-            bmc_add_be_into_solver_positively(
-                SAT_SOLVER(solver_step),
-                SatSolver_get_permanent_group(SAT_SOLVER(solver_step)),
-                trans, be_enc, cnf_alg);
-          }
-
-          {
-            be_ptr invar;
-
-            invar = BeEnc_untimed_expr_to_timed(be_enc, be_invar, stepN+1);
-
-            /* Insert the invariant at time stepN+1 to 'step' solver */
-            bmc_add_be_into_solver_positively(
-                SAT_SOLVER(solver_step),
-                SatSolver_get_permanent_group(SAT_SOLVER(solver_step)),
-                invar, be_enc, cnf_alg);
-          }
-
-          /* Insert and force to true not_equal(i,stepN+1) for each
-             0 < i < stepN+1 to 'step solver Note: we do not need to care
-             about state 0 because it is bad, therefore can not be equal
-             to all other states, which are good */
-          if (1 < stepN) {
-            be_ptr not_equal = bmc_build_uniqueness(be_fsm, crnt_state_be_vars,
-                                                    1, 1 + stepN);
-
-            bmc_add_be_into_solver_positively(
-                SAT_SOLVER(solver_step),
-                SatSolver_get_permanent_group(SAT_SOLVER(solver_step)),
-                not_equal, be_enc, cnf_alg);
-          }
-          break;
-        } /* BACKWARD CLOSURE */
-
-      case BMC_INVAR_FORWARD_CLOSURE:
-        {
-          { /* push unrolling (permanent) */
-            be_ptr unrolling =
-              Bmc_Model_Invar_Dual_forward_unrolling(be_fsm, be_invar, stepN);
-
-            bmc_add_be_into_solver_positively(
-                SAT_SOLVER(solver_step),
-                SatSolver_get_permanent_group(SAT_SOLVER(solver_step)),
-                unrolling, be_enc, cnf_alg);
-          }
-
-          if (0 < stepN) {
-            /* push uniqueness (permanent) */
-            be_ptr uniqueness =
-              bmc_build_uniqueness(be_fsm, crnt_state_be_vars, 0, stepN);
-
-            bmc_add_be_into_solver_positively(
-                SAT_SOLVER(solver_step),
-                SatSolver_get_permanent_group(SAT_SOLVER(solver_step)),
-                uniqueness, be_enc, cnf_alg);
-          }
-
-          { /* push bug (temporarily) */
-            SatSolverGroup bugGroup =  SatIncSolver_create_group(solver_step);
-
-            /* Insert the invariant at time k  but not set the polarity */
-            cnf =  bmc_add_be_into_solver(
-                SAT_SOLVER(solver_step), bugGroup,
-                BeEnc_untimed_expr_to_timed(be_enc, be_invar, stepN),
-                0, cnf_alg, be_enc);
-
-            /* Set negative polarity at time k in the additional group */
-            SatSolver_set_polarity(SAT_SOLVER(solver_step), cnf, -1, bugGroup);
-
-            /* SAT problem solving (forward step) */
-            satResult = SatSolver_solve_all_groups(SAT_SOLVER(solver_step));
-
-            /* Processes the result: */
-            switch (satResult) {
-
-            case SAT_SOLVER_SATISFIABLE_PROBLEM:
+          case SAT_SOLVER_SATISFIABLE_PROBLEM:
 #if 0
               /* [AT] This is a debugging code which generate
                  traces showing the failure of the induction.
@@ -1169,61 +1162,66 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
                         Trace_get_id(trace));
               }
 #endif
-              break;
+            break;
 
-            case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
-              StreamMgr_print_output(streams,  "-- ");
-              print_invar(StreamMgr_get_output_ostream(streams),
-                          oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
-              StreamMgr_print_output(streams,  "  is true\n");
-              Prop_set_status(invarprop, Prop_True);
+          case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
+            StreamMgr_print_output(streams, "-- ");
+            print_invar(StreamMgr_get_output_ostream(streams), oldprop,
+                        (Prop_PrintFmt)get_prop_print_method(opts));
+            StreamMgr_print_output(streams, "  is true\n");
+            Prop_set_status(invarprop, Prop_True);
 
-              /* freeing all existing object in the function */
-              SatIncSolver_destroy_group(solver_step, bugGroup);
-              SatIncSolver_destroy(solver_step);
-              SatIncSolver_destroy(solver_base);
-              lsDestroy(crnt_state_be_vars, NULL);
-
-              Prop_Rewriter_update_original_property(rewriter);
-              Prop_Rewriter_destroy(rewriter); rewriter = NULL;
-
-              return 0;
-
-            case SAT_SOLVER_INTERNAL_ERROR:
-              ErrorMgr_internal_error(errmgr, "Sorry, solver answered with a fatal Internal "
-                             "Failure during problem solving.\n");
-
-            case SAT_SOLVER_TIMEOUT:
-            case SAT_SOLVER_MEMOUT:
-              ErrorMgr_internal_error(errmgr, "Sorry, solver ran out of resources and aborted "
-                             "the execution.\n");
-
-            default:
-              ErrorMgr_internal_error(errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
-                             __FILE__, __LINE__, __func__, satResult);
-
-            } /* switch */
-
-            /* Destroy existing bug group */
+            /* freeing all existing object in the function */
             SatIncSolver_destroy_group(solver_step, bugGroup);
-          }
+            SatIncSolver_destroy(solver_step);
+            SatIncSolver_destroy(solver_base);
+            lsDestroy(crnt_state_be_vars, NULL);
 
-          break;
-        } /* FORWARD CLOSURE */
+            Prop_Rewriter_update_original_property(rewriter);
+            Prop_Rewriter_destroy(rewriter);
+            rewriter = NULL;
 
-      default: error_unreachable_code(); /* unexpected */
+            return 0;
+
+          case SAT_SOLVER_INTERNAL_ERROR:
+            ErrorMgr_internal_error(
+                errmgr, "Sorry, solver answered with a fatal Internal "
+                        "Failure during problem solving.\n");
+
+          case SAT_SOLVER_TIMEOUT:
+          case SAT_SOLVER_MEMOUT:
+            ErrorMgr_internal_error(
+                errmgr, "Sorry, solver ran out of resources and aborted "
+                        "the execution.\n");
+
+          default:
+            ErrorMgr_internal_error(
+                errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
+                __FILE__, __LINE__, __func__, satResult);
+
+          } /* switch */
+
+          /* Destroy existing bug group */
+          SatIncSolver_destroy_group(solver_step, bugGroup);
+        }
+
+        break;
+      } /* FORWARD CLOSURE */
+
+      default:
+        error_unreachable_code(); /* unexpected */
       }
 
       /* Print out the current state of solving */
-      StreamMgr_print_output(streams,
-              "-- no proof or counterexample found with bound %d", stepN);
+      StreamMgr_print_output(
+          streams, "-- no proof or counterexample found with bound %d", stepN);
       if (opt_verbose_level_gt(opts, 2)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_log(logger, " for ");
-        print_invar(Logger_get_ostream(logger),
-                    oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
+        print_invar(Logger_get_ostream(logger), oldprop,
+                    (Prop_PrintFmt)get_prop_print_method(opts));
       }
-      StreamMgr_print_output(streams,  "\n");
+      StreamMgr_print_output(streams, "\n");
 
     } /* for loop on stepN */
 
@@ -1234,27 +1232,27 @@ int Bmc_GenSolveInvarDual(NuSMVEnv_ptr env,
   } /* end of Dual algorithm */
 
   Prop_Rewriter_update_original_property(rewriter);
-  Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+  Prop_Rewriter_destroy(rewriter);
+  rewriter = NULL;
 
   return 0;
 }
 
 int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
-                                   const int max_k, int step_k)
-{
+                                   const int max_k, int step_k) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   const Be_CnfAlgorithm cnf_alg = get_rbc2cnf_algorithm(opts);
 
   BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
-  node_ptr binvarspec;  /* Its booleanization */
-  be_ptr be_invar;  /* Its BE representation */
-  BeFsm_ptr be_fsm; /* The corresponding be fsm */
+  node_ptr binvarspec; /* Its booleanization */
+  be_ptr be_invar;     /* Its BE representation */
+  BeFsm_ptr be_fsm;    /* The corresponding be fsm */
 
   BeEnc_ptr be_enc;
 
@@ -1267,8 +1265,7 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
   /* outputs the name of the algorithm */
   if (opt_verbose_level_gt(opts, 2)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-            "The invariant solving algorithm is Falsification\n");
+    Logger_log(logger, "The invariant solving algorithm is Falsification\n");
   }
 
   /* checks that a property was selected: */
@@ -1281,18 +1278,17 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
   be_fsm = Prop_compute_ground_be_fsm(env, invarprop);
   BE_FSM_CHECK_INSTANCE(be_fsm);
 
-  rewriter = Prop_Rewriter_create(env, invarprop,
-                                  WFF_REWRITE_METHOD_DEADLOCK_FREE,
-                                  WFF_REWRITER_REWRITE_INPUT_NEXT,
-                                  FSM_TYPE_BE, bdd_enc);
+  rewriter = Prop_Rewriter_create(
+      env, invarprop, WFF_REWRITE_METHOD_DEADLOCK_FREE,
+      WFF_REWRITER_REWRITE_INPUT_NEXT, FSM_TYPE_BE, bdd_enc);
   invarprop = Prop_Rewriter_rewrite(rewriter);
   be_fsm = Prop_get_be_fsm(invarprop);
 
   be_enc = BeFsm_get_be_encoding(be_fsm);
 
   /* Booleanizes, negates and NNFs the invariant formula: */
-  binvarspec = Wff2Nnf(env, Compile_detexpr2bexpr(bdd_enc,
-                                           Prop_get_expr_core(invarprop)));
+  binvarspec = Wff2Nnf(
+      env, Compile_detexpr2bexpr(bdd_enc, Prop_get_expr_core(invarprop)));
 
   /* begin the solving of the problem: */
   if (opt_verbose_level_gt(opts, 0)) {
@@ -1315,11 +1311,13 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
     /* Initialiaze two incremental SAT solvers */
     solver_base = Sat_CreateIncSolver(env, get_sat_solver(opts));
     if (solver_base == SAT_INC_SOLVER(NULL)) {
-      StreamMgr_print_error(streams,  "Incremental sat solver '%s' is not available.\n",
-              get_sat_solver(opts));
+      StreamMgr_print_error(streams,
+                            "Incremental sat solver '%s' is not available.\n",
+                            get_sat_solver(opts));
 
       Prop_Rewriter_update_original_property(rewriter);
-      Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+      Prop_Rewriter_destroy(rewriter);
+      rewriter = NULL;
 
       return 1;
     }
@@ -1327,7 +1325,7 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
     /* retrieves the list of bool variables needed to calculate the
        state uniqueness, taking into account of coi if enabled. */
     crnt_state_be_vars =
-      Bmc_Utils_get_vars_list_for_uniqueness(be_enc, invarprop);
+        Bmc_Utils_get_vars_list_for_uniqueness(be_enc, invarprop);
 
     be_invar = Bmc_Conv_Bexp2Be(be_enc, binvarspec);
 
@@ -1342,7 +1340,7 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
     nusmv_assert(badstatesvec);
     be_mgr = BeEnc_get_be_manager(be_enc);
 
-    for (stepN=0; stepN <= max_k; stepN += step_k) {
+    for (stepN = 0; stepN <= max_k; stepN += step_k) {
       be_ptr prob_k;
       SatSolverGroup additionalGroup;
       SatSolverResult satResult;
@@ -1351,7 +1349,7 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
       /* set the watchdog for the current iteration */
       WATCHDOG_START(env, BMC_WATCHDOG_NAME);
 
-      limit_k = (stepN + step_k <= max_k ? stepN + step_k : max_k+1);
+      limit_k = (stepN + step_k <= max_k ? stepN + step_k : max_k + 1);
       /* ---------------------- */
       /* --- Extending base --- */
       /* ---------------------- */
@@ -1360,8 +1358,8 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
         if (cur_k == 1) {
           Logger_log(logger, "\nExtending the base to k=%d\n", stepN);
         } else {
-          Logger_log(logger, "\nExtending the base to k in [%d:%d]\n",
-                     stepN, limit_k);
+          Logger_log(logger, "\nExtending the base to k in [%d:%d]\n", stepN,
+                     limit_k);
         }
       }
 
@@ -1369,16 +1367,15 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
       additionalGroup = SatIncSolver_create_group(solver_base);
 
       prob_k = Be_Falsity(be_mgr);
-      for (cur_k = stepN; cur_k < limit_k; ++cur_k){
+      for (cur_k = stepN; cur_k < limit_k; ++cur_k) {
         /* BE of the invariant at time k */
         be_ptr cur_prob_k =
-          BeEnc_untimed_expr_to_timed(be_enc, be_invar, cur_k);
+            BeEnc_untimed_expr_to_timed(be_enc, be_invar, cur_k);
 
         /* Insert the invariant at time k  but not set the polarity */
-        cnf =  bmc_add_be_into_solver(
+        cnf = bmc_add_be_into_solver(
             SAT_SOLVER(solver_base),
-            SatSolver_get_permanent_group(SAT_SOLVER(solver_base)),
-            cur_prob_k,
+            SatSolver_get_permanent_group(SAT_SOLVER(solver_base)), cur_prob_k,
             0, /* Consider both polarities during conversion */
             cnf_alg, be_enc);
 
@@ -1387,18 +1384,17 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
       }
       if (limit_k - stepN > 1) {
         be_ptr unrolling =
-          Bmc_Model_GetUnrolling(be_fsm, stepN, stepN + limit_k - 1);
+            Bmc_Model_GetUnrolling(be_fsm, stepN, stepN + limit_k - 1);
 
         bmc_add_be_into_solver_positively(
             SAT_SOLVER(solver_base),
-            SatSolver_get_permanent_group(SAT_SOLVER(solver_base)),
-            unrolling, be_enc, cnf_alg);
+            SatSolver_get_permanent_group(SAT_SOLVER(solver_base)), unrolling,
+            be_enc, cnf_alg);
       }
 
       /* Set the polarity at time k to flase in the additiona group */
-      cnf =  bmc_add_be_into_solver(SAT_SOLVER(solver_base),
-                                    additionalGroup, prob_k,
-                                    1, cnf_alg, be_enc);
+      cnf = bmc_add_be_into_solver(SAT_SOLVER(solver_base), additionalGroup,
+                                   prob_k, 1, cnf_alg, be_enc);
 
       SatSolver_set_polarity(SAT_SOLVER(solver_base), cnf, 1, additionalGroup);
 
@@ -1411,10 +1407,10 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
       switch (satResult) {
 
       case SAT_SOLVER_SATISFIABLE_PROBLEM:
-        StreamMgr_print_output(streams,  "-- ");
-        print_invar(StreamMgr_get_output_ostream(streams),
-                    oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
-        StreamMgr_print_output(streams,  "  is false\n");
+        StreamMgr_print_output(streams, "-- ");
+        print_invar(StreamMgr_get_output_ostream(streams), oldprop,
+                    (Prop_PrintFmt)get_prop_print_method(opts));
+        StreamMgr_print_output(streams, "  is false\n");
         Prop_set_status(invarprop, Prop_False);
 
         if (opt_counter_examples(opts)) {
@@ -1424,17 +1420,14 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
 
           bsexp_fsm = Prop_get_bool_sexp_fsm(invarprop);
           if (BOOL_SEXP_FSM(NULL) == bsexp_fsm) {
-            bsexp_fsm = \
-              BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
+            bsexp_fsm = BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
             BOOL_SEXP_FSM_CHECK_INSTANCE(bsexp_fsm);
           }
 
-          trace = \
-            Bmc_Utils_generate_and_print_cntexample(be_enc, tm,
-                                                    SAT_SOLVER(solver_base),
-                                                    prob_k, limit_k-1,
-                                                    "BMC Counterexample",
-                                  SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
+          trace = Bmc_Utils_generate_and_print_cntexample(
+              be_enc, tm, SAT_SOLVER(solver_base), prob_k, limit_k - 1,
+              "BMC Counterexample",
+              SexpFsm_get_symbols_list(SEXP_FSM(bsexp_fsm)));
 
           Prop_set_trace(invarprop, Trace_get_id(trace));
         }
@@ -1450,38 +1443,44 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
         lsDestroy(crnt_state_be_vars, NULL);
 
         Prop_Rewriter_update_original_property(rewriter);
-        Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+        Prop_Rewriter_destroy(rewriter);
+        rewriter = NULL;
 
         /* stop the watchdog */
         WATCHDOG_PAUSE(env, BMC_WATCHDOG_NAME);
         FREE(badstatesvec);
         return 0;
 
-      case  SAT_SOLVER_UNSATISFIABLE_PROBLEM:
+      case SAT_SOLVER_UNSATISFIABLE_PROBLEM:
         if (opt_verbose_level_gt(opts, 0)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           if (step_k == 1) {
             Logger_log(logger, "No counter-example path of length %d found\n",
                        stepN);
           } else {
-            Logger_log(logger, "No counter-example path of length between %d and %d found\n",
-                       stepN, limit_k-1);
+            Logger_log(
+                logger,
+                "No counter-example path of length between %d and %d found\n",
+                stepN, limit_k - 1);
           }
         }
         break;
 
       case SAT_SOLVER_INTERNAL_ERROR:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver answered with a fatal Internal "
-                       "Failure during problem solving.\n");
+        ErrorMgr_internal_error(errmgr,
+                                "Sorry, solver answered with a fatal Internal "
+                                "Failure during problem solving.\n");
 
       case SAT_SOLVER_TIMEOUT:
       case SAT_SOLVER_MEMOUT:
-        ErrorMgr_internal_error(errmgr, "Sorry, solver ran out of resources and aborted "
-                       "the execution.\n");
+        ErrorMgr_internal_error(
+            errmgr, "Sorry, solver ran out of resources and aborted "
+                    "the execution.\n");
 
       default:
-        ErrorMgr_internal_error(errmgr, "%s:%d:%s: Unexpected value in satResult (%d)",
-                       __FILE__, __LINE__, __func__, satResult);
+        ErrorMgr_internal_error(errmgr,
+                                "%s:%d:%s: Unexpected value in satResult (%d)",
+                                __FILE__, __LINE__, __func__, satResult);
       } /* switch */
 
       /* Destrioy existing additional group with polarity of prob_k */
@@ -1489,41 +1488,41 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
 
       /* Set the polarity of prob_k as true permaently */
       for (cur_k = stepN; cur_k < limit_k; ++cur_k) {
-        SatSolver_set_polarity(SAT_SOLVER(solver_base),
-                               badstatesvec[cur_k - stepN], 1,
-                               SatSolver_get_permanent_group(
-                                 SAT_SOLVER(solver_base)));
+        SatSolver_set_polarity(
+            SAT_SOLVER(solver_base), badstatesvec[cur_k - stepN], 1,
+            SatSolver_get_permanent_group(SAT_SOLVER(solver_base)));
         Be_Cnf_Delete(badstatesvec[cur_k - stepN]);
       }
       Be_Cnf_Delete(cnf);
 
       {
         /* Insert transition relation (steapN,stepN+1) permanently */
-        be_ptr unrolling = Bmc_Model_GetUnrolling(be_fsm, limit_k-1, limit_k);
+        be_ptr unrolling = Bmc_Model_GetUnrolling(be_fsm, limit_k - 1, limit_k);
 
         bmc_add_be_into_solver_positively(
             SAT_SOLVER(solver_base),
-            SatSolver_get_permanent_group(SAT_SOLVER(solver_base)),
-            unrolling, be_enc, cnf_alg);
+            SatSolver_get_permanent_group(SAT_SOLVER(solver_base)), unrolling,
+            be_enc, cnf_alg);
       }
 
       /* Print out the current state of solving */
       if (step_k == 1) {
-        StreamMgr_print_output(streams,
-                "-- no proof or counterexample found with bound %d", stepN);
+        StreamMgr_print_output(
+            streams, "-- no proof or counterexample found with bound %d",
+            stepN);
       } else {
         StreamMgr_print_output(
-          streams,
-          "-- no proof or counterexample found with bound between %d and %d",
-          stepN, limit_k-1);
+            streams,
+            "-- no proof or counterexample found with bound between %d and %d",
+            stepN, limit_k - 1);
       }
       if (opt_verbose_level_gt(opts, 2)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_log(logger, " for ");
-        print_invar(Logger_get_ostream(logger),
-                    oldprop, (Prop_PrintFmt) get_prop_print_method(opts));
+        print_invar(Logger_get_ostream(logger), oldprop,
+                    (Prop_PrintFmt)get_prop_print_method(opts));
       }
-      StreamMgr_print_output(streams,  "\n");
+      StreamMgr_print_output(streams, "\n");
 
       /* stop the watchdog */
       WATCHDOG_PAUSE(env, BMC_WATCHDOG_NAME);
@@ -1535,22 +1534,20 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
   } /* end of Falsification algorithm */
 
   Prop_Rewriter_update_original_property(rewriter);
-  Prop_Rewriter_destroy(rewriter); rewriter = NULL;
+  Prop_Rewriter_destroy(rewriter);
+  rewriter = NULL;
   FREE(badstatesvec);
 
   return 0;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
 
 /*!
   \brief Converts Be into CNF, and adds it into a group of a solver.
@@ -1565,11 +1562,9 @@ int Bmc_GenSolveInvarFalsification(NuSMVEnv_ptr env, Prop_ptr invarprop,
 
 inline static Be_Cnf_ptr bmc_add_be_into_solver(SatSolver_ptr solver,
                                                 SatSolverGroup group,
-                                                be_ptr prob,
-                                                int polarity,
+                                                be_ptr prob, int polarity,
                                                 Be_CnfAlgorithm cnf_alg,
-                                                BeEnc_ptr be_enc)
-{
+                                                BeEnc_ptr be_enc) {
   Be_Manager_ptr be_mgr;
   Be_Cnf_ptr cnf;
   be_ptr inprob;
@@ -1587,7 +1582,6 @@ inline static Be_Cnf_ptr bmc_add_be_into_solver(SatSolver_ptr solver,
   return cnf;
 }
 
-
 /*!
   \brief Converts Be into CNF, and adds it into a group of a solver,
   sets polarity to 1, and then destroys the CNF.
@@ -1600,11 +1594,10 @@ inline static void bmc_add_be_into_solver_positively(SatSolver_ptr solver,
                                                      SatSolverGroup group,
                                                      be_ptr prob,
                                                      BeEnc_ptr be_enc,
-                                                     Be_CnfAlgorithm cnf_alg)
-{
+                                                     Be_CnfAlgorithm cnf_alg) {
   Be_Cnf_ptr cnf;
 
-  cnf =  bmc_add_be_into_solver(solver, group, prob, 1, cnf_alg, be_enc);
+  cnf = bmc_add_be_into_solver(solver, group, prob, 1, cnf_alg, be_enc);
   SatSolver_set_polarity(solver, cnf, 1, group);
   Be_Cnf_Delete(cnf);
 }
@@ -1616,10 +1609,9 @@ inline static void bmc_add_be_into_solver_positively(SatSolver_ptr solver,
   \todo Missing description
 */
 
-static be_ptr
-bmc_build_uniqueness(const BeFsm_ptr be_fsm, const lsList state_vars,
-                     const int init_state, const int last_state)
-{
+static be_ptr bmc_build_uniqueness(const BeFsm_ptr be_fsm,
+                                   const lsList state_vars,
+                                   const int init_state, const int last_state) {
   BeEnc_ptr be_enc = BeFsm_get_be_encoding(be_fsm);
   Be_Manager_ptr be_mgr = BeEnc_get_be_manager(be_enc);
 
@@ -1635,9 +1627,8 @@ bmc_build_uniqueness(const BeFsm_ptr be_fsm, const lsList state_vars,
 
     lsForEachItem(state_vars, gen, be_var) {
       be_ptr be_xor =
-        Be_Xor(be_mgr,
-               BeEnc_untimed_expr_to_timed(be_enc, be_var, l),
-               BeEnc_untimed_expr_to_timed(be_enc, be_var, last_state));
+          Be_Xor(be_mgr, BeEnc_untimed_expr_to_timed(be_enc, be_var, l),
+                 BeEnc_untimed_expr_to_timed(be_enc, be_var, last_state));
 
       be_notEqual = Be_Or(be_mgr, be_notEqual, be_xor);
     }
@@ -1647,6 +1638,5 @@ bmc_build_uniqueness(const BeFsm_ptr be_fsm, const lsList state_vars,
 
   return res;
 }
-
 
 #endif /* NUSMV_HAVE_INCREMENTAL_SAT */

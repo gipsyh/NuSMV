@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,31 +34,26 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_BASE_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_BASE_TRACE_EXECUTOR_PRIVATE_H__
 
-
-#include "nusmv/core/trace/exec/BaseTraceExecutor.h"
 #include "nusmv/core/trace/Trace.h"
+#include "nusmv/core/trace/exec/BaseTraceExecutor.h"
 
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
 #include "nusmv/core/utils/utils.h"
 
-
 /*!
   \brief BaseTraceExecutor class definition derived from
                class Object
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct BaseTraceExecutor_TAG
-{
+typedef struct BaseTraceExecutor_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
@@ -70,10 +65,10 @@ typedef struct BaseTraceExecutor_TAG
   int verbosity;
 
   /* the output stream */
-  FILE* output_stream;
+  FILE *output_stream;
 
   /* the error stream */
-  FILE* error_stream;
+  FILE *error_stream;
 
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
@@ -90,8 +85,7 @@ typedef struct BaseTraceExecutor_TAG
 
   The BaseTraceExecutor class private initializer
 */
-void trace_executor_init(BaseTraceExecutor_ptr self,
-                                const NuSMVEnv_ptr env);
+void trace_executor_init(BaseTraceExecutor_ptr self, const NuSMVEnv_ptr env);
 
 /*!
   \methodof BaseTraceExecutor
@@ -117,6 +111,6 @@ void trace_executor_deinit(BaseTraceExecutor_ptr self);
   \se none
 */
 boolean trace_executor_check_defines(const BaseTraceExecutor_ptr self,
-                                            Trace_ptr trace);
+                                     Trace_ptr trace);
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_BASE_TRACE_EXECUTOR_PRIVATE_H__ */

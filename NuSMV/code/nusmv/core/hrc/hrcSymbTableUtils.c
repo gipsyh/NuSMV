@@ -34,43 +34,37 @@
 
 */
 
-
 #include "nusmv/core/hrc/hrcSymbTableUtils.h"
-#include "nusmv/core/hrc/hrcPrefixUtils.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/compile/compile.h"
-#include "nusmv/core/utils/error.h"
+#include "nusmv/core/hrc/hrcPrefixUtils.h"
+#include "nusmv/core/node/normalizers/MasterNormalizer.h"
+#include "nusmv/core/opt/OptsHandler.h"
+#include "nusmv/core/opt/opt.h"
+#include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/normalizers/MasterNormalizer.h"
-#include "nusmv/core/opt/opt.h"
-#include "nusmv/core/opt/OptsHandler.h"
+#include "nusmv/core/utils/error.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -78,23 +72,17 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void
-hrc_symb_table_utils_declare_variables(SymbTable_ptr symb_table,
-                                       SymbLayer_ptr layer,
-                                       Oiter vars_iter,
-                                       node_ptr context,
-                                       Instantiation_Variables_Mode_Type mode);
+static void hrc_symb_table_utils_declare_variables(
+    SymbTable_ptr symb_table, SymbLayer_ptr layer, Oiter vars_iter,
+    node_ptr context, Instantiation_Variables_Mode_Type mode);
 
-static void
-hrc_symb_table_utils_instantiate_array_define(SymbTable_ptr st,
-                                              SymbLayer_ptr layer,
-                                              node_ptr name,
-                                              node_ptr mod_name,
-                                              node_ptr definition);
-
+static void hrc_symb_table_utils_instantiate_array_define(SymbTable_ptr st,
+                                                          SymbLayer_ptr layer,
+                                                          node_ptr name,
+                                                          node_ptr mod_name,
+                                                          node_ptr definition);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -111,25 +99,23 @@ hrc_symb_table_utils_instantiate_array_define(SymbTable_ptr st,
 void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
                                               SymbLayer_ptr layer,
                                               HrcNode_ptr node,
-                                              node_ptr context)
-{
+                                              node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(symb_table));
   const MasterNormalizer_ptr normalizer =
-    MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
-  const ErrorMgr_ptr errmgr = ERROR_MGR(NuSMVEnv_get_value(env,
-                                                           ENV_ERROR_MANAGER));
+      MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
+  const ErrorMgr_ptr errmgr =
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   /* PARAMETERS */
   {
     Oiter actuals = HrcNode_get_actual_parameters_iter(node);
     Oiter formals = HrcNode_get_formal_parameters_iter(node);
 
-    for(; ! Oiter_is_end(actuals);
-        actuals = Oiter_next(actuals),
-        formals = Oiter_next(formals)) {
+    for (; !Oiter_is_end(actuals);
+         actuals = Oiter_next(actuals), formals = Oiter_next(formals)) {
       node_ptr actual, formal, form_flat;
 
-      nusmv_assert(! Oiter_is_end(formals));
+      nusmv_assert(!Oiter_is_end(formals));
       /* Parameters are stored in HRC as cons nodes with car = name
          and cdr = type. We just need the name */
       actual = car(NODE_PTR(Oiter_element(actuals)));
@@ -141,29 +127,22 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
   }
 
   /* State Variables */
-  hrc_symb_table_utils_declare_variables(symb_table,
-                                         layer,
-                                         HrcNode_get_state_variables_iter(node),
-                                         context,
-                                         State_Variables_Instantiation_Mode);
+  hrc_symb_table_utils_declare_variables(
+      symb_table, layer, HrcNode_get_state_variables_iter(node), context,
+      State_Variables_Instantiation_Mode);
   /* Frozen Variables */
-  hrc_symb_table_utils_declare_variables(symb_table,
-                                         layer,
-                                         HrcNode_get_frozen_variables_iter(node),
-                                         context,
-                                         Frozen_Variables_Instantiation_Mode);
+  hrc_symb_table_utils_declare_variables(
+      symb_table, layer, HrcNode_get_frozen_variables_iter(node), context,
+      Frozen_Variables_Instantiation_Mode);
   /* Input Variables */
-  hrc_symb_table_utils_declare_variables(symb_table,
-                                         layer,
-                                         HrcNode_get_input_variables_iter(node),
-                                         context,
-                                         Input_Variables_Instantiation_Mode);
-
+  hrc_symb_table_utils_declare_variables(
+      symb_table, layer, HrcNode_get_input_variables_iter(node), context,
+      Input_Variables_Instantiation_Mode);
 
   /* FUNCTIONs */
   {
     Oiter functions = HrcNode_get_frozen_functions_iter(node);
-    for(; ! Oiter_is_end(functions); functions = Oiter_next(functions)) {
+    for (; !Oiter_is_end(functions); functions = Oiter_next(functions)) {
       node_ptr name = car(NODE_PTR(Oiter_element(functions)));
       node_ptr type = cdr(NODE_PTR(Oiter_element(functions)));
 
@@ -172,20 +151,19 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
       rs = SymbTable_resolve_symbol(symb_table, name, context);
       name = ResolveSymbol_get_resolved_name(rs);
 
-      if (! SymbLayer_can_declare_function(layer, name)) {
+      if (!SymbLayer_can_declare_function(layer, name)) {
         /* a more precise error message */
         if (SymbTable_is_symbol_parameter(symb_table, name)) {
           ErrorMgr_error_shadowing(errmgr, name);
-        }
-        else ErrorMgr_error_redefining(errmgr, name);
+        } else
+          ErrorMgr_error_redefining(errmgr, name);
       }
 
       nusmv_assert(SymbLayer_can_declare_function(layer, name));
 
       {
-        SymbType_ptr fun_type =
-            Compile_InstantiateType(symb_table, layer,
-                                    name, type, context, false);
+        SymbType_ptr fun_type = Compile_InstantiateType(symb_table, layer, name,
+                                                        type, context, false);
 
         SymbLayer_declare_function(layer, name, context, fun_type);
       }
@@ -195,7 +173,7 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
   /* DEFINEs */
   {
     Oiter defines = HrcNode_get_defines_iter(node);
-    for(; ! Oiter_is_end(defines); defines = Oiter_next(defines)) {
+    for (; !Oiter_is_end(defines); defines = Oiter_next(defines)) {
       node_ptr name = car(NODE_PTR(Oiter_element(defines)));
       node_ptr body = cdr(NODE_PTR(Oiter_element(defines)));
       ResolveSymbol_ptr rs;
@@ -203,12 +181,12 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
       rs = SymbTable_resolve_symbol(symb_table, name, context);
       name = ResolveSymbol_get_resolved_name(rs);
 
-      if (! SymbLayer_can_declare_define(layer, name)) {
+      if (!SymbLayer_can_declare_define(layer, name)) {
         /* a more precise error message */
         if (SymbTable_is_symbol_parameter(symb_table, name)) {
           ErrorMgr_error_shadowing(errmgr, name);
-        }
-        else ErrorMgr_error_redefining(errmgr, name);
+        } else
+          ErrorMgr_error_redefining(errmgr, name);
       }
 
       nusmv_assert(SymbLayer_can_declare_define(layer, name));
@@ -219,7 +197,8 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
   /*  ARRAY DEFINE */
   {
     Oiter array_defines = HrcNode_get_array_defines_iter(node);
-    for(; ! Oiter_is_end(array_defines); array_defines = Oiter_next(array_defines)) {
+    for (; !Oiter_is_end(array_defines);
+         array_defines = Oiter_next(array_defines)) {
       node_ptr name = car(NODE_PTR(Oiter_element(array_defines)));
       node_ptr body = cdr(NODE_PTR(Oiter_element(array_defines)));
       ResolveSymbol_ptr rs;
@@ -230,8 +209,8 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
       nusmv_assert(SymbLayer_can_declare_array_define(layer, name));
       /* SymbLayer_declare_array_define(layer, name, context, body); */
 
-      hrc_symb_table_utils_instantiate_array_define(symb_table, layer,
-                                                    name, context, body);
+      hrc_symb_table_utils_instantiate_array_define(symb_table, layer, name,
+                                                    context, body);
     }
   }
 
@@ -239,14 +218,13 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
   /* Constants do not need any type of flattening */
   {
     Oiter constants = HrcNode_get_constants_iter(node);
-    for(; ! Oiter_is_end(constants); constants = Oiter_next(constants)) {
+    for (; !Oiter_is_end(constants); constants = Oiter_next(constants)) {
       /* [SM] 25/08/2010: added normalization to constant.
          The constant inserted in the symbol table MUST be normalized,
          as it happens in the compile flatten process.
        */
-      node_ptr constant =
-        MasterNormalizer_normalize_node(normalizer,
-                                        NODE_PTR(Oiter_element(constants)));
+      node_ptr constant = MasterNormalizer_normalize_node(
+          normalizer, NODE_PTR(Oiter_element(constants)));
 
       if (SymbLayer_can_declare_constant(layer, constant)) {
         SymbLayer_declare_constant(layer, constant);
@@ -259,7 +237,6 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -271,19 +248,16 @@ void hrc_symb_table_utils_populate_symb_table(SymbTable_ptr symb_table,
   Declares each variable of the given array within
                       the symbol table.
 */
-static void hrc_symb_table_utils_declare_variables(SymbTable_ptr symb_table,
-                                                   SymbLayer_ptr layer,
-                                                   Oiter vars_iter,
-                                                   node_ptr context,
-                                                   Instantiation_Variables_Mode_Type mode)
-{
+static void hrc_symb_table_utils_declare_variables(
+    SymbTable_ptr symb_table, SymbLayer_ptr layer, Oiter vars_iter,
+    node_ptr context, Instantiation_Variables_Mode_Type mode) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(symb_table));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const MasterNormalizer_ptr normalizer =
-    MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
+      MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
 
-  for(; ! Oiter_is_end(vars_iter); vars_iter = Oiter_next(vars_iter)) {
+  for (; !Oiter_is_end(vars_iter); vars_iter = Oiter_next(vars_iter)) {
     node_ptr var_node = NODE_PTR(Oiter_element(vars_iter));
     node_ptr var = car(var_node);
     node_ptr type = cdr(var_node);
@@ -293,26 +267,23 @@ static void hrc_symb_table_utils_declare_variables(SymbTable_ptr symb_table,
     var = MasterNormalizer_normalize_node(normalizer, var);
 
     if (PROCESS == node_get_type(type)) {
-      StreamMgr_print_error(streams,  "%s\n",
-                            "Processes are not yet supported by the HRC hierarchy");
+      StreamMgr_print_error(
+          streams, "%s\n",
+          "Processes are not yet supported by the HRC hierarchy");
 
       error_unreachable_code();
-    }
-    else {
+    } else {
       const OptsHandler_ptr opts =
-        OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+          OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-      SymbType_ptr symbolicType
-        = Compile_InstantiateType(symb_table,
-                                  layer,
-                                  var, type, context, false);
-      boolean success
-        = Compile_DeclareVariable(symb_table, layer,
-                                  var, symbolicType, context, mode);
-      nusmv_assert(success ||
-                   ( (! opt_keep_single_value_vars(opts)) &&
-                    SymbTable_is_symbol_define(symb_table,
-                                               hrc_prefix_utils_concat_context(env, context, var))));
+      SymbType_ptr symbolicType =
+          Compile_InstantiateType(symb_table, layer, var, type, context, false);
+      boolean success = Compile_DeclareVariable(symb_table, layer, var,
+                                                symbolicType, context, mode);
+      nusmv_assert(success || ((!opt_keep_single_value_vars(opts)) &&
+                               SymbTable_is_symbol_define(
+                                   symb_table, hrc_prefix_utils_concat_context(
+                                                   env, context, var))));
     }
   } /* loop on vars */
 }
@@ -329,13 +300,11 @@ static void hrc_symb_table_utils_instantiate_array_define(SymbTable_ptr st,
                                                           SymbLayer_ptr layer,
                                                           node_ptr name,
                                                           node_ptr mod_name,
-                                                          node_ptr definition)
-{
+                                                          node_ptr definition) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   if (!SymbLayer_can_declare_define(layer, name)) {
     ErrorMgr_error_redefining(errmgr, name);
@@ -343,40 +312,35 @@ static void hrc_symb_table_utils_instantiate_array_define(SymbTable_ptr st,
   }
 
   switch (node_get_type(definition)) {
-  case ARRAY_DEF:
-    {
-      node_ptr iter;
-      int idx;
-      nusmv_assert((cdr(definition) == Nil) &&
-                   "Wrong node arity found: ARRAY_DEF must be unary!");
+  case ARRAY_DEF: {
+    node_ptr iter;
+    int idx;
+    nusmv_assert((cdr(definition) == Nil) &&
+                 "Wrong node arity found: ARRAY_DEF must be unary!");
 
-      /* Declare this symbol */
-      SymbLayer_declare_array_define(layer, name, mod_name, definition);
+    /* Declare this symbol */
+    SymbLayer_declare_array_define(layer, name, mod_name, definition);
 
-      /* Instantiate every element of the array individually
-         with first index = 0 */
-      for (idx = 0, iter = car(definition);
-           iter != Nil;
-           idx += 1, iter = cdr(iter)) {
-        /* definition has to be a list of values */
-        nusmv_assert(CONS == node_get_type(iter));
+    /* Instantiate every element of the array individually
+       with first index = 0 */
+    for (idx = 0, iter = car(definition); iter != Nil;
+         idx += 1, iter = cdr(iter)) {
+      /* definition has to be a list of values */
+      nusmv_assert(CONS == node_get_type(iter));
 
-        {  /* Instantiate name[idx] element */
-          node_ptr index =
-              find_node(nodemgr, NUMBER, NODE_FROM_INT(idx), Nil);
-          hrc_symb_table_utils_instantiate_array_define(
-              st, layer,
-              find_node(nodemgr, ARRAY, name, index),
-              mod_name, car(iter));
-        }
+      { /* Instantiate name[idx] element */
+        node_ptr index = find_node(nodemgr, NUMBER, NODE_FROM_INT(idx), Nil);
+        hrc_symb_table_utils_instantiate_array_define(
+            st, layer, find_node(nodemgr, ARRAY, name, index), mod_name,
+            car(iter));
       }
-      break;
     }
+    break;
+  }
 
-  default:
-    {
-      /* Declare this element */
-      SymbLayer_declare_define(layer, name, mod_name, definition);
-    }
+  default: {
+    /* Declare this element */
+    SymbLayer_declare_define(layer, name, mod_name, definition);
+  }
   }
 }

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -38,7 +38,7 @@
 #define __NUSMV_CORE_TRACE_LOADERS_TRACE_XML_LOADER_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/trace/loaders/TraceLoader.h"
@@ -53,7 +53,7 @@
 
   \todo Missing description
 */
-typedef struct TraceXmlLoader_TAG* TraceXmlLoader_ptr;
+typedef struct TraceXmlLoader_TAG *TraceXmlLoader_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -68,16 +68,15 @@ typedef struct TraceXmlLoader_TAG* TraceXmlLoader_ptr;
 
   \todo Missing description
 */
-#define TRACE_XML_LOADER(x) \
-         ((TraceXmlLoader_ptr) x)
+#define TRACE_XML_LOADER(x) ((TraceXmlLoader_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_LOADER_CHECK_INSTANCE(x) \
-         (nusmv_assert(TRACE_XML_LOADER(x) != TRACE_XML_LOADER(NULL)))
+#define TRACE_XML_LOADER_CHECK_INSTANCE(x)                                     \
+  (nusmv_assert(TRACE_XML_LOADER(x) != TRACE_XML_LOADER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -89,14 +88,12 @@ typedef struct TraceXmlLoader_TAG* TraceXmlLoader_ptr;
   \methodof TraceXmlLoader
   \brief Constructor
 
-  
+
 */
-TraceXmlLoader_ptr
-TraceXmlLoader_create(const char* xml_filename,
-                      boolean halt_on_undefined_symbols,
-                      boolean halt_on_wrong_section);
+TraceXmlLoader_ptr TraceXmlLoader_create(const char *xml_filename,
+                                         boolean halt_on_undefined_symbols,
+                                         boolean halt_on_wrong_section);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __TRACE_XML__H */
-

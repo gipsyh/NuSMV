@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
   SatMinisat inherits the SatIncSolver (interface) class
 
 */
-
 
 #ifndef __NUSMV_CORE_SAT_SOLVERS_SAT_MINISAT_H__
 #define __NUSMV_CORE_SAT_SOLVERS_SAT_MINISAT_H__
@@ -55,7 +54,7 @@
 
   \todo Missing description
 */
-typedef struct SatMinisat_TAG* SatMinisat_ptr;
+typedef struct SatMinisat_TAG *SatMinisat_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -70,15 +69,14 @@ typedef struct SatMinisat_TAG* SatMinisat_ptr;
 
   \todo Missing description
 */
-#define SAT_MINISAT(x)                          \
-  ((SatMinisat_ptr) x)
+#define SAT_MINISAT(x) ((SatMinisat_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SAT_MINISAT_CHECK_INSTANCE(x)                   \
+#define SAT_MINISAT_CHECK_INSTANCE(x)                                          \
   (nusmv_assert(SAT_MINISAT(x) != SAT_MINISAT(NULL)))
 
 /**AutomaticStart*************************************************************/
@@ -95,15 +93,14 @@ typedef struct SatMinisat_TAG* SatMinisat_ptr;
 
   The first parameter is the name of the solver.
 */
-SatMinisat_ptr SatMinisat_create(const NuSMVEnv_ptr env,
-                                        const char* name,
-                                        boolean enable_proof_logging);
+SatMinisat_ptr SatMinisat_create(const NuSMVEnv_ptr env, const char *name,
+                                 boolean enable_proof_logging);
 
 /*!
   \methodof SatMinisat
   \brief Destroys an instance of a MiniSat SAT solver
 
-  
+
 */
 void SatMinisat_destroy(SatMinisat_ptr self);
 

@@ -39,6 +39,6 @@
 #ifndef __NUSMV_CORE_UTILS_MSVC_H__
 #define __NUSMV_CORE_UTILS_MSVC_H__
 
-int Utils_msvc_files_are_the_same(const char* fname1, const char* fname2);
+int Utils_msvc_files_are_the_same(const char *fname1, const char *fname2);
 
-#endif  /* __NUSMV_CORE_UTILS_MSVC_H__ */
+#endif /* __NUSMV_CORE_UTILS_MSVC_H__ */

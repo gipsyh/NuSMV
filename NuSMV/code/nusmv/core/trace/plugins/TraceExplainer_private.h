@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,8 +37,8 @@
 #ifndef __NUSMV_CORE_TRACE_PLUGINS_TRACE_EXPLAINER_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_PLUGINS_TRACE_EXPLAINER_PRIVATE_H__
 
-#include "nusmv/core/trace/plugins/TracePlugin_private.h"
 #include "nusmv/core/trace/plugins/TraceExplainer.h"
+#include "nusmv/core/trace/plugins/TracePlugin_private.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -59,11 +59,10 @@
   </dl>
   <br>
   This Class inherits from TracePlugin class.
-  
+
 */
 
-typedef struct TraceExplainer_TAG
-{
+typedef struct TraceExplainer_TAG {
   INHERITS_FROM(TracePlugin);
 
   boolean changes_only;
@@ -86,8 +85,7 @@ typedef struct TraceExplainer_TAG
   \methodof TraceExplainer
   \todo
 */
-void trace_explainer_init(TraceExplainer_ptr self,
-                          boolean changes_only);
+void trace_explainer_init(TraceExplainer_ptr self, boolean changes_only);
 
 /*!
   \methodof TraceExplainer
@@ -100,4 +98,3 @@ int trace_explainer_action(const TracePlugin_ptr plugin);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __TRACE_EXPLAIN_PRIVATE__H */
-

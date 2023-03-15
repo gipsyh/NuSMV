@@ -15,18 +15,16 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_WFF_WFF_REWRITE_H__
 #define __NUSMV_CORE_WFF_WFF_REWRITE_H__
 
-#include "nusmv/core/utils/defs.h"
-#include "nusmv/core/utils/Pair.h"
 #include "nusmv/core/compile/FlatHierarchy.h"
+#include "nusmv/core/utils/Pair.h"
+#include "nusmv/core/utils/defs.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -42,14 +40,16 @@ enum WffRewriteFormulaKind_TAG {
   WFF_REWRITE_FORMULA_KIND_FIRST = 0,
   WFF_REWRITE_FORMULA_KIND_STATE = 1, /* non-temporal and without input vars or
                                       next operator */
-  WFF_REWRITE_FORMULA_KIND_INPUT = 1 << 1, /* non-temporal but with input vars */
-  WFF_REWRITE_FORMULA_KIND_NEXT = 1 << 2, /* non-temporal but with next operator */
+  WFF_REWRITE_FORMULA_KIND_INPUT = 1
+                                   << 1, /* non-temporal but with input vars */
+  WFF_REWRITE_FORMULA_KIND_NEXT =
+      1 << 2, /* non-temporal but with next operator */
   WFF_REWRITE_FORMULA_KIND_INPUT_NEXT =
-  WFF_REWRITE_FORMULA_KIND_INPUT |
-  WFF_REWRITE_FORMULA_KIND_NEXT, /* non-temporal but with input vars
-                                           and next operator */
-  WFF_REWRITE_FORMULA_KIND_TEMP = 1 << 3, /* temporal (it must be without input vars or
-                                              next operator) */
+      WFF_REWRITE_FORMULA_KIND_INPUT |
+      WFF_REWRITE_FORMULA_KIND_NEXT,      /* non-temporal but with input vars
+                                                    and next operator */
+  WFF_REWRITE_FORMULA_KIND_TEMP = 1 << 3, /* temporal (it must be without input
+                                             vars or next operator) */
   WFF_REWRITE_FORMULA_KIND_LAST = 1 << 4
 };
 typedef enum WffRewriteFormulaKind_TAG WffRewriteFormulaKind;
@@ -118,7 +118,6 @@ typedef enum {
   WFF_REWRITE_METHOD_DEADLOCK_FREE,
 } WffRewriteMethod;
 
-
 /*! \brief The type of expected input property.
 
   The input property to be converted is a generalized invar
@@ -136,16 +135,13 @@ typedef enum {
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -165,13 +161,10 @@ typedef enum {
 
   \sa Prop_Rewriter_private.h
 */
-Pair_ptr Wff_Rewrite_rewrite_formula(NuSMVEnv_ptr const env,
-                                            const WffRewriteMethod method,
-                                            const WffRewriterExpectedProperty eproptype,
-                                            SymbLayer_ptr layer,
-                                            FlatHierarchy_ptr outfh,
-                                            node_ptr const spec,
-                                            const short int spec_type);
+Pair_ptr Wff_Rewrite_rewrite_formula(
+    NuSMVEnv_ptr const env, const WffRewriteMethod method,
+    const WffRewriterExpectedProperty eproptype, SymbLayer_ptr layer,
+    FlatHierarchy_ptr outfh, node_ptr const spec, const short int spec_type);
 
 /*!
   \brief Return an equivalent specification, without input vars
@@ -187,15 +180,12 @@ Pair_ptr Wff_Rewrite_rewrite_formula(NuSMVEnv_ptr const env,
 
   \sa Prop_Rewriter_private.h
 */
-Pair_ptr Wff_Rewrite_rewrite_formula_generic(NuSMVEnv_ptr const env,
-                                             const WffRewriteMethod method,
-                                             const WffRewriterExpectedProperty eproptype,
-                                             SymbLayer_ptr layer,
-                                             FlatHierarchy_ptr outfh,
-                                             node_ptr const spec,
-                                             const short int spec_type,
-                                             const boolean initialize_monitor_to_true,
-                                             const boolean ltl2invar_negate_property);
+Pair_ptr Wff_Rewrite_rewrite_formula_generic(
+    NuSMVEnv_ptr const env, const WffRewriteMethod method,
+    const WffRewriterExpectedProperty eproptype, SymbLayer_ptr layer,
+    FlatHierarchy_ptr outfh, node_ptr const spec, const short int spec_type,
+    const boolean initialize_monitor_to_true,
+    const boolean ltl2invar_negate_property);
 
 /*!
   \brief Checks if "wff" contains input variables or next
@@ -203,8 +193,7 @@ Pair_ptr Wff_Rewrite_rewrite_formula_generic(NuSMVEnv_ptr const env,
 
 */
 boolean Wff_Rewrite_is_rewriting_needed(SymbTable_ptr st, node_ptr wff,
-                                               node_ptr context);
-
+                                        node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

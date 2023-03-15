@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_BASE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_BASE_H__
-
 
 #include "nusmv/core/node/node.h"
 
@@ -51,7 +48,7 @@
 
 
 */
-typedef struct PrinterBase_TAG*  PrinterBase_ptr;
+typedef struct PrinterBase_TAG *PrinterBase_ptr;
 
 /*!
   \brief To cast and check instances of class PrinterBase
@@ -59,17 +56,15 @@ typedef struct PrinterBase_TAG*  PrinterBase_ptr;
   These macros must be used respectively to cast and to check
   instances of class PrinterBase
 */
-#define PRINTER_BASE(self) \
-         ((PrinterBase_ptr) self)
+#define PRINTER_BASE(self) ((PrinterBase_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PRINTER_BASE_CHECK_INSTANCE(self) \
-         (nusmv_assert(PRINTER_BASE(self) != PRINTER_BASE(NULL)))
-
+#define PRINTER_BASE_CHECK_INSTANCE(self)                                      \
+  (nusmv_assert(PRINTER_BASE(self) != PRINTER_BASE(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -87,12 +82,9 @@ typedef struct PrinterBase_TAG*  PrinterBase_ptr;
 
   \sa PrinterBase_can_handle
 */
-VIRTUAL int
-PrinterBase_print_node(PrinterBase_ptr self, node_ptr n, int priority);
-
-
+VIRTUAL int PrinterBase_print_node(PrinterBase_ptr self, node_ptr n,
+                                   int priority);
 
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_PRINTER_BASE_H__ */

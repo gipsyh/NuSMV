@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,30 +34,28 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_HRC_NODE_H__
 #define __NUSMV_CORE_HRC_HRC_NODE_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/node/node.h"
-#include "nusmv/core/utils/Slist.h"
-#include "nusmv/core/utils/Olist.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/Olist.h"
+#include "nusmv/core/utils/Slist.h"
+#include "nusmv/core/utils/utils.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 /*!
   \struct HrcNode
   \brief Definition of the public accessor for class HrcNode
 
-  
+
 */
-typedef struct HrcNode_TAG*  HrcNode_ptr;
+typedef struct HrcNode_TAG *HrcNode_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -69,18 +67,15 @@ typedef struct HrcNode_TAG*  HrcNode_ptr;
   These macros must be used respectively to cast and to check
   instances of class HrcNode
 */
-#define HRC_NODE(self) \
-         ((HrcNode_ptr) self)
+#define HRC_NODE(self) ((HrcNode_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define HRC_NODE_CHECK_INSTANCE(self) \
-         (nusmv_assert(HRC_NODE(self) != HRC_NODE(NULL)))
-
-
+#define HRC_NODE_CHECK_INSTANCE(self)                                          \
+  (nusmv_assert(HRC_NODE(self) != HRC_NODE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -129,7 +124,7 @@ HrcNode_ptr HrcNode_copy(const HrcNode_ptr self);
   \sa HrcNode_copy
 */
 HrcNode_ptr HrcNode_copy_rename(const HrcNode_ptr self,
-                                      node_ptr new_module_name);
+                                node_ptr new_module_name);
 
 /*!
   \methodof HrcNode
@@ -137,7 +132,7 @@ HrcNode_ptr HrcNode_copy_rename(const HrcNode_ptr self,
   its children.
 
   Creates a copy of self and recursively of all
-  its children. 
+  its children.
 */
 HrcNode_ptr HrcNode_recursive_copy(const HrcNode_ptr self);
 
@@ -149,7 +144,7 @@ HrcNode_ptr HrcNode_recursive_copy(const HrcNode_ptr self);
                       This is needed for safely recycle a node instance.
                       For example, if a parsing error occurs.
                       Children are destroyed.
-                      
+
 */
 void HrcNode_cleanup(HrcNode_ptr self);
 
@@ -176,7 +171,6 @@ void HrcNode_destroy(HrcNode_ptr self);
   \sa HrcNode_create, HrcNode_destroy
 */
 void HrcNode_destroy_recur(HrcNode_ptr self);
-
 
 /* Getters and Setters ********************************************************/
 
@@ -405,10 +399,10 @@ void HrcNode_add_formal_parameter(HrcNode_ptr self, node_ptr par);
   par_name is the name of the formal parameter.
 
   Note that given parameter may have type set to Nil.
-  
+
 */
 node_ptr HrcNode_find_formal_parameter(const HrcNode_ptr self,
-                                              node_ptr par_name);
+                                       node_ptr par_name);
 
 /*!
   \methodof HrcNode
@@ -682,10 +676,9 @@ void HrcNode_add_define(HrcNode_ptr self, node_ptr def);
   Nil is returned if define is not found.
 
   def_name is the name of the define.
-  
+
 */
-node_ptr HrcNode_find_define(const HrcNode_ptr self,
-                                    node_ptr def_name);
+node_ptr HrcNode_find_define(const HrcNode_ptr self, node_ptr def_name);
 
 /*!
   \methodof HrcNode
@@ -778,7 +771,7 @@ void HrcNode_add_init_expr(HrcNode_ptr self, node_ptr expr);
   current node.
 
   Replaces the init(*) := expressions for the
-  current node. 
+  current node.
 
   \se Structure is updated
 
@@ -895,7 +888,6 @@ Oiter HrcNode_get_invar_assign_exprs_iter(const HrcNode_ptr self);
   \sa optional
 */
 void HrcNode_add_invar_assign_expr(HrcNode_ptr self, node_ptr assign);
-
 
 /* TRANS */
 
@@ -1295,7 +1287,7 @@ void HrcNode_add_compute_property_expr(HrcNode_ptr self, node_ptr compute);
 
   \sa HrcNode_set_undef
 */
-void HrcNode_set_undef(const HrcNode_ptr self, void* undef);
+void HrcNode_set_undef(const HrcNode_ptr self, void *undef);
 
 /*!
   \methodof HrcNode
@@ -1305,7 +1297,7 @@ void HrcNode_set_undef(const HrcNode_ptr self, void* undef);
 
   \sa HrcNode_set_undef
 */
-void* HrcNode_get_undef(const HrcNode_ptr self);
+void *HrcNode_get_undef(const HrcNode_ptr self);
 
 /* We assume the father of the child has been set by someone else */
 
@@ -1344,7 +1336,6 @@ void HrcNode_add_child_hrc_node(HrcNode_ptr self, HrcNode_ptr node);
 */
 Slist_ptr HrcNode_get_child_hrc_nodes(const HrcNode_ptr self);
 
-
 /* Queries  *******************************************************************/
 
 /*!
@@ -1358,7 +1349,7 @@ Slist_ptr HrcNode_get_child_hrc_nodes(const HrcNode_ptr self);
                       can be declared
 */
 boolean HrcNode_can_declare_assign(HrcNode_ptr self, node_ptr symbol,
-                                          int assign_type);
+                                   int assign_type);
 
 /*!
   \methodof HrcNode
@@ -1386,7 +1377,6 @@ boolean HrcNode_is_root(const HrcNode_ptr self);
 */
 boolean HrcNode_is_leaf(const HrcNode_ptr self);
 
-
 /* Miscellaneous **************************************************************/
 /* NULL if it does not exixts */
 
@@ -1402,9 +1392,8 @@ boolean HrcNode_is_leaf(const HrcNode_ptr self);
 
   \sa optional
 */
-HrcNode_ptr
-HrcNode_find_hrc_node_by_mod_type(const HrcNode_ptr self,
-                                  node_ptr mod_type);
+HrcNode_ptr HrcNode_find_hrc_node_by_mod_type(const HrcNode_ptr self,
+                                              node_ptr mod_type);
 
 /* The caller has to free returned list */
 
@@ -1421,9 +1410,8 @@ HrcNode_find_hrc_node_by_mod_type(const HrcNode_ptr self,
 
   \sa optional
 */
-Olist_ptr
-HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
-                                   const node_ptr mod_type);
+Olist_ptr HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
+                                             const node_ptr mod_type);
 
 /* NULL if it does not exits */
 
@@ -1439,9 +1427,8 @@ HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
 
   \sa optional
 */
-HrcNode_ptr
-HrcNode_find_hrc_node_by_instance_name(const HrcNode_ptr self,
-                                       node_ptr name);
+HrcNode_ptr HrcNode_find_hrc_node_by_instance_name(const HrcNode_ptr self,
+                                                   node_ptr name);
 
 /* Find var_name of a given kind (state, frozen, input) in self node */
 
@@ -1462,8 +1449,7 @@ HrcNode_find_hrc_node_by_instance_name(const HrcNode_ptr self,
   [MD] bad interface, the input is a symbol, the output is a pair symbol, type
   (returned as a CONS)
 */
-node_ptr
-HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type);
+node_ptr HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type);
 
 /*!
   \methodof HrcNode
@@ -1472,8 +1458,7 @@ HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type);
   Like HrcNode_find_var, but it searches in all variable
   types VAR, FROZENVAR, INVAR
 */
-node_ptr
-HrcNode_find_var_all(HrcNode_ptr self, node_ptr var_name);
+node_ptr HrcNode_find_var_all(HrcNode_ptr self, node_ptr var_name);
 
 /*!
   \methodof HrcNode
@@ -1499,8 +1484,7 @@ void HrcNode_unlink_nodes(HrcNode_ptr self, HrcNode_ptr child);
   The symbol table is not modified.
                       Linear in the number of state variables
 */
-void HrcNode_remove_state_variable(HrcNode_ptr self,
-                                          node_ptr var);
+void HrcNode_remove_state_variable(HrcNode_ptr self, node_ptr var);
 
 /*!
   \methodof HrcNode
@@ -1509,8 +1493,7 @@ void HrcNode_remove_state_variable(HrcNode_ptr self,
   The symbol table is not modified.
                       Linear in the number of frozen variables
 */
-void HrcNode_remove_frozen_variable(HrcNode_ptr self,
-                                          node_ptr var);
+void HrcNode_remove_frozen_variable(HrcNode_ptr self, node_ptr var);
 
 /*!
   \methodof HrcNode
@@ -1519,14 +1502,13 @@ void HrcNode_remove_frozen_variable(HrcNode_ptr self,
   The symbol table is not modified.
                       Linear in the number of input variables
 */
-void HrcNode_remove_input_variable(HrcNode_ptr self,
-                                          node_ptr var);
+void HrcNode_remove_input_variable(HrcNode_ptr self, node_ptr var);
 
 /*!
   \methodof HrcNode
   \brief Returns the number of all declared variables
 
-  
+
 */
 int HrcNode_get_vars_num(const HrcNode_ptr self);
 
@@ -1534,7 +1516,7 @@ int HrcNode_get_vars_num(const HrcNode_ptr self);
   \methodof HrcNode
   \brief Returns the number of all declared state variables
 
-  
+
 */
 int HrcNode_get_state_vars_num(const HrcNode_ptr self);
 
@@ -1542,7 +1524,7 @@ int HrcNode_get_state_vars_num(const HrcNode_ptr self);
   \methodof HrcNode
   \brief Returns the number of all declared frozen variables
 
-  
+
 */
 int HrcNode_get_frozen_vars_num(const HrcNode_ptr self);
 
@@ -1550,7 +1532,7 @@ int HrcNode_get_frozen_vars_num(const HrcNode_ptr self);
   \methodof HrcNode
   \brief Returns the number of all declared input variables
 
-  
+
 */
 int HrcNode_get_input_vars_num(const HrcNode_ptr self);
 
@@ -1558,7 +1540,7 @@ int HrcNode_get_input_vars_num(const HrcNode_ptr self);
   \methodof HrcNode
   \brief Returns the number of all declared defines
 
-  
+
 */
 int HrcNode_get_defines_num(const HrcNode_ptr self);
 
@@ -1566,7 +1548,7 @@ int HrcNode_get_defines_num(const HrcNode_ptr self);
   \methodof HrcNode
   \brief Returns the number of all declared array define
 
-  
+
 */
 int HrcNode_get_array_defines_num(const HrcNode_ptr self);
 
@@ -1574,7 +1556,7 @@ int HrcNode_get_array_defines_num(const HrcNode_ptr self);
   \methodof HrcNode
   \brief Returns the number of all parameters
 
-  
+
 */
 int HrcNode_get_parameters_num(const HrcNode_ptr self);
 
@@ -1599,12 +1581,9 @@ int HrcNode_get_functions_num(const HrcNode_ptr self);
   \methodof HrcNode
   \brief Returns the number of all symbols
 
-  
+
 */
 int HrcNode_get_symbols_num(const HrcNode_ptr self);
-
-
-
 
 /**AutomaticEnd***************************************************************/
 

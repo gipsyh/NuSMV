@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,15 +34,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_TRACE_TRACE_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_TRACE_PRIVATE_H__
 
 #include "nusmv/core/trace/Trace.h"
-#include "nusmv/core/utils/array.h"
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/EnvObject_private.h"
+#include "nusmv/core/utils/array.h"
+#include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/error.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -51,11 +50,16 @@ typedef enum TraceSection_TAG {
   /* reserved */
   TRACE_SECTION_INVALID = 0,
 
-  TRACE_SECTION_FROZEN_VAR, TRACE_SECTION_STATE_VAR,
-  TRACE_SECTION_INPUT_VAR, TRACE_SECTION_STATE_DEFINE,
-  TRACE_SECTION_INPUT_DEFINE, TRACE_SECTION_STATE_INPUT_DEFINE,
-  TRACE_SECTION_NEXT_DEFINE, TRACE_SECTION_STATE_NEXT_DEFINE,
-  TRACE_SECTION_INPUT_NEXT_DEFINE, TRACE_SECTION_STATE_INPUT_NEXT_DEFINE,
+  TRACE_SECTION_FROZEN_VAR,
+  TRACE_SECTION_STATE_VAR,
+  TRACE_SECTION_INPUT_VAR,
+  TRACE_SECTION_STATE_DEFINE,
+  TRACE_SECTION_INPUT_DEFINE,
+  TRACE_SECTION_STATE_INPUT_DEFINE,
+  TRACE_SECTION_NEXT_DEFINE,
+  TRACE_SECTION_STATE_NEXT_DEFINE,
+  TRACE_SECTION_INPUT_NEXT_DEFINE,
+  TRACE_SECTION_STATE_INPUT_NEXT_DEFINE,
 
   /* reserved */
   TRACE_SECTION_END,
@@ -69,7 +73,7 @@ typedef enum TraceSection_TAG {
 
   \todo Missing description
 */
-typedef struct TraceFrozenFrame_TAG* TraceFrozenFrame_ptr;
+typedef struct TraceFrozenFrame_TAG *TraceFrozenFrame_ptr;
 
 /*!
   \struct TraceVarFrame
@@ -77,7 +81,7 @@ typedef struct TraceFrozenFrame_TAG* TraceFrozenFrame_ptr;
 
   \todo Missing description
 */
-typedef struct TraceVarFrame_TAG* TraceVarFrame_ptr;
+typedef struct TraceVarFrame_TAG *TraceVarFrame_ptr;
 
 /*!
   \struct TraceDefineFrame
@@ -85,7 +89,7 @@ typedef struct TraceVarFrame_TAG* TraceVarFrame_ptr;
 
   \todo Missing description
 */
-typedef struct TraceDefineFrame_TAG* TraceDefineFrame_ptr;
+typedef struct TraceDefineFrame_TAG *TraceDefineFrame_ptr;
 
 /*!
   \brief Trace Class
@@ -113,16 +117,15 @@ typedef struct TraceDefineFrame_TAG* TraceDefineFrame_ptr;
             <dd>  Symbol to index hash table for fast look-up.
     </dl>
         <br>
-  
+
 */
 
-typedef struct Trace_TAG
-{
+typedef struct Trace_TAG {
   INHERITS_FROM(EnvObject);
 
   /* metadata */
   TraceType type;
-  const char* desc;
+  const char *desc;
   int id;
 
   unsigned length;
@@ -147,7 +150,7 @@ typedef struct Trace_TAG
 
   /* buckets (first and last unused) */
   unsigned n_buckets[TRACE_SECTION_END];
-  node_ptr* buckets[TRACE_SECTION_END];
+  node_ptr *buckets[TRACE_SECTION_END];
 
   /*  lookup aux structures */
   hash_ptr symb2section;
@@ -157,11 +160,10 @@ typedef struct Trace_TAG
 } Trace;
 
 /* frames */
-typedef struct TraceVarFrame_TAG
-{
+typedef struct TraceVarFrame_TAG {
   /* metadata */
-  node_ptr* state_values;
-  node_ptr* input_values;
+  node_ptr *state_values;
+  node_ptr *input_values;
 
   /* for frozen traces only */
   boolean loopback;
@@ -175,28 +177,24 @@ typedef struct TraceVarFrame_TAG
   TraceVarFrame_ptr prev_frame;
 } TraceVarFrame;
 
-typedef struct TraceFrozenFrame_TAG
-{
-  node_ptr* frozen_values;
+typedef struct TraceFrozenFrame_TAG {
+  node_ptr *frozen_values;
   /* unsigned n_frozen_values; */
 } TraceFrozenFrame;
 
-typedef struct TraceDefineFrame_TAG
-{
-  node_ptr* s_values;
-  node_ptr* i_values;
-  node_ptr* si_values;
-  node_ptr* n_values;
-  node_ptr* sn_values;
-  node_ptr* in_values;
-  node_ptr* sin_values;
+typedef struct TraceDefineFrame_TAG {
+  node_ptr *s_values;
+  node_ptr *i_values;
+  node_ptr *si_values;
+  node_ptr *n_values;
+  node_ptr *sn_values;
+  node_ptr *in_values;
+  node_ptr *sin_values;
 } TraceDefineFrame;
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -219,31 +217,28 @@ typedef struct TraceDefineFrame_TAG
 
   \todo Missing description
 */
-#define TRACE_VAR_FRAME(x) \
-  ((TraceVarFrame_ptr) x)
+#define TRACE_VAR_FRAME(x) ((TraceVarFrame_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_DEFINE_FRAME(x) \
-  ((TraceDefineFrame_ptr) x)
+#define TRACE_DEFINE_FRAME(x) ((TraceDefineFrame_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_FROZEN_FRAME(x) \
-  ((TraceFrozenFrame_ptr) x)
+#define TRACE_FROZEN_FRAME(x) ((TraceFrozenFrame_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_VAR_FRAME_CHECK_INSTANCE(x) \
+#define TRACE_VAR_FRAME_CHECK_INSTANCE(x)                                      \
   (nusmv_assert(TRACE_VAR_FRAME(x) != TRACE_VAR_FRAME(NULL)))
 
 /*!
@@ -251,7 +246,7 @@ typedef struct TraceDefineFrame_TAG
 
   \todo Missing description
 */
-#define TRACE_DEFINE_FRAME_CHECK_INSTANCE(x) \
+#define TRACE_DEFINE_FRAME_CHECK_INSTANCE(x)                                   \
   (nusmv_assert(TRACE_DEFINE_FRAME(x) != TRACE_DEFINE_FRAME(NULL)))
 
 /*!
@@ -259,7 +254,7 @@ typedef struct TraceDefineFrame_TAG
 
   \todo Missing description
 */
-#define TRACE_FROZEN_FRAME_CHECK_INSTANCE(x) \
+#define TRACE_FROZEN_FRAME_CHECK_INSTANCE(x)                                   \
   (nusmv_assert(TRACE_FROZEN_FRAME(x) != TRACE_FROZEN_FRAME(NULL)))
 
 /**AutomaticStart*************************************************************/
@@ -273,11 +268,9 @@ typedef struct TraceDefineFrame_TAG
 
   \todo Missing description
 */
-Trace_ptr
-trace_create(SymbTable_ptr st, const char* desc,
-             const TraceType type, NodeList_ptr symbols,
-             boolean is_volatile,
-           boolean allow_bits);
+Trace_ptr trace_create(SymbTable_ptr st, const char *desc, const TraceType type,
+                       NodeList_ptr symbols, boolean is_volatile,
+                       boolean allow_bits);
 
 /*!
   \methodof Trace
@@ -285,9 +278,7 @@ trace_create(SymbTable_ptr st, const char* desc,
 
   \todo Missing description
 */
-Trace_ptr
-trace_copy(Trace_ptr self, TraceIter until_here,
-           boolean is_volatile);
+Trace_ptr trace_copy(Trace_ptr self, TraceIter until_here, boolean is_volatile);
 
 /*!
   \methodof Trace
@@ -295,8 +286,7 @@ trace_copy(Trace_ptr self, TraceIter until_here,
 
   \todo Missing description
 */
-boolean
-trace_is_volatile(const Trace_ptr self);
+boolean trace_is_volatile(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -304,8 +294,7 @@ trace_is_volatile(const Trace_ptr self);
 
   \todo Missing description
 */
-boolean
-trace_equals(const Trace_ptr self, const Trace_ptr other);
+boolean trace_equals(const Trace_ptr self, const Trace_ptr other);
 
 /*!
   \methodof Trace
@@ -313,8 +302,7 @@ trace_equals(const Trace_ptr self, const Trace_ptr other);
 
   \todo Missing description
 */
-Trace_ptr
-trace_concat(Trace_ptr self, Trace_ptr* other);
+Trace_ptr trace_concat(Trace_ptr self, Trace_ptr *other);
 
 /*!
   \methodof Trace
@@ -322,8 +310,7 @@ trace_concat(Trace_ptr self, Trace_ptr* other);
 
   \todo Missing description
 */
-void
-trace_destroy(Trace_ptr self);
+void trace_destroy(Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -331,9 +318,8 @@ trace_destroy(Trace_ptr self);
 
   \todo Missing description
 */
-boolean
-trace_symbol_fwd_lookup(Trace_ptr self, node_ptr symb,
-                        TraceSection* section, unsigned* index);
+boolean trace_symbol_fwd_lookup(Trace_ptr self, node_ptr symb,
+                                TraceSection *section, unsigned *index);
 
 /*!
   \methodof Trace
@@ -341,9 +327,8 @@ trace_symbol_fwd_lookup(Trace_ptr self, node_ptr symb,
 
   \todo Missing description
 */
-node_ptr
-trace_symbol_bwd_lookup(Trace_ptr self, TraceSection section,
-                        unsigned offset);
+node_ptr trace_symbol_bwd_lookup(Trace_ptr self, TraceSection section,
+                                 unsigned offset);
 
 /*!
   \methodof Trace
@@ -351,8 +336,7 @@ trace_symbol_bwd_lookup(Trace_ptr self, TraceSection section,
 
   \todo Missing description
 */
-TraceIter
-trace_append_step(Trace_ptr self);
+TraceIter trace_append_step(Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -360,8 +344,7 @@ trace_append_step(Trace_ptr self);
 
   \todo Missing description
 */
-boolean
-trace_step_is_loopback(const Trace_ptr self, const TraceIter step);
+boolean trace_step_is_loopback(const Trace_ptr self, const TraceIter step);
 
 /*!
   \methodof Trace
@@ -369,8 +352,7 @@ trace_step_is_loopback(const Trace_ptr self, const TraceIter step);
 
   \todo Missing description
 */
-boolean
-trace_step_test_loopback(Trace_ptr self, const TraceIter step);
+boolean trace_step_test_loopback(Trace_ptr self, const TraceIter step);
 
 /*!
   \methodof Trace
@@ -378,8 +360,7 @@ trace_step_test_loopback(Trace_ptr self, const TraceIter step);
 
   \todo Missing description
 */
-void
-trace_step_force_loopback(const Trace_ptr self, TraceIter step);
+void trace_step_force_loopback(const Trace_ptr self, TraceIter step);
 
 /*!
   \methodof Trace
@@ -387,8 +368,7 @@ trace_step_force_loopback(const Trace_ptr self, TraceIter step);
 
   \todo Missing description
 */
-boolean
-trace_is_frozen(const Trace_ptr self);
+boolean trace_is_frozen(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -396,8 +376,7 @@ trace_is_frozen(const Trace_ptr self);
 
   \todo Missing description
 */
-boolean
-trace_is_thawed(const Trace_ptr self);
+boolean trace_is_thawed(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -405,8 +384,7 @@ trace_is_thawed(const Trace_ptr self);
 
   \todo Missing description
 */
-void
-trace_freeze(Trace_ptr self);
+void trace_freeze(Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -414,8 +392,7 @@ trace_freeze(Trace_ptr self);
 
   \todo Missing description
 */
-void
-trace_thaw(Trace_ptr self);
+void trace_thaw(Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -423,8 +400,7 @@ trace_thaw(Trace_ptr self);
 
   \todo Missing description
 */
-boolean
-trace_symbol_in_language(const Trace_ptr self, const node_ptr symb);
+boolean trace_symbol_in_language(const Trace_ptr self, const node_ptr symb);
 
 /*!
   \methodof Trace
@@ -432,8 +408,7 @@ trace_symbol_in_language(const Trace_ptr self, const node_ptr symb);
 
   \todo Missing description
 */
-SymbCategory
-trace_symbol_get_category(Trace_ptr self, node_ptr symb);
+SymbCategory trace_symbol_get_category(Trace_ptr self, node_ptr symb);
 
 /*!
   \methodof Trace
@@ -441,8 +416,8 @@ trace_symbol_get_category(Trace_ptr self, node_ptr symb);
 
   \todo Missing description
 */
-const char*
-trace_get_layer_from_symb(const Trace_ptr self, const node_ptr symb);
+const char *trace_get_layer_from_symb(const Trace_ptr self,
+                                      const node_ptr symb);
 
 /*!
   \methodof Trace
@@ -450,9 +425,8 @@ trace_get_layer_from_symb(const Trace_ptr self, const node_ptr symb);
 
   \todo Missing description
 */
-boolean
-trace_symbol_is_assigned(const Trace_ptr self,
-                         const TraceIter step, node_ptr symb);
+boolean trace_symbol_is_assigned(const Trace_ptr self, const TraceIter step,
+                                 node_ptr symb);
 
 /*!
   \methodof Trace
@@ -460,9 +434,8 @@ trace_symbol_is_assigned(const Trace_ptr self,
 
   \todo Missing description
 */
-boolean
-trace_step_put_value(Trace_ptr self, const TraceIter step,
-                     const node_ptr symb, const node_ptr value);
+boolean trace_step_put_value(Trace_ptr self, const TraceIter step,
+                             const node_ptr symb, const node_ptr value);
 
 /*!
   \methodof Trace
@@ -470,9 +443,8 @@ trace_step_put_value(Trace_ptr self, const TraceIter step,
 
   \todo Missing description
 */
-node_ptr
-trace_step_get_value(const Trace_ptr self, const TraceIter step,
-                     const node_ptr symb);
+node_ptr trace_step_get_value(const Trace_ptr self, const TraceIter step,
+                              const node_ptr symb);
 
 /*!
   \methodof Trace
@@ -480,9 +452,8 @@ trace_step_get_value(const Trace_ptr self, const TraceIter step,
 
   \todo Missing description
 */
-boolean
-trace_is_complete_vars(const Trace_ptr self, const NodeList_ptr vars,
-                       FILE* report_stream);
+boolean trace_is_complete_vars(const Trace_ptr self, const NodeList_ptr vars,
+                               FILE *report_stream);
 
 /* horizontal iterators management */
 
@@ -492,8 +463,7 @@ trace_is_complete_vars(const Trace_ptr self, const NodeList_ptr vars,
 
   \todo Missing description
 */
-TraceIter
-trace_first_iter(const Trace_ptr self);
+TraceIter trace_first_iter(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -501,8 +471,7 @@ trace_first_iter(const Trace_ptr self);
 
   \todo Missing description
 */
-TraceIter
-trace_ith_iter(const Trace_ptr self, unsigned i);
+TraceIter trace_ith_iter(const Trace_ptr self, unsigned i);
 
 /*!
   \methodof Trace
@@ -510,8 +479,7 @@ trace_ith_iter(const Trace_ptr self, unsigned i);
 
   \todo Missing description
 */
-TraceIter
-trace_last_iter(const Trace_ptr self);
+TraceIter trace_last_iter(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -519,24 +487,21 @@ trace_last_iter(const Trace_ptr self);
 
   \todo Missing description
 */
-unsigned
-trace_iter_i(const Trace_ptr self, TraceIter iter);
+unsigned trace_iter_i(const Trace_ptr self, TraceIter iter);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-TraceIter
-trace_iter_get_next(const TraceIter iter);
+TraceIter trace_iter_get_next(const TraceIter iter);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-TraceIter
-trace_iter_get_prev(const TraceIter iter);
+TraceIter trace_iter_get_prev(const TraceIter iter);
 
 /* vertical iterators management */
 
@@ -546,18 +511,16 @@ trace_iter_get_prev(const TraceIter iter);
 
   \todo Missing description
 */
-TraceStepIter
-trace_step_iter(const Trace_ptr self, const TraceIter step,
-                TraceIteratorType iter_type);
+TraceStepIter trace_step_iter(const Trace_ptr self, const TraceIter step,
+                              TraceIteratorType iter_type);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-boolean
-trace_step_iter_fetch(TraceStepIter* step_iter,
-                      node_ptr* symb, node_ptr* value);
+boolean trace_step_iter_fetch(TraceStepIter *step_iter, node_ptr *symb,
+                              node_ptr *value);
 
 /*!
   \methodof Trace
@@ -565,17 +528,16 @@ trace_step_iter_fetch(TraceStepIter* step_iter,
 
   \todo Missing description
 */
-TraceSymbolsIter
-trace_symbols_iter(const Trace_ptr self, TraceIteratorType iter_type);
+TraceSymbolsIter trace_symbols_iter(const Trace_ptr self,
+                                    TraceIteratorType iter_type);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-boolean
-trace_symbols_iter_fetch(TraceSymbolsIter* symbols_iter,
-                         node_ptr* symb);
+boolean trace_symbols_iter_fetch(TraceSymbolsIter *symbols_iter,
+                                 node_ptr *symb);
 
 /* trace metadata */
 
@@ -585,8 +547,7 @@ trace_symbols_iter_fetch(TraceSymbolsIter* symbols_iter,
 
   \todo Missing description
 */
-unsigned
-trace_get_length(const Trace_ptr self);
+unsigned trace_get_length(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -594,8 +555,7 @@ trace_get_length(const Trace_ptr self);
 
   \todo Missing description
 */
-boolean
-trace_is_empty(const Trace_ptr self);
+boolean trace_is_empty(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -603,8 +563,7 @@ trace_is_empty(const Trace_ptr self);
 
   \todo Missing description
 */
-NodeList_ptr
-trace_get_symbols(const Trace_ptr self);
+NodeList_ptr trace_get_symbols(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -612,8 +571,7 @@ trace_get_symbols(const Trace_ptr self);
 
   \todo Missing description
 */
-NodeList_ptr
-trace_get_s_vars(const Trace_ptr self);
+NodeList_ptr trace_get_s_vars(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -621,8 +579,7 @@ trace_get_s_vars(const Trace_ptr self);
 
   \todo Missing description
 */
-NodeList_ptr
-trace_get_sf_vars(const Trace_ptr self);
+NodeList_ptr trace_get_sf_vars(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -630,8 +587,7 @@ trace_get_sf_vars(const Trace_ptr self);
 
   \todo Missing description
 */
-NodeList_ptr
-trace_get_i_vars(const Trace_ptr self);
+NodeList_ptr trace_get_i_vars(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -639,8 +595,7 @@ trace_get_i_vars(const Trace_ptr self);
 
   \todo Missing description
 */
-SymbTable_ptr
-trace_get_symb_table(Trace_ptr self);
+SymbTable_ptr trace_get_symb_table(Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -648,8 +603,7 @@ trace_get_symb_table(Trace_ptr self);
 
   \todo Missing description
 */
-void
-trace_register(Trace_ptr self, int id);
+void trace_register(Trace_ptr self, int id);
 
 /*!
   \methodof Trace
@@ -657,8 +611,7 @@ trace_register(Trace_ptr self, int id);
 
   \todo Missing description
 */
-void
-trace_unregister(Trace_ptr self);
+void trace_unregister(Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -666,8 +619,7 @@ trace_unregister(Trace_ptr self);
 
   \todo Missing description
 */
-boolean
-trace_is_registered(Trace_ptr self);
+boolean trace_is_registered(Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -675,8 +627,7 @@ trace_is_registered(Trace_ptr self);
 
   \todo Missing description
 */
-int
-trace_get_id(const Trace_ptr self);
+int trace_get_id(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -684,8 +635,7 @@ trace_get_id(const Trace_ptr self);
 
   \todo Missing description
 */
-TraceType
-trace_get_type(const Trace_ptr self);
+TraceType trace_get_type(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -693,8 +643,7 @@ trace_get_type(const Trace_ptr self);
 
   \todo Missing description
 */
-void
-trace_set_type(Trace_ptr self, TraceType trace_type);
+void trace_set_type(Trace_ptr self, TraceType trace_type);
 
 /*!
   \methodof Trace
@@ -702,8 +651,7 @@ trace_set_type(Trace_ptr self, TraceType trace_type);
 
   \todo Missing description
 */
-const char*
-trace_get_desc(const Trace_ptr self);
+const char *trace_get_desc(const Trace_ptr self);
 
 /*!
   \methodof Trace
@@ -711,8 +659,7 @@ trace_get_desc(const Trace_ptr self);
 
   \todo Missing description
 */
-void
-trace_set_desc(Trace_ptr self, const char* desc);
+void trace_set_desc(Trace_ptr self, const char *desc);
 
 /*!
   \methodof Trace
@@ -731,23 +678,21 @@ trace_set_desc(Trace_ptr self, const char* desc);
                or a valid, empty list.
 
                0 is returned if no mismatching were detected, 1
-               otherwise 
+               otherwise
 
   \se The trace is filled with defines, failures list is
                populated as necessary.
 */
-void
-trace_step_evaluate_defines(Trace_ptr self, const TraceIter step);
+void trace_step_evaluate_defines(Trace_ptr self, const TraceIter step);
 
 /*!
   \methodof Trace
-  \brief 
+  \brief
 
-  
+
 */
-boolean
-trace_step_check_defines(Trace_ptr self, const TraceIter step,
-                         NodeList_ptr failures);
+boolean trace_step_check_defines(Trace_ptr self, const TraceIter step,
+                                 NodeList_ptr failures);
 
 /* private conversion functions */
 
@@ -756,24 +701,21 @@ trace_step_check_defines(Trace_ptr self, const TraceIter step,
 
   \todo Missing description
 */
-SymbCategory
-trace_section_to_category(const TraceSection section);
+SymbCategory trace_section_to_category(const TraceSection section);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-TraceSection
-trace_category_to_section(const SymbCategory category);
+TraceSection trace_category_to_section(const SymbCategory category);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-const char*
-trace_symb_category_to_string(const SymbCategory category);
+const char *trace_symb_category_to_string(const SymbCategory category);
 
 /**AutomaticEnd***************************************************************/
 

@@ -34,13 +34,12 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #if defined(_MSC_VER)
-#include <stdlib.h>  /* for getenv in MSVC */
+#include <stdlib.h> /* for getenv in MSVC */
 #endif
 
 #include "nusmv/core/cinit/cinitInt.h"
@@ -56,7 +55,7 @@
 
   \todo Missing description
 */
-#define NUSMV_PACKAGE_BUILD_DATE  "<compile date not supplied>"
+#define NUSMV_PACKAGE_BUILD_DATE "<compile date not supplied>"
 #endif
 
 #ifndef NUSMV_PACKAGE_STRING
@@ -66,65 +65,60 @@
 
   \todo Missing description
 */
-#define NUSMV_PACKAGE_STRING         "NuSMV 2.5.x"
+#define NUSMV_PACKAGE_STRING "NuSMV 2.5.x"
 #endif
 
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-# define NUSMV_PACKAGE_STRING_POSTFIX " zchaff"
+#define NUSMV_PACKAGE_STRING_POSTFIX " zchaff"
 #else
-# define NUSMV_PACKAGE_STRING_POSTFIX ""
+#define NUSMV_PACKAGE_STRING_POSTFIX ""
 #endif
 
 #ifndef NUSMV_SHARE_PATH
-# ifdef DATADIR
-#  define NUSMV_SHARE_PATH DATADIR "/nusmv"
-# elif defined(_WIN32) || defined(__CYGWIN__)
-#  define NUSMV_SHARE_PATH "./nusmv"
-# else
-#  define NUSMV_SHARE_PATH "/usr/share/nusmv"
-# endif
+#ifdef DATADIR
+#define NUSMV_SHARE_PATH DATADIR "/nusmv"
+#elif defined(_WIN32) || defined(__CYGWIN__)
+#define NUSMV_SHARE_PATH "./nusmv"
+#else
+#define NUSMV_SHARE_PATH "/usr/share/nusmv"
 #endif
-
+#endif
 
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void cinit_banner_print(FILE* file, boolean is_linked);
-static char * DateReadFromDateString(char * datestr);
+static void cinit_banner_print(FILE *file, boolean is_linked);
+static char *DateReadFromDateString(char *datestr);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-char* CInit_NuSMVReadVersion()
-{
-  int max_len = 20 +
-    strlen(NuSMVCore_get_tool_name()) +
-    strlen(NuSMVCore_get_tool_version()) +
-    strlen(NuSMVCore_get_build_date());
+char *CInit_NuSMVReadVersion() {
+  int max_len = 20 + strlen(NuSMVCore_get_tool_name()) +
+                strlen(NuSMVCore_get_tool_version()) +
+                strlen(NuSMVCore_get_build_date());
 
-  char* version = ALLOC(char, max_len);
+  char *version = ALLOC(char, max_len);
   int c;
 
   c = snprintf(version, max_len, "%s %s (compiled on %s)",
-              NuSMVCore_get_tool_name(), NuSMVCore_get_tool_version(),
-              NuSMVCore_get_build_date());
+               NuSMVCore_get_tool_name(), NuSMVCore_get_tool_version(),
+               NuSMVCore_get_build_date());
   SNPRINTF_CHECK(c, max_len);
   return version;
 }
 
-char* CInit_NuSMVObtainLibrary(void)
-{
+char *CInit_NuSMVObtainLibrary(void) {
 #if NUSMV_HAVE_GETENV || defined(_MSC_VER)
-  const char* tool_path_suffix = "_LIBRARY_PATH";
-  char * nusmv_lib_path;
-  const char* tool_name = NuSMVCore_get_tool_name();
-  char* path = ALLOC(char, strlen(tool_name) + strlen(tool_path_suffix) + 1);
+  const char *tool_path_suffix = "_LIBRARY_PATH";
+  char *nusmv_lib_path;
+  const char *tool_name = NuSMVCore_get_tool_name();
+  char *path = ALLOC(char, strlen(tool_name) + strlen(tool_path_suffix) + 1);
   int i;
 
   for (i = 0; i < strlen(tool_name); ++i) {
@@ -138,8 +132,7 @@ char* CInit_NuSMVObtainLibrary(void)
 
   if (nusmv_lib_path) {
     return util_tilde_expand(nusmv_lib_path);
-  }
-  else {
+  } else {
     return util_tilde_expand(NUSMV_SHARE_PATH);
   }
 #else
@@ -147,18 +140,11 @@ char* CInit_NuSMVObtainLibrary(void)
 #endif
 }
 
-void CInit_BannerPrint(FILE * file)
-{
-  cinit_banner_print(file, false);
-}
+void CInit_BannerPrint(FILE *file) { cinit_banner_print(file, false); }
 
-void CInit_BannerPrintLibrary(FILE * file)
-{
-  cinit_banner_print(file, true);
-}
+void CInit_BannerPrintLibrary(FILE *file) { cinit_banner_print(file, true); }
 
-void CInit_BannerPrint_nusmv_library(FILE * file)
-{
+void CInit_BannerPrint_nusmv_library(FILE *file) {
   fprintf(file, "*** This version of %s is linked to %s %s.\n",
           NuSMVCore_get_tool_name(), NuSMVCore_get_library_name(),
           NuSMVCore_get_library_version());
@@ -171,59 +157,60 @@ void CInit_BannerPrint_nusmv_library(FILE * file)
   fprintf(file, "*** Copyright (C) 2010-2014, Fondazione Bruno Kessler\n\n");
 }
 
-void CInit_BannerPrint_cudd(FILE * file)
-{
+void CInit_BannerPrint_cudd(FILE *file) {
   fprintf(file,
           "*** This version of %s is linked to the CUDD library version %s\n",
           NuSMVCore_get_tool_name(), CUDD_VERSION);
-  fprintf(file,
-          "*** Copyright (c) 1995-2004, Regents of the University of Colorado\n\n");
+  fprintf(
+      file,
+      "*** Copyright (c) 1995-2004, Regents of the University of Colorado\n\n");
 
   fflush(NULL); /* to flush all the banner before any other output */
 }
 
-void CInit_BannerPrint_minisat(FILE * file)
-{
+void CInit_BannerPrint_minisat(FILE *file) {
   fprintf(file,
           "*** This version of %s is linked to the MiniSat SAT solver. \n",
           NuSMVCore_get_tool_name());
-  fprintf(file,
-          "*** See http://minisat.se/MiniSat.html\n");
-  fprintf(file,
-          "*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson\n"
-          "*** Copyright (c) 2007-2010, Niklas Sorensson\n\n");
+  fprintf(file, "*** See http://minisat.se/MiniSat.html\n");
+  fprintf(file, "*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson\n"
+                "*** Copyright (c) 2007-2010, Niklas Sorensson\n\n");
 
   fflush(NULL); /* to flush all the banner before any other output */
 }
 
-void CInit_BannerPrint_zchaff(FILE * file)
-{
+void CInit_BannerPrint_zchaff(FILE *file) {
   int i;
 
-  fprintf(file,
-          "WARNING *** This version of %s is linked to the zchaff SAT",
+  fprintf(file, "WARNING *** This version of %s is linked to the zchaff SAT",
           NuSMVCore_get_tool_name());
   for (i = 0; i < 13 - strlen(NuSMVCore_get_tool_name()); i++) {
     fprintf(file, " ");
   }
   fprintf(file, " ***\n");
-  fprintf(file,"WARNING *** solver (see http://www.princeton.edu/~chaff/zchaff.html). ***\n");
-  fprintf(file, "WARNING *** Zchaff is used in Bounded Model Checking when the         ***\n");
-  fprintf(file, "WARNING *** system variable \"sat_solver\" is set to \"zchaff\".          ***\n");
-  fprintf(file, "WARNING *** Notice that zchaff is for non-commercial purposes only.   ***\n");
-  fprintf(file, "WARNING *** NO COMMERCIAL USE OF ZCHAFF IS ALLOWED WITHOUT WRITTEN    ***\n");
-  fprintf(file, "WARNING *** PERMISSION FROM PRINCETON UNIVERSITY.                     ***\n");
-  fprintf(file, "WARNING *** Please contact Sharad Malik (malik@ee.princeton.edu)      ***\n");
-  fprintf(file, "WARNING *** for details.                                              ***\n\n");
+  fprintf(file, "WARNING *** solver (see "
+                "http://www.princeton.edu/~chaff/zchaff.html). ***\n");
+  fprintf(file, "WARNING *** Zchaff is used in Bounded Model Checking when the "
+                "        ***\n");
+  fprintf(file, "WARNING *** system variable \"sat_solver\" is set to "
+                "\"zchaff\".          ***\n");
+  fprintf(file, "WARNING *** Notice that zchaff is for non-commercial purposes "
+                "only.   ***\n");
+  fprintf(file, "WARNING *** NO COMMERCIAL USE OF ZCHAFF IS ALLOWED WITHOUT "
+                "WRITTEN    ***\n");
+  fprintf(file, "WARNING *** PERMISSION FROM PRINCETON UNIVERSITY.             "
+                "        ***\n");
+  fprintf(file, "WARNING *** Please contact Sharad Malik "
+                "(malik@ee.princeton.edu)      ***\n");
+  fprintf(file, "WARNING *** for details.                                      "
+                "        ***\n\n");
 
   fflush(NULL); /* to flush all the banner before any other output */
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -235,13 +222,11 @@ void CInit_BannerPrint_zchaff(FILE * file)
   Prints the banner of NuSMV. If is_linked is true,
                also the NuSMV library banner is output
 */
-static void cinit_banner_print(FILE* file, boolean is_linked)
-{
+static void cinit_banner_print(FILE *file, boolean is_linked) {
   fprintf(file, "*** This is %s %s (compiled on %s)\n",
-          NuSMVCore_get_tool_name(),
-          NuSMVCore_get_tool_version(),
+          NuSMVCore_get_tool_name(), NuSMVCore_get_tool_version(),
           NuSMVCore_get_build_date());
-# ifdef NUSMV_LINKED_CORE_ADDONS
+#ifdef NUSMV_LINKED_CORE_ADDONS
   /* linked addons are printed only if not empty */
   if (strcmp(NuSMVCore_get_linked_addons(), "") != 0) {
     fprintf(file, "*** Enabled addons are: %s\n",
@@ -251,10 +236,8 @@ static void cinit_banner_print(FILE* file, boolean is_linked)
   fprintf(file, "*** For more information on %s see <%s>\n",
           NuSMVCore_get_tool_name(), NuSMVCore_get_website());
 
-  fprintf(file, "*** or email to <%s>.\n",
-          NuSMVCore_get_email());
-  fprintf(file, "*** %s\n\n",
-          NuSMVCore_get_bug_report_message());
+  fprintf(file, "*** or email to <%s>.\n", NuSMVCore_get_email());
+  fprintf(file, "*** %s\n\n", NuSMVCore_get_bug_report_message());
 
   fprintf(file, "*** Copyright (c) 2010-2014, Fondazione Bruno Kessler\n\n");
 
@@ -265,13 +248,13 @@ static void cinit_banner_print(FILE* file, boolean is_linked)
   /* Cudd license */
   CInit_BannerPrint_cudd(file);
 
-# if NUSMV_HAVE_SOLVER_MINISAT
+#if NUSMV_HAVE_SOLVER_MINISAT
   CInit_BannerPrint_minisat(file);
-# endif
+#endif
 
-# if NUSMV_HAVE_SOLVER_ZCHAFF
+#if NUSMV_HAVE_SOLVER_ZCHAFF
   CInit_BannerPrint_zchaff(file);
-# endif
+#endif
 
   fflush(NULL); /* to flush all the banner before any other output */
 }
@@ -282,38 +265,35 @@ static void cinit_banner_print(FILE* file, boolean is_linked)
 
   optional
 */
-static char *
-DateReadFromDateString(
-  char * datestr)
-{
+static char *DateReadFromDateString(char *datestr) {
   static char result[25];
-  char        day[10];
-  char        month[10];
-  char        zone[10];
-  char       *at;
-  int         date;
-  int         hour;
-  int         minute;
-  int         second;
-  int         year;
+  char day[10];
+  char month[10];
+  char zone[10];
+  char *at;
+  int date;
+  int hour;
+  int minute;
+  int second;
+  int year;
   int c;
 
-  if (sscanf(datestr, "%s %s %2d %2d:%2d:%2d %s %4d",
-             day, month, &date, &hour, &minute, &second, zone, &year) == 8) {
+  if (sscanf(datestr, "%s %s %2d %2d:%2d:%2d %s %4d", day, month, &date, &hour,
+             &minute, &second, zone, &year) == 8) {
     if (hour >= 12) {
-      if (hour >= 13) hour -= 12;
+      if (hour >= 13)
+        hour -= 12;
       at = "PM";
-    }
-    else {
-      if (hour == 0) hour = 12;
+    } else {
+      if (hour == 0)
+        hour = 12;
       at = "AM";
     }
-    c = snprintf(result, sizeof(result), "%d-%3s-%02d at %d:%02d %s",
-                 date, month, year % 100, hour, minute, at);
+    c = snprintf(result, sizeof(result), "%d-%3s-%02d at %d:%02d %s", date,
+                 month, year % 100, hour, minute, at);
     SNPRINTF_CHECK(c, sizeof(result));
     return result;
-  }
-  else {
+  } else {
     return datestr;
   }
 }

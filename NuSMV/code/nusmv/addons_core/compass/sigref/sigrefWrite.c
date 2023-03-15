@@ -34,9 +34,8 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include <stdarg.h>
@@ -64,8 +63,12 @@
 /*---------------------------------------------------------------------------*/
 /* macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-#define _INDENT(file, c, cond) \
-  if (cond) {int _i_; for (_i_=indent; _i_>0; --_i_) fprintf(file, " ");}
+#define _INDENT(file, c, cond)                                                 \
+  if (cond) {                                                                  \
+    int _i_;                                                                   \
+    for (_i_ = indent; _i_ > 0; --_i_)                                         \
+      fprintf(file, " ");                                                      \
+  }
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -74,23 +77,23 @@
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static int compass_sigref_dump_dd(FILE* file, DDMgr_ptr dd, add_ptr add,
-                                  const char* dd_title, const char * dd_label,
+static int compass_sigref_dump_dd(FILE *file, DDMgr_ptr dd, add_ptr add,
+                                  const char *dd_title, const char *dd_label,
                                   boolean do_indent);
 
-static int
-compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add, FILE* file,
-                                int indent, hash_ptr hash, boolean do_indent);
+static int compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add,
+                                           FILE *file, int indent,
+                                           hash_ptr hash, boolean do_indent);
 
-static void compass_write_sigref_adds(FILE* file,
-                                      BddEnc_ptr enc, /* language */
-                                      add_ptr init,   /* init & invar states */
-                                      add_ptr trans,  /* trans & invar */
-                                      add_ptr prob,   /* probabilities */
-                                      add_ptr tau,     /* tau value */
-                                      NodeList_ptr ap_list, /* ap list (optional) */
-                                      boolean do_indent /* beautify XML output */
-                                      );
+static void
+compass_write_sigref_adds(FILE *file, BddEnc_ptr enc, /* language */
+                          add_ptr init,               /* init & invar states */
+                          add_ptr trans,              /* trans & invar */
+                          add_ptr prob,               /* probabilities */
+                          add_ptr tau,                /* tau value */
+                          NodeList_ptr ap_list,       /* ap list (optional) */
+                          boolean do_indent           /* beautify XML output */
+);
 
 static void print_trans(BddEnc_ptr enc, bdd_ptr bdd_to_print, FILE *f);
 
@@ -98,19 +101,15 @@ static void print_trans(BddEnc_ptr enc, bdd_ptr bdd_to_print, FILE *f);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-int Compass_write_sigref(NuSMVEnv_ptr env,
-                         BddFsm_ptr fsm,
-                         FILE* sigref_file,
-                         FILE* prob_file, /* can be NULL */
-                         FILE* ap_file, /* can be NULL */
-                         Expr_ptr tau, /* can be NULL */
+int Compass_write_sigref(NuSMVEnv_ptr env, BddFsm_ptr fsm, FILE *sigref_file,
+                         FILE *prob_file,  /* can be NULL */
+                         FILE *ap_file,    /* can be NULL */
+                         Expr_ptr tau,     /* can be NULL */
                          boolean do_indent /* Beautify the XML output */
-                         )
-{
+) {
   BddEnc_ptr enc = BddFsm_get_bdd_encoding(fsm);
   DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const TypeChecker_ptr tc = BaseEnc_get_type_checker(BASE_ENC(enc));
 
   NodeList_ptr ap_list_add = NODE_LIST(NULL);
@@ -132,8 +131,7 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
   /* tau */
   if (EXPR(NULL) != tau) {
     tau = Compile_FlattenSexp(BaseEnc_get_symb_table(BASE_ENC(enc)),
-                              car(tau) /* gets rid of SIMPWFF */,
-                              Nil);
+                              car(tau) /* gets rid of SIMPWFF */, Nil);
   }
 
   /* prob_file */
@@ -189,7 +187,6 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
     bdd_free(dd, bdd_init);
   }
 
-
   { /* to control dynamic reordering */
     dd_reorderingtype method;
     int dd_reord_status;
@@ -212,7 +209,7 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
 
 /* #define DEBUG_TRANS */
 #ifdef DEBUG_TRANS
-      FILE * p = stdout; // fopen("TRANS.txt", "w");
+      FILE *p = stdout; // fopen("TRANS.txt", "w");
       fprintf(p, "==================================================\n");
       fprintf(p, "TRANS\n");
       fprintf(p, "==================================================\n");
@@ -239,12 +236,12 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
     /* probability and tau are optional */
     if (probs_list != NODE_LIST(NULL)) {
       prob_add = Compass_process_prob_list(enc, probs_list, bdd_trans);
-    }
-    else prob_add = (add_ptr) NULL;
+    } else
+      prob_add = (add_ptr)NULL;
 
     bdd_free(dd, bdd_trans);
 
-    if (tau != (Expr_ptr) NULL) {
+    if (tau != (Expr_ptr)NULL) {
       tau_add = BddEnc_expr_to_add(enc, tau, Nil);
 
       /* [RC]: This code was disable because it seems masks for input
@@ -252,9 +249,8 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
       /* mask_tau_add = BddEnc_apply_input_vars_mask_add(enc, tau_add); */
       /* add_free(dd, tau_add); */
       /* tau_add = mask_tau_add; */
-    }
-    else
-      tau_add = (add_ptr) NULL;
+    } else
+      tau_add = (add_ptr)NULL;
 
     if (NODE_LIST(NULL) != ap_list) {
       add_ptr expr_add, expr_add_mask;
@@ -268,7 +264,8 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
 
         expr_add = BddEnc_expr_to_add(enc, expr, Nil);
         expr_add_mask = BddEnc_apply_state_frozen_vars_mask_add(enc, expr_add);
-        NodeList_append(ap_list_add, cons(nodemgr, lab, (node_ptr)expr_add_mask));
+        NodeList_append(ap_list_add,
+                        cons(nodemgr, lab, (node_ptr)expr_add_mask));
         add_free(dd, expr_add);
         /* The expr_add_mask will be freed later when the ap_list_add
            will be destroyed */
@@ -276,13 +273,13 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
     }
 
     /* dump the whole fsm */
-    compass_write_sigref_adds(sigref_file, enc,
-                              init_add, trans_add,
-                              prob_add, tau_add,
-                              ap_list_add, do_indent);
+    compass_write_sigref_adds(sigref_file, enc, init_add, trans_add, prob_add,
+                              tau_add, ap_list_add, do_indent);
 
-    if ((add_ptr) NULL != tau_add) add_free(dd, tau_add);
-    if ((add_ptr) NULL != prob_add) add_free(dd, prob_add);
+    if ((add_ptr)NULL != tau_add)
+      add_free(dd, tau_add);
+    if ((add_ptr)NULL != prob_add)
+      add_free(dd, prob_add);
     add_free(dd, trans_add);
     add_free(dd, init_add);
 
@@ -304,31 +301,33 @@ int Compass_write_sigref(NuSMVEnv_ptr env,
     bdd_free(dd, state_mask);
 
     /* re-enable dynamic reordering if it was already enabled */
-    if (dd_reord_status == 1) { dd_autodyn_enable(dd, method); }
+    if (dd_reord_status == 1) {
+      dd_autodyn_enable(dd, method);
+    }
   } /* end of block for dynamic reordering */
 
   return retval;
 }
 
-int Compass_write_language_sigref(BddEnc_ptr enc, FILE* file)
-{
+int Compass_write_language_sigref(BddEnc_ptr enc, FILE *file) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-  static const char* TAG_VARS = "variables";
-  static const char* SVAR_FM = \
-    "<var index=\"%d\" name=\"%s\" type=\"%s\" corr=\"%d\"/>\n";
-  static const char* IVAR_FM = "<var index=\"%d\" name=\"%s\" type=\"%s\"/>\n";
-  static const char* SVAR_TYPE = "ps";
-  static const char* NVAR_TYPE = "ns";
-  static const char* IVAR_TYPE = "in";
+  static const char *TAG_VARS = "variables";
+  static const char *SVAR_FM =
+      "<var index=\"%d\" name=\"%s\" type=\"%s\" corr=\"%d\"/>\n";
+  static const char *IVAR_FM = "<var index=\"%d\" name=\"%s\" type=\"%s\"/>\n";
+  static const char *SVAR_TYPE = "ps";
+  static const char *NVAR_TYPE = "ns";
+  static const char *IVAR_TYPE = "in";
 
   int res;
 
   res = fprintf(file, "<%s>\n", TAG_VARS);
-  if (res <= 0) return -1;
+  if (res <= 0)
+    return -1;
 
   { /* loop over variables */
     SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(enc));
@@ -344,15 +343,14 @@ int Compass_write_language_sigref(BddEnc_ptr enc, FILE* file)
 
         boolean is_ivar = SymbTable_is_symbol_input_var(st, cvar);
         int cidx = BddEnc_get_var_index_from_name(enc, cvar);
-        char* cvarn = sprint_node(wffprint, cvar);
+        char *cvarn = sprint_node(wffprint, cvar);
 
         if (is_ivar) { /* input variable */
           fprintf(file, IVAR_FM, cidx, cvarn, IVAR_TYPE);
-        }
-        else { /* state variables */
+        } else { /* state variables */
           node_ptr nvar = ExprMgr_next(exprs, cvar, st);
           int nidx = BddEnc_get_var_index_from_name(enc, nvar);
-          char* nvarn = sprint_node(wffprint, nvar);
+          char *nvarn = sprint_node(wffprint, nvar);
           fprintf(file, SVAR_FM, cidx, cvarn, SVAR_TYPE, nidx);
           fprintf(file, SVAR_FM, nidx, nvarn, NVAR_TYPE, cidx);
           FREE(nvarn);
@@ -363,12 +361,13 @@ int Compass_write_language_sigref(BddEnc_ptr enc, FILE* file)
   }
 
   res = fprintf(file, "</%s>\n", TAG_VARS);
-  if (res <= 0) return -1;
+  if (res <= 0)
+    return -1;
   return 0;
 }
 
-int Compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add, FILE* file, boolean do_indent)
-{
+int Compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add, FILE *file,
+                                    boolean do_indent) {
   int res;
   hash_ptr hash = new_assoc();
   res = compass_print_add_sigref_format(dd, add, file, 1, hash, do_indent);
@@ -376,17 +375,13 @@ int Compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add, FILE* file, boole
   return res;
 }
 
-
-
 /* service for temporary command sigref_dumper */
-static int compass_sigref_dump_dd(FILE* file, DDMgr_ptr dd,
-                                  add_ptr add, const char* dd_title,
-                                  const char * dd_lab,
-                                  boolean do_indent)
-{
-  static const char* DD_TAG = "dd";
-  static const char* DD_FM = "type=\"%s\"";
-  static const char* DD_LAB = " label=\"%s\"";
+static int compass_sigref_dump_dd(FILE *file, DDMgr_ptr dd, add_ptr add,
+                                  const char *dd_title, const char *dd_lab,
+                                  boolean do_indent) {
+  static const char *DD_TAG = "dd";
+  static const char *DD_FM = "type=\"%s\"";
+  static const char *DD_LAB = " label=\"%s\"";
   int res;
 
   fprintf(file, "<%s ", DD_TAG);
@@ -403,8 +398,6 @@ static int compass_sigref_dump_dd(FILE* file, DDMgr_ptr dd,
   return res;
 }
 
-
-
 /*!
   \brief Private service to a node child, used by
 print_add_sigref_format
@@ -412,117 +405,138 @@ print_add_sigref_format
   Returns 0 if successful, a negative number if an occurs
 */
 
-static int compass_print_add_child_sigref(DDMgr_ptr dd, add_ptr add,
-                                          FILE* file,
-                                          int indent, const char* child_tag,
-                                          hash_ptr hash, boolean do_indent)
-{
+static int compass_print_add_child_sigref(DDMgr_ptr dd, add_ptr add, FILE *file,
+                                          int indent, const char *child_tag,
+                                          hash_ptr hash, boolean do_indent) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-  static const char* LEAF_FM = "const_value=\"%s\"";
-  static const char* REF_FM = "node_ref=\"%#lu\"";
+  static const char *LEAF_FM = "const_value=\"%s\"";
+  static const char *REF_FM = "node_ref=\"%#lu\"";
   int res;
 
   _INDENT(file, indent, do_indent);
-  res = fprintf(file, "<%s", child_tag); if (res<0) return -1;
+  res = fprintf(file, "<%s", child_tag);
+  if (res < 0)
+    return -1;
 
   if (add_isleaf(add)) {
-    const char* val;
-    res = fprintf(file, " "); if (res<0) return -1;
+    const char *val;
+    res = fprintf(file, " ");
+    if (res < 0)
+      return -1;
 
-    if (add_is_false(dd, add)) val = util_strsav("0.0");
-    else if (add_is_true(dd, add)) val = util_strsav("1.0");
-    else val = sprint_node(wffprint, (node_ptr) add_get_leaf(dd, add));
+    if (add_is_false(dd, add))
+      val = util_strsav("0.0");
+    else if (add_is_true(dd, add))
+      val = util_strsav("1.0");
+    else
+      val = sprint_node(wffprint, (node_ptr)add_get_leaf(dd, add));
 
     res = fprintf(file, LEAF_FM, val);
     FREE(val);
-    if (res<0) return -1;
-    res = fprintf(file, "/>\n"); if (res<0) return -1;
-  }
-  else { /* not a leaf, recurse if needed */
-    if (find_assoc(hash, (node_ptr) add) == NULL) {
-      res = fprintf(file, ">\n"); if (res<0) return -1;
-      res = compass_print_add_sigref_format(dd, add, file, indent+1, hash, do_indent);
-      if (res<0) return -1;
+    if (res < 0)
+      return -1;
+    res = fprintf(file, "/>\n");
+    if (res < 0)
+      return -1;
+  } else { /* not a leaf, recurse if needed */
+    if (find_assoc(hash, (node_ptr)add) == NULL) {
+      res = fprintf(file, ">\n");
+      if (res < 0)
+        return -1;
+      res = compass_print_add_sigref_format(dd, add, file, indent + 1, hash,
+                                            do_indent);
+      if (res < 0)
+        return -1;
       _INDENT(file, indent, do_indent);
-      res = fprintf(file, "</%s>\n", child_tag); if (res<0) return -1;
+      res = fprintf(file, "</%s>\n", child_tag);
+      if (res < 0)
+        return -1;
 
       /* stores the node as printed */
-      insert_assoc(hash, (node_ptr) add, PTR_FROM_INT(node_ptr, 1));
-    }
-    else { /* this node has already been dumped */
-      res = fprintf(file, " "); if (res<0) return -1;
-      res = fprintf(file, REF_FM, add); if (res<0) return -1;
-      res = fprintf(file, "/>\n"); if (res<0) return -1;
+      insert_assoc(hash, (node_ptr)add, PTR_FROM_INT(node_ptr, 1));
+    } else { /* this node has already been dumped */
+      res = fprintf(file, " ");
+      if (res < 0)
+        return -1;
+      res = fprintf(file, REF_FM, add);
+      if (res < 0)
+        return -1;
+      res = fprintf(file, "/>\n");
+      if (res < 0)
+        return -1;
     }
   }
 
   return 0;
 }
 
-
-static int compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add, FILE* file,
-                                           int indent, hash_ptr hash, boolean do_indent)
-{
-  static const char* DD_NODE_FM = "<dd_node index=\"%d\" id=\"%#lu\">\n";
-  static const char* TAG_THEN = "dd_then";
-  static const char* TAG_ELSE = "dd_else";
-  static const char* TAG_NODE = "dd_node";
+static int compass_print_add_sigref_format(DDMgr_ptr dd, add_ptr add,
+                                           FILE *file, int indent,
+                                           hash_ptr hash, boolean do_indent) {
+  static const char *DD_NODE_FM = "<dd_node index=\"%d\" id=\"%#lu\">\n";
+  static const char *TAG_THEN = "dd_then";
+  static const char *TAG_ELSE = "dd_else";
+  static const char *TAG_NODE = "dd_node";
   int res;
 
   if (add_isleaf(add)) {
     /* term 'child' here is not used properly */
-    res = compass_print_add_child_sigref(dd, add, file, indent, TAG_NODE, hash, do_indent);
-    if (res<0) return -1;
-  }
-  else {
+    res = compass_print_add_child_sigref(dd, add, file, indent, TAG_NODE, hash,
+                                         do_indent);
+    if (res < 0)
+      return -1;
+  } else {
     add_ptr _then = add_then(dd, add);
     add_ptr _else = add_else(dd, add);
 
-    _INDENT(file,indent,do_indent);
+    _INDENT(file, indent, do_indent);
     res = fprintf(file, DD_NODE_FM, add_index(dd, add), add);
-    if (res<0) return -1;
+    if (res < 0)
+      return -1;
 
-    res = compass_print_add_child_sigref(dd, _then, file,
-                                         indent+1, TAG_THEN, hash, do_indent);
-    if (res<0) return -1;
-    res = compass_print_add_child_sigref(dd, _else, file,
-                                         indent+1, TAG_ELSE, hash, do_indent);
-    if (res<0) return -1;
-    _INDENT(file,indent,do_indent);
-    res = fprintf(file, "</%s>\n",TAG_NODE);
-    if (res<0) return -1;
+    res = compass_print_add_child_sigref(dd, _then, file, indent + 1, TAG_THEN,
+                                         hash, do_indent);
+    if (res < 0)
+      return -1;
+    res = compass_print_add_child_sigref(dd, _else, file, indent + 1, TAG_ELSE,
+                                         hash, do_indent);
+    if (res < 0)
+      return -1;
+    _INDENT(file, indent, do_indent);
+    res = fprintf(file, "</%s>\n", TAG_NODE);
+    if (res < 0)
+      return -1;
   }
   return 0;
 }
 
-
-static void compass_write_sigref_adds(FILE* file,
-                                      BddEnc_ptr enc, /* language */
-                                      add_ptr init,   /* init & invar states */
-                                      add_ptr trans,  /* trans & invar */
-                                      add_ptr prob,   /* probabilities (optional) */
-                                      add_ptr tau,    /* tau value (optional) */
-                                      NodeList_ptr ap_list, /* ap list (optional) */
-                                      boolean do_indent /* Enable indent */
-                                      )
-{
+static void
+compass_write_sigref_adds(FILE *file, BddEnc_ptr enc, /* language */
+                          add_ptr init,               /* init & invar states */
+                          add_ptr trans,              /* trans & invar */
+                          add_ptr prob,         /* probabilities (optional) */
+                          add_ptr tau,          /* tau value (optional) */
+                          NodeList_ptr ap_list, /* ap list (optional) */
+                          boolean do_indent     /* Enable indent */
+) {
   /* ---------------------------------------------------------------------- */
-  static const char* SIGREF_HEADER = "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>";
-  static const char* MODEL_TAG = "model";
-  static const char* MODEL_FM = "type=\"%s\"";
-  static const char* MODEL_TYPE = "ctmc";
+  static const char *SIGREF_HEADER =
+      "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>";
+  static const char *MODEL_TAG = "model";
+  static const char *MODEL_FM = "type=\"%s\"";
+  static const char *MODEL_TYPE = "ctmc";
 
   /* labels for ADDs */
-  static const char* SIGREF_INIT_STATE_LBL = "initial_state";
-  static const char* SIGREF_LTS_STATE_LBL = "trans";
-  static const char* SIGREF_TAU_LBL = "tau";
-  static const char* SIGREF_PROB_MAP_LBL = "label_map";
+  static const char *SIGREF_INIT_STATE_LBL = "initial_state";
+  static const char *SIGREF_LTS_STATE_LBL = "trans";
+  static const char *SIGREF_TAU_LBL = "tau";
+  static const char *SIGREF_PROB_MAP_LBL = "label_map";
 
   /* labels for AP */
-  static const char* SIGREF_AP_LBL = "atomic_prop";
+  static const char *SIGREF_AP_LBL = "atomic_prop";
   /* ---------------------------------------------------------------------- */
 
   DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
@@ -537,21 +551,24 @@ static void compass_write_sigref_adds(FILE* file,
   fprintf(file, "\n");
 
   /* init and trans */
-  compass_sigref_dump_dd(file, dd, init, SIGREF_INIT_STATE_LBL, NULL, do_indent);
+  compass_sigref_dump_dd(file, dd, init, SIGREF_INIT_STATE_LBL, NULL,
+                         do_indent);
   fprintf(file, "\n");
-  compass_sigref_dump_dd(file, dd, trans, SIGREF_LTS_STATE_LBL, NULL, do_indent);
+  compass_sigref_dump_dd(file, dd, trans, SIGREF_LTS_STATE_LBL, NULL,
+                         do_indent);
 
-  if (prob != (add_ptr) NULL) {
+  if (prob != (add_ptr)NULL) {
 #ifdef DEBUG_PROBS
     fprintf(file, "\n");
     StreamMgr_print_output(streams, "==================\n");
     dd_printminterm(dd, prob);
     StreamMgr_print_output(streams, "==================\n");
 #endif
-    compass_sigref_dump_dd(file, dd, prob, SIGREF_PROB_MAP_LBL, NULL, do_indent);
+    compass_sigref_dump_dd(file, dd, prob, SIGREF_PROB_MAP_LBL, NULL,
+                           do_indent);
   }
 
-  if (tau != (add_ptr) NULL) {
+  if (tau != (add_ptr)NULL) {
     fprintf(file, "\n");
     compass_sigref_dump_dd(file, dd, tau, SIGREF_TAU_LBL, NULL, do_indent);
   }
@@ -561,13 +578,15 @@ static void compass_write_sigref_adds(FILE* file,
 
     NODE_LIST_FOREACH(ap_list, iter) {
       node_ptr ap_el = (node_ptr)NodeList_get_elem_at(ap_list, iter);
-      const char* ap_lab = UStringMgr_get_string_text((string_ptr)car(car(ap_el)));
+      const char *ap_lab =
+          UStringMgr_get_string_text((string_ptr)car(car(ap_el)));
       add_ptr ap_bdd = (add_ptr)cdr(ap_el);
 
       nusmv_assert(node_get_type(car(ap_el)) == ATOM);
 
       fprintf(file, "\n");
-      compass_sigref_dump_dd(file, dd, ap_bdd, SIGREF_AP_LBL, ap_lab, do_indent);
+      compass_sigref_dump_dd(file, dd, ap_bdd, SIGREF_AP_LBL, ap_lab,
+                             do_indent);
     }
   }
 
@@ -580,8 +599,7 @@ static void compass_write_sigref_adds(FILE* file,
 
   \todo Missing description
 */
-static void print_trans(BddEnc_ptr enc, bdd_ptr bdd_to_print, FILE *f)
-{
+static void print_trans(BddEnc_ptr enc, bdd_ptr bdd_to_print, FILE *f) {
   bdd_ptr bdd;
   NodeList_ptr vars_list;
   NodeList_ptr sv_list;
@@ -589,20 +607,19 @@ static void print_trans(BddEnc_ptr enc, bdd_ptr bdd_to_print, FILE *f)
   DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   if (bdd_is_false(dd, bdd_to_print)) {
     fprintf(f, "-- The BDD is the constant 0\n");
     return;
   }
 
-  vars_list = SymbTable_get_layers_sf_i_vars(st,
-                SymbTable_get_class_layer_names(st, (const char*) NULL));
+  vars_list = SymbTable_get_layers_sf_i_vars(
+      st, SymbTable_get_class_layer_names(st, (const char *)NULL));
 
-  sv_list = SymbTable_get_layers_sf_vars(st,
-                SymbTable_get_class_layer_names(st, (const char*) NULL));
+  sv_list = SymbTable_get_layers_sf_vars(
+      st, SymbTable_get_class_layer_names(st, (const char *)NULL));
 
   { /* We append next variables */
     ListIter_ptr iter;
@@ -620,8 +637,8 @@ static void print_trans(BddEnc_ptr enc, bdd_ptr bdd_to_print, FILE *f)
 
   do {
     bdd_ptr bdd_of_assigns, tmp;
-    node_ptr varValueList = BddEnc_assign_symbols(enc, bdd, vars_list,
-                                                  true, &bdd_of_assigns);
+    node_ptr varValueList =
+        BddEnc_assign_symbols(enc, bdd, vars_list, true, &bdd_of_assigns);
 
     {
       node_ptr l;

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,7 +35,7 @@
 */
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/trace/TraceXml.h"
@@ -59,31 +59,20 @@
   \brief String to XML Tag converter.
 
    Protected function that converts an string to
-                     TraceXMLTag 
+                     TraceXMLTag
 */
 
-TraceXmlTag TraceXmlTag_from_string(const char* tag)
-{
-  static char* tag_names[] = {
-    TRACE_XML_CNTX_TAG_STRING,
-    TRACE_XML_NODE_TAG_STRING,
-    TRACE_XML_STATE_TAG_STRING,
-    TRACE_XML_COMB_TAG_STRING,
-    TRACE_XML_INPUT_TAG_STRING,
-    TRACE_XML_VALUE_TAG_STRING,
-    TRACE_XML_LOOPS_TAG_STRING
-  };
+TraceXmlTag TraceXmlTag_from_string(const char *tag) {
+  static char *tag_names[] = {
+      TRACE_XML_CNTX_TAG_STRING,  TRACE_XML_NODE_TAG_STRING,
+      TRACE_XML_STATE_TAG_STRING, TRACE_XML_COMB_TAG_STRING,
+      TRACE_XML_INPUT_TAG_STRING, TRACE_XML_VALUE_TAG_STRING,
+      TRACE_XML_LOOPS_TAG_STRING};
 
-  static TraceXmlTag tag_value[] = {
-    TRACE_XML_CNTX_TAG,
-    TRACE_XML_NODE_TAG,
-    TRACE_XML_STATE_TAG,
-    TRACE_XML_COMB_TAG,
-    TRACE_XML_INPUT_TAG,
-    TRACE_XML_VALUE_TAG,
-    TRACE_XML_LOOPS_TAG,
-    TRACE_XML_INVALID_TAG
-  };
+  static TraceXmlTag tag_value[] = {TRACE_XML_CNTX_TAG,  TRACE_XML_NODE_TAG,
+                                    TRACE_XML_STATE_TAG, TRACE_XML_COMB_TAG,
+                                    TRACE_XML_INPUT_TAG, TRACE_XML_VALUE_TAG,
+                                    TRACE_XML_LOOPS_TAG, TRACE_XML_INVALID_TAG};
 
   TraceXmlTag ret_val = TRACE_XML_INVALID_TAG;
   int i;
@@ -98,25 +87,19 @@ TraceXmlTag TraceXmlTag_from_string(const char* tag)
   return ret_val;
 }
 
-
 /*!
   \brief XML Tag converter to string converter.
 
    Protected function that converts a TraceXMLTag to
-                     a string 
+                     a string
 */
 
-const char* TraceXmlTag_to_string(TraceXmlTag tag)
-{
-  static char* tag_names[] = {
-    TRACE_XML_CNTX_TAG_STRING,
-    TRACE_XML_NODE_TAG_STRING,
-    TRACE_XML_STATE_TAG_STRING,
-    TRACE_XML_COMB_TAG_STRING,
-    TRACE_XML_INPUT_TAG_STRING,
-    TRACE_XML_VALUE_TAG_STRING,
-    TRACE_XML_LOOPS_TAG_STRING
-  };
+const char *TraceXmlTag_to_string(TraceXmlTag tag) {
+  static char *tag_names[] = {
+      TRACE_XML_CNTX_TAG_STRING,  TRACE_XML_NODE_TAG_STRING,
+      TRACE_XML_STATE_TAG_STRING, TRACE_XML_COMB_TAG_STRING,
+      TRACE_XML_INPUT_TAG_STRING, TRACE_XML_VALUE_TAG_STRING,
+      TRACE_XML_LOOPS_TAG_STRING};
 
   return tag_names[tag];
 }

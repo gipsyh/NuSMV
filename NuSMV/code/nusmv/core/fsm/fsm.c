@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
 
 */
 
-
 #include "nusmv/core/fsm/fsm.h"
 #include "nusmv/core/fsm/fsmInt.h"
 #include "nusmv/core/fsm/sexp/sexpInt.h"
@@ -43,40 +42,33 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Fsm_init()
-{
+void Fsm_init() {
 #ifdef SYMB_TABLE_STATIC
   fsm_sexp_expr_init();
 #endif
 }
 
-void Fsm_quit()
-{
+void Fsm_quit() {
 #ifdef SYMB_TABLE_STATIC
   fsm_sexp_expr_quit();
 #endif
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Static function definitions                                               */

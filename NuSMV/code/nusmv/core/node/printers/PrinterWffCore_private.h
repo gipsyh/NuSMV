@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,29 +35,24 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_PRIVATE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_PRIVATE_H__
 
-
-#include "nusmv/core/node/printers/PrinterWffCore.h"
-#include "nusmv/core/node/printers/PrinterBase.h" /* fix this */
+#include "nusmv/core/node/printers/PrinterBase.h"         /* fix this */
 #include "nusmv/core/node/printers/PrinterBase_private.h" /* fix this */
+#include "nusmv/core/node/printers/PrinterWffCore.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief PrinterWffCore class definition derived from
                class PrinterBase
 
-  
+
 
   \sa Base class PrinterBase
 */
 
-typedef struct PrinterWffCore_TAG
-{
+typedef struct PrinterWffCore_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(PrinterBase);
 
@@ -65,14 +60,11 @@ typedef struct PrinterWffCore_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } PrinterWffCore;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -86,9 +78,8 @@ typedef struct PrinterWffCore_TAG
 
   \sa PrinterWffCore_create
 */
-void
-printer_wff_core_init(PrinterWffCore_ptr self, const NuSMVEnv_ptr env,
-                      const char* name, int low, size_t num);
+void printer_wff_core_init(PrinterWffCore_ptr self, const NuSMVEnv_ptr env,
+                           const char *name, int low, size_t num);
 
 /*!
   \methodof PrinterWffCore
@@ -104,10 +95,8 @@ void printer_wff_core_deinit(PrinterWffCore_ptr self);
   \brief Virtual menthod that prints the given node
   (core nodes are handled here)
 
-  
+
 */
-int
-printer_wff_core_print_node(PrinterBase_ptr self, node_ptr n,
-                            int priority);
+int printer_wff_core_print_node(PrinterBase_ptr self, node_ptr n, int priority);
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_PRIVATE_H__ */

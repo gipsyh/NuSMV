@@ -34,20 +34,19 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/enc/enc.h"
 #include "nusmv/core/enc/encInt.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
+#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/dd/VarsHandler.h"
 #include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/compile/compile.h"
-#include "nusmv/core/utils/ucmd.h"
-#include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/ucmd.h"
 
 #if NUSMV_HAVE_STRING_H
 #include <string.h>
@@ -62,91 +61,87 @@
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_INPUTS_BEFORE    "inputs_before"
+#define VARS_ORD_STR_INPUTS_BEFORE "inputs_before"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_INPUTS_AFTER     "inputs_after"
+#define VARS_ORD_STR_INPUTS_AFTER "inputs_after"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_TOPOLOGICAL      "topological"
+#define VARS_ORD_STR_TOPOLOGICAL "topological"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_INPUTS_BEFORE_BI "inputs_before_bi"
+#define VARS_ORD_STR_INPUTS_BEFORE_BI "inputs_before_bi"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_INPUTS_AFTER_BI  "inputs_after_bi"
+#define VARS_ORD_STR_INPUTS_AFTER_BI "inputs_after_bi"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_TOPOLOGICAL_BI   "topological_bi"
+#define VARS_ORD_STR_TOPOLOGICAL_BI "topological_bi"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_LEXICOGRAPHIC    "lexicographic"
+#define VARS_ORD_STR_LEXICOGRAPHIC "lexicographic"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  VARS_ORD_STR_UNKNOWN
+#define VARS_ORD_STR_UNKNOWN
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_STATIC_ORDER_HEURISTICS_STR_NONE       "none"
+#define BDD_STATIC_ORDER_HEURISTICS_STR_NONE "none"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_STATIC_ORDER_HEURISTICS_STR_BASIC      "basic"
+#define BDD_STATIC_ORDER_HEURISTICS_STR_BASIC "basic"
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void
-enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
-                                   FlatHierarchy_ptr flat_hierarchy,
-                                   OrdGroups_ptr ord_groups);
+static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
+                                               FlatHierarchy_ptr flat_hierarchy,
+                                               OrdGroups_ptr ord_groups);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Enc_init_encodings(NuSMVEnv_ptr env)
-{
-}
+void Enc_init_encodings(NuSMVEnv_ptr env) {}
 
-void Enc_init_bool_encoding(NuSMVEnv_ptr env)
-{
+void Enc_init_bool_encoding(NuSMVEnv_ptr env) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   OptsHandler_ptr opts;
   SymbTable_ptr st;
   BoolEnc_ptr bool_enc;
@@ -168,17 +163,17 @@ void Enc_init_bool_encoding(NuSMVEnv_ptr env)
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_log(logger, "Global boolean encoding initialized.\n");
     }
-  }
-  else {
-    StreamMgr_print_output(streams,
-            "Warning: Boolean encoding already initialized for this environment\n");
+  } else {
+    StreamMgr_print_output(
+        streams,
+        "Warning: Boolean encoding already initialized for this environment\n");
   }
 }
 
-void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char* input_order_file_name)
-{
+void Enc_init_bdd_encoding(NuSMVEnv_ptr env,
+                           const char *input_order_file_name) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   VarsHandler_ptr dd_vars_handler;
   SymbTable_ptr st;
   /* This variable has to be initialized with NULL otherwise it may
@@ -188,7 +183,7 @@ void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char* input_order_file_name)
   BoolEnc_ptr bool_enc;
   BddEnc_ptr bdd_enc;
   OptsHandler_ptr opts;
-  char * opts_order_file;
+  char *opts_order_file;
 
   nusmv_assert(NuSMVEnv_has_value(env, ENV_BOOL_ENCODER));
   nusmv_assert(!NuSMVEnv_has_value(env, ENV_BDD_ENCODER));
@@ -208,11 +203,9 @@ void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char* input_order_file_name)
       Logger_log(logger, "'...\n");
     }
 
-    ord_groups = enc_utils_parse_ordering_file(env,
-                                               input_order_file_name,
-                                               bool_enc);
-  }
-  else if (!util_is_string_null(opts_order_file)) {
+    ord_groups =
+        enc_utils_parse_ordering_file(env, input_order_file_name, bool_enc);
+  } else if (!util_is_string_null(opts_order_file)) {
     if (opt_verbose_level_gt(opts, 0)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_log(logger, "\nParsing the ordering file '");
@@ -220,12 +213,9 @@ void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char* input_order_file_name)
       Logger_log(logger, "'...\n");
     }
 
-    ord_groups = enc_utils_parse_ordering_file(env,
-                                               opts_order_file,
-                                               bool_enc);
+    ord_groups = enc_utils_parse_ordering_file(env, opts_order_file, bool_enc);
 
-  }
-  else {
+  } else {
     /* there is no ordering file => use heuristics to construct the order */
     BddSohEnum bse = get_bdd_static_order_heuristics(opts);
 
@@ -236,25 +226,26 @@ void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char* input_order_file_name)
       if (opt_verbose_level_gt(opts, 0)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_log(logger,
-                "\nHeuristics \"%s\" is going to be used to create var"
-                "ordering statically\n",
-                Enc_bdd_static_order_heuristics_to_string(bse));
+                   "\nHeuristics \"%s\" is going to be used to create var"
+                   "ordering statically\n",
+                   Enc_bdd_static_order_heuristics_to_string(bse));
       }
 
       if (!NuSMVEnv_has_value(env, ENV_FLAT_HIERARCHY)) {
-        StreamMgr_print_error(streams,
-                "Warning for addons writers: static BDD variables order heuristics is \n"
-                "   set up but flatten hierarchy has not been constructed. Switch off\n"
-                "   static order heuristics or provide the flatten hierarchy.\n"
-                "   See docs on bdd_static_order_heuristics variable.\n");
-      }
-      else {
+        StreamMgr_print_error(
+            streams,
+            "Warning for addons writers: static BDD variables order heuristics "
+            "is \n"
+            "   set up but flatten hierarchy has not been constructed. Switch "
+            "off\n"
+            "   static order heuristics or provide the flatten hierarchy.\n"
+            "   See docs on bdd_static_order_heuristics variable.\n");
+      } else {
         FlatHierarchy_ptr fh =
-          FLAT_HIERARCHY(NuSMVEnv_get_value(env, ENV_FLAT_HIERARCHY));
+            FLAT_HIERARCHY(NuSMVEnv_get_value(env, ENV_FLAT_HIERARCHY));
         enc_construct_bdd_order_statically(env, fh, ord_groups);
       }
-    }
-    else {
+    } else {
       /* heuristics are switched off => do nothing */
     }
   }
@@ -270,7 +261,7 @@ void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char* input_order_file_name)
   NuSMVEnv_set_value(env, ENV_BDD_ENCODER, bdd_enc);
 
   if (!util_is_string_null(input_order_file_name)) {
-    set_input_order_file(opts, (char*)input_order_file_name);
+    set_input_order_file(opts, (char *)input_order_file_name);
   }
 
   if (opt_verbose_level_gt(opts, 1)) {
@@ -279,8 +270,7 @@ void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char* input_order_file_name)
   }
 }
 
-void Enc_init_be_encoding(NuSMVEnv_ptr env)
-{
+void Enc_init_be_encoding(NuSMVEnv_ptr env) {
   SymbTable_ptr st;
   BoolEnc_ptr bool_enc;
   OptsHandler_ptr opts;
@@ -308,8 +298,7 @@ void Enc_init_be_encoding(NuSMVEnv_ptr env)
   }
 }
 
-void Enc_quit_encodings(NuSMVEnv_ptr env)
-{
+void Enc_quit_encodings(NuSMVEnv_ptr env) {
   if (NuSMVEnv_has_value(env, ENV_BDD_ENCODER)) {
     BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_remove_value(env, ENV_BDD_ENCODER));
     BddEnc_destroy(bdd_enc);
@@ -321,19 +310,17 @@ void Enc_quit_encodings(NuSMVEnv_ptr env)
   }
 
   if (NuSMVEnv_has_value(env, ENV_BOOL_ENCODER)) {
-    BoolEnc_ptr bool_enc = BOOL_ENC(NuSMVEnv_remove_value(env, ENV_BOOL_ENCODER));
+    BoolEnc_ptr bool_enc =
+        BOOL_ENC(NuSMVEnv_remove_value(env, ENV_BOOL_ENCODER));
     BoolEnc_destroy(bool_enc);
   }
 }
 
-void
-Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
-                              NodeList_ptr sorted_list, node_ptr var,
-                              node_ptr* sorting_cache)
-{
+void Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
+                                   NodeList_ptr sorted_list, node_ptr var,
+                                   node_ptr *sorting_cache) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(symb_table));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr cache = *sorting_cache;
   int bit_number;
@@ -341,7 +328,8 @@ Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
 
   /* a var may be only a true bool var or a bit only */
   nusmv_assert(SymbTable_is_symbol_bool_var(symb_table, var) ||
-               SymbType_calculate_type_size(SymbTable_get_var_type(symb_table, var)) == 1);
+               SymbType_calculate_type_size(
+                   SymbTable_get_var_type(symb_table, var)) == 1);
 
   /* NOTE about cache:
      In sorted list the vars are collected in groups. For example, there
@@ -358,10 +346,12 @@ Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
      'cache' are sorted by nodetype from higher to lower values (the
      same as in sorted list).
   */
-  if (node_get_type(var) != BIT) bit_number = SHRT_MAX; /* a true boolean var */
+  if (node_get_type(var) != BIT)
+    bit_number = SHRT_MAX; /* a true boolean var */
   else {
     bit_number = NODE_TO_INT(cdr(var));
-    nusmv_assert(bit_number < SHRT_MAX);/* implementation limit is not reached */
+    nusmv_assert(bit_number <
+                 SHRT_MAX); /* implementation limit is not reached */
   }
 
   if (cache == Nil || node_get_type(cache) < bit_number) {
@@ -387,9 +377,9 @@ Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
     /* such group already exists => just update the iterator*/
     setcar(cache, (node_ptr)iter);
     return;
-  }
-  else {
-    /* we are at the end of the list or before smaller group => create new group */
+  } else {
+    /* we are at the end of the list or before smaller group => create new group
+     */
     nusmv_assert(node_get_type(cache) > bit_number);
     nusmv_assert(cdr(cache) == Nil || node_get_type(cdr(cache)) < bit_number);
 
@@ -398,16 +388,21 @@ Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
   }
 }
 
-const char* Enc_vars_ord_to_string(VarsOrdType vot)
-{
+const char *Enc_vars_ord_to_string(VarsOrdType vot) {
   switch (vot) {
 
-  case VARS_ORD_INPUTS_BEFORE: return VARS_ORD_STR_INPUTS_BEFORE;
-  case VARS_ORD_INPUTS_AFTER: return VARS_ORD_STR_INPUTS_AFTER;
-  case VARS_ORD_TOPOLOGICAL: return VARS_ORD_STR_TOPOLOGICAL;
-  case VARS_ORD_INPUTS_BEFORE_BI: return VARS_ORD_STR_INPUTS_BEFORE_BI;
-  case VARS_ORD_INPUTS_AFTER_BI: return VARS_ORD_STR_INPUTS_AFTER_BI;
-  case VARS_ORD_TOPOLOGICAL_BI: return VARS_ORD_STR_TOPOLOGICAL_BI;
+  case VARS_ORD_INPUTS_BEFORE:
+    return VARS_ORD_STR_INPUTS_BEFORE;
+  case VARS_ORD_INPUTS_AFTER:
+    return VARS_ORD_STR_INPUTS_AFTER;
+  case VARS_ORD_TOPOLOGICAL:
+    return VARS_ORD_STR_TOPOLOGICAL;
+  case VARS_ORD_INPUTS_BEFORE_BI:
+    return VARS_ORD_STR_INPUTS_BEFORE_BI;
+  case VARS_ORD_INPUTS_AFTER_BI:
+    return VARS_ORD_STR_INPUTS_AFTER_BI;
+  case VARS_ORD_TOPOLOGICAL_BI:
+    return VARS_ORD_STR_TOPOLOGICAL_BI;
   case VARS_ORD_UNKNOWN:
   default:
     error_unreachable_code(); /* no other possible cases */
@@ -415,8 +410,7 @@ const char* Enc_vars_ord_to_string(VarsOrdType vot)
   return NULL;
 }
 
-VarsOrdType Enc_string_to_vars_ord(const char* str, StreamMgr_ptr streams)
-{
+VarsOrdType Enc_string_to_vars_ord(const char *str, StreamMgr_ptr streams) {
   if (strcmp(str, VARS_ORD_STR_INPUTS_BEFORE) == 0) {
     return VARS_ORD_INPUTS_BEFORE;
   }
@@ -438,39 +432,36 @@ VarsOrdType Enc_string_to_vars_ord(const char* str, StreamMgr_ptr streams)
   /* deprecated feature */
   if (strcmp(str, VARS_ORD_STR_LEXICOGRAPHIC) == 0) {
     if (STREAM_MGR(NULL) != streams) {
-      StreamMgr_print_error(streams,  "Warning: value \"" VARS_ORD_STR_LEXICOGRAPHIC
-                            "\" is a deprecated feature. Use \"" VARS_ORD_STR_TOPOLOGICAL
-                            "\" instead.\n");
+      StreamMgr_print_error(
+          streams, "Warning: value \"" VARS_ORD_STR_LEXICOGRAPHIC
+                   "\" is a deprecated feature. Use \"" VARS_ORD_STR_TOPOLOGICAL
+                   "\" instead.\n");
     }
     return VARS_ORD_TOPOLOGICAL;
   }
   return VARS_ORD_UNKNOWN;
 }
 
-const char* Enc_get_valid_vars_ord_types()
-{
-  return
-    VARS_ORD_STR_INPUTS_BEFORE ", " \
-    VARS_ORD_STR_INPUTS_AFTER  ", " \
-    VARS_ORD_STR_TOPOLOGICAL ", "\
-    VARS_ORD_STR_INPUTS_BEFORE_BI ", " \
-    VARS_ORD_STR_INPUTS_AFTER_BI  ", " \
-    VARS_ORD_STR_TOPOLOGICAL_BI;
+const char *Enc_get_valid_vars_ord_types() {
+  return VARS_ORD_STR_INPUTS_BEFORE
+      ", " VARS_ORD_STR_INPUTS_AFTER ", " VARS_ORD_STR_TOPOLOGICAL
+      ", " VARS_ORD_STR_INPUTS_BEFORE_BI ", " VARS_ORD_STR_INPUTS_AFTER_BI
+      ", " VARS_ORD_STR_TOPOLOGICAL_BI;
 }
 
-const char* Enc_bdd_static_order_heuristics_to_string(BddSohEnum value)
-{
+const char *Enc_bdd_static_order_heuristics_to_string(BddSohEnum value) {
   switch (value) {
-  case BDD_STATIC_ORDER_HEURISTICS_NONE: return BDD_STATIC_ORDER_HEURISTICS_STR_NONE;
-  case BDD_STATIC_ORDER_HEURISTICS_BASIC: return BDD_STATIC_ORDER_HEURISTICS_STR_BASIC;
+  case BDD_STATIC_ORDER_HEURISTICS_NONE:
+    return BDD_STATIC_ORDER_HEURISTICS_STR_NONE;
+  case BDD_STATIC_ORDER_HEURISTICS_BASIC:
+    return BDD_STATIC_ORDER_HEURISTICS_STR_BASIC;
   default:
     error_unreachable_code(); /* no other possible cases */
   }
   return NULL;
 }
 
-BddSohEnum Enc_string_to_bdd_static_order_heuristics(const char* str)
-{
+BddSohEnum Enc_string_to_bdd_static_order_heuristics(const char *str) {
   if (strcmp(str, BDD_STATIC_ORDER_HEURISTICS_STR_NONE) == 0) {
     return BDD_STATIC_ORDER_HEURISTICS_NONE;
   }
@@ -480,16 +471,12 @@ BddSohEnum Enc_string_to_bdd_static_order_heuristics(const char* str)
   return BDD_STATIC_ORDER_HEURISTICS_ERROR;
 }
 
-const char* Enc_get_valid_bdd_static_order_heuristics()
-{
-  return
-    BDD_STATIC_ORDER_HEURISTICS_STR_NONE ", " \
-    BDD_STATIC_ORDER_HEURISTICS_STR_BASIC;
+const char *Enc_get_valid_bdd_static_order_heuristics() {
+  return BDD_STATIC_ORDER_HEURISTICS_STR_NONE
+      ", " BDD_STATIC_ORDER_HEURISTICS_STR_BASIC;
 }
 
-int Enc_clean_evaluation_cache(NuSMVEnv_ptr env,
-                               BddEnc_ptr enc)
-{
+int Enc_clean_evaluation_cache(NuSMVEnv_ptr env, BddEnc_ptr enc) {
   UNUSED_PARAM(env);
 
   BddEnc_clean_evaluation_cache(enc);
@@ -516,8 +503,7 @@ int Enc_clean_evaluation_cache(NuSMVEnv_ptr env,
 */
 static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
                                                FlatHierarchy_ptr flat_hierarchy,
-                                               OrdGroups_ptr ord_groups)
-{
+                                               OrdGroups_ptr ord_groups) {
   /* Discussion about the algorithm.  The only necessary thing to get
      is clusters computed by PredicateExtractor. The actual predicates
      are of no importance.  Unfortunately, it is more difficult to
@@ -528,9 +514,9 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
      vars. Boolean vars interaction are completely ignored.
      A special function would be able to collect all the information */
 
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   BoolEnc_ptr bool_enc = BOOL_ENC(NuSMVEnv_get_value(env, ENV_BOOL_ENCODER));
   SymbTable_ptr st = FlatHierarchy_get_symb_table(flat_hierarchy);
   PredicateExtractor_ptr extractor = PredicateExtractor_create(st, true);
@@ -551,9 +537,9 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
 
   /* create the original var order to begin with */
   original_var_order = NodeList_create();
-  switch(get_vars_order_type(opts)) {
+  switch (get_vars_order_type(opts)) {
   case VARS_ORD_INPUTS_BEFORE_BI:
-    isBitInterleaved = true;  /* no break here */
+    isBitInterleaved = true; /* no break here */
   case VARS_ORD_INPUTS_BEFORE:
     filter[0] = STT_INPUT_VAR;
     filter[1] = STT_STATE_VAR | STT_FROZEN_VAR;
@@ -561,7 +547,7 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
     break;
 
   case VARS_ORD_INPUTS_AFTER_BI:
-    isBitInterleaved = true;    /* no break here */
+    isBitInterleaved = true; /* no break here */
   case VARS_ORD_INPUTS_AFTER:
     filter[0] = STT_STATE_VAR | STT_FROZEN_VAR;
     filter[1] = STT_INPUT_VAR;
@@ -569,7 +555,7 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
     break;
 
   case VARS_ORD_TOPOLOGICAL_BI:
-    isBitInterleaved = true;   /* no break here */
+    isBitInterleaved = true; /* no break here */
   case VARS_ORD_TOPOLOGICAL:
     filter[0] = STT_VAR;
     filter[1] = STT_NONE;
@@ -614,8 +600,8 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
     ListIter_ptr subIter;
     node_ptr sorting_cache = Nil;
 
-    node_ptr var = NodeList_get_elem_at(original_var_order,
-                                        NodeList_get_first_iter(original_var_order));
+    node_ptr var = NodeList_get_elem_at(
+        original_var_order, NodeList_get_first_iter(original_var_order));
     Set_t cluster = PredicateExtractor_get_var_cluster(extractor, var);
 
     if (NULL == cluster) { /* not grouped var */
@@ -624,8 +610,7 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
       NodeList_remove_elem_at(original_var_order,
                               NodeList_get_first_iter(original_var_order));
 
-    }
-    else { /* a group of vars has to be added */
+    } else { /* a group of vars has to be added */
       /* remove all the vars from the original list and the hash */
 
       /* It is useless to continue iterating over the NodeList if
@@ -662,12 +647,10 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
       if (SymbTable_is_symbol_bool_var(st, var)) {
         if (isBitInterleaved) {
           /* NB: for boolean interleaving actually may be of no importance? */
-          Enc_append_bit_to_sorted_list(st, subListBits, var,
-                                        &sorting_cache);
-        }
-        else NodeList_append(subListBits, var);
-      }
-      else {
+          Enc_append_bit_to_sorted_list(st, subListBits, var, &sorting_cache);
+        } else
+          NodeList_append(subListBits, var);
+      } else {
 
         /* Skip variables that are not booleanizable */
         if (Compile_is_expr_booleanizable(st, var, false, cache)) {
@@ -675,17 +658,16 @@ static void enc_construct_bdd_order_statically(NuSMVEnv_ptr env,
              Grouping is done by caller function */
           NodeList_ptr bits = BoolEnc_get_var_bits(bool_enc, var);
           ListIter_ptr bit_iter;
-          NODE_LIST_FOREACH(bits,bit_iter) {
+          NODE_LIST_FOREACH(bits, bit_iter) {
             node_ptr varBit = NodeList_get_elem_at(bits, bit_iter);
             if (isBitInterleaved) {
               Enc_append_bit_to_sorted_list(st, subListBits, varBit,
                                             &sorting_cache);
-            }
-            else NodeList_append(subListBits, varBit);
+            } else
+              NodeList_append(subListBits, varBit);
           }
           NodeList_destroy(bits);
         }
-
       }
     }
 

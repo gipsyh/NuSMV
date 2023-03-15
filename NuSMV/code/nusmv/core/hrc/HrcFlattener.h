@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,26 +35,23 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_HRC_FLATTENER_H__
 #define __NUSMV_CORE_HRC_HRC_FLATTENER_H__
 
-
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/hrc/HrcNode.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/compile/FlatHierarchy.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/fsm/sexp/SexpFsm.h"
+#include "nusmv/core/hrc/HrcNode.h"
 #include "nusmv/core/hrc/hrc.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct HrcFlattener
   \brief Definition of the public accessor for class HrcFlattener
 
-  
+
 */
-typedef struct HrcFlattener_TAG*  HrcFlattener_ptr;
+typedef struct HrcFlattener_TAG *HrcFlattener_ptr;
 
 /*!
   \brief To cast and check instances of class HrcFlattener
@@ -62,18 +59,15 @@ typedef struct HrcFlattener_TAG*  HrcFlattener_ptr;
   These macros must be used respectively to cast and to check
   instances of class HrcFlattener
 */
-#define HRC_FLATTENER(self) \
-         ((HrcFlattener_ptr) self)
+#define HRC_FLATTENER(self) ((HrcFlattener_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define HRC_FLATTENER_CHECK_INSTANCE(self) \
-         (nusmv_assert(HRC_FLATTENER(self) != HRC_FLATTENER(NULL)))
-
-
+#define HRC_FLATTENER_CHECK_INSTANCE(self)                                     \
+  (nusmv_assert(HRC_FLATTENER(self) != HRC_FLATTENER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -94,11 +88,9 @@ typedef struct HrcFlattener_TAG*  HrcFlattener_ptr;
 
   \sa HrcFlattener_create
 */
-FlatHierarchy_ptr
-HrcToFlatHierarchy(const NuSMVEnv_ptr env,
-                   HrcNode_ptr node,
-                   SymbTable_ptr symb_table,
-                   SymbLayer_ptr layer);
+FlatHierarchy_ptr HrcToFlatHierarchy(const NuSMVEnv_ptr env, HrcNode_ptr node,
+                                     SymbTable_ptr symb_table,
+                                     SymbLayer_ptr layer);
 
 /*!
   \brief HrcFlattener main routine
@@ -115,11 +107,8 @@ HrcToFlatHierarchy(const NuSMVEnv_ptr env,
 
   \sa HrcFlattener_create
 */
-SexpFsm_ptr
-HrcToSexpFsm(const NuSMVEnv_ptr env,
-             HrcNode_ptr node,
-             SymbTable_ptr symb_table,
-             SymbLayer_ptr layer);
+SexpFsm_ptr HrcToSexpFsm(const NuSMVEnv_ptr env, HrcNode_ptr node,
+                         SymbTable_ptr symb_table, SymbLayer_ptr layer);
 
 /*!
   \methodof HrcFlattener
@@ -136,10 +125,9 @@ HrcToSexpFsm(const NuSMVEnv_ptr env,
 
   \sa HrcFlattener_destroy
 */
-HrcFlattener_ptr HrcFlattener_create(const NuSMVEnv_ptr env,
-                                            HrcNode_ptr node,
-                                            SymbTable_ptr symb_table,
-                                            SymbLayer_ptr layer);
+HrcFlattener_ptr HrcFlattener_create(const NuSMVEnv_ptr env, HrcNode_ptr node,
+                                     SymbTable_ptr symb_table,
+                                     SymbLayer_ptr layer);
 
 /*!
   \methodof HrcFlattener
@@ -177,8 +165,7 @@ void HrcFlattener_populate_symbol_table(HrcFlattener_ptr self);
 
   \sa HrcFlattener_flatten_hierarchy
 */
-FlatHierarchy_ptr
-HrcFlattener_get_flat_hierarchy(HrcFlattener_ptr self);
+FlatHierarchy_ptr HrcFlattener_get_flat_hierarchy(HrcFlattener_ptr self);
 
 /*!
   \methodof HrcFlattener
@@ -191,8 +178,7 @@ HrcFlattener_get_flat_hierarchy(HrcFlattener_ptr self);
 
   \sa HrcFlattener_flatten_hierarchy
 */
-SymbTable_ptr
-HrcFlattener_get_symbol_table(HrcFlattener_ptr self);
+SymbTable_ptr HrcFlattener_get_symbol_table(HrcFlattener_ptr self);
 
 /*!
   \methodof HrcFlattener
@@ -205,8 +191,7 @@ HrcFlattener_get_symbol_table(HrcFlattener_ptr self);
 
   \sa HrcFlattener_flatten_hierarchy
 */
-SymbLayer_ptr
-HrcFlattener_get_symbol_layer(HrcFlattener_ptr self);
+SymbLayer_ptr HrcFlattener_get_symbol_layer(HrcFlattener_ptr self);
 
 /*!
   \methodof HrcFlattener
@@ -214,9 +199,7 @@ HrcFlattener_get_symbol_layer(HrcFlattener_ptr self);
 
   Dumps the flatten model on file "out"
 */
-void
-HrcFlattener_write_flatten_model(HrcFlattener_ptr self,
-                                 FILE* out);
+void HrcFlattener_write_flatten_model(HrcFlattener_ptr self, FILE *out);
 
 /*!
   \methodof HrcFlattener
@@ -227,7 +210,6 @@ HrcFlattener_write_flatten_model(HrcFlattener_ptr self,
   \sa HrcFlattener_create
 */
 void HrcFlattener_destroy(HrcFlattener_ptr self);
-
 
 /**AutomaticEnd***************************************************************/
 

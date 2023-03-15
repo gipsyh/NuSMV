@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,30 +34,25 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_PRIVATE_H__
-
 
 #include "nusmv/core/compile/flattening/MasterCompileFlattener.h"
 #include "nusmv/core/node/MasterNodeWalker.h"
 #include "nusmv/core/node/MasterNodeWalker_private.h"
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/utils/assoc.h"
-
+#include "nusmv/core/utils/defs.h"
 
 /*!
   \brief MasterCompileFlattener class definition derived from
                class MasterNodeWalker
 
-  
+
 
   \sa Base class MasterNodeWalker
 */
 
-typedef struct MasterCompileFlattener_TAG
-{
+typedef struct MasterCompileFlattener_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(MasterNodeWalker);
 
@@ -77,8 +72,7 @@ typedef struct MasterCompileFlattener_TAG
   Indicates that the body of a define is under the
    flattening, it is usde to discover possible recursive definitions.
 */
-#define MASTER_COMPILE_FLATTENER_BUILDING_FLAT_BODY (node_ptr)-11
-
+#define MASTER_COMPILE_FLATTENER_BUILDING_FLAT_BODY (node_ptr) - 11
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -93,7 +87,7 @@ typedef struct MasterCompileFlattener_TAG
   \sa MasterCompileFlattener_create
 */
 void master_compile_flattener_init(MasterCompileFlattener_ptr self,
-                                          const NuSMVEnv_ptr env);
+                                   const NuSMVEnv_ptr env);
 
 /*!
   \methodof MasterCompileFlattener
@@ -109,7 +103,7 @@ void master_compile_flattener_deinit(MasterCompileFlattener_ptr self);
   \methodof MasterCompileFlattener
   \brief Recursive function for flattenig a sexp.
 
-  
+
    The function changes its behavior depending on the value of mode:
      - Flattener_Get_Def_Mode: in this mode, the defines in the
    expression are returned as-is (i.e. they are not expanded!)
@@ -157,10 +151,8 @@ void master_compile_flattener_deinit(MasterCompileFlattener_ptr self);
 */
 node_ptr
 master_compile_flattener_flatten(MasterCompileFlattener_ptr self,
-                                 SymbTable_ptr symb_table,
-                                 hash_ptr def_hash,
-                                 node_ptr sexp,
-                                 node_ptr context,
+                                 SymbTable_ptr symb_table, hash_ptr def_hash,
+                                 node_ptr sexp, node_ptr context,
                                  MasterCompileFlattener_def_mode def_mode);
 
 /*!
@@ -175,21 +167,18 @@ master_compile_flattener_flatten(MasterCompileFlattener_ptr self,
   \se The flatten_def_hash is modified in
    order to memoize previously computed definition expansion.
 */
-node_ptr
-master_compile_flattener_get_definition(MasterCompileFlattener_ptr self,
-                                        SymbTable_ptr symb_table,
-                                        hash_ptr def_hash,
-                                        node_ptr name,
-                                        MasterCompileFlattener_def_mode def_mode);
+node_ptr master_compile_flattener_get_definition(
+    MasterCompileFlattener_ptr self, SymbTable_ptr symb_table,
+    hash_ptr def_hash, node_ptr name, MasterCompileFlattener_def_mode def_mode);
 
 /*!
   \methodof MasterCompileFlattener
   \brief Get the hash of the defines
 
-  
-*/
-hash_ptr
-master_compile_flattener_get_def_hash(MasterCompileFlattener_ptr self,
-                                      SymbTable_ptr symb_table);
 
-#endif /* __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_PRIVATE_H__ */
+*/
+hash_ptr master_compile_flattener_get_def_hash(MasterCompileFlattener_ptr self,
+                                               SymbTable_ptr symb_table);
+
+#endif /* __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_PRIVATE_H__ \
+        */

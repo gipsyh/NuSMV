@@ -36,37 +36,32 @@
 
 */
 
+#include "nusmv/core/hrc/hrcPrefixUtils.h"
+#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
-#include "nusmv/core/hrc/hrcPrefixUtils.h"
 #include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/compile/compile.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -76,14 +71,11 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Set_t hrc_prefix_utils_get_prefix_symbols(Set_t symbol_set,
-                                          node_ptr prefix)
-{
+Set_t hrc_prefix_utils_get_prefix_symbols(Set_t symbol_set, node_ptr prefix) {
   Set_t result_set;
   Set_Iterator_t iter;
 
@@ -104,8 +96,7 @@ Set_t hrc_prefix_utils_get_prefix_symbols(Set_t symbol_set,
   return result_set;
 }
 
-boolean hrc_prefix_utils_is_subprefix(node_ptr subprefix, node_ptr prefix)
-{
+boolean hrc_prefix_utils_is_subprefix(node_ptr subprefix, node_ptr prefix) {
   if (subprefix == prefix) {
     /* subprefix and prefix are the same */
     return true;
@@ -118,9 +109,8 @@ boolean hrc_prefix_utils_is_subprefix(node_ptr subprefix, node_ptr prefix)
   }
 }
 
-node_ptr hrc_prefix_utils_add_context(NodeMgr_ptr nodemgr,
-                                      node_ptr context, node_ptr expression)
-{
+node_ptr hrc_prefix_utils_add_context(NodeMgr_ptr nodemgr, node_ptr context,
+                                      node_ptr expression) {
   node_ptr return_expression;
 
   nusmv_assert(NODE_PTR(Nil) != expression);
@@ -128,24 +118,20 @@ node_ptr hrc_prefix_utils_add_context(NodeMgr_ptr nodemgr,
   if (DOT != node_get_type(expression) &&
       CONTEXT != node_get_type(expression)) {
     /* base case: concatenate context and expression */
-    return_expression = find_node(nodemgr, DOT,
-                                  context,
-                                  find_atom(nodemgr, expression));
+    return_expression =
+        find_node(nodemgr, DOT, context, find_atom(nodemgr, expression));
   } else {
     /* Recursively build the context with car(expression) and prefix
        it to cdr(expression) */
-    context = hrc_prefix_utils_add_context(nodemgr, context,
-                                       car(expression));
-    return_expression = find_node(nodemgr, DOT,
-                                  context,
-                                  find_atom(nodemgr, cdr(expression)));
+    context = hrc_prefix_utils_add_context(nodemgr, context, car(expression));
+    return_expression =
+        find_node(nodemgr, DOT, context, find_atom(nodemgr, cdr(expression)));
   }
 
   return return_expression;
 }
 
-node_ptr hrc_prefix_utils_get_first_subcontext(node_ptr symbol)
-{
+node_ptr hrc_prefix_utils_get_first_subcontext(node_ptr symbol) {
   node_ptr context;
 
   context = symbol;
@@ -159,8 +145,7 @@ node_ptr hrc_prefix_utils_get_first_subcontext(node_ptr symbol)
      From this loop context will be a Nil node, a DOT node or a
      CONTEXT node.
   */
-  while (NODE_PTR(Nil) != context &&
-         DOT != node_get_type(context) &&
+  while (NODE_PTR(Nil) != context && DOT != node_get_type(context) &&
          CONTEXT != node_get_type(context)) {
     context = car(context);
   }
@@ -188,8 +173,7 @@ node_ptr hrc_prefix_utils_get_first_subcontext(node_ptr symbol)
 
 node_ptr hrc_prefix_utils_remove_context(NodeMgr_ptr nodemgr,
                                          node_ptr identifier,
-                                         node_ptr context)
-{
+                                         node_ptr context) {
   node_ptr identifier_no_context;
 
   if (Nil == identifier) {
@@ -199,32 +183,31 @@ node_ptr hrc_prefix_utils_remove_context(NodeMgr_ptr nodemgr,
   } else {
     node_ptr new_context;
 
-    new_context = hrc_prefix_utils_remove_context(nodemgr, car(identifier), context);
-    identifier_no_context = find_node(nodemgr, DOT, new_context, cdr(identifier));
+    new_context =
+        hrc_prefix_utils_remove_context(nodemgr, car(identifier), context);
+    identifier_no_context =
+        find_node(nodemgr, DOT, new_context, cdr(identifier));
   }
 
   return identifier_no_context;
 }
 
 node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
-                                             node_ptr instance_name)
-{
+                                             node_ptr instance_name) {
   SymbTable_ptr st = HrcNode_get_symbol_table(instance);
   NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   UStringMgr_ptr strings = USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   node_ptr module_name;
   node_ptr new_name;
-  char* module_name_chr;
-  char* instance_name_chr;
-  char* new_name_chr;
-  char* tmp;
+  char *module_name_chr;
+  char *instance_name_chr;
+  char *new_name_chr;
+  char *tmp;
   boolean found_double_quote;
-
 
   module_name = HrcNode_get_name(instance);
 
@@ -233,19 +216,14 @@ node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
   instance_name_chr = sprint_node(wffprint, instance_name);
 
   /* creates the new module name */
-  new_name_chr = ALLOC(char,
-                       strlen(module_name_chr) +
-                       strlen(instance_name_chr) +
-                       2);
+  new_name_chr =
+      ALLOC(char, strlen(module_name_chr) + strlen(instance_name_chr) + 2);
 
   if (NODE_PTR(Nil) == instance_name) {
     /* main module */
     sprintf(new_name_chr, "%s", module_name_chr);
   } else {
-    sprintf(new_name_chr,
-            "%s_%s",
-            module_name_chr,
-            instance_name_chr);
+    sprintf(new_name_chr, "%s_%s", module_name_chr, instance_name_chr);
   }
 
   found_double_quote = false;
@@ -254,7 +232,8 @@ node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
      substitutes " with _ inside the module name.
    */
   for (tmp = new_name_chr; *tmp != 0; tmp++) {
-    if ('.' == *tmp) *tmp = '_';
+    if ('.' == *tmp)
+      *tmp = '_';
     if ('"' == *tmp) {
       /* [SM] found_double_quote is true iff the first character of
          new_name_chr is a double quote that must NOT be substituted.
@@ -271,8 +250,8 @@ node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
 
   /* manages double quote */
   if (found_double_quote) {
-    char* copy_str;
-    char* app;
+    char *copy_str;
+    char *app;
     unsigned int copy_size;
 
     copy_size = strlen(new_name_chr) + 3;
@@ -281,11 +260,11 @@ node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
     /* copy in copy_str new_name_chr, leaving free the first character.
        Pay attention that this operation does not copy terminator.
      */
-    strncpy((copy_str+1) , new_name_chr, strlen(new_name_chr));
+    strncpy((copy_str + 1), new_name_chr, strlen(new_name_chr));
     copy_str[0] = '"';
     /* Add ending double quote */
-    copy_str[copy_size-2] = '"';
-    copy_str[copy_size-1] = '\0';
+    copy_str[copy_size - 2] = '"';
+    copy_str[copy_size - 1] = '\0';
 
     /* replace new_name_chr with copy_str */
     app = new_name_chr;
@@ -294,7 +273,9 @@ node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
   }
 
   /* Creates the new module name */
-  new_name = find_node(nodemgr, ATOM, (node_ptr) UStringMgr_find_string(strings, new_name_chr), Nil);
+  new_name =
+      find_node(nodemgr, ATOM,
+                (node_ptr)UStringMgr_find_string(strings, new_name_chr), Nil);
 
   FREE(module_name_chr);
   FREE(instance_name_chr);
@@ -309,9 +290,8 @@ node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
   Contatenates 2 contexts
 */
 
-node_ptr hrc_prefix_utils_concat_context(const NuSMVEnv_ptr env,
-                                         node_ptr ctx1, node_ptr ctx2)
-{
+node_ptr hrc_prefix_utils_concat_context(const NuSMVEnv_ptr env, node_ptr ctx1,
+                                         node_ptr ctx2) {
   return CompileFlatten_concat_contexts(env, ctx1, ctx2);
 }
 
@@ -324,32 +304,26 @@ node_ptr hrc_prefix_utils_concat_context(const NuSMVEnv_ptr env,
 */
 
 node_ptr hrc_prefix_utils_contextualize_expr(const NuSMVEnv_ptr env,
-                                             node_ptr expr,
-                                             node_ptr context)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+                                             node_ptr expr, node_ptr context) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   node_ptr _expr;
-  if (Nil == expr) return Nil;
+  if (Nil == expr)
+    return Nil;
 
   if (CONTEXT == node_get_type(expr)) {
     /* Concatenate contexts */
     context = hrc_prefix_utils_concat_context(env, context, car(expr));
     _expr = cdr(expr);
-  }
-  else {
+  } else {
     _expr = expr;
   }
 
   return find_node(nodemgr, CONTEXT, context, _expr);
 }
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */

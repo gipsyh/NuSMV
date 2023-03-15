@@ -34,19 +34,16 @@
 
 */
 
-
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/enc/utils/AddArray.h"
 #include "nusmv/core/dd/dd.h" /* required by functions of word arithmetic operations */
 #include "nusmv/core/enc/operators.h" /* for word arithmetic operation */
-#include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/opt/opt.h"
-#include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/utils/error.h"
+#include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/WordNumberMgr.h"
-
-
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/ustring.h"
 
 /*---------------------------------------------------------------------------*/
 /* Types definition                                                          */
@@ -63,8 +60,7 @@
   defined, but just used to create a new type (for proper
   type-checking).  The actually type below AddArray_ptr is array_t*
 */
-typedef AddArray_ptr (*APFDAA)(DDMgr_ptr , AddArray_ptr, AddArray_ptr);
-
+typedef AddArray_ptr (*APFDAA)(DDMgr_ptr, AddArray_ptr, AddArray_ptr);
 
 /*---------------------------------------------------------------------------*/
 /* Macro definition                                                          */
@@ -86,8 +82,7 @@ typedef AddArray_ptr (*APFDAA)(DDMgr_ptr , AddArray_ptr, AddArray_ptr);
 
   See array2AddArray
 */
-#define AddArray2array(addArray) ((array_t*)(addArray))
-
+#define AddArray2array(addArray) ((array_t *)(addArray))
 
 /*---------------------------------------------------------------------------*/
 /* Variable definition                                                       */
@@ -95,81 +90,65 @@ typedef AddArray_ptr (*APFDAA)(DDMgr_ptr , AddArray_ptr, AddArray_ptr);
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void add_array_full_adder(DDMgr_ptr dd,
-                                 add_ptr arg1,
-                                 add_ptr arg2,
-                                 add_ptr carry_in,
-                                 add_ptr* sum,
-                                 add_ptr* carry_out);
+static void add_array_full_adder(DDMgr_ptr dd, add_ptr arg1, add_ptr arg2,
+                                 add_ptr carry_in, add_ptr *sum,
+                                 add_ptr *carry_out);
 
-static void add_array_adder(DDMgr_ptr dd,
-                            AddArray_ptr arg1,
-                            AddArray_ptr arg2,
-                            add_ptr carry_in,
-                            AddArray_ptr* res,
-                            add_ptr* carry_out);
+static void add_array_adder(DDMgr_ptr dd, AddArray_ptr arg1, AddArray_ptr arg2,
+                            add_ptr carry_in, AddArray_ptr *res,
+                            add_ptr *carry_out);
 
 static AddArray_ptr add_array_word_plus_negated_and_one(DDMgr_ptr dd,
                                                         AddArray_ptr arg1,
                                                         AddArray_ptr arg2,
-                                                        add_ptr* carry);
+                                                        add_ptr *carry);
 
-static AddArray_ptr add_array_negate_bits(DDMgr_ptr dd,
-                                          AddArray_ptr arg);
+static AddArray_ptr add_array_negate_bits(DDMgr_ptr dd, AddArray_ptr arg);
 
-static AddArray_ptr add_array_word_extend(DDMgr_ptr dd,
-                                          AddArray_ptr arg,
+static AddArray_ptr add_array_word_extend(DDMgr_ptr dd, AddArray_ptr arg,
                                           AddArray_ptr arg_repeat,
                                           add_ptr paddingBit);
 
-static AddArray_ptr add_array_word_right_shift(DDMgr_ptr dd,
-                                               AddArray_ptr arg,
+static AddArray_ptr add_array_word_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
                                                AddArray_ptr number,
                                                boolean isSigned);
 
 static void add_array_unsigned_division_remainder(DDMgr_ptr dd,
                                                   AddArray_ptr arg1,
                                                   AddArray_ptr arg2,
-                                                  AddArray_ptr* quotient,
-                                                  AddArray_ptr* remainder);
+                                                  AddArray_ptr *quotient,
+                                                  AddArray_ptr *remainder);
 
-static void
-add_array_signed_division_remainder_simple(DDMgr_ptr dd,
-                                           AddArray_ptr arg1,
-                                           AddArray_ptr arg2,
-                                           AddArray_ptr* quotient,
-                                           AddArray_ptr* remainder);
-static void
-add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
-                                             AddArray_ptr arg1,
-                                             AddArray_ptr arg2,
-                                             AddArray_ptr* quotient,
-                                             AddArray_ptr* remainder);
+static void add_array_signed_division_remainder_simple(DDMgr_ptr dd,
+                                                       AddArray_ptr arg1,
+                                                       AddArray_ptr arg2,
+                                                       AddArray_ptr *quotient,
+                                                       AddArray_ptr *remainder);
+static void add_array_signed_division_remainder_hardware(
+    DDMgr_ptr dd, AddArray_ptr arg1, AddArray_ptr arg2, AddArray_ptr *quotient,
+    AddArray_ptr *remainder);
 
-static add_ptr
-add_array_create_default_value_of_shift_operation(DDMgr_ptr dd, AddArray_ptr number,
-int width, add_ptr defaultBit, const char* errMessage);
+static add_ptr add_array_create_default_value_of_shift_operation(
+    DDMgr_ptr dd, AddArray_ptr number, int width, add_ptr defaultBit,
+    const char *errMessage);
 
+static AddArray_ptr add_array_word_signed_comparison(DDMgr_ptr dd, APFDAA op,
+                                                     AddArray_ptr arg1,
+                                                     AddArray_ptr arg2);
 
-static AddArray_ptr
-add_array_word_signed_comparison(DDMgr_ptr dd, APFDAA op,
-                               AddArray_ptr arg1, AddArray_ptr arg2);
-
-static inline boolean
-add_array_is_word(DDMgr_ptr dd, const AddArray_ptr number);
+static inline boolean add_array_is_word(DDMgr_ptr dd,
+                                        const AddArray_ptr number);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-AddArray_ptr AddArray_create(int number)
-{
+AddArray_ptr AddArray_create(int number) {
   nusmv_assert(number > 0);
   return array2AddArray(array_alloc(add_ptr, number));
 }
 
-AddArray_ptr AddArray_from_word_number(DDMgr_ptr dd, WordNumber_ptr wn)
-{
+AddArray_ptr AddArray_from_word_number(DDMgr_ptr dd, WordNumber_ptr wn) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
@@ -180,23 +159,22 @@ AddArray_ptr AddArray_from_word_number(DDMgr_ptr dd, WordNumber_ptr wn)
 
   res = AddArray_create(width);
   for (i = 0; i < width; ++i) {
-    node_ptr value = WordNumber_get_bit(wn, i) ? ExprMgr_true(exprs) : ExprMgr_false(exprs);
+    node_ptr value =
+        WordNumber_get_bit(wn, i) ? ExprMgr_true(exprs) : ExprMgr_false(exprs);
     AddArray_set_n(res, i, add_leaf(dd, value));
   }
   return res;
 }
 
-AddArray_ptr AddArray_from_add(add_ptr add)
-{
-  array_t* array = array_alloc(add_ptr, 1);
+AddArray_ptr AddArray_from_add(add_ptr add) {
+  array_t *array = array_alloc(add_ptr, 1);
   array_insert(add_ptr, array, 0, add);
   return array2AddArray(array);
 }
 
-AddArray_ptr AddArray_duplicate(AddArray_ptr self)
-{
-  array_t* new;
-  array_t* old;
+AddArray_ptr AddArray_duplicate(AddArray_ptr self) {
+  array_t *new;
+  array_t *old;
   int i;
 
   old = AddArray2array(self);
@@ -209,60 +187,49 @@ AddArray_ptr AddArray_duplicate(AddArray_ptr self)
   return array2AddArray(new);
 }
 
-void AddArray_destroy(DDMgr_ptr dd, AddArray_ptr self)
-{
+void AddArray_destroy(DDMgr_ptr dd, AddArray_ptr self) {
   int i;
-  array_t* array = AddArray2array(self);
+  array_t *array = AddArray2array(self);
   for (i = 0; i < array_n(array); ++i) {
     add_free(dd, array_fetch(add_ptr, array, i));
   }
   array_free(array);
 }
 
-int AddArray_get_size(AddArray_ptr self)
-{
+int AddArray_get_size(AddArray_ptr self) {
   return array_n(AddArray2array(self));
 }
 
-add_ptr AddArray_get_add(AddArray_ptr self)
-{
-  array_t* array = AddArray2array(self);
+add_ptr AddArray_get_add(AddArray_ptr self) {
+  array_t *array = AddArray2array(self);
   nusmv_assert(array_n(array) == 1);
   return array_fetch(add_ptr, array, 0);
 }
 
-add_ptr AddArray_get_n(AddArray_ptr self, int number)
-{
-  array_t* array = AddArray2array(self);
+add_ptr AddArray_get_n(AddArray_ptr self, int number) {
+  array_t *array = AddArray2array(self);
   return array_fetch(add_ptr, array, number);
 }
 
-array_t* AddArray_get_array(AddArray_ptr self)
-{
-  return AddArray2array(self);
-}
+array_t *AddArray_get_array(AddArray_ptr self) { return AddArray2array(self); }
 
-size_t AddArray_get_add_size(const AddArray_ptr self, DDMgr_ptr dd)
-{
+size_t AddArray_get_add_size(const AddArray_ptr self, DDMgr_ptr dd) {
   size_t size = 0;
   int i;
 
-  for (i=AddArray_get_size(self)-1; i>=0; --i) {
+  for (i = AddArray_get_size(self) - 1; i >= 0; --i) {
     size += add_size(dd, AddArray_get_n(self, i));
   }
   return size;
 }
 
-void AddArray_set_n(AddArray_ptr self, int number, add_ptr add)
-{
-  array_t* array = AddArray2array(self);
+void AddArray_set_n(AddArray_ptr self, int number, add_ptr add) {
+  array_t *array = AddArray2array(self);
   array_insert(add_ptr, array, number, add);
 }
 
-AddArray_ptr AddArray_word_apply_unary(DDMgr_ptr dd,
-                                       AddArray_ptr arg1,
-                                       FP_A_DA op)
-{
+AddArray_ptr AddArray_word_apply_unary(DDMgr_ptr dd, AddArray_ptr arg1,
+                                       FP_A_DA op) {
   const int width = AddArray_get_size(arg1);
   AddArray_ptr res;
   int i;
@@ -278,11 +245,8 @@ AddArray_ptr AddArray_word_apply_unary(DDMgr_ptr dd,
   return res;
 }
 
-AddArray_ptr AddArray_word_apply_binary(DDMgr_ptr dd,
-                                        AddArray_ptr arg1,
-                                        AddArray_ptr arg2,
-                                        FP_A_DAA op)
-{
+AddArray_ptr AddArray_word_apply_binary(DDMgr_ptr dd, AddArray_ptr arg1,
+                                        AddArray_ptr arg2, FP_A_DAA op) {
   const int width = AddArray_get_size(arg1);
   AddArray_ptr res;
   int i;
@@ -294,36 +258,32 @@ AddArray_ptr AddArray_word_apply_binary(DDMgr_ptr dd,
   /* at every interation, process one bit and collect the result in res */
   for (i = 0; i < width; ++i) {
     AddArray_set_n(res, i,
-                   op(dd,
-                      AddArray_get_n(arg1, i),
-                      AddArray_get_n(arg2, i)));
+                   op(dd, AddArray_get_n(arg1, i), AddArray_get_n(arg2, i)));
   }
 
   return res;
 }
 
-add_ptr AddArray_make_disjunction(DDMgr_ptr dd, AddArray_ptr arg)
-{
+add_ptr AddArray_make_disjunction(DDMgr_ptr dd, AddArray_ptr arg) {
   add_ptr res;
   int i;
 
   nusmv_assert(AddArray_get_size(arg) > 0);
 
   res = add_false(dd);
-  for (i=AddArray_get_size(arg)-1; i>=0; --i) {
+  for (i = AddArray_get_size(arg) - 1; i >= 0; --i) {
     add_or_accumulate(dd, &res, AddArray_get_n(arg, i));
   }
 
   return res;
 }
 
-add_ptr AddArray_make_conjunction(DDMgr_ptr dd, AddArray_ptr arg)
-{
+add_ptr AddArray_make_conjunction(DDMgr_ptr dd, AddArray_ptr arg) {
   add_ptr res;
   int i;
 
   res = add_true(dd);
-  for (i=AddArray_get_size(arg)-1; i>=0; --i) {
+  for (i = AddArray_get_size(arg) - 1; i >= 0; --i) {
     add_and_accumulate(dd, &res, AddArray_get_n(arg, i));
   }
 
@@ -331,8 +291,7 @@ add_ptr AddArray_make_conjunction(DDMgr_ptr dd, AddArray_ptr arg)
 }
 
 AddArray_ptr AddArray_word_plus(DDMgr_ptr dd, AddArray_ptr arg1,
-                                               AddArray_ptr arg2)
-{
+                                AddArray_ptr arg2) {
   AddArray_ptr res;
   add_ptr carry;
   add_ptr zero = add_false(dd);
@@ -345,8 +304,7 @@ AddArray_ptr AddArray_word_plus(DDMgr_ptr dd, AddArray_ptr arg1,
 }
 
 AddArray_ptr AddArray_word_minus(DDMgr_ptr dd, AddArray_ptr arg1,
-                                                AddArray_ptr arg2)
-{
+                                 AddArray_ptr arg2) {
   AddArray_ptr res;
   add_ptr carry;
 
@@ -357,11 +315,10 @@ AddArray_ptr AddArray_word_minus(DDMgr_ptr dd, AddArray_ptr arg1,
   return res;
 }
 
-AddArray_ptr AddArray_word_unary_minus(DDMgr_ptr dd, AddArray_ptr arg)
-{
+AddArray_ptr AddArray_word_unary_minus(DDMgr_ptr dd, AddArray_ptr arg) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   const WordNumberMgr_ptr words =
-    WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
   const int width = AddArray_get_size(arg);
   WordNumber_ptr wn = WordNumberMgr_integer_to_word_number(words, 0, width);
@@ -375,20 +332,20 @@ AddArray_ptr AddArray_word_unary_minus(DDMgr_ptr dd, AddArray_ptr arg)
   return res;
 }
 
-AddArray_ptr AddArray_word_times(DDMgr_ptr dd,
-                                 AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_times(DDMgr_ptr dd, AddArray_ptr arg1,
+                                 AddArray_ptr arg2) {
 
   int index;
   const int N = AddArray_get_size(arg1);
   AddArray_ptr res = AddArray_create(N);
 
-  nusmv_assert( N > 0 && N == AddArray_get_size(arg2));
+  nusmv_assert(N > 0 && N == AddArray_get_size(arg2));
 
   /* set the result array to (arg2 & arg1[0]), i.e. process first bit of arg1 */
-  for (index = 0 ; index < N; ++index) {
-    AddArray_set_n(res, index, add_and(dd, AddArray_get_n(arg1, 0),
-                                       AddArray_get_n(arg2, index)));
+  for (index = 0; index < N; ++index) {
+    AddArray_set_n(
+        res, index,
+        add_and(dd, AddArray_get_n(arg1, 0), AddArray_get_n(arg2, index)));
   }
 
   /* A*B = ((B & A[0])<<0) +...+ ((B & A[i])<<i) +...+ ((B & A[N-1])<<N-1) */
@@ -401,9 +358,9 @@ AddArray_ptr AddArray_word_times(DDMgr_ptr dd,
 
     /* create an adder, i.e. (N - index) lower bits of (B & A[index])*/
     AddArray_ptr adder = AddArray_create(N - index);
-    for (k = 0; k < N - index; ++ k){
-      add_ptr add = add_and(dd, AddArray_get_n(arg1, index),
-                            AddArray_get_n(arg2, k));
+    for (k = 0; k < N - index; ++k) {
+      add_ptr add =
+          add_and(dd, AddArray_get_n(arg1, index), AddArray_get_n(arg2, k));
       AddArray_set_n(adder, k, add);
     } /* for k */
 
@@ -415,8 +372,8 @@ AddArray_ptr AddArray_word_times(DDMgr_ptr dd,
       add_ptr tmp_carry;
 
       add_array_full_adder(dd, AddArray_get_n(res, k + index),
-                           AddArray_get_n(adder, k),
-                           carry_in, &sum, &tmp_carry);
+                           AddArray_get_n(adder, k), carry_in, &sum,
+                           &tmp_carry);
       add_free(dd, AddArray_get_n(res, k + index));
       AddArray_set_n(res, k + index, sum);
       add_free(dd, carry_in);
@@ -428,9 +385,8 @@ AddArray_ptr AddArray_word_times(DDMgr_ptr dd,
   return res;
 }
 
-AddArray_ptr AddArray_word_unsigned_divide(DDMgr_ptr dd,
-                                           AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_unsigned_divide(DDMgr_ptr dd, AddArray_ptr arg1,
+                                           AddArray_ptr arg2) {
   AddArray_ptr quotient;
   AddArray_ptr remainder;
 
@@ -440,9 +396,8 @@ AddArray_ptr AddArray_word_unsigned_divide(DDMgr_ptr dd,
   return quotient;
 }
 
-AddArray_ptr AddArray_word_unsigned_mod(DDMgr_ptr dd,
-                                        AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_unsigned_mod(DDMgr_ptr dd, AddArray_ptr arg1,
+                                        AddArray_ptr arg2) {
   AddArray_ptr quotient;
   AddArray_ptr remainder;
 
@@ -452,9 +407,8 @@ AddArray_ptr AddArray_word_unsigned_mod(DDMgr_ptr dd,
   return remainder;
 }
 
-AddArray_ptr AddArray_word_signed_divide(DDMgr_ptr dd,
-                                         AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_signed_divide(DDMgr_ptr dd, AddArray_ptr arg1,
+                                         AddArray_ptr arg2) {
   AddArray_ptr quotient;
   AddArray_ptr remainder;
 
@@ -462,23 +416,24 @@ AddArray_ptr AddArray_word_signed_divide(DDMgr_ptr dd,
 #if 0
   add_array_signed_division_remainder_simple(dd, arg1, arg2, &quotient, &remainder);
 #else
-  add_array_signed_division_remainder_hardware(dd, arg1, arg2, &quotient, &remainder);
+  add_array_signed_division_remainder_hardware(dd, arg1, arg2, &quotient,
+                                               &remainder);
 #endif
 
   AddArray_destroy(dd, remainder);
   return quotient;
 }
 
-AddArray_ptr AddArray_word_signed_mod(DDMgr_ptr dd,
-                                      AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_signed_mod(DDMgr_ptr dd, AddArray_ptr arg1,
+                                      AddArray_ptr arg2) {
   AddArray_ptr quotient;
   AddArray_ptr remainder;
 
 #if 0
   add_array_signed_division_remainder_simple(dd, arg1, arg2, &quotient, &remainder);
 #else
-  add_array_signed_division_remainder_hardware(dd, arg1, arg2, &quotient, &remainder);
+  add_array_signed_division_remainder_hardware(dd, arg1, arg2, &quotient,
+                                               &remainder);
 #endif
 
   AddArray_destroy(dd, quotient);
@@ -486,13 +441,11 @@ AddArray_ptr AddArray_word_signed_mod(DDMgr_ptr dd,
 }
 
 AddArray_ptr AddArray_word_left_shift(DDMgr_ptr dd, AddArray_ptr arg,
-                                      AddArray_ptr number)
-{
+                                      AddArray_ptr number) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const WordNumberMgr_ptr words =
-    WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
   const int width = AddArray_get_size(arg);
   const int numWidth = AddArray_get_size(number);
@@ -502,16 +455,15 @@ AddArray_ptr AddArray_word_left_shift(DDMgr_ptr dd, AddArray_ptr arg,
   unsigned long long maxPossibleValue;
   int i;
 
-  nusmv_assert(width>0 && numWidth>0);
+  nusmv_assert(width > 0 && numWidth > 0);
 
   res = AddArray_create(width);
 
   /* creates the default case, i.e. the last ITE (see description) */
   {
     add_ptr zero = add_false(dd);
-    def_case = add_array_create_default_value_of_shift_operation(dd,
-                              number, width, zero,
-                              "Right operand of left-shift is out of range");
+    def_case = add_array_create_default_value_of_shift_operation(
+        dd, number, width, zero, "Right operand of left-shift is out of range");
     add_free(dd, zero);
   }
 
@@ -521,8 +473,10 @@ AddArray_ptr AddArray_word_left_shift(DDMgr_ptr dd, AddArray_ptr arg,
   */
 
   /* find the highest value for number (word or int) */
-  if (is_word) maxPossibleValue = ((2ULL << (numWidth-1)) - 1);
-  else maxPossibleValue = ~0U; /* value for sure greater that width */
+  if (is_word)
+    maxPossibleValue = ((2ULL << (numWidth - 1)) - 1);
+  else
+    maxPossibleValue = ~0U; /* value for sure greater that width */
 
   /* proceed one bit at every iteration */
   for (i = 0; i < width; ++i) {
@@ -534,23 +488,21 @@ AddArray_ptr AddArray_word_left_shift(DDMgr_ptr dd, AddArray_ptr arg,
       add_ptr numeqn_add, tmp;
 
       /* create  ITE(number=n, arg[i-n], ...) */
-      if (is_word) {  /* number is a word */
-        AddArray_ptr an = AddArray_from_word_number(dd,
-                              WordNumberMgr_integer_to_word_number(words, n, numWidth));
+      if (is_word) { /* number is a word */
+        AddArray_ptr an = AddArray_from_word_number(
+            dd, WordNumberMgr_integer_to_word_number(words, n, numWidth));
         AddArray_ptr numeqn = AddArray_word_equal(dd, number, an);
         numeqn_add = add_dup(AddArray_get_add(numeqn));
         AddArray_destroy(dd, numeqn);
         AddArray_destroy(dd, an);
-      }
-      else { /* number is not a word.  */
-        add_ptr n_add = add_leaf(dd, find_node(nodemgr, NUMBER, NODE_FROM_INT(n), Nil));
-        numeqn_add = add_apply(dd, node_equal,
-                               AddArray_get_add(number), n_add);
+      } else { /* number is not a word.  */
+        add_ptr n_add =
+            add_leaf(dd, find_node(nodemgr, NUMBER, NODE_FROM_INT(n), Nil));
+        numeqn_add = add_apply(dd, node_equal, AddArray_get_add(number), n_add);
         add_free(dd, n_add);
       }
 
-      tmp = add_ifthenelse(dd, numeqn_add, AddArray_get_n(arg, i - n),
-                           bit);
+      tmp = add_ifthenelse(dd, numeqn_add, AddArray_get_n(arg, i - n), bit);
 
       add_free(dd, numeqn_add);
       add_free(dd, bit);
@@ -567,27 +519,23 @@ AddArray_ptr AddArray_word_left_shift(DDMgr_ptr dd, AddArray_ptr arg,
 }
 
 AddArray_ptr AddArray_word_unsigned_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
-                                                AddArray_ptr number)
-{
+                                                AddArray_ptr number) {
   return add_array_word_right_shift(dd, arg, number, false);
 }
 
 AddArray_ptr AddArray_word_signed_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
-                                                AddArray_ptr number)
-{
+                                              AddArray_ptr number) {
   return add_array_word_right_shift(dd, arg, number, true);
 }
 
 AddArray_ptr AddArray_word_left_rotate(DDMgr_ptr dd, AddArray_ptr arg,
-                                       AddArray_ptr number)
-{
+                                       AddArray_ptr number) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const WordNumberMgr_ptr words =
-    WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
   const int width = AddArray_get_size(arg);
   const int numWidth = AddArray_get_size(number);
@@ -602,13 +550,16 @@ AddArray_ptr AddArray_word_left_rotate(DDMgr_ptr dd, AddArray_ptr arg,
   res = AddArray_create(width);
 
   /* create the default case, i.e. the last ITE (see description) */
-  err_case = add_leaf(dd,
-               ErrorMgr_failure_make(errmgr, "Right operand of rotate operation is out of range",
-                            FAILURE_UNSPECIFIED,
-                            (int) node_get_lineno(ErrorMgr_get_the_node(errmgr))));
+  err_case = add_leaf(
+      dd, ErrorMgr_failure_make(
+              errmgr, "Right operand of rotate operation is out of range",
+              FAILURE_UNSPECIFIED,
+              (int)node_get_lineno(ErrorMgr_get_the_node(errmgr))));
 
-  if (is_word) maxPossibleValue = MIN(((2ULL << (numWidth-1)) - 1), width);
-  else maxPossibleValue = width;
+  if (is_word)
+    maxPossibleValue = MIN(((2ULL << (numWidth - 1)) - 1), width);
+  else
+    maxPossibleValue = width;
 
   /* proceed one bit at every iteration */
   for (i = 0; i < width; ++i) {
@@ -616,27 +567,25 @@ AddArray_ptr AddArray_word_left_rotate(DDMgr_ptr dd, AddArray_ptr arg,
     add_ptr bit = add_dup(err_case); /* it is de-ref in the loop */
 
     /* create all other ITEs */
-    for (k=maxPossibleValue ; k >= 0; --k) {
+    for (k = maxPossibleValue; k >= 0; --k) {
       add_ptr neqk, tmp;
 
       if (is_word) {
-        AddArray_ptr ak = AddArray_from_word_number(dd,
-                              WordNumberMgr_integer_to_word_number(words, k, numWidth));
+        AddArray_ptr ak = AddArray_from_word_number(
+            dd, WordNumberMgr_integer_to_word_number(words, k, numWidth));
         AddArray_ptr aneqk = AddArray_word_equal(dd, number, ak);
         neqk = add_dup(AddArray_get_add(aneqk));
         AddArray_destroy(dd, aneqk);
         AddArray_destroy(dd, ak);
-      }
-      else {
-        add_ptr k_add = add_leaf(dd, find_node(nodemgr, NUMBER, NODE_FROM_INT(k), Nil));
+      } else {
+        add_ptr k_add =
+            add_leaf(dd, find_node(nodemgr, NUMBER, NODE_FROM_INT(k), Nil));
         neqk = add_apply(dd, node_equal, AddArray_get_add(number), k_add);
         add_free(dd, k_add);
       }
 
-      tmp = add_ifthenelse(dd, neqk,
-                           AddArray_get_n(arg,
-                                          (i >= k) ? i-k : i-k+width),
-                           bit);
+      tmp = add_ifthenelse(
+          dd, neqk, AddArray_get_n(arg, (i >= k) ? i - k : i - k + width), bit);
 
       add_free(dd, neqk);
       add_free(dd, bit);
@@ -653,16 +602,13 @@ AddArray_ptr AddArray_word_left_rotate(DDMgr_ptr dd, AddArray_ptr arg,
 }
 
 AddArray_ptr AddArray_word_right_rotate(DDMgr_ptr dd, AddArray_ptr arg,
-                                        AddArray_ptr number)
-{
+                                        AddArray_ptr number) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const WordNumberMgr_ptr words =
-    WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
-
+      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
   const int width = AddArray_get_size(arg);
   const int numWidth = AddArray_get_size(number);
@@ -677,13 +623,16 @@ AddArray_ptr AddArray_word_right_rotate(DDMgr_ptr dd, AddArray_ptr arg,
   res = AddArray_create(width);
 
   /* create the default case, i.e. the last ITE (see description) */
-  err_case = add_leaf(dd,
-               ErrorMgr_failure_make(errmgr, "Right operand of rotate operation is out of range",
-                            FAILURE_UNSPECIFIED,
-                            (int) node_get_lineno(ErrorMgr_get_the_node(errmgr))));
+  err_case = add_leaf(
+      dd, ErrorMgr_failure_make(
+              errmgr, "Right operand of rotate operation is out of range",
+              FAILURE_UNSPECIFIED,
+              (int)node_get_lineno(ErrorMgr_get_the_node(errmgr))));
 
-  if (is_word) maxPossibleValue = MIN(((2ULL << (numWidth-1)) - 1), width);
-  else maxPossibleValue = width;
+  if (is_word)
+    maxPossibleValue = MIN(((2ULL << (numWidth - 1)) - 1), width);
+  else
+    maxPossibleValue = width;
 
   /* proceed one bit at every iteration */
   for (i = 0; i < width; ++i) {
@@ -691,26 +640,25 @@ AddArray_ptr AddArray_word_right_rotate(DDMgr_ptr dd, AddArray_ptr arg,
     add_ptr bit = add_dup(err_case); /* it is de-ref in the loop */
 
     /* create all other ITEs */
-    for (k=maxPossibleValue ; k >= 0; --k) {
+    for (k = maxPossibleValue; k >= 0; --k) {
       add_ptr neqk, tmp;
 
       if (is_word) {
-        AddArray_ptr ak = AddArray_from_word_number(dd,
-                              WordNumberMgr_integer_to_word_number(words, k, numWidth));
+        AddArray_ptr ak = AddArray_from_word_number(
+            dd, WordNumberMgr_integer_to_word_number(words, k, numWidth));
         AddArray_ptr aneqk = AddArray_word_equal(dd, number, ak);
         neqk = add_dup(AddArray_get_add(aneqk));
         AddArray_destroy(dd, aneqk);
         AddArray_destroy(dd, ak);
-      }
-      else {
-        add_ptr k_add = add_leaf(dd, find_node(nodemgr, NUMBER, NODE_FROM_INT(k), Nil));
+      } else {
+        add_ptr k_add =
+            add_leaf(dd, find_node(nodemgr, NUMBER, NODE_FROM_INT(k), Nil));
         neqk = add_apply(dd, node_equal, AddArray_get_add(number), k_add);
         add_free(dd, k_add);
       }
 
-      tmp = add_ifthenelse(dd, neqk,
-                           AddArray_get_n(arg, ((i+k) % width)),
-                           bit);
+      tmp =
+          add_ifthenelse(dd, neqk, AddArray_get_n(arg, ((i + k) % width)), bit);
 
       add_free(dd, neqk);
       add_free(dd, bit);
@@ -726,10 +674,8 @@ AddArray_ptr AddArray_word_right_rotate(DDMgr_ptr dd, AddArray_ptr arg,
   return res;
 }
 
-AddArray_ptr AddArray_word_unsigned_less(DDMgr_ptr dd,
-                                         AddArray_ptr arg1,
-                                         AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_unsigned_less(DDMgr_ptr dd, AddArray_ptr arg1,
+                                         AddArray_ptr arg2) {
   /* A < B
      === NOT (A >= B)
      === NOT ("carry bit of" (B - A - 1))
@@ -760,10 +706,8 @@ AddArray_ptr AddArray_word_unsigned_less(DDMgr_ptr dd,
   */
 }
 
-AddArray_ptr AddArray_word_unsigned_less_equal(DDMgr_ptr dd,
-                                               AddArray_ptr arg1,
-                                               AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_unsigned_less_equal(DDMgr_ptr dd, AddArray_ptr arg1,
+                                               AddArray_ptr arg2) {
   /* A <= B ===
      A < (B + 1) ==
      === "carry bit of" ((not A) + (B + 1))    (see  AddArray_word_less)
@@ -775,81 +719,67 @@ AddArray_ptr AddArray_word_unsigned_less_equal(DDMgr_ptr dd,
      === "carry bit of" B + !A + 1
   */
   add_ptr carry;
-  AddArray_ptr tmp = add_array_word_plus_negated_and_one(dd, arg2, arg1, &carry);
+  AddArray_ptr tmp =
+      add_array_word_plus_negated_and_one(dd, arg2, arg1, &carry);
   AddArray_destroy(dd, tmp);
 
   return AddArray_from_add(carry);
 }
 
-AddArray_ptr AddArray_word_unsigned_greater(DDMgr_ptr dd,
-                                           AddArray_ptr arg1,
-                                           AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_unsigned_greater(DDMgr_ptr dd, AddArray_ptr arg1,
+                                            AddArray_ptr arg2) {
   return AddArray_word_unsigned_less(dd, arg2, arg1);
 }
 
 AddArray_ptr AddArray_word_unsigned_greater_equal(DDMgr_ptr dd,
-                                                 AddArray_ptr arg1,
-                                                 AddArray_ptr arg2)
-{
-    return AddArray_word_unsigned_less_equal(dd, arg2, arg1);
+                                                  AddArray_ptr arg1,
+                                                  AddArray_ptr arg2) {
+  return AddArray_word_unsigned_less_equal(dd, arg2, arg1);
 }
 
-AddArray_ptr AddArray_word_signed_less(DDMgr_ptr dd,
-                                       AddArray_ptr arg1,
-                                       AddArray_ptr arg2)
-{
-  return add_array_word_signed_comparison(dd, AddArray_word_unsigned_less,
-                                          arg1, arg2);
+AddArray_ptr AddArray_word_signed_less(DDMgr_ptr dd, AddArray_ptr arg1,
+                                       AddArray_ptr arg2) {
+  return add_array_word_signed_comparison(dd, AddArray_word_unsigned_less, arg1,
+                                          arg2);
 }
 
-AddArray_ptr AddArray_word_signed_less_equal(DDMgr_ptr dd,
-                                             AddArray_ptr arg1,
-                                             AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_signed_less_equal(DDMgr_ptr dd, AddArray_ptr arg1,
+                                             AddArray_ptr arg2) {
   return add_array_word_signed_comparison(dd, AddArray_word_unsigned_less_equal,
                                           arg1, arg2);
 }
 
-AddArray_ptr AddArray_word_signed_greater(DDMgr_ptr dd,
-                                          AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_signed_greater(DDMgr_ptr dd, AddArray_ptr arg1,
+                                          AddArray_ptr arg2) {
   /* A >s B === B <s A */
-  return add_array_word_signed_comparison(dd, AddArray_word_unsigned_less,
-                                          arg2, arg1);
+  return add_array_word_signed_comparison(dd, AddArray_word_unsigned_less, arg2,
+                                          arg1);
 }
 
-AddArray_ptr AddArray_word_signed_greater_equal(DDMgr_ptr dd,
-                                                AddArray_ptr arg1,
-                                                AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_signed_greater_equal(DDMgr_ptr dd, AddArray_ptr arg1,
+                                                AddArray_ptr arg2) {
   /* A >=s B === B <=s A */
   return add_array_word_signed_comparison(dd, AddArray_word_unsigned_less_equal,
                                           arg2, arg1);
 }
 
-AddArray_ptr AddArray_word_signed_extend(DDMgr_ptr dd,
-                                       AddArray_ptr arg,
-                                       AddArray_ptr arg_repeat)
-{
+AddArray_ptr AddArray_word_signed_extend(DDMgr_ptr dd, AddArray_ptr arg,
+                                         AddArray_ptr arg_repeat) {
   add_ptr paddingBit = AddArray_get_n(arg, AddArray_get_size(arg) - 1);
   AddArray_ptr res = add_array_word_extend(dd, arg, arg_repeat, paddingBit);
   return res;
 }
 
-AddArray_ptr AddArray_word_unsigned_extend(DDMgr_ptr dd,
-                                           AddArray_ptr arg,
-                                           AddArray_ptr arg_repeat)
-{
+AddArray_ptr AddArray_word_unsigned_extend(DDMgr_ptr dd, AddArray_ptr arg,
+                                           AddArray_ptr arg_repeat) {
   add_ptr paddingBit = add_false(dd);
   AddArray_ptr res = add_array_word_extend(dd, arg, arg_repeat, paddingBit);
   add_free(dd, paddingBit);
   return res;
 }
 
-AddArray_ptr AddArray_word_equal(DDMgr_ptr dd,
-                                 AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_equal(DDMgr_ptr dd, AddArray_ptr arg1,
+                                 AddArray_ptr arg2) {
   add_ptr result = add_true(dd);
   int i;
   const int width = AddArray_get_size(arg1);
@@ -857,22 +787,22 @@ AddArray_ptr AddArray_word_equal(DDMgr_ptr dd,
   nusmv_assert(width == AddArray_get_size(arg2) && width > 0);
 
   for (i = 0; i < width; ++i) {
-    add_ptr bit_equal = add_iff(dd, AddArray_get_n(arg1, i),
-                                AddArray_get_n(arg2, i));
+    add_ptr bit_equal =
+        add_iff(dd, AddArray_get_n(arg1, i), AddArray_get_n(arg2, i));
     add_ptr tmp = add_and(dd, bit_equal, result);
     add_free(dd, bit_equal);
     add_free(dd, result);
     result = tmp;
 
-    if (add_is_false(dd, result)) break; /* lazy eval */
+    if (add_is_false(dd, result))
+      break; /* lazy eval */
   }
 
   return AddArray_from_add(result);
 }
 
-AddArray_ptr AddArray_word_not_equal(DDMgr_ptr dd,
-                                     AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_not_equal(DDMgr_ptr dd, AddArray_ptr arg1,
+                                     AddArray_ptr arg2) {
   add_ptr result = add_false(dd);
   int i;
   const int width = AddArray_get_size(arg1);
@@ -880,8 +810,8 @@ AddArray_ptr AddArray_word_not_equal(DDMgr_ptr dd,
   nusmv_assert(width == AddArray_get_size(arg2) && width > 0);
 
   for (i = 0; i < width; ++i) {
-    add_ptr bit_not_equal = add_xor(dd, AddArray_get_n(arg1, i),
-                                    AddArray_get_n(arg2, i));
+    add_ptr bit_not_equal =
+        add_xor(dd, AddArray_get_n(arg1, i), AddArray_get_n(arg2, i));
     add_ptr tmp = add_or(dd, bit_not_equal, result);
     add_free(dd, bit_not_equal);
     add_free(dd, result);
@@ -891,10 +821,8 @@ AddArray_ptr AddArray_word_not_equal(DDMgr_ptr dd,
   return AddArray_from_add(result);
 }
 
-AddArray_ptr AddArray_word_ite(DDMgr_ptr dd,
-                               AddArray_ptr _if,
-                               AddArray_ptr _then, AddArray_ptr _else)
-{
+AddArray_ptr AddArray_word_ite(DDMgr_ptr dd, AddArray_ptr _if,
+                               AddArray_ptr _then, AddArray_ptr _else) {
   int width, i;
   AddArray_ptr res;
   boolean is_else_failure;
@@ -912,11 +840,9 @@ AddArray_ptr AddArray_word_ite(DDMgr_ptr dd,
   res = AddArray_create(width);
   /* process every pair of bits */
   for (i = 0; i < width; ++i) {
-    add_ptr add = add_ifthenelse(dd,
-                                 if_add,
-                                 AddArray_get_n(_then, i),
+    add_ptr add = add_ifthenelse(dd, if_add, AddArray_get_n(_then, i),
                                  is_else_failure ? AddArray_get_add(_else)
-                                 : AddArray_get_n(_else, i));
+                                                 : AddArray_get_n(_else, i));
     /* if ELSE is a failure node then only one ADD will be there */
     AddArray_set_n(res, i, add);
   }
@@ -924,10 +850,8 @@ AddArray_ptr AddArray_word_ite(DDMgr_ptr dd,
   return res;
 }
 
-AddArray_ptr AddArray_word_bit_selection(DDMgr_ptr dd,
-                                         AddArray_ptr word,
-                                         AddArray_ptr range)
-{
+AddArray_ptr AddArray_word_bit_selection(DDMgr_ptr dd, AddArray_ptr word,
+                                         AddArray_ptr range) {
   const int width = AddArray_get_size(word);
   int i;
   int highBit;
@@ -936,10 +860,11 @@ AddArray_ptr AddArray_word_bit_selection(DDMgr_ptr dd,
 
   /* convert the ADD representation of high and low bits into integers */
   {
-    add_ptr range_add = AddArray_get_add(range);/*one ADD may be in range*/
+    add_ptr range_add = AddArray_get_add(range); /*one ADD may be in range*/
     node_ptr range_node;
 
-    nusmv_assert(add_isleaf(range_add));/* range must be a value, not ADD tree */
+    nusmv_assert(
+        add_isleaf(range_add)); /* range must be a value, not ADD tree */
 
     range_node = add_get_leaf(dd, range_add);
     nusmv_assert(node_get_type(range_node) == RANGE &&
@@ -954,7 +879,7 @@ AddArray_ptr AddArray_word_bit_selection(DDMgr_ptr dd,
 
   i = highBit - lowBit + 1;
   res = AddArray_create(i);
-  for ( --i; i >= 0; --i){
+  for (--i; i >= 0; --i) {
     add_ptr add = AddArray_get_n(word, i + lowBit);
     add_ref(add);
     AddArray_set_n(res, i, add);
@@ -962,19 +887,18 @@ AddArray_ptr AddArray_word_bit_selection(DDMgr_ptr dd,
   return res;
 }
 
-AddArray_ptr AddArray_word_signed_resize(DDMgr_ptr dd,
-                                         AddArray_ptr word,
-                                         AddArray_ptr new_size)
-{
+AddArray_ptr AddArray_word_signed_resize(DDMgr_ptr dd, AddArray_ptr word,
+                                         AddArray_ptr new_size) {
   const int width = AddArray_get_size(word);
   int i, new_width;
 
   /* convert the ADD representation of size into integer */
   {
-    add_ptr size_add = AddArray_get_add(new_size);/*one ADD may be in size*/
+    add_ptr size_add = AddArray_get_add(new_size); /*one ADD may be in size*/
     node_ptr size_node;
 
-    nusmv_assert(add_isleaf(size_add));/* range must be a value, not ADD tree */
+    nusmv_assert(
+        add_isleaf(size_add)); /* range must be a value, not ADD tree */
 
     size_node = add_get_leaf(dd, size_add);
     nusmv_assert(NUMBER == node_get_type(size_node));
@@ -983,7 +907,9 @@ AddArray_ptr AddArray_word_signed_resize(DDMgr_ptr dd,
     nusmv_assert(0 < new_width);
   }
 
-  if (width == new_width) { return AddArray_duplicate(word); }
+  if (width == new_width) {
+    return AddArray_duplicate(word);
+  }
 
   {
     AddArray_ptr res = AddArray_create(new_width);
@@ -996,20 +922,18 @@ AddArray_ptr AddArray_word_signed_resize(DDMgr_ptr dd,
       }
 
       /* extends sign bit */
-      for (;i < new_width; ++i) {
-        AddArray_set_n(res, i,
-                       add_dup(AddArray_get_n(word, width - 1)));
+      for (; i < new_width; ++i) {
+        AddArray_set_n(res, i, add_dup(AddArray_get_n(word, width - 1)));
       }
-    }
-    else {
+    } else {
       /* copy bits in the range (N-2:0) */
       i = 0;
-      for (; i < new_width-1; ++i){
+      for (; i < new_width - 1; ++i) {
         AddArray_set_n(res, i, add_dup(AddArray_get_n(word, i)));
       }
 
       /* preserve sign bit */
-      AddArray_set_n(res, new_width-1,
+      AddArray_set_n(res, new_width - 1,
                      add_dup(AddArray_get_n(word, width - 1)));
     }
 
@@ -1017,19 +941,18 @@ AddArray_ptr AddArray_word_signed_resize(DDMgr_ptr dd,
   }
 }
 
-AddArray_ptr AddArray_word_unsigned_resize(DDMgr_ptr dd,
-                                           AddArray_ptr word,
-                                           AddArray_ptr new_size)
-{
+AddArray_ptr AddArray_word_unsigned_resize(DDMgr_ptr dd, AddArray_ptr word,
+                                           AddArray_ptr new_size) {
   const int width = AddArray_get_size(word);
   int i, new_width;
 
   /* convert the ADD representation of high and low bits into integers */
   {
-    add_ptr size_add = AddArray_get_add(new_size);/*one ADD may be in size*/
+    add_ptr size_add = AddArray_get_add(new_size); /*one ADD may be in size*/
     node_ptr size_node;
 
-    nusmv_assert(add_isleaf(size_add));/* range must be a value, not ADD tree */
+    nusmv_assert(
+        add_isleaf(size_add)); /* range must be a value, not ADD tree */
 
     size_node = add_get_leaf(dd, size_add);
     nusmv_assert(NUMBER == node_get_type(size_node));
@@ -1038,7 +961,9 @@ AddArray_ptr AddArray_word_unsigned_resize(DDMgr_ptr dd,
     nusmv_assert(0 < new_width);
   }
 
-  if (width == new_width) { return AddArray_duplicate(word); }
+  if (width == new_width) {
+    return AddArray_duplicate(word);
+  }
 
   {
     AddArray_ptr res = AddArray_create(new_width);
@@ -1052,13 +977,15 @@ AddArray_ptr AddArray_word_unsigned_resize(DDMgr_ptr dd,
       }
 
       /* pads with zeroes */
-      for (;i < new_width; ++i) { AddArray_set_n(res, i, add_false(dd)); }
+      for (; i < new_width; ++i) {
+        AddArray_set_n(res, i, add_false(dd));
+      }
     }
 
     else { /* bit-selection */
       /* copy bits in range [N-1:0] */
       i = 0;
-      for (; i < new_width; ++i){
+      for (; i < new_width; ++i) {
         AddArray_set_n(res, i, add_dup(AddArray_get_n(word, i)));
       }
     }
@@ -1067,9 +994,8 @@ AddArray_ptr AddArray_word_unsigned_resize(DDMgr_ptr dd,
   }
 }
 
-AddArray_ptr AddArray_word_concatenation(DDMgr_ptr dd,
-                                         AddArray_ptr arg1, AddArray_ptr arg2)
-{
+AddArray_ptr AddArray_word_concatenation(DDMgr_ptr dd, AddArray_ptr arg1,
+                                         AddArray_ptr arg2) {
   const int width1 = AddArray_get_size(arg1);
   const int width2 = AddArray_get_size(arg2);
   int i;
@@ -1090,7 +1016,6 @@ AddArray_ptr AddArray_word_concatenation(DDMgr_ptr dd,
   return res;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -1102,18 +1027,14 @@ AddArray_ptr AddArray_word_concatenation(DDMgr_ptr dd,
 
   The returned ADD (sum and carry_out) are referenced.
 */
-static void add_array_full_adder(DDMgr_ptr dd,
-                                 add_ptr arg1,
-                                 add_ptr arg2,
-                                 add_ptr carry_in,
-                                 add_ptr* sum,
-                                 add_ptr* carry_out)
-{
+static void add_array_full_adder(DDMgr_ptr dd, add_ptr arg1, add_ptr arg2,
+                                 add_ptr carry_in, add_ptr *sum,
+                                 add_ptr *carry_out) {
   add_ptr arg1_xor_arg2;
   add_ptr arg1_and_arg2;
   add_ptr arg1_xor_arg2_and_carry_in;
 
-  nusmv_assert( sum != (add_ptr*)NULL && carry_out != (add_ptr*)NULL);
+  nusmv_assert(sum != (add_ptr *)NULL && carry_out != (add_ptr *)NULL);
 
   /* sum = arg1 XOR arg2 XOR carry_in */
   arg1_xor_arg2 = add_xor(dd, arg1, arg2);
@@ -1140,18 +1061,17 @@ static void add_array_full_adder(DDMgr_ptr dd,
   The size of input arrays must be equal(and positive).
 */
 static void add_array_adder(DDMgr_ptr dd, AddArray_ptr arg1, AddArray_ptr arg2,
-                            add_ptr carry_in,
-                            AddArray_ptr* res,  add_ptr* carry_out)
-{
+                            add_ptr carry_in, AddArray_ptr *res,
+                            add_ptr *carry_out) {
   const int width = AddArray_get_size(arg1);
   int i;
 
-  nusmv_assert( res != (AddArray_ptr*)NULL && carry_out != (add_ptr*)NULL);
+  nusmv_assert(res != (AddArray_ptr *)NULL && carry_out != (add_ptr *)NULL);
   nusmv_assert(AddArray_get_size(arg2) == width && width > 0);
 
-
   *res = AddArray_create(width);
-  add_ref(carry_in);/* it will be de-referenced in the loop or in an outter fun */
+  add_ref(
+      carry_in); /* it will be de-referenced in the loop or in an outter fun */
 
   for (i = 0; i < width; ++i) {
     add_ptr sum;
@@ -1167,7 +1087,6 @@ static void add_array_adder(DDMgr_ptr dd, AddArray_ptr arg1, AddArray_ptr arg2,
   *carry_out = carry_in;
   return;
 }
-
 
 /*!
   \brief Perform "arg1 + (not arg2) + 1"
@@ -1185,8 +1104,7 @@ static void add_array_adder(DDMgr_ptr dd, AddArray_ptr arg1, AddArray_ptr arg2,
 AddArray_ptr add_array_word_plus_negated_and_one(DDMgr_ptr dd,
                                                  AddArray_ptr arg1,
                                                  AddArray_ptr arg2,
-                                                 add_ptr* carry)
-{
+                                                 add_ptr *carry) {
   AddArray_ptr res;
 
   AddArray_ptr not_arg2;
@@ -1219,12 +1137,11 @@ AddArray_ptr add_array_word_plus_negated_and_one(DDMgr_ptr dd,
 static void add_array_unsigned_division_remainder(DDMgr_ptr dd,
                                                   AddArray_ptr arg1,
                                                   AddArray_ptr arg2,
-                                                  AddArray_ptr* quotient,
-                                                  AddArray_ptr* remainder)
-{
+                                                  AddArray_ptr *quotient,
+                                                  AddArray_ptr *remainder) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   int index;
   const int N = AddArray_get_size(arg1);
   AddArray_ptr quot;
@@ -1247,7 +1164,7 @@ static void add_array_unsigned_division_remainder(DDMgr_ptr dd,
     {
       int k;
       add_ptr tmp;
-      add_free(dd, AddArray_get_n(rem, N-1));
+      add_free(dd, AddArray_get_n(rem, N - 1));
       for (k = N - 1; k > 0; --k) {
         AddArray_set_n(rem, k, AddArray_get_n(rem, k - 1));
       }
@@ -1299,23 +1216,22 @@ static void add_array_unsigned_division_remainder(DDMgr_ptr dd,
       add_or_accumulate(dd, &isNotZero, AddArray_get_n(arg2, index));
     }
 
-
     /* create an error message */
-    error = add_leaf(dd,
-                     ErrorMgr_failure_make(errmgr, "Division by zero",
-                                           FAILURE_DIV_BY_ZERO,
-                                           (int) node_get_lineno(ErrorMgr_get_the_node(errmgr))));
+    error =
+        add_leaf(dd, ErrorMgr_failure_make(
+                         errmgr, "Division by zero", FAILURE_DIV_BY_ZERO,
+                         (int)node_get_lineno(ErrorMgr_get_the_node(errmgr))));
 
     for (index = 0; index < N; ++index) {
       add_ptr guarded;
       /* quotient */
-      guarded = add_ifthenelse(dd, isNotZero, AddArray_get_n(quot, index),
-                               error);
+      guarded =
+          add_ifthenelse(dd, isNotZero, AddArray_get_n(quot, index), error);
       add_free(dd, AddArray_get_n(quot, index));
       AddArray_set_n(quot, index, guarded);
       /* remainder */
-      guarded = add_ifthenelse(dd, isNotZero, AddArray_get_n(rem, index),
-                               error);
+      guarded =
+          add_ifthenelse(dd, isNotZero, AddArray_get_n(rem, index), error);
       add_free(dd, AddArray_get_n(rem, index));
       AddArray_set_n(rem, index, guarded);
     }
@@ -1354,12 +1270,9 @@ static void add_array_unsigned_division_remainder(DDMgr_ptr dd,
   \sa add_array_unsigned_division_remainder,
   add_array_signed_division_remainder_harware
 */
-static void add_array_signed_division_remainder_simple(DDMgr_ptr dd,
-                                                       AddArray_ptr arg1,
-                                                       AddArray_ptr arg2,
-                                                       AddArray_ptr* quotient,
-                                                       AddArray_ptr* remainder)
-{
+static void add_array_signed_division_remainder_simple(
+    DDMgr_ptr dd, AddArray_ptr arg1, AddArray_ptr arg2, AddArray_ptr *quotient,
+    AddArray_ptr *remainder) {
   int index;
   const int N = AddArray_get_size(arg1);
   AddArray_ptr quot;
@@ -1370,8 +1283,8 @@ static void add_array_signed_division_remainder_simple(DDMgr_ptr dd,
 
   nusmv_assert(N > 0 && AddArray_get_size(arg2) == N);
 
-  sign1 = AddArray_get_n(arg1, N-1);
-  sign2 = AddArray_get_n(arg2, N-1);
+  sign1 = AddArray_get_n(arg1, N - 1);
+  sign2 = AddArray_get_n(arg2, N - 1);
 
   /* created negated arguments */
   arg1_positive = AddArray_word_unary_minus(dd, arg1);
@@ -1392,10 +1305,7 @@ static void add_array_signed_division_remainder_simple(DDMgr_ptr dd,
     add_free(dd, bitPositive);
   }
 
-  add_array_unsigned_division_remainder(dd,
-                                        arg1_positive,
-                                        arg2_positive,
-                                        &quot,
+  add_array_unsigned_division_remainder(dd, arg1_positive, arg2_positive, &quot,
                                         &rem);
 
   AddArray_destroy(dd, arg1_positive);
@@ -1423,7 +1333,8 @@ static void add_array_signed_division_remainder_simple(DDMgr_ptr dd,
       add_ptr old, new;
 
       old = AddArray_get_n(quot, index);
-      new = add_ifthenelse(dd, diff_signs, AddArray_get_n(quot_neg, index), old);
+      new =
+          add_ifthenelse(dd, diff_signs, AddArray_get_n(quot_neg, index), old);
       AddArray_set_n(quot, index, new);
       add_free(dd, old);
     }
@@ -1461,15 +1372,12 @@ static void add_array_signed_division_remainder_simple(DDMgr_ptr dd,
 
   \sa add_array_signed_division_remainder_simple
 */
-static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
-                                                         AddArray_ptr arg1,
-                                                         AddArray_ptr arg2,
-                                                         AddArray_ptr* quotient,
-                                                         AddArray_ptr* remainder)
-{
+static void add_array_signed_division_remainder_hardware(
+    DDMgr_ptr dd, AddArray_ptr arg1, AddArray_ptr arg2, AddArray_ptr *quotient,
+    AddArray_ptr *remainder) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   int index;
   const int N = AddArray_get_size(arg1);
   AddArray_ptr quot;
@@ -1482,7 +1390,7 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
   quot = AddArray_create(N);
   rem = AddArray_create(N);
   for (index = 0; index < N; ++index) {
-    AddArray_set_n(rem, index, add_dup(AddArray_get_n(arg1, N-1)));
+    AddArray_set_n(rem, index, add_dup(AddArray_get_n(arg1, N - 1)));
   }
 
   /* calculate the division operation */
@@ -1494,7 +1402,7 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
     {
       int k;
       add_ptr tmp;
-      add_free(dd, AddArray_get_n(rem, N-1));
+      add_free(dd, AddArray_get_n(rem, N - 1));
       for (k = N - 1; k > 0; --k) {
         AddArray_set_n(rem, k, AddArray_get_n(rem, k - 1));
       }
@@ -1512,8 +1420,8 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
     {
       AddArray_ptr plus = AddArray_word_plus(dd, rem, arg2);
       AddArray_ptr minus = AddArray_word_minus(dd, rem, arg2);
-      add_ptr areSignsEqual = add_iff(dd, AddArray_get_n(rem, N-1),
-                                      AddArray_get_n(arg2, N-1));
+      add_ptr areSignsEqual =
+          add_iff(dd, AddArray_get_n(rem, N - 1), AddArray_get_n(arg2, N - 1));
       int k;
       rem_next = AddArray_create(N);
       for (k = 0; k < N; ++k) {
@@ -1542,16 +1450,15 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
       int k;
       add_ptr isZero;
 
-      isDividable = add_iff(dd,
-                            AddArray_get_n(rem, N-1),
-                            AddArray_get_n(rem_next, N-1));
+      isDividable = add_iff(dd, AddArray_get_n(rem, N - 1),
+                            AddArray_get_n(rem_next, N - 1));
 
       isNotZero = AddArray_make_disjunction(dd, rem_next);
 
-      //for (k = N-1; k > index; --k) {
-      //  add_or_accumulate(dd, &isNotZero, AddArray_get_n(quot, k));
-      //}
-      for (k = index-1; k >= 0; --k) {
+      // for (k = N-1; k > index; --k) {
+      //   add_or_accumulate(dd, &isNotZero, AddArray_get_n(quot, k));
+      // }
+      for (k = index - 1; k >= 0; --k) {
         add_or_accumulate(dd, &isNotZero, AddArray_get_n(arg1, k));
       }
 
@@ -1563,9 +1470,9 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
     }
 
     /* Set the quotinet[index] to the flag isDividable computed above.
-       Set remainder to its next value if division is possible (isDividable is on)
-       and restore the remainder otherwise, i.e.
-       remainder = ITE(isDividable, next-remainder, remainder)
+       Set remainder to its next value if division is possible (isDividable is
+       on) and restore the remainder otherwise, i.e. remainder =
+       ITE(isDividable, next-remainder, remainder)
     */
     {
       int k;
@@ -1574,8 +1481,7 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
       for (k = 0; k < N; ++k) {
         add_ptr old_bit = AddArray_get_n(rem, k);
         add_ptr new_bit = add_ifthenelse(dd, isDividable,
-                                         AddArray_get_n(rem_next, k),
-                                         old_bit);
+                                         AddArray_get_n(rem_next, k), old_bit);
         add_free(dd, old_bit);
         AddArray_set_n(rem, k, new_bit);
       }
@@ -1587,14 +1493,13 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
      disagrees.
   */
   {
-    AddArray_ptr quot_negated  = AddArray_word_unary_minus(dd, quot);
-    add_ptr areSignsEqual = add_iff(dd, AddArray_get_n(arg1, N-1),
-                                    AddArray_get_n(arg2, N-1));
+    AddArray_ptr quot_negated = AddArray_word_unary_minus(dd, quot);
+    add_ptr areSignsEqual =
+        add_iff(dd, AddArray_get_n(arg1, N - 1), AddArray_get_n(arg2, N - 1));
     int k;
     for (k = 0; k < N; ++k) {
       add_ptr old_bit = AddArray_get_n(quot, k);
-      add_ptr new_bit = add_ifthenelse(dd, areSignsEqual,
-                                       old_bit,
+      add_ptr new_bit = add_ifthenelse(dd, areSignsEqual, old_bit,
                                        AddArray_get_n(quot_negated, k));
       add_free(dd, old_bit);
       AddArray_set_n(quot, k, new_bit);
@@ -1612,21 +1517,21 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
     add_ptr isNotZero = AddArray_make_disjunction(dd, arg2);
 
     /* create an error message */
-    add_ptr error = add_leaf(dd,
-                     ErrorMgr_failure_make(errmgr, "Division by zero",
-                                  FAILURE_DIV_BY_ZERO,
-                                  (int) node_get_lineno(ErrorMgr_get_the_node(errmgr))));
+    add_ptr error =
+        add_leaf(dd, ErrorMgr_failure_make(
+                         errmgr, "Division by zero", FAILURE_DIV_BY_ZERO,
+                         (int)node_get_lineno(ErrorMgr_get_the_node(errmgr))));
 
     for (index = 0; index < N; ++index) {
       add_ptr guarded;
       /* quotient */
-      guarded = add_ifthenelse(dd, isNotZero, AddArray_get_n(quot, index),
-                               error);
+      guarded =
+          add_ifthenelse(dd, isNotZero, AddArray_get_n(quot, index), error);
       add_free(dd, AddArray_get_n(quot, index));
       AddArray_set_n(quot, index, guarded);
       /* remainder */
-      guarded = add_ifthenelse(dd, isNotZero, AddArray_get_n(rem, index),
-                               error);
+      guarded =
+          add_ifthenelse(dd, isNotZero, AddArray_get_n(rem, index), error);
       add_free(dd, AddArray_get_n(rem, index));
       AddArray_set_n(rem, index, guarded);
     }
@@ -1657,50 +1562,46 @@ static void add_array_signed_division_remainder_hardware(DDMgr_ptr dd,
 
   NB: The returned ADD is referenced.
 */
-static add_ptr
-add_array_create_default_value_of_shift_operation(DDMgr_ptr dd,
-                                                  AddArray_ptr number,
-                                                  int width,
-                                                  add_ptr defaultBit,
-                                                  const char* errMessage)
-{
+static add_ptr add_array_create_default_value_of_shift_operation(
+    DDMgr_ptr dd, AddArray_ptr number, int width, add_ptr defaultBit,
+    const char *errMessage) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   int numWidth = AddArray_get_size(number);
-  add_ptr res = (add_ptr) NULL;
+  add_ptr res = (add_ptr)NULL;
   boolean is_word = add_array_is_word(dd, number);
-  add_ptr err_val = add_leaf(dd,
-                        ErrorMgr_failure_make(errmgr, errMessage, FAILURE_UNSPECIFIED,
-                        (int) node_get_lineno(ErrorMgr_get_the_node(errmgr))));
+  add_ptr err_val =
+      add_leaf(dd, ErrorMgr_failure_make(
+                       errmgr, errMessage, FAILURE_UNSPECIFIED,
+                       (int)node_get_lineno(ErrorMgr_get_the_node(errmgr))));
 
   if (is_word) { /* 'number' is a word. Words (unsigned) are always >= 0 */
-    if ((width >= (2ULL<<(numWidth-1)) - 1)) { /* width >= (2^numWidth - 1). */
+    if ((width >=
+         (2ULL << (numWidth - 1)) - 1)) { /* width >= (2^numWidth - 1). */
       /* 'number' cannot represent values > width. Thus
          a check that number<=width is not required. */
       res = add_dup(defaultBit);
-    }
-    else {
+    } else {
       const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
       const WordNumberMgr_ptr words =
-        WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+          WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
-      AddArray_ptr maxValid = AddArray_from_word_number(dd,
-                                              WordNumberMgr_integer_to_word_number(words, width, numWidth));
-      AddArray_ptr nlemax = AddArray_word_unsigned_less_equal(dd, number, maxValid);
+      AddArray_ptr maxValid = AddArray_from_word_number(
+          dd, WordNumberMgr_integer_to_word_number(words, width, numWidth));
+      AddArray_ptr nlemax =
+          AddArray_word_unsigned_less_equal(dd, number, maxValid);
       add_ptr cond = AddArray_get_add(nlemax); /* only one add can be there */
       res = add_ifthenelse(dd, cond, defaultBit, err_val);
 
       AddArray_destroy(dd, nlemax);
       AddArray_destroy(dd, maxValid);
     }
-  }
-  else { /* 'number' is not a word.
-            Actually 'number' sill may be a word of width 2 but we cannot
-            detect that here. So process it as a usual integer */
+  } else { /* 'number' is not a word.
+              Actually 'number' sill may be a word of width 2 but we cannot
+              detect that here. So process it as a usual integer */
     add_ptr zero, aw, nge0, nlew, nge0_lew;
     add_ptr add_number = (add_ptr)NULL;
 
@@ -1733,8 +1634,7 @@ add_array_create_default_value_of_shift_operation(DDMgr_ptr dd,
 
   NB: The invoker should free the returned array.
 */
-static AddArray_ptr add_array_negate_bits(DDMgr_ptr dd, AddArray_ptr arg)
-{
+static AddArray_ptr add_array_negate_bits(DDMgr_ptr dd, AddArray_ptr arg) {
   AddArray_ptr res;
   int i;
   const int width = AddArray_get_size(arg);
@@ -1759,11 +1659,9 @@ static AddArray_ptr add_array_negate_bits(DDMgr_ptr dd, AddArray_ptr arg)
 
   \sa AddArray_word_signed_extend, AddArray_word_unsigned_extend
 */
-static AddArray_ptr add_array_word_extend(DDMgr_ptr dd,
-                                          AddArray_ptr arg,
+static AddArray_ptr add_array_word_extend(DDMgr_ptr dd, AddArray_ptr arg,
                                           AddArray_ptr arg_repeat,
-                                          add_ptr paddingBit)
-{
+                                          add_ptr paddingBit) {
   const int width = AddArray_get_size(arg);
 
   AddArray_ptr res;
@@ -1796,12 +1694,12 @@ static AddArray_ptr add_array_word_extend(DDMgr_ptr dd,
     }
 
     /* extends the sign */
-    for (;i < new_width; ++i) AddArray_set_n(res, i, add_dup(paddingBit));
+    for (; i < new_width; ++i)
+      AddArray_set_n(res, i, add_dup(paddingBit));
   }
 
   return res;
 }
-
 
 /*!
   \brief Performs right shift operations
@@ -1828,14 +1726,11 @@ static AddArray_ptr add_array_word_extend(DDMgr_ptr dd,
 */
 
 AddArray_ptr add_array_word_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
-                                       AddArray_ptr number,
-                                       boolean isSigned)
-{
+                                        AddArray_ptr number, boolean isSigned) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const WordNumberMgr_ptr words =
-    WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
   const int width = AddArray_get_size(arg);
   const int numWidth = AddArray_get_size(number);
@@ -1845,24 +1740,26 @@ AddArray_ptr add_array_word_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
   unsigned long long maxPossibleValue;
   int i;
 
-  nusmv_assert(width>0 && numWidth>0);
+  nusmv_assert(width > 0 && numWidth > 0);
 
   res = AddArray_create(width);
 
   /* creates the default case, i.e. the last ITE (see description) */
   {
-    add_ptr defaultBit = isSigned
-      ? add_dup(AddArray_get_n(arg, width-1)) : add_false(dd);
+    add_ptr defaultBit =
+        isSigned ? add_dup(AddArray_get_n(arg, width - 1)) : add_false(dd);
 
-    def_case = add_array_create_default_value_of_shift_operation(dd,
-                                number, width, defaultBit,
-                                "Right operand of right-shift is out of range");
+    def_case = add_array_create_default_value_of_shift_operation(
+        dd, number, width, defaultBit,
+        "Right operand of right-shift is out of range");
     add_free(dd, defaultBit);
   }
 
   /* find the highest value for number (word or int) */
-  if (is_word) maxPossibleValue = (2ULL << (numWidth-1)) - 1;
-  else maxPossibleValue = ~0U; /* value for sure greater that width  */
+  if (is_word)
+    maxPossibleValue = (2ULL << (numWidth - 1)) - 1;
+  else
+    maxPossibleValue = ~0U; /* value for sure greater that width  */
 
   /* proceed one bit at every iteration */
   for (i = 0; i < width; ++i) {
@@ -1870,27 +1767,24 @@ AddArray_ptr add_array_word_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
     int n;
 
     /* create all other ITEs */
-    for (n=MIN(maxPossibleValue, width - i - 1); n >= 0; --n) {
+    for (n = MIN(maxPossibleValue, width - i - 1); n >= 0; --n) {
       add_ptr numeqn_add, tmp;
 
-      if (is_word) {/* number is a word */
-        AddArray_ptr an = AddArray_from_word_number(dd,
-                                 WordNumberMgr_integer_to_word_number(words, n, numWidth));
+      if (is_word) { /* number is a word */
+        AddArray_ptr an = AddArray_from_word_number(
+            dd, WordNumberMgr_integer_to_word_number(words, n, numWidth));
         AddArray_ptr numeqn = AddArray_word_equal(dd, number, an);
         numeqn_add = add_dup(AddArray_get_add(numeqn));
         AddArray_destroy(dd, numeqn);
         AddArray_destroy(dd, an);
-      }
-      else { /* number is not a word */
-        add_ptr n_add = add_leaf(dd,
-                                 find_node(nodemgr, NUMBER, NODE_FROM_INT(n), Nil));
-        numeqn_add = add_apply(dd, node_equal,
-                               AddArray_get_add(number), n_add);
+      } else { /* number is not a word */
+        add_ptr n_add =
+            add_leaf(dd, find_node(nodemgr, NUMBER, NODE_FROM_INT(n), Nil));
+        numeqn_add = add_apply(dd, node_equal, AddArray_get_add(number), n_add);
         add_free(dd, n_add);
       }
 
-      tmp = add_ifthenelse(dd, numeqn_add, AddArray_get_n(arg, i+n),
-                           bit);
+      tmp = add_ifthenelse(dd, numeqn_add, AddArray_get_n(arg, i + n), bit);
 
       add_free(dd, numeqn_add);
       add_free(dd, bit);
@@ -1914,10 +1808,9 @@ AddArray_ptr add_array_word_right_shift(DDMgr_ptr dd, AddArray_ptr arg,
   \sa AddArray_word_signed_less, AddArray_word_signed_less_equal,
   AddArray_word_signed_greater, AddArray_word_signed_greater_equal
 */
-static AddArray_ptr
-add_array_word_signed_comparison(DDMgr_ptr dd, APFDAA op,
-                                 AddArray_ptr arg1, AddArray_ptr arg2)
-{
+static AddArray_ptr add_array_word_signed_comparison(DDMgr_ptr dd, APFDAA op,
+                                                     AddArray_ptr arg1,
+                                                     AddArray_ptr arg2) {
   /* to compare signed words it is enough to swap sign bits
      between the words and then perform normal (unsigned) comparison */
 
@@ -1938,7 +1831,6 @@ add_array_word_signed_comparison(DDMgr_ptr dd, APFDAA op,
   AddArray_set_n(arg2, N, sign2);
 
   return res;
-
 
 #if 0
   /* A <s B   ===   (A[msb] & !B[msb]) | ((A[msb] = B[msb]) & (A <u B))
@@ -1982,17 +1874,19 @@ add_array_word_signed_comparison(DDMgr_ptr dd, APFDAA op,
 #endif
 }
 
-static inline boolean _add_is_true_false_add(DDMgr_ptr dd, add_ptr f)
-{
+static inline boolean _add_is_true_false_add(DDMgr_ptr dd, add_ptr f) {
   /* TODO: This can be improved by using memoizing */
-  if ((add_ptr)NULL == f) return false;
+  if ((add_ptr)NULL == f)
+    return false;
 
   if (add_isleaf(f)) {
-    if (add_is_true(dd, f) || (add_is_false(dd, f))) return true;
-    else return false;
+    if (add_is_true(dd, f) || (add_is_false(dd, f)))
+      return true;
+    else
+      return false;
   }
   return _add_is_true_false_add(dd, add_then(dd, f)) &&
-    _add_is_true_false_add(dd, add_else(dd, f));
+         _add_is_true_false_add(dd, add_else(dd, f));
 }
 
 /*!
@@ -2001,15 +1895,13 @@ static inline boolean _add_is_true_false_add(DDMgr_ptr dd, add_ptr f)
   Checks whether the given AddArray is a word or not.
 */
 static inline boolean add_array_is_word(DDMgr_ptr dd,
-                                        const AddArray_ptr number)
-{
+                                        const AddArray_ptr number) {
   boolean is_word = false;
   const int numWidth = AddArray_get_size(number);
 
   if (numWidth > 1) {
     is_word = true;
-  }
-  else {
+  } else {
     add_ptr add_number;
     nusmv_assert(numWidth == 1);
     add_number = AddArray_get_add(number);

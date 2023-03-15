@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,16 +36,15 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/node/nodeInt.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
 #include "nusmv/core/node/printers/MasterPrinter.h"
-#include "nusmv/core/node/printers/PrinterWffCore.h"
 #include "nusmv/core/node/printers/PrinterIWffCore.h"
 #include "nusmv/core/node/printers/PrinterPsl.h"
 #include "nusmv/core/node/printers/PrinterSexpCore.h"
+#include "nusmv/core/node/printers/PrinterWffCore.h"
 
 #include "nusmv/core/node/normalizers/MasterNormalizer.h"
 #include "nusmv/core/node/normalizers/NormalizerBase.h"
@@ -62,15 +61,13 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void node_pkg_init(NuSMVEnv_ptr env)
-{
+void node_pkg_init(NuSMVEnv_ptr env) {
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   MasterPrinter_ptr wff_printer;
   MasterPrinter_ptr iwff_printer;
@@ -96,7 +93,6 @@ void node_pkg_init(NuSMVEnv_ptr env)
       printer = PRINTER_BASE(PrinterPsl_create(env, "PSL Printer"));
       MasterNodeWalker_register_walker(MASTER_NODE_WALKER(wff_printer),
                                        NODE_WALKER(printer));
-
     }
 
     FAIL(errmgr) {
@@ -156,11 +152,13 @@ void node_pkg_init(NuSMVEnv_ptr env)
     CATCH(errmgr) {
 
       NormalizerBase_ptr tmp_normalizer;
-      tmp_normalizer = NORMALIZER_BASE(NormalizerCore_create(env, "Core Normalizer"));
+      tmp_normalizer =
+          NORMALIZER_BASE(NormalizerCore_create(env, "Core Normalizer"));
       MasterNodeWalker_register_walker(MASTER_NODE_WALKER(normalizer),
                                        NODE_WALKER(tmp_normalizer));
 
-      tmp_normalizer = NORMALIZER_BASE(NormalizerPsl_create(env, "Psl Normalizer"));
+      tmp_normalizer =
+          NORMALIZER_BASE(NormalizerPsl_create(env, "Psl Normalizer"));
       MasterNodeWalker_register_walker(MASTER_NODE_WALKER(normalizer),
                                        NODE_WALKER(tmp_normalizer));
     }
@@ -172,12 +170,12 @@ void node_pkg_init(NuSMVEnv_ptr env)
   }
 }
 
-void node_pkg_quit(NuSMVEnv_ptr env)
-{
+void node_pkg_quit(NuSMVEnv_ptr env) {
   MasterPrinter_ptr wff_printer = NuSMVEnv_remove_value(env, ENV_WFF_PRINTER);
   MasterPrinter_ptr iwff_printer = NuSMVEnv_remove_value(env, ENV_IWFF_PRINTER);
   MasterPrinter_ptr sexp_printer = NuSMVEnv_remove_value(env, ENV_SEXP_PRINTER);
-  MasterNormalizer_ptr normalizer = NuSMVEnv_remove_value(env, ENV_NODE_NORMALIZER);
+  MasterNormalizer_ptr normalizer =
+      NuSMVEnv_remove_value(env, ENV_NODE_NORMALIZER);
 
   MasterNodeWalker_destroy(MASTER_NODE_WALKER(wff_printer));
   MasterNodeWalker_destroy(MASTER_NODE_WALKER(iwff_printer));
@@ -192,8 +190,6 @@ void node_pkg_quit(NuSMVEnv_ptr env)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-

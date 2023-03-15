@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,17 +34,17 @@
 
 */
 
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/mc/mc.h"
 #include "nusmv/core/mc/mcInt.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/core/fsm/bdd/BddFsm.h"
 
-#include "nusmv/core/trace/pkg_trace.h"
-#include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/trace/Trace.h"
+#include "nusmv/core/trace/pkg_trace.h"
 #include "nusmv/core/utils/WordNumberMgr.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -61,21 +61,17 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -89,39 +85,34 @@ static void mc_trace_step_put_values(Trace_ptr trace, TraceIter iter,
 static void mc_model_trace_step_print(const Trace_ptr trace,
                                       const TraceIter step,
                                       TraceIteratorType it_type,
-                                      const char* prefix,
-                                      int count);
+                                      const char *prefix, int count);
 #endif
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Trace_ptr
-Mc_create_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
-                                          const NodeList_ptr symbols,
-                                          const char* desc,
-                                          const TraceType type,
-                                          node_ptr path)
-{
+Trace_ptr Mc_create_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
+                                                    const NodeList_ptr symbols,
+                                                    const char *desc,
+                                                    const TraceType type,
+                                                    node_ptr path) {
   Trace_ptr trace;
 
-  if (Nil == path) return TRACE(NULL);
+  if (Nil == path)
+    return TRACE(NULL);
 
-  trace = Trace_create(BaseEnc_get_symb_table(BASE_ENC(bdd_enc)),
-                       desc, type, symbols, false);
+  trace = Trace_create(BaseEnc_get_symb_table(BASE_ENC(bdd_enc)), desc, type,
+                       symbols, false);
 
   return Mc_fill_trace_from_bdd_state_input_list(bdd_enc, trace, path);
 }
 
-Trace_ptr
-Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
-                                        Trace_ptr trace,
-                                        node_ptr path)
-{
+Trace_ptr Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
+                                                  Trace_ptr trace,
+                                                  node_ptr path) {
   TraceIter step;
 
   NodeList_ptr sf_vars;
@@ -141,11 +132,12 @@ Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
   step = Trace_first_iter(trace);
 
 #if MC_MODEL_DEBUG
-  StreamMgr_print_error(streams,  "\n--- MC Model extraction ---\n");
+  StreamMgr_print_error(streams, "\n--- MC Model extraction ---\n");
 #endif
 
   /* first node of path is initial state */
-  mc_trace_step_put_values(trace, step, bdd_enc, BDD_STATES(car(path)), sf_vars);
+  mc_trace_step_put_values(trace, step, bdd_enc, BDD_STATES(car(path)),
+                           sf_vars);
 
 #if MC_MODEL_DEBUG
   mc_model_trace_step_print(trace, step, TRACE_ITER_SF_VARS, "S", i);
@@ -155,33 +147,34 @@ Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
   while (path != Nil) {
     /* append one more (i,S) to trace */
     step = Trace_append_step(trace);
-    mc_trace_step_put_values(trace, step, bdd_enc, BDD_INPUTS(car(path)), i_vars);
+    mc_trace_step_put_values(trace, step, bdd_enc, BDD_INPUTS(car(path)),
+                             i_vars);
 
 #if MC_MODEL_DEBUG
-    mc_model_trace_step_print(trace, step, TRACE_ITER_I_VARS, "I", ++ i);
+    mc_model_trace_step_print(trace, step, TRACE_ITER_I_VARS, "I", ++i);
 #endif
 
-    path = cdr(path); nusmv_assert(Nil != path);
+    path = cdr(path);
+    nusmv_assert(Nil != path);
 
-    mc_trace_step_put_values(trace, step, bdd_enc, BDD_STATES(car(path)), sf_vars);
+    mc_trace_step_put_values(trace, step, bdd_enc, BDD_STATES(car(path)),
+                             sf_vars);
     path = cdr(path);
 
 #if MC_MODEL_DEBUG
     mc_model_trace_step_print(trace, step, TRACE_ITER_S_VARS, "S", i);
 #endif
-
   }
 
 #if MC_MODEL_DEBUG
-  StreamMgr_print_error(streams,  "\n\n");
+  StreamMgr_print_error(streams, "\n\n");
 #endif
 
   return trace;
 }
 
 void Mc_trace_step_put_state_from_bdd(Trace_ptr trace, TraceIter step,
-                                      BddEnc_ptr bdd_enc, bdd_ptr bdd)
-{
+                                      BddEnc_ptr bdd_enc, bdd_ptr bdd) {
   TRACE_CHECK_INSTANCE(trace);
 
   mc_trace_step_put_values(trace, step, bdd_enc, bdd, Trace_get_sf_vars(trace));
@@ -191,8 +184,7 @@ void Mc_trace_step_put_state_from_bdd(Trace_ptr trace, TraceIter step,
 }
 
 void Mc_trace_step_put_input_from_bdd(Trace_ptr trace, TraceIter step,
-                                      BddEnc_ptr bdd_enc, bdd_ptr bdd)
-{
+                                      BddEnc_ptr bdd_enc, bdd_ptr bdd) {
   TRACE_CHECK_INSTANCE(trace);
 
   mc_trace_step_put_values(trace, step, bdd_enc, bdd, Trace_get_i_vars(trace));
@@ -205,7 +197,6 @@ void Mc_trace_step_put_input_from_bdd(Trace_ptr trace, TraceIter step,
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -217,18 +208,15 @@ void Mc_trace_step_put_input_from_bdd(Trace_ptr trace, TraceIter step,
 */
 static void mc_trace_step_put_values(Trace_ptr trace, TraceIter step,
                                      BddEnc_ptr bdd_enc, bdd_ptr bdd,
-                                     NodeList_ptr symbols)
-{
+                                     NodeList_ptr symbols) {
   DDMgr_ptr dd = BddEnc_get_dd_manager(bdd_enc);
   SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(bdd_enc));
   TypeChecker_ptr tc = SymbTable_get_type_checker(st);
   NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const ExprMgr_ptr exprs =
-    EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   ListIter_ptr iter;
   add_ptr add, support;
 
@@ -249,12 +237,10 @@ static void mc_trace_step_put_values(Trace_ptr trace, TraceIter step,
     /* obtain the type */
     if (SymbTable_is_symbol_var(st, sym_cleaned)) {
       type = SymbTable_get_var_type(st, sym_cleaned);
-    }
-    else if (SymbTable_is_symbol_define(st, sym_cleaned)) {
+    } else if (SymbTable_is_symbol_define(st, sym_cleaned)) {
       type = TypeChecker_get_expression_type(tc, sym_cleaned, Nil);
       nusmv_assert(!SymbType_is_error(type)); /* cannot be an type error */
-    }
-    else {
+    } else {
       error_unreachable_code(); /* how the type may be not known ? */
       type = SYMB_TYPE(NULL);
     }
@@ -270,7 +256,8 @@ static void mc_trace_step_put_values(Trace_ptr trace, TraceIter step,
     /* check that var is a part of the BDD */
     if (!opt_keep_single_value_vars(opts)) {
       boolean printVar = BddEnc_is_var_in_cube(bdd_enc, sym, support);
-      if (!printVar) continue; /* skip this var */
+      if (!printVar)
+        continue; /* skip this var */
     }
 
     sym_add = BddEnc_expr_to_addarray(bdd_enc, sym, Nil);
@@ -280,36 +267,41 @@ static void mc_trace_step_put_values(Trace_ptr trace, TraceIter step,
     */
     if (SymbType_is_word(type)) {
       const WordNumberMgr_ptr words =
-        WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+          WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
       int width = AddArray_get_size(sym_add);
-      WordNumber_ptr one = WordNumberMgr_integer_to_word_number(words, 1, width);
-      WordNumber_ptr result = WordNumberMgr_integer_to_word_number(words, 0, width);
+      WordNumber_ptr one =
+          WordNumberMgr_integer_to_word_number(words, 1, width);
+      WordNumber_ptr result =
+          WordNumberMgr_integer_to_word_number(words, 0, width);
 
       /* number of bits in ADD should be equal to number of bits in the type */
-      nusmv_assert(width == SymbType_get_word_width(type) && width >0);
+      nusmv_assert(width == SymbType_get_word_width(type) && width > 0);
 
       /* compute the Word value from bits */
-      for (--width; width >=0; --width) {
-        add_ptr tmp_add = add_if_then(dd, add,
-                                      AddArray_get_n(sym_add, width));
+      for (--width; width >= 0; --width) {
+        add_ptr tmp_add = add_if_then(dd, add, AddArray_get_n(sym_add, width));
         node_ptr bit = add_value(dd, tmp_add);
         add_free(dd, tmp_add);
 
         /* the value of a bit can be 0 or 1 only */
-        nusmv_assert(ExprMgr_is_false(exprs, bit) || ExprMgr_is_true(exprs, bit));
+        nusmv_assert(ExprMgr_is_false(exprs, bit) ||
+                     ExprMgr_is_true(exprs, bit));
 
         /* words with width 1 cannot be shifted at all */
         if (WordNumber_get_width(result) != 1) {
           result = WordNumberMgr_left_shift(words, result, 1);
         }
         /* add the bit to the result */
-        if (ExprMgr_is_true(exprs, bit)) result = WordNumberMgr_plus(words, result, one);
+        if (ExprMgr_is_true(exprs, bit))
+          result = WordNumberMgr_plus(words, result, one);
       } /* for */
 
-      sym_value = find_node(nodemgr, SymbType_is_signed_word(type)
-                            ? NUMBER_SIGNED_WORD : NUMBER_UNSIGNED_WORD,
-                            (node_ptr)result, Nil);
+      sym_value =
+          find_node(nodemgr,
+                    SymbType_is_signed_word(type) ? NUMBER_SIGNED_WORD
+                                                  : NUMBER_UNSIGNED_WORD,
+                    (node_ptr)result, Nil);
     }
     /* Else this is a symbol with non-Word type, i.e. it can have only one usual
        ADD, not array.
@@ -328,7 +320,8 @@ static void mc_trace_step_put_values(Trace_ptr trace, TraceIter step,
     /* unnecessary ? */
     /* /\* type check the created expression to allow further evaluation, */
     /*    created expression is always well-typed *\/ */
-    /* TypeChecker_is_expression_wellformed(bdd_enc->type_checker, sym_value, Nil); */
+    /* TypeChecker_is_expression_wellformed(bdd_enc->type_checker, sym_value,
+     * Nil); */
 
     AddArray_destroy(dd, sym_add);
   } /* for loop */
@@ -347,20 +340,23 @@ static void mc_trace_step_put_values(Trace_ptr trace, TraceIter step,
 static void mc_model_trace_step_print(const Trace_ptr trace,
                                       const TraceIter step,
                                       TraceIteratorType it_type,
-                                      const char* prefix,
-                                      int count)
-{
+                                      const char *prefix, int count) {
   TraceStepIter iter;
   node_ptr symb, val;
 
-  if (0 < count) { StreamMgr_print_error(streams,  "%s%d:", prefix, count); }
-  else { StreamMgr_print_error(streams,  "%s:", prefix); }
-
-  TRACE_STEP_FOREACH(trace, step, it_type, iter, symb, val) {
-    StreamMgr_nprint_error(streams, wffprint, "%N", symb); StreamMgr_print_error(streams,  "=");
-    StreamMgr_nprint_error(streams, wffprint, "%N", val); StreamMgr_print_error(streams,  " ");
+  if (0 < count) {
+    StreamMgr_print_error(streams, "%s%d:", prefix, count);
+  } else {
+    StreamMgr_print_error(streams, "%s:", prefix);
   }
 
-  StreamMgr_print_error(streams,  "\n");
+  TRACE_STEP_FOREACH(trace, step, it_type, iter, symb, val) {
+    StreamMgr_nprint_error(streams, wffprint, "%N", symb);
+    StreamMgr_print_error(streams, "=");
+    StreamMgr_nprint_error(streams, wffprint, "%N", val);
+    StreamMgr_print_error(streams, " ");
+  }
+
+  StreamMgr_print_error(streams, "\n");
 } /* mc_model_trace_step_print */
 #endif

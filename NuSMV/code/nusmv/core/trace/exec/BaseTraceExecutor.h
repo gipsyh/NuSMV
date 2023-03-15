@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,8 +34,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_BASE_TRACE_EXECUTOR_H__
 #define __NUSMV_CORE_TRACE_EXEC_BASE_TRACE_EXECUTOR_H__
 
@@ -46,9 +44,9 @@
   \struct BaseTraceExecutor
   \brief Definition of the public accessor for class BaseTraceExecutor
 
-  
+
 */
-typedef struct BaseTraceExecutor_TAG*  BaseTraceExecutor_ptr;
+typedef struct BaseTraceExecutor_TAG *BaseTraceExecutor_ptr;
 
 /*!
   \brief To cast and check instances of class BaseTraceExecutor
@@ -56,16 +54,15 @@ typedef struct BaseTraceExecutor_TAG*  BaseTraceExecutor_ptr;
   These macros must be used respectively to cast and to check
   instances of class BaseTraceExecutor
 */
-#define BASE_TRACE_EXECUTOR(self) \
-         ((BaseTraceExecutor_ptr) self)
+#define BASE_TRACE_EXECUTOR(self) ((BaseTraceExecutor_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BASE_TRACE_EXECUTOR_CHECK_INSTANCE(self) \
-         (nusmv_assert(BASE_TRACE_EXECUTOR(self) != BASE_TRACE_EXECUTOR(NULL)))
+#define BASE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                               \
+  (nusmv_assert(BASE_TRACE_EXECUTOR(self) != BASE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -77,66 +74,58 @@ typedef struct BaseTraceExecutor_TAG*  BaseTraceExecutor_ptr;
   \methodof BaseTraceExecutor
   \brief Getter for the verbosity field
 
-  
+
 */
-int
-BaseTraceExecutor_get_verbosity(BaseTraceExecutor_ptr self);
+int BaseTraceExecutor_get_verbosity(BaseTraceExecutor_ptr self);
 
 /*!
   \methodof BaseTraceExecutor
   \brief Setter for the verbosity field
 
-  
+
 */
-void
-BaseTraceExecutor_set_verbosity(BaseTraceExecutor_ptr self,
-                            int verbosity);
+void BaseTraceExecutor_set_verbosity(BaseTraceExecutor_ptr self, int verbosity);
 
 /*!
   \methodof BaseTraceExecutor
   \brief Getter for the output_stream field
 
-  
+
 */
-FILE*
-BaseTraceExecutor_get_output_stream(BaseTraceExecutor_ptr self);
+FILE *BaseTraceExecutor_get_output_stream(BaseTraceExecutor_ptr self);
 
 /*!
   \methodof BaseTraceExecutor
   \brief Setter for the output_stream field
 
-  
+
 */
-void
-BaseTraceExecutor_set_output_stream(BaseTraceExecutor_ptr self,
-                                FILE* error_stream);
+void BaseTraceExecutor_set_output_stream(BaseTraceExecutor_ptr self,
+                                         FILE *error_stream);
 
 /*!
   \methodof BaseTraceExecutor
   \brief Getter for the error_stream field
 
-  
+
 */
-FILE*
-BaseTraceExecutor_get_error_stream(BaseTraceExecutor_ptr self);
+FILE *BaseTraceExecutor_get_error_stream(BaseTraceExecutor_ptr self);
 
 /*!
   \methodof BaseTraceExecutor
   \brief Setter for the error_stream field
 
-  
+
 */
-void
-BaseTraceExecutor_set_error_stream(BaseTraceExecutor_ptr self,
-                               FILE* error_stream);
+void BaseTraceExecutor_set_error_stream(BaseTraceExecutor_ptr self,
+                                        FILE *error_stream);
 
 /* virtual destructor */
 /*!
   \methodof BaseTraceExecutor
   \todo
 */
-VIRTUAL void
-BaseTraceExecutor_destroy(BaseTraceExecutor_ptr self);
+VIRTUAL void BaseTraceExecutor_destroy(BaseTraceExecutor_ptr self);
 
 /**AutomaticEnd***************************************************************/
 

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,90 +36,81 @@
 
 */
 
-
-
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/bmc/sbmc/sbmcStructs.h"
 #include "nusmv/core/bmc/sbmc/sbmcUtils.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
 
 #include "nusmv/core/node/node.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/array.h"
+#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/list.h"
+#include "nusmv/core/utils/ustring.h"
+#include "nusmv/core/utils/utils.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-struct state_vars_struct_TAG
-{
+struct state_vars_struct_TAG {
   /* lsLists below are lists of node_ptr */
   NuSMVEnv_ptr environment;
 
   /* System state variables occurring in transition relation */
-  lsList   transition_state_vars;
+  lsList transition_state_vars;
 
   /* Auxiliary variables needed in the PLTL BMC encoding */
-  lsList   translation_vars_pd0;  /* [[f]]_i^0 vars */
-  lsList   translation_vars_pdx;  /* [[f]]_i^d, d > 0 vars */
-  lsList   translation_vars_aux;  /* <<F f>>_i and <<G f>>_i vars */
-  node_ptr l_var;                 /* The loop selector variable */
-  node_ptr LoopExists_var;        /* The loop exists variable */
-  node_ptr LastState_var;         /* The last state variable */
+  lsList translation_vars_pd0; /* [[f]]_i^0 vars */
+  lsList translation_vars_pdx; /* [[f]]_i^d, d > 0 vars */
+  lsList translation_vars_aux; /* <<F f>>_i and <<G f>>_i vars */
+  node_ptr l_var;              /* The loop selector variable */
+  node_ptr LoopExists_var;     /* The loop exists variable */
+  node_ptr LastState_var;      /* The last state variable */
 
   /* System state variables occurring in formula */
-  lsList   formula_state_vars;
+  lsList formula_state_vars;
 
   /* System input variables occurring in formula */
-  lsList   formula_input_vars;
+  lsList formula_input_vars;
 
   /* System variables used to create constraint of equality of states. Union of
      transition_state_vars, formula_state_vars, formula_input_vars.
   */
-  lsList   simple_path_system_vars;
+  lsList simple_path_system_vars;
 };
 
-struct sbmc_node_info_struct
-{
-  unsigned int past_depth;   /* The past depth of the subformula */
+struct sbmc_node_info_struct {
+  unsigned int past_depth; /* The past depth of the subformula */
 
   /* The variables for [[f]]^d if translated via variables, 0 otherwise */
-  array_t*     trans_vars;   /* node_ptr[past_depth] of node_ptr */
+  array_t *trans_vars; /* node_ptr[past_depth] of node_ptr */
   /* The bes for [[f]]_i^d */
-  array_t*     trans_bes;    /* array_t [time] array_t [past_depth] of be_ptr*/
+  array_t *trans_bes; /* array_t [time] array_t [past_depth] of be_ptr*/
 
   /* The variable for the auxiliary <<F f>> translation if needed */
-  node_ptr     aux_F_node;
+  node_ptr aux_F_node;
   /* The bes for <<F f>>_i */
-  array_t*     aux_F_trans;  /* be_ptr aux_F_trans[time] */
+  array_t *aux_F_trans; /* be_ptr aux_F_trans[time] */
 
   /* The variable for the auxiliary <<G f>> translation if needed */
-  node_ptr     aux_G_node;
+  node_ptr aux_G_node;
   /* The bes for <<G f>>_i */
-  array_t*     aux_G_trans;  /* be_ptr aux_G_trans[time] */
+  array_t *aux_G_trans; /* be_ptr aux_G_trans[time] */
 };
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -131,15 +122,13 @@ static enum st_retval sbmc_node_info_free_func(char *k, char *r, char *a);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-state_vars_struct* sbmc_state_vars_create(const NuSMVEnv_ptr env)
-{
+state_vars_struct *sbmc_state_vars_create(const NuSMVEnv_ptr env) {
   state_vars_struct *svs = ALLOC(state_vars_struct, 1);
-  nusmv_assert(svs != (state_vars_struct *) NULL);
+  nusmv_assert(svs != (state_vars_struct *)NULL);
 
   /* We increment to counter for the creation of unique ids among
      different calls */
@@ -160,8 +149,7 @@ state_vars_struct* sbmc_state_vars_create(const NuSMVEnv_ptr env)
   return svs;
 }
 
-void sbmc_state_vars_destroy(state_vars_struct* svs)
-{
+void sbmc_state_vars_destroy(state_vars_struct *svs) {
   nusmv_assert(svs);
 
   /* frees members */
@@ -176,134 +164,114 @@ void sbmc_state_vars_destroy(state_vars_struct* svs)
   FREE(svs);
 }
 
-
 /* Getters and Setters */
 
-lsList sbmc_state_vars_get_trans_state_vars(const state_vars_struct * ss)
-{
+lsList sbmc_state_vars_get_trans_state_vars(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->transition_state_vars;
 }
 
-node_ptr sbmc_state_vars_get_l_var(const state_vars_struct * ss)
-{
+node_ptr sbmc_state_vars_get_l_var(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->l_var;
 }
 
-node_ptr sbmc_state_vars_get_LoopExists_var(const state_vars_struct * ss)
-{
+node_ptr sbmc_state_vars_get_LoopExists_var(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->LoopExists_var;
 }
 
-node_ptr sbmc_state_vars_get_LastState_var(const state_vars_struct * ss)
-{
+node_ptr sbmc_state_vars_get_LastState_var(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->LastState_var;
 }
 
-lsList sbmc_state_vars_get_translation_vars_pd0(const state_vars_struct * ss)
-{
+lsList sbmc_state_vars_get_translation_vars_pd0(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->translation_vars_pd0;
 }
 
-lsList sbmc_state_vars_get_translation_vars_pdx(const state_vars_struct * ss)
-{
+lsList sbmc_state_vars_get_translation_vars_pdx(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->translation_vars_pdx;
 }
 
-lsList sbmc_state_vars_get_translation_vars_aux(const state_vars_struct * ss)
-{
+lsList sbmc_state_vars_get_translation_vars_aux(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->translation_vars_aux;
 }
 
-lsList sbmc_state_vars_get_formula_state_vars(const state_vars_struct * ss)
-{
+lsList sbmc_state_vars_get_formula_state_vars(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->formula_state_vars;
 }
 
-lsList sbmc_state_vars_get_formula_input_vars(const state_vars_struct * ss) {
+lsList sbmc_state_vars_get_formula_input_vars(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->formula_input_vars;
 }
 
-lsList sbmc_state_vars_get_simple_path_system_vars(const state_vars_struct * ss)
-{
+lsList
+sbmc_state_vars_get_simple_path_system_vars(const state_vars_struct *ss) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   return ss->simple_path_system_vars;
 }
 
-void sbmc_state_vars_set_trans_state_vars(state_vars_struct * ss, lsList f)
-{
+void sbmc_state_vars_set_trans_state_vars(state_vars_struct *ss, lsList f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->transition_state_vars = f;
 }
 
-void sbmc_state_vars_set_l_var(state_vars_struct * ss, node_ptr f)
-{
+void sbmc_state_vars_set_l_var(state_vars_struct *ss, node_ptr f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->l_var = f;
 }
 
-void sbmc_state_vars_set_LoopExists_var(state_vars_struct * ss, node_ptr f)
-{
+void sbmc_state_vars_set_LoopExists_var(state_vars_struct *ss, node_ptr f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->LoopExists_var = f;
 }
 
-void sbmc_state_vars_set_LastState_var(state_vars_struct * ss, node_ptr f)
-{
+void sbmc_state_vars_set_LastState_var(state_vars_struct *ss, node_ptr f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->LastState_var = f;
 }
 
-void sbmc_state_vars_set_translation_vars_pd0(state_vars_struct * ss, lsList f)
-{
+void sbmc_state_vars_set_translation_vars_pd0(state_vars_struct *ss, lsList f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->translation_vars_pd0 = f;
 }
 
-void sbmc_state_vars_set_translation_vars_pdx(state_vars_struct * ss, lsList f)
-{
+void sbmc_state_vars_set_translation_vars_pdx(state_vars_struct *ss, lsList f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->translation_vars_pdx = f;
 }
 
-void sbmc_state_vars_set_translation_vars_aux(state_vars_struct * ss, lsList f)
-{
+void sbmc_state_vars_set_translation_vars_aux(state_vars_struct *ss, lsList f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->translation_vars_aux = f;
 }
 
-void sbmc_state_vars_set_formula_state_vars(state_vars_struct * ss, lsList f)
-{
+void sbmc_state_vars_set_formula_state_vars(state_vars_struct *ss, lsList f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->formula_state_vars = f;
 }
 
-void sbmc_state_vars_set_formula_input_vars(state_vars_struct * ss, lsList f)
-{
+void sbmc_state_vars_set_formula_input_vars(state_vars_struct *ss, lsList f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->formula_input_vars = f;
 }
 
-void sbmc_state_vars_set_simple_path_system_vars(state_vars_struct * ss,
-                                                 lsList f)
-{
+void sbmc_state_vars_set_simple_path_system_vars(state_vars_struct *ss,
+                                                 lsList f) {
   nusmv_assert((state_vars_struct *)NULL != ss);
   ss->simple_path_system_vars = f;
 }
 
-void sbmc_state_vars_print(state_vars_struct *svs, FILE* out)
-{
+void sbmc_state_vars_print(state_vars_struct *svs, FILE *out) {
   const NuSMVEnv_ptr env = svs->environment;
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   fprintf(out, "The %d state variables in transition relation are: ",
           lsLength(svs->transition_state_vars));
@@ -348,46 +316,41 @@ void sbmc_state_vars_print(state_vars_struct *svs, FILE* out)
   fprintf(out, "\n");
 }
 
-hash_ptr sbmc_set_create()
-{
+hash_ptr sbmc_set_create() {
   hash_ptr hash = new_assoc();
-  nusmv_assert(hash != (hash_ptr) NULL);
+  nusmv_assert(hash != (hash_ptr)NULL);
 
   return hash;
 }
 
-void sbmc_set_destroy(hash_ptr hash)
-{
-  if (hash != (hash_ptr) NULL) {
+void sbmc_set_destroy(hash_ptr hash) {
+  if (hash != (hash_ptr)NULL) {
     free_assoc(hash);
   }
 }
 
-void sbmc_set_insert(hash_ptr hash, node_ptr bexp)
-{
-  nusmv_assert(hash != (hash_ptr) NULL);
+void sbmc_set_insert(hash_ptr hash, node_ptr bexp) {
+  nusmv_assert(hash != (hash_ptr)NULL);
   nusmv_assert((node_ptr)1 != (node_ptr)NULL);
   insert_assoc(hash, bexp, (node_ptr)1);
 }
 
-int sbmc_set_is_in(hash_ptr hash, node_ptr bexp)
-{
+int sbmc_set_is_in(hash_ptr hash, node_ptr bexp) {
   node_ptr result;
-  nusmv_assert(hash != (hash_ptr) NULL);
+  nusmv_assert(hash != (hash_ptr)NULL);
   result = find_assoc(hash, bexp);
   if (result == (node_ptr)NULL)
     return 0;
   return 1;
 }
 
-sbmc_node_info * sbmc_alloc_node_info()
-{
-  sbmc_node_info * info = ALLOC(sbmc_node_info, 1);
+sbmc_node_info *sbmc_alloc_node_info() {
+  sbmc_node_info *info = ALLOC(sbmc_node_info, 1);
 
   info->past_depth = (unsigned int)0;
   info->trans_vars = (array_t *)NULL;
   info->trans_bes = array_alloc(array_t *, 1);
-  array_insert(array_t*, info->trans_bes, 0, (array_t *)NULL);
+  array_insert(array_t *, info->trans_bes, 0, (array_t *)NULL);
   info->aux_F_node = (node_ptr)NULL;
   info->aux_F_trans = (array_t *)NULL;
   info->aux_G_node = (node_ptr)NULL;
@@ -395,7 +358,7 @@ sbmc_node_info * sbmc_alloc_node_info()
   return info;
 }
 
-void sbmc_node_info_free(sbmc_node_info * info) {
+void sbmc_node_info_free(sbmc_node_info *info) {
   if ((array_t *)NULL != info->trans_vars) {
     array_free(info->trans_vars);
     info->trans_vars = (array_t *)NULL;
@@ -403,11 +366,11 @@ void sbmc_node_info_free(sbmc_node_info * info) {
   if ((array_t *)NULL != info->trans_bes) {
     int i;
     for (i = 0; i < array_n(info->trans_bes); i++) {
-      array_t * a = array_fetch(array_t*, info->trans_bes, i);
+      array_t *a = array_fetch(array_t *, info->trans_bes, i);
 
       if ((array_t *)NULL != a) {
         array_free(a);
-        array_insert(array_t*, info->trans_bes, i, (array_t *)NULL);
+        array_insert(array_t *, info->trans_bes, i, (array_t *)NULL);
       }
     }
     array_free(info->trans_bes);
@@ -427,104 +390,85 @@ void sbmc_node_info_free(sbmc_node_info * info) {
 
 /* Getters and Setters */
 
-unsigned int sbmc_node_info_get_past_depth(sbmc_node_info * h)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+unsigned int sbmc_node_info_get_past_depth(sbmc_node_info *h) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   return h->past_depth;
 }
 
-array_t * sbmc_node_info_get_trans_vars(sbmc_node_info * h)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+array_t *sbmc_node_info_get_trans_vars(sbmc_node_info *h) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   return h->trans_vars;
 }
-array_t * sbmc_node_info_get_trans_bes(sbmc_node_info * h)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+array_t *sbmc_node_info_get_trans_bes(sbmc_node_info *h) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   return h->trans_bes;
 }
-node_ptr sbmc_node_info_get_aux_F_node(sbmc_node_info * h)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+node_ptr sbmc_node_info_get_aux_F_node(sbmc_node_info *h) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   return h->aux_F_node;
 }
-array_t * sbmc_node_info_get_aux_F_trans(sbmc_node_info * h)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+array_t *sbmc_node_info_get_aux_F_trans(sbmc_node_info *h) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   return h->aux_F_trans;
 }
-node_ptr sbmc_node_info_get_aux_G_node(sbmc_node_info * h)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+node_ptr sbmc_node_info_get_aux_G_node(sbmc_node_info *h) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   return h->aux_G_node;
 }
-array_t * sbmc_node_info_get_aux_G_trans(sbmc_node_info * h)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+array_t *sbmc_node_info_get_aux_G_trans(sbmc_node_info *h) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   return h->aux_G_trans;
 }
 
-void sbmc_node_info_set_past_depth(sbmc_node_info * h, unsigned int s)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+void sbmc_node_info_set_past_depth(sbmc_node_info *h, unsigned int s) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   h->past_depth = s;
 }
 
-void sbmc_node_info_set_past_trans_vars(sbmc_node_info * h, array_t * s)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+void sbmc_node_info_set_past_trans_vars(sbmc_node_info *h, array_t *s) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   h->trans_vars = s;
 }
-void sbmc_node_info_set_trans_bes(sbmc_node_info * h, array_t * s)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+void sbmc_node_info_set_trans_bes(sbmc_node_info *h, array_t *s) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   h->trans_bes = s;
 }
-void sbmc_node_info_set_aux_F_node(sbmc_node_info * h, node_ptr s)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+void sbmc_node_info_set_aux_F_node(sbmc_node_info *h, node_ptr s) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   h->aux_F_node = s;
 }
-void sbmc_node_info_set_aux_F_trans(sbmc_node_info * h, array_t * s)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+void sbmc_node_info_set_aux_F_trans(sbmc_node_info *h, array_t *s) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   h->aux_F_trans = s;
 }
-void sbmc_node_info_set_aux_G_node(sbmc_node_info * h, node_ptr s)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+void sbmc_node_info_set_aux_G_node(sbmc_node_info *h, node_ptr s) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   h->aux_G_node = s;
 }
-void sbmc_node_info_set_aux_G_trans(sbmc_node_info * h, array_t * s)
-{
-  nusmv_assert((sbmc_node_info*)NULL != h);
+void sbmc_node_info_set_aux_G_trans(sbmc_node_info *h, array_t *s) {
+  nusmv_assert((sbmc_node_info *)NULL != h);
   h->aux_G_trans = s;
 }
 
-hash_ptr sbmc_node_info_assoc_create(void) {
-  return new_assoc();
-}
+hash_ptr sbmc_node_info_assoc_create(void) { return new_assoc(); }
 
-void sbmc_node_info_assoc_free(hash_ptr * a) {
+void sbmc_node_info_assoc_free(hash_ptr *a) {
   clear_assoc_and_free_entries(*a, sbmc_node_info_free_func);
   free_assoc(*a);
-  *a = (hash_ptr) NULL;
+  *a = (hash_ptr)NULL;
 }
 
-void sbmc_node_info_assoc_insert(hash_ptr a, node_ptr n,
-                                 sbmc_node_info * i) {
+void sbmc_node_info_assoc_insert(hash_ptr a, node_ptr n, sbmc_node_info *i) {
   insert_assoc(a, n, (node_ptr)i);
 }
 
-sbmc_node_info * sbmc_node_info_assoc_find(hash_ptr a, node_ptr n) {
+sbmc_node_info *sbmc_node_info_assoc_find(hash_ptr a, node_ptr n) {
   return (sbmc_node_info *)find_assoc(a, n);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -539,13 +483,10 @@ sbmc_node_info * sbmc_node_info_assoc_find(hash_ptr a, node_ptr n) {
 
   \todo Missing description
 */
-static enum st_retval sbmc_node_info_free_func(char *k, char *r, char *a)
-{
+static enum st_retval sbmc_node_info_free_func(char *k, char *r, char *a) {
   if ((char *)NULL != r) {
-    sbmc_node_info* info = (sbmc_node_info*)r;
+    sbmc_node_info *info = (sbmc_node_info *)r;
     sbmc_node_info_free(info);
   }
   return ST_DELETE;
 }
-
-

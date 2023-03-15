@@ -1,28 +1,28 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``utils'' package of NuSMV version 2. 
-  Copyright (C) 2011 by FBK-irst. 
+  This file is part of the ``utils'' package of NuSMV version 2.
+  Copyright (C) 2011 by FBK-irst.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_TRIPLE_H__
 #define __NUSMV_CORE_UTILS_TRIPLE_H__
-
 
 #include "nusmv/core/utils/utils.h"
 
@@ -46,22 +43,20 @@
   \struct Triple
   \brief Definition of the public accessor for class Triple
 
-  
-*/
-typedef struct Triple_TAG*  Triple_ptr;
 
+*/
+typedef struct Triple_TAG *Triple_ptr;
 
 /*!
   \brief Triple class definition
 
-  
+
 */
 
-typedef struct Triple_TAG
-{
-  void* first;
-  void* second;
-  void* third;
+typedef struct Triple_TAG {
+  void *first;
+  void *second;
+  void *third;
   boolean frozen;
 } Triple;
 
@@ -71,18 +66,14 @@ typedef struct Triple_TAG
   These macros must be used respectively to cast and to check
   instances of class Triple
 */
-#define TRIPLE(self) \
-         ((Triple_ptr) self)
+#define TRIPLE(self) ((Triple_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRIPLE_CHECK_INSTANCE(self) \
-         (nusmv_assert(TRIPLE(self) != TRIPLE(NULL)))
-
-
+#define TRIPLE_CHECK_INSTANCE(self) (nusmv_assert(TRIPLE(self) != TRIPLE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -98,21 +89,18 @@ typedef struct Triple_TAG
 
   \sa Triple_destroy
 */
-Triple_ptr Triple_create(void* first,
-                                void* second,
-                                void* third);
+Triple_ptr Triple_create(void *first, void *second, void *third);
 
 /*!
   \methodof Triple
   \brief The Triple class initializer
 
   The Triple class initializer.  Use this function if
-                      declaring a Triple in the stack 
+                      declaring a Triple in the stack
 
   \sa Triple_create
 */
-void Triple_init(Triple_ptr self, void* first,
-                        void* second, void* third);
+void Triple_init(Triple_ptr self, void *first, void *second, void *third);
 
 /*!
   \methodof Triple
@@ -139,7 +127,7 @@ boolean Triple_is_freezed(const Triple_ptr self);
 
   Get the first value of the Triple instance
 */
-void* Triple_get_first(const Triple_ptr self);
+void *Triple_get_first(const Triple_ptr self);
 
 /*!
   \methodof Triple
@@ -147,7 +135,7 @@ void* Triple_get_first(const Triple_ptr self);
 
   Get the second value of the Triple instance
 */
-void* Triple_get_second(const Triple_ptr self);
+void *Triple_get_second(const Triple_ptr self);
 
 /*!
   \methodof Triple
@@ -155,7 +143,7 @@ void* Triple_get_second(const Triple_ptr self);
 
   Get the third value of the Triple instance
 */
-void* Triple_get_third(const Triple_ptr self);
+void *Triple_get_third(const Triple_ptr self);
 
 /*!
   \methodof Triple
@@ -164,7 +152,7 @@ void* Triple_get_third(const Triple_ptr self);
   Sets the first value for the Triple instance.
                       The Triple must not be frozen
 */
-void Triple_set_first(Triple_ptr self, void* first);
+void Triple_set_first(Triple_ptr self, void *first);
 
 /*!
   \methodof Triple
@@ -173,7 +161,7 @@ void Triple_set_first(Triple_ptr self, void* first);
   Sets the second value for the Triple instance.
                       The Triple must not be frozen
 */
-void Triple_set_second(Triple_ptr self, void* second);
+void Triple_set_second(Triple_ptr self, void *second);
 
 /*!
   \methodof Triple
@@ -182,7 +170,7 @@ void Triple_set_second(Triple_ptr self, void* second);
   Sets the third value for the Triple instance.
                       The Triple must not be frozen
 */
-void Triple_set_third(Triple_ptr self, void* third);
+void Triple_set_third(Triple_ptr self, void *third);
 
 /*!
   \methodof Triple
@@ -191,8 +179,7 @@ void Triple_set_third(Triple_ptr self, void* third);
   Sets both the values for the Triple instance.
                       The Triple must not be frozen
 */
-void Triple_set_values(Triple_ptr self, void* first,
-                              void* second, void* third);
+void Triple_set_values(Triple_ptr self, void *first, void *second, void *third);
 
 /*!
   \methodof Triple
@@ -216,8 +203,7 @@ void Triple_destroy(Triple_ptr self);
                       Casts to char* are added to prevent "warning: pointer of
                       type ‘void *’ used in subtraction".
 */
-int Triple_compare(const Triple_ptr a,
-                          const Triple_ptr b);
+int Triple_compare(const Triple_ptr a, const Triple_ptr b);
 
 /*!
   \methodof Triple
@@ -231,7 +217,5 @@ int Triple_compare(const Triple_ptr a,
 unsigned long Triple_hash(const Triple_ptr self, int size);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_TRIPLE_H__ */

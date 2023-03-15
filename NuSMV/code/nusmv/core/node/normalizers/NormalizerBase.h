@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_BASE_H__
 #define __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_BASE_H__
-
 
 #include "nusmv/core/node/node.h"
 
@@ -49,9 +46,9 @@
   \struct NormalizerBase
   \brief Definition of the public accessor for class NormalizerBase
 
-  
+
 */
-typedef struct NormalizerBase_TAG*  NormalizerBase_ptr;
+typedef struct NormalizerBase_TAG *NormalizerBase_ptr;
 
 /*!
   \brief To cast and check instances of class NormalizerBase
@@ -59,18 +56,15 @@ typedef struct NormalizerBase_TAG*  NormalizerBase_ptr;
   These macros must be used respectively to cast and to check
   instances of class NormalizerBase
 */
-#define NORMALIZER_BASE(self) \
-         ((NormalizerBase_ptr) self)
+#define NORMALIZER_BASE(self) ((NormalizerBase_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NORMALIZER_BASE_CHECK_INSTANCE(self) \
-         (nusmv_assert(NORMALIZER_BASE(self) != NORMALIZER_BASE(NULL)))
-
-
+#define NORMALIZER_BASE_CHECK_INSTANCE(self)                                   \
+  (nusmv_assert(NORMALIZER_BASE(self) != NORMALIZER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -90,13 +84,9 @@ typedef struct NormalizerBase_TAG*  NormalizerBase_ptr;
 
   \sa NormalizerBase_can_handle
 */
-VIRTUAL node_ptr
-NormalizerBase_normalize_node(NormalizerBase_ptr self,
-                              node_ptr n);
-
-
+VIRTUAL node_ptr NormalizerBase_normalize_node(NormalizerBase_ptr self,
+                                               node_ptr n);
 
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_BASE_H__ */

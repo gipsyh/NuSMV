@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -49,7 +49,7 @@
 
   \todo Missing description
 */
-typedef struct TraceXmlDumper_TAG* TraceXmlDumper_ptr;
+typedef struct TraceXmlDumper_TAG *TraceXmlDumper_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -60,16 +60,15 @@ typedef struct TraceXmlDumper_TAG* TraceXmlDumper_ptr;
 
   \todo Missing description
 */
-#define TRACE_XML_DUMPER(x) \
-         ((TraceXmlDumper_ptr) x)
+#define TRACE_XML_DUMPER(x) ((TraceXmlDumper_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_DUMPER_CHECK_INSTANCE(x) \
-         (nusmv_assert(TRACE_XML_DUMPER(x) != TRACE_XML_DUMPER(NULL)))
+#define TRACE_XML_DUMPER_CHECK_INSTANCE(x)                                     \
+  (nusmv_assert(TRACE_XML_DUMPER(x) != TRACE_XML_DUMPER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -89,4 +88,3 @@ TraceXmlDumper_ptr TraceXmlDumper_create(boolean is_embedded);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_TRACE_PLUGINS_TRACE_XML_DUMPER_H__ */
-

@@ -34,47 +34,45 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/OStream.h"
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
-#include "nusmv/core/enc/encInt.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
 #include "nusmv/core/enc/bdd/BddEnc_private.h"
+#include "nusmv/core/enc/encInt.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/OStream.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/core/enc/bdd/bddInt.h"
 
-#include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/compile/compile.h"
 #include "nusmv/core/compile/symb_table/ResolveSymbol.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/enc/operators.h"
+#include "nusmv/core/parser/symbols.h"
 
 #include "nusmv/core/parser/ord/ParserOrd.h"
 
+#include "nusmv/core/cinit/cinit.h"
 #include "nusmv/core/utils/WordNumberMgr.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/range.h"
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/utils/utils_io.h"
-#include "nusmv/core/utils/ucmd.h"
 #include "nusmv/core/utils/array.h"
 #include "nusmv/core/utils/defs.h"
-#include "nusmv/core/cinit/cinit.h"
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/range.h"
+#include "nusmv/core/utils/ucmd.h"
+#include "nusmv/core/utils/ustring.h"
+#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/utils/utils_io.h"
 #include "nusmv/core/wff/ExprMgr.h"
 
+#include "nusmv/core/utils/portability.h"
 #include <math.h>
 #include <stdint.h>
-#include "nusmv/core/utils/portability.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -86,7 +84,6 @@
   \todo Missing description
 */
 #define MAX_ELEMENTS_PRINTABLE (double)(pow((double)2.0, (double)16.0))
-
 
 /*!
 
@@ -119,13 +116,11 @@
    calls can be nested, a stack of BddEncPrintInfo instances is used
 */
 
-typedef struct BddEncPrintInfo_TAG
-{
+typedef struct BddEncPrintInfo_TAG {
   hash_ptr hash;
   NodeList_ptr symbols;
-  boolean  changes_only;
+  boolean changes_only;
 } BddEncPrintInfo;
-
 
 /* used by private callbacks */
 
@@ -134,9 +129,9 @@ typedef struct BddEncPrintInfo_TAG
 
   \todo Missing description
 */
-typedef AddArray_ptr (*ADD_ARRAY_UNARY_OP)(DDMgr_ptr , AddArray_ptr);
-typedef AddArray_ptr (*ADD_ARRAY_BINARY_OP)(DDMgr_ptr ,
-                                            AddArray_ptr, AddArray_ptr);
+typedef AddArray_ptr (*ADD_ARRAY_UNARY_OP)(DDMgr_ptr, AddArray_ptr);
+typedef AddArray_ptr (*ADD_ARRAY_BINARY_OP)(DDMgr_ptr, AddArray_ptr,
+                                            AddArray_ptr);
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -151,10 +146,10 @@ typedef AddArray_ptr (*ADD_ARRAY_BINARY_OP)(DDMgr_ptr ,
 
   \todo Missing description
 */
-#define BDD_ENC_FREE_ADD(add)                   \
-  if (add != (add_ptr) NULL) {                  \
-    add_free(self->dd, add);                    \
-    add = (add_ptr) NULL;                       \
+#define BDD_ENC_FREE_ADD(add)                                                  \
+  if (add != (add_ptr)NULL) {                                                  \
+    add_free(self->dd, add);                                                   \
+    add = (add_ptr)NULL;                                                       \
   }
 
 /*!
@@ -162,12 +157,11 @@ typedef AddArray_ptr (*ADD_ARRAY_BINARY_OP)(DDMgr_ptr ,
 
   \todo Missing description
 */
-#define BDD_ENC_FREE_BDD(bdd)                   \
-  if (bdd != (bdd_ptr) NULL) {                  \
-    bdd_free(self->dd, bdd);                    \
-    bdd = (bdd_ptr) NULL;                       \
+#define BDD_ENC_FREE_BDD(bdd)                                                  \
+  if (bdd != (bdd_ptr)NULL) {                                                  \
+    bdd_free(self->dd, bdd);                                                   \
+    bdd = (bdd_ptr)NULL;                                                       \
   }
-
 
 /**AutomaticStart*************************************************************/
 
@@ -175,46 +169,35 @@ typedef AddArray_ptr (*ADD_ARRAY_BINARY_OP)(DDMgr_ptr ,
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void bdd_enc_finalize(Object_ptr object, void* dummy);
+static void bdd_enc_finalize(Object_ptr object, void *dummy);
 
+static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
+                                            const SymbLayer_ptr layer,
+                                            size_t block_size,
+                                            size_t idx_chunk_size);
 
-static int
-bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
-                                 const SymbLayer_ptr layer,
-                                 size_t block_size,
-                                 size_t idx_chunk_size);
-
-static void bdd_enc_add_input_var(BddEnc_ptr self, node_ptr name,
-                                  int index);
+static void bdd_enc_add_input_var(BddEnc_ptr self, node_ptr name, int index);
 
 static void bdd_enc_add_state_var(BddEnc_ptr self, SymbLayer_ptr layer,
-                                  node_ptr name,
-                                  int curr_index, int next_index);
+                                  node_ptr name, int curr_index,
+                                  int next_index);
 
-static void bdd_enc_add_frozen_var(BddEnc_ptr self,
-                                   node_ptr name, int index);
+static void bdd_enc_add_frozen_var(BddEnc_ptr self, node_ptr name, int index);
 
-static void
-bdd_enc_add_input_var_to_minterm(BddEnc_ptr self, int index);
+static void bdd_enc_add_input_var_to_minterm(BddEnc_ptr self, int index);
 
-static void
-bdd_enc_add_state_var_to_minterm(BddEnc_ptr self, int index);
+static void bdd_enc_add_state_var_to_minterm(BddEnc_ptr self, int index);
 
-static void
-bdd_enc_add_next_state_var_to_minterm(BddEnc_ptr self, int index);
+static void bdd_enc_add_next_state_var_to_minterm(BddEnc_ptr self, int index);
 
-static void
-bdd_enc_add_frozen_var_to_minterm(BddEnc_ptr self, int index);
+static void bdd_enc_add_frozen_var_to_minterm(BddEnc_ptr self, int index);
 
-static void
-bdd_enc_accumulate_state_var_cube(BddEnc_ptr self, add_ptr curr,
-                                  add_ptr next);
+static void bdd_enc_accumulate_state_var_cube(BddEnc_ptr self, add_ptr curr,
+                                              add_ptr next);
 
-static void
-bdd_enc_accumulate_input_var_cube(BddEnc_ptr self, add_ptr input);
+static void bdd_enc_accumulate_input_var_cube(BddEnc_ptr self, add_ptr input);
 
-static void
-bdd_enc_accumulate_frozen_var_cube(BddEnc_ptr self, add_ptr frozen);
+static void bdd_enc_accumulate_frozen_var_cube(BddEnc_ptr self, add_ptr frozen);
 
 static void bdd_enc_remove_input_var(BddEnc_ptr self, node_ptr name);
 
@@ -224,152 +207,127 @@ static void bdd_enc_remove_frozen_var(BddEnc_ptr self, node_ptr name);
 
 static void bdd_enc_remove_var(BddEnc_ptr self, node_ptr name);
 
-static void
-bdd_enc_remove_var_from_minterm(BddEnc_ptr self, int var_idx,
-                                array_t* minterms_array,
-                                int minterms_array_len);
+static void bdd_enc_remove_var_from_minterm(BddEnc_ptr self, int var_idx,
+                                            array_t *minterms_array,
+                                            int minterms_array_len);
 
-static node_ptr
-bdd_enc_get_next_state_var_name(NodeMgr_ptr nodemgr,
-                                node_ptr name);
+static node_ptr bdd_enc_get_next_state_var_name(NodeMgr_ptr nodemgr,
+                                                node_ptr name);
 
-static int
-bdd_enc_compact_minterms_array(BddEnc_ptr self,
-                               array_t* minterms_array,
-                               int minterms_array_len);
+static int bdd_enc_compact_minterms_array(BddEnc_ptr self,
+                                          array_t *minterms_array,
+                                          int minterms_array_len);
 
-static NodeList_ptr
-bdd_enc_sort_variables_and_groups(BddEnc_ptr self,
-                                  SymbLayer_ptr layer,
-                                  OrdGroups_ptr res_group,
-                                  boolean* needs_reshuffle,
-                                  boolean* interleaved);
+static NodeList_ptr bdd_enc_sort_variables_and_groups(BddEnc_ptr self,
+                                                      SymbLayer_ptr layer,
+                                                      OrdGroups_ptr res_group,
+                                                      boolean *needs_reshuffle,
+                                                      boolean *interleaved);
 
 static void bdd_enc_lock_reordering(BddEnc_ptr self);
 static void bdd_enc_unlock_reordering(BddEnc_ptr self);
 
-static void
-bdd_enc_insert_gap(BddEnc_ptr self, int index, size_t gap_size);
+static void bdd_enc_insert_gap(BddEnc_ptr self, int index, size_t gap_size);
 
-static void
-bdd_enc_remove_gap(BddEnc_ptr self, int index, size_t size);
+static void bdd_enc_remove_gap(BddEnc_ptr self, int index, size_t size);
 
 static int bdd_enc_name_to_index(const BddEnc_ptr self, node_ptr name);
 
-static assoc_retval hash_node_free(char* key, char* data, char* arg);
+static assoc_retval hash_node_free(char *key, char *data, char *arg);
 
-static assoc_retval hash_add_key_free(char* key, char* data, char* arg);
+static assoc_retval hash_add_key_free(char *key, char *data, char *arg);
 
-static add_ptr
-bdd_enc_get_vars_list_mask(BddEnc_ptr self, const SymbLayer_ptr layer,
-                           SymbLayerIter* iter);
+static add_ptr bdd_enc_get_vars_list_mask(BddEnc_ptr self,
+                                          const SymbLayer_ptr layer,
+                                          SymbLayerIter *iter);
 
-static add_ptr
-bdd_enc_get_var_mask_recur(BddEnc_ptr self, add_ptr var_encoding,
-                           add_ptr cube);
+static add_ptr bdd_enc_get_var_mask_recur(BddEnc_ptr self, add_ptr var_encoding,
+                                          add_ptr cube);
 
-static AddArray_ptr
-bdd_enc_eval(BddEnc_ptr self, Expr_ptr expr, node_ptr context);
+static AddArray_ptr bdd_enc_eval(BddEnc_ptr self, Expr_ptr expr,
+                                 node_ptr context);
 
-static AddArray_ptr
-bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx);
+static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
+                                       node_ptr ctx);
 
-static AddArray_ptr
-bdd_enc_eval_recur_case_atom(BddEnc_ptr self, Expr_ptr expr,
-                             node_ptr ctx);
+static AddArray_ptr bdd_enc_eval_recur_case_atom(BddEnc_ptr self, Expr_ptr expr,
+                                                 node_ptr ctx);
 
 static AddArray_ptr
-bdd_enc_eval_recur_case_dot_array(BddEnc_ptr self, Expr_ptr expr,
-                                  node_ptr ctx);
+bdd_enc_eval_recur_case_dot_array(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx);
 
-static boolean bdd_enc_is_bit_vector(BddEnc_ptr self,
-                                     node_ptr expr, node_ptr context,
-                                     boolean* isSigned);
+static boolean bdd_enc_is_bit_vector(BddEnc_ptr self, node_ptr expr,
+                                     node_ptr context, boolean *isSigned);
 
-static AddArray_ptr
-bdd_enc_unary_add_op(BddEnc_ptr self, FP_A_DA op,
-                     node_ptr n, node_ptr context);
+static AddArray_ptr bdd_enc_unary_add_op(BddEnc_ptr self, FP_A_DA op,
+                                         node_ptr n, node_ptr context);
 
-static AddArray_ptr
-bdd_enc_binary_add_op(BddEnc_ptr self, FP_A_DAA op,
-                      node_ptr n, node_ptr context);
+static AddArray_ptr bdd_enc_binary_add_op(BddEnc_ptr self, FP_A_DAA op,
+                                          node_ptr n, node_ptr context);
 
-static AddArray_ptr
-bdd_enc_unary_node_op(BddEnc_ptr self, NPFNNE/*NPFCVT*/ op,
-                      node_ptr n, node_ptr context);
+static AddArray_ptr bdd_enc_unary_node_op(BddEnc_ptr self, NPFNNE /*NPFCVT*/ op,
+                                          node_ptr n, node_ptr context);
 
-static AddArray_ptr
-bdd_enc_binary_node_op(BddEnc_ptr self, NPFNNE op, node_ptr n,
-                       node_ptr context);
+static AddArray_ptr bdd_enc_binary_node_op(BddEnc_ptr self, NPFNNE op,
+                                           node_ptr n, node_ptr context);
 
-static AddArray_ptr
-bdd_enc_if_then_else_op(BddEnc_ptr self, node_ptr node,
-                        node_ptr context);
+static AddArray_ptr bdd_enc_if_then_else_op(BddEnc_ptr self, node_ptr node,
+                                            node_ptr context);
 
-static AddArray_ptr
-bdd_enc_unary_vector_op(BddEnc_ptr self,
-                        ADD_ARRAY_UNARY_OP op,
-                        node_ptr n, node_ptr context);
+static AddArray_ptr bdd_enc_unary_vector_op(BddEnc_ptr self,
+                                            ADD_ARRAY_UNARY_OP op, node_ptr n,
+                                            node_ptr context);
 
-static AddArray_ptr
-bdd_enc_binary_vector_op(BddEnc_ptr self, ADD_ARRAY_BINARY_OP op,
-                         node_ptr n, node_ptr context);
+static AddArray_ptr bdd_enc_binary_vector_op(BddEnc_ptr self,
+                                             ADD_ARRAY_BINARY_OP op, node_ptr n,
+                                             node_ptr context);
 
 static NodeList_ptr
-bdd_enc_append_bool_vars_from_layers(BddEnc_ptr self,
-                                     NodeList_ptr layers,
-                                     boolean* layers_interleaved);
+bdd_enc_append_bool_vars_from_layers(BddEnc_ptr self, NodeList_ptr layers,
+                                     boolean *layers_interleaved);
 
-static node_ptr
-bdd_enc_add2expr_recur(BddEnc_ptr self, SymbLayer_ptr det_layer,
-                       add_ptr bool_add, hash_ptr lc, boolean is_scalar);
+static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self, SymbLayer_ptr det_layer,
+                                       add_ptr bool_add, hash_ptr lc,
+                                       boolean is_scalar);
 
-static boolean
-bdd_enc_is_index_not_allocated(const BddEnc_ptr self, int index);
+static boolean bdd_enc_is_index_not_allocated(const BddEnc_ptr self, int index);
 
-static NodeList_ptr
-bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
-                                            OrdGroups_ptr old_group,
-                                            OrdGroups_ptr res_group,
-                                            boolean* interleaved);
+static NodeList_ptr bdd_enc_sort_variables_and_groups_according(
+    BddEnc_ptr self, OrdGroups_ptr old_group, OrdGroups_ptr res_group,
+    boolean *interleaved);
 
-static NodeList_ptr
-bdd_enc_get_var_booleanizations(BddEnc_ptr self, Set_t vars);
+static NodeList_ptr bdd_enc_get_var_booleanizations(BddEnc_ptr self,
+                                                    Set_t vars);
 
-
-static int bdd_enc_create_block(BddEnc_ptr self,
-                                SymbLayer_ptr layer,
+static int bdd_enc_create_block(BddEnc_ptr self, SymbLayer_ptr layer,
                                 int lev_min, size_t block_size,
-                                size_t idx_chunk_size,
-                                boolean shared);
+                                size_t idx_chunk_size, boolean shared);
 
 static void bdd_enc_dissolve_committed_groups(BddEnc_ptr self);
 
 static int bdd_enc_dump_addarray_dot_davinci(BddEnc_ptr self,
                                              AddArray_ptr addarray,
-                                             const char** labels,
-                                             FILE* outfile,
+                                             const char **labels, FILE *outfile,
                                              boolean use_dot);
 
 static boolean is_max_elements_printable_exceeded(StreamMgr_ptr streams,
                                                   double tmp_array_size,
-                                                  char* elements_name);
+                                                  char *elements_name);
 
 static void bdd_enc_failure_node_check(DDMgr_ptr dd, node_ptr node);
 
 static void bdd_enc_range_check(DDMgr_ptr dd, node_ptr node);
 
-static add_ptr lazy_commit_layer_and_get_add(BddEnc_ptr self,
-                                             node_ptr name, int type);
+static add_ptr lazy_commit_layer_and_get_add(BddEnc_ptr self, node_ptr name,
+                                             int type);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-BddEnc_ptr BddEnc_create(SymbTable_ptr symb_table,
-                         BoolEnc_ptr bool_enc, VarsHandler_ptr dd_vars_hndr,
-                         OrdGroups_ptr ord_groups)
-{
+BddEnc_ptr BddEnc_create(SymbTable_ptr symb_table, BoolEnc_ptr bool_enc,
+                         VarsHandler_ptr dd_vars_hndr,
+                         OrdGroups_ptr ord_groups) {
   BddEnc_ptr self = ALLOC(BddEnc, 1);
   BDD_ENC_CHECK_INSTANCE(self);
 
@@ -377,95 +335,82 @@ BddEnc_ptr BddEnc_create(SymbTable_ptr symb_table,
   return self;
 }
 
-VIRTUAL void BddEnc_destroy(BddEnc_ptr self)
-{
+VIRTUAL void BddEnc_destroy(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-VarsHandler_ptr BddEnc_get_dd_vars_handler(const BddEnc_ptr self)
-{
+VarsHandler_ptr BddEnc_get_dd_vars_handler(const BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
   return self->dd_vars_hndr;
 }
 
-DDMgr_ptr BddEnc_get_dd_manager(const BddEnc_ptr self)
-{
+DDMgr_ptr BddEnc_get_dd_manager(const BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
   return self->dd;
 }
 
-OrdGroups_ptr BddEnc_get_ord_groups(const BddEnc_ptr self)
-{
+OrdGroups_ptr BddEnc_get_ord_groups(const BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
   return self->ord_groups;
 }
 
-BddVarSet_ptr BddEnc_get_state_vars_cube(const BddEnc_ptr self)
-{
+BddVarSet_ptr BddEnc_get_state_vars_cube(const BddEnc_ptr self) {
   bdd_ptr res;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->state_vars_bdd != (bdd_ptr) NULL) {
+  if (self->state_vars_bdd != (bdd_ptr)NULL) {
     res = bdd_dup(self->state_vars_bdd);
-  }
-  else if (self->state_vars_add != (add_ptr) NULL) {
+  } else if (self->state_vars_add != (add_ptr)NULL) {
     self->state_vars_bdd = add_to_bdd(self->dd, self->state_vars_add);
     res = bdd_dup(self->state_vars_bdd);
-  }
-  else res = (bdd_ptr) NULL;
+  } else
+    res = (bdd_ptr)NULL;
 
   return BDD_VAR_SET(res);
 }
 
-BddVarSet_ptr BddEnc_get_next_state_vars_cube(const BddEnc_ptr self)
-{
+BddVarSet_ptr BddEnc_get_next_state_vars_cube(const BddEnc_ptr self) {
   bdd_ptr res;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->next_state_vars_bdd != (bdd_ptr) NULL) {
+  if (self->next_state_vars_bdd != (bdd_ptr)NULL) {
     res = bdd_dup(self->next_state_vars_bdd);
-  }
-  else if (self->next_state_vars_add != (add_ptr) NULL) {
-    self->next_state_vars_bdd = add_to_bdd(self->dd,
-                                           self->next_state_vars_add);
+  } else if (self->next_state_vars_add != (add_ptr)NULL) {
+    self->next_state_vars_bdd = add_to_bdd(self->dd, self->next_state_vars_add);
     res = bdd_dup(self->next_state_vars_bdd);
-  }
-  else res = (bdd_ptr) NULL;
+  } else
+    res = (bdd_ptr)NULL;
 
   return BDD_VAR_SET(res);
 }
 
-BddVarSet_ptr BddEnc_get_frozen_vars_cube(const BddEnc_ptr self)
-{
+BddVarSet_ptr BddEnc_get_frozen_vars_cube(const BddEnc_ptr self) {
   bdd_ptr res;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->frozen_vars_bdd != (bdd_ptr) NULL) {
+  if (self->frozen_vars_bdd != (bdd_ptr)NULL) {
     res = bdd_dup(self->frozen_vars_bdd);
-  }
-  else if (self->frozen_vars_add != (add_ptr) NULL) {
-    self->frozen_vars_bdd = add_to_bdd(self->dd,
-                                       self->frozen_vars_add);
+  } else if (self->frozen_vars_add != (add_ptr)NULL) {
+    self->frozen_vars_bdd = add_to_bdd(self->dd, self->frozen_vars_add);
     res = bdd_dup(self->frozen_vars_bdd);
-  }
-  else res = (bdd_ptr) NULL;
+  } else
+    res = (bdd_ptr)NULL;
 
   return BDD_VAR_SET(res);
 }
 
-BddVarSet_ptr BddEnc_get_state_frozen_vars_cube(const BddEnc_ptr self)
-{
+BddVarSet_ptr BddEnc_get_state_frozen_vars_cube(const BddEnc_ptr self) {
   bdd_ptr res;
 
   BDD_ENC_CHECK_INSTANCE(self);
   res = self->state_frozen_vars_bdd;
 
-  if (res == (bdd_ptr) NULL) {
+  if (res == (bdd_ptr)NULL) {
     /* needs to be computed */
     BddVarSet_ptr state_vars = BddEnc_get_state_vars_cube(self);
     BddVarSet_ptr frozen_vars = BddEnc_get_frozen_vars_cube(self);
@@ -479,8 +424,8 @@ BddVarSet_ptr BddEnc_get_state_frozen_vars_cube(const BddEnc_ptr self)
   return BDD_VAR_SET(bdd_dup(res));
 }
 
-BddVarSet_ptr BddEnc_get_state_next_state_frozen_vars_cube(const BddEnc_ptr self)
-{
+BddVarSet_ptr
+BddEnc_get_state_next_state_frozen_vars_cube(const BddEnc_ptr self) {
   bdd_ptr res;
   bdd_ptr next_state_vars;
 
@@ -495,28 +440,25 @@ BddVarSet_ptr BddEnc_get_state_next_state_frozen_vars_cube(const BddEnc_ptr self
   return BDD_VAR_SET(bdd_dup(res));
 }
 
-BddVarSet_ptr BddEnc_get_input_vars_cube(const BddEnc_ptr self)
-{
+BddVarSet_ptr BddEnc_get_input_vars_cube(const BddEnc_ptr self) {
   bdd_ptr res;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->input_vars_bdd != (bdd_ptr) NULL) {
+  if (self->input_vars_bdd != (bdd_ptr)NULL) {
     res = bdd_dup(self->input_vars_bdd);
-  }
-  else if (self->input_vars_add != (add_ptr) NULL) {
+  } else if (self->input_vars_add != (add_ptr)NULL) {
     self->input_vars_bdd = add_to_bdd(self->dd, self->input_vars_add);
     res = bdd_dup(self->input_vars_bdd);
-  }
-  else res = (bdd_ptr) NULL;
+  } else
+    res = (bdd_ptr)NULL;
 
   return BDD_VAR_SET(res);
 }
 
 BddVarSet_ptr BddEnc_get_layer_vars_cube(const BddEnc_ptr self,
                                          SymbLayer_ptr layer,
-                                         SymbFilterType vt)
-{
+                                         SymbFilterType vt) {
   SymbTable_ptr st;
   NodeList_ptr booled_vars;
   NodeList_ptr layer_list;
@@ -525,8 +467,7 @@ BddVarSet_ptr BddEnc_get_layer_vars_cube(const BddEnc_ptr self,
   boolean interleaved;
 
   BDD_ENC_CHECK_INSTANCE(self);
-  nusmv_assert(BaseEnc_layer_occurs(BASE_ENC(self),
-                                    SymbLayer_get_name(layer)));
+  nusmv_assert(BaseEnc_layer_occurs(BASE_ENC(self), SymbLayer_get_name(layer)));
 
   st = BaseEnc_get_symb_table(BASE_ENC(self));
   layer_list = NodeList_create();
@@ -534,8 +475,8 @@ BddVarSet_ptr BddEnc_get_layer_vars_cube(const BddEnc_ptr self,
   result = bdd_true(self->dd);
 
   /* get all vars in the booleanized form */
-  booled_vars = bdd_enc_append_bool_vars_from_layers(self, layer_list,
-                                                     &interleaved);
+  booled_vars =
+      bdd_enc_append_bool_vars_from_layers(self, layer_list, &interleaved);
   nusmv_assert(!interleaved); /* there is only one layer! */
 
   /* convert every var into BDD and add to the cube */
@@ -544,9 +485,9 @@ BddVarSet_ptr BddEnc_get_layer_vars_cube(const BddEnc_ptr self,
     node_ptr vname = NodeList_get_elem_at(booled_vars, iter);
     bdd_ptr curr = BddEnc_expr_to_bdd(self, vname, Nil);
 
-    if ( ((vt & VFT_INPUT) && SymbTable_is_symbol_input_var(st, vname)) ||
-         ((vt & VFT_CURRENT) && SymbTable_is_symbol_state_var(st, vname)) ||
-         ((vt & VFT_FROZEN) && SymbTable_is_symbol_frozen_var(st, vname))) {
+    if (((vt & VFT_INPUT) && SymbTable_is_symbol_input_var(st, vname)) ||
+        ((vt & VFT_CURRENT) && SymbTable_is_symbol_state_var(st, vname)) ||
+        ((vt & VFT_FROZEN) && SymbTable_is_symbol_frozen_var(st, vname))) {
       bdd_and_accumulate(self->dd, &result, curr);
     }
     if ((vt & VFT_NEXT) && SymbTable_is_symbol_state_var(st, vname)) {
@@ -563,10 +504,8 @@ BddVarSet_ptr BddEnc_get_layer_vars_cube(const BddEnc_ptr self,
   return result;
 }
 
-BddVarSet_ptr BddEnc_get_vars_cube(const BddEnc_ptr self,
-                                   Set_t vars,
-                                   SymbFilterType vt)
-{
+BddVarSet_ptr BddEnc_get_vars_cube(const BddEnc_ptr self, Set_t vars,
+                                   SymbFilterType vt) {
   SymbTable_ptr st;
   NodeList_ptr booled_vars;
   BddVarSet_ptr result;
@@ -589,9 +528,9 @@ BddVarSet_ptr BddEnc_get_vars_cube(const BddEnc_ptr self,
     vname = NodeList_get_elem_at(booled_vars, iter);
     curr = BddEnc_expr_to_bdd(self, vname, Nil);
 
-    if ( ((vt & VFT_INPUT) && SymbTable_is_symbol_input_var(st, vname)) ||
-         ((vt & VFT_CURRENT) && SymbTable_is_symbol_state_var(st, vname)) ||
-         ((vt & VFT_FROZEN) && SymbTable_is_symbol_frozen_var(st, vname))) {
+    if (((vt & VFT_INPUT) && SymbTable_is_symbol_input_var(st, vname)) ||
+        ((vt & VFT_CURRENT) && SymbTable_is_symbol_state_var(st, vname)) ||
+        ((vt & VFT_FROZEN) && SymbTable_is_symbol_frozen_var(st, vname))) {
       bdd_and_accumulate(self->dd, &result, curr);
     }
     if ((vt & VFT_NEXT) && SymbTable_is_symbol_state_var(st, vname)) {
@@ -607,8 +546,8 @@ BddVarSet_ptr BddEnc_get_vars_cube(const BddEnc_ptr self,
   return result;
 }
 
-BddVarSet_ptr BddEnc_get_unfiltered_vars_cube(const BddEnc_ptr self, Set_t vars)
-{
+BddVarSet_ptr BddEnc_get_unfiltered_vars_cube(const BddEnc_ptr self,
+                                              Set_t vars) {
   BddVarSet_ptr result;
   BddVarSet_ptr normal_result;
   BddVarSet_ptr next_result;
@@ -626,8 +565,7 @@ BddVarSet_ptr BddEnc_get_unfiltered_vars_cube(const BddEnc_ptr self, Set_t vars)
     node_ptr var = Set_GetMember(vars, viter);
     if (NEXT != node_get_type(var)) {
       normal_vars = Set_AddMember(normal_vars, var);
-    }
-    else {
+    } else {
       next_vars = Set_AddMember(next_vars, car(var));
     }
   }
@@ -648,9 +586,8 @@ BddVarSet_ptr BddEnc_get_unfiltered_vars_cube(const BddEnc_ptr self, Set_t vars)
   return result;
 }
 
-boolean BddEnc_is_var_in_cube(const BddEnc_ptr self,
-                              node_ptr name, add_ptr cube)
-{
+boolean BddEnc_is_var_in_cube(const BddEnc_ptr self, node_ptr name,
+                              add_ptr cube) {
   int width;
   AddArray_ptr add_sym;
 
@@ -661,14 +598,14 @@ boolean BddEnc_is_var_in_cube(const BddEnc_ptr self,
   /* Subtracts the cube of a var (or expression) from the given
      cube. ADD can be a list of bits, therefore subtract all the bits
      from the cube. */
-  for (width = AddArray_get_size(add_sym) - 1; width >=0; --width) {
+  for (width = AddArray_get_size(add_sym) - 1; width >= 0; --width) {
     /* every bit of a variable is subtracted from the given cube */
-    add_ptr bit_cube = add_support(self->dd,
-                                   AddArray_get_n(add_sym, width));
+    add_ptr bit_cube = add_support(self->dd, AddArray_get_n(add_sym, width));
     add_ptr tmp = add_cube_diff(self->dd, cube, bit_cube);
 
     /* arbitrary value below -1 to exit with true*/
-    if (tmp != cube) width = -10;
+    if (tmp != cube)
+      width = -10;
 
     add_free(self->dd, tmp);
     add_free(self->dd, bit_cube);
@@ -679,8 +616,7 @@ boolean BddEnc_is_var_in_cube(const BddEnc_ptr self,
 }
 
 add_ptr BddEnc_expr_to_add(BddEnc_ptr self, const Expr_ptr expr,
-                           const node_ptr context)
-{
+                           const node_ptr context) {
   AddArray_ptr array;
   add_ptr add;
   OptsHandler_ptr opts;
@@ -701,21 +637,20 @@ add_ptr BddEnc_expr_to_add(BddEnc_ptr self, const Expr_ptr expr,
 
   array = bdd_enc_eval(self, expr, context);
 
-  add = AddArray_get_add(array);/* array must contain only one element */
+  add = AddArray_get_add(array); /* array must contain only one element */
   add_ref(add);
   AddArray_destroy(self->dd, array);
 
   /* check for absence of FAILURE node in the expression if needed */
-  if (find_assoc(self->failures_hash, (node_ptr) add) == (node_ptr) NULL) {
+  if (find_assoc(self->failures_hash, (node_ptr)add) == (node_ptr)NULL) {
     add_walkleaves(self->dd, bdd_enc_failure_node_check, add);
-    insert_assoc(self->failures_hash, (node_ptr) add_dup(add),
-                 (node_ptr) true);
+    insert_assoc(self->failures_hash, (node_ptr)add_dup(add), (node_ptr) true);
   }
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_nlog(logger, wffprint, "size of %N = %d ADD nodes\n",
-                expr, add_size(self->dd, add));
+    Logger_nlog(logger, wffprint, "size of %N = %d ADD nodes\n", expr,
+                add_size(self->dd, add));
     Logger_dec_indent_size(logger); /* Dec 0 */
   }
 
@@ -723,8 +658,7 @@ add_ptr BddEnc_expr_to_add(BddEnc_ptr self, const Expr_ptr expr,
 }
 
 AddArray_ptr BddEnc_expr_to_addarray(BddEnc_ptr self, const Expr_ptr expr,
-                                     const node_ptr context)
-{
+                                     const node_ptr context) {
   AddArray_ptr result;
 
   BDD_ENC_CHECK_INSTANCE(self);
@@ -735,8 +669,7 @@ AddArray_ptr BddEnc_expr_to_addarray(BddEnc_ptr self, const Expr_ptr expr,
 }
 
 bdd_ptr BddEnc_expr_to_bdd(BddEnc_ptr self, const Expr_ptr expr,
-                           const node_ptr context)
-{
+                           const node_ptr context) {
   bdd_ptr res;
   add_ptr tmp;
 
@@ -747,14 +680,13 @@ bdd_ptr BddEnc_expr_to_bdd(BddEnc_ptr self, const Expr_ptr expr,
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-    CATCH(errmgr) {
-      res = add_to_bdd(self->dd, tmp);
-    }
+    CATCH(errmgr) { res = add_to_bdd(self->dd, tmp); }
     FAIL(errmgr) {
-      ErrorMgr_internal_error(errmgr, "BddEnc_expr_to_bdd: cannot convert non-propositional" \
-                              " expression\n");
+      ErrorMgr_internal_error(
+          errmgr, "BddEnc_expr_to_bdd: cannot convert non-propositional"
+                  " expression\n");
     }
   }
 
@@ -763,14 +695,13 @@ bdd_ptr BddEnc_expr_to_bdd(BddEnc_ptr self, const Expr_ptr expr,
 }
 
 node_ptr BddEnc_add_to_expr(BddEnc_ptr self, const add_ptr add,
-                            SymbLayer_ptr det_layer)
-{
+                            SymbLayer_ptr det_layer) {
   node_ptr result;
 
   hash_ptr lc = st_init_table(st_ptrcmp, st_ptrhash);
 
   BDD_ENC_CHECK_INSTANCE(self);
-  nusmv_assert(lc != (hash_ptr) NULL);
+  nusmv_assert(lc != (hash_ptr)NULL);
 
   /* If dynamic reordering is enabled, it is temporarily disabled */
   bdd_enc_lock_reordering(self);
@@ -782,14 +713,13 @@ node_ptr BddEnc_add_to_expr(BddEnc_ptr self, const add_ptr add,
 }
 
 node_ptr BddEnc_add_to_scalar_expr(BddEnc_ptr self, const add_ptr add,
-                                   SymbLayer_ptr det_layer)
-{
+                                   SymbLayer_ptr det_layer) {
   node_ptr result;
 
   hash_ptr lc = st_init_table(st_ptrcmp, st_ptrhash);
 
   BDD_ENC_CHECK_INSTANCE(self);
-  nusmv_assert(lc != (hash_ptr) NULL);
+  nusmv_assert(lc != (hash_ptr)NULL);
 
   /* If dynamic reordering is enabled, it is temporarily disabled */
   bdd_enc_lock_reordering(self);
@@ -800,8 +730,7 @@ node_ptr BddEnc_add_to_scalar_expr(BddEnc_ptr self, const add_ptr add,
   return result;
 }
 
-node_ptr BddEnc_bdd_to_expr(BddEnc_ptr self, const bdd_ptr bdd)
-{
+node_ptr BddEnc_bdd_to_expr(BddEnc_ptr self, const bdd_ptr bdd) {
   node_ptr res;
   add_ptr add;
 
@@ -818,44 +747,39 @@ node_ptr BddEnc_bdd_to_expr(BddEnc_ptr self, const bdd_ptr bdd)
 }
 
 add_ptr BddEnc_state_var_to_next_state_var_add(const BddEnc_ptr self,
-                                               add_ptr add)
-{
+                                               add_ptr add) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return add_permute(self->dd, add, array_fetch_p(int, self->current2next, 0));
 }
 
 add_ptr BddEnc_next_state_var_to_state_var_add(const BddEnc_ptr self,
-                                               add_ptr add)
-{
+                                               add_ptr add) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return add_permute(self->dd, add, array_fetch_p(int, self->next2current, 0));
 }
 
-bdd_ptr BddEnc_state_var_to_next_state_var(const BddEnc_ptr self, bdd_ptr bdd)
-{
+bdd_ptr BddEnc_state_var_to_next_state_var(const BddEnc_ptr self, bdd_ptr bdd) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return bdd_permute(self->dd, bdd, array_fetch_p(int, self->current2next, 0));
 }
 
-bdd_ptr BddEnc_next_state_var_to_state_var(const BddEnc_ptr self, bdd_ptr bdd)
-{
+bdd_ptr BddEnc_next_state_var_to_state_var(const BddEnc_ptr self, bdd_ptr bdd) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return bdd_permute(self->dd, bdd, array_fetch_p(int, self->next2current, 0));
 }
 
 void BddEnc_print_bdd_begin(BddEnc_ptr self, NodeList_ptr symbols,
-                            boolean changes_only)
-{
-  BddEncPrintInfo* info;
+                            boolean changes_only) {
+  BddEncPrintInfo *info;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
   info = ALLOC(BddEncPrintInfo, 1);
-  nusmv_assert(info != (BddEncPrintInfo*) NULL);
+  nusmv_assert(info != (BddEncPrintInfo *)NULL);
 
   info->hash = new_assoc();
   info->symbols = symbols;
@@ -863,19 +787,16 @@ void BddEnc_print_bdd_begin(BddEnc_ptr self, NodeList_ptr symbols,
 
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-    self->print_stack = cons(nodemgr,  (node_ptr) info, self->print_stack);
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    self->print_stack = cons(nodemgr, (node_ptr)info, self->print_stack);
   }
 }
 
-void BddEnc_print_bdd_end(BddEnc_ptr self)
-{
+void BddEnc_print_bdd_end(BddEnc_ptr self) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  BddEncPrintInfo* info;
+  BddEncPrintInfo *info;
   node_ptr curr;
 
   BDD_ENC_CHECK_INSTANCE(self);
@@ -884,29 +805,26 @@ void BddEnc_print_bdd_end(BddEnc_ptr self)
   curr = self->print_stack;
   self->print_stack = cdr(curr);
 
-  info = ( BddEncPrintInfo*) car(curr);
-  nusmv_assert(info != (BddEncPrintInfo*) NULL);
+  info = (BddEncPrintInfo *)car(curr);
+  nusmv_assert(info != (BddEncPrintInfo *)NULL);
 
-  clear_assoc_and_free_entries_arg(info->hash, hash_node_free, (char*)nodemgr);
+  clear_assoc_and_free_entries_arg(info->hash, hash_node_free, (char *)nodemgr);
   free_assoc(info->hash);
   FREE(info);
   free_node(nodemgr, curr);
 }
 
-int BddEnc_print_bdd(BddEnc_ptr self, bdd_ptr bdd,
-                     VPFBEFNNV p_fun, OStream_ptr file, void* arg)
-{
+int BddEnc_print_bdd(BddEnc_ptr self, bdd_ptr bdd, VPFBEFNNV p_fun,
+                     OStream_ptr file, void *arg) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  BddEncPrintInfo* info;
+  BddEncPrintInfo *info;
   node_ptr iter;
   node_ptr valueList;
   int count;
-
 
   BDD_ENC_CHECK_INSTANCE(self);
   nusmv_assert(self->print_stack != Nil); /*print_bdd_begin previously called*/
@@ -916,10 +834,10 @@ int BddEnc_print_bdd(BddEnc_ptr self, bdd_ptr bdd,
     return 0;
   }
 
-  info = ( BddEncPrintInfo*) car(self->print_stack);
+  info = (BddEncPrintInfo *)car(self->print_stack);
 
-  valueList = BddEnc_assign_symbols(self, bdd, info->symbols,
-                                    false, (bdd_ptr*)NULL);
+  valueList =
+      BddEnc_assign_symbols(self, bdd, info->symbols, false, (bdd_ptr *)NULL);
 
   for (count = 0, iter = valueList; iter != Nil; iter = cdr(iter)) {
     node_ptr cur_sym = car(car(iter));
@@ -927,11 +845,12 @@ int BddEnc_print_bdd(BddEnc_ptr self, bdd_ptr bdd,
 
     /* if required, print only symbols with changed values */
     if (info->changes_only) {
-      if (cur_sym_value == find_assoc(info->hash, cur_sym)) continue;
+      if (cur_sym_value == find_assoc(info->hash, cur_sym))
+        continue;
       insert_assoc(info->hash, cur_sym, cur_sym_value);
     }
 
-    if (p_fun == (VPFBEFNNV) NULL) {
+    if (p_fun == (VPFBEFNNV)NULL) {
       /* Default printing */
       OStream_nprintf(file, wffprint, "%N = %N\n", cur_sym, cur_sym_value);
     } else {
@@ -948,12 +867,9 @@ int BddEnc_print_bdd(BddEnc_ptr self, bdd_ptr bdd,
 }
 
 void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
-                                boolean changes_only,
-                                boolean show_defines,
-                                VPFBEFNNV p_fun,
-                                OStream_ptr file, void* arg)
-{
-  bdd_ptr* array;
+                                boolean changes_only, boolean show_defines,
+                                VPFBEFNNV p_fun, OStream_ptr file, void *arg) {
+  bdd_ptr *array;
   int j;
   size_t array_size;
   double tmp_array_size;
@@ -979,7 +895,7 @@ void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
   array_size = (size_t)tmp_array_size;
   array = ALLOC(bdd_ptr, array_size);
 
-  nusmv_assert(array != (bdd_ptr*) NULL);
+  nusmv_assert(array != (bdd_ptr *)NULL);
 
   res = BddEnc_pick_all_terms_states(self, states, array, array_size);
 
@@ -987,8 +903,8 @@ void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
 
   /* Retrieve the vars list from committed layers */
   {
-    const array_t* layer_names;
-    const char* layer_name;
+    const array_t *layer_names;
+    const char *layer_name;
     int i;
 
     SymbTableIter sfiter;
@@ -1004,7 +920,7 @@ void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
 
       node_ptr symbol = SymbTable_iter_get_symbol(st, &sfiter);
 
-      arrayForEachItem(const char*, layer_names, i, layer_name) {
+      arrayForEachItem(const char *, layer_names, i, layer_name) {
         SymbLayer_ptr layer;
 
         layer = SymbTable_get_layer(BASE_ENC(self)->symb_table, layer_name);
@@ -1016,8 +932,7 @@ void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
             if (show_defines) {
               NodeList_append(committed_vars, symbol);
             }
-          }
-          else {
+          } else {
             BoolEnc_ptr bool_enc;
 
             nusmv_assert(SymbTable_is_symbol_var(st, symbol));
@@ -1037,8 +952,8 @@ void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
   BddEnc_print_bdd_begin(self, committed_vars, changes_only);
 
   OStream_inc_indent_size(file);
-  for (j=0; j < array_size; ++j) {
-    OStream_printf(file, "------- State %4.d ------\n", j+1);
+  for (j = 0; j < array_size; ++j) {
+    OStream_printf(file, "------- State %4.d ------\n", j + 1);
 
     BddEnc_print_bdd(self, array[j], p_fun, file, arg);
     bdd_free(self->dd, array[j]);
@@ -1054,9 +969,8 @@ void BddEnc_print_set_of_states(BddEnc_ptr self, bdd_ptr states,
 
 void BddEnc_print_set_of_inputs(BddEnc_ptr self, bdd_ptr inputs,
                                 boolean changes_only, VPFBEFNNV p_fun,
-                                OStream_ptr file, void* arg)
-{
-  bdd_ptr* array;
+                                OStream_ptr file, void *arg) {
+  bdd_ptr *array;
   int array_size, j;
   boolean res;
   NodeList_ptr input_list;
@@ -1069,7 +983,7 @@ void BddEnc_print_set_of_inputs(BddEnc_ptr self, bdd_ptr inputs,
 
   array_size = BddEnc_count_inputs_of_bdd(self, inputs);
   array = ALLOC(bdd_ptr, array_size);
-  nusmv_assert(array != (bdd_ptr*) NULL);
+  nusmv_assert(array != (bdd_ptr *)NULL);
 
   res = BddEnc_pick_all_terms_inputs(self, inputs, array, array_size);
   nusmv_assert(!res); /* an error occurred */
@@ -1080,8 +994,8 @@ void BddEnc_print_set_of_inputs(BddEnc_ptr self, bdd_ptr inputs,
   BddEnc_print_bdd_begin(self, input_list, changes_only);
 
   OStream_inc_indent_size(file);
-  for (j=0; j < array_size; ++j) {
-    OStream_printf(file, "------- Input %4.d ------\n", j+1);
+  for (j = 0; j < array_size; ++j) {
+    OStream_printf(file, "------- Input %4.d ------\n", j + 1);
 
     BddEnc_print_bdd(self, array[j], p_fun, file, arg);
     bdd_free(self->dd, array[j]);
@@ -1094,13 +1008,12 @@ void BddEnc_print_set_of_inputs(BddEnc_ptr self, bdd_ptr inputs,
   FREE(array);
 }
 
-void BddEnc_print_set_of_state_input_pairs (BddEnc_ptr self,
-                                            bdd_ptr state_input_pairs,
-                                            boolean changes_only,
-                                            VPFBEFNNV p_fun,
-                                            OStream_ptr file, void* arg)
-{
-  bdd_ptr* array;
+void BddEnc_print_set_of_state_input_pairs(BddEnc_ptr self,
+                                           bdd_ptr state_input_pairs,
+                                           boolean changes_only,
+                                           VPFBEFNNV p_fun, OStream_ptr file,
+                                           void *arg) {
+  bdd_ptr *array;
   int j;
   double tmp_array_size;
   size_t array_size;
@@ -1122,17 +1035,18 @@ void BddEnc_print_set_of_state_input_pairs (BddEnc_ptr self,
 
   nusmv_assert(tmp_array_size >= 0);
 
-  if (is_max_elements_printable_exceeded(streams, tmp_array_size, "transitions")) {
+  if (is_max_elements_printable_exceeded(streams, tmp_array_size,
+                                         "transitions")) {
     return;
   }
 
   array_size = (size_t)tmp_array_size;
   array = ALLOC(bdd_ptr, array_size);
 
-  nusmv_assert(array != (bdd_ptr*) NULL);
+  nusmv_assert(array != (bdd_ptr *)NULL);
 
-  res = BddEnc_pick_all_terms_states_inputs(self, state_input_pairs,
-                                            array, array_size);
+  res = BddEnc_pick_all_terms_states_inputs(self, state_input_pairs, array,
+                                            array_size);
   nusmv_assert(!res); /* an error occurred */
 
   SymbTable_gen_iter(st, &iter, STT_STATE_VAR | STT_FROZEN_VAR);
@@ -1143,8 +1057,8 @@ void BddEnc_print_set_of_state_input_pairs (BddEnc_ptr self,
 
   OStream_inc_indent_size(file);
   BddEnc_print_bdd_begin(self, states, changes_only);
-  for (j=0; j < array_size; ++j) {
-    OStream_printf(file, "------- State-Input Pair %4.d ------\n", j+1);
+  for (j = 0; j < array_size; ++j) {
+    OStream_printf(file, "------- State-Input Pair %4.d ------\n", j + 1);
 
     /* prints the set of states... */
     BddEnc_print_bdd(self, array[j], p_fun, file, arg);
@@ -1168,13 +1082,11 @@ void BddEnc_print_set_of_state_input_pairs (BddEnc_ptr self,
 }
 
 void BddEnc_print_set_of_trans_models(BddEnc_ptr self, bdd_ptr bdd_to_print,
-                                      OStream_ptr file)
-{
+                                      OStream_ptr file) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   bdd_ptr bdd;
   NodeList_ptr vars_list;
@@ -1182,17 +1094,16 @@ void BddEnc_print_set_of_trans_models(BddEnc_ptr self, bdd_ptr bdd_to_print,
   SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(self));
   DDMgr_ptr dd = BddEnc_get_dd_manager(self);
 
-
   if (bdd_is_false(dd, bdd_to_print)) {
     OStream_printf(file, "-- The BDD is the constant 0\n");
     return;
   }
 
-  vars_list = SymbTable_get_layers_sf_i_vars(st,
-                SymbTable_get_class_layer_names(st, (const char*) NULL));
+  vars_list = SymbTable_get_layers_sf_i_vars(
+      st, SymbTable_get_class_layer_names(st, (const char *)NULL));
 
-  sv_list = SymbTable_get_layers_sf_vars(st,
-                SymbTable_get_class_layer_names(st, (const char*) NULL));
+  sv_list = SymbTable_get_layers_sf_vars(
+      st, SymbTable_get_class_layer_names(st, (const char *)NULL));
 
   { /* We append next variables */
     ListIter_ptr iter;
@@ -1210,14 +1121,13 @@ void BddEnc_print_set_of_trans_models(BddEnc_ptr self, bdd_ptr bdd_to_print,
 
   do {
     bdd_ptr bdd_of_assigns, tmp;
-    node_ptr varValueList = BddEnc_assign_symbols(self, bdd, vars_list,
-                                                  true, &bdd_of_assigns);
+    node_ptr varValueList =
+        BddEnc_assign_symbols(self, bdd, vars_list, true, &bdd_of_assigns);
 
     {
       node_ptr l;
       for (l = varValueList; Nil != l; l = cdr(l)) {
-        OStream_nprintf(file, wffprint, "%N = %N\t",
-                        car(car(l)), cdr(car(l)));
+        OStream_nprintf(file, wffprint, "%N = %N\t", car(car(l)), cdr(car(l)));
       }
       OStream_printf(file, "\n");
     }
@@ -1233,13 +1143,10 @@ void BddEnc_print_set_of_trans_models(BddEnc_ptr self, bdd_ptr bdd_to_print,
 }
 
 node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
-                               NodeList_ptr symbols,
-                               boolean onlyRequiredSymbs,
-                               bdd_ptr* resultAssignment)
-{
+                               NodeList_ptr symbols, boolean onlyRequiredSymbs,
+                               bdd_ptr *resultAssignment) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   node_ptr returnList = Nil;
   add_ptr add;
   hash_ptr cache;
@@ -1255,7 +1162,8 @@ node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
   add = bdd_to_add(self->dd, bdd);
   bdd_free(self->dd, bdd);
 
-  if (resultAssignment != (bdd_ptr*)NULL) *resultAssignment = bdd_true(self->dd);
+  if (resultAssignment != (bdd_ptr *)NULL)
+    *resultAssignment = bdd_true(self->dd);
 
   NODE_LIST_FOREACH(symbols, iter) {
     node_ptr sym = NodeList_get_elem_at(symbols, iter);
@@ -1267,20 +1175,19 @@ node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
     /* obtain the type */
     if (SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, sym_cleaned)) {
       type = SymbTable_get_var_type(BASE_ENC(self)->symb_table, sym_cleaned);
-    }
-    else if (SymbTable_is_symbol_define(BASE_ENC(self)->symb_table, sym_cleaned)) {
-      type = TypeChecker_get_expression_type(self->type_checker, sym_cleaned, Nil);
+    } else if (SymbTable_is_symbol_define(BASE_ENC(self)->symb_table,
+                                          sym_cleaned)) {
+      type =
+          TypeChecker_get_expression_type(self->type_checker, sym_cleaned, Nil);
       nusmv_assert(!SymbType_is_error(type)); /* cannot be an type error */
-    }
-    else {
+    } else {
       error_unreachable_code(); /* how the type may be not known ? */
       type = SYMB_TYPE(NULL);
     }
 
     /* check that sym is not a non-encodable symbol (like a real,
        string or integer) */
-    if (!Compile_is_expr_booleanizable(BASE_ENC(self)->symb_table,
-                                       sym_cleaned,
+    if (!Compile_is_expr_booleanizable(BASE_ENC(self)->symb_table, sym_cleaned,
                                        false, cache)) {
       continue; /* skip this var */
     }
@@ -1290,7 +1197,8 @@ node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
       add_ptr support = add_support(self->dd, add);
       boolean printVar = BddEnc_is_var_in_cube(self, sym, support);
       add_free(self->dd, support);
-      if (!printVar) continue; /* skip this var */
+      if (!printVar)
+        continue; /* skip this var */
     }
 
     sym_add = bdd_enc_eval(self, sym, Nil);
@@ -1300,45 +1208,53 @@ node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
     */
     if (SymbType_is_word(type)) {
       const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-      const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+      const ExprMgr_ptr exprs =
+          EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
       const WordNumberMgr_ptr words =
-        WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+          WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
       int width = AddArray_get_size(sym_add);
-      WordNumber_ptr one = WordNumberMgr_integer_to_word_number(words, 1, width);
-      WordNumber_ptr result = WordNumberMgr_integer_to_word_number(words, 0, width);
+      WordNumber_ptr one =
+          WordNumberMgr_integer_to_word_number(words, 1, width);
+      WordNumber_ptr result =
+          WordNumberMgr_integer_to_word_number(words, 0, width);
 
       /* number of bits in ADD should be equal to number of bits in the type */
-      nusmv_assert(width == SymbType_get_word_width(type) && width >0);
+      nusmv_assert(width == SymbType_get_word_width(type) && width > 0);
 
       /* compute the Word value from bits */
-      for (--width; width >=0; --width) {
-        add_ptr tmp_add = add_if_then(self->dd, add,
-                                      AddArray_get_n(sym_add, width));
+      for (--width; width >= 0; --width) {
+        add_ptr tmp_add =
+            add_if_then(self->dd, add, AddArray_get_n(sym_add, width));
         node_ptr bit = add_value(self->dd, tmp_add);
         add_free(self->dd, tmp_add);
 
         /* the value of a bit can be 0 or 1 only */
-        nusmv_assert(ExprMgr_is_true(exprs, bit) || ExprMgr_is_false(exprs, bit));
+        nusmv_assert(ExprMgr_is_true(exprs, bit) ||
+                     ExprMgr_is_false(exprs, bit));
 
         /* words with width 1 cannot be shifted at all */
         if (WordNumber_get_width(result) != 1) {
           result = WordNumberMgr_left_shift(words, result, 1);
         }
         /* add the bit to the result */
-        if (ExprMgr_is_true(exprs, bit)) result = WordNumberMgr_plus(words, result, one);
+        if (ExprMgr_is_true(exprs, bit))
+          result = WordNumberMgr_plus(words, result, one);
       } /* for */
 
-      sym_value = find_node(nodemgr, SymbType_is_signed_word(type)
-                            ? NUMBER_SIGNED_WORD : NUMBER_UNSIGNED_WORD,
-                            (node_ptr)result, Nil);
+      sym_value =
+          find_node(nodemgr,
+                    SymbType_is_signed_word(type) ? NUMBER_SIGNED_WORD
+                                                  : NUMBER_UNSIGNED_WORD,
+                    (node_ptr)result, Nil);
     }
     /* Else this is a symbol with non-Word type, i.e. it can have only one usual
        ADD, not array.
     */
     else {
       /* sym_add must have only one element in the array */
-      add_ptr add_values = add_if_then(self->dd, add, AddArray_get_add(sym_add));
+      add_ptr add_values =
+          add_if_then(self->dd, add, AddArray_get_add(sym_add));
       sym_value = add_value(self->dd, add_values);
       add_free(self->dd, add_values);
     }
@@ -1351,7 +1267,7 @@ node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
     TypeChecker_is_expression_wellformed(self->type_checker, sym_value, Nil);
 
     /* collect the obtained assignment in BDD if it is required */
-    if (resultAssignment != (bdd_ptr*)NULL) {
+    if (resultAssignment != (bdd_ptr *)NULL) {
       bdd_ptr eq = BddEnc_expr_to_bdd(self, sym_value, Nil);
       bdd_and_accumulate(self->dd, resultAssignment, eq);
       bdd_free(self->dd, eq);
@@ -1371,9 +1287,7 @@ node_ptr BddEnc_assign_symbols(BddEnc_ptr self, bdd_ptr bdd,
 }
 
 void BddEnc_print_vars_in_cube(BddEnc_ptr self, bdd_ptr cube,
-                               node_ptr list_of_sym,
-                               OStream_ptr file)
-{
+                               node_ptr list_of_sym, OStream_ptr file) {
   node_ptr los;
   add_ptr add_cube;
   NuSMVEnv_ptr env;
@@ -1406,15 +1320,12 @@ void BddEnc_print_vars_in_cube(BddEnc_ptr self, bdd_ptr cube,
   } /* while loop */
 
   add_free(self->dd, add_cube);
-  OStream_printf(file,"\n");
+  OStream_printf(file, "\n");
 }
 
-
-NodeList_ptr BddEnc_get_vars_in_cube(const BddEnc_ptr self,
-                                     bdd_ptr cube,
+NodeList_ptr BddEnc_get_vars_in_cube(const BddEnc_ptr self, bdd_ptr cube,
                                      node_ptr list_of_sym,
-                                     boolean include_next)
-{
+                                     boolean include_next) {
   node_ptr los;
   add_ptr add_cube;
   NuSMVEnv_ptr env;
@@ -1445,30 +1356,27 @@ NodeList_ptr BddEnc_get_vars_in_cube(const BddEnc_ptr self,
   return result;
 }
 
-
-array_t*
-BddEnc_ComputePrimeImplicants(BddEnc_ptr self, const array_t* layer_names,
-                              bdd_ptr formula)
-{
+array_t *BddEnc_ComputePrimeImplicants(BddEnc_ptr self,
+                                       const array_t *layer_names,
+                                       bdd_ptr formula) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   int i;
   bdd_ptr fbdd, bddprime, mask;
-  array_t * primes, *result;
+  array_t *primes, *result;
   NodeList_ptr syms, syms2;
 
   /* Extracting state and input symbols declared in the layers */
   syms = SymbTable_get_layers_sf_i_symbols(
-                      BaseEnc_get_symb_table(BASE_ENC(self)), layer_names);
+      BaseEnc_get_symb_table(BASE_ENC(self)), layer_names);
   syms2 = SymbTable_get_layers_sf_symbols(
-                      BaseEnc_get_symb_table(BASE_ENC(self)), layer_names);
+      BaseEnc_get_symb_table(BASE_ENC(self)), layer_names);
   NodeList_concat(syms, syms2);
   NodeList_destroy(syms2);
-  syms2 = SymbTable_get_layers_i_symbols(
-                      BaseEnc_get_symb_table(BASE_ENC(self)), layer_names);
+  syms2 = SymbTable_get_layers_i_symbols(BaseEnc_get_symb_table(BASE_ENC(self)),
+                                         layer_names);
   NodeList_concat(syms, syms2);
   NodeList_destroy(syms2);
 
@@ -1504,20 +1412,23 @@ BddEnc_ComputePrimeImplicants(BddEnc_ptr self, const array_t* layer_names,
         AddArray_ptr sym_add;
         node_ptr sym_value;
 
-        nusmv_assert(SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, sym_cleaned));
+        nusmv_assert(
+            SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, sym_cleaned));
         type = SymbTable_get_var_type(BASE_ENC(self)->symb_table, sym_cleaned);
         sym_add = bdd_enc_eval(self, sym, Nil);
 
         if (SymbType_is_word(type)) {
-          ErrorMgr_internal_error(errmgr, "BddEnc_ComputePrimeImplicants: words not yet handled\n");
-        }
-        else {
+          ErrorMgr_internal_error(
+              errmgr, "BddEnc_ComputePrimeImplicants: words not yet handled\n");
+        } else {
           /* sym_add must have only one element in the array */
-          add_ptr add_values = add_if_then(self->dd, addprime, AddArray_get_add(sym_add));
+          add_ptr add_values =
+              add_if_then(self->dd, addprime, AddArray_get_add(sym_add));
           sym_value = add_value(self->dd, add_values);
           add_free(self->dd, add_values);
         }
-        listpair = cons(nodemgr, find_node(nodemgr, COLON, sym, sym_value), listpair);
+        listpair =
+            cons(nodemgr, find_node(nodemgr, COLON, sym, sym_value), listpair);
 
         AddArray_destroy(self->dd, sym_add);
       }
@@ -1539,125 +1450,111 @@ BddEnc_ComputePrimeImplicants(BddEnc_ptr self, const array_t* layer_names,
   return result;
 }
 
-double BddEnc_count_states_of_add(const BddEnc_ptr self, add_ptr add)
-{
+double BddEnc_count_states_of_add(const BddEnc_ptr self, add_ptr add) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return add_count_minterm(self->dd, add,
                            (self->state_vars_num / 2) + self->frozen_vars_num);
 }
 
-double BddEnc_count_states_of_bdd(const BddEnc_ptr self, bdd_ptr bdd)
-{
+double BddEnc_count_states_of_bdd(const BddEnc_ptr self, bdd_ptr bdd) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return bdd_count_minterm(self->dd, bdd,
                            (self->state_vars_num / 2) + self->frozen_vars_num);
 }
 
-double BddEnc_count_inputs_of_bdd(const BddEnc_ptr self, bdd_ptr bdd)
-{
+double BddEnc_count_inputs_of_bdd(const BddEnc_ptr self, bdd_ptr bdd) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return bdd_count_minterm(self->dd, bdd, self->input_vars_num);
 }
 
-double BddEnc_count_states_inputs_of_bdd(const BddEnc_ptr self, bdd_ptr bdd)
-{
+double BddEnc_count_states_inputs_of_bdd(const BddEnc_ptr self, bdd_ptr bdd) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return bdd_count_minterm(self->dd, bdd,
-                           self->input_vars_num +
-                           self->frozen_vars_num +
-                           (self->state_vars_num / 2));
+                           self->input_vars_num + self->frozen_vars_num +
+                               (self->state_vars_num / 2));
 }
 
-double BddEnc_get_minterms_of_add(const BddEnc_ptr self, add_ptr add)
-{
+double BddEnc_get_minterms_of_add(const BddEnc_ptr self, add_ptr add) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return add_count_minterm(self->dd, add,
                            self->minterm_state_frozen_input_vars_dim);
 }
 
-double BddEnc_get_minterms_of_bdd(const BddEnc_ptr self, bdd_ptr bdd)
-{
+double BddEnc_get_minterms_of_bdd(const BddEnc_ptr self, bdd_ptr bdd) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   return bdd_count_minterm(self->dd, bdd,
                            self->minterm_state_frozen_input_vars_dim);
 }
 
-bdd_ptr BddEnc_pick_one_state(const BddEnc_ptr self, bdd_ptr states)
-{
+bdd_ptr BddEnc_pick_one_state(const BddEnc_ptr self, bdd_ptr states) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  return bdd_pick_one_minterm(self->dd, states,
-                              array_fetch_p(bdd_ptr, self->minterm_state_frozen_vars, 0),
-                              self->minterm_state_frozen_vars_dim);
+  return bdd_pick_one_minterm(
+      self->dd, states,
+      array_fetch_p(bdd_ptr, self->minterm_state_frozen_vars, 0),
+      self->minterm_state_frozen_vars_dim);
 }
 
-bdd_ptr BddEnc_pick_one_input(const BddEnc_ptr self, bdd_ptr inputs)
-{
+bdd_ptr BddEnc_pick_one_input(const BddEnc_ptr self, bdd_ptr inputs) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  return bdd_pick_one_minterm(self->dd, inputs,
-                              array_fetch_p(bdd_ptr, self->minterm_input_vars, 0),
-                              self->minterm_input_vars_dim);
+  return bdd_pick_one_minterm(
+      self->dd, inputs, array_fetch_p(bdd_ptr, self->minterm_input_vars, 0),
+      self->minterm_input_vars_dim);
 }
 
-bdd_ptr BddEnc_pick_one_input_state(const BddEnc_ptr self, bdd_ptr inputs_states)
-{
+bdd_ptr BddEnc_pick_one_input_state(const BddEnc_ptr self,
+                                    bdd_ptr inputs_states) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  return bdd_pick_one_minterm(self->dd, inputs_states,
-                              array_fetch_p(bdd_ptr, self->minterm_state_frozen_input_vars, 0),
-                              self->minterm_state_frozen_input_vars_dim);
+  return bdd_pick_one_minterm(
+      self->dd, inputs_states,
+      array_fetch_p(bdd_ptr, self->minterm_state_frozen_input_vars, 0),
+      self->minterm_state_frozen_input_vars_dim);
 }
 
-boolean BddEnc_pick_all_terms_states_inputs(const BddEnc_ptr self,
-                                            bdd_ptr bdd,
-                                            bdd_ptr* result_array,
-                                            const int array_len)
-{
+boolean BddEnc_pick_all_terms_states_inputs(const BddEnc_ptr self, bdd_ptr bdd,
+                                            bdd_ptr *result_array,
+                                            const int array_len) {
   int res = 1;
   BDD_ENC_CHECK_INSTANCE(self);
 
   if (self->minterm_state_frozen_input_vars_dim > 0) {
-    res = bdd_pick_all_terms(self->dd, bdd,
-                             array_fetch_p(bdd_ptr, self->minterm_state_frozen_input_vars, 0),
-                             self->minterm_state_frozen_input_vars_dim,
-                             result_array, array_len);
+    res = bdd_pick_all_terms(
+        self->dd, bdd,
+        array_fetch_p(bdd_ptr, self->minterm_state_frozen_input_vars, 0),
+        self->minterm_state_frozen_input_vars_dim, result_array, array_len);
   }
   return res == 1;
 }
 
 boolean BddEnc_pick_all_terms_states(const BddEnc_ptr self, bdd_ptr bdd,
-                                     bdd_ptr* result_array,
-                                     const int array_len)
-{
+                                     bdd_ptr *result_array,
+                                     const int array_len) {
   BDD_ENC_CHECK_INSTANCE(self);
 
   if (self->minterm_state_frozen_vars_dim > 0) {
     int res;
 
-    res = bdd_pick_all_terms(self->dd, bdd,
-                             array_fetch_p(bdd_ptr,
-                                           self->minterm_state_frozen_vars,
-                                           0),
-                             self->minterm_state_frozen_vars_dim,
-                             result_array,
-                             array_len);
+    res = bdd_pick_all_terms(
+        self->dd, bdd,
+        array_fetch_p(bdd_ptr, self->minterm_state_frozen_vars, 0),
+        self->minterm_state_frozen_vars_dim, result_array, array_len);
     return res == 1;
-  }
-  else {
+  } else {
     int i;
 
     /*
       We have no varibles, therefore we reference a bdd_true for each
       state
     */
-    for (i = 0; i<array_len; i++) {
+    for (i = 0; i < array_len; i++) {
       result_array[i] = bdd_true(self->dd);
     }
 
@@ -1666,74 +1563,68 @@ boolean BddEnc_pick_all_terms_states(const BddEnc_ptr self, bdd_ptr bdd,
 }
 
 boolean BddEnc_pick_all_terms_inputs(const BddEnc_ptr self, bdd_ptr bdd,
-                                     bdd_ptr* result_array,
-                                     const int array_len)
-{
+                                     bdd_ptr *result_array,
+                                     const int array_len) {
   int res = 1;
   BDD_ENC_CHECK_INSTANCE(self);
 
   if (self->minterm_input_vars_dim > 0) {
-    res = bdd_pick_all_terms(self->dd, bdd,
-                             array_fetch_p(bdd_ptr, self->minterm_input_vars, 0),
-                             self->minterm_input_vars_dim,
-                             result_array, array_len);
+    res = bdd_pick_all_terms(
+        self->dd, bdd, array_fetch_p(bdd_ptr, self->minterm_input_vars, 0),
+        self->minterm_input_vars_dim, result_array, array_len);
   }
   return res == 1;
 }
 
-bdd_ptr BddEnc_pick_one_state_rand(const BddEnc_ptr self, bdd_ptr states)
-{
+bdd_ptr BddEnc_pick_one_state_rand(const BddEnc_ptr self, bdd_ptr states) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  return bdd_pick_one_minterm_rand(self->dd, states,
-                                   array_fetch_p(bdd_ptr, self->minterm_state_frozen_vars, 0),
-                                   self->minterm_state_frozen_vars_dim);
+  return bdd_pick_one_minterm_rand(
+      self->dd, states,
+      array_fetch_p(bdd_ptr, self->minterm_state_frozen_vars, 0),
+      self->minterm_state_frozen_vars_dim);
 }
 
-bdd_ptr BddEnc_pick_one_input_rand(const BddEnc_ptr self, bdd_ptr inputs)
-{
+bdd_ptr BddEnc_pick_one_input_rand(const BddEnc_ptr self, bdd_ptr inputs) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  return bdd_pick_one_minterm_rand(self->dd, inputs,
-                                   array_fetch_p(bdd_ptr, self->minterm_input_vars, 0),
-                                   self->minterm_input_vars_dim);
+  return bdd_pick_one_minterm_rand(
+      self->dd, inputs, array_fetch_p(bdd_ptr, self->minterm_input_vars, 0),
+      self->minterm_input_vars_dim);
 }
 
 bdd_ptr BddEnc_pick_one_input_state_rand(const BddEnc_ptr self,
-                                         bdd_ptr inputs_states)
-{
+                                         bdd_ptr inputs_states) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  return bdd_pick_one_minterm_rand(self->dd, inputs_states,
-                                   array_fetch_p(bdd_ptr, self->minterm_state_frozen_input_vars, 0),
-                                   self->minterm_state_frozen_input_vars_dim);
+  return bdd_pick_one_minterm_rand(
+      self->dd, inputs_states,
+      array_fetch_p(bdd_ptr, self->minterm_state_frozen_input_vars, 0),
+      self->minterm_state_frozen_input_vars_dim);
 }
 
-node_ptr BddEnc_get_var_name_from_index(const BddEnc_ptr self, int index)
-{
+node_ptr BddEnc_get_var_name_from_index(const BddEnc_ptr self, int index) {
   BDD_ENC_CHECK_INSTANCE(self);
   nusmv_assert((index >= 0) && (index < array_n(self->index2name)));
 
   return array_fetch(node_ptr, self->index2name, index);
 }
 
-boolean BddEnc_has_var_at_index(const BddEnc_ptr self, int index)
-{
+boolean BddEnc_has_var_at_index(const BddEnc_ptr self, int index) {
   BDD_ENC_CHECK_INSTANCE(self);
   return (index >= 0) && (index < array_n(self->index2name));
 }
 
-int BddEnc_get_var_index_from_name(const BddEnc_ptr self, node_ptr name)
-{
+int BddEnc_get_var_index_from_name(const BddEnc_ptr self, node_ptr name) {
   add_ptr add;
   int res;
 
   BDD_ENC_CHECK_INSTANCE(self);
   if (NEXT != node_get_type(name)) {
     nusmv_assert(SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, name));
-  }
-  else {
-    nusmv_assert(SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, car(name)));
+  } else {
+    nusmv_assert(
+        SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, car(name)));
   }
 
 #if __BDDENC_LAZY_COMMIT_LAYER__
@@ -1741,7 +1632,7 @@ int BddEnc_get_var_index_from_name(const BddEnc_ptr self, node_ptr name)
 #else
   add = BddEncCache_lookup_boolean_var(self->cache, name);
 #endif
-  nusmv_assert(add != (add_ptr) NULL);
+  nusmv_assert(add != (add_ptr)NULL);
   /* add = BddEnc_get_symbol_add(self, name); */
 
   res = add_index(self->dd, add);
@@ -1749,8 +1640,7 @@ int BddEnc_get_var_index_from_name(const BddEnc_ptr self, node_ptr name)
   return res;
 }
 
-add_ptr BddEnc_constant_to_add(const BddEnc_ptr self, node_ptr constant)
-{
+add_ptr BddEnc_constant_to_add(const BddEnc_ptr self, node_ptr constant) {
   add_ptr add;
 
   BDD_ENC_CHECK_INSTANCE(self);
@@ -1760,33 +1650,34 @@ add_ptr BddEnc_constant_to_add(const BddEnc_ptr self, node_ptr constant)
 #else
   add = BddEncCache_lookup_constant(self->cache, constant);
 #endif
-  nusmv_assert(add != (add_ptr) NULL);
+  nusmv_assert(add != (add_ptr)NULL);
 
   return add;
 }
 
-add_ptr BddEnc_eval_sign_add(BddEnc_ptr self, add_ptr a, int flag)
-{
+add_ptr BddEnc_eval_sign_add(BddEnc_ptr self, add_ptr a, int flag) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (flag == -1) a = add_not(self->dd, a);
-  else add_ref(a);
+  if (flag == -1)
+    a = add_not(self->dd, a);
+  else
+    add_ref(a);
 
   return a;
 }
 
-bdd_ptr BddEnc_eval_sign_bdd(BddEnc_ptr self, bdd_ptr a, int flag)
-{
+bdd_ptr BddEnc_eval_sign_bdd(BddEnc_ptr self, bdd_ptr a, int flag) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (flag == -1) a = bdd_not(self->dd, a);
-  else bdd_ref(a);
+  if (flag == -1)
+    a = bdd_not(self->dd, a);
+  else
+    bdd_ref(a);
 
   return a;
 }
 
-int BddEnc_eval_num(BddEnc_ptr self, node_ptr e, node_ptr context)
-{
+int BddEnc_eval_num(BddEnc_ptr self, node_ptr e, node_ptr context) {
   node_ptr n;
   AddArray_ptr ar;
   boolean old;
@@ -1796,17 +1687,16 @@ int BddEnc_eval_num(BddEnc_ptr self, node_ptr e, node_ptr context)
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
     old = self->enforce_constant;
     self->enforce_constant = true;
 
-    CATCH(errmgr) {
-      ar = bdd_enc_eval(self, e, context);
-    }
+    CATCH(errmgr) { ar = bdd_enc_eval(self, e, context); }
     FAIL(errmgr) {
       self->enforce_constant = old;
-      ErrorMgr_rpterr(errmgr, "BddEnc_eval_num: an error occurred during evaluation.\n");
+      ErrorMgr_rpterr(
+          errmgr, "BddEnc_eval_num: an error occurred during evaluation.\n");
     }
 
     self->enforce_constant = old;
@@ -1822,8 +1712,7 @@ int BddEnc_eval_num(BddEnc_ptr self, node_ptr e, node_ptr context)
   return NODE_TO_INT(car(n));
 }
 
-add_ptr BddEnc_eval_constant(BddEnc_ptr self, Expr_ptr expr, node_ptr context)
-{
+add_ptr BddEnc_eval_constant(BddEnc_ptr self, Expr_ptr expr, node_ptr context) {
   AddArray_ptr evaluation;
   add_ptr result;
 
@@ -1835,13 +1724,13 @@ add_ptr BddEnc_eval_constant(BddEnc_ptr self, Expr_ptr expr, node_ptr context)
   self->enforce_constant = enforce_constant_saved;
   result = AddArray_get_n(evaluation, 0);
 
-  if (AddArray_get_size(evaluation)!=1 || add_isleaf(result) == 0){
+  if (AddArray_get_size(evaluation) != 1 || add_isleaf(result) == 0) {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-    ErrorMgr_internal_error(errmgr, "BddEnc_eval_constant: Evaluating a non" \
-                   " constant expression");
+    ErrorMgr_internal_error(errmgr, "BddEnc_eval_constant: Evaluating a non"
+                                    " constant expression");
   }
   add_ref(result);
   AddArray_destroy(self->dd, evaluation);
@@ -1849,8 +1738,7 @@ add_ptr BddEnc_eval_constant(BddEnc_ptr self, Expr_ptr expr, node_ptr context)
   return result;
 }
 
-AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
-{
+AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name) {
   /* NB for developers: there cannot be any ambiguity in the name 'name'
      because VAR and DEFINE cannot be declared with the same name.
      Only 'running' (processes's) constants can be here but there is special
@@ -1880,8 +1768,8 @@ AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
     ErrorMgr_error_circular(errmgr, name);
   }
 
-  if (res != (AddArray_ptr) NULL) return res;
-
+  if (res != (AddArray_ptr)NULL)
+    return res;
 
   if (!SymbTable_is_symbol_declared(BASE_ENC(self)->symb_table, name)) {
     ErrorMgr_error_undefined(errmgr, name);
@@ -1896,8 +1784,8 @@ AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
   }
 
   /* do we required symbol to be a constant? */
-  if ( self->enforce_constant
-       && !SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, name) ) {
+  if (self->enforce_constant &&
+      !SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, name)) {
     self->enforce_constant = false;
     if (opt_verbose_level_gt(opts, 4)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
@@ -1907,7 +1795,7 @@ AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
   }
 
   /* Is it a constant? */
-  if (SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, name) ) {
+  if (SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, name)) {
     res = AddArray_from_add(BddEnc_constant_to_add(self, name));
   }
 
@@ -1927,16 +1815,16 @@ AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
        expressions are quite printable. */
 #if 1 /* new code about issue 2349 is enabled */
     node_ptr body = SymbTable_get_define_body(BASE_ENC(self)->symb_table, name);
-    node_ptr new_context = SymbTable_get_define_context(BASE_ENC(self)->symb_table,
-                                                        name);
+    node_ptr new_context =
+        SymbTable_get_define_context(BASE_ENC(self)->symb_table, name);
     ErrorMgr_io_atom_push(errmgr, name); /* for error reporting */
     res = bdd_enc_eval(self, body, new_context);
     ErrorMgr_io_atom_pop(errmgr);
 
-#else /* this is the old code prior issue 2349 (disabled by
+#else /* this is the old code prior issue 2349 (disabled by                    \
          default, but kept for record) */
-    node_ptr def = SymbTable_get_define_flatten_body(BASE_ENC(self)->symb_table,
-                                                     name);
+    node_ptr def =
+        SymbTable_get_define_flatten_body(BASE_ENC(self)->symb_table, name);
 
     BddEncCache_set_evaluation(self->cache, name, BDD_ENC_EVALUATING);
     ErrorMgr_io_atom_push(errmgr, name); /* for error reporting */
@@ -1945,28 +1833,29 @@ AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
 #endif
   } /* end of define */
 
-
   /* gets the encoding associated with possible variable */
   else if (SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, name)) {
-    SymbType_ptr var_type = SymbTable_get_var_type(BASE_ENC(self)->symb_table, name);
+    SymbType_ptr var_type =
+        SymbTable_get_var_type(BASE_ENC(self)->symb_table, name);
     SymbTypeTag type = SymbType_get_tag(var_type);
 
     /* Skip ARRAY_TYPE variables */
     if (!(SYMB_TYPE_ARRAY == type)) {
-      /* the variable is boolean => it is in the special boolean cache already */
+      /* the variable is boolean => it is in the special boolean cache already
+       */
       if (SymbTable_is_symbol_bool_var(BASE_ENC(self)->symb_table, name)) {
 #if __BDDENC_LAZY_COMMIT_LAYER__
         add_ptr tmp = lazy_commit_layer_and_get_add(self, name, __EVAL_VAR__);
 #else
         add_ptr tmp = BddEncCache_lookup_boolean_var(self->cache, name);
 #endif
-        nusmv_assert(tmp != (add_ptr) NULL);
+        nusmv_assert(tmp != (add_ptr)NULL);
         res = AddArray_from_add(tmp);
       }
       /* usual (not boolean) variable => evaluate its boolean encoding */
       else {
-        node_ptr def = BoolEnc_get_var_encoding(BOOL_ENC_CLIENT(self)->bool_enc,
-                                                name);
+        node_ptr def =
+            BoolEnc_get_var_encoding(BOOL_ENC_CLIENT(self)->bool_enc, name);
         BddEncCache_set_evaluation(self->cache, name, BDD_ENC_EVALUATING);
         ErrorMgr_io_atom_push(errmgr, name); /* for error reporting */
         res = bdd_enc_eval(self, def, Nil);
@@ -1974,9 +1863,10 @@ AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
       }
     }
   } /* end of variable */
-    /* added for parameter due to mantis issue 4854 */
-  else if (SymbTable_is_symbol_parameter(BASE_ENC(self)->symb_table, name)){
-    node_ptr def = SymbTable_get_flatten_actual_parameter(BASE_ENC(self)->symb_table, name);
+  /* added for parameter due to mantis issue 4854 */
+  else if (SymbTable_is_symbol_parameter(BASE_ENC(self)->symb_table, name)) {
+    node_ptr def = SymbTable_get_flatten_actual_parameter(
+        BASE_ENC(self)->symb_table, name);
     BddEncCache_set_evaluation(self->cache, name, BDD_ENC_EVALUATING);
     ErrorMgr_io_atom_push(errmgr, name); /* for error reporting */
     res = bdd_enc_eval(self, def, Nil);
@@ -2001,28 +1891,27 @@ AddArray_ptr BddEnc_get_symbol_add(BddEnc_ptr self, node_ptr name)
   return res;
 }
 
-add_ptr BddEnc_get_state_frozen_vars_mask_add(BddEnc_ptr self)
-{
+add_ptr BddEnc_get_state_frozen_vars_mask_add(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->state_frozen_vars_mask_add == (add_ptr) NULL) {
+  if (self->state_frozen_vars_mask_add == (add_ptr)NULL) {
     add_ptr res;
     ListIter_ptr iter_layer;
 
     res = add_true(self->dd);
 
     iter_layer = NodeList_get_first_iter(BASE_ENC(self)->committed_layers);
-    while (! ListIter_is_end(iter_layer)) {
+    while (!ListIter_is_end(iter_layer)) {
       add_ptr mask;
       SymbLayer_ptr layer;
       SymbLayerIter iter;
 
-      layer = SYMB_LAYER(NodeList_get_elem_at(BASE_ENC(self)->committed_layers,
-                                              iter_layer));
+      layer = SYMB_LAYER(
+          NodeList_get_elem_at(BASE_ENC(self)->committed_layers, iter_layer));
 
       SymbLayer_gen_iter(layer, &iter, STT_STATE_VAR | STT_FROZEN_VAR);
       mask = bdd_enc_get_vars_list_mask(self, layer, &iter);
-      nusmv_assert(mask != (add_ptr) NULL);
+      nusmv_assert(mask != (add_ptr)NULL);
 
       add_and_accumulate(self->dd, &res, mask);
       add_free(self->dd, mask);
@@ -2036,28 +1925,27 @@ add_ptr BddEnc_get_state_frozen_vars_mask_add(BddEnc_ptr self)
   return add_dup(self->state_frozen_vars_mask_add);
 }
 
-add_ptr BddEnc_get_input_vars_mask_add(BddEnc_ptr self)
-{
+add_ptr BddEnc_get_input_vars_mask_add(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->input_vars_mask_add == (add_ptr) NULL) {
+  if (self->input_vars_mask_add == (add_ptr)NULL) {
     add_ptr res;
     ListIter_ptr iter_layer;
 
     res = add_true(self->dd);
 
     iter_layer = NodeList_get_first_iter(BASE_ENC(self)->committed_layers);
-    while (! ListIter_is_end(iter_layer)) {
+    while (!ListIter_is_end(iter_layer)) {
       add_ptr mask;
       SymbLayer_ptr layer;
       SymbLayerIter iter;
 
-      layer = SYMB_LAYER(NodeList_get_elem_at(BASE_ENC(self)->committed_layers,
-                                              iter_layer));
+      layer = SYMB_LAYER(
+          NodeList_get_elem_at(BASE_ENC(self)->committed_layers, iter_layer));
 
       SymbLayer_gen_iter(layer, &iter, STT_INPUT_VAR);
       mask = bdd_enc_get_vars_list_mask(self, layer, &iter);
-      nusmv_assert(mask != (add_ptr) NULL);
+      nusmv_assert(mask != (add_ptr)NULL);
 
       add_and_accumulate(self->dd, &res, mask);
       add_free(self->dd, mask);
@@ -2071,16 +1959,16 @@ add_ptr BddEnc_get_input_vars_mask_add(BddEnc_ptr self)
   return add_dup(self->input_vars_mask_add);
 }
 
-add_ptr BddEnc_get_state_frozen_input_vars_mask_add(BddEnc_ptr self)
-{
+add_ptr BddEnc_get_state_frozen_input_vars_mask_add(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->state_frozen_input_vars_mask_add == (add_ptr) NULL) {
+  if (self->state_frozen_input_vars_mask_add == (add_ptr)NULL) {
     add_ptr inp_mask = BddEnc_get_input_vars_mask_add(self);
     add_ptr sta_mask = BddEnc_get_state_frozen_vars_mask_add(self);
 
-    self->state_frozen_input_vars_mask_add = add_and(self->dd, inp_mask, sta_mask);
-    nusmv_assert(self->state_frozen_input_vars_mask_add != (add_ptr) NULL);
+    self->state_frozen_input_vars_mask_add =
+        add_and(self->dd, inp_mask, sta_mask);
+    nusmv_assert(self->state_frozen_input_vars_mask_add != (add_ptr)NULL);
     add_free(self->dd, sta_mask);
     add_free(self->dd, inp_mask);
   }
@@ -2088,11 +1976,10 @@ add_ptr BddEnc_get_state_frozen_input_vars_mask_add(BddEnc_ptr self)
   return add_dup(self->state_frozen_input_vars_mask_add);
 }
 
-bdd_ptr BddEnc_get_state_frozen_vars_mask_bdd(BddEnc_ptr self)
-{
+bdd_ptr BddEnc_get_state_frozen_vars_mask_bdd(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->state_frozen_vars_mask_bdd == (bdd_ptr) NULL) {
+  if (self->state_frozen_vars_mask_bdd == (bdd_ptr)NULL) {
     add_ptr mask_add;
 
     mask_add = BddEnc_get_state_frozen_vars_mask_add(self);
@@ -2103,11 +1990,10 @@ bdd_ptr BddEnc_get_state_frozen_vars_mask_bdd(BddEnc_ptr self)
   return bdd_dup(self->state_frozen_vars_mask_bdd);
 }
 
-bdd_ptr BddEnc_get_input_vars_mask_bdd(BddEnc_ptr self)
-{
+bdd_ptr BddEnc_get_input_vars_mask_bdd(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->input_vars_mask_bdd == (bdd_ptr) NULL) {
+  if (self->input_vars_mask_bdd == (bdd_ptr)NULL) {
     add_ptr mask_add;
 
     mask_add = BddEnc_get_input_vars_mask_add(self);
@@ -2118,11 +2004,10 @@ bdd_ptr BddEnc_get_input_vars_mask_bdd(BddEnc_ptr self)
   return bdd_dup(self->input_vars_mask_bdd);
 }
 
-bdd_ptr BddEnc_get_state_frozen_input_vars_mask_bdd(BddEnc_ptr self)
-{
+bdd_ptr BddEnc_get_state_frozen_input_vars_mask_bdd(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
 
-  if (self->state_frozen_input_vars_mask_bdd == (bdd_ptr) NULL) {
+  if (self->state_frozen_input_vars_mask_bdd == (bdd_ptr)NULL) {
     add_ptr mask_add;
 
     mask_add = BddEnc_get_state_frozen_input_vars_mask_add(self);
@@ -2133,8 +2018,8 @@ bdd_ptr BddEnc_get_state_frozen_input_vars_mask_bdd(BddEnc_ptr self)
   return bdd_dup(self->state_frozen_input_vars_mask_bdd);
 }
 
-add_ptr BddEnc_apply_state_frozen_vars_mask_add(BddEnc_ptr self, add_ptr states)
-{
+add_ptr BddEnc_apply_state_frozen_vars_mask_add(BddEnc_ptr self,
+                                                add_ptr states) {
   add_ptr mask, res;
 
   BDD_ENC_CHECK_INSTANCE(self);
@@ -2146,8 +2031,7 @@ add_ptr BddEnc_apply_state_frozen_vars_mask_add(BddEnc_ptr self, add_ptr states)
   return res;
 }
 
-add_ptr BddEnc_apply_input_vars_mask_add(BddEnc_ptr self, add_ptr inputs)
-{
+add_ptr BddEnc_apply_input_vars_mask_add(BddEnc_ptr self, add_ptr inputs) {
   add_ptr mask, res;
 
   BDD_ENC_CHECK_INSTANCE(self);
@@ -2160,8 +2044,7 @@ add_ptr BddEnc_apply_input_vars_mask_add(BddEnc_ptr self, add_ptr inputs)
 }
 
 add_ptr BddEnc_apply_state_frozen_input_vars_mask_add(BddEnc_ptr self,
-                                                      add_ptr states_inputs)
-{
+                                                      add_ptr states_inputs) {
   add_ptr mask, res;
 
   BDD_ENC_CHECK_INSTANCE(self);
@@ -2174,29 +2057,27 @@ add_ptr BddEnc_apply_state_frozen_input_vars_mask_add(BddEnc_ptr self,
 }
 
 BddStates BddEnc_apply_state_frozen_vars_mask_bdd(BddEnc_ptr self,
-                                                  BddStates states)
-{
+                                                  BddStates states) {
   bdd_ptr mask;
   BddStates res;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
   mask = BddEnc_get_state_frozen_vars_mask_bdd(self);
-  res = BDD_STATES( bdd_and(self->dd, states, mask) );
+  res = BDD_STATES(bdd_and(self->dd, states, mask));
   bdd_free(self->dd, mask);
 
   return res;
 }
 
-BddInputs BddEnc_apply_input_vars_mask_bdd(BddEnc_ptr self, BddInputs inputs)
-{
+BddInputs BddEnc_apply_input_vars_mask_bdd(BddEnc_ptr self, BddInputs inputs) {
   bdd_ptr mask;
   BddInputs res;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
   mask = BddEnc_get_input_vars_mask_bdd(self);
-  res = BDD_INPUTS( bdd_and(self->dd, inputs, mask) );
+  res = BDD_INPUTS(bdd_and(self->dd, inputs, mask));
   bdd_free(self->dd, mask);
 
   return res;
@@ -2204,28 +2085,25 @@ BddInputs BddEnc_apply_input_vars_mask_bdd(BddEnc_ptr self, BddInputs inputs)
 
 BddStatesInputs
 BddEnc_apply_state_frozen_input_vars_mask_bdd(BddEnc_ptr self,
-                                              BddStatesInputs states_inputs)
-{
+                                              BddStatesInputs states_inputs) {
   bdd_ptr mask;
   BddStatesInputs res;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
   mask = BddEnc_get_state_frozen_input_vars_mask_bdd(self);
-  res = BDD_STATES_INPUTS( bdd_and(self->dd, states_inputs, mask) );
+  res = BDD_STATES_INPUTS(bdd_and(self->dd, states_inputs, mask));
   bdd_free(self->dd, mask);
 
   return res;
 }
 
-add_ptr BddEnc_get_var_mask(BddEnc_ptr self, node_ptr var_name)
-{
+add_ptr BddEnc_get_var_mask(BddEnc_ptr self, node_ptr var_name) {
   node_ptr mask;
 
   mask = BoolEnc_get_var_mask(BOOL_ENC_CLIENT(self)->bool_enc, var_name);
   return BddEnc_expr_to_add(self, mask, Nil);
 }
-
 
 /*!
   \brief Return the list of variables corresponding
@@ -2241,8 +2119,7 @@ add_ptr BddEnc_get_var_mask(BddEnc_ptr self, node_ptr var_name)
 */
 
 NodeList_ptr BddEnc_get_var_ordering(const BddEnc_ptr self,
-                                     const VarOrderingType ord_type)
-{
+                                     const VarOrderingType ord_type) {
   int cvl, max_level;
 
   NodeList_ptr current_ordering;
@@ -2275,10 +2152,9 @@ NodeList_ptr BddEnc_get_var_ordering(const BddEnc_ptr self,
 }
 
 int BddEnc_write_var_ordering(const BddEnc_ptr self,
-                              const char* output_order_file_name,
-                              const VarOrderingType dump_type)
-{
-  FILE* oof;
+                              const char *output_order_file_name,
+                              const VarOrderingType dump_type) {
+  FILE *oof;
 
   NodeList_ptr out_vars;
   ListIter_ptr iter;
@@ -2288,24 +2164,21 @@ int BddEnc_write_var_ordering(const BddEnc_ptr self,
   MasterPrinter_ptr wffprint;
   ErrorMgr_ptr errmgr;
   StreamMgr_ptr streams;
-  FILE* outstream;
+  FILE *outstream;
   int retval = 0;
 
   BDD_ENC_CHECK_INSTANCE(self);
 
   env = ENV_OBJECT(self)->environment;
   opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  wffprint = MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  errmgr = ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   outstream = StreamMgr_get_output_stream(streams);
 
   if (output_order_file_name != NIL(char) &&
       0 != strcmp(output_order_file_name, get_output_order_file(opts))) {
-    set_output_order_file(opts, (char*)output_order_file_name);
+    set_output_order_file(opts, (char *)output_order_file_name);
   }
 
   /* the result list */
@@ -2314,14 +2187,14 @@ int BddEnc_write_var_ordering(const BddEnc_ptr self,
   /* The _process_select_ variable is inserted at the top of the
      ordering, if not otherwise specified */
   if (NuSMVEnv_has_value(env, ENV_PROC_SELECTOR_VNAME)) {
-    node_ptr proc_selector_vname = NODE_PTR(NuSMVEnv_get_value(env, ENV_PROC_SELECTOR_VNAME));
+    node_ptr proc_selector_vname =
+        NODE_PTR(NuSMVEnv_get_value(env, ENV_PROC_SELECTOR_VNAME));
     NodeList_ptr proc_sel_vars;
 
     if (dump_type != DUMP_BITS) {
       proc_sel_vars = NodeList_create();
       NodeList_append(proc_sel_vars, proc_selector_vname);
-    }
-    else {
+    } else {
       proc_sel_vars = BoolEnc_get_var_bits(BOOL_ENC_CLIENT(self)->bool_enc,
                                            proc_selector_vname);
     }
@@ -2343,14 +2216,15 @@ int BddEnc_write_var_ordering(const BddEnc_ptr self,
   if (!util_is_string_null(output_order_file_name)) {
     oof = fopen(output_order_file_name, "w");
     if (oof == NULL) {
-      ErrorMgr_rpterr(errmgr, "output_order: unable to open file %s", output_order_file_name);
+      ErrorMgr_rpterr(errmgr, "output_order: unable to open file %s",
+                      output_order_file_name);
     }
-  }
-  else oof = outstream;  /* uses stdout */
+  } else
+    oof = outstream; /* uses stdout */
 
   /* Actually dump the list: */
   iter = NodeList_get_first_iter(out_vars);
-  while (! ListIter_is_end(iter)) {
+  while (!ListIter_is_end(iter)) {
     node_ptr name = NodeList_get_elem_at(out_vars, iter);
     print_node(wffprint, oof, name);
     fprintf(oof, "\n");
@@ -2371,30 +2245,27 @@ int BddEnc_write_var_ordering(const BddEnc_ptr self,
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     if (output_order_file_name != NULL) {
       Logger_log(logger, "%s: variable order output to file %s\n",
-              NuSMVCore_get_tool_name(), output_order_file_name);
+                 NuSMVCore_get_tool_name(), output_order_file_name);
     }
   }
 
   return retval;
 }
 
-int BddEnc_get_reordering_count(const BddEnc_ptr self)
-{
+int BddEnc_get_reordering_count(const BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
   return (dd_get_reorderings(self->dd) - self->curr_reorderings);
 }
 
-void BddEnc_reset_reordering_count(BddEnc_ptr self)
-{
+void BddEnc_reset_reordering_count(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
   self->curr_reorderings = dd_get_reorderings(self->dd);
 }
 
-void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
-{
+void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   NodeList_ptr new_order;
   OrdGroups_ptr new_ord_groups;
@@ -2407,10 +2278,8 @@ void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
   new_ord_groups = OrdGroups_create();
 
   /* We complete the possibly partial order group */
-  new_order =
-    bdd_enc_sort_variables_and_groups_according(self, new_po_grps,
-                                                new_ord_groups,
-                                                &interleaved);
+  new_order = bdd_enc_sort_variables_and_groups_according(
+      self, new_po_grps, new_ord_groups, &interleaved);
   /*
    * At this point new_ord_groups and new_order contain respectively
    * the new grouping of variables and the new order of variables
@@ -2434,7 +2303,7 @@ void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
       int min_idx;
       size_t size;
       int chunk;
-    } *group2info; /* this is used later when reconstructing the var groups */
+    } * group2info; /* this is used later when reconstructing the var groups */
 
     groups_size = OrdGroups_get_size(new_ord_groups);
     group2info = ALLOC(struct GroupInfo, groups_size);
@@ -2450,7 +2319,7 @@ void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
       index = -1;
 
       vars = OrdGroups_get_vars_in_group(new_ord_groups, group_id);
-      NODE_LIST_FOREACH (vars, iter) {
+      NODE_LIST_FOREACH(vars, iter) {
         name = NodeList_get_elem_at(vars, iter);
 
         /* Here we must check that the variables of the group belongs
@@ -2458,7 +2327,8 @@ void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
         nusmv_assert(SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, name));
 
         if (SYMB_LAYER(NULL) == current_layer) {
-          current_layer = SymbTable_variable_get_layer(BASE_ENC(self)->symb_table, name);
+          current_layer =
+              SymbTable_variable_get_layer(BASE_ENC(self)->symb_table, name);
           nusmv_assert(SYMB_LAYER(NULL) != current_layer);
         }
 
@@ -2468,21 +2338,26 @@ void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
         if (-1 == low_index) {
           low_index = bdd_enc_name_to_index(self, name);
           index = low_index;
-        }
-        else {
+        } else {
           index = bdd_enc_name_to_index(self, name);
         }
 
         if (SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table, name)) {
-          if (-1 == chunk) chunk = 2;
-          else { nusmv_assert(2 == chunk); }
+          if (-1 == chunk)
+            chunk = 2;
+          else {
+            nusmv_assert(2 == chunk);
+          }
           index += 1;
-        }
-        else { /* input and frozen var */
-          nusmv_assert(SymbTable_is_symbol_input_var(BASE_ENC(self)->symb_table, name) ||
-                       SymbTable_is_symbol_frozen_var(BASE_ENC(self)->symb_table, name));
-          if (-1 == chunk) chunk = 1;
-          else { nusmv_assert(1 == chunk); }
+        } else { /* input and frozen var */
+          nusmv_assert(
+              SymbTable_is_symbol_input_var(BASE_ENC(self)->symb_table, name) ||
+              SymbTable_is_symbol_frozen_var(BASE_ENC(self)->symb_table, name));
+          if (-1 == chunk)
+            chunk = 1;
+          else {
+            nusmv_assert(1 == chunk);
+          }
         }
 
         nusmv_assert(1 <= chunk && 2 >= chunk);
@@ -2512,14 +2387,11 @@ void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
 
     { /* now it is time to construct the new variable blocks */
       for (group_id = 0; group_id < groups_size; ++group_id) {
-        int min_lev = dd_get_level_at_index(self->dd,
-                                            group2info[group_id].min_idx);
-        int real_lev = bdd_enc_create_block(self,
-                                            group2info[group_id].layer,
-                                            min_lev,
-                                            group2info[group_id].size,
-                                            group2info[group_id].chunk,
-                                            true);
+        int min_lev =
+            dd_get_level_at_index(self->dd, group2info[group_id].min_idx);
+        int real_lev = bdd_enc_create_block(self, group2info[group_id].layer,
+                                            min_lev, group2info[group_id].size,
+                                            group2info[group_id].chunk, true);
         nusmv_assert(real_lev == min_lev);
       }
     } /* end of group re-construction */
@@ -2531,10 +2403,9 @@ void BddEnc_force_order(BddEnc_ptr self, OrdGroups_ptr new_po_grps)
   NodeList_destroy(new_order);
 }
 
-void BddEnc_force_order_from_file(BddEnc_ptr self, FILE * orderfile)
-{
+void BddEnc_force_order_from_file(BddEnc_ptr self, FILE *orderfile) {
   BDD_ENC_CHECK_INSTANCE(self);
-  nusmv_assert((FILE*)NULL != orderfile);
+  nusmv_assert((FILE *)NULL != orderfile);
   {
     BoolEnc_ptr bool_enc;
     OrdGroups_ptr grps;
@@ -2558,108 +2429,98 @@ void BddEnc_force_order_from_file(BddEnc_ptr self, FILE * orderfile)
   }
 }
 
-void BddEnc_clean_evaluation_cache(BddEnc_ptr self)
-{
+void BddEnc_clean_evaluation_cache(BddEnc_ptr self) {
   BDD_ENC_CHECK_INSTANCE(self);
   BddEncCache_clean_evaluation(self->cache);
 }
 
-int BddEnc_dump_addarray_dot(BddEnc_ptr self,
-                             AddArray_ptr addarray,
-                             const char** labels,
-                             FILE* outfile)
-{
+int BddEnc_dump_addarray_dot(BddEnc_ptr self, AddArray_ptr addarray,
+                             const char **labels, FILE *outfile) {
   BDD_ENC_CHECK_INSTANCE(self);
-  return bdd_enc_dump_addarray_dot_davinci(self, addarray, labels,
-                                           outfile, true);
+  return bdd_enc_dump_addarray_dot_davinci(self, addarray, labels, outfile,
+                                           true);
 }
 
-int BddEnc_dump_addarray_davinci(BddEnc_ptr self,
-                                 AddArray_ptr addarray,
-                                 const char** labels,
-                                 FILE* outfile)
-{
+int BddEnc_dump_addarray_davinci(BddEnc_ptr self, AddArray_ptr addarray,
+                                 const char **labels, FILE *outfile) {
   BDD_ENC_CHECK_INSTANCE(self);
-  return bdd_enc_dump_addarray_dot_davinci(self, addarray, labels,
-                                           outfile, false);
+  return bdd_enc_dump_addarray_dot_davinci(self, addarray, labels, outfile,
+                                           false);
 }
 
 void BddEnc_print_formula(const NuSMVEnv_ptr env, node_ptr constr,
-                          const boolean verbose, const boolean formula)
-{
+                          const boolean verbose, const boolean formula) {
   const BddEnc_ptr bdd_enc = BDD_ENC(NuSMVEnv_get_value(env, ENV_BDD_ENCODER));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(bdd_enc));
   const TypeChecker_ptr tc = SymbTable_get_type_checker(st);
   const OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
 
   /* check that the expression is a predicate */
-  if (SymbType_is_boolean(TypeChecker_get_expression_type(tc, car(constr), Nil))) {
+  if (SymbType_is_boolean(
+          TypeChecker_get_expression_type(tc, car(constr), Nil))) {
 
-    StreamMgr_print_output(streams,
-                           "######################################################################\n");
+    StreamMgr_print_output(streams, "##########################################"
+                                    "############################\n");
 
-    BddEnc_print_formula_info(bdd_enc, car(constr),
-                              verbose, formula, outstream);
-    StreamMgr_print_output(streams,
-                           "######################################################################\n");
+    BddEnc_print_formula_info(bdd_enc, car(constr), verbose, formula,
+                              outstream);
+    StreamMgr_print_output(streams, "##########################################"
+                                    "############################\n");
 
-  }
-  else  {
-    StreamMgr_print_error(streams,  "expression is not a predicate.\n");
+  } else {
+    StreamMgr_print_error(streams, "expression is not a predicate.\n");
   }
 }
 
 int BddEnc_dump_expr(const BddEnc_ptr self, const node_ptr parsed_expr,
-                     const char* str_constr, const t_format format,
-                     FILE* outfile)
-{
+                     const char *str_constr, const t_format format,
+                     FILE *outfile) {
   const NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-   ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(self));
   const TypeChecker_ptr tc = SymbTable_get_type_checker(st);
-  node_ptr node_expr =  Compile_FlattenSexp(st, car(parsed_expr), Nil);
+  node_ptr node_expr = Compile_FlattenSexp(st, car(parsed_expr), Nil);
   const SymbType_ptr tp = TypeChecker_get_expression_type(tc, node_expr, Nil);
   int res = 1;
 
   /* checks type compatibility */
   if (SymbType_is_error(tp)) {
-    StreamMgr_print_error(streams,  "Type of expression is not correct\n");
+    StreamMgr_print_error(streams, "Type of expression is not correct\n");
     return 1;
   }
-  if (SymbType_is_real(tp) ||
-      SymbType_is_continuous(tp) ||
+  if (SymbType_is_real(tp) || SymbType_is_continuous(tp) ||
       SymbType_is_statement(tp)) {
-    StreamMgr_print_error(streams,  "Type of expression is not supported\n");
+    StreamMgr_print_error(streams, "Type of expression is not supported\n");
     return 1;
   }
 
   { /* the actual job */
     AddArray_ptr addarray = BddEnc_expr_to_addarray(self, node_expr, Nil);
     const int adr_size = AddArray_get_size(addarray);
-    const char** onames;
+    const char **onames;
     int i;
 
-    onames = ALLOC(const char*, adr_size);
-    nusmv_assert((const char**) NULL != onames);
+    onames = ALLOC(const char *, adr_size);
+    nusmv_assert((const char **)NULL != onames);
 
     /* fills onames */
     if (1 == adr_size) {
       onames[0] = util_strsav(str_constr);
-    }
-    else {
-      const char* oname_fmt = "%s[%0*d]";
-      const int digits = (int) log10(adr_size);
-      const int oname_len = (strlen(str_constr) + strlen(oname_fmt) + digits + 1);
+    } else {
+      const char *oname_fmt = "%s[%0*d]";
+      const int digits = (int)log10(adr_size);
+      const int oname_len =
+          (strlen(str_constr) + strlen(oname_fmt) + digits + 1);
 
-      for (i=0; i<adr_size; ++i) {
-        char* oname = ALLOC(char, oname_len);
+      for (i = 0; i < adr_size; ++i) {
+        char *oname = ALLOC(char, oname_len);
         int c;
-        nusmv_assert((char*) NULL != oname);
+        nusmv_assert((char *)NULL != oname);
         c = snprintf(oname, oname_len, oname_fmt, str_constr, digits, i);
         SNPRINTF_CHECK(c, oname_len);
         onames[i] = oname;
@@ -2680,7 +2541,9 @@ int BddEnc_dump_expr(const BddEnc_ptr self, const node_ptr parsed_expr,
     }
 
     /* cleanup */
-    for (i=0; i<adr_size; ++i) { FREE(onames[i]); }
+    for (i = 0; i < adr_size; ++i) {
+      FREE(onames[i]);
+    }
     FREE(onames);
     AddArray_destroy(BddEnc_get_dd_manager(self), addarray);
   }
@@ -2700,11 +2563,9 @@ int BddEnc_dump_expr(const BddEnc_ptr self, const node_ptr parsed_expr,
   \sa BddEnc_create
 */
 
-void bdd_enc_init(BddEnc_ptr self,
-                  SymbTable_ptr symb_table,
+void bdd_enc_init(BddEnc_ptr self, SymbTable_ptr symb_table,
                   BoolEnc_ptr bool_enc, VarsHandler_ptr dd_vars_hndr,
-                  OrdGroups_ptr ord_groups)
-{
+                  OrdGroups_ptr ord_groups) {
   int i;
 
   /* base class initialization */
@@ -2718,40 +2579,41 @@ void bdd_enc_init(BddEnc_ptr self,
   self->cache = BddEncCache_create(symb_table, self->dd);
 
   /* ord_groups can be NULL */
-  if (ord_groups != ORD_GROUPS(NULL)) self->ord_groups = ord_groups;
-  else self->ord_groups = OrdGroups_create();
+  if (ord_groups != ORD_GROUPS(NULL))
+    self->ord_groups = ord_groups;
+  else
+    self->ord_groups = OrdGroups_create();
 
   /* dynamic arrays */
-  self->level2index = NULL;  /* lazily created later */
+  self->level2index = NULL; /* lazily created later */
 
   self->index2name = array_alloc(node_ptr, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->index2name != (array_t*) NULL);
+  nusmv_assert(self->index2name != (array_t *)NULL);
 
   self->current2next = array_alloc(int, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->current2next != (array_t*) NULL);
+  nusmv_assert(self->current2next != (array_t *)NULL);
 
   self->next2current = array_alloc(int, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->next2current != (array_t*) NULL);
-
+  nusmv_assert(self->next2current != (array_t *)NULL);
 
   self->minterm_input_vars = array_alloc(bdd_ptr, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->minterm_input_vars != (array_t*) NULL);
+  nusmv_assert(self->minterm_input_vars != (array_t *)NULL);
 
   self->minterm_state_vars = array_alloc(bdd_ptr, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->minterm_state_vars != (array_t*) NULL);
+  nusmv_assert(self->minterm_state_vars != (array_t *)NULL);
 
   self->minterm_next_state_vars = array_alloc(bdd_ptr, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->minterm_next_state_vars != (array_t*) NULL);
+  nusmv_assert(self->minterm_next_state_vars != (array_t *)NULL);
 
   self->minterm_frozen_vars = array_alloc(bdd_ptr, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->minterm_frozen_vars != (array_t*) NULL);
+  nusmv_assert(self->minterm_frozen_vars != (array_t *)NULL);
 
   self->minterm_state_frozen_vars = array_alloc(bdd_ptr, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->minterm_state_frozen_vars != (array_t*) NULL);
+  nusmv_assert(self->minterm_state_frozen_vars != (array_t *)NULL);
 
-  self->minterm_state_frozen_input_vars = array_alloc(bdd_ptr, BDD_ENC_INIT_VAR_NUM);
-  nusmv_assert(self->minterm_state_frozen_input_vars != (array_t*) NULL);
-
+  self->minterm_state_frozen_input_vars =
+      array_alloc(bdd_ptr, BDD_ENC_INIT_VAR_NUM);
+  nusmv_assert(self->minterm_state_frozen_input_vars != (array_t *)NULL);
 
   self->reord_locked_num = 0;
 
@@ -2763,16 +2625,17 @@ void bdd_enc_init(BddEnc_ptr self,
   self->frozen_vars_num = 0;
 
   /* initializes the arrays containing variables info: */
-  for (i=0; i < BDD_ENC_INIT_VAR_NUM; ++i) {
-    array_insert(node_ptr, self->index2name, i, (node_ptr) NULL);
+  for (i = 0; i < BDD_ENC_INIT_VAR_NUM; ++i) {
+    array_insert(node_ptr, self->index2name, i, (node_ptr)NULL);
     array_insert(int, self->current2next, i, 0);
     array_insert(int, self->next2current, i, 0);
-    array_insert(bdd_ptr, self->minterm_input_vars, i, (bdd_ptr) NULL);
-    array_insert(bdd_ptr, self->minterm_state_vars, i, (bdd_ptr) NULL);
-    array_insert(bdd_ptr, self->minterm_next_state_vars, i, (bdd_ptr) NULL);
-    array_insert(bdd_ptr, self->minterm_frozen_vars, i, (bdd_ptr) NULL);
-    array_insert(bdd_ptr, self->minterm_state_frozen_vars, i, (bdd_ptr) NULL);
-    array_insert(bdd_ptr, self->minterm_state_frozen_input_vars, i, (bdd_ptr) NULL);
+    array_insert(bdd_ptr, self->minterm_input_vars, i, (bdd_ptr)NULL);
+    array_insert(bdd_ptr, self->minterm_state_vars, i, (bdd_ptr)NULL);
+    array_insert(bdd_ptr, self->minterm_next_state_vars, i, (bdd_ptr)NULL);
+    array_insert(bdd_ptr, self->minterm_frozen_vars, i, (bdd_ptr)NULL);
+    array_insert(bdd_ptr, self->minterm_state_frozen_vars, i, (bdd_ptr)NULL);
+    array_insert(bdd_ptr, self->minterm_state_frozen_input_vars, i,
+                 (bdd_ptr)NULL);
   }
 
   /* minterms frontiers */
@@ -2797,19 +2660,19 @@ void bdd_enc_init(BddEnc_ptr self,
   self->frozen_vars_add = add_true(self->dd);
 
   /* BDDs are calculated only on demand, converting the corresponding ADDs */
-  self->input_vars_bdd = (bdd_ptr) NULL;
-  self->state_vars_bdd = (bdd_ptr) NULL;
-  self->next_state_vars_bdd = (bdd_ptr) NULL;
-  self->frozen_vars_bdd = (bdd_ptr) NULL;
-  self->state_frozen_vars_bdd = (bdd_ptr) NULL;
+  self->input_vars_bdd = (bdd_ptr)NULL;
+  self->state_vars_bdd = (bdd_ptr)NULL;
+  self->next_state_vars_bdd = (bdd_ptr)NULL;
+  self->frozen_vars_bdd = (bdd_ptr)NULL;
+  self->state_frozen_vars_bdd = (bdd_ptr)NULL;
 
   /* masks: */
-  self->input_vars_mask_add = (add_ptr) NULL;
-  self->state_frozen_vars_mask_add = (add_ptr) NULL;
-  self->state_frozen_input_vars_mask_add = (add_ptr) NULL;
-  self->input_vars_mask_bdd = (bdd_ptr) NULL;
-  self->state_frozen_vars_mask_bdd = (bdd_ptr) NULL;
-  self->state_frozen_input_vars_mask_bdd = (bdd_ptr) NULL;
+  self->input_vars_mask_add = (add_ptr)NULL;
+  self->state_frozen_vars_mask_add = (add_ptr)NULL;
+  self->state_frozen_input_vars_mask_add = (add_ptr)NULL;
+  self->input_vars_mask_bdd = (bdd_ptr)NULL;
+  self->state_frozen_vars_mask_bdd = (bdd_ptr)NULL;
+  self->state_frozen_input_vars_mask_bdd = (bdd_ptr)NULL;
 
   /* reorderings counters */
   BddEnc_reset_reordering_count(self);
@@ -2825,7 +2688,6 @@ void bdd_enc_init(BddEnc_ptr self,
   OVERRIDE(BaseEnc, remove_layer) = bdd_enc_remove_layer;
 }
 
-
 /*!
   \brief The BddEnc class private deinitializer
 
@@ -2834,10 +2696,10 @@ void bdd_enc_init(BddEnc_ptr self,
   \sa BddEnc_destroy
 */
 
-void bdd_enc_deinit(BddEnc_ptr self)
-{
+void bdd_enc_deinit(BddEnc_ptr self) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   int i;
 
@@ -2846,32 +2708,33 @@ void bdd_enc_deinit(BddEnc_ptr self)
   OrdGroups_destroy(self->ord_groups);
 
   /* initializes the arrays containing variables info: */
-  for (i=0; i < self->minterm_input_vars_dim; ++i) {
+  for (i = 0; i < self->minterm_input_vars_dim; ++i) {
     bdd_free(self->dd, array_fetch(bdd_ptr, self->minterm_input_vars, i));
     array_insert(bdd_ptr, self->minterm_input_vars, i, NULL);
   }
 
-  for (i=0; i < self->minterm_state_vars_dim; ++i) {
+  for (i = 0; i < self->minterm_state_vars_dim; ++i) {
     bdd_free(self->dd, array_fetch(bdd_ptr, self->minterm_state_vars, i));
     array_insert(bdd_ptr, self->minterm_state_vars, i, NULL);
   }
 
-  for (i=0; i < self->minterm_next_state_vars_dim; ++i) {
+  for (i = 0; i < self->minterm_next_state_vars_dim; ++i) {
     bdd_free(self->dd, array_fetch(bdd_ptr, self->minterm_next_state_vars, i));
     array_insert(bdd_ptr, self->minterm_next_state_vars, i, NULL);
   }
 
-  for (i=0; i < self->minterm_frozen_vars_dim; ++i) {
+  for (i = 0; i < self->minterm_frozen_vars_dim; ++i) {
     bdd_free(self->dd, array_fetch(bdd_ptr, self->minterm_frozen_vars, i));
     array_insert(bdd_ptr, self->minterm_frozen_vars, i, NULL);
   }
 
-  for (i=0; i < self->minterm_state_frozen_vars_dim; ++i) {
-    bdd_free(self->dd, array_fetch(bdd_ptr, self->minterm_state_frozen_vars, i));
+  for (i = 0; i < self->minterm_state_frozen_vars_dim; ++i) {
+    bdd_free(self->dd,
+             array_fetch(bdd_ptr, self->minterm_state_frozen_vars, i));
     array_insert(bdd_ptr, self->minterm_state_frozen_vars, i, NULL);
   }
 
-  for (i=0; i < self->minterm_state_frozen_input_vars_dim ; ++i) {
+  for (i = 0; i < self->minterm_state_frozen_input_vars_dim; ++i) {
     bdd_free(self->dd,
              array_fetch(bdd_ptr, self->minterm_state_frozen_input_vars, i));
     array_insert(bdd_ptr, self->minterm_state_frozen_input_vars, i, NULL);
@@ -2902,19 +2765,19 @@ void bdd_enc_deinit(BddEnc_ptr self)
   /* hashes */
   {
     SymbLayer_ptr layer;
-    array_t* groups;
+    array_t *groups;
     assoc_iter aiter;
 
     ASSOC_FOREACH(self->layer2groups, aiter, &layer, &groups) {
-      if ((array_t*) NULL != groups) {
+      if ((array_t *)NULL != groups) {
         int giter;
         GroupInfo_ptr binfo;
 
         if (opt_verbose_level_gt(opts, 5)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
           Logger_log(logger,
-                  "BddEnc: releasing dd groups associated with layer '%s'\n",
-                  SymbLayer_get_name(layer));
+                     "BddEnc: releasing dd groups associated with layer '%s'\n",
+                     SymbLayer_get_name(layer));
         }
 
         /* releases all groups */
@@ -2932,7 +2795,7 @@ void bdd_enc_deinit(BddEnc_ptr self)
   free_assoc(self->name2index);
 
   clear_assoc_and_free_entries_arg(self->failures_hash, hash_add_key_free,
-                                   (char*) self->dd);
+                                   (char *)self->dd);
   free_assoc(self->failures_hash);
 
   /* dynamic arrays */
@@ -2954,7 +2817,6 @@ void bdd_enc_deinit(BddEnc_ptr self)
   bool_enc_client_deinit(BOOL_ENC_CLIENT(self));
 }
 
-
 /*!
   \brief Encodes all variables within the given layer. If the
    given layer has an associated boolean layer (created by the BoolEnc), that
@@ -2965,25 +2827,24 @@ void bdd_enc_deinit(BddEnc_ptr self)
   \sa bdd_enc_remove_layer
 */
 
-void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
-{
+void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char *layer_name) {
   BddEnc_ptr self;
   SymbTable_ptr symbTable;
   SymbLayer_ptr layer;
   SymbLayer_ptr layers[3];
-  const char* bool_layer_name;
+  const char *bool_layer_name;
   int idx;
   BoolEnc_ptr bool_enc;
 
   NuSMVEnv_ptr env = ENV_OBJECT(enc_base)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   if (opt_verbose_level_ge(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "BddEnc committing layer '%s'\n",
-            layer_name);
+    Logger_log(logger, "BddEnc committing layer '%s'\n", layer_name);
   }
 
   self = BDD_ENC(enc_base);
@@ -3025,7 +2886,8 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
 
       if (opt_verbose_level_gt(opts, 4)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_nlog(logger, wffprint, "BddEnc: encoding constant %N\n", constant);
+        Logger_nlog(logger, wffprint, "BddEnc: encoding constant %N\n",
+                    constant);
       }
 
       add_constant = add_leaf(self->dd, constant);
@@ -3035,7 +2897,6 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
 
     idx += 1;
   } /* end of iteration on layers */
-
 
   /* Retrieves the list of sorted vars, and creates the sorted groups
      of those variables that must be created. Then iterates on the
@@ -3048,9 +2909,8 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
     boolean dissolve_groups = false;
 
     groups = OrdGroups_create();
-    ord_vars = bdd_enc_sort_variables_and_groups(self, layer, groups,
-                                                 &needs_reshuffle,
-                                                 &dissolve_groups);
+    ord_vars = bdd_enc_sort_variables_and_groups(
+        self, layer, groups, &needs_reshuffle, &dissolve_groups);
 
     groups_num = OrdGroups_get_size(groups);
     for (group_id = 0; group_id < groups_num; ++group_id) {
@@ -3066,13 +2926,14 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
         nusmv_assert(SymbTable_is_symbol_var(symbTable, name));
 
         if (SymbTable_is_symbol_state_var(symbTable, name)) {
-          if (-1 == group_chunk) group_chunk = 2;
+          if (-1 == group_chunk)
+            group_chunk = 2;
 
           /* not mixed input/frozen and state in the same group */
           nusmv_assert(2 == group_chunk);
-        }
-        else { /* frozen or input */
-          if (-1 == group_chunk) group_chunk = 1;
+        } else { /* frozen or input */
+          if (-1 == group_chunk)
+            group_chunk = 1;
           /* not mixed input/frozen and state in the same group */
           nusmv_assert(1 == group_chunk);
         }
@@ -3088,8 +2949,8 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
         bdd_enc_lock_reordering(self); /* locks reordering */
 
         block_layer = SymbTable_get_layer(symbTable, layer_name);
-        level = bdd_enc_reserve_consecutive_vars(self, block_layer,
-                                                 group_size, group_chunk);
+        level = bdd_enc_reserve_consecutive_vars(self, block_layer, group_size,
+                                                 group_chunk);
 
         gr_iter = NodeList_get_first_iter(group);
         while (!ListIter_is_end(gr_iter)) {
@@ -3123,7 +2984,6 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
       }
     } /* for groups */
 
-
     /* reshuffle the dd level, by changing the bdd level order, but
        only if needed) */
     if (needs_reshuffle) {
@@ -3138,16 +2998,15 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
       if (BddEnc_get_reordering_count(self) == 0) {
         if (opt_verbose_level_gt(opts, 4)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "BddEnc: Reshuffling layer '%s'...\n",
-                  layer_name);
+          Logger_log(logger, "BddEnc: Reshuffling layer '%s'...\n", layer_name);
         }
         bdd_enc_shuffle_variables_order(self, ord_vars);
-      }
-      else {
+      } else {
         if (opt_verbose_level_gt(opts, 0)) {
           Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-          Logger_log(logger, "BddEnc: Warning:\n"
-                  "Skipping reshuffle as dynamic reordering occurred.\n");
+          Logger_log(logger,
+                     "BddEnc: Warning:\n"
+                     "Skipping reshuffle as dynamic reordering occurred.\n");
         }
       }
 
@@ -3159,18 +3018,20 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
         ListIter_ptr iter;
         NODE_LIST_FOREACH(ord_vars, iter) {
           node_ptr name = NodeList_get_elem_at(ord_vars, iter);
-          int chunk = (SymbTable_is_symbol_state_var(
-                           BASE_ENC(self)->symb_table, name)) ? 2 : 1;
+          int chunk =
+              (SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table, name))
+                  ? 2
+                  : 1;
 
           /* if (chunk > 1) { */
           /* We create also groups of size 1, since initially they are
              created, and dissolved, thus here we re-created */
           SymbLayer_ptr current_layer =
-            SymbTable_variable_get_layer(BASE_ENC(self)->symb_table, name);
+              SymbTable_variable_get_layer(BASE_ENC(self)->symb_table, name);
           int idx = BddEnc_get_var_index_from_name(self, name);
           int lev = dd_get_level_at_index(self->dd, idx);
-          int real_lev = bdd_enc_create_block(self, current_layer,
-                                              lev, chunk, chunk, false);
+          int real_lev = bdd_enc_create_block(self, current_layer, lev, chunk,
+                                              chunk, false);
 
           /* Since groups are new (not shared) we must obtain
              exactly the requested level */
@@ -3184,9 +3045,7 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
     NodeList_destroy(ord_vars);
     OrdGroups_destroy(groups);
   }
-
 }
-
 
 /*!
   \brief Removes the encoding of all variables occurring within
@@ -3202,17 +3061,17 @@ void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name)
   \sa bdd_enc_commit_layer
 */
 
-void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
-{
+void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char *layer_name) {
   NuSMVEnv_ptr env = ENV_OBJECT(enc_base)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   BoolEnc_ptr bool_enc;
   BddEnc_ptr self;
   SymbLayer_ptr layers[3];
-  const char* bool_layer_name;
+  const char *bool_layer_name;
   int i;
 
   self = BDD_ENC(enc_base);
@@ -3238,7 +3097,7 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
   /* -------------------------------------------------- */
 
   { /* At first dissolves the associated groups */
-    array_t* groups;
+    array_t *groups;
 
     i = 0;
     while (SYMB_LAYER(NULL) != layers[i]) {
@@ -3247,8 +3106,8 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
          loose the boolean layer that may contain groups. Indeed, if
          the committed layer contains enumerative variables, then the
          boolean layer is not empty, and it has associated groups. */
-      groups = (array_t*) find_assoc(self->layer2groups, (node_ptr) layers[i]);
-      if (groups != (array_t*) NULL) {
+      groups = (array_t *)find_assoc(self->layer2groups, (node_ptr)layers[i]);
+      if (groups != (array_t *)NULL) {
         int iter;
         GroupInfo_ptr binfo;
 
@@ -3268,14 +3127,14 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
         bdd_enc_unlock_reordering(self);
 
         array_free(groups);
-        insert_assoc(self->layer2groups, (node_ptr) layers[i], (node_ptr) NULL);
+        insert_assoc(self->layer2groups, (node_ptr)layers[i], (node_ptr)NULL);
       }
       i += 1;
     } /* end of while */
-  } /* end of blocks removal */
+  }   /* end of blocks removal */
 
   /* removes constant and variables */
-  i=0;
+  i = 0;
   while (layers[i] != SYMB_LAYER(NULL)) {
     SymbLayerIter iter;
 
@@ -3284,7 +3143,8 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
 
       if (opt_verbose_level_gt(opts, 4)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_nlog(logger, wffprint, "BddEnc: removing constant %N\n", constant);
+        Logger_nlog(logger, wffprint, "BddEnc: removing constant %N\n",
+                    constant);
       }
 
       BddEncCache_remove_constant(self->cache, constant);
@@ -3294,12 +3154,14 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
                               SymbLayer_iter_filter_bool_vars, NULL) {
       node_ptr name = SymbLayer_iter_get_symbol(layers[i], &iter);
 
-      nusmv_assert(SymbTable_is_symbol_bool_var(BASE_ENC(self)->symb_table, name));
+      nusmv_assert(
+          SymbTable_is_symbol_bool_var(BASE_ENC(self)->symb_table, name));
 
       if (opt_verbose_level_gt(opts, 4)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_nlog(logger, wffprint, "BddEnc: removing variable %N (index = %d)\n", name,
-                BddEnc_get_var_index_from_name(self, name));
+        Logger_nlog(logger, wffprint,
+                    "BddEnc: removing variable %N (index = %d)\n", name,
+                    BddEnc_get_var_index_from_name(self, name));
       }
 
       bdd_enc_remove_var(self, name);
@@ -3336,24 +3198,20 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
   }
 
   /* compacts the minterms arrays: */
-  self->minterm_input_vars_dim =
-    bdd_enc_compact_minterms_array(self, self->minterm_input_vars,
-                                   self->minterm_input_vars_dim);
-  self->minterm_state_vars_dim =
-    bdd_enc_compact_minterms_array(self, self->minterm_state_vars,
-                                   self->minterm_state_vars_dim);
-  self->minterm_next_state_vars_dim =
-    bdd_enc_compact_minterms_array(self, self->minterm_next_state_vars,
-                                   self->minterm_next_state_vars_dim);
-  self->minterm_frozen_vars_dim =
-    bdd_enc_compact_minterms_array(self, self->minterm_frozen_vars,
-                                   self->minterm_frozen_vars_dim);
+  self->minterm_input_vars_dim = bdd_enc_compact_minterms_array(
+      self, self->minterm_input_vars, self->minterm_input_vars_dim);
+  self->minterm_state_vars_dim = bdd_enc_compact_minterms_array(
+      self, self->minterm_state_vars, self->minterm_state_vars_dim);
+  self->minterm_next_state_vars_dim = bdd_enc_compact_minterms_array(
+      self, self->minterm_next_state_vars, self->minterm_next_state_vars_dim);
+  self->minterm_frozen_vars_dim = bdd_enc_compact_minterms_array(
+      self, self->minterm_frozen_vars, self->minterm_frozen_vars_dim);
   self->minterm_state_frozen_vars_dim =
-    bdd_enc_compact_minterms_array(self, self->minterm_state_frozen_vars,
-                                   self->minterm_state_frozen_vars_dim);
-  self->minterm_state_frozen_input_vars_dim =
-    bdd_enc_compact_minterms_array(self, self->minterm_state_frozen_input_vars,
-                                   self->minterm_state_frozen_input_vars_dim);
+      bdd_enc_compact_minterms_array(self, self->minterm_state_frozen_vars,
+                                     self->minterm_state_frozen_vars_dim);
+  self->minterm_state_frozen_input_vars_dim = bdd_enc_compact_minterms_array(
+      self, self->minterm_state_frozen_input_vars,
+      self->minterm_state_frozen_input_vars_dim);
 
   /* finally calls the inherited method: */
   bool_enc_client_remove_layer(enc_base, layer_name);
@@ -3361,7 +3219,6 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
     bool_enc_client_remove_layer(enc_base, bool_layer_name);
   }
 }
-
 
 /*!
   \brief Reshuffle the ordering of bdds. The ordering is
@@ -3374,12 +3231,11 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name)
   \sa bdd_enc_commit_layer
 */
 
-void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars)
-{
+void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   boolean changed = false;
   int level;
@@ -3395,7 +3251,7 @@ void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars)
      and levels (continues below with the results) */
   if (opt_verbose_level_gt(opts, 5)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    const int str_len = (int) (log10(tot_vars_num)+1);
+    const int str_len = (int)(log10(tot_vars_num) + 1);
     int idx;
 
     Logger_log(logger, "BddEnc:        Index: \t");
@@ -3404,8 +3260,7 @@ void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars)
     }
     Logger_log(logger, "\nBddEnc: Before Level: \t");
     for (idx = 0; idx < tot_vars_num; ++idx) {
-      Logger_log(logger, "%*d ", str_len,
-              dd_get_level_at_index(self->dd, idx));
+      Logger_log(logger, "%*d ", str_len, dd_get_level_at_index(self->dd, idx));
     }
     Logger_log(logger, "\n");
   }
@@ -3434,7 +3289,8 @@ void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars)
       if (!NodeList_belongs_to(vars, next_name)) {
         /* it is assumed here that next is always closed to current */
         int nidx = array_fetch(int, self->current2next, idx);
-        if (level != dd_get_level_at_index(self->dd, nidx)) changed = true;
+        if (level != dd_get_level_at_index(self->dd, nidx))
+          changed = true;
 
         array_insert(int, self->level2index, level++, nidx);
         NodeList_append(used_indices, NODE_FROM_INT(nidx));
@@ -3469,29 +3325,29 @@ void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars)
   if (opt_verbose_level_gt(opts, 5)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     if (changed) {
-      const int str_len = (int) (log10(tot_vars_num)+1);
+      const int str_len = (int)(log10(tot_vars_num) + 1);
       int idx;
 
       Logger_log(logger, "BddEnc:   Lev2Index:  \t");
       for (idx = 0; idx < tot_vars_num; ++idx) {
         Logger_log(logger, "%*d ", str_len,
-                array_fetch(int, self->level2index, idx));
+                   array_fetch(int, self->level2index, idx));
       }
       Logger_log(logger, "\n");
 
       {
-        char* req_lev = ALLOC(char, (str_len+1) * tot_vars_num + 1);
+        char *req_lev = ALLOC(char, (str_len + 1) * tot_vars_num + 1);
 
-        for (idx=0; idx < (str_len+1)*tot_vars_num; ++idx) {
+        for (idx = 0; idx < (str_len + 1) * tot_vars_num; ++idx) {
           req_lev[idx] = ' ';
         }
-        req_lev[(str_len+1)*tot_vars_num] = '\0';
+        req_lev[(str_len + 1) * tot_vars_num] = '\0';
 
         for (idx = 0; idx < tot_vars_num; ++idx) {
-          int ofs = array_fetch(int, self->level2index, idx)*(str_len+1);
-          char trail = *(req_lev+ofs+str_len+1);
-          sprintf(req_lev+ofs, "%*d ", str_len, idx);
-          *(req_lev+ofs+str_len+1) = trail;
+          int ofs = array_fetch(int, self->level2index, idx) * (str_len + 1);
+          char trail = *(req_lev + ofs + str_len + 1);
+          sprintf(req_lev + ofs, "%*d ", str_len, idx);
+          *(req_lev + ofs + str_len + 1) = trail;
         }
 
         Logger_log(logger, "BddEnc:    Req Level: \t");
@@ -3502,12 +3358,11 @@ void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars)
       Logger_log(logger, "BddEnc:  After Level: \t");
       for (idx = 0; idx < tot_vars_num; ++idx) {
         Logger_log(logger, "%*d ", str_len,
-                dd_get_level_at_index(self->dd, idx));
+                   dd_get_level_at_index(self->dd, idx));
       }
       Logger_log(logger, "\n");
 
-    }
-    else {
+    } else {
       Logger_log(logger, "(No reordering was needed)\n");
     }
   } /* end of verbose info */
@@ -3526,14 +3381,12 @@ void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars)
 
   Called by the class destructor
 */
-static void bdd_enc_finalize(Object_ptr object, void* dummy)
-{
+static void bdd_enc_finalize(Object_ptr object, void *dummy) {
   BddEnc_ptr self = BDD_ENC(object);
 
   bdd_enc_deinit(self);
   FREE(self);
 }
-
 
 /*!
   \brief Private service of bdd_enc_reserve_consecutive_vars,
@@ -3542,11 +3395,13 @@ static void bdd_enc_finalize(Object_ptr object, void* dummy)
 
 */
 
-static int bdd_enc_int_qsort(const void* e1, const void* e2)
-{
-  int a = *((int*) e1); int b = *((int*) e2);
-  if (a < b) return -1;
-  if (a == b) return 0;
+static int bdd_enc_int_qsort(const void *e1, const void *e2) {
+  int a = *((int *)e1);
+  int b = *((int *)e2);
+  if (a < b)
+    return -1;
+  if (a == b)
+    return 0;
   return 1;
 }
 
@@ -3575,21 +3430,21 @@ static int bdd_enc_int_qsort(const void* e1, const void* e2)
 static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
                                             const SymbLayer_ptr layer,
                                             size_t block_size,
-                                            size_t idx_chunk_size)
-{
+                                            size_t idx_chunk_size) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   const int INVALID_LEV = -2; /* not supposed to be changed! */
 
   ListIter_ptr iter;
-  array_t* levels;
+  array_t *levels;
   boolean enough_levels;
 
   nusmv_assert(idx_chunk_size <= block_size);
 
   levels = array_alloc(int, block_size);
-  nusmv_assert(levels != (array_t*) NULL);
+  nusmv_assert(levels != (array_t *)NULL);
 
   /* searches in the gaps list large enough gaps of consecutives indices: */
   enough_levels = false;
@@ -3601,7 +3456,8 @@ static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
     int prev_lev = INVALID_LEV;
     int idx;
 
-    if (enough_levels) break;
+    if (enough_levels)
+      break;
 
     el = NodeList_get_elem_at(self->index_gaps, iter);
     gap_idx = NODE_TO_INT(car(el));
@@ -3610,19 +3466,22 @@ static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
     /* pushes into the array 'levels' those levels that are good
        candidates for being reused */
     for (idx = 0; idx < gap_size; ++idx) {
-      int lev = dd_get_level_at_index(self->dd, idx+gap_idx);
+      int lev = dd_get_level_at_index(self->dd, idx + gap_idx);
       nusmv_assert(lev != -1);
 
-      if (curr_lev_init == -1) curr_lev_init = lev;
-      if (prev_lev == INVALID_LEV || lev == prev_lev+1) lev_count += 1;
+      if (curr_lev_init == -1)
+        curr_lev_init = lev;
+      if (prev_lev == INVALID_LEV || lev == prev_lev + 1)
+        lev_count += 1;
 
-      if ((prev_lev != INVALID_LEV && lev != prev_lev+1) || idx == gap_size-1) {
+      if ((prev_lev != INVALID_LEV && lev != prev_lev + 1) ||
+          idx == gap_size - 1) {
         if (lev_count >= idx_chunk_size &&
-            VarsHandler_can_group(self->dd_vars_hndr, curr_lev_init,
-                                  lev_count, idx_chunk_size)) {
+            VarsHandler_can_group(self->dd_vars_hndr, curr_lev_init, lev_count,
+                                  idx_chunk_size)) {
           int i;
-          for (i=0; i < lev_count; ++i) {
-            array_insert_last(int, levels, curr_lev_init+i);
+          for (i = 0; i < lev_count; ++i) {
+            array_insert_last(int, levels, curr_lev_init + i);
           }
 
           /* is it enough? (this is an optimization to avoid searching
@@ -3639,7 +3498,7 @@ static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
 
       prev_lev = lev;
     } /* for */
-  } /* while on gaps */
+  }   /* while on gaps */
 
   array_sort(levels, bdd_enc_int_qsort);
 
@@ -3660,11 +3519,13 @@ static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
     for (idx = 0; idx < array_n(levels); ++idx) {
       int lev = array_fetch(int, levels, idx);
 
-      if (curr_lev_init == -1) curr_lev_init = lev;
-      if (prev_lev == INVALID_LEV || lev == prev_lev+1) lev_count += 1;
+      if (curr_lev_init == -1)
+        curr_lev_init = lev;
+      if (prev_lev == INVALID_LEV || lev == prev_lev + 1)
+        lev_count += 1;
 
-      if ((prev_lev != INVALID_LEV && lev != prev_lev+1) ||
-          idx == array_n(levels)-1) {
+      if ((prev_lev != INVALID_LEV && lev != prev_lev + 1) ||
+          idx == array_n(levels) - 1) {
 
         if (lev_count >= block_size &&
             (size_min == -1 || lev_count < size_min)) {
@@ -3690,18 +3551,18 @@ static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
       if (opt_verbose_level_gt(opts, 4)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_log(logger,
-                "BddEnc: removing gaps for reusing of %" PRIuPTR \
-                " variables from level %d, index %d\n",
-                block_size, lev_min, dd_get_index_at_level(self->dd, lev_min));
+                   "BddEnc: removing gaps for reusing of %" PRIuPTR
+                   " variables from level %d, index %d\n",
+                   block_size, lev_min,
+                   dd_get_index_at_level(self->dd, lev_min));
       }
-      for (i=0; i < block_size; i += idx_chunk_size) {
-        int idx = dd_get_index_at_level(self->dd, lev_min+i);
+      for (i = 0; i < block_size; i += idx_chunk_size) {
+        int idx = dd_get_index_at_level(self->dd, lev_min + i);
         bdd_enc_remove_gap(self, idx, idx_chunk_size);
       }
-    }
-    else { /* no reuse of gaps: adds levels taking them from the
-              index frontier */
-      lev_min = self->used_indices_frontier+1;
+    } else { /* no reuse of gaps: adds levels taking them from the
+                index frontier */
+      lev_min = self->used_indices_frontier + 1;
       /* Issue 4871: removed self->used_indices_frontier += block_size; */
     }
 
@@ -3710,8 +3571,8 @@ static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
 
     /* Issue 4871: Index frontier is based on the value obtained from function
        bdd_enc_create_block.         */
-    if (real_lev+block_size-1 > self->used_indices_frontier)
-      self->used_indices_frontier = real_lev+block_size-1;
+    if (real_lev + block_size - 1 > self->used_indices_frontier)
+      self->used_indices_frontier = real_lev + block_size - 1;
 
     return real_lev;
   }
@@ -3725,38 +3586,34 @@ static int bdd_enc_reserve_consecutive_vars(BddEnc_ptr self,
    group. Returned level may be different from the requested one.
    This is a private service used only when dealing with groups.
 */
-static int bdd_enc_create_block(BddEnc_ptr self,
-                                SymbLayer_ptr layer,
+static int bdd_enc_create_block(BddEnc_ptr self, SymbLayer_ptr layer,
                                 int lev_min, size_t block_size,
-                                size_t idx_chunk_size,
-                                boolean shared)
-{
+                                size_t idx_chunk_size, boolean shared) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   int real_lev;
-  GroupInfo_ptr gid = VarsHandler_reserve_group(self->dd_vars_hndr,
-                                                lev_min, block_size,
-                                                idx_chunk_size,
-                                                shared, &real_lev);
-  array_t* blocks = (array_t*) find_assoc(self->layer2groups,
-                                          (node_ptr) layer);
-  if (blocks == (array_t*) NULL) {
+  GroupInfo_ptr gid =
+      VarsHandler_reserve_group(self->dd_vars_hndr, lev_min, block_size,
+                                idx_chunk_size, shared, &real_lev);
+  array_t *blocks = (array_t *)find_assoc(self->layer2groups, (node_ptr)layer);
+  if (blocks == (array_t *)NULL) {
     /* creates one */
     blocks = array_alloc(GroupInfo_ptr, 1);
-    nusmv_assert((array_t*) NULL != blocks);
-    insert_assoc(self->layer2groups, (node_ptr) layer, (node_ptr) blocks);
+    nusmv_assert((array_t *)NULL != blocks);
+    insert_assoc(self->layer2groups, (node_ptr)layer, (node_ptr)blocks);
   }
   array_insert_last(GroupInfo_ptr, blocks, gid);
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "BddEnc: created a (%s) block of %" PRIuPTR \
-            " variables: " \
-            "Asked from level %d, obtained from level %d to level %"  \
-            PRIuPTR "\n",
-            shared ? "shared" : "not shared",
-            block_size, lev_min, real_lev, real_lev+block_size-1);
+    Logger_log(logger,
+               "BddEnc: created a (%s) block of %" PRIuPTR " variables: "
+               "Asked from level %d, obtained from level %d to level %" PRIuPTR
+               "\n",
+               shared ? "shared" : "not shared", block_size, lev_min, real_lev,
+               real_lev + block_size - 1);
   }
 
   return real_lev;
@@ -3772,12 +3629,12 @@ static int bdd_enc_create_block(BddEnc_ptr self,
 
   \sa bdd_enc_add_state_var
 */
-static void bdd_enc_add_input_var(BddEnc_ptr self, node_ptr name, int index)
-{
+static void bdd_enc_add_input_var(BddEnc_ptr self, node_ptr name, int index) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   add_ptr add;
 
@@ -3785,8 +3642,10 @@ static void bdd_enc_add_input_var(BddEnc_ptr self, node_ptr name, int index)
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_nlog(logger, wffprint, "BddEnc: creating input variable %N\n  BDD input variable index %d, level %d\n", name,
-            index, dd_get_level_at_index(self->dd, index));
+    Logger_nlog(logger, wffprint,
+                "BddEnc: creating input variable %N\n  BDD input variable "
+                "index %d, level %d\n",
+                name, index, dd_get_level_at_index(self->dd, index));
   }
 
   /* Creates the add */
@@ -3832,15 +3691,14 @@ static void bdd_enc_add_input_var(BddEnc_ptr self, node_ptr name, int index)
   \sa bdd_enc_add_input_var
 */
 static void bdd_enc_add_state_var(BddEnc_ptr self, SymbLayer_ptr layer,
-                                  node_ptr name,
-                                  int curr_index, int next_index)
-{
+                                  node_ptr name, int curr_index,
+                                  int next_index) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   add_ptr curr, next;
   node_ptr next_name;
@@ -3852,7 +3710,7 @@ static void bdd_enc_add_state_var(BddEnc_ptr self, SymbLayer_ptr layer,
   /* either new or consecutive*/
   nusmv_assert((dd_get_level_at_index(self->dd, curr_index) == -1 &&
                 dd_get_level_at_index(self->dd, next_index) == -1) ||
-               (dd_get_level_at_index(self->dd, curr_index)+1 ==
+               (dd_get_level_at_index(self->dd, curr_index) + 1 ==
                 dd_get_level_at_index(self->dd, next_index)));
 
   /* ---------------------- */
@@ -3860,8 +3718,10 @@ static void bdd_enc_add_state_var(BddEnc_ptr self, SymbLayer_ptr layer,
   /* ---------------------- */
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_nlog(logger, wffprint, "BddEnc: creating state variable %N\n  BDD variable index %d, level %d\n", name,
-            curr_index, dd_get_level_at_index(self->dd, curr_index));
+    Logger_nlog(logger, wffprint,
+                "BddEnc: creating state variable %N\n  BDD variable index %d, "
+                "level %d\n",
+                name, curr_index, dd_get_level_at_index(self->dd, curr_index));
   }
 
   curr = add_new_var_with_index(self->dd, curr_index);
@@ -3877,7 +3737,7 @@ static void bdd_enc_add_state_var(BddEnc_ptr self, SymbLayer_ptr layer,
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "  BDD next state variable index %d, level %d\n",
-            next_index, dd_get_level_at_index(self->dd, next_index));
+               next_index, dd_get_level_at_index(self->dd, next_index));
   }
 
   next_name = bdd_enc_get_next_state_var_name(nodemgr, name);
@@ -3919,12 +3779,12 @@ static void bdd_enc_add_state_var(BddEnc_ptr self, SymbLayer_ptr layer,
 
   \sa bdd_enc_add_input_var, bdd_enc_add_state_var
 */
-static void bdd_enc_add_frozen_var(BddEnc_ptr self, node_ptr name, int index)
-{
+static void bdd_enc_add_frozen_var(BddEnc_ptr self, node_ptr name, int index) {
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   add_ptr add;
 
@@ -3933,8 +3793,10 @@ static void bdd_enc_add_frozen_var(BddEnc_ptr self, node_ptr name, int index)
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_nlog(logger, wffprint, "BddEnc: creating frozen variable %N\n  BDD variable index %d, level %d\n", name,
-            index, dd_get_level_at_index(self->dd, index));
+    Logger_nlog(logger, wffprint,
+                "BddEnc: creating frozen variable %N\n  BDD variable index %d, "
+                "level %d\n",
+                name, index, dd_get_level_at_index(self->dd, index));
   }
 
   add = add_new_var_with_index(self->dd, index);
@@ -3979,17 +3841,16 @@ static void bdd_enc_add_frozen_var(BddEnc_ptr self, node_ptr name, int index)
    corresponding ADD, typically returned by the method
    get_avail_input_var_index
 */
-static void bdd_enc_add_input_var_to_minterm(BddEnc_ptr self, int index)
-{
+static void bdd_enc_add_input_var_to_minterm(BddEnc_ptr self, int index) {
   bdd_ptr bdd;
 
-  nusmv_assert(index > 0);  /* vars indices start from 1 */
+  nusmv_assert(index > 0); /* vars indices start from 1 */
 
   /* index has already been checked */
   bdd = bdd_new_var_with_index(self->dd, index);
 
-  array_insert(bdd_ptr, self->minterm_input_vars,
-               self->minterm_input_vars_dim, bdd_dup(bdd));
+  array_insert(bdd_ptr, self->minterm_input_vars, self->minterm_input_vars_dim,
+               bdd_dup(bdd));
   self->minterm_input_vars_dim += 1;
 
   array_insert(bdd_ptr, self->minterm_state_frozen_input_vars,
@@ -4001,8 +3862,8 @@ static void bdd_enc_add_input_var_to_minterm(BddEnc_ptr self, int index)
 
 /*!
   \brief Adds a state boolean variable to the arrays necessary to extract
-   minterms from a BDD containing either input-state-frozen, state-frozen or state
-   variables only.
+   minterms from a BDD containing either input-state-frozen, state-frozen or
+  state variables only.
 
 
   The minterms arrays are assumed to be always
@@ -4013,17 +3874,16 @@ static void bdd_enc_add_input_var_to_minterm(BddEnc_ptr self, int index)
    corresponding ADD, typically returned by the method
    get_avail_state_var_index
 */
-static void bdd_enc_add_state_var_to_minterm(BddEnc_ptr self, int index)
-{
+static void bdd_enc_add_state_var_to_minterm(BddEnc_ptr self, int index) {
   bdd_ptr bdd;
 
-  nusmv_assert(index > 0);  /* vars indices start from 1 */
+  nusmv_assert(index > 0); /* vars indices start from 1 */
 
   /* index has been already checked */
   bdd = bdd_new_var_with_index(self->dd, index);
 
-  array_insert(bdd_ptr, self->minterm_state_vars,
-               self->minterm_state_vars_dim, bdd_dup(bdd));
+  array_insert(bdd_ptr, self->minterm_state_vars, self->minterm_state_vars_dim,
+               bdd_dup(bdd));
   self->minterm_state_vars_dim += 1;
 
   array_insert(bdd_ptr, self->minterm_state_frozen_vars,
@@ -4051,11 +3911,10 @@ static void bdd_enc_add_state_var_to_minterm(BddEnc_ptr self, int index)
    corresponding next state var ADD, typically the value returned by
    the method get_avail_state_var_index + 1
 */
-static void bdd_enc_add_next_state_var_to_minterm(BddEnc_ptr self, int index)
-{
+static void bdd_enc_add_next_state_var_to_minterm(BddEnc_ptr self, int index) {
   bdd_ptr bdd;
 
-  nusmv_assert(index > 0);  /* vars indices start from 1 */
+  nusmv_assert(index > 0); /* vars indices start from 1 */
 
   /* index already checked */
 
@@ -4080,11 +3939,10 @@ static void bdd_enc_add_next_state_var_to_minterm(BddEnc_ptr self, int index)
    corresponding ADD, typically returned by the method
    get_avail_state_var_index
 */
-static void bdd_enc_add_frozen_var_to_minterm(BddEnc_ptr self, int index)
-{
+static void bdd_enc_add_frozen_var_to_minterm(BddEnc_ptr self, int index) {
   bdd_ptr bdd;
 
-  nusmv_assert(index > 0);  /* vars indices start from 1 */
+  nusmv_assert(index > 0); /* vars indices start from 1 */
 
   /* index has been already checked */
   bdd = bdd_new_var_with_index(self->dd, index);
@@ -4111,25 +3969,24 @@ static void bdd_enc_add_frozen_var_to_minterm(BddEnc_ptr self, int index)
 
 
 */
-static void
-bdd_enc_accumulate_state_var_cube(BddEnc_ptr self, add_ptr curr, add_ptr next)
-{
-  nusmv_assert((curr != (add_ptr) NULL) && (next != (add_ptr) NULL));
+static void bdd_enc_accumulate_state_var_cube(BddEnc_ptr self, add_ptr curr,
+                                              add_ptr next) {
+  nusmv_assert((curr != (add_ptr)NULL) && (next != (add_ptr)NULL));
 
   /* current */
   BDD_ENC_FREE_BDD(self->state_vars_bdd); /* to reset the bdd */
   BDD_ENC_FREE_BDD(self->state_frozen_vars_bdd);
-  if (self->state_vars_add != (add_ptr) NULL) {
+  if (self->state_vars_add != (add_ptr)NULL) {
     add_and_accumulate(self->dd, &(self->state_vars_add), curr);
-  }
-  else self->state_vars_add = add_dup(curr);
+  } else
+    self->state_vars_add = add_dup(curr);
 
   /* next */
   BDD_ENC_FREE_BDD(self->next_state_vars_bdd); /* to reset the bdd */
-  if (self->next_state_vars_add != (add_ptr) NULL) {
+  if (self->next_state_vars_add != (add_ptr)NULL) {
     add_and_accumulate(self->dd, &(self->next_state_vars_add), next);
-  }
-  else self->next_state_vars_add = add_dup(next);
+  } else
+    self->next_state_vars_add = add_dup(next);
 }
 
 /*!
@@ -4138,18 +3995,17 @@ bdd_enc_accumulate_state_var_cube(BddEnc_ptr self, add_ptr curr, add_ptr next)
 
 
 */
-static void
-bdd_enc_accumulate_frozen_var_cube(BddEnc_ptr self, add_ptr frozen)
-{
-  nusmv_assert(frozen != (add_ptr) NULL);
+static void bdd_enc_accumulate_frozen_var_cube(BddEnc_ptr self,
+                                               add_ptr frozen) {
+  nusmv_assert(frozen != (add_ptr)NULL);
 
   BDD_ENC_FREE_BDD(self->frozen_vars_bdd);
   BDD_ENC_FREE_BDD(self->state_frozen_vars_bdd);
 
-  if (self->frozen_vars_add != (add_ptr) NULL) {
+  if (self->frozen_vars_add != (add_ptr)NULL) {
     add_and_accumulate(self->dd, &(self->frozen_vars_add), frozen);
-  }
-  else self->frozen_vars_add = add_dup(frozen);
+  } else
+    self->frozen_vars_add = add_dup(frozen);
 }
 
 /*!
@@ -4158,17 +4014,15 @@ bdd_enc_accumulate_frozen_var_cube(BddEnc_ptr self, add_ptr frozen)
 
 
 */
-static void
-bdd_enc_accumulate_input_var_cube(BddEnc_ptr self, add_ptr input)
-{
-  nusmv_assert(input != (add_ptr) NULL);
+static void bdd_enc_accumulate_input_var_cube(BddEnc_ptr self, add_ptr input) {
+  nusmv_assert(input != (add_ptr)NULL);
 
   BDD_ENC_FREE_BDD(self->input_vars_bdd);
 
-  if (self->input_vars_add != (add_ptr) NULL) {
+  if (self->input_vars_add != (add_ptr)NULL) {
     add_and_accumulate(self->dd, &(self->input_vars_add), input);
-  }
-  else self->input_vars_add = add_dup(input);
+  } else
+    self->input_vars_add = add_dup(input);
 }
 
 /*!
@@ -4178,8 +4032,7 @@ bdd_enc_accumulate_input_var_cube(BddEnc_ptr self, add_ptr input)
   This is a service of method remove_var. DO NOT call
    this directly.
 */
-static void bdd_enc_remove_input_var(BddEnc_ptr self, node_ptr name)
-{
+static void bdd_enc_remove_input_var(BddEnc_ptr self, node_ptr name) {
   add_ptr input_add, tmp_add;
   int index;
 
@@ -4198,8 +4051,7 @@ static void bdd_enc_remove_input_var(BddEnc_ptr self, node_ptr name)
   /*     Minterms                           */
   /* -------------------------------------- */
   index = bdd_enc_name_to_index(self, name);
-  bdd_enc_remove_var_from_minterm(self, index,
-                                  self->minterm_input_vars,
+  bdd_enc_remove_var_from_minterm(self, index, self->minterm_input_vars,
                                   self->minterm_input_vars_dim);
 
   bdd_enc_remove_var_from_minterm(self, index,
@@ -4210,7 +4062,6 @@ static void bdd_enc_remove_input_var(BddEnc_ptr self, node_ptr name)
   /*     Gaps for index reuse               */
   /* -------------------------------------- */
   bdd_enc_insert_gap(self, index, 1);
-
 
   /* -------------------------------------- */
   /*     Cache and permutation arrays       */
@@ -4223,7 +4074,7 @@ static void bdd_enc_remove_input_var(BddEnc_ptr self, node_ptr name)
   /* -------------------------------------- */
   /*     Hashes                             */
   /* -------------------------------------- */
-  insert_assoc(self->name2index, name, (node_ptr) NULL);
+  insert_assoc(self->name2index, name, (node_ptr)NULL);
 
   /* -------------------------------------- */
   /*     Counters                           */
@@ -4246,11 +4097,9 @@ static void bdd_enc_remove_input_var(BddEnc_ptr self, node_ptr name)
   This is a service of method remove_var. DO NOT call
    this directly.
 */
-static void bdd_enc_remove_state_var(BddEnc_ptr self, node_ptr name)
-{
+static void bdd_enc_remove_state_var(BddEnc_ptr self, node_ptr name) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   add_ptr curr_add, next_add, tmp_add;
   int curr_index;
@@ -4258,7 +4107,6 @@ static void bdd_enc_remove_state_var(BddEnc_ptr self, node_ptr name)
   int next_index;
 
   next_name = bdd_enc_get_next_state_var_name(nodemgr, name);
-
 
   /* -------------------------------------- */
   /*     Cubes                              */
@@ -4284,8 +4132,7 @@ static void bdd_enc_remove_state_var(BddEnc_ptr self, node_ptr name)
   /*     Minterms                           */
   /* -------------------------------------- */
   curr_index = bdd_enc_name_to_index(self, name);
-  bdd_enc_remove_var_from_minterm(self, curr_index,
-                                  self->minterm_state_vars,
+  bdd_enc_remove_var_from_minterm(self, curr_index, self->minterm_state_vars,
                                   self->minterm_state_vars_dim);
 
   bdd_enc_remove_var_from_minterm(self, curr_index,
@@ -4297,13 +4144,11 @@ static void bdd_enc_remove_state_var(BddEnc_ptr self, node_ptr name)
                                   self->minterm_state_frozen_input_vars_dim);
 
   next_index = bdd_enc_name_to_index(self, next_name);
-  nusmv_assert(array_fetch(int, self->current2next, curr_index)
-               == next_index);
+  nusmv_assert(array_fetch(int, self->current2next, curr_index) == next_index);
 
   bdd_enc_remove_var_from_minterm(self, next_index,
                                   self->minterm_next_state_vars,
                                   self->minterm_next_state_vars_dim);
-
 
   /* -------------------------------------- */
   /*     Gaps for index reuse               */
@@ -4327,9 +4172,8 @@ static void bdd_enc_remove_state_var(BddEnc_ptr self, node_ptr name)
   /* -------------------------------------- */
   /*     Hashes                             */
   /* -------------------------------------- */
-  insert_assoc(self->name2index, name, (node_ptr) NULL);
-  insert_assoc(self->name2index, next_name, (node_ptr) NULL);
-
+  insert_assoc(self->name2index, name, (node_ptr)NULL);
+  insert_assoc(self->name2index, next_name, (node_ptr)NULL);
 
   /* -------------------------------------- */
   /*     Counters                           */
@@ -4352,8 +4196,7 @@ static void bdd_enc_remove_state_var(BddEnc_ptr self, node_ptr name)
   This is a service of method remove_var. DO NOT call
    this directly.
 */
-static void bdd_enc_remove_frozen_var(BddEnc_ptr self, node_ptr name)
-{
+static void bdd_enc_remove_frozen_var(BddEnc_ptr self, node_ptr name) {
   add_ptr frozen_add, tmp_add;
   int index;
 
@@ -4373,12 +4216,10 @@ static void bdd_enc_remove_frozen_var(BddEnc_ptr self, node_ptr name)
   /*     Minterms                           */
   /* -------------------------------------- */
   index = bdd_enc_name_to_index(self, name);
-  bdd_enc_remove_var_from_minterm(self, index,
-                                  self->minterm_frozen_vars,
+  bdd_enc_remove_var_from_minterm(self, index, self->minterm_frozen_vars,
                                   self->minterm_frozen_vars_dim);
 
-  bdd_enc_remove_var_from_minterm(self, index,
-                                  self->minterm_state_frozen_vars,
+  bdd_enc_remove_var_from_minterm(self, index, self->minterm_state_frozen_vars,
                                   self->minterm_state_frozen_vars_dim);
 
   bdd_enc_remove_var_from_minterm(self, index,
@@ -4389,7 +4230,6 @@ static void bdd_enc_remove_frozen_var(BddEnc_ptr self, node_ptr name)
   /*     Gaps for index reuse               */
   /* -------------------------------------- */
   bdd_enc_insert_gap(self, index, 1);
-
 
   /* -------------------------------------- */
   /*     Cache and permutation arrays       */
@@ -4402,7 +4242,7 @@ static void bdd_enc_remove_frozen_var(BddEnc_ptr self, node_ptr name)
   /* -------------------------------------- */
   /*     Hashes                             */
   /* -------------------------------------- */
-  insert_assoc(self->name2index, name, (node_ptr) NULL);
+  insert_assoc(self->name2index, name, (node_ptr)NULL);
 
   /* -------------------------------------- */
   /*     Counters                           */
@@ -4424,8 +4264,7 @@ static void bdd_enc_remove_frozen_var(BddEnc_ptr self, node_ptr name)
   A bunch of calls to this method, must be followed by
    a call to compact_minterms_array, to compact the minterms arrays
 */
-static void bdd_enc_remove_var(BddEnc_ptr self, node_ptr name)
-{
+static void bdd_enc_remove_var(BddEnc_ptr self, node_ptr name) {
   int curr_index;
 
   boolean is_state_var;
@@ -4435,8 +4274,8 @@ static void bdd_enc_remove_var(BddEnc_ptr self, node_ptr name)
   /* ------------------------------ */
   nusmv_assert(SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, name));
 
-  is_state_var = SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table,
-                                               name);
+  is_state_var =
+      SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table, name);
 
   curr_index = bdd_enc_name_to_index(self, name);
 
@@ -4444,18 +4283,19 @@ static void bdd_enc_remove_var(BddEnc_ptr self, node_ptr name)
      i.e. next state variable is type NEXT NEXT */
   if (node_get_type(name) == NEXT && is_state_var) {
     nusmv_assert(array_fetch(int, self->next2current,
-                             array_fetch(int, self->current2next, curr_index))
-                 == curr_index);
+                             array_fetch(int, self->current2next,
+                                         curr_index)) == curr_index);
   }
   /* ------------------------------ */
   /*    The actual removal          */
   /* ------------------------------ */
-  if (is_state_var) bdd_enc_remove_state_var(self, name);
+  if (is_state_var)
+    bdd_enc_remove_state_var(self, name);
   else if (SymbTable_is_symbol_input_var(BASE_ENC(self)->symb_table, name)) {
     bdd_enc_remove_input_var(self, name);
-  }
-  else {
-    nusmv_assert(SymbTable_is_symbol_frozen_var(BASE_ENC(self)->symb_table, name));
+  } else {
+    nusmv_assert(
+        SymbTable_is_symbol_frozen_var(BASE_ENC(self)->symb_table, name));
     bdd_enc_remove_frozen_var(self, name);
   }
 }
@@ -4470,15 +4310,15 @@ static void bdd_enc_remove_var(BddEnc_ptr self, node_ptr name)
   \sa bdd_enc_compact_minterms_array
 */
 static void bdd_enc_remove_var_from_minterm(BddEnc_ptr self, int var_idx,
-                                            array_t* minterms_array,
-                                            int minterms_array_len)
-{
+                                            array_t *minterms_array,
+                                            int minterms_array_len) {
   int i;
 
-  for (i=0; i < minterms_array_len; ++i) {
-    if (array_fetch(bdd_ptr, minterms_array, i) == (bdd_ptr) NULL) continue;
-    if (var_idx == bdd_index(self->dd,
-                             array_fetch(bdd_ptr, minterms_array, i))) {
+  for (i = 0; i < minterms_array_len; ++i) {
+    if (array_fetch(bdd_ptr, minterms_array, i) == (bdd_ptr)NULL)
+      continue;
+    if (var_idx ==
+        bdd_index(self->dd, array_fetch(bdd_ptr, minterms_array, i))) {
       bdd_free(self->dd, array_fetch(bdd_ptr, minterms_array, i));
       array_insert(bdd_ptr, minterms_array, i, NULL);
       break;
@@ -4492,10 +4332,8 @@ static void bdd_enc_remove_var_from_minterm(BddEnc_ptr self, int var_idx,
 
 
 */
-static node_ptr
-bdd_enc_get_next_state_var_name(NodeMgr_ptr nodemgr,
-                                node_ptr name)
-{
+static node_ptr bdd_enc_get_next_state_var_name(NodeMgr_ptr nodemgr,
+                                                node_ptr name) {
   return find_node(nodemgr, NEXT, name, Nil);
 }
 
@@ -4523,12 +4361,11 @@ bdd_enc_get_next_state_var_name(NodeMgr_ptr nodemgr,
 */
 static NodeList_ptr
 bdd_enc_append_bool_vars_from_layers(BddEnc_ptr self, NodeList_ptr layers,
-                                     boolean* layers_interleaved)
-{
+                                     boolean *layers_interleaved) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   NodeList_ptr result = NodeList_create();
   node_ptr sorting_cache = Nil; /* used only if bit-interleaving is set up */
@@ -4549,10 +4386,10 @@ bdd_enc_append_bool_vars_from_layers(BddEnc_ptr self, NodeList_ptr layers,
 
     /* the layer has to be a scalar layer, i.e. there must exist a
        boolean layer for it. */
-    nusmv_assert(SymbTable_get_layer(symb_table,
-                                     BoolEnc_scalar_layer_to_bool_layer(bool_enc,
-                              SymbLayer_get_name(layer))) != SYMB_LAYER(NULL));
-
+    nusmv_assert(SymbTable_get_layer(
+                     symb_table, BoolEnc_scalar_layer_to_bool_layer(
+                                     bool_enc, SymbLayer_get_name(layer))) !=
+                 SYMB_LAYER(NULL));
 
     switch (get_vars_order_type(opts)) {
     case VARS_ORD_INPUTS_BEFORE_BI:
@@ -4594,28 +4431,26 @@ bdd_enc_append_bool_vars_from_layers(BddEnc_ptr self, NodeList_ptr layers,
 
         if (SymbTable_is_symbol_bool_var(symb_table, var)) {
           if (isBitInterleaved) {
-            Enc_append_bit_to_sorted_list(symb_table, result,
-                                          var, &sorting_cache);
-          }
-          else NodeList_append(result, var);   /* pushes it as it is */
-        }
-        else {
+            Enc_append_bit_to_sorted_list(symb_table, result, var,
+                                          &sorting_cache);
+          } else
+            NodeList_append(result, var); /* pushes it as it is */
+        } else {
           /* Skip variables that are not booleanizable. */
-          if (Compile_is_expr_booleanizable(symb_table, var,
-               !opt_bdd_encoding_word_bits(opts),
-               cache)) {
+          if (Compile_is_expr_booleanizable(
+                  symb_table, var, !opt_bdd_encoding_word_bits(opts), cache)) {
             /* pushes the bits composing the scalar variable.
                Grouping is done by caller function */
             NodeList_ptr bits = BoolEnc_get_var_bits(
-                   BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self)), var);
+                BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self)), var);
             ListIter_ptr bit_iter;
             NODE_LIST_FOREACH(bits, bit_iter) {
               node_ptr var = NodeList_get_elem_at(bits, bit_iter);
               if (isBitInterleaved) {
-                Enc_append_bit_to_sorted_list(symb_table, result,
-                                              var, &sorting_cache);
-              }
-              else NodeList_append(result, var);   /* pushes it as it is */
+                Enc_append_bit_to_sorted_list(symb_table, result, var,
+                                              &sorting_cache);
+              } else
+                NodeList_append(result, var); /* pushes it as it is */
             }
             NodeList_destroy(bits);
           }
@@ -4629,7 +4464,8 @@ bdd_enc_append_bool_vars_from_layers(BddEnc_ptr self, NodeList_ptr layers,
   free_list(nodemgr, sorting_cache);
   free_assoc(cache);
 
-  if (NodeList_get_length(layers) > 1) *layers_interleaved = isBitInterleaved;
+  if (NodeList_get_length(layers) > 1)
+    *layers_interleaved = isBitInterleaved;
   return result;
 }
 
@@ -4639,9 +4475,8 @@ bdd_enc_append_bool_vars_from_layers(BddEnc_ptr self, NodeList_ptr layers,
 
 
 */
-static NodeList_ptr
-bdd_enc_get_var_booleanizations(BddEnc_ptr self, Set_t vars)
-{
+static NodeList_ptr bdd_enc_get_var_booleanizations(BddEnc_ptr self,
+                                                    Set_t vars) {
   NodeList_ptr result;
   SymbTable_ptr symb_table;
   Set_Iterator_t viter;
@@ -4656,21 +4491,20 @@ bdd_enc_get_var_booleanizations(BddEnc_ptr self, Set_t vars)
     var = Set_GetMember(vars, viter);
 
     if (SymbTable_is_symbol_bool_var(symb_table, var)) {
-      NodeList_append(result, var);   /* pushes it as it is */
-    }
-    else {
+      NodeList_append(result, var); /* pushes it as it is */
+    } else {
       if (Compile_is_expr_booleanizable(symb_table, var, false, cache)) {
         NodeList_ptr bits;
         ListIter_ptr bit_iter;
 
-        bits = BoolEnc_get_var_bits(BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self)),
-                                    var);
+        bits = BoolEnc_get_var_bits(
+            BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self)), var);
 
-        NODE_LIST_FOREACH(bits,bit_iter) {
+        NODE_LIST_FOREACH(bits, bit_iter) {
           node_ptr bvar;
 
           bvar = NodeList_get_elem_at(bits, bit_iter);
-          NodeList_append(result, bvar);   /* pushes it as it is */
+          NodeList_append(result, bvar); /* pushes it as it is */
         }
         NodeList_destroy(bits);
       }
@@ -4695,13 +4529,10 @@ bdd_enc_get_var_booleanizations(BddEnc_ptr self, Set_t vars)
    created, whereas the returned list is the 'flat' version
    (i.e. without grouping information) of those variables.
 */
-static NodeList_ptr
-bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
-                                            OrdGroups_ptr old_group,
-                                            OrdGroups_ptr res_group,
-                                            boolean* interleaved)
-{
-  const char* bool_name;
+static NodeList_ptr bdd_enc_sort_variables_and_groups_according(
+    BddEnc_ptr self, OrdGroups_ptr old_group, OrdGroups_ptr res_group,
+    boolean *interleaved) {
+  const char *bool_name;
   NodeList_ptr all_po_vars, res_ord_vars;
   ListIter_ptr iter;
   NodeList_ptr layer_list;
@@ -4719,23 +4550,23 @@ bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
   /* fills the partially ordered list of all variables that had been
      committed so far, in order to return the fully ordered list */
   for (iter = NodeList_get_first_iter(BASE_ENC(self)->committed_layers);
-      !ListIter_is_end(iter);
-      iter = ListIter_get_next(iter)) {
-    SymbLayer_ptr com_layer
-      = SYMB_LAYER(NodeList_get_elem_at(BASE_ENC(self)->committed_layers, iter));
+       !ListIter_is_end(iter); iter = ListIter_get_next(iter)) {
+    SymbLayer_ptr com_layer = SYMB_LAYER(
+        NodeList_get_elem_at(BASE_ENC(self)->committed_layers, iter));
 
     /* checks that it is not a layer deriving from the booleanization
        process: get the name that the boolean layer would have, and if
        that boolean layer exists, than com_layer is not a boolean layer */
-    bool_name = BoolEnc_scalar_layer_to_bool_layer(bool_enc, SymbLayer_get_name(com_layer));
+    bool_name = BoolEnc_scalar_layer_to_bool_layer(
+        bool_enc, SymbLayer_get_name(com_layer));
     if (SymbTable_get_layer(BASE_ENC(self)->symb_table, bool_name) !=
         SYMB_LAYER(NULL)) {
       /* layer has an associated boolean layer, so it is a scalar layer */
       NodeList_append(layer_list, (node_ptr)com_layer);
     }
   }
-  all_po_vars = bdd_enc_append_bool_vars_from_layers(self, layer_list,
-                                                     interleaved);
+  all_po_vars =
+      bdd_enc_append_bool_vars_from_layers(self, layer_list, interleaved);
 
   /* creates the final ordered list, taking into account the ordering
      groups, and generates a new groups set to be returned, and to be
@@ -4748,9 +4579,8 @@ bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
     NodeList_ptr gr_vars;
     ListIter_ptr gr_iter;
 
-    for (iter = NodeList_get_first_iter(all_po_vars);
-        !ListIter_is_end(iter);
-        iter = ListIter_get_next(iter)) {
+    for (iter = NodeList_get_first_iter(all_po_vars); !ListIter_is_end(iter);
+         iter = ListIter_get_next(iter)) {
 
       name = NodeList_get_elem_at(all_po_vars, iter);
 
@@ -4762,8 +4592,7 @@ bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
         if (!NodeList_belongs_to(res_ord_vars, name)) {
           NodeList_append(res_ord_vars, name);
         }
-      }
-      else {
+      } else {
         /*
          * it is grouped, insert all the previous not inserted groups
          * up to the group that has been just found
@@ -4782,8 +4611,8 @@ bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
           gr_vars = OrdGroups_get_vars_in_group(old_group, gr_id);
 
           for (gr_iter = NodeList_get_first_iter(gr_vars);
-              !ListIter_is_end(gr_iter);
-              gr_iter = ListIter_get_next(gr_iter)) {
+               !ListIter_is_end(gr_iter);
+               gr_iter = ListIter_get_next(gr_iter)) {
 
             var_name = NodeList_get_elem_at(gr_vars, gr_iter);
 
@@ -4802,11 +4631,11 @@ bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
               OrdGroups_add_variable(res_group, var_name, new_group_id);
             } /* if (NodeList_belongs_to(all_po_vars, var_name) &&
                  !NodeList_belongs_to(res_ord_vars, var_name)) */
-          } /* loop on vars in the group */
-        } /* for all groups up to the current one */
+          }   /* loop on vars in the group */
+        }     /* for all groups up to the current one */
 
         curr_group = group + 1; /* passes to the following group */
-      } /* if (-1 == group) */
+      }                         /* if (-1 == group) */
 
     } /* main loop on variables */
   }
@@ -4834,12 +4663,11 @@ bdd_enc_sort_variables_and_groups_according(BddEnc_ptr self,
    'flat' version (i.e. without grouping information) of those
    variables.
 */
-static NodeList_ptr
-bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
-                                  OrdGroups_ptr res_group,
-                                  boolean* needs_reshuffle,
-                                  boolean* interleaved)
-{
+static NodeList_ptr bdd_enc_sort_variables_and_groups(BddEnc_ptr self,
+                                                      SymbLayer_ptr layer,
+                                                      OrdGroups_ptr res_group,
+                                                      boolean *needs_reshuffle,
+                                                      boolean *interleaved) {
   NodeList_ptr new_po_vars;
   NodeList_ptr all_po_vars;
   NodeList_ptr res_ord_vars = NodeList_create();
@@ -4849,14 +4677,16 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
   NodeList_ptr layer_list = NodeList_create();
 
   /* This variable is used to control reshuffle ouput parameter */
-  enum { needs_reshuffle_wait,
-         needs_reshuffle_yes,
-         needs_reshuffle_no } reshuffle = needs_reshuffle_wait;
+  enum {
+    needs_reshuffle_wait,
+    needs_reshuffle_yes,
+    needs_reshuffle_no
+  } reshuffle = needs_reshuffle_wait;
 
   NodeList_append(layer_list, (node_ptr)layer);
 
-  new_po_vars = bdd_enc_append_bool_vars_from_layers(self, layer_list,
-                                                     interleaved);
+  new_po_vars =
+      bdd_enc_append_bool_vars_from_layers(self, layer_list, interleaved);
   nusmv_assert(!(*interleaved)); /* there is only one layer! */
 
   NodeList_remove_elem_at(layer_list, NodeList_get_first_iter(layer_list));
@@ -4865,15 +4695,15 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
      committed so far, in order to return the fully ordered list */
   iter = NodeList_get_first_iter(BASE_ENC(self)->committed_layers);
   while (!ListIter_is_end(iter)) {
-    const char* bool_name;
-    SymbLayer_ptr com_layer =
-      SYMB_LAYER(NodeList_get_elem_at(BASE_ENC(self)->committed_layers, iter));
+    const char *bool_name;
+    SymbLayer_ptr com_layer = SYMB_LAYER(
+        NodeList_get_elem_at(BASE_ENC(self)->committed_layers, iter));
 
     /* checks that it is not a layer deriving from the booleanization
        process: get the name that the boolean layer would have, and if
        that boolean layer exists, than com_layer is not a boolean layer */
-    bool_name =
-      BoolEnc_scalar_layer_to_bool_layer(bool_enc, SymbLayer_get_name(com_layer));
+    bool_name = BoolEnc_scalar_layer_to_bool_layer(
+        bool_enc, SymbLayer_get_name(com_layer));
 
     if (SymbTable_get_layer(BASE_ENC(self)->symb_table, bool_name) !=
         SYMB_LAYER(NULL)) {
@@ -4884,8 +4714,8 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
     iter = ListIter_get_next(iter);
   }
 
-  all_po_vars = bdd_enc_append_bool_vars_from_layers(self, layer_list,
-                                                     interleaved);
+  all_po_vars =
+      bdd_enc_append_bool_vars_from_layers(self, layer_list, interleaved);
 
   /* creates the final ordered list, taking into account the ordering
      groups, and generates a new groups set to be returned, and to be
@@ -4914,13 +4744,13 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
           if (NodeList_belongs_to(new_po_vars, name)) {
 
             if (BoolEnc_is_var_bit(bool_enc, name)) {
-              node_ptr scalar_name = BoolEnc_get_scalar_var_from_bit(bool_enc, name);
+              node_ptr scalar_name =
+                  BoolEnc_get_scalar_var_from_bit(bool_enc, name);
               if (curr_scalar_var == Nil || scalar_name != curr_scalar_var) {
                 curr_scalar_group = OrdGroups_create_group(res_group);
                 curr_scalar_var = scalar_name;
               }
-            }
-            else {
+            } else {
               curr_scalar_group = OrdGroups_create_group(res_group);
               curr_scalar_var = Nil;
             }
@@ -4930,14 +4760,14 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
                same group for ungroupped bits of scalar vars */
             nusmv_assert(curr_scalar_group >= 0);
             OrdGroups_add_variable(res_group, name, curr_scalar_group);
-            if (reshuffle == needs_reshuffle_wait) reshuffle = needs_reshuffle_no;
-          }
-          else { /* it is not a new var */
-            if (reshuffle == needs_reshuffle_no) reshuffle = needs_reshuffle_yes;
+            if (reshuffle == needs_reshuffle_wait)
+              reshuffle = needs_reshuffle_no;
+          } else { /* it is not a new var */
+            if (reshuffle == needs_reshuffle_no)
+              reshuffle = needs_reshuffle_yes;
           }
         }
-      }
-      else {
+      } else {
         /* it is grouped, insert all the previous not inserted groups
            up to the group that has been just found */
         int gr_id;
@@ -4971,8 +4801,7 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
                 if (reshuffle == needs_reshuffle_wait) {
                   reshuffle = needs_reshuffle_no;
                 }
-              }
-              else {
+              } else {
                 /* not a new var */
                 if (reshuffle == needs_reshuffle_no) {
                   reshuffle = needs_reshuffle_yes;
@@ -4982,7 +4811,7 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
 
             gr_iter = ListIter_get_next(gr_iter);
           } /* loop on vars in the group */
-        } /* for all groups up to the current one */
+        }   /* for all groups up to the current one */
 
         curr_group = group + 1; /* passes to the following group */
       }
@@ -5008,16 +4837,16 @@ bdd_enc_sort_variables_and_groups(BddEnc_ptr self, SymbLayer_ptr layer,
   Returns the actual length of the compacted array
 */
 static int bdd_enc_compact_minterms_array(BddEnc_ptr self,
-                                          array_t* minterms_array,
-                                          int minterms_array_len)
-{
+                                          array_t *minterms_array,
+                                          int minterms_array_len) {
   int ofs = 0;
   int i;
 
-  for (i=0; i < minterms_array_len; ++i) {
-    if (array_fetch(bdd_ptr, minterms_array, i) == (bdd_ptr) NULL) ++ofs;
+  for (i = 0; i < minterms_array_len; ++i) {
+    if (array_fetch(bdd_ptr, minterms_array, i) == (bdd_ptr)NULL)
+      ++ofs;
     else if (ofs > 0) {
-      array_insert(bdd_ptr, minterms_array, i-ofs,
+      array_insert(bdd_ptr, minterms_array, i - ofs,
                    array_fetch(bdd_ptr, minterms_array, i));
       array_insert(bdd_ptr, minterms_array, i, NULL);
     }
@@ -5035,12 +4864,13 @@ static int bdd_enc_compact_minterms_array(BddEnc_ptr self,
 
   \sa bdd_enc_unlock_reordering
 */
-static void bdd_enc_lock_reordering(BddEnc_ptr self)
-{
+static void bdd_enc_lock_reordering(BddEnc_ptr self) {
   if (self->reord_locked_num == 0) {
-    self->reord_status = dd_reordering_status(self->dd,
-                                              &(self->curr_reord_type));
-    if (self->reord_status == 1) { dd_autodyn_disable(self->dd); }
+    self->reord_status =
+        dd_reordering_status(self->dd, &(self->curr_reord_type));
+    if (self->reord_status == 1) {
+      dd_autodyn_disable(self->dd);
+    }
   }
 
   self->reord_locked_num += 1;
@@ -5054,8 +4884,7 @@ static void bdd_enc_lock_reordering(BddEnc_ptr self)
 
   \sa bdd_enc_lock_reordering
 */
-static void bdd_enc_unlock_reordering(BddEnc_ptr self)
-{
+static void bdd_enc_unlock_reordering(BddEnc_ptr self) {
   nusmv_assert(self->reord_locked_num > 0); /* locked at least once */
 
   self->reord_locked_num -= 1;
@@ -5070,12 +4899,9 @@ static void bdd_enc_unlock_reordering(BddEnc_ptr self)
   This method guarantees that the list of gaps
    is ordered
 */
-static void
-bdd_enc_insert_gap(BddEnc_ptr self, int index, size_t gap_size)
-{
+static void bdd_enc_insert_gap(BddEnc_ptr self, int index, size_t gap_size) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   /* searches the insertion point within the list of gaps: */
   ListIter_ptr iter;
@@ -5097,25 +4923,22 @@ bdd_enc_insert_gap(BddEnc_ptr self, int index, size_t gap_size)
         if (index == prev_idx + prev_size) {
           /* attaches to the previous gap */
           setcdr(el, NODE_FROM_INT(prev_size + gap_size));
-        }
-        else {
+        } else {
           /* creates a new gaps group */
-          NodeList_insert_after(self->index_gaps, prev,
-                                cons(nodemgr, NODE_FROM_INT(index),
-                                     NODE_FROM_INT(gap_size)));
+          NodeList_insert_after(
+              self->index_gaps, prev,
+              cons(nodemgr, NODE_FROM_INT(index), NODE_FROM_INT(gap_size)));
         }
-      }
-      else { /* to the head */
+      } else {                                      /* to the head */
         nusmv_assert(index + gap_size <= iter_idx); /* no overlap */
         if (index + gap_size == iter_idx) {
           /* reuses the existing first node */
           setcar(el, NODE_FROM_INT(index));
           setcdr(el, NODE_FROM_INT(NODE_TO_INT(cdr(el)) + gap_size));
-        }
-        else {
+        } else {
           /* prepend a new gap */
-          NodeList_prepend(self->index_gaps,
-                           cons(nodemgr, NODE_FROM_INT(index), NODE_FROM_INT(gap_size)));
+          NodeList_prepend(self->index_gaps, cons(nodemgr, NODE_FROM_INT(index),
+                                                  NODE_FROM_INT(gap_size)));
         }
       }
       inserted = true;
@@ -5131,22 +4954,19 @@ bdd_enc_insert_gap(BddEnc_ptr self, int index, size_t gap_size)
       node_ptr el = NodeList_get_elem_at(self->index_gaps, prev); /* last */
       int prev_idx = NODE_TO_INT(car(el));
       int prev_size = NODE_TO_INT(cdr(el));
-      nusmv_assert(index >= prev_idx+prev_size); /* no overlap */
-      if (index == prev_idx+prev_size) {
+      nusmv_assert(index >= prev_idx + prev_size); /* no overlap */
+      if (index == prev_idx + prev_size) {
         /* attaches to the last gap */
         setcdr(el, NODE_FROM_INT(prev_size + gap_size));
+      } else {
+        NodeList_append(self->index_gaps, cons(nodemgr, NODE_FROM_INT(index),
+                                               NODE_FROM_INT(gap_size)));
       }
-      else {
-        NodeList_append(self->index_gaps,
-                        cons(nodemgr, NODE_FROM_INT(index), NODE_FROM_INT(gap_size)));
-      }
-    }
-    else { /* the list was empty */
-      NodeList_append(self->index_gaps,
-                      cons(nodemgr, NODE_FROM_INT(index), NODE_FROM_INT(gap_size)));
+    } else { /* the list was empty */
+      NodeList_append(self->index_gaps, cons(nodemgr, NODE_FROM_INT(index),
+                                             NODE_FROM_INT(gap_size)));
     }
   }
-
 }
 
 /*!
@@ -5157,14 +4977,11 @@ bdd_enc_insert_gap(BddEnc_ptr self, int index, size_t gap_size)
    splitted into to smaller gaps. If the gap is not found, an internal
    error occurs.
 */
-static void
-bdd_enc_remove_gap(BddEnc_ptr self, int index, size_t size)
-{
+static void bdd_enc_remove_gap(BddEnc_ptr self, int index, size_t size) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   /* searches the removal point within the list of gaps: */
   ListIter_ptr iter;
@@ -5176,9 +4993,9 @@ bdd_enc_remove_gap(BddEnc_ptr self, int index, size_t size)
     gap_idx = NODE_TO_INT(car(el));
     gap_size = NODE_TO_INT(cdr(el));
 
-    if ((index >= gap_idx) && (index < gap_idx+gap_size)) {
+    if ((index >= gap_idx) && (index < gap_idx + gap_size)) {
       /* found the gap to be affected */
-      nusmv_assert(size <= gap_idx+gap_size-index); /* enough space */
+      nusmv_assert(size <= gap_idx + gap_size - index); /* enough space */
 
       if (index == gap_idx && size == (unsigned int)gap_size) {
         /* removes the whole gap */
@@ -5192,24 +5009,24 @@ bdd_enc_remove_gap(BddEnc_ptr self, int index, size_t size)
       if (index == gap_idx) { /* at the begin */
         setcdr(el, NODE_FROM_INT(gap_size - size));
         setcar(el, NODE_FROM_INT(gap_idx + size));
-      }
-      else if (index + size == gap_idx + gap_size) { /* at the end */
+      } else if (index + size == gap_idx + gap_size) { /* at the end */
         setcdr(el, NODE_FROM_INT(gap_size - size));
-      }
-      else { /* in the middle, splits the gap */
+      } else { /* in the middle, splits the gap */
         setcdr(el, NODE_FROM_INT(index - gap_idx)); /* left gap adjust size */
 
         /* adds a new gap */
-        NodeList_insert_after(self->index_gaps, iter,
-                              cons(nodemgr, NODE_FROM_INT(index+size),
-                                   NODE_FROM_INT(gap_size - (index+size-gap_idx))));
+        NodeList_insert_after(
+            self->index_gaps, iter,
+            cons(nodemgr, NODE_FROM_INT(index + size),
+                 NODE_FROM_INT(gap_size - (index + size - gap_idx))));
       }
       return;
     }
   } /* for all gaps in self->index_gaps */
 
-  ErrorMgr_internal_error(errmgr, "bdd_enc_remove_gap: gap index=%d size=%d not found",
-                 index, size); /* gap not found */
+  ErrorMgr_internal_error(errmgr,
+                          "bdd_enc_remove_gap: gap index=%d size=%d not found",
+                          index, size); /* gap not found */
 }
 
 /*!
@@ -5221,8 +5038,7 @@ bdd_enc_remove_gap(BddEnc_ptr self, int index, size_t size)
    that a corresponding current state var exists. If it does not, again an
    assertion will be thrown.
 */
-static int bdd_enc_name_to_index(const BddEnc_ptr self, node_ptr name)
-{
+static int bdd_enc_name_to_index(const BddEnc_ptr self, node_ptr name) {
   int index;
 
   index = NODE_TO_INT(find_assoc(self->name2index, name));
@@ -5245,12 +5061,13 @@ static int bdd_enc_name_to_index(const BddEnc_ptr self, node_ptr name)
 
   Used when destroying node list containing node_ptr
 */
-static assoc_retval hash_node_free(char* key, char* data, char* arg)
-{
+static assoc_retval hash_node_free(char *key, char *data, char *arg) {
   const NodeMgr_ptr nodemgr = NODE_MGR(arg);
-  node_ptr element = (node_ptr) data;
+  node_ptr element = (node_ptr)data;
 
-  if (element != Nil) { free_node(nodemgr, element); }
+  if (element != Nil) {
+    free_node(nodemgr, element);
+  }
   return ASSOC_DELETE;
 }
 
@@ -5259,12 +5076,13 @@ static assoc_retval hash_node_free(char* key, char* data, char* arg)
 
   Used when destroying hash containing add_ptr as key
 */
-static assoc_retval hash_add_key_free(char* key, char* data, char* arg)
-{
-  add_ptr add = (add_ptr) key;
-  DDMgr_ptr dd = (DDMgr_ptr ) arg;
+static assoc_retval hash_add_key_free(char *key, char *data, char *arg) {
+  add_ptr add = (add_ptr)key;
+  DDMgr_ptr dd = (DDMgr_ptr)arg;
 
-  if (add != (add_ptr) NULL) { add_free(dd, add); }
+  if (add != (add_ptr)NULL) {
+    add_free(dd, add);
+  }
   return ASSOC_DELETE;
 }
 
@@ -5275,9 +5093,9 @@ static assoc_retval hash_add_key_free(char* key, char* data, char* arg)
   Private service used by higher level mask-related
    methods
 */
-static add_ptr bdd_enc_get_vars_list_mask(BddEnc_ptr self, const SymbLayer_ptr layer,
-                                          SymbLayerIter* iter)
-{
+static add_ptr bdd_enc_get_vars_list_mask(BddEnc_ptr self,
+                                          const SymbLayer_ptr layer,
+                                          SymbLayerIter *iter) {
   add_ptr mask;
 
   mask = add_true(self->dd);
@@ -5306,17 +5124,15 @@ static add_ptr bdd_enc_get_vars_list_mask(BddEnc_ptr self, const SymbLayer_ptr l
    automatic reordering *must* be disabled before calling this
    method.
 */
-static add_ptr
-bdd_enc_get_var_mask_recur(BddEnc_ptr self, add_ptr var_encoding, add_ptr cube)
-{
+static add_ptr bdd_enc_get_var_mask_recur(BddEnc_ptr self, add_ptr var_encoding,
+                                          add_ptr cube) {
   add_ptr res;
 
-  if (add_isleaf(cube))  {
+  if (add_isleaf(cube)) {
     /* base step: visit is over, exits: */
     nusmv_assert(add_isleaf(var_encoding));
     res = add_true(self->dd);
-  }
-  else {
+  } else {
     /* inductive step, evaluates whether it is a constant or a var: */
 
     if (add_isleaf(var_encoding)) {
@@ -5326,31 +5142,28 @@ bdd_enc_get_var_mask_recur(BddEnc_ptr self, add_ptr var_encoding, add_ptr cube)
 
       t = bdd_enc_get_var_mask_recur(self, var_encoding,
                                      add_then(self->dd, cube));
-      nusmv_assert(t != (add_ptr) NULL);
+      nusmv_assert(t != (add_ptr)NULL);
 
       res = add_build(self->dd, add_index(self->dd, cube), zero, t);
-      nusmv_assert(res != (add_ptr) NULL);
+      nusmv_assert(res != (add_ptr)NULL);
 
       add_free(self->dd, t);
       add_free(self->dd, zero);
-    }
-    else {
+    } else {
       /* it is a variable, keep visiting the dag, searching for gaps
          to fill */
       add_ptr t, e;
 
-      t =  bdd_enc_get_var_mask_recur(self,
-                                      add_then(self->dd, var_encoding),
-                                      add_then(self->dd, cube));
-      nusmv_assert(t != (add_ptr) NULL);
+      t = bdd_enc_get_var_mask_recur(self, add_then(self->dd, var_encoding),
+                                     add_then(self->dd, cube));
+      nusmv_assert(t != (add_ptr)NULL);
 
-      e =  bdd_enc_get_var_mask_recur(self,
-                                      add_else(self->dd, var_encoding),
-                                      add_then(self->dd, cube));
-      nusmv_assert(e != (add_ptr) NULL);
+      e = bdd_enc_get_var_mask_recur(self, add_else(self->dd, var_encoding),
+                                     add_then(self->dd, cube));
+      nusmv_assert(e != (add_ptr)NULL);
 
       res = add_build(self->dd, add_index(self->dd, cube), t, e);
-      nusmv_assert(res != (add_ptr) NULL);
+      nusmv_assert(res != (add_ptr)NULL);
 
       add_free(self->dd, e);
       add_free(self->dd, t);
@@ -5411,25 +5224,24 @@ bdd_enc_get_var_mask_recur(BddEnc_ptr self, add_ptr var_encoding, add_ptr cube)
   \sa eval_recur, AddArray_ptr
 */
 static AddArray_ptr bdd_enc_eval(BddEnc_ptr self, Expr_ptr expr,
-                                 node_ptr context)
-{
+                                 node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   AddArray_ptr res = NULL;
   node_ptr hash_entry;
 
-  if (expr == Nil) return AddArray_from_add(add_true(self->dd));
+  if (expr == Nil)
+    return AddArray_from_add(add_true(self->dd));
 
   hash_entry = find_node(nodemgr, CONTEXT, context, expr);
   res = BddEncCache_get_evaluation(self->cache, hash_entry);
 
-  if ((res == (AddArray_ptr) NULL) || (res == BDD_ENC_EVALUATING)) {
+  if ((res == (AddArray_ptr)NULL) || (res == BDD_ENC_EVALUATING)) {
     int temp;
     /* debugging code */
     if (res == BDD_ENC_EVALUATING) {
       const ErrorMgr_ptr errmgr =
-        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+          ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
       ErrorMgr_rpterr(errmgr, "WARNING : THE SAME EXPR IS EVALUATED TWICE!\n");
     }
     temp = nusmv_yylineno;
@@ -5438,7 +5250,8 @@ static AddArray_ptr bdd_enc_eval(BddEnc_ptr self, Expr_ptr expr,
     nusmv_yylineno = temp;
 
     /* inserts the evaluated add array in the cache */
-    BddEncCache_set_evaluation(self->cache, hash_entry, AddArray_duplicate(res));
+    BddEncCache_set_evaluation(self->cache, hash_entry,
+                               AddArray_duplicate(res));
   }
 
   return res;
@@ -5464,21 +5277,22 @@ static AddArray_ptr bdd_enc_eval(BddEnc_ptr self, Expr_ptr expr,
 
   \sa eval get_definition
 */
-static AddArray_ptr
-bdd_enc_eval_recur_case_atom(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx)
+static AddArray_ptr bdd_enc_eval_recur_case_atom(BddEnc_ptr self, Expr_ptr expr,
+                                                 node_ptr ctx)
 
 {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   ResolveSymbol_ptr rs;
   node_ptr resName;
-  node_ptr param = (node_ptr) NULL;
+  node_ptr param = (node_ptr)NULL;
   add_ptr constant = (add_ptr)NULL;
 
   rs = SymbTable_resolve_symbol(BASE_ENC(self)->symb_table, expr, ctx);
   resName = ResolveSymbol_get_resolved_name(rs);
 
   /* If any error happened, throw it. */
-  if (ResolveSymbol_is_error(rs)) ResolveSymbol_throw_error(rs, env);
+  if (ResolveSymbol_is_error(rs))
+    ResolveSymbol_throw_error(rs, env);
 
   if (ResolveSymbol_is_constant(rs)) {
 #if __BDDENC_LAZY_COMMIT_LAYER__
@@ -5493,15 +5307,15 @@ bdd_enc_eval_recur_case_atom(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx)
   }
 
   /* the atom is a parameter */
-  if (param != (node_ptr) NULL) {
+  if (param != (node_ptr)NULL) {
     /* no need to free 'constant' because it must be zero here */
-    nusmv_assert(constant == (add_ptr) NULL);
+    nusmv_assert(constant == (add_ptr)NULL);
 
     return bdd_enc_eval(self, param, ctx);
   }
 
   /* the atom is a constant */
-  if (constant != (add_ptr) NULL) {
+  if (constant != (add_ptr)NULL) {
     return AddArray_from_add(constant); /*already referenced*/
   }
 
@@ -5515,9 +5329,9 @@ bdd_enc_eval_recur_case_atom(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx)
 
 
 */
-static AddArray_ptr
-bdd_enc_eval_recur_case_dot_array(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx)
-{
+static AddArray_ptr bdd_enc_eval_recur_case_dot_array(BddEnc_ptr self,
+                                                      Expr_ptr expr,
+                                                      node_ptr ctx) {
   ResolveSymbol_ptr rs;
   node_ptr name;
   AddArray_ptr res;
@@ -5531,7 +5345,7 @@ bdd_enc_eval_recur_case_dot_array(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx)
   if (res == ADD_ARRAY(NULL)) {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
     ErrorMgr_error_undefined(errmgr, name);
   }
 
@@ -5544,71 +5358,73 @@ bdd_enc_eval_recur_case_dot_array(BddEnc_ptr self, Expr_ptr expr, node_ptr ctx)
   The returned list belongs to the invoker.
 */
 static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
-                                       node_ptr ctx)
-{
+                                       node_ptr ctx) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const MasterPrinter_ptr wffprint = MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const MasterPrinter_ptr wffprint =
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   boolean tmp_bool;
 
-  if (expr == Nil)  return AddArray_from_add(add_true(self->dd));
+  if (expr == Nil)
+    return AddArray_from_add(add_true(self->dd));
 
   switch (node_get_type(expr)) {
 
   case ATOM:
     return bdd_enc_eval_recur_case_atom(self, expr, ctx);
 
-  case BIT:
-    {
-      ResolveSymbol_ptr rs;
-      node_ptr name;
+  case BIT: {
+    ResolveSymbol_ptr rs;
+    node_ptr name;
 
-      rs = SymbTable_resolve_symbol(BASE_ENC(self)->symb_table, expr, ctx);
-      name = ResolveSymbol_get_resolved_name(rs);
+    rs = SymbTable_resolve_symbol(BASE_ENC(self)->symb_table, expr, ctx);
+    name = ResolveSymbol_get_resolved_name(rs);
 #if __BDDENC_LAZY_COMMIT_LAYER__
-      return AddArray_from_add(lazy_commit_layer_and_get_add(self, name, __EVAL_VAR__));
+    return AddArray_from_add(
+        lazy_commit_layer_and_get_add(self, name, __EVAL_VAR__));
 #else
-      return AddArray_from_add(BddEncCache_lookup_boolean_var(self->cache, name));
+    return AddArray_from_add(BddEncCache_lookup_boolean_var(self->cache, name));
 #endif
+  }
+
+  case ARRAY: {
+    ResolveSymbol_ptr rs;
+
+    rs = SymbTable_resolve_symbol(BASE_ENC(self)->symb_table, expr, ctx);
+
+    if (ResolveSymbol_is_undefined(rs)) {
+      /* Array may be an identifier-with-brackets and may be
+         expression.  Here an array-expression is detected =>
+         expression is to be flattened at first to resolve
+         identifiers-with-brackets (see description of
+         flattener_core_flatten for details) and then general
+         function is to be invoked */
+      node_ptr tmp = Compile_FlattenSexp(BASE_ENC(self)->symb_table, expr, ctx);
+      nusmv_assert(tmp != expr); /* loop in recursion is impossible */
+      return bdd_enc_eval_recur(self, tmp, Nil);
+    } else {
+      /* array is actually identifier => process it with other identifiers */
+      return bdd_enc_eval_recur_case_dot_array(self, expr, ctx);
     }
-
-  case ARRAY:
-    {
-      ResolveSymbol_ptr rs;
-
-      rs = SymbTable_resolve_symbol(BASE_ENC(self)->symb_table, expr, ctx);
-
-      if (ResolveSymbol_is_undefined(rs)) {
-        /* Array may be an identifier-with-brackets and may be
-           expression.  Here an array-expression is detected =>
-           expression is to be flattened at first to resolve
-           identifiers-with-brackets (see description of
-           flattener_core_flatten for details) and then general
-           function is to be invoked */
-        node_ptr tmp = Compile_FlattenSexp(BASE_ENC(self)->symb_table,
-                                           expr, ctx);
-        nusmv_assert(tmp != expr); /* loop in recursion is impossible */
-        return bdd_enc_eval_recur(self, tmp, Nil);
-      }
-      else {
-        /* array is actually identifier => process it with other identifiers */
-        return bdd_enc_eval_recur_case_dot_array(self, expr, ctx);
-      }
-    }
+  }
 
   case DOT:
     return bdd_enc_eval_recur_case_dot_array(self, expr, ctx);
 
-  case CONTEXT: return bdd_enc_eval(self, cdr(expr), car(expr));
+  case CONTEXT:
+    return bdd_enc_eval(self, cdr(expr), car(expr));
 
-  case TRUEEXP:  return AddArray_from_add(add_true(self->dd));
-  case FALSEEXP: return AddArray_from_add(add_false(self->dd));
+  case TRUEEXP:
+    return AddArray_from_add(add_true(self->dd));
+  case FALSEEXP:
+    return AddArray_from_add(add_false(self->dd));
 
-  case NOT: return bdd_enc_unary_add_op(self, add_not, expr, ctx);
+  case NOT:
+    return bdd_enc_unary_add_op(self, add_not, expr, ctx);
   case CONS:
     if (Nil == cdr(expr)) { /* list of one element. return the element */
       return bdd_enc_eval(self, car(expr), ctx);
@@ -5619,16 +5435,23 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
        corresponding pair of bits, i.e.
        [a2,a1,a0] op [b2,b1,b0] === [a2 op b2, a1 op b2, a0 op b0]
     */
-  case AND: return bdd_enc_binary_add_op(self, add_and, expr, ctx);
-  case OR:       return bdd_enc_binary_add_op(self, add_or, expr, ctx);
-  case IMPLIES:  return bdd_enc_binary_add_op(self, add_implies, expr, ctx);
-  case IFF:      return bdd_enc_binary_add_op(self, add_iff, expr, ctx);
-  case XOR:      return bdd_enc_binary_add_op(self, add_xor, expr, ctx);
-  case XNOR:     return bdd_enc_binary_add_op(self, add_xnor, expr, ctx);
+  case AND:
+    return bdd_enc_binary_add_op(self, add_and, expr, ctx);
+  case OR:
+    return bdd_enc_binary_add_op(self, add_or, expr, ctx);
+  case IMPLIES:
+    return bdd_enc_binary_add_op(self, add_implies, expr, ctx);
+  case IFF:
+    return bdd_enc_binary_add_op(self, add_iff, expr, ctx);
+  case XOR:
+    return bdd_enc_binary_add_op(self, add_xor, expr, ctx);
+  case XNOR:
+    return bdd_enc_binary_add_op(self, add_xnor, expr, ctx);
 
     /* if-then-else is the same for both Word and usual expressions */
   case IFTHENELSE:
-  case CASE:  return bdd_enc_if_then_else_op(self, expr, ctx);
+  case CASE:
+    return bdd_enc_if_then_else_op(self, expr, ctx);
 
   case EQUAL:
     /* this is Word expression (coded as array of ADD) */
@@ -5636,144 +5459,155 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
       return bdd_enc_binary_vector_op(self, AddArray_word_equal, expr, ctx);
     }
     /* This is a usual (scalar) expression */
-    else return bdd_enc_binary_node_op(self, node_equal, expr, ctx);
+    else
+      return bdd_enc_binary_node_op(self, node_equal, expr, ctx);
 
   case NOTEQUAL:
     /* this is Word expression (coded as array of ADD) */
     if (bdd_enc_is_bit_vector(self, car(expr), ctx, NULL)) {
       return bdd_enc_binary_vector_op(self, AddArray_word_not_equal, expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_not_equal, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_not_equal, expr, ctx);
 
   case LT:
     /* operands are Word expressions (coded as arrays of ADD) */
     if (bdd_enc_is_bit_vector(self, car(expr), ctx, &tmp_bool)) {
       return bdd_enc_binary_vector_op(self,
                                       tmp_bool ? AddArray_word_signed_less
-                                      : AddArray_word_unsigned_less,
+                                               : AddArray_word_unsigned_less,
                                       expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_lt, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_lt, expr, ctx);
 
   case GT:
     /* operands are Word expressions (coded as arrays of ADD) */
     if (bdd_enc_is_bit_vector(self, car(expr), ctx, &tmp_bool)) {
       return bdd_enc_binary_vector_op(self,
                                       tmp_bool ? AddArray_word_signed_greater
-                                      : AddArray_word_unsigned_greater,
+                                               : AddArray_word_unsigned_greater,
                                       expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_gt, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_gt, expr, ctx);
 
   case LE:
     /* operands are Word expressions (coded as arrays of ADD) */
     if (bdd_enc_is_bit_vector(self, car(expr), ctx, &tmp_bool)) {
       return bdd_enc_binary_vector_op(self,
-                                      tmp_bool ? AddArray_word_signed_less_equal
-                                      : AddArray_word_unsigned_less_equal,
+                                      tmp_bool
+                                          ? AddArray_word_signed_less_equal
+                                          : AddArray_word_unsigned_less_equal,
                                       expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_le, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_le, expr, ctx);
 
   case GE:
     /* operands are Word expressions (coded as arrays of ADD) */
     if (bdd_enc_is_bit_vector(self, car(expr), ctx, &tmp_bool)) {
-      return bdd_enc_binary_vector_op(self,
-                                      tmp_bool ? AddArray_word_signed_greater_equal
-                                      : AddArray_word_unsigned_greater_equal,
-                                      expr,
-                                      ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_ge, expr, ctx);
+      return bdd_enc_binary_vector_op(
+          self,
+          tmp_bool ? AddArray_word_signed_greater_equal
+                   : AddArray_word_unsigned_greater_equal,
+          expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_ge, expr, ctx);
 
   case PLUS:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
       return bdd_enc_binary_vector_op(self, AddArray_word_plus, expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_plus, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_plus, expr, ctx);
 
   case UMINUS:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
-      return bdd_enc_unary_vector_op(self, AddArray_word_unary_minus, expr, ctx);
+      return bdd_enc_unary_vector_op(self, AddArray_word_unary_minus, expr,
+                                     ctx);
     }
     return bdd_enc_unary_node_op(self, node_unary_minus, expr, ctx);
 
   case MINUS:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
       return bdd_enc_binary_vector_op(self, AddArray_word_minus, expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_minus, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_minus, expr, ctx);
 
   case TIMES:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
       return bdd_enc_binary_vector_op(self, AddArray_word_times, expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_times, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_times, expr, ctx);
 
   case DIVIDE:
     if (bdd_enc_is_bit_vector(self, expr, ctx, &tmp_bool)) {
       return bdd_enc_binary_vector_op(self,
                                       tmp_bool ? AddArray_word_signed_divide
-                                      : AddArray_word_unsigned_divide,
+                                               : AddArray_word_unsigned_divide,
                                       expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_divide, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_divide, expr, ctx);
 
   case MOD:
     if (bdd_enc_is_bit_vector(self, expr, ctx, &tmp_bool)) {
       return bdd_enc_binary_vector_op(self,
                                       tmp_bool ? AddArray_word_signed_mod
-                                      : AddArray_word_unsigned_mod,
+                                               : AddArray_word_unsigned_mod,
                                       expr, ctx);
-    }
-    else return bdd_enc_binary_node_op(self, node_mod, expr, ctx);
+    } else
+      return bdd_enc_binary_node_op(self, node_mod, expr, ctx);
 
   case LSHIFT:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
-      return bdd_enc_binary_vector_op(self, AddArray_word_left_shift, expr, ctx);
-    }
-    else ErrorMgr_internal_error(errmgr, "l-shift has always to be a word exp");
+      return bdd_enc_binary_vector_op(self, AddArray_word_left_shift, expr,
+                                      ctx);
+    } else
+      ErrorMgr_internal_error(errmgr, "l-shift has always to be a word exp");
 
   case RSHIFT:
     if (bdd_enc_is_bit_vector(self, expr, ctx, &tmp_bool)) {
       return bdd_enc_binary_vector_op(self,
-                                      tmp_bool ? AddArray_word_signed_right_shift :
-                                      AddArray_word_unsigned_right_shift,
-                                      expr,ctx);
-    }
-    else ErrorMgr_internal_error(errmgr, "r-shift has always to be a word exp");
+                                      tmp_bool
+                                          ? AddArray_word_signed_right_shift
+                                          : AddArray_word_unsigned_right_shift,
+                                      expr, ctx);
+    } else
+      ErrorMgr_internal_error(errmgr, "r-shift has always to be a word exp");
 
   case LROTATE:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
-      return bdd_enc_binary_vector_op(self, AddArray_word_left_rotate, expr,ctx);
-    }
-    else ErrorMgr_internal_error(errmgr, "l-rotate has always to be a word exp");
+      return bdd_enc_binary_vector_op(self, AddArray_word_left_rotate, expr,
+                                      ctx);
+    } else
+      ErrorMgr_internal_error(errmgr, "l-rotate has always to be a word exp");
 
   case RROTATE:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
-      return bdd_enc_binary_vector_op(self, AddArray_word_right_rotate,expr,ctx);
-    }
-    else ErrorMgr_internal_error(errmgr, "r-rotate has always to be a word exp");
+      return bdd_enc_binary_vector_op(self, AddArray_word_right_rotate, expr,
+                                      ctx);
+    } else
+      ErrorMgr_internal_error(errmgr, "r-rotate has always to be a word exp");
 
   case CONCATENATION:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
-      return bdd_enc_binary_vector_op(self, AddArray_word_concatenation,
-                                      expr, ctx);
-    }
-    else ErrorMgr_internal_error(errmgr, "concatenation has always to be a word exp");
+      return bdd_enc_binary_vector_op(self, AddArray_word_concatenation, expr,
+                                      ctx);
+    } else
+      ErrorMgr_internal_error(errmgr,
+                              "concatenation has always to be a word exp");
 
   case BIT_SELECTION:
     if (bdd_enc_is_bit_vector(self, expr, ctx, NULL)) {
       return bdd_enc_binary_vector_op(self, AddArray_word_bit_selection, expr,
                                       ctx);
-    }
-    else ErrorMgr_internal_error(errmgr, "bit selection has always to be a word exp");
+    } else
+      ErrorMgr_internal_error(errmgr,
+                              "bit selection has always to be a word exp");
 
   case COLON: /* used only as an argument of bit selection */
     return bdd_enc_binary_node_op(self, node_bit_range, expr, ctx);
 
-  case UNION: return bdd_enc_binary_node_op(self, node_union, expr, ctx);
-  case SETIN: return bdd_enc_binary_node_op(self, node_setin, expr, ctx);
+  case UNION:
+    return bdd_enc_binary_node_op(self, node_union, expr, ctx);
+  case SETIN:
+    return bdd_enc_binary_node_op(self, node_setin, expr, ctx);
 
   case NEXT: {
     int i;
@@ -5785,7 +5619,8 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
 #else
       add_ptr add = BddEncCache_lookup_boolean_var(self->cache, expr);
 #endif
-      if (add != (add_ptr)NULL) return AddArray_from_add(add);
+      if (add != (add_ptr)NULL)
+        return AddArray_from_add(add);
     }
 
     res = bdd_enc_eval(self, car(expr), ctx);
@@ -5800,7 +5635,8 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     return res;
   }
 
-  case ATTIME: ErrorMgr_internal_error(errmgr, "unexpected attime node");
+  case ATTIME:
+    ErrorMgr_internal_error(errmgr, "unexpected attime node");
 
     /* Assignment */
   case EQDEF: {
@@ -5813,7 +5649,7 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
       break;
 
     case NEXT: /* we deal wit statements of this kind: next(x) := next_expr */
-      t1 = car(expr); /* (NEXT (ATOM x Nil) Nil) */
+      t1 = car(expr);      /* (NEXT (ATOM x Nil) Nil) */
       t2 = car(car(expr)); /* (ATOM x Nil) */
       break;
 
@@ -5828,17 +5664,18 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
       name = ResolveSymbol_get_resolved_name(rs);
     }
 
-    if (! SymbTable_is_symbol_declared(BASE_ENC(self)->symb_table, name)) {
+    if (!SymbTable_is_symbol_declared(BASE_ENC(self)->symb_table, name)) {
       ErrorMgr_error_undefined(errmgr, t2);
     }
-    if (! SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, name)) {
+    if (!SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, name)) {
       ErrorMgr_error_redefining(errmgr, t2);
     }
 
     if (opt_verbose_level_gt(opts, 4)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_inc_indent_size(logger); /* INC 2 */
-      Logger_nlog(logger, wffprint, "evaluating operands of assignment of %N\n", t1);
+      Logger_nlog(logger, wffprint, "evaluating operands of assignment of %N\n",
+                  t1);
     }
 
     /* We evaluate both the left and the right hand side of the
@@ -5859,7 +5696,8 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
 
       /* traverses the rhs */
       switch (SymbType_get_tag(type)) {
-      case SYMB_TYPE_BOOLEAN: break;
+      case SYMB_TYPE_BOOLEAN:
+        break;
       case SYMB_TYPE_ENUM:
         Utils_set_data_for_range_check(env, t2, /* var and range */
                                        SymbType_get_enum_type_values(type));
@@ -5872,18 +5710,22 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
         error_unreachable_code(); /* not implemented */
         break;
 
-      case SYMB_TYPE_UNSIGNED_WORD: /*do nothing(type checking guarantees correctness) */
+      case SYMB_TYPE_UNSIGNED_WORD: /*do nothing(type checking guarantees
+                                       correctness) */
       case SYMB_TYPE_SIGNED_WORD:
         break;
 
-      case SYMB_TYPE_ERROR:   error_unreachable_code(); /* not implemented */
-      default:  error_unreachable_code(); /* unknown type  */
-      } /* switch */
+      case SYMB_TYPE_ERROR:
+        error_unreachable_code(); /* not implemented */
+      default:
+        error_unreachable_code(); /* unknown type  */
+      }                           /* switch */
 
       if (opt_verbose_level_gt(opts, 4)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_inc_indent_size(logger); /* INC 3 */
-        Logger_nlog(logger, wffprint, "construction of assignment of %N:\n", t1);
+        Logger_nlog(logger, wffprint, "construction of assignment of %N:\n",
+                    t1);
       }
 
       /* We perform set inclusion of the evaluation of the rhs with the lhs
@@ -5894,8 +5736,8 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
         int i;
         res = add_true(self->dd);
         for (i = AddArray_get_size(lhs) - 1; i >= 0; --i) {
-      /* [MRMR]: With words we cannot have non-determinism. */
-          add_ptr bit = add_apply(self->dd, node_setin, AddArray_get_n(lhs,i),
+          /* [MRMR]: With words we cannot have non-determinism. */
+          add_ptr bit = add_apply(self->dd, node_setin, AddArray_get_n(lhs, i),
                                   AddArray_get_n(rhs, i));
           add_ptr tmp = add_and(self->dd, res, bit);
           add_free(self->dd, res);
@@ -5908,8 +5750,9 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
 
       if (opt_verbose_level_gt(opts, 4)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_nlog(logger, wffprint, "size of assignment of %N = %d ADD nodes\n",
-                    t1, add_size(self->dd, res));
+        Logger_nlog(logger, wffprint,
+                    "size of assignment of %N = %d ADD nodes\n", t1,
+                    add_size(self->dd, res));
         Logger_dec_indent_size(logger); /* DEC 3 */
         Logger_dec_indent_size(logger); /* DEC 2 */
       }
@@ -5923,10 +5766,10 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
       Logger_dec_indent_size(logger); /* DEC 2 */
     }
 
-
   } /* case EQDEF */
 
-  case NUMBER:   return AddArray_from_add(add_leaf(self->dd, find_atom(nodemgr, expr)));
+  case NUMBER:
+    return AddArray_from_add(add_leaf(self->dd, find_atom(nodemgr, expr)));
 
   case NUMBER_UNSIGNED_WORD:
   case NUMBER_SIGNED_WORD: {
@@ -5940,14 +5783,14 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     /* here we rely on the flattener, which is in charge of getting
        rid of SWCONST and UWCONST */
     node_ptr wn = Compile_FlattenSexp(BASE_ENC(self)->symb_table, expr, ctx);
-    return bdd_enc_eval_recur(self, wn, (node_ptr) NULL);
+    return bdd_enc_eval_recur(self, wn, (node_ptr)NULL);
   }
 
   case WSIZEOF: {
     /* here we rely on the flattener, which is in charge of getting
        rid of WSIZEOF */
     node_ptr wn = Compile_FlattenSexp(BASE_ENC(self)->symb_table, expr, ctx);
-    return bdd_enc_eval_recur(self, wn, (node_ptr) NULL);
+    return bdd_enc_eval_recur(self, wn, (node_ptr)NULL);
   }
 
   case WRESIZE: {
@@ -5956,7 +5799,7 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     /* operands are Word expressions (coded as arrays of ADD) */
     return bdd_enc_binary_vector_op(self,
                                     tmp_bool ? AddArray_word_signed_resize
-                                    : AddArray_word_unsigned_resize,
+                                             : AddArray_word_unsigned_resize,
                                     expr, ctx);
   }
 
@@ -5964,7 +5807,7 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     /* cannot be met in expression. only UNSIGNED_WORD can be
      * used. See below */
     error_unreachable_code();
-    break;  /* to silent static checkers */
+    break; /* to silent static checkers */
 
     /* this artificial expression is used to code (signed and unsigned)
        Word variables as array of bits.
@@ -5997,32 +5840,33 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     /* [AMa] in the future, The BddEnc should only deal with already flattened
        expressions. And this operator (and CAST_BOOL, CAST_TOINT, etc)
        should not be found here. */
-  case COUNT:
-    {
-      node_ptr flat = Compile_FlattenSexp(BASE_ENC(self)->symb_table,
-                                          expr, ctx);
-      return bdd_enc_eval_recur(self, flat, Nil);
-    }
+  case COUNT: {
+    node_ptr flat = Compile_FlattenSexp(BASE_ENC(self)->symb_table, expr, ctx);
+    return bdd_enc_eval_recur(self, flat, Nil);
+  }
 
   case NUMBER_FRAC:
   case NUMBER_REAL:
-  case NUMBER_EXP :
+  case NUMBER_EXP:
     return AddArray_from_add(add_leaf(self->dd, find_atom(nodemgr, expr)));
 
   case TWODOTS: /* this expression is used in bit selection */
-    {
-      int dim1, dim2, i;
-      node_ptr t = Nil;
+  {
+    int dim1, dim2, i;
+    node_ptr t = Nil;
 
-      dim1 = BddEnc_eval_num(self, car(expr), ctx);
-      dim2 = BddEnc_eval_num(self, cdr(expr), ctx);
-      for (i = dim2; i >= dim1; --i) {
-        t = find_node(nodemgr, CONS, find_node(nodemgr, NUMBER, NODE_FROM_INT(i), Nil), t);
-      }
-
-      if (t == Nil) { ErrorMgr_rpterr(errmgr, "empty range: %d..%d", dim1, dim2); }
-      return AddArray_from_add(add_leaf(self->dd, t));
+    dim1 = BddEnc_eval_num(self, car(expr), ctx);
+    dim2 = BddEnc_eval_num(self, cdr(expr), ctx);
+    for (i = dim2; i >= dim1; --i) {
+      t = find_node(nodemgr, CONS,
+                    find_node(nodemgr, NUMBER, NODE_FROM_INT(i), Nil), t);
     }
+
+    if (t == Nil) {
+      ErrorMgr_rpterr(errmgr, "empty range: %d..%d", dim1, dim2);
+    }
+    return AddArray_from_add(add_leaf(self->dd, t));
+  }
 
   case CAST_BOOL: {
     node_ptr tmp = Compile_FlattenSexp(BASE_ENC(self)->symb_table, expr, ctx);
@@ -6031,7 +5875,8 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     /* The resulting expression must be boolean */
     nusmv_assert(AddArray_get_size(arg) == 1);
 
-    /* Word is encoded as a list of ADD => just return the result(i.e. one bit)*/
+    /* Word is encoded as a list of ADD => just return the result(i.e. one
+     * bit)*/
     return arg;
   }
 
@@ -6047,11 +5892,13 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     /* the operand can be of the boolean type only */
     nusmv_assert(AddArray_get_size(arg) == 1);
 
-    /*Word is encoded as a list of ADD => just return the result (i.e. one bit)*/
+    /*Word is encoded as a list of ADD => just return the result (i.e. one
+     * bit)*/
     return arg;
   }
 
-    /* cast between signed and unsigned words. The representation does not change.*/
+    /* cast between signed and unsigned words. The representation does not
+     * change.*/
   case CAST_SIGNED:
   case CAST_UNSIGNED:
     return bdd_enc_eval(self, car(expr), ctx);
@@ -6062,7 +5909,7 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     /* operands are Word expressions (coded as arrays of ADD) */
     return bdd_enc_binary_vector_op(self,
                                     tmp_bool ? AddArray_word_signed_extend
-                                    : AddArray_word_unsigned_extend,
+                                             : AddArray_word_unsigned_extend,
                                     expr, ctx);
   }
 
@@ -6070,11 +5917,12 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
     return AddArray_from_add(add_leaf(self->dd, find_atom(nodemgr, expr)));
 
   default:
-    ErrorMgr_internal_error(errmgr, "bdd_enc_eval_recur: type = %d\n", node_get_type(expr));
+    ErrorMgr_internal_error(errmgr, "bdd_enc_eval_recur: type = %d\n",
+                            node_get_type(expr));
   } /* switch */
 
   error_unreachable_code(); /* impossible code */
-  return (AddArray_ptr) NULL;
+  return (AddArray_ptr)NULL;
 }
 
 /*!
@@ -6092,23 +5940,25 @@ static AddArray_ptr bdd_enc_eval_recur(BddEnc_ptr self, Expr_ptr expr,
   \sa bdd_enc_eval, bdd_enc_binary_op
 */
 static boolean bdd_enc_is_bit_vector(BddEnc_ptr self, node_ptr expr,
-                                     node_ptr context, boolean* isSigned)
-{
-  SymbType_ptr type = TypeChecker_get_expression_type(self->type_checker,
-                                                      expr, context);
+                                     node_ptr context, boolean *isSigned) {
+  SymbType_ptr type =
+      TypeChecker_get_expression_type(self->type_checker, expr, context);
   /* the expression type should be ok */
   if (type == SYMB_TYPE(NULL) || SymbType_is_error(type)) {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-    ErrorMgr_internal_error(errmgr, "bdd_enc_is_bit_vector: invalid or empty type");
+    ErrorMgr_internal_error(errmgr,
+                            "bdd_enc_is_bit_vector: invalid or empty type");
   }
 
-  if (!SymbType_is_word(type)) return false;
+  if (!SymbType_is_word(type))
+    return false;
 
   /* this is a Word expression and it is coded as a list of ADD */
-  if (NULL != isSigned) *isSigned = SymbType_is_signed_word(type);
+  if (NULL != isSigned)
+    *isSigned = SymbType_is_signed_word(type);
 
   return true;
 }
@@ -6129,11 +5979,10 @@ static boolean bdd_enc_is_bit_vector(BddEnc_ptr self, node_ptr expr,
   \sa bdd_enc_eval, bdd_enc_binary_op
 */
 static AddArray_ptr bdd_enc_unary_add_op(BddEnc_ptr self, FP_A_DA op,
-                                         node_ptr n, node_ptr context)
-{
+                                         node_ptr n, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   AddArray_ptr arg1 = bdd_enc_eval(self, car(n), context);
   AddArray_ptr res;
@@ -6155,8 +6004,7 @@ static AddArray_ptr bdd_enc_unary_add_op(BddEnc_ptr self, FP_A_DA op,
   \sa bdd_enc_eval, bdd_enc_unary_op
 */
 static AddArray_ptr bdd_enc_binary_add_op(BddEnc_ptr self, FP_A_DAA op,
-                                          node_ptr n, node_ptr context)
-{
+                                          node_ptr n, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   ExprMgr_ptr exprmgr = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
@@ -6164,8 +6012,7 @@ static AddArray_ptr bdd_enc_binary_add_op(BddEnc_ptr self, FP_A_DAA op,
 
   if ((add_and == op) && ExprMgr_is_false(exprmgr, cdr(n))) {
     return bdd_enc_eval(self, cdr(n), context);
-  }
-  else if ((add_or == op) && ExprMgr_is_true(exprmgr, cdr(n))) {
+  } else if ((add_or == op) && ExprMgr_is_true(exprmgr, cdr(n))) {
     return bdd_enc_eval(self, cdr(n), context);
   }
 
@@ -6174,12 +6021,10 @@ static AddArray_ptr bdd_enc_binary_add_op(BddEnc_ptr self, FP_A_DAA op,
   if ((add_and == op) && (1 == AddArray_get_size(arg1)) &&
       add_is_false(self->dd, AddArray_get_add(arg1))) {
     return arg1;
-  }
-  else if (((add_or == op) && (1 == AddArray_get_size(arg1)) &&
-      add_is_true(self->dd, AddArray_get_add(arg1)))) {
+  } else if (((add_or == op) && (1 == AddArray_get_size(arg1)) &&
+              add_is_true(self->dd, AddArray_get_add(arg1)))) {
     return arg1;
-  }
-  else {
+  } else {
     arg2 = bdd_enc_eval(self, cdr(n), context);
     res = AddArray_word_apply_binary(self->dd, arg1, arg2, op);
     AddArray_destroy(self->dd, arg1);
@@ -6209,12 +6054,11 @@ static AddArray_ptr bdd_enc_binary_add_op(BddEnc_ptr self, FP_A_DAA op,
 
   \sa bdd_enc_eval, bdd_enc_binary_op
 */
-static AddArray_ptr bdd_enc_unary_node_op(BddEnc_ptr self, NPFNNE/*NPFCVT*/ op,
-                                          node_ptr n, node_ptr context)
-{
+static AddArray_ptr bdd_enc_unary_node_op(BddEnc_ptr self, NPFNNE /*NPFCVT*/ op,
+                                          node_ptr n, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   AddArray_ptr arg = bdd_enc_eval(self, car(n), context);
   int i;
@@ -6254,11 +6098,10 @@ static AddArray_ptr bdd_enc_unary_node_op(BddEnc_ptr self, NPFNNE/*NPFCVT*/ op,
   \sa bdd_enc_eval, bdd_enc_unary_node_op
 */
 static AddArray_ptr bdd_enc_binary_node_op(BddEnc_ptr self, NPFNNE op,
-                                           node_ptr n, node_ptr context)
-{
+                                           node_ptr n, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   AddArray_ptr arg1 = bdd_enc_eval(self, car(n), context);
   AddArray_ptr arg2 = bdd_enc_eval(self, cdr(n), context);
@@ -6301,8 +6144,7 @@ static AddArray_ptr bdd_enc_binary_node_op(BddEnc_ptr self, NPFNNE op,
   \sa add_ifthenelse
 */
 static AddArray_ptr bdd_enc_if_then_else_op(BddEnc_ptr self, node_ptr node,
-                                            node_ptr context)
-{
+                                            node_ptr context) {
   AddArray_ptr res;
   AddArray_ptr ifarg, thenarg, elsearg;
   add_ptr add;
@@ -6315,12 +6157,10 @@ static AddArray_ptr bdd_enc_if_then_else_op(BddEnc_ptr self, node_ptr node,
   if (add_is_true(self->dd, add)) {
     /* ITE(1, A, B) = A */
     res = bdd_enc_eval(self, cdr(car(node)), context);
-  }
-  else if (add_is_false(self->dd, add)) {
+  } else if (add_is_false(self->dd, add)) {
     /* ITE(0, A, B) = B */
     res = bdd_enc_eval(self, cdr(node), context);
-  }
-  else {
+  } else {
     thenarg = bdd_enc_eval(self, cdr(car(node)), context);
     elsearg = bdd_enc_eval(self, cdr(node), context);
 
@@ -6348,17 +6188,16 @@ static AddArray_ptr bdd_enc_if_then_else_op(BddEnc_ptr self, node_ptr node,
   \sa bdd_enc_eval, bdd_enc_binary_vector_op, bdd_enc_binary_op
 */
 static AddArray_ptr bdd_enc_unary_vector_op(BddEnc_ptr self,
-                                            ADD_ARRAY_UNARY_OP op,
-                                            node_ptr n, node_ptr context)
-{
+                                            ADD_ARRAY_UNARY_OP op, node_ptr n,
+                                            node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   AddArray_ptr res;
   AddArray_ptr arg = bdd_enc_eval(self, car(n), context);
 
-  ErrorMgr_set_the_node(errmgr, n);/* for error reporting */
+  ErrorMgr_set_the_node(errmgr, n); /* for error reporting */
   res = op(self->dd, arg);
   AddArray_destroy(self->dd, arg);
 
@@ -6377,18 +6216,17 @@ static AddArray_ptr bdd_enc_unary_vector_op(BddEnc_ptr self,
   \sa bdd_enc_eval, bdd_enc_unary_vector_op, bdd_enc_binary_op
 */
 static AddArray_ptr bdd_enc_binary_vector_op(BddEnc_ptr self,
-                                             ADD_ARRAY_BINARY_OP op,
-                                             node_ptr n, node_ptr context)
-{
+                                             ADD_ARRAY_BINARY_OP op, node_ptr n,
+                                             node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   AddArray_ptr res;
   AddArray_ptr arg1 = bdd_enc_eval(self, car(n), context);
   AddArray_ptr arg2 = bdd_enc_eval(self, cdr(n), context);
 
-  ErrorMgr_set_the_node(errmgr, n);/* for error reporting */
+  ErrorMgr_set_the_node(errmgr, n); /* for error reporting */
   res = op(self->dd, arg1, arg2);
 
   AddArray_destroy(self->dd, arg1);
@@ -6411,26 +6249,22 @@ static AddArray_ptr bdd_enc_binary_vector_op(BddEnc_ptr self,
 
   \sa bdd_enc_add2expr
 */
-static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
-                                       SymbLayer_ptr det_layer,
-                                       add_ptr add_expr,
-                                       hash_ptr lc,
-                                       boolean is_scalar)
-{
+static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self, SymbLayer_ptr det_layer,
+                                       add_ptr add_expr, hash_ptr lc,
+                                       boolean is_scalar) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   DDMgr_ptr dd = BddEnc_get_dd_manager(self);
-  node_ptr result = (node_ptr) NULL;
+  node_ptr result = (node_ptr)NULL;
   SymbTable_ptr symb_table = BASE_ENC(self)->symb_table;
 
-  nusmv_assert((add_expr != (add_ptr) NULL));
+  nusmv_assert((add_expr != (add_ptr)NULL));
 
   /* base case */
   if (add_isleaf(add_expr)) {
@@ -6439,7 +6273,8 @@ static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
     leaf = add_get_leaf(dd, add_expr);
 
     /* handles set singleton */
-    if (CONS == node_get_type(leaf) && llength(leaf) == 1) leaf = car(leaf);
+    if (CONS == node_get_type(leaf) && llength(leaf) == 1)
+      leaf = car(leaf);
 
     /* checks boolean case */
     if (ExprMgr_is_true(exprs, leaf) || ExprMgr_is_false(exprs, leaf)) {
@@ -6457,7 +6292,7 @@ static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
            of values to a set and returns it. */
         node_ptr leaf_iter;
         result = Nil;
-        for (leaf_iter=leaf; Nil != leaf_iter; leaf_iter = cdr(leaf_iter)) {
+        for (leaf_iter = leaf; Nil != leaf_iter; leaf_iter = cdr(leaf_iter)) {
           node_ptr elem;
 
           nusmv_assert(CONS == node_get_type(leaf_iter));
@@ -6465,12 +6300,15 @@ static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
              needed */
           elem = car(leaf_iter);
 
-          if (ExprMgr_is_number(exprs, elem, 1) || ExprMgr_is_number(exprs, elem, 0)) {
+          if (ExprMgr_is_number(exprs, elem, 1) ||
+              ExprMgr_is_number(exprs, elem, 0)) {
             nusmv_assert(is_scalar);
           }
 
-          if (Nil == result) result = elem;
-          else result = find_node(nodemgr, UNION, elem, result);
+          if (Nil == result)
+            result = elem;
+          else
+            result = find_node(nodemgr, UNION, elem, result);
         }
         return result;
       }
@@ -6482,9 +6320,9 @@ static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
         node_ptr det_enc;
 
         det_enc = BoolEnc_get_values_bool_encoding(
-                          BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self)),
-                          leaf, /* this is the non-deterministic range */
-                          &det_vars /* the set of determinization bits */);
+            BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(self)),
+            leaf, /* this is the non-deterministic range */
+            &det_vars /* the set of determinization bits */);
 
         if (!is_scalar) {
           /* simplify when possible: this reduces "v ? T : F" to
@@ -6495,9 +6333,9 @@ static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
         /* now declares the determinization symbols into the
            determinization layer */
         SET_FOREACH(det_vars, det_vars_iter) {
-          node_ptr bit = (node_ptr) Set_GetMember(det_vars, det_vars_iter);
-          SymbLayer_declare_state_var(det_layer, bit,
-                                      SymbType_create(env, SYMB_TYPE_BOOLEAN, Nil));
+          node_ptr bit = (node_ptr)Set_GetMember(det_vars, det_vars_iter);
+          SymbLayer_declare_state_var(
+              det_layer, bit, SymbType_create(env, SYMB_TYPE_BOOLEAN, Nil));
         }
 
         Set_ReleaseSet(det_vars);
@@ -6516,36 +6354,41 @@ static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
     node_ptr t, e, var;
     int index;
 
-    if (st_lookup(lc, (char*) add_expr, (char**) &result)) return result;
+    if (st_lookup(lc, (char *)add_expr, (char **)&result))
+      return result;
 
     index = add_index(dd, add_expr);
 
     t = bdd_enc_add2expr_recur(self, det_layer, add_then(dd, add_expr), lc,
                                is_scalar);
-    if (t == (node_ptr) NULL) return (node_ptr) NULL;
+    if (t == (node_ptr)NULL)
+      return (node_ptr)NULL;
 
     e = bdd_enc_add2expr_recur(self, det_layer, add_else(dd, add_expr), lc,
                                is_scalar);
-    if (e == (node_ptr) NULL) return (node_ptr) NULL;
+    if (e == (node_ptr)NULL)
+      return (node_ptr)NULL;
 
     var = BddEnc_get_var_name_from_index(self, index);
     if (var == Nil) {
-      StreamMgr_print_error(streams,
-              "bdd_enc_add2expr_recur: No variable associated to BDD variable %d\n",
-              index);
+      StreamMgr_print_error(
+          streams,
+          "bdd_enc_add2expr_recur: No variable associated to BDD variable %d\n",
+          index);
 
-      return (node_ptr) NULL;
+      return (node_ptr)NULL;
     }
 
-    result = NODE_PTR(ExprMgr_simplify(exprs, symb_table,
-                                    ExprMgr_ite(exprs, EXPR(var),
-                                             EXPR(t),
-                                             EXPR(e),
-                                             symb_table)));
-    if (result == (node_ptr)NULL) return (node_ptr)NULL;
+    result = NODE_PTR(ExprMgr_simplify(
+        exprs, symb_table,
+        ExprMgr_ite(exprs, EXPR(var), EXPR(t), EXPR(e), symb_table)));
+    if (result == (node_ptr)NULL)
+      return (node_ptr)NULL;
 
-    if (st_add_direct(lc, (char*) add_expr, (char*) result) == ST_OUT_OF_MEM) {
-      ErrorMgr_internal_error(errmgr, "bdd_enc_add2expr_recur: Unable to insert result in local hash.\n");
+    if (st_add_direct(lc, (char *)add_expr, (char *)result) == ST_OUT_OF_MEM) {
+      ErrorMgr_internal_error(
+          errmgr,
+          "bdd_enc_add2expr_recur: Unable to insert result in local hash.\n");
     }
 
     return result;
@@ -6558,13 +6401,13 @@ static node_ptr bdd_enc_add2expr_recur(BddEnc_ptr self,
 
   Used internally to check indices
 */
-static boolean bdd_enc_is_index_not_allocated(const BddEnc_ptr self, int index)
-{
+static boolean bdd_enc_is_index_not_allocated(const BddEnc_ptr self,
+                                              int index) {
   BDD_ENC_CHECK_INSTANCE(self);
   nusmv_assert(index >= 0);
 
   return ((index >= array_n(self->index2name)) ||
-          BddEnc_get_var_name_from_index(self, index) == (node_ptr) NULL);
+          BddEnc_get_var_name_from_index(self, index) == (node_ptr)NULL);
 }
 
 /*!
@@ -6574,30 +6417,29 @@ static boolean bdd_enc_is_index_not_allocated(const BddEnc_ptr self, int index)
 
 
 */
-static void bdd_enc_dissolve_committed_groups(BddEnc_ptr self)
-{
+static void bdd_enc_dissolve_committed_groups(BddEnc_ptr self) {
   ListIter_ptr iter;
   NuSMVEnv_ptr env = ENV_OBJECT(self)->environment;
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   bdd_enc_lock_reordering(self);
   for (iter = NodeList_get_first_iter(BASE_ENC(self)->committed_layers);
-       !ListIter_is_end(iter);
-       iter = ListIter_get_next(iter)) {
-    SymbLayer_ptr com_layer = SYMB_LAYER(NodeList_get_elem_at(
-                                      BASE_ENC(self)->committed_layers, iter));
-    array_t* groups = (array_t*) find_assoc(self->layer2groups,
-                                            (node_ptr) com_layer);
+       !ListIter_is_end(iter); iter = ListIter_get_next(iter)) {
+    SymbLayer_ptr com_layer = SYMB_LAYER(
+        NodeList_get_elem_at(BASE_ENC(self)->committed_layers, iter));
+    array_t *groups =
+        (array_t *)find_assoc(self->layer2groups, (node_ptr)com_layer);
 
-    if ((array_t*) NULL != groups) {
+    if ((array_t *)NULL != groups) {
       int giter;
       GroupInfo_ptr binfo;
 
       if (opt_verbose_level_gt(opts, 5)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
         Logger_log(logger,
-                "BddEnc: dissolving dd groups associated with layer '%s'\n",
-                SymbLayer_get_name(com_layer));
+                   "BddEnc: dissolving dd groups associated with layer '%s'\n",
+                   SymbLayer_get_name(com_layer));
       }
 
       /* promote and remove all groups */
@@ -6611,7 +6453,7 @@ static void bdd_enc_dissolve_committed_groups(BddEnc_ptr self)
        * have groups within this layer */
       array_free(groups);
     }
-    insert_assoc(self->layer2groups, (node_ptr) com_layer, (node_ptr) NULL);
+    insert_assoc(self->layer2groups, (node_ptr)com_layer, (node_ptr)NULL);
   }
   bdd_enc_unlock_reordering(self);
 }
@@ -6627,19 +6469,17 @@ static void bdd_enc_dissolve_committed_groups(BddEnc_ptr self)
 */
 static int bdd_enc_dump_addarray_dot_davinci(BddEnc_ptr self,
                                              AddArray_ptr addarray,
-                                             const char** labels,
-                                             FILE* outfile,
-                                             boolean use_dot)
-{
+                                             const char **labels, FILE *outfile,
+                                             boolean use_dot) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   DDMgr_ptr dd = BddEnc_get_dd_manager(self);
   const int dd_size = dd_get_size(dd);
   const int adr_size = AddArray_get_size(addarray);
-  add_ptr* dd_array;
-  const char** inames;
+  add_ptr *dd_array;
+  const char **inames;
   int lev;
   int res = 0;
 
@@ -6649,33 +6489,36 @@ static int bdd_enc_dump_addarray_dot_davinci(BddEnc_ptr self,
   dd_array = array_data(add_ptr, AddArray_get_array(addarray));
 
   /* calculates inames */
-  inames = ALLOC(const char*, dd_size);
-  nusmv_assert((const char**) NULL != inames);
-  for (lev=0; lev<dd_size; ++lev) {
+  inames = ALLOC(const char *, dd_size);
+  nusmv_assert((const char **)NULL != inames);
+  for (lev = 0; lev < dd_size; ++lev) {
     int idx = dd_get_index_at_level(dd, lev);
     if (BddEnc_has_var_at_index(self, idx)) {
-      inames[lev] = (const char*) sprint_node(wffprint,
-                      BddEnc_get_var_name_from_index(self, idx));
-    }
-    else inames[lev] = (const char*) NULL;
+      inames[lev] = (const char *)sprint_node(
+          wffprint, BddEnc_get_var_name_from_index(self, idx));
+    } else
+      inames[lev] = (const char *)NULL;
   }
 
   /* invocation of the main routine */
   if (use_dot) {
     int tmp = dd_dump_dot(dd, adr_size, dd_array, inames, labels, outfile);
-    if (tmp == 0) res = (tmp ==0) ? 1 : 0;
-  }
-  else {
+    if (tmp == 0)
+      res = (tmp == 0) ? 1 : 0;
+  } else {
     int tmp = dd_dump_davinci(dd, adr_size, dd_array, inames, labels, outfile);
-    if (tmp == 0) res = (tmp ==0) ? 1 : 0;
+    if (tmp == 0)
+      res = (tmp == 0) ? 1 : 0;
   }
 
   /* cleanup */
   {
     int i;
     /* free inames */
-    for (i=0; i<dd_size; ++i) {
-      if ((const char*) NULL != inames[i]) { FREE(inames[i]); }
+    for (i = 0; i < dd_size; ++i) {
+      if ((const char *)NULL != inames[i]) {
+        FREE(inames[i]);
+      }
     }
     FREE(inames);
   }
@@ -6691,15 +6534,15 @@ static int bdd_enc_dump_addarray_dot_davinci(BddEnc_ptr self,
 */
 static boolean is_max_elements_printable_exceeded(StreamMgr_ptr streams,
                                                   double tmp_array_size,
-                                                  char* elements_name)
-{
+                                                  char *elements_name) {
   if (tmp_array_size > MAX_ELEMENTS_PRINTABLE) {
-    StreamMgr_print_error(streams,
-            "\nwarning: the %s are more than 2^16: they will not be printed\n",
-            elements_name);
+    StreamMgr_print_error(
+        streams,
+        "\nwarning: the %s are more than 2^16: they will not be printed\n",
+        elements_name);
     return true;
-  }
-  else return false;
+  } else
+    return false;
 }
 
 /*!
@@ -6709,8 +6552,7 @@ static boolean is_max_elements_printable_exceeded(StreamMgr_ptr streams,
                       Utils_failure_node_check to function ptr parameter
                       of add_walkleaves
 */
-static void bdd_enc_failure_node_check(DDMgr_ptr dd, node_ptr node)
-{
+static void bdd_enc_failure_node_check(DDMgr_ptr dd, node_ptr node) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   Utils_failure_node_check(env, node);
 }
@@ -6722,14 +6564,12 @@ static void bdd_enc_failure_node_check(DDMgr_ptr dd, node_ptr node)
                       Utils_range_check to function ptr parameter
                       of add_walkleaves
 */
-static void bdd_enc_range_check(DDMgr_ptr dd, node_ptr node)
-{
+static void bdd_enc_range_check(DDMgr_ptr dd, node_ptr node) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd));
   Utils_range_check(env, node);
 }
 
 /**AutomaticEnd***************************************************************/
-
 
 /*!
   \brief Aux routine to lazily commit in the BDD Enc the layer a
@@ -6739,13 +6579,13 @@ static void bdd_enc_range_check(DDMgr_ptr dd, node_ptr node)
   belongs to. Thus, only if needed for some activity the variables are
   added.
 */
-static add_ptr
-lazy_commit_layer_and_get_add(BddEnc_ptr self, node_ptr name, int type) {
+static add_ptr lazy_commit_layer_and_get_add(BddEnc_ptr self, node_ptr name,
+                                             int type) {
   const SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(self));
   const SymbLayer_ptr layer = SymbTable_symbol_get_layer(st, name);
 
   if (SYMB_LAYER(NULL) != layer) {
-    const char * layer_name = SymbLayer_get_name(layer);
+    const char *layer_name = SymbLayer_get_name(layer);
     if (!BaseEnc_layer_occurs(BASE_ENC(self), layer_name)) {
       /* The layer has not been commit yet */
       BaseEnc_commit_layer(BASE_ENC(self), layer_name);
@@ -6773,7 +6613,7 @@ lazy_commit_layer_and_get_add(BddEnc_ptr self, node_ptr name, int type) {
     return BddEncCache_lookup_constant(self->cache, name);
   }
   if (__EVAL_VAR__ == type) {
-   return BddEncCache_lookup_boolean_var(self->cache, name);
+    return BddEncCache_lookup_boolean_var(self->cache, name);
   }
   nusmv_assert(false);
   return (add_ptr)NULL;

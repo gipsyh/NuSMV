@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_H__
 #define __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_H__
-
 
 #include "nusmv/core/node/printers/PrinterBase.h"
 #include "nusmv/core/utils/defs.h"
@@ -47,9 +44,9 @@
   \struct PrinterNonAmbiguousDot
   \brief Definition of the public accessor for class PrinterNonAmbiguousDot
 
-  
+
 */
-typedef struct PrinterNonAmbiguousDot_TAG*  PrinterNonAmbiguousDot_ptr;
+typedef struct PrinterNonAmbiguousDot_TAG *PrinterNonAmbiguousDot_ptr;
 
 /*!
   \brief To cast and check instances of class PrinterNonAmbiguousDot
@@ -57,18 +54,15 @@ typedef struct PrinterNonAmbiguousDot_TAG*  PrinterNonAmbiguousDot_ptr;
   These macros must be used respectively to cast and to check
   instances of class PrinterNonAmbiguousDot
 */
-#define PRINTER_ANON_MAP_ENTRY(self) \
-         ((PrinterNonAmbiguousDot_ptr) self)
+#define PRINTER_ANON_MAP_ENTRY(self) ((PrinterNonAmbiguousDot_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self) \
-         (nusmv_assert(PRINTER_ANON_MAP_ENTRY(self) != PRINTER_ANON_MAP_ENTRY(NULL)))
-
-
+#define PRINTER_ANON_MAP_ENTRY_CHECK_INSTANCE(self)                            \
+  (nusmv_assert(PRINTER_ANON_MAP_ENTRY(self) != PRINTER_ANON_MAP_ENTRY(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -96,9 +90,6 @@ PrinterNonAmbiguousDot_ptr PrinterNonAmbiguousDot_create(NuSMVEnv_ptr env);
 */
 void PrinterNonAmbiguousDot_destroy(PrinterNonAmbiguousDot_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_H__ */

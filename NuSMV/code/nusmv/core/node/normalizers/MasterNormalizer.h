@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,13 +34,11 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_NORMALIZERS_MASTER_NORMALIZER_H__
 #define __NUSMV_CORE_NODE_NORMALIZERS_MASTER_NORMALIZER_H__
 
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/node/MasterNodeWalker.h"
+#include "nusmv/core/node/node.h"
 
 #include "nusmv/core/utils/utils.h"
 
@@ -48,9 +46,9 @@
   \struct MasterNormalizer
   \brief Definition of the public accessor for class MasterNormalizer
 
-  
+
 */
-typedef struct MasterNormalizer_TAG*  MasterNormalizer_ptr;
+typedef struct MasterNormalizer_TAG *MasterNormalizer_ptr;
 
 /*!
   \brief To cast and check instances of class MasterNormalizer
@@ -58,23 +56,22 @@ typedef struct MasterNormalizer_TAG*  MasterNormalizer_ptr;
   These macros must be used respectively to cast and to check
   instances of class MasterNormalizer
 */
-#define MASTER_NORMALIZER(self) \
-         ((MasterNormalizer_ptr) self)
+#define MASTER_NORMALIZER(self) ((MasterNormalizer_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MASTER_NORMALIZER_CHECK_INSTANCE(self) \
-         (nusmv_assert(MASTER_NORMALIZER(self) != MASTER_NORMALIZER(NULL)))
+#define MASTER_NORMALIZER_CHECK_INSTANCE(self)                                 \
+  (nusmv_assert(MASTER_NORMALIZER(self) != MASTER_NORMALIZER(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MASTER_NORMALIZER_ASSERT_IS_NODE_NORMALIZED(self, node)        \
+#define MASTER_NORMALIZER_ASSERT_IS_NODE_NORMALIZED(self, node)                \
   (nusmv_assert(node == MasterNormalizer_normalize_node(self, node)))
 
 /*!
@@ -82,9 +79,9 @@ typedef struct MasterNormalizer_TAG*  MasterNormalizer_ptr;
 
   \todo Missing description
 */
-#define MASTER_NORMALIZER_ASSERT_IS_NODE_NOT_NORMALIZED(self, node)        \
-  (nusmv_assert(Nil == node || node != MasterNormalizer_normalize_node(self, node)))
-
+#define MASTER_NORMALIZER_ASSERT_IS_NODE_NOT_NORMALIZED(self, node)            \
+  (nusmv_assert(Nil == node ||                                                 \
+                node != MasterNormalizer_normalize_node(self, node)))
 
 /**AutomaticStart*************************************************************/
 
@@ -110,10 +107,9 @@ MasterNormalizer_ptr MasterNormalizer_create(const NuSMVEnv_ptr env);
   is a normalized copy of the first. Use for constant-time comparison
   of two trees
 
-  
+
 */
-node_ptr
-MasterNormalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n);
+node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n);
 
 /*!
   \methodof MasterNormalizer
@@ -123,8 +119,7 @@ MasterNormalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n);
   Looks in the internal memoization cache for a
                       match. Returns Nil if no memoized data has been found
 */
-node_ptr
-MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n);
+node_ptr MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n);
 
 /*!
   \methodof MasterNormalizer
@@ -132,11 +127,9 @@ MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n);
 
   Inserts new data in the internal memoization cache.
 */
-void
-MasterNormalizer_insert_cache(MasterNormalizer_ptr self, node_ptr n,
-                              node_ptr find);
+void MasterNormalizer_insert_cache(MasterNormalizer_ptr self, node_ptr n,
+                                   node_ptr find);
 
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_NODE_NORMALIZERS_MASTER_NORMALIZER_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,10 +34,9 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/trace/exec/BDDCompleteTraceExecutor.h"
 #include "nusmv/core/trace/exec/BDDCompleteTraceExecutor_private.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
 #include "nusmv/core/trace/pkg_trace.h"
 #include "nusmv/core/utils/utils.h"
@@ -55,7 +54,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'BDDCompleteTraceExecutor_private.h' for class 'BDDCompleteTraceExecutor' definition. */
+/* See 'BDDCompleteTraceExecutor_private.h' for class 'BDDCompleteTraceExecutor'
+ * definition. */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -65,7 +65,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -73,19 +72,18 @@
 /*---------------------------------------------------------------------------*/
 
 static void bdd_complete_trace_executor_finalize(Object_ptr object,
-                                                 void* dummy);
+                                                 void *dummy);
 
 static boolean
 bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr self,
-                                    const Trace_ptr trace, int* n_steps);
+                                    const Trace_ptr trace, int *n_steps);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 BDDCompleteTraceExecutor_ptr
-BDDCompleteTraceExecutor_create(const BddFsm_ptr fsm, const BddEnc_ptr enc)
-{
+BDDCompleteTraceExecutor_create(const BddFsm_ptr fsm, const BddEnc_ptr enc) {
   BDDCompleteTraceExecutor_ptr self = ALLOC(BDDCompleteTraceExecutor, 1);
   BDD_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
@@ -93,21 +91,19 @@ BDDCompleteTraceExecutor_create(const BddFsm_ptr fsm, const BddEnc_ptr enc)
   return self;
 }
 
-void BDDCompleteTraceExecutor_destroy(BDDCompleteTraceExecutor_ptr self)
-{
+void BDDCompleteTraceExecutor_destroy(BDDCompleteTraceExecutor_ptr self) {
   BDD_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
 void bdd_complete_trace_executor_init(BDDCompleteTraceExecutor_ptr self,
-                                      const BddFsm_ptr fsm, const BddEnc_ptr enc)
-{
+                                      const BddFsm_ptr fsm,
+                                      const BddEnc_ptr enc) {
   /* base class initialization */
   complete_trace_executor_init(COMPLETE_TRACE_EXECUTOR(self),
                                EnvObject_get_environment(ENV_OBJECT(enc)));
@@ -120,17 +116,16 @@ void bdd_complete_trace_executor_init(BDDCompleteTraceExecutor_ptr self,
   OVERRIDE(Object, finalize) = bdd_complete_trace_executor_finalize;
 
   /* for example, to override a base class' virtual method: */
-  OVERRIDE(CompleteTraceExecutor, execute) = bdd_complete_trace_executor_execute;
+  OVERRIDE(CompleteTraceExecutor, execute) =
+      bdd_complete_trace_executor_execute;
 }
 
-void bdd_complete_trace_executor_deinit(BDDCompleteTraceExecutor_ptr self)
-{
+void bdd_complete_trace_executor_deinit(BDDCompleteTraceExecutor_ptr self) {
   /* members deinitialization */
 
   /* base class deinitialization */
   complete_trace_executor_deinit(COMPLETE_TRACE_EXECUTOR(self));
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -141,8 +136,8 @@ void bdd_complete_trace_executor_deinit(BDDCompleteTraceExecutor_ptr self)
 
   Called by the class destructor
 */
-static void bdd_complete_trace_executor_finalize(Object_ptr object, void* dummy)
-{
+static void bdd_complete_trace_executor_finalize(Object_ptr object,
+                                                 void *dummy) {
   BDDCompleteTraceExecutor_ptr self = BDD_COMPLETE_TRACE_EXECUTOR(object);
 
   bdd_complete_trace_executor_deinit(self);
@@ -161,16 +156,14 @@ static void bdd_complete_trace_executor_finalize(Object_ptr object, void* dummy)
 
   \se None
 */
-static boolean
-bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_executor,
-                                    const Trace_ptr trace, int* n_steps)
-{
+static boolean bdd_complete_trace_executor_execute(
+    const CompleteTraceExecutor_ptr complete_executor, const Trace_ptr trace,
+    int *n_steps) {
   /* local reference to self */
-  const BaseTraceExecutor_ptr executor = \
-    BASE_TRACE_EXECUTOR(complete_executor);
+  const BaseTraceExecutor_ptr executor = BASE_TRACE_EXECUTOR(complete_executor);
 
-  const BDDCompleteTraceExecutor_ptr self = \
-    BDD_COMPLETE_TRACE_EXECUTOR(executor);
+  const BDDCompleteTraceExecutor_ptr self =
+      BDD_COMPLETE_TRACE_EXECUTOR(executor);
 
   DDMgr_ptr dd;
   BddStates trace_state;
@@ -189,9 +182,10 @@ bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
       !Trace_is_complete(trace, Trace_get_i_vars(trace), false)) {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-    ErrorMgr_internal_error(errmgr, "%s:%d:%s: This executor does not support partial traces.",
-                   __FILE__, __LINE__, __func__);
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+    ErrorMgr_internal_error(
+        errmgr, "%s:%d:%s: This executor does not support partial traces.",
+        __FILE__, __LINE__, __func__);
   }
 
   dd = BddEnc_get_dd_manager(self->enc);
@@ -201,15 +195,15 @@ bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
 
   /* the set of initial states for the trace consists of just one
      state under the assumption that the trace is complete */
-  trace_state = TraceUtils_fetch_as_bdd(trace, step,
-                                        TRACE_ITER_SF_SYMBOLS, self->enc);
+  trace_state =
+      TraceUtils_fetch_as_bdd(trace, step, TRACE_ITER_SF_SYMBOLS, self->enc);
 
   /* 1- Check Start State */
   {
     bdd_ptr init_bdd = BddFsm_get_init(self->fsm);
     bdd_ptr invar_bdd = BddFsm_get_state_constraints(self->fsm);
     BddStates initial_states; /* the initial set of states for the model */
-    BddStates from_state; /* last known state (just one, see above) */
+    BddStates from_state;     /* last known state (just one, see above) */
 
     initial_states = bdd_and(dd, init_bdd, invar_bdd);
     bdd_free(dd, init_bdd);
@@ -218,30 +212,27 @@ bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
     if (bdd_entailed(dd, trace_state, initial_states)) {
       boolean terminate = false;
       from_state = trace_state;
-      ++ count;
+      ++count;
 
       /* 2- Check Consecutive States are related by transition relation */
       do {
         BddStates forward_states;
-        BddStates next_state;  /* (un-shifted) next state */
+        BddStates next_state; /* (un-shifted) next state */
 
-        BddInputs next_input; /* next input constraints */
+        BddInputs next_input;            /* next input constraints */
         BddStatesInputsNexts next_combo; /* next combinatorials */
 
         step = TraceIter_get_next(step);
         if (TRACE_END_ITER != step) {
 
           /* fetch next bdds from trace */
-          next_input = \
-            TraceUtils_fetch_as_bdd(trace, step,
-                                    TRACE_ITER_I_SYMBOLS, self->enc);
+          next_input = TraceUtils_fetch_as_bdd(trace, step,
+                                               TRACE_ITER_I_SYMBOLS, self->enc);
 
-          next_combo =  \
-            TraceUtils_fetch_as_bdd(trace, step, TRACE_ITER_COMBINATORIAL,
-                                    self->enc);
-          next_state = \
-            TraceUtils_fetch_as_bdd(trace, step, TRACE_ITER_SF_SYMBOLS,
-                                    self->enc);
+          next_combo = TraceUtils_fetch_as_bdd(
+              trace, step, TRACE_ITER_COMBINATORIAL, self->enc);
+          next_state = TraceUtils_fetch_as_bdd(
+              trace, step, TRACE_ITER_SF_SYMBOLS, self->enc);
 
           if (0 < BaseTraceExecutor_get_verbosity(executor)) {
             fprintf(BaseTraceExecutor_get_output_stream(executor),
@@ -253,9 +244,8 @@ bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
             BddStatesInputsNexts constraints = bdd_dup(next_input);
             bdd_and_accumulate(dd, &constraints, next_combo);
 
-            forward_states =
-              BddFsm_get_sins_constrained_forward_image(self->fsm, from_state,
-                                                        constraints);
+            forward_states = BddFsm_get_sins_constrained_forward_image(
+                self->fsm, from_state, constraints);
             bdd_free(dd, constraints);
           }
 
@@ -264,7 +254,7 @@ bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
             if (0 < BaseTraceExecutor_get_verbosity(executor)) {
               fprintf(BaseTraceExecutor_get_output_stream(executor), "done\n");
             }
-            ++ count;
+            ++count;
           }
 
           else {
@@ -315,22 +305,21 @@ bdd_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
         fprintf(BaseTraceExecutor_get_output_stream(executor),
                 "Trace %d execution completed successfully.\n"
                 "%d steps performed.\n",
-                Trace_get_id(trace),
-                count);
+                Trace_get_id(trace), count);
 
         res = true;
       }
-    }
-    else {
+    } else {
       fprintf(BaseTraceExecutor_get_output_stream(executor),
               "Trace execution failed!\n"
               /* "(%d steps performed).\n", count */);
     }
 
-    if (NIL(int) != n_steps) { *n_steps = count; }
+    if (NIL(int) != n_steps) {
+      *n_steps = count;
+    }
     return res;
   }
 }
 
 /**AutomaticEnd***************************************************************/
-

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,36 +34,30 @@
 
 */
 
-
 #ifndef __NUSMV_SHELL_UTILS_UTILS_CMD_H__
 #define __NUSMV_SHELL_UTILS_UTILS_CMD_H__
 
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/utils/EnvObject.h"
+#include "nusmv/core/utils/defs.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -74,14 +68,14 @@
 /*!
   \brief Initializes the commands of the hrc package.
 
-  
+
 */
 void Utils_init_cmd(NuSMVEnv_ptr env);
 
 /*!
   \brief Removes the commands provided by the hrc package.
 
-  
+
 */
 void Utils_quit_cmd(NuSMVEnv_ptr env);
 
@@ -92,7 +86,7 @@ void Utils_quit_cmd(NuSMVEnv_ptr env);
 
   \todo Missing description
 */
-int CommandUtilsTestSset(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandUtilsTestSset(NuSMVEnv_ptr env, int argc, char **argv);
 #endif
 
 /*!
@@ -102,11 +96,9 @@ int CommandUtilsTestSset(NuSMVEnv_ptr env, int argc, char** argv);
   usage is called.
   usage can be NULL
 */
-int Utils_check_non_option_args(NuSMVEnv_ptr env,
-                                       int argc,
-                                       unsigned int expected_args,
-                                       int (*usage)(void* arg),
-                                       void* arg);
+int Utils_check_non_option_args(NuSMVEnv_ptr env, int argc,
+                                unsigned int expected_args,
+                                int (*usage)(void *arg), void *arg);
 
 /**AutomaticEnd***************************************************************/
 

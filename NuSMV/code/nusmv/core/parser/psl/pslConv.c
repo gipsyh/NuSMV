@@ -22,7 +22,7 @@ For more information on NuSMV see <http://nusmv.fbk.eu>
 or email to <nusmv-users@fbk.eu>.
 Please report bugs to <nusmv-users@fbk.eu>.
 
-To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,15 +34,14 @@ To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
-#include "nusmv/core/parser/psl/pslNode.h"
 #include "nusmv/core/parser/psl/pslExpr.h"
 #include "nusmv/core/parser/psl/pslInt.h"
+#include "nusmv/core/parser/psl/pslNode.h"
 #include "nusmv/core/parser/psl/psl_symbols.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/utils/NodeList.h"
@@ -69,14 +68,14 @@ To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 /*!
   \brief Define to optimize the convertion of next
 
-  
+
 */
 #define PSL_CONV_DISTRIB_NEXT
 
 /*!
   \brief Enable for debugging of fix point
 
-  
+
 */
 #define PSL_VERBOSE_TRANSLATE 0
 
@@ -85,33 +84,36 @@ To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
   This is used by the function that converts the operators
 */
-#define PSL_OP_CONV3(err, tok, psl, smv)                                 \
-   if (op == ((type == TOK2PSL)? tok :                                   \
-              (type == TOK2SMV)? tok :                                   \
-              (type == PSL2PSL)? psl : psl)) {                           \
-      switch (type) {                                                    \
-      case PSL2PSL: return psl;                                          \
-      case TOK2PSL: return psl;                                          \
-      case TOK2SMV:                                                      \
-         if (smv == -1) ErrorMgr_internal_error(err, "PSL_OP_CONV: unknown token.\n"); \
-         return smv;                                                     \
-      case PSL2TOK: return tok;                                          \
-      case PSL2SMV: return smv;                                          \
-      default:                                                           \
-        ErrorMgr_internal_error(err, "PSL_OP_CONV: invalid conversion type.\n");       \
-      }                                                                  \
-   }
+#define PSL_OP_CONV3(err, tok, psl, smv)                                       \
+  if (op == ((type == TOK2PSL)   ? tok                                         \
+             : (type == TOK2SMV) ? tok                                         \
+             : (type == PSL2PSL) ? psl                                         \
+                                 : psl)) {                                     \
+    switch (type) {                                                            \
+    case PSL2PSL:                                                              \
+      return psl;                                                              \
+    case TOK2PSL:                                                              \
+      return psl;                                                              \
+    case TOK2SMV:                                                              \
+      if (smv == -1)                                                           \
+        ErrorMgr_internal_error(err, "PSL_OP_CONV: unknown token.\n");         \
+      return smv;                                                              \
+    case PSL2TOK:                                                              \
+      return tok;                                                              \
+    case PSL2SMV:                                                              \
+      return smv;                                                              \
+    default:                                                                   \
+      ErrorMgr_internal_error(err, "PSL_OP_CONV: invalid conversion type.\n"); \
+    }                                                                          \
+  }
 
 /*!
   \brief This was implemented for the sake of readability
 
   This is used by the function that converts the operators, as
-  a shortcut for PSL_OP_CONV3(tok, X, X) 
+  a shortcut for PSL_OP_CONV3(tok, X, X)
 */
-#define PSL_OP_CONV2(err, tok, sym)     PSL_OP_CONV3(err, tok, sym, sym)
-
-
-
+#define PSL_OP_CONV2(err, tok, sym) PSL_OP_CONV3(err, tok, sym, sym)
 
 /**AutomaticStart*************************************************************/
 
@@ -119,102 +121,94 @@ To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static PslNode_ptr
-psl_node_pslobe2ctl(const NuSMVEnv_ptr env,
-                    PslNode_ptr expr, PslOpConvType type,
-                    NodeList_ptr replicator_id_stack);
+static PslNode_ptr psl_node_pslobe2ctl(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                                       PslOpConvType type,
+                                       NodeList_ptr replicator_id_stack);
 
-static PslNode_ptr
-psl_node_pslltl2ltl(const NuSMVEnv_ptr env,
-                    PslNode_ptr expr, PslOpConvType type,
-                    NodeList_ptr replicator_id_stack);
+static PslNode_ptr psl_node_pslltl2ltl(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                                       PslOpConvType type,
+                                       NodeList_ptr replicator_id_stack);
 
-static PslNode_ptr
-psl_node_expand_next_event(const NuSMVEnv_ptr env,
-                           PslOp op, PslNode_ptr f, PslNode_ptr b,
-                           PslOpConvType type);
+static PslNode_ptr psl_node_expand_next_event(const NuSMVEnv_ptr env, PslOp op,
+                                              PslNode_ptr f, PslNode_ptr b,
+                                              PslOpConvType type);
 
-static PslNode_ptr
-psl_node_subst_id(const NuSMVEnv_ptr env,
-                  PslNode_ptr expr, PslNode_ptr id, PslNode_ptr v,
-                  boolean is_top_level);
+static PslNode_ptr psl_node_subst_id(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                                     PslNode_ptr id, PslNode_ptr v,
+                                     boolean is_top_level);
 
-static PslNode_ptr
-psl_node_expand_replicator(const NuSMVEnv_ptr env,
-                           PslNode_ptr rep, PslNode_ptr wff,
-                           PslOp op);
+static PslNode_ptr psl_node_expand_replicator(const NuSMVEnv_ptr env,
+                                              PslNode_ptr rep, PslNode_ptr wff,
+                                              PslOp op);
 
 static PslNode_ptr psl_node_sere_remove_disj(const NuSMVEnv_ptr env,
                                              PslNode_ptr e);
 
-static PslNode_ptr
-psl_node_insert_inside_holes(const NuSMVEnv_ptr env,
-                             PslNode_ptr e, PslNode_ptr to_be_inserted,
-                             boolean* inserted);
+static PslNode_ptr psl_node_insert_inside_holes(const NuSMVEnv_ptr env,
+                                                PslNode_ptr e,
+                                                PslNode_ptr to_be_inserted,
+                                                boolean *inserted);
 
-static PslNode_ptr
-psl_node_sere_concat_fusion2ltl(const NuSMVEnv_ptr env,
-                                PslNode_ptr e, PslNode_ptr phi);
+static PslNode_ptr psl_node_sere_concat_fusion2ltl(const NuSMVEnv_ptr env,
+                                                   PslNode_ptr e,
+                                                   PslNode_ptr phi);
 
 static PslNode_ptr psl_node_sere_translate(const NuSMVEnv_ptr env,
                                            PslNode_ptr e);
 
 static boolean psl_node_sere_is_disj(PslNode_ptr e);
 
-static PslNode_ptr
-psl_node_sere_distrib_disj(const NuSMVEnv_ptr env,
-                           PslNode_ptr e, boolean *modified);
+static PslNode_ptr psl_node_sere_distrib_disj(const NuSMVEnv_ptr env,
+                                              PslNode_ptr e, boolean *modified);
 
 static PslNode_ptr psl_node_sere_remove_star_count(const NuSMVEnv_ptr env,
                                                    PslNode_ptr e);
 
-static PslNode_ptr
-psl_node_sere_remove_trailing_star(const NuSMVEnv_ptr env,
-                                   PslNode_ptr e, boolean* modified);
+static PslNode_ptr psl_node_sere_remove_trailing_star(const NuSMVEnv_ptr env,
+                                                      PslNode_ptr e,
+                                                      boolean *modified);
 
 static boolean psl_node_sere_is_ampersand(PslNode_ptr e);
 static PslNode_ptr psl_node_sere_get_leftmost(PslNode_ptr e);
 static PslNode_ptr psl_node_sere_get_rightmost(PslNode_ptr e);
 
-static PslNode_ptr
-psl_node_sere_remove_plus(const NuSMVEnv_ptr env,
-                          PslNode_ptr e, boolean toplevel);
+static PslNode_ptr psl_node_sere_remove_plus(const NuSMVEnv_ptr env,
+                                             PslNode_ptr e, boolean toplevel);
 
 static PslNode_ptr psl_node_sere_remove_trailing_plus(const NuSMVEnv_ptr env,
                                                       PslNode_ptr e);
 static PslNode_ptr psl_node_remove_suffix_implication(const NuSMVEnv_ptr env,
                                                       PslNode_ptr e);
 
-static PslNode_ptr
-psl_node_sere_remove_star(const NuSMVEnv_ptr env, PslNode_ptr e, boolean toplevel,
-                          boolean* modified);
+static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
+                                             PslNode_ptr e, boolean toplevel,
+                                             boolean *modified);
+
+static PslNode_ptr psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env,
+                                                  PslNode_ptr e,
+                                                  boolean *modified);
+
+static PslNode_ptr psl_node_sere_remove_2ampersand(const NuSMVEnv_ptr env,
+                                                   PslNode_ptr e,
+                                                   boolean *modified);
+
+static PslNode_ptr psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
+                                               PslNode_ptr e,
+                                               boolean *modified);
 
 static PslNode_ptr
-psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env, PslNode_ptr e, boolean* modified);
-
-static PslNode_ptr
-psl_node_sere_remove_2ampersand(const NuSMVEnv_ptr env,
-                                PslNode_ptr e, boolean *modified);
-
-static PslNode_ptr
-psl_node_sere_remove_fusion(const NuSMVEnv_ptr env, PslNode_ptr e, boolean *modified);
-
-static PslNode_ptr
-psl_node_remove_forall_replicators(const NuSMVEnv_ptr env,
-                                   PslNode_ptr expr,
+psl_node_remove_forall_replicators(const NuSMVEnv_ptr env, PslNode_ptr expr,
                                    NodeList_ptr replicator_id_stack);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-node_ptr PslNode_convert_psl_to_core(const NuSMVEnv_ptr env, PslNode_ptr expr)
-{
+node_ptr PslNode_convert_psl_to_core(const NuSMVEnv_ptr env, PslNode_ptr expr) {
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   PslNode_ptr res;
 
   /* removal of forall */
@@ -229,80 +223,78 @@ node_ptr PslNode_convert_psl_to_core(const NuSMVEnv_ptr env, PslNode_ptr expr)
 
     /* converts to SMV ltl */
     res = PslNode_pslltl2ltl(env, res, PSL2SMV);
-  }
-  else {
+  } else {
     /* here the property may be either OBE or unmanageable */
     if (PslNode_is_obe(res)) {
       res = PslNode_pslobe2ctl(env, res, PSL2SMV);
-    }
-    else ErrorMgr_error_psl_not_supported_feature(errmgr);
+    } else
+      ErrorMgr_error_psl_not_supported_feature(errmgr);
   }
 
   return PslNode_convert_to_node_ptr(res);
 }
 
-
-
-
 /*!
   \brief Converts an id to a different id type, for example a PSL id
 to a SMV id
 
-  
+
 
   \se None
 */
 
-PslNode_ptr PslNode_convert_id(const NuSMVEnv_ptr env, PslNode_ptr id, PslOpConvType type)
-{
+PslNode_ptr PslNode_convert_id(const NuSMVEnv_ptr env, PslNode_ptr id,
+                               PslOpConvType type) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   PslNode_ptr result;
   PslOp op, op_psl;
 
-  if (id == PSL_NULL) return PSL_NULL;
+  if (id == PSL_NULL)
+    return PSL_NULL;
 
   op = psl_node_get_op(id);
 
   /* Cases are limited to normalized parse-tree compatible node, so if token is
      coming, it is converted at first */
-  if ((type == TOK2PSL) || (type == TOK2SMV)) op_psl = psl_conv_op(env, type, op);
-  else op_psl = op;
+  if ((type == TOK2PSL) || (type == TOK2SMV))
+    op_psl = psl_conv_op(env, type, op);
+  else
+    op_psl = op;
 
   switch (op_psl) {
     /* leaves: */
   case ATOM:
   case NUMBER:
     result = psl_new_node(nodemgr, psl_conv_op(env, type, op),
-                          psl_node_get_left(id),
-                          psl_node_get_right(id));
+                          psl_node_get_left(id), psl_node_get_right(id));
     break;
 
   case ARRAY:
   case DOT:
-    result = psl_new_node(nodemgr, psl_conv_op(env, type, op),
-                          PslNode_convert_id(env, psl_node_get_left(id), type),
-                          PslNode_convert_id(env, psl_node_get_right(id), type));
+    result =
+        psl_new_node(nodemgr, psl_conv_op(env, type, op),
+                     PslNode_convert_id(env, psl_node_get_left(id), type),
+                     PslNode_convert_id(env, psl_node_get_right(id), type));
     break;
 
   default:
-    StreamMgr_print_error(streams, 
-                          "PslNode_convert_id: operator type not supported \"%d\"\n",
-                          op_psl);
+    StreamMgr_print_error(
+        streams, "PslNode_convert_id: operator type not supported \"%d\"\n",
+        op_psl);
     ErrorMgr_internal_error(errmgr, "Invalid op");
-    result = (PslNode_ptr) NULL;
+    result = (PslNode_ptr)NULL;
   }
 
   return result;
 }
 
-
 /*!
   \brief Takes a PSL OBE expression and builds the corresponding
-CTL expression 
+CTL expression
 
   Takes a PSL OBE expression and builds the corresponding
 CTL expression.
@@ -312,9 +304,8 @@ CTL expression.
   \sa optional
 */
 
-PslNode_ptr PslNode_pslobe2ctl(const NuSMVEnv_ptr env,
-                               PslNode_ptr expr, PslOpConvType type)
-{
+PslNode_ptr PslNode_pslobe2ctl(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                               PslOpConvType type) {
   NodeList_ptr repl_stack = NodeList_create();
   PslNode_ptr res = psl_node_pslobe2ctl(env, expr, type, repl_stack);
 
@@ -331,24 +322,25 @@ PslNode_ptr PslNode_pslobe2ctl(const NuSMVEnv_ptr env,
 
   \sa PslNode_pslobe2ctl
 */
-static PslNode_ptr psl_node_pslobe2ctl(const NuSMVEnv_ptr env,
-                                       PslNode_ptr expr, PslOpConvType type,
-                                       NodeList_ptr replicator_id_stack)
-{
+static PslNode_ptr psl_node_pslobe2ctl(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                                       PslOpConvType type,
+                                       NodeList_ptr replicator_id_stack) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   PslNode_ptr result;
   PslOp op;
 
-  if (expr == PSL_NULL) return PSL_NULL;
+  if (expr == PSL_NULL)
+    return PSL_NULL;
 
   op = psl_node_get_op(expr);
 
   if (psl_node_is_leaf(expr)) {
-    return psl_new_node(nodemgr, op, psl_node_get_left(expr), psl_node_get_right(expr));
+    return psl_new_node(nodemgr, op, psl_node_get_left(expr),
+                        psl_node_get_right(expr));
   }
 
   switch (op) {
@@ -402,57 +394,55 @@ static PslNode_ptr psl_node_pslobe2ctl(const NuSMVEnv_ptr env,
   case EU:
   case AU:
     result = psl_new_node(nodemgr, op,
-                          psl_node_pslobe2ctl(env, psl_node_get_left(expr), type,
-                                           replicator_id_stack),
-                          psl_node_pslobe2ctl(env, psl_node_get_right(expr), type,
-                                           replicator_id_stack));
+                          psl_node_pslobe2ctl(env, psl_node_get_left(expr),
+                                              type, replicator_id_stack),
+                          psl_node_pslobe2ctl(env, psl_node_get_right(expr),
+                                              type, replicator_id_stack));
     break;
 
-  case PSL_ITE:
-    {
-      PslNode_ptr _cond = psl_node_get_ite_cond(expr);
-      PslNode_ptr _then = psl_node_get_ite_then(expr);
-      PslNode_ptr _else = psl_node_get_ite_else(expr);
+  case PSL_ITE: {
+    PslNode_ptr _cond = psl_node_get_ite_cond(expr);
+    PslNode_ptr _then = psl_node_get_ite_then(expr);
+    PslNode_ptr _else = psl_node_get_ite_else(expr);
 
-      PslNode_ptr case_else =
-        psl_node_make_case(nodemgr, psl_node_make_true(nodemgr),
-                           _else,
+    PslNode_ptr case_else =
+        psl_node_make_case(nodemgr, psl_node_make_true(nodemgr), _else,
                            psl_node_make_failure(nodemgr, "Impossible failure",
                                                  FAILURE_UNSPECIFIED));
 
-      result = psl_node_make_case(nodemgr, _cond, _then, case_else);
-      break;
-    }
+    result = psl_node_make_case(nodemgr, _cond, _then, case_else);
+    break;
+  }
 
-  case PSL_REPLPROP:
+  case PSL_REPLPROP: {
+    PslNode_ptr rep = psl_node_repl_prop_get_replicator(expr);
+    PslNode_ptr wff = psl_node_repl_prop_get_property(expr);
+    PslNode_ptr id = psl_node_get_replicator_id(rep);
+    PslOp rop = psl_node_get_replicator_join_op(rep);
+
+    /* checks if the forall ID has been already used by an outer forall */
+    if (NodeList_belongs_to(replicator_id_stack,
+                            PslNode_convert_to_node_ptr(id))) {
+      ErrorMgr_error_psl_repeated_replicator_id(errmgr);
+    }
+    NodeList_prepend(replicator_id_stack, PslNode_convert_to_node_ptr(id));
+
+    result = psl_node_expand_replicator(env, rep, wff, rop);
+    result = psl_node_pslobe2ctl(env, result, type, replicator_id_stack);
+
+    /* finally pops the forall ID from the stack: */
     {
-      PslNode_ptr rep = psl_node_repl_prop_get_replicator(expr);
-      PslNode_ptr wff = psl_node_repl_prop_get_property(expr);
-      PslNode_ptr id = psl_node_get_replicator_id(rep);
-      PslOp rop = psl_node_get_replicator_join_op(rep);
-
-      /* checks if the forall ID has been already used by an outer forall */
-      if (NodeList_belongs_to(replicator_id_stack,
-                              PslNode_convert_to_node_ptr(id))) {
-        ErrorMgr_error_psl_repeated_replicator_id(errmgr);
-      }
-      NodeList_prepend(replicator_id_stack, PslNode_convert_to_node_ptr(id));
-
-      result = psl_node_expand_replicator(env, rep, wff, rop);
-      result = psl_node_pslobe2ctl(env, result, type, replicator_id_stack);
-
-      /* finally pops the forall ID from the stack: */
-      {
-        node_ptr el = NodeList_remove_elem_at(replicator_id_stack,
-                                NodeList_get_first_iter(replicator_id_stack));
-        free_node(nodemgr, el);
-      }
-      break;
+      node_ptr el = NodeList_remove_elem_at(
+          replicator_id_stack, NodeList_get_first_iter(replicator_id_stack));
+      free_node(nodemgr, el);
     }
+    break;
+  }
 
   default:
-    StreamMgr_print_error(streams, 
-            "psl_node_pslobe2ctl: operator type not supported \"%d\"\n", op);
+    StreamMgr_print_error(
+        streams, "psl_node_pslobe2ctl: operator type not supported \"%d\"\n",
+        op);
     error_unreachable_code();
   }
 
@@ -474,8 +464,7 @@ its scope.
 */
 
 PslNode_ptr PslNode_remove_forall_replicators(const NuSMVEnv_ptr env,
-                                              PslNode_ptr expr)
-{
+                                              PslNode_ptr expr) {
   NodeList_ptr repl_stack = NodeList_create();
   PslNode_ptr res = psl_node_remove_forall_replicators(env, expr, repl_stack);
 
@@ -497,53 +486,54 @@ PslNode_ptr PslNode_remove_forall_replicators(const NuSMVEnv_ptr env,
   \sa PslNode_remove_forall_replicators
 */
 static PslNode_ptr
-psl_node_remove_forall_replicators(const NuSMVEnv_ptr env,
-                                   PslNode_ptr expr,
-                                   NodeList_ptr replicator_id_stack)
-{
+psl_node_remove_forall_replicators(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                                   NodeList_ptr replicator_id_stack) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  const ErrorMgr_ptr errmgr =
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   PslNode_ptr result;
   PslOp op;
 
-  if (expr == PSL_NULL) return PSL_NULL;
-  if (psl_node_is_leaf(expr)) return expr;
+  if (expr == PSL_NULL)
+    return PSL_NULL;
+  if (psl_node_is_leaf(expr))
+    return expr;
 
   op = psl_node_get_op(expr);
 
   switch (op) {
-  case PSL_REPLPROP:
-    {
-      PslNode_ptr rep = psl_node_repl_prop_get_replicator(expr);
-      PslNode_ptr wff = psl_node_repl_prop_get_property(expr);
-      PslNode_ptr id = psl_node_get_replicator_id(rep);
-      PslOp rop = psl_node_get_replicator_join_op(rep);
+  case PSL_REPLPROP: {
+    PslNode_ptr rep = psl_node_repl_prop_get_replicator(expr);
+    PslNode_ptr wff = psl_node_repl_prop_get_property(expr);
+    PslNode_ptr id = psl_node_get_replicator_id(rep);
+    PslOp rop = psl_node_get_replicator_join_op(rep);
 
-      /* checks if the forall ID has been already used by an outer forall */
-      if (NodeList_belongs_to(replicator_id_stack,
-                              PslNode_convert_to_node_ptr(id))) {
-        ErrorMgr_error_psl_repeated_replicator_id(errmgr);
-      }
-      NodeList_prepend(replicator_id_stack, PslNode_convert_to_node_ptr(id));
-
-      result = psl_node_expand_replicator(env, rep, wff, rop);
-      result = psl_node_remove_forall_replicators(env, result, replicator_id_stack);
-
-      /* finally pops the forall ID from the stack: */
-      {
-        node_ptr el = NodeList_remove_elem_at(replicator_id_stack,
-                              NodeList_get_first_iter(replicator_id_stack));
-        free_node(nodemgr, el);
-      }
-      break;
+    /* checks if the forall ID has been already used by an outer forall */
+    if (NodeList_belongs_to(replicator_id_stack,
+                            PslNode_convert_to_node_ptr(id))) {
+      ErrorMgr_error_psl_repeated_replicator_id(errmgr);
     }
+    NodeList_prepend(replicator_id_stack, PslNode_convert_to_node_ptr(id));
+
+    result = psl_node_expand_replicator(env, rep, wff, rop);
+    result =
+        psl_node_remove_forall_replicators(env, result, replicator_id_stack);
+
+    /* finally pops the forall ID from the stack: */
+    {
+      node_ptr el = NodeList_remove_elem_at(
+          replicator_id_stack, NodeList_get_first_iter(replicator_id_stack));
+      free_node(nodemgr, el);
+    }
+    break;
+  }
   default:
-    result = psl_new_node(nodemgr, psl_node_get_op(expr),
-                          psl_node_remove_forall_replicators(env, psl_node_get_left(expr),
-                                                             replicator_id_stack),
-                          psl_node_remove_forall_replicators(env, psl_node_get_right(expr),
-                                                             replicator_id_stack));
+    result =
+        psl_new_node(nodemgr, psl_node_get_op(expr),
+                     psl_node_remove_forall_replicators(
+                         env, psl_node_get_left(expr), replicator_id_stack),
+                     psl_node_remove_forall_replicators(
+                         env, psl_node_get_right(expr), replicator_id_stack));
     break;
   }
   return result;
@@ -551,7 +541,7 @@ const ErrorMgr_ptr errmgr =
 
 /*!
   \brief Takes a PSL LTL expression and builds the
-corresponding LTL expression 
+corresponding LTL expression
 
   Takes a PSL LTL expression and builds the corresponding
 LTL expression. This ignores SERE that can be easily mapped to the
@@ -563,8 +553,8 @@ used to prevent ID duplication of nested forall (replicators).
   \sa optional
 */
 
-PslNode_ptr PslNode_pslltl2ltl(const NuSMVEnv_ptr env, PslNode_ptr expr, PslOpConvType type)
-{
+PslNode_ptr PslNode_pslltl2ltl(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                               PslOpConvType type) {
   NodeList_ptr repl_stack = NodeList_create();
   PslNode_ptr res = psl_node_pslltl2ltl(env, expr, type, repl_stack);
 
@@ -574,7 +564,7 @@ PslNode_ptr PslNode_pslltl2ltl(const NuSMVEnv_ptr env, PslNode_ptr expr, PslOpCo
 
 /*!
   \brief Takes a PSL LTL expression and builds the
-corresponding LTL expression 
+corresponding LTL expression
 
   Takes a PSL LTL expression and builds the corresponding
 LTL expression. This ignores SERE that can be easily mapped to the
@@ -586,26 +576,27 @@ type can be PSL2SMV or PSL2PSL
 
   \sa optional
 */
-static PslNode_ptr psl_node_pslltl2ltl(const NuSMVEnv_ptr env,
-                                       PslNode_ptr expr, PslOpConvType type,
-                                       NodeList_ptr replicator_id_stack)
-{
+static PslNode_ptr psl_node_pslltl2ltl(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                                       PslOpConvType type,
+                                       NodeList_ptr replicator_id_stack) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  const ErrorMgr_ptr errmgr =
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   PslNode_ptr result;
   PslOp op;
 
-  if (expr == PSL_NULL) return PSL_NULL;
+  if (expr == PSL_NULL)
+    return PSL_NULL;
 
   op = psl_node_get_op(expr);
   if (psl_node_is_leaf(expr)) {
-    return psl_new_node(nodemgr, op, psl_node_get_left(expr), psl_node_get_right(expr));
+    return psl_new_node(nodemgr, op, psl_node_get_left(expr),
+                        psl_node_get_right(expr));
   }
 
   switch (op) {
@@ -673,520 +664,516 @@ const ErrorMgr_ptr errmgr =
     /* binary temporal ops */
   case UNTIL:
     result = psl_new_node(nodemgr, psl_conv_op(env, type, op),
-                          psl_node_pslltl2ltl(env, psl_node_get_left(expr), type,
-                                              replicator_id_stack),
-                          psl_node_pslltl2ltl(env, psl_node_get_right(expr), type,
-                                              replicator_id_stack));
+                          psl_node_pslltl2ltl(env, psl_node_get_left(expr),
+                                              type, replicator_id_stack),
+                          psl_node_pslltl2ltl(env, psl_node_get_right(expr),
+                                              type, replicator_id_stack));
     break;
 
-  case PSL_ITE:
-    {
-      PslNode_ptr _cond = psl_node_get_ite_cond(expr);
-      PslNode_ptr _then = psl_node_get_ite_then(expr);
-      PslNode_ptr _else = psl_node_get_ite_else(expr);
+  case PSL_ITE: {
+    PslNode_ptr _cond = psl_node_get_ite_cond(expr);
+    PslNode_ptr _then = psl_node_get_ite_then(expr);
+    PslNode_ptr _else = psl_node_get_ite_else(expr);
 
-      PslNode_ptr case_else =
-        psl_node_make_case(nodemgr, psl_node_make_true(nodemgr),
-                           _else,
+    PslNode_ptr case_else =
+        psl_node_make_case(nodemgr, psl_node_make_true(nodemgr), _else,
                            psl_node_make_failure(nodemgr, "Impossible failure",
                                                  FAILURE_UNSPECIFIED));
 
-      result = psl_node_make_case(nodemgr, _cond, _then, case_else);
-      break;
-    }
+    result = psl_node_make_case(nodemgr, _cond, _then, case_else);
+    break;
+  }
 
     /* next* operators */
   case OP_NEXT:
   case PSL_X:
   case PSL_XBANG:
   case PSL_NEXT:
-  case PSL_NEXTBANG:
-    {
-      PslNode_ptr l = psl_node_pslltl2ltl(env, psl_node_get_left(expr), type,
-                                          replicator_id_stack);
-      PslNode_ptr r = psl_node_get_right(expr);
+  case PSL_NEXTBANG: {
+    PslNode_ptr l = psl_node_pslltl2ltl(env, psl_node_get_left(expr), type,
+                                        replicator_id_stack);
+    PslNode_ptr r = psl_node_get_right(expr);
 
-      /* Developer's note: we might think to use specific top level
-         ops for extended next operators, instead of reusing NEXT and X */
-      if (r != PSL_NULL) {
-        /* Extended next (event) operator */
-        int lim;
-        PslNode_ptr lim_expr;
+    /* Developer's note: we might think to use specific top level
+       ops for extended next operators, instead of reusing NEXT and X */
+    if (r != PSL_NULL) {
+      /* Extended next (event) operator */
+      int lim;
+      PslNode_ptr lim_expr;
 
-        nusmv_assert(psl_node_get_op(r) == COLON);
-        nusmv_assert(psl_node_get_right(r) == PSL_NULL);
+      nusmv_assert(psl_node_get_op(r) == COLON);
+      nusmv_assert(psl_node_get_right(r) == PSL_NULL);
 
-        lim_expr = psl_node_get_left(r);
-        if (!psl_node_is_number(lim_expr)) {
-          StreamMgr_print_error(streams,  "In PSL expression '");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "'\n");
-          ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
-        }
-        lim = psl_node_number_get_value(lim_expr);
-
-        /* inf must be greater or equal to 0 */
-        nusmv_assert(lim >=0 );
-        for (; lim > 0; --lim) {
-          l = psl_new_node(nodemgr, psl_conv_op(env, type, op), l, PSL_NULL);
-        }
+      lim_expr = psl_node_get_left(r);
+      if (!psl_node_is_number(lim_expr)) {
+        StreamMgr_print_error(streams, "In PSL expression '");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "'\n");
+        ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
       }
-      else {
-        /* when is not specified */
+      lim = psl_node_number_get_value(lim_expr);
+
+      /* inf must be greater or equal to 0 */
+      nusmv_assert(lim >= 0);
+      for (; lim > 0; --lim) {
         l = psl_new_node(nodemgr, psl_conv_op(env, type, op), l, PSL_NULL);
       }
-
-      /* At the moment we do not distinguish among weak and strong next */
-      result = l;
+    } else {
+      /* when is not specified */
+      l = psl_new_node(nodemgr, psl_conv_op(env, type, op), l, PSL_NULL);
     }
+
+    /* At the moment we do not distinguish among weak and strong next */
+    result = l;
+  } break;
+
+  case PSL_WSELECT: {
+    PslNode_ptr l = psl_node_get_left(expr);
+    PslNode_ptr r = psl_node_get_right(expr);
+
+    result = psl_new_node(nodemgr, BIT_SELECTION, l, r);
     break;
-
-
-  case PSL_WSELECT:
-    {
-      PslNode_ptr l = psl_node_get_left(expr);
-      PslNode_ptr r = psl_node_get_right(expr);
-
-      result = psl_new_node(nodemgr, BIT_SELECTION, l, r);
-      break;
-    }
+  }
 
   case PSL_NEXT_E:
   case PSL_NEXT_EBANG:
   case PSL_NEXT_A:
-  case PSL_NEXT_ABANG:
+  case PSL_NEXT_ABANG: {
+    PslNode_ptr l = psl_node_get_left(expr);
+    PslNode_ptr r = psl_node_get_right(expr);
+
+    /* we do not distinguish among weak and strong next */
+    nusmv_assert(r != PSL_NULL);
+    nusmv_assert(psl_node_get_op(r) == COLON);
+    nusmv_assert(psl_node_get_right(r) == PSL_NULL);
+
+    result = psl_node_pslltl2ltl(env, l, type, replicator_id_stack);
+
     {
-      PslNode_ptr l = psl_node_get_left(expr);
-      PslNode_ptr r = psl_node_get_right(expr);
+      PslNode_ptr rr;
+      int inf, sup;
+      PslNode_ptr lim_expr = psl_node_get_left(r);
 
-      /* we do not distinguish among weak and strong next */
-      nusmv_assert(r != PSL_NULL);
-      nusmv_assert(psl_node_get_op(r) == COLON);
-      nusmv_assert(psl_node_get_right(r) == PSL_NULL);
+      nusmv_assert(psl_node_get_op(lim_expr) == PSL_RANGE);
 
-      result = psl_node_pslltl2ltl(env, l, type, replicator_id_stack);
+      if (!psl_node_is_number(psl_node_get_left(lim_expr))) {
+        StreamMgr_print_error(streams, "In PSL expression '");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "'\n");
+        ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
+      }
+      inf = psl_node_number_get_value(psl_node_get_left(lim_expr));
 
-      {
-        PslNode_ptr rr;
-        int inf, sup;
-        PslNode_ptr lim_expr = psl_node_get_left(r);
+      if (!psl_node_is_number(psl_node_get_right(lim_expr))) {
+        StreamMgr_print_error(streams, "In PSL expression '");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "'\n");
+        ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
+      }
+      sup = psl_node_number_get_value(psl_node_get_right(lim_expr));
 
-        nusmv_assert(psl_node_get_op(lim_expr) == PSL_RANGE);
+      if (inf > sup) {
+        StreamMgr_print_error(streams, "Error in: ");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "\n");
 
-        if (!psl_node_is_number(psl_node_get_left(lim_expr))) {
-          StreamMgr_print_error(streams,  "In PSL expression '");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "'\n");
-          ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
-        }
-        inf = psl_node_number_get_value(psl_node_get_left(lim_expr));
+        ErrorMgr_error_invalid_numeric_value(
+            errmgr, sup,
+            "Next operators expect"
+            " ranges with high bound greater than"
+            " low bound.");
+      }
 
-        if (!psl_node_is_number(psl_node_get_right(lim_expr))) {
-          StreamMgr_print_error(streams,  "In PSL expression '");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "'\n");
-          ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
-        }
-        sup = psl_node_number_get_value(psl_node_get_right(lim_expr));
-
-        if (inf > sup) {
-          StreamMgr_print_error(streams,  "Error in: ");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "\n");
-
-          ErrorMgr_error_invalid_numeric_value(errmgr, sup, "Next operators expect"\
-                                      " ranges with high bound greater than"\
-                                      " low bound.");
-        }
-
-        rr = result;
+      rr = result;
 
 #ifdef PSL_CONV_DISTRIB_NEXT
-        /*
-           X^{inf}(phi & X (phi & .. X(phi & X phi)....))
-           \----------------- sup - inf -------/
-        */
-        {
-          int k;
+      /*
+         X^{inf}(phi & X (phi & .. X(phi & X phi)....))
+         \----------------- sup - inf -------/
+      */
+      {
+        int k;
 
-          for (k = (sup - inf); k > 0; --k) {
-            if ((op == PSL_NEXT_E) || (op == PSL_NEXT_EBANG)) {
-              /* result' = result | rr */
-              rr = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
-                                psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG),
-                                             rr, PSL_NULL));
-            }
-            else {
-              rr = psl_new_node(nodemgr, psl_conv_op(env,type, AND), result,
-                                psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG),
-                                             rr, PSL_NULL));
-            }
-          }
-          for (k = inf; k > 0; --k) {
-            rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr, PSL_NULL);
-          }
-        }
-        result = rr;
-#else
-        /* X^{inf}(phi) & X^{inf+1}(phi) & ... & X^{sup}(phi) */
-
-        for (i = inf; i > 0; --i) {
-          result = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG),
-                                result, PSL_NULL);
-        }
-
-        rr = result;
-
-        for (i = inf + 1 ; i <= sup; ++i) {
-          rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr, PSL_NULL);
-
+        for (k = (sup - inf); k > 0; --k) {
           if ((op == PSL_NEXT_E) || (op == PSL_NEXT_EBANG)) {
             /* result' = result | rr */
-            result = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result, rr);
-          }
-          else {
-            /* result' = result & rr */
-            result = psl_new_node(nodemgr, psl_conv_op(env, type, AND), result, rr);
+            rr = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
+                              psl_new_node(nodemgr,
+                                           psl_conv_op(env, type, PSL_XBANG),
+                                           rr, PSL_NULL));
+          } else {
+            rr = psl_new_node(nodemgr, psl_conv_op(env, type, AND), result,
+                              psl_new_node(nodemgr,
+                                           psl_conv_op(env, type, PSL_XBANG),
+                                           rr, PSL_NULL));
           }
         }
-#endif
+        for (k = inf; k > 0; --k) {
+          rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr,
+                            PSL_NULL);
+        }
       }
+      result = rr;
+#else
+      /* X^{inf}(phi) & X^{inf+1}(phi) & ... & X^{sup}(phi) */
+
+      for (i = inf; i > 0; --i) {
+        result = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG),
+                              result, PSL_NULL);
+      }
+
+      rr = result;
+
+      for (i = inf + 1; i <= sup; ++i) {
+        rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr,
+                          PSL_NULL);
+
+        if ((op == PSL_NEXT_E) || (op == PSL_NEXT_EBANG)) {
+          /* result' = result | rr */
+          result =
+              psl_new_node(nodemgr, psl_conv_op(env, type, OR), result, rr);
+        } else {
+          /* result' = result & rr */
+          result =
+              psl_new_node(nodemgr, psl_conv_op(env, type, AND), result, rr);
+        }
+      }
+#endif
     }
-    break;
+  } break;
 
   case PSL_NEXT_EVENT:
-  case PSL_NEXT_EVENTBANG:
+  case PSL_NEXT_EVENTBANG: {
+    PslNode_ptr b;
+    PslNode_ptr l = psl_node_get_left(expr);
+    PslNode_ptr r = psl_node_get_right(expr);
+
+    nusmv_assert(r != PSL_NULL);
+    nusmv_assert(psl_node_get_op(r) == COLON);
+
+    b = psl_node_pslltl2ltl(env, psl_node_get_right(r), type,
+                            replicator_id_stack);
+    nusmv_assert(b != PSL_NULL);
+
+    /* !b {U|W} (b & l) */
+    result = psl_node_expand_next_event(
+        env, op, psl_node_pslltl2ltl(env, l, type, replicator_id_stack), b,
+        type);
+
     {
-      PslNode_ptr b;
-      PslNode_ptr l = psl_node_get_left(expr);
-      PslNode_ptr r = psl_node_get_right(expr);
+      PslNode_ptr lim_expr = psl_node_get_left(r);
 
-      nusmv_assert(r != PSL_NULL);
-      nusmv_assert(psl_node_get_op(r) == COLON);
+      if (lim_expr != PSL_NULL) {
+        /* the next event is iterated */
+        int lim;
 
-      b = psl_node_pslltl2ltl(env, psl_node_get_right(r), type,
-                              replicator_id_stack);
-      nusmv_assert(b != PSL_NULL);
+        if (!psl_node_is_number(lim_expr)) {
+          StreamMgr_print_error(streams, "In PSL expression '");
+          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+          StreamMgr_print_error(streams, "'\n");
+          ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
+        }
+        lim = psl_node_number_get_value(lim_expr);
+        if (lim <= 0) {
+          StreamMgr_print_error(streams, "Error in: ");
+          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+          StreamMgr_print_error(streams, "\n");
 
-      /* !b {U|W} (b & l) */
-      result = psl_node_expand_next_event(env, op,
-                                          psl_node_pslltl2ltl(env,l, type, replicator_id_stack),
-                                          b, type);
+          ErrorMgr_error_invalid_numeric_value(errmgr, lim,
+                                               "Next event operators expect"
+                                               " a positive integer.");
+        }
 
-      {
-        PslNode_ptr lim_expr = psl_node_get_left(r);
-
-        if (lim_expr != PSL_NULL) {
-          /* the next event is iterated */
-          int lim;
-
-          if (!psl_node_is_number(lim_expr)) {
-            StreamMgr_print_error(streams,  "In PSL expression '");
-            StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-            StreamMgr_print_error(streams,  "'\n");
-            ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
-          }
-          lim  = psl_node_number_get_value(lim_expr);
-          if (lim <= 0) {
-            StreamMgr_print_error(streams,  "Error in: ");
-            StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-            StreamMgr_print_error(streams,  "\n");
-
-            ErrorMgr_error_invalid_numeric_value(errmgr, lim, "Next event operators expect"\
-                                        " a positive integer.");
-          }
-
-          for (; lim > 1; --lim) {
-            /* We assume strong next */
-            result = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG),
-                                  result, PSL_NULL);
-            result = psl_node_expand_next_event(env, op, result, b, type);
-          }
+        for (; lim > 1; --lim) {
+          /* We assume strong next */
+          result = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG),
+                                result, PSL_NULL);
+          result = psl_node_expand_next_event(env, op, result, b, type);
         }
       }
     }
-    break;
+  } break;
 
   case PSL_NEXT_EVENT_E:
   case PSL_NEXT_EVENT_EBANG:
   case PSL_NEXT_EVENT_A:
-  case PSL_NEXT_EVENT_ABANG:
+  case PSL_NEXT_EVENT_ABANG: {
+    PslNode_ptr b;
+    PslNode_ptr l = psl_node_get_left(expr);
+    PslNode_ptr r = psl_node_get_right(expr);
+
+    nusmv_assert(r != PSL_NULL);
+    nusmv_assert(psl_node_get_op(r) == COLON);
+
+    b = psl_node_pslltl2ltl(env, psl_node_get_right(r), type,
+                            replicator_id_stack);
+    nusmv_assert(b != PSL_NULL);
+
     {
-      PslNode_ptr b;
-      PslNode_ptr l = psl_node_get_left(expr);
-      PslNode_ptr r = psl_node_get_right(expr);
+      int i, inf, sup;
+      PslNode_ptr rr;
+      PslNode_ptr lim_expr = psl_node_get_left(r);
 
-      nusmv_assert(r != PSL_NULL);
-      nusmv_assert(psl_node_get_op(r) == COLON);
+      /* !b {U|W} (b & l) */
+      rr = psl_node_expand_next_event(
+          env, op, psl_node_pslltl2ltl(env, l, type, replicator_id_stack), b,
+          type);
 
-      b = psl_node_pslltl2ltl(env, psl_node_get_right(r), type, replicator_id_stack);
-      nusmv_assert(b != PSL_NULL);
-
-      {
-        int i, inf, sup;
-        PslNode_ptr rr;
-        PslNode_ptr lim_expr = psl_node_get_left(r);
-
-        /* !b {U|W} (b & l) */
-        rr = psl_node_expand_next_event(env, op,
-                                        psl_node_pslltl2ltl(env,l, type, replicator_id_stack),
-                                        b, type);
-
-        if (!psl_node_is_number(psl_node_get_left(lim_expr))) {
-          StreamMgr_print_error(streams,  "In PSL expression '");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "'\n");
-          ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
-        }
-        inf = psl_node_number_get_value(psl_node_get_left(lim_expr));
-
-        if (!psl_node_is_number(psl_node_get_right(lim_expr))) {
-          StreamMgr_print_error(streams,  "In PSL expression '");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "'\n");
-          ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
-        }
-        sup = psl_node_number_get_value(psl_node_get_right(lim_expr));
-
-        /* inf, sup must be greater than 0 */
-        if (inf <= 0) {
-          StreamMgr_print_error(streams,  "Error in: ");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "\n");
-
-          ErrorMgr_error_invalid_numeric_value(errmgr, inf, "Next event operators expect"\
-                                      " a positive range.");
-        }
-
-        if (sup <= 0) {
-          StreamMgr_print_error(streams,  "Error in: ");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "\n");
-
-          ErrorMgr_error_invalid_numeric_value(errmgr, sup, "Next event operators expect"\
-                                      " a positive range.");
-        }
-
-        if (inf > sup) {
-          StreamMgr_print_error(streams,  "Error in: ");
-          StreamMgr_nprint_error(streams, wffprint, "%N", expr);
-          StreamMgr_print_error(streams,  "\n");
-
-          ErrorMgr_error_invalid_numeric_value(errmgr, sup, "Next event operators expect"\
-                                      " ranges with high bound greater than"\
-                                      " low bound.");
-        }
-
-        for (i = 2; i <= inf; ++i) {
-          rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr, PSL_NULL);
-          rr = psl_node_expand_next_event(env, op, rr, b, type);
-        }
-
-        result = rr;
-
-        for (i = inf + 1; i <= sup; ++i) {
-          rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr, PSL_NULL);
-          rr = psl_node_expand_next_event(env, op, rr, b, type);
-
-          if (op == PSL_NEXT_EVENT_A || op == PSL_NEXT_EVENT_ABANG) {
-            result = psl_new_node(nodemgr, psl_conv_op(env, type, AND), result, rr);
-          }
-          else result = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result, rr);
-        }
+      if (!psl_node_is_number(psl_node_get_left(lim_expr))) {
+        StreamMgr_print_error(streams, "In PSL expression '");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "'\n");
+        ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
       }
-      break;
+      inf = psl_node_number_get_value(psl_node_get_left(lim_expr));
+
+      if (!psl_node_is_number(psl_node_get_right(lim_expr))) {
+        StreamMgr_print_error(streams, "In PSL expression '");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "'\n");
+        ErrorMgr_error_psl_not_supported_feature_next_number(errmgr);
+      }
+      sup = psl_node_number_get_value(psl_node_get_right(lim_expr));
+
+      /* inf, sup must be greater than 0 */
+      if (inf <= 0) {
+        StreamMgr_print_error(streams, "Error in: ");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "\n");
+
+        ErrorMgr_error_invalid_numeric_value(errmgr, inf,
+                                             "Next event operators expect"
+                                             " a positive range.");
+      }
+
+      if (sup <= 0) {
+        StreamMgr_print_error(streams, "Error in: ");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "\n");
+
+        ErrorMgr_error_invalid_numeric_value(errmgr, sup,
+                                             "Next event operators expect"
+                                             " a positive range.");
+      }
+
+      if (inf > sup) {
+        StreamMgr_print_error(streams, "Error in: ");
+        StreamMgr_nprint_error(streams, wffprint, "%N", expr);
+        StreamMgr_print_error(streams, "\n");
+
+        ErrorMgr_error_invalid_numeric_value(
+            errmgr, sup,
+            "Next event operators expect"
+            " ranges with high bound greater than"
+            " low bound.");
+      }
+
+      for (i = 2; i <= inf; ++i) {
+        rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr,
+                          PSL_NULL);
+        rr = psl_node_expand_next_event(env, op, rr, b, type);
+      }
+
+      result = rr;
+
+      for (i = inf + 1; i <= sup; ++i) {
+        rr = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_XBANG), rr,
+                          PSL_NULL);
+        rr = psl_node_expand_next_event(env, op, rr, b, type);
+
+        if (op == PSL_NEXT_EVENT_A || op == PSL_NEXT_EVENT_ABANG) {
+          result =
+              psl_new_node(nodemgr, psl_conv_op(env, type, AND), result, rr);
+        } else
+          result =
+              psl_new_node(nodemgr, psl_conv_op(env, type, OR), result, rr);
+      }
     }
+    break;
+  }
 
     /* never */
-  case PSL_NEVER:
-    {
-      /* globally */
-      PslNode_ptr not_l;
-      PslNode_ptr l = psl_node_get_left(expr);
-      PslNode_ptr r = psl_node_get_right(expr);
+  case PSL_NEVER: {
+    /* globally */
+    PslNode_ptr not_l;
+    PslNode_ptr l = psl_node_get_left(expr);
+    PslNode_ptr r = psl_node_get_right(expr);
 
-      nusmv_assert(r == PSL_NULL);
+    nusmv_assert(r == PSL_NULL);
 
-      l = psl_node_pslltl2ltl(env, l, type, replicator_id_stack);
-      not_l = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), l, PSL_NULL);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS), not_l, PSL_NULL);
-      break;
-    }
+    l = psl_node_pslltl2ltl(env, l, type, replicator_id_stack);
+    not_l = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), l, PSL_NULL);
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS), not_l,
+                          PSL_NULL);
+    break;
+  }
 
     /* weak until operators */
   case PSL_W:
-  case PSL_UNTIL:
-    {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
+  case PSL_UNTIL: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
 
-      f1 = psl_node_pslltl2ltl(env,f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
 
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
-                            psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
-                                         f1, PSL_NULL));
-      break;
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
+    result =
+        psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
+                     psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
+                                  f1, PSL_NULL));
+    break;
+  }
+
+  case PSL_UNTILBANG: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
+
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
+    break;
+  }
+
+  case PSL_UNTILBANG_: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
+
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+
+    f2 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
+    break;
+  }
+
+  case PSL_UNTIL_: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
+
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+
+    f2 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
+    result =
+        psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
+                     psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
+                                  f1, PSL_NULL));
+    break;
+  }
+
+  case PSL_BEFOREBANG: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
+
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+
+    f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
+    f1 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
+    break;
+  }
+
+  case PSL_BEFORE: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
+
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+
+    f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
+    f1 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
+    result =
+        psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
+                     psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
+                                  f2, PSL_NULL));
+    break;
+  }
+
+  case PSL_BEFOREBANG_: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
+
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+
+    f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
+    break;
+  }
+
+  case PSL_BEFORE_: {
+    PslNode_ptr f1 = psl_node_get_left(expr);
+    PslNode_ptr f2 = psl_node_get_right(expr);
+
+    f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
+    f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
+
+    f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
+    result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
+    result =
+        psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
+                     psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
+                                  f2, PSL_NULL));
+    break;
+  }
+
+  case PSL_REPLPROP: {
+    PslNode_ptr rep = psl_node_repl_prop_get_replicator(expr);
+    PslNode_ptr wff = psl_node_repl_prop_get_property(expr);
+    PslNode_ptr id = psl_node_get_replicator_id(rep);
+    PslOp rop = psl_node_get_replicator_join_op(rep);
+
+    /* checks if the forall ID has been already used by an outer forall */
+    if (NodeList_belongs_to(replicator_id_stack,
+                            PslNode_convert_to_node_ptr(id))) {
+      ErrorMgr_error_psl_repeated_replicator_id(errmgr);
     }
+    NodeList_prepend(replicator_id_stack, PslNode_convert_to_node_ptr(id));
 
-  case PSL_UNTILBANG:
+    result = psl_node_expand_replicator(env, rep, wff, rop);
+    result = psl_node_pslltl2ltl(env, result, type, replicator_id_stack);
+
+    /* finally pops the forall ID from the stack: */
     {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
-
-      f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
-
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
-      break;
+      node_ptr el = NodeList_remove_elem_at(
+          replicator_id_stack, NodeList_get_first_iter(replicator_id_stack));
+      free_node(nodemgr, el);
     }
-
-  case PSL_UNTILBANG_:
-    {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
-
-      f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
-
-      f2 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
-      break;
-    }
-
-  case PSL_UNTIL_:
-    {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
-
-      f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
-
-      f2 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f1, f2);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
-                            psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
-                                         f1, PSL_NULL));
-      break;
-    }
-
-  case PSL_BEFOREBANG:
-    {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
-
-      f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
-
-      f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
-      f1 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
-      break;
-    }
-
-  case PSL_BEFORE:
-    {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
-
-      f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
-
-      f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
-      f1 = psl_new_node(nodemgr, psl_conv_op(env, type, AND), f1, f2);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
-                            psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
-                                         f2, PSL_NULL));
-      break;
-    }
-
-  case PSL_BEFOREBANG_:
-    {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
-
-      f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
-
-      f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
-      break;
-    }
-
-  case PSL_BEFORE_:
-    {
-      PslNode_ptr f1 = psl_node_get_left(expr);
-      PslNode_ptr f2 = psl_node_get_right(expr);
-
-      f1 = psl_node_pslltl2ltl(env, f1, type, replicator_id_stack);
-      f2 = psl_node_pslltl2ltl(env, f2, type, replicator_id_stack);
-
-      f2 = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), f2, PSL_NULL);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), f2, f1);
-      result = psl_new_node(nodemgr, psl_conv_op(env, type, OR), result,
-                            psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
-                                         f2, PSL_NULL));
-      break;
-    }
-
-  case PSL_REPLPROP:
-    {
-      PslNode_ptr rep = psl_node_repl_prop_get_replicator(expr);
-      PslNode_ptr wff = psl_node_repl_prop_get_property(expr);
-      PslNode_ptr id = psl_node_get_replicator_id(rep);
-      PslOp rop = psl_node_get_replicator_join_op(rep);
-
-      /* checks if the forall ID has been already used by an outer forall */
-      if (NodeList_belongs_to(replicator_id_stack,
-                              PslNode_convert_to_node_ptr(id))) {
-        ErrorMgr_error_psl_repeated_replicator_id(errmgr);
-      }
-      NodeList_prepend(replicator_id_stack, PslNode_convert_to_node_ptr(id));
-
-      result = psl_node_expand_replicator(env, rep, wff, rop);
-      result = psl_node_pslltl2ltl(env, result, type, replicator_id_stack);
-
-      /* finally pops the forall ID from the stack: */
-      {
-        node_ptr el = NodeList_remove_elem_at(replicator_id_stack,
-                              NodeList_get_first_iter(replicator_id_stack));
-        free_node(nodemgr, el);
-      }
-      break;
-    }
+    break;
+  }
 
   default:
-    StreamMgr_print_error(streams, 
-            "psl_node_pslltl2ltl: operator type not supported \"%d\"\n",
-            op);
+    StreamMgr_print_error(
+        streams, "psl_node_pslltl2ltl: operator type not supported \"%d\"\n",
+        op);
     error_unreachable_code();
   }
 
   return result;
 }
 
-
 /*!
   \brief Converts the given expression (possibly containing sere)
 into an equivalent LTL formula
 
-  
+
 
   \se required
 
   \sa optional
 */
 
-PslNode_ptr PslNode_remove_sere(const NuSMVEnv_ptr env, PslNode_ptr e)
-{
+PslNode_ptr PslNode_remove_sere(const NuSMVEnv_ptr env, PslNode_ptr e) {
   PslNode_ptr r = psl_node_sere_translate(env, e);
   /* Here e is a disjunction of concat/fusion */
   PslNode_ptr m = psl_node_sere_remove_disj(env, r);
   return m;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
@@ -1196,7 +1183,7 @@ PslNode_ptr PslNode_remove_sere(const NuSMVEnv_ptr env, PslNode_ptr e)
   \brief Converts the given operator into either a PSL operator, or
 a SMV operator, depending on the value of 'type'
 
-  
+
 
   \se required
 
@@ -1204,10 +1191,9 @@ a SMV operator, depending on the value of 'type'
 */
 
 #include "nusmv/core/parser/psl/psl_grammar.h" /* token are used only here */
-PslOp psl_conv_op(const NuSMVEnv_ptr env, PslOpConvType type, PslOp op)
-{
+PslOp psl_conv_op(const NuSMVEnv_ptr env, PslOpConvType type, PslOp op) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   ErrorMgr_ptr errmgr = ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   /* This is table is organized as either:
@@ -1356,12 +1342,11 @@ PslOp psl_conv_op(const NuSMVEnv_ptr env, PslOpConvType type, PslOp op)
   PSL_OP_CONV3(errmgr, TKLBPLUSRB, PSL_LBPLUSRB, -1);
   PSL_OP_CONV3(errmgr, TKITE, PSL_ITE, -1);
 
-  StreamMgr_print_error(streams,  "psl_conv_op: operator type not supported \"%d\"\n", op);
+  StreamMgr_print_error(
+      streams, "psl_conv_op: operator type not supported \"%d\"\n", op);
   ErrorMgr_internal_error(errmgr, "Invalid operator.");
   return 0; /* return something to suppress C warnings */
 }
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -1371,16 +1356,15 @@ PslOp psl_conv_op(const NuSMVEnv_ptr env, PslOpConvType type, PslOp op)
   \brief During the conversion to LTL, this function is invoked
 when the expansion of next_event family is required.
 
-  
+
 
   \se required
 
   \sa optional
 */
-static PslNode_ptr
-psl_node_expand_next_event(const NuSMVEnv_ptr env, PslOp op, PslNode_ptr f, PslNode_ptr b,
-                           PslOpConvType type)
-{
+static PslNode_ptr psl_node_expand_next_event(const NuSMVEnv_ptr env, PslOp op,
+                                              PslNode_ptr f, PslNode_ptr b,
+                                              PslOpConvType type) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   PslNode_ptr result, notb;
 
@@ -1391,16 +1375,15 @@ psl_node_expand_next_event(const NuSMVEnv_ptr env, PslOp op, PslNode_ptr f, PslN
   notb = psl_new_node(nodemgr, psl_conv_op(env, type, NOT), b, PSL_NULL);
   result = psl_new_node(nodemgr, psl_conv_op(env, type, AND), b, f);
 
-  if ((op == PSL_NEXT_EVENT) ||
-      (op == PSL_NEXT_EVENT_E) ||
+  if ((op == PSL_NEXT_EVENT) || (op == PSL_NEXT_EVENT_E) ||
       (op == PSL_NEXT_EVENT_A)) {
     /* result = psl_new_node(nodemgr, PSL_W, notb, result); */
-    result = psl_new_node(nodemgr, psl_conv_op(env, type, OR),
-                          psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), notb, result),
-                          psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS),
-                                       notb, PSL_NULL));
-  }
-  else {
+    result = psl_new_node(
+        nodemgr, psl_conv_op(env, type, OR),
+        psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), notb, result),
+        psl_new_node(nodemgr, psl_conv_op(env, type, PSL_ALWAYS), notb,
+                     PSL_NULL));
+  } else {
     result = psl_new_node(nodemgr, psl_conv_op(env, type, UNTIL), notb, result);
   }
   return result;
@@ -1410,53 +1393,58 @@ psl_node_expand_next_event(const NuSMVEnv_ptr env, PslOp op, PslNode_ptr f, PslN
   \brief This is used to rename IDs occurring in the tree, when
 the replicator 'foreach' statement is resolved
 
-  
+
 
   \se required
 
   \sa optional
 */
-static PslNode_ptr
-psl_node_subst_id(const NuSMVEnv_ptr env,
-                  PslNode_ptr expr, PslNode_ptr id, PslNode_ptr v,
-                  boolean is_top_level)
-{
+static PslNode_ptr psl_node_subst_id(const NuSMVEnv_ptr env, PslNode_ptr expr,
+                                     PslNode_ptr id, PslNode_ptr v,
+                                     boolean is_top_level) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-if (expr == PSL_NULL) return expr;
+  if (expr == PSL_NULL)
+    return expr;
 
   /* Does not substitute inner replicators */
-  if (psl_node_is_replicator(expr)) return expr;
+  if (psl_node_is_replicator(expr))
+    return expr;
 
   if (psl_node_is_id(expr)) {
-    if (psl_node_is_id_equal(expr, id) && is_top_level) return v; /* substitute */
+    if (psl_node_is_id_equal(expr, id) && is_top_level)
+      return v; /* substitute */
     else {
       switch (psl_node_get_op(expr)) {
       case ARRAY:
         /* Developers' note: second operand allows to write expressions like:
            forall i in {0,1,2}: forall arr in {a,b,c}: arr[i];
            ... will be expanded in:
-           ((((c[2] & b[2]) & a[2]) & ((c[1] & b[1]) & a[1])) & ((c[0] & b[0]) & a[0]))
+           ((((c[2] & b[2]) & a[2]) & ((c[1] & b[1]) & a[1])) & ((c[0] & b[0]) &
+           a[0]))
         */
-        expr = psl_new_node(nodemgr, psl_node_get_op(expr),
-                            psl_node_subst_id(env, psl_node_get_left(expr), id, v, true),
-                            psl_node_subst_id(env, psl_node_get_right(expr), id, v, true));
+        expr = psl_new_node(
+            nodemgr, psl_node_get_op(expr),
+            psl_node_subst_id(env, psl_node_get_left(expr), id, v, true),
+            psl_node_subst_id(env, psl_node_get_right(expr), id, v, true));
         break;
 
       case DOT:
-        expr = psl_new_node(nodemgr, psl_node_get_op(expr),
-                            psl_node_subst_id(env, psl_node_get_left(expr), id, v, false),
-                            psl_node_subst_id(env, psl_node_get_right(expr), id, v, false));
+        expr = psl_new_node(
+            nodemgr, psl_node_get_op(expr),
+            psl_node_subst_id(env, psl_node_get_left(expr), id, v, false),
+            psl_node_subst_id(env, psl_node_get_right(expr), id, v, false));
         break;
-
       }
       return expr;
     }
   }
 
-  if (psl_node_is_leaf(expr)) return expr;
-  return psl_new_node(nodemgr, psl_node_get_op(expr),
-                      psl_node_subst_id(env, psl_node_get_left(expr), id, v, true),
-                      psl_node_subst_id(env, psl_node_get_right(expr), id, v, true));
+  if (psl_node_is_leaf(expr))
+    return expr;
+  return psl_new_node(
+      nodemgr, psl_node_get_op(expr),
+      psl_node_subst_id(env, psl_node_get_left(expr), id, v, true),
+      psl_node_subst_id(env, psl_node_get_right(expr), id, v, true));
 }
 
 /*!
@@ -1471,12 +1459,11 @@ if (expr == PSL_NULL) return expr;
 
   \sa optional
 */
-static PslNode_ptr
-psl_node_expand_replicator(const NuSMVEnv_ptr env,
-                           PslNode_ptr rep, PslNode_ptr wff, PslOp op)
-{
+static PslNode_ptr psl_node_expand_replicator(const NuSMVEnv_ptr env,
+                                              PslNode_ptr rep, PslNode_ptr wff,
+                                              PslOp op) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-PslNode_ptr result;
+  PslNode_ptr result;
   PslNode_ptr id;
   PslNode_ptr erange;
 
@@ -1490,15 +1477,17 @@ PslNode_ptr result;
   {
     PslNode_ptr r;
 
-    for (r = erange ; r != PSL_NULL; r = psl_node_cons_get_next(r)) {
+    for (r = erange; r != PSL_NULL; r = psl_node_cons_get_next(r)) {
       PslNode_ptr rwff;
       PslNode_ptr rt;
       PslNode_ptr v = psl_node_cons_get_element(r);
 
       rt = r;
       rwff = psl_node_subst_id(env, wff, id, v, true);
-      if (result == PSL_NULL) result = rwff;
-      else result = psl_new_node(nodemgr, op, result, rwff);
+      if (result == PSL_NULL)
+        result = rwff;
+      else
+        result = psl_new_node(nodemgr, op, result, rwff);
 
       free_node(nodemgr, rt);
     }
@@ -1517,19 +1506,18 @@ of concat/fusion
   \sa optional
 */
 static PslNode_ptr psl_node_sere_remove_disj(const NuSMVEnv_ptr env,
-                                             PslNode_ptr e)
-{
+                                             PslNode_ptr e) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
   /* absorb sere parenteses */
-  if (psl_node_get_op(e)==PSL_SERE) {
+  if (psl_node_get_op(e) == PSL_SERE) {
     return psl_node_sere_remove_disj(env, psl_node_get_left(e));
   }
 
-  if (psl_node_is_id(e) || psl_node_is_leaf(e) ||
-      PslNode_is_propositional(e)) {
+  if (psl_node_is_id(e) || psl_node_is_leaf(e) || PslNode_is_propositional(e)) {
     return e;
   }
 
@@ -1538,10 +1526,10 @@ static PslNode_ptr psl_node_sere_remove_disj(const NuSMVEnv_ptr env,
   }
 
   /* if the top level operator is a | */
-  if (psl_node_get_op(e)==PSL_SERECOMPOUND && psl_node_get_left(e) &&
-      psl_node_get_op(psl_node_get_left(e))==OR) {
+  if (psl_node_get_op(e) == PSL_SERECOMPOUND && psl_node_get_left(e) &&
+      psl_node_get_op(psl_node_get_left(e)) == OR) {
     PslNode_ptr l, r;
-    e = psl_node_get_left(e); /* gets r1 | r2 */
+    e = psl_node_get_left(e);                                 /* gets r1 | r2 */
     l = psl_node_sere_remove_disj(env, psl_node_get_left(e)); /* gets r1 */
     r = psl_node_sere_remove_disj(env, psl_node_get_right(e)); /* gets r2 */
     return psl_new_node(nodemgr, OR /* here is logical or */, l, r);
@@ -1555,25 +1543,25 @@ static PslNode_ptr psl_node_sere_remove_disj(const NuSMVEnv_ptr env,
 /*!
   \brief Service due to way concat_fusion expansion is implemented
 
-  
+
 
   \se required
 
   \sa optional
 */
-static PslNode_ptr
-psl_node_insert_inside_holes(const NuSMVEnv_ptr env,
-                             PslNode_ptr e, PslNode_ptr to_be_inserted,
-                             boolean* inserted)
-{
+static PslNode_ptr psl_node_insert_inside_holes(const NuSMVEnv_ptr env,
+                                                PslNode_ptr e,
+                                                PslNode_ptr to_be_inserted,
+                                                boolean *inserted) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
-  if (to_be_inserted == PSL_NULL) return e;
+  if (to_be_inserted == PSL_NULL)
+    return e;
 
-  if (psl_node_is_id(e) || psl_node_is_leaf(e) ||
-      PslNode_is_propositional(e)) {
+  if (psl_node_is_id(e) || psl_node_is_leaf(e) || PslNode_is_propositional(e)) {
     return e;
   }
 
@@ -1583,11 +1571,9 @@ psl_node_insert_inside_holes(const NuSMVEnv_ptr env,
   /* holes inside until */
   if (psl_node_get_op(e) == PSL_UNTILBANG) {
     *inserted = true;
-    return psl_new_node(nodemgr, PSL_UNTILBANG,
-                        psl_node_get_left(e),
-                        psl_new_node(nodemgr, AND,
-                                     psl_node_get_right(e),
-                                     to_be_inserted));
+    return psl_new_node(
+        nodemgr, PSL_UNTILBANG, psl_node_get_left(e),
+        psl_new_node(nodemgr, AND, psl_node_get_right(e), to_be_inserted));
   }
 
   /* holes inside X of XF */
@@ -1597,16 +1583,13 @@ psl_node_insert_inside_holes(const NuSMVEnv_ptr env,
     /* inside F */
     *inserted = true;
     return psl_new_node(nodemgr, PSL_EVENTUALLYBANG, to_be_inserted, PSL_NULL);
-
   }
 
   {
     PslNode_ptr l = psl_node_insert_inside_holes(env, psl_node_get_left(e),
-                                                 to_be_inserted,
-                                                 inserted);
+                                                 to_be_inserted, inserted);
     PslNode_ptr r = psl_node_insert_inside_holes(env, psl_node_get_right(e),
-                                                 to_be_inserted,
-                                                 inserted);
+                                                 to_be_inserted, inserted);
 
     return psl_new_node(nodemgr, psl_node_get_op(e), l, r);
   }
@@ -1622,16 +1605,16 @@ expression
 
   \sa optional
 */
-static PslNode_ptr
-psl_node_sere_concat_fusion2ltl(const NuSMVEnv_ptr env,
-                                PslNode_ptr e, PslNode_ptr phi)
-{
+static PslNode_ptr psl_node_sere_concat_fusion2ltl(const NuSMVEnv_ptr env,
+                                                   PslNode_ptr e,
+                                                   PslNode_ptr phi) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
   /* recursion on atomic  */
-  if (psl_node_get_op(e)==PSL_SERE) {
+  if (psl_node_get_op(e) == PSL_SERE) {
     return psl_node_sere_concat_fusion2ltl(env, psl_node_get_left(e), phi);
   }
 
@@ -1640,12 +1623,12 @@ psl_node_sere_concat_fusion2ltl(const NuSMVEnv_ptr env,
       (psl_node_get_op(e) == PSL_SEREFUSION)) {
     PslNode_ptr r1 = psl_node_get_left(e);
     PslNode_ptr r2 = psl_node_get_right(e);
-    PslNode_ptr next_phi = (PslNode_ptr) NULL;
+    PslNode_ptr next_phi = (PslNode_ptr)NULL;
 
     if (psl_node_get_op(e) == PSL_SERECONCAT) {
-      next_phi = psl_new_node(nodemgr, PSL_XBANG,
-                              psl_node_sere_concat_fusion2ltl(env, r2, phi),
-                              PSL_NULL);
+      next_phi =
+          psl_new_node(nodemgr, PSL_XBANG,
+                       psl_node_sere_concat_fusion2ltl(env, r2, phi), PSL_NULL);
     }
 
     if (psl_node_get_op(e) == PSL_SEREFUSION) {
@@ -1660,7 +1643,8 @@ psl_node_sere_concat_fusion2ltl(const NuSMVEnv_ptr env,
     PslNode_ptr rec;
     boolean inserted = false;
     rec = psl_node_insert_inside_holes(env, e, phi, &inserted);
-    if (inserted) phi = PSL_NULL;
+    if (inserted)
+      phi = PSL_NULL;
     rec = psl_node_sere_remove_disj(env, rec);
     return (phi != PSL_NULL) ? psl_new_node(nodemgr, AND, rec, phi) : rec;
   }
@@ -1669,16 +1653,15 @@ psl_node_sere_concat_fusion2ltl(const NuSMVEnv_ptr env,
 /*!
   \brief High-level service of exported function PslNode_remove_sere
 
-  
+
 
   \se required
 
   \sa optional
 */
 static PslNode_ptr psl_node_sere_translate(const NuSMVEnv_ptr env,
-                                           PslNode_ptr e)
-{
-  PslNode_ptr m=e;
+                                           PslNode_ptr e) {
+  PslNode_ptr m = e;
   boolean mod = false;
   boolean mod1 = false;
 
@@ -1686,9 +1669,9 @@ static PslNode_ptr psl_node_sere_translate(const NuSMVEnv_ptr env,
      one shoot). */
   m = psl_node_sere_remove_star_count(env, m);
 #if PSL_VERBOSE_TRANSLATE
-  StreamMgr_print_output(streams,  "multiplication<");
+  StreamMgr_print_output(streams, "multiplication<");
   StreamMgr_nprint_output(streams, wffprint, "%N", m);
-  StreamMgr_print_output(streams,  ">\n");
+  StreamMgr_print_output(streams, ">\n");
 #endif
 
   /* a first call to remove_star is needed to remove possible trailing
@@ -1698,76 +1681,81 @@ static PslNode_ptr psl_node_sere_translate(const NuSMVEnv_ptr env,
      on the following code */
   m = psl_node_sere_remove_star(env, m, true, &mod1);
 #if PSL_VERBOSE_TRANSLATE
-  StreamMgr_print_output(streams,  "rem[*]<");
+  StreamMgr_print_output(streams, "rem[*]<");
   StreamMgr_nprint_output(streams, wffprint, "%N", m);
-  StreamMgr_print_output(streams,  ">\n");
+  StreamMgr_print_output(streams, ">\n");
 #endif
 
   m = psl_node_sere_remove_plus(env, m, true);
 #if PSL_VERBOSE_TRANSLATE
-  StreamMgr_print_output(streams,  "rem[+]<");
+  StreamMgr_print_output(streams, "rem[+]<");
   StreamMgr_nprint_output(streams, wffprint, "%N", m);
-  StreamMgr_print_output(streams,  ">\n");
+  StreamMgr_print_output(streams, ">\n");
 #endif
 
   m = psl_node_remove_suffix_implication(env, m);
 #if PSL_VERBOSE_TRANSLATE
-  StreamMgr_print_output(streams,  "rem[si]<");
+  StreamMgr_print_output(streams, "rem[si]<");
   StreamMgr_nprint_output(streams, wffprint, "%N", m);
-  StreamMgr_print_output(streams,  ">\n");
+  StreamMgr_print_output(streams, ">\n");
 #endif
 
   do {
     mod = false;
 
-    m = psl_node_sere_remove_star(env, m, true, &mod1); mod |= mod1;
+    m = psl_node_sere_remove_star(env, m, true, &mod1);
+    mod |= mod1;
 #if PSL_VERBOSE_TRANSLATE
-    StreamMgr_print_output(streams,  "rem[*]<");
+    StreamMgr_print_output(streams, "rem[*]<");
     StreamMgr_nprint_output(streams, wffprint, "%N", m);
-    StreamMgr_print_output(streams,  ">\n");
+    StreamMgr_print_output(streams, ">\n");
 #endif
 
-    m = psl_node_sere_remove_ampersand(env, m, &mod1); mod |= mod1;
+    m = psl_node_sere_remove_ampersand(env, m, &mod1);
+    mod |= mod1;
 #if PSL_VERBOSE_TRANSLATE
     if (mod1) {
-      StreamMgr_print_output(streams,  "rem&<");
+      StreamMgr_print_output(streams, "rem&<");
       StreamMgr_nprint_output(streams, wffprint, "%N", m);
-      StreamMgr_print_output(streams,  ">\n");
+      StreamMgr_print_output(streams, ">\n");
     }
 #endif
 
-    m = psl_node_sere_remove_2ampersand(env, m, &mod1); mod=mod || mod1;
+    m = psl_node_sere_remove_2ampersand(env, m, &mod1);
+    mod = mod || mod1;
 #if PSL_VERBOSE_TRANSLATE
     if (mod1) {
-      StreamMgr_print_output(streams,  "rem&&<");
+      StreamMgr_print_output(streams, "rem&&<");
       StreamMgr_nprint_output(streams, wffprint, "%N", m);
-      StreamMgr_print_output(streams,  ">\n");
+      StreamMgr_print_output(streams, ">\n");
     }
 #endif
 
-    m = psl_node_sere_remove_fusion(env, m, &mod1); mod=mod || mod1;
+    m = psl_node_sere_remove_fusion(env, m, &mod1);
+    mod = mod || mod1;
 #if PSL_VERBOSE_TRANSLATE
     if (mod1) {
-      StreamMgr_print_output(streams,  "rem:<");
+      StreamMgr_print_output(streams, "rem:<");
       StreamMgr_nprint_output(streams, wffprint, "%N", m);
-      StreamMgr_print_output(streams,  ">\n");
+      StreamMgr_print_output(streams, ">\n");
     }
 #endif
 
-    m = psl_node_sere_distrib_disj(env, m, &mod1); mod=mod || mod1;
+    m = psl_node_sere_distrib_disj(env, m, &mod1);
+    mod = mod || mod1;
 #if PSL_VERBOSE_TRANSLATE
     if (mod1) {
-      StreamMgr_print_output(streams,  "dist|<");
+      StreamMgr_print_output(streams, "dist|<");
       StreamMgr_nprint_output(streams, wffprint, "%N", m);
-      StreamMgr_print_output(streams,  ">\n");
+      StreamMgr_print_output(streams, ">\n");
     }
 #endif
 
 #if PSL_VERBOSE_TRANSLATE
     if (mod) {
-      StreamMgr_print_output(streams,  "MOD: <");
+      StreamMgr_print_output(streams, "MOD: <");
       StreamMgr_nprint_output(streams, wffprint, "%N", m);
-      StreamMgr_print_output(streams,  ">\n");
+      StreamMgr_print_output(streams, ">\n");
     }
 #endif
   } while (mod);
@@ -1778,16 +1766,17 @@ static PslNode_ptr psl_node_sere_translate(const NuSMVEnv_ptr env,
 /*!
   \brief Returns true if the given expression is a disjunction of SEREs.
 
-  
+
 
   \se required
 
   \sa optional
 */
-static boolean psl_node_sere_is_disj(PslNode_ptr e)
-{
-  if (e == PSL_NULL) return false;
-  if (psl_node_get_left(e) == PSL_NULL) return false;
+static boolean psl_node_sere_is_disj(PslNode_ptr e) {
+  if (e == PSL_NULL)
+    return false;
+  if (psl_node_get_left(e) == PSL_NULL)
+    return false;
   if (psl_node_get_op(e) == PSL_SERE) {
     return psl_node_sere_is_disj(psl_node_get_left(e));
   }
@@ -1798,38 +1787,40 @@ static boolean psl_node_sere_is_disj(PslNode_ptr e)
 /*!
   \brief Distributes the disjunction among SEREs
 
-  
+
 
   \se required
 
   \sa optional
 */
 static PslNode_ptr psl_node_sere_distrib_disj(const NuSMVEnv_ptr env,
-                                              PslNode_ptr e, boolean *modified)
-{
+                                              PslNode_ptr e,
+                                              boolean *modified) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   PslOp op;
   PslOp real_op;
 
-  *modified=false;
+  *modified = false;
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
   op = psl_node_get_op(e);
-  real_op = (op==PSL_SERECOMPOUND) ? psl_node_get_op(psl_node_get_left(e)) : op;
+  real_op =
+      (op == PSL_SERECOMPOUND) ? psl_node_get_op(psl_node_get_left(e)) : op;
 
   /* distributive rule (lookahead on parse-tree is used ) */
-  if (real_op==PSL_SERECONCAT || real_op==PSL_SEREFUSION ||
-      real_op==AND || real_op==PSL_AMPERSANDAMPERSAND) {
+  if (real_op == PSL_SERECONCAT || real_op == PSL_SEREFUSION ||
+      real_op == AND || real_op == PSL_AMPERSANDAMPERSAND) {
     PslNode_ptr l, r, disj;
 
-    if (op==PSL_SERECOMPOUND) {
+    if (op == PSL_SERECOMPOUND) {
       l = psl_node_get_left(psl_node_get_left(e));
       r = psl_node_get_right(psl_node_get_left(e));
-    }
-    else {
+    } else {
       l = psl_node_get_left(e);
       r = psl_node_get_right(e);
     }
@@ -1838,47 +1829,46 @@ static PslNode_ptr psl_node_sere_distrib_disj(const NuSMVEnv_ptr env,
       /* left node is a disjunction */
       PslNode_ptr r1, r2, r3, r1_op_r3, r2_op_r3;
 
-      *modified=true;
-      while (psl_node_get_op(l)==PSL_SERE) l = psl_node_get_left(l);
+      *modified = true;
+      while (psl_node_get_op(l) == PSL_SERE)
+        l = psl_node_get_left(l);
 
       disj = psl_node_get_left(l); /* to remove PSL_SERECOMPOUND */
-      nusmv_assert(psl_node_get_op(disj)==OR);
+      nusmv_assert(psl_node_get_op(disj) == OR);
 
       r1 = psl_node_get_left(disj);
       r2 = psl_node_get_right(disj);
       r3 = r;
 
-      if (real_op==PSL_SERECONCAT || real_op==PSL_SEREFUSION) {
+      if (real_op == PSL_SERECONCAT || real_op == PSL_SEREFUSION) {
         r1_op_r3 = psl_new_node(nodemgr, real_op, r1, r3);
         r2_op_r3 = psl_new_node(nodemgr, real_op, r2, r3);
-      }
-      else {
+      } else {
         r1_op_r3 = psl_node_make_sere_compound(nodemgr, r1, real_op, r3);
         r2_op_r3 = psl_node_make_sere_compound(nodemgr, r2, real_op, r3);
       }
 
       return psl_node_make_sere_compound(nodemgr, r1_op_r3, OR, r2_op_r3);
-    }
-    else if (psl_node_sere_is_disj(r)) {
+    } else if (psl_node_sere_is_disj(r)) {
       /* right node is a disjunction (no matter if both are) */
       PslNode_ptr r1, r2, r3, r3_op_r1, r3_op_r2;
 
-      *modified=true;
+      *modified = true;
 
-      while (psl_node_get_op(r)==PSL_SERE) r = psl_node_get_left(r);
+      while (psl_node_get_op(r) == PSL_SERE)
+        r = psl_node_get_left(r);
 
       disj = psl_node_get_left(r); /* to remove PSL_SERECOMPOUND */
-      nusmv_assert(psl_node_get_op(disj)==OR);
+      nusmv_assert(psl_node_get_op(disj) == OR);
 
       r1 = psl_node_get_left(disj);
       r2 = psl_node_get_right(disj);
       r3 = l;
 
-      if (real_op==PSL_SERECONCAT || real_op==PSL_SEREFUSION) {
+      if (real_op == PSL_SERECONCAT || real_op == PSL_SEREFUSION) {
         r3_op_r1 = psl_new_node(nodemgr, real_op, r3, r1);
         r3_op_r2 = psl_new_node(nodemgr, real_op, r3, r2);
-      }
-      else {
+      } else {
         r3_op_r1 = psl_node_make_sere_compound(nodemgr, r3, real_op, r1);
         r3_op_r2 = psl_node_make_sere_compound(nodemgr, r3, real_op, r2);
       }
@@ -1890,9 +1880,9 @@ static PslNode_ptr psl_node_sere_distrib_disj(const NuSMVEnv_ptr env,
   /* fallback rule */
   {
     boolean lm, rm;
-    PslNode_ptr l=psl_node_sere_distrib_disj(env, psl_node_get_left(e), &lm);
-    PslNode_ptr r=psl_node_sere_distrib_disj(env, psl_node_get_right(e), &rm);
-    *modified = (lm||rm);
+    PslNode_ptr l = psl_node_sere_distrib_disj(env, psl_node_get_left(e), &lm);
+    PslNode_ptr r = psl_node_sere_distrib_disj(env, psl_node_get_right(e), &rm);
+    *modified = (lm || rm);
     return psl_new_node(nodemgr, psl_node_get_op(e), l, r);
   }
 }
@@ -1900,26 +1890,29 @@ static PslNode_ptr psl_node_sere_distrib_disj(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves starred SEREs
 
-  
+
 
   \se required
 
   \sa optional
 */
 static PslNode_ptr psl_node_sere_remove_star_count(const NuSMVEnv_ptr env,
-                                                   PslNode_ptr e)
-{
+                                                   PslNode_ptr e) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
-  if (psl_node_sere_is_propositional(e)) return e;
+  if (psl_node_sere_is_propositional(e))
+    return e;
 
-  if (psl_node_sere_is_repeated(e) && !psl_node_sere_is_star_count(e)) return e;
+  if (psl_node_sere_is_repeated(e) && !psl_node_sere_is_star_count(e))
+    return e;
 
-  if (psl_node_get_op(e)==PSL_SERE) {
+  if (psl_node_get_op(e) == PSL_SERE) {
     return psl_node_sere_remove_star_count(env, psl_node_get_left(e));
   }
 
@@ -1930,26 +1923,29 @@ static PslNode_ptr psl_node_sere_remove_star_count(const NuSMVEnv_ptr env,
 
     nusmv_assert(psl_node_is_number(count_range));
     count = psl_node_number_get_value(count_range);
-    if (count>0) {
+    if (count > 0) {
       /* a [* count] possibly applied to a sere */
-      PslNode_ptr mul = psl_node_sere_remove_star_count(env, psl_node_get_left(psl_node_get_left(e)));
-      if (mul ==  PSL_NULL) {
+      PslNode_ptr mul = psl_node_sere_remove_star_count(
+          env, psl_node_get_left(psl_node_get_left(e)));
+      if (mul == PSL_NULL) {
         /* a [* count] stand-alone, i.e. not applied to a sere, can be
            treated as if applied to the sere {True} */
-        mul = psl_new_node(nodemgr, PSL_SERE, psl_node_make_true(nodemgr), PSL_NULL);
+        mul = psl_new_node(nodemgr, PSL_SERE, psl_node_make_true(nodemgr),
+                           PSL_NULL);
       }
       {
-      PslNode_ptr acc = mul;
-      for (count--; count>0; count--) acc = psl_new_node(nodemgr, PSL_SERECONCAT, mul, acc);
+        PslNode_ptr acc = mul;
+        for (count--; count > 0; count--)
+          acc = psl_new_node(nodemgr, PSL_SERECONCAT, mul, acc);
 
-      return acc;
+        return acc;
       }
     } /* else empty star or plus on propositionals */
   }
 
   {
-    PslNode_ptr l=psl_node_sere_remove_star_count(env, psl_node_get_left(e));
-    PslNode_ptr r=psl_node_sere_remove_star_count(env, psl_node_get_right(e));
+    PslNode_ptr l = psl_node_sere_remove_star_count(env, psl_node_get_left(e));
+    PslNode_ptr r = psl_node_sere_remove_star_count(env, psl_node_get_right(e));
     return psl_new_node(nodemgr, psl_node_get_op(e), l, r);
   }
 }
@@ -1957,31 +1953,30 @@ static PslNode_ptr psl_node_sere_remove_star_count(const NuSMVEnv_ptr env,
 /*!
   \brief Returns true if the given SERE is in the form {a} & {b}
 
-  
+
 
   \se required
 
   \sa optional
 */
-static boolean psl_node_sere_is_ampersand(PslNode_ptr e)
-{
+static boolean psl_node_sere_is_ampersand(PslNode_ptr e) {
   return psl_node_is_sere_compound_binary(e) &&
-    (psl_node_get_left(e) != PSL_NULL) &&
-    (psl_node_get_op(psl_node_get_left(e))==AND);
+         (psl_node_get_left(e) != PSL_NULL) &&
+         (psl_node_get_op(psl_node_get_left(e)) == AND);
 }
 
 /*!
   \brief Returns the leftmost element of e that is not a SERE
 
-  
+
 
   \se required
 
   \sa optional
 */
-static PslNode_ptr psl_node_sere_get_leftmost(PslNode_ptr e)
-{
-  if (psl_node_get_op(e)==PSL_SERE && ! psl_node_is_sere(psl_node_get_left(e))) {
+static PslNode_ptr psl_node_sere_get_leftmost(PslNode_ptr e) {
+  if (psl_node_get_op(e) == PSL_SERE &&
+      !psl_node_is_sere(psl_node_get_left(e))) {
     return e;
   }
 
@@ -1993,17 +1988,18 @@ static PslNode_ptr psl_node_sere_get_leftmost(PslNode_ptr e)
 /*!
   \brief Returns the rightmost element of e that is not a SERE
 
-  
+
 
   \se required
 
   \sa optional
 */
-static PslNode_ptr psl_node_sere_get_rightmost(PslNode_ptr e)
-{
-  if (psl_node_get_op(e)==PSL_SERE) {
-    if (!psl_node_is_sere(psl_node_get_left(e))) return e;
-    else return psl_node_sere_get_rightmost(psl_node_get_left(e));
+static PslNode_ptr psl_node_sere_get_rightmost(PslNode_ptr e) {
+  if (psl_node_get_op(e) == PSL_SERE) {
+    if (!psl_node_is_sere(psl_node_get_left(e)))
+      return e;
+    else
+      return psl_node_sere_get_rightmost(psl_node_get_left(e));
   }
 
   nusmv_assert(psl_node_sere_is_concat_fusion(e));
@@ -2014,31 +2010,33 @@ static PslNode_ptr psl_node_sere_get_rightmost(PslNode_ptr e)
 /*!
   \brief Resolve SERE \[+\]
 
-  
+
 
   \se required
 
   \sa optional
 */
 static PslNode_ptr psl_node_sere_remove_plus(const NuSMVEnv_ptr env,
-                                             PslNode_ptr e, boolean toplevel)
-{
+                                             PslNode_ptr e, boolean toplevel) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   boolean toplevel_l = toplevel;
   boolean toplevel_r = toplevel;
 
-  if (e == PSL_NULL) return PSL_NULL;
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (e == PSL_NULL)
+    return PSL_NULL;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
   /* toplevel trailing plus in a concatenations is simplified
      e.g. r;[+] --> r;TRUE */
-  if (psl_node_get_op(e)==PSL_SERECONCAT && toplevel) {
+  if (psl_node_get_op(e) == PSL_SERECONCAT && toplevel) {
     e = psl_node_sere_remove_trailing_plus(env, e);
   }
 
   if (toplevel && psl_node_sere_is_standalone_plus(e)) {
-    return psl_new_node(nodemgr, PSL_SERE, psl_node_make_true(nodemgr), PSL_NULL);
+    return psl_new_node(nodemgr, PSL_SERE, psl_node_make_true(nodemgr),
+                        PSL_NULL);
   }
 
   if (psl_node_sere_is_plus(e)) {
@@ -2047,10 +2045,11 @@ static PslNode_ptr psl_node_sere_remove_plus(const NuSMVEnv_ptr env,
     /* since the possible toplevel trailing plus has been already simplified,
        here we are NOT toplevel */
     /* {r1;[+]} --> {r1;{F}} */
-    if(psl_node_sere_is_standalone_plus(e)) {
-      return psl_new_node(nodemgr, PSL_SERE,
-                          psl_new_node(nodemgr, PSL_EVENTUALLYBANG, PSL_NULL, PSL_NULL),
-                          PSL_NULL);
+    if (psl_node_sere_is_standalone_plus(e)) {
+      return psl_new_node(
+          nodemgr, PSL_SERE,
+          psl_new_node(nodemgr, PSL_EVENTUALLYBANG, PSL_NULL, PSL_NULL),
+          PSL_NULL);
     }
 
     expr = psl_node_sere_repeated_get_expr(e);
@@ -2060,17 +2059,21 @@ static PslNode_ptr psl_node_sere_remove_plus(const NuSMVEnv_ptr env,
                         PSL_NULL);
   }
 
-  if (psl_node_get_op(e)==PSL_SERECONCAT || psl_node_get_op(e)==PSL_SEREFUSION) {
+  if (psl_node_get_op(e) == PSL_SERECONCAT ||
+      psl_node_get_op(e) == PSL_SEREFUSION) {
     toplevel_l = false;
   }
 
-/*   if (psl_node_get_op(e)==PSL_SERECONCAT || psl_node_get_op(e)==PSL_SEREFUSION) { */
-/*     toplevel = false; */
-/*   } */
+  /*   if (psl_node_get_op(e)==PSL_SERECONCAT ||
+   * psl_node_get_op(e)==PSL_SEREFUSION) { */
+  /*     toplevel = false; */
+  /*   } */
 
   {
-    PslNode_ptr l = psl_node_sere_remove_plus(env, psl_node_get_left(e), toplevel_l);
-    PslNode_ptr r = psl_node_sere_remove_plus(env, psl_node_get_right(e), toplevel_r);
+    PslNode_ptr l =
+        psl_node_sere_remove_plus(env, psl_node_get_left(e), toplevel_l);
+    PslNode_ptr r =
+        psl_node_sere_remove_plus(env, psl_node_get_right(e), toplevel_r);
 
     return psl_new_node(nodemgr, psl_node_get_op(e), l, r);
   }
@@ -2079,18 +2082,18 @@ static PslNode_ptr psl_node_sere_remove_plus(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves suffix implication
 
-  
+
 
   \se required
 
   \sa optional
 */
 static PslNode_ptr psl_node_remove_suffix_implication(const NuSMVEnv_ptr env,
-                                                      PslNode_ptr e)
-{
+                                                      PslNode_ptr e) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
   if (psl_node_is_leaf(e) || psl_node_is_id(e) ||
       psl_node_sere_is_propositional(e)) {
@@ -2109,23 +2112,21 @@ static PslNode_ptr psl_node_remove_suffix_implication(const NuSMVEnv_ptr env,
     /* makes 'con' a sere if needed */
     if (!psl_node_is_sere(con)) {
       sere_con = psl_new_node(nodemgr, PSL_SERE, con, PSL_NULL);
-    }
-    else sere_con = con;
+    } else
+      sere_con = con;
 
     /* resolves possible nested suffix implications within con: */
     sere_con = psl_node_remove_suffix_implication(env, sere_con);
 
     if (op == PSL_PIPEMINUSGT) {
       sere_con = psl_new_node(nodemgr, PSL_SEREFUSION, pre, sere_con);
-    }
-    else {
+    } else {
       nusmv_assert(op == PSL_PIPEEQGT);
       sere_con = psl_new_node(nodemgr, PSL_SERECONCAT, pre, sere_con);
     }
 
     return psl_new_node(nodemgr, OR, npre, sere_con);
-  }
-  else {
+  } else {
     PslNode_ptr l, r;
     l = psl_node_remove_suffix_implication(env, psl_node_get_left(e));
     r = psl_node_remove_suffix_implication(env, psl_node_get_right(e));
@@ -2136,7 +2137,7 @@ static PslNode_ptr psl_node_remove_suffix_implication(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves starred SEREs
 
-  
+
 
   \se required
 
@@ -2144,23 +2145,25 @@ static PslNode_ptr psl_node_remove_suffix_implication(const NuSMVEnv_ptr env,
 */
 static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
                                              PslNode_ptr e, boolean toplevel,
-                                             boolean* modified)
-{
+                                             boolean *modified) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   *modified = false;
 
-  if (e == PSL_NULL) return PSL_NULL;
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (e == PSL_NULL)
+    return PSL_NULL;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
   /* toplevel trailing stars in a concatenations are simplified
      e.g. r;[*];[*] --> r */
   if (toplevel) {
     e = psl_node_sere_remove_trailing_star(env, e, modified);
-    if (e == PSL_NULL) return PSL_NULL;
+    if (e == PSL_NULL)
+      return PSL_NULL;
   }
 
-  if (psl_node_get_op(e)==PSL_SERECONCAT) {
+  if (psl_node_get_op(e) == PSL_SERECONCAT) {
 
     if (psl_node_sere_is_standalone_star(psl_node_get_right(e))) {
       PslNode_ptr l;
@@ -2175,13 +2178,17 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
       /* regardless the effects of the recursive call on tail, the
          expression has been modified */
       *modified = true;
-      return psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                psl_new_node(nodemgr, OR, l,
-                   psl_new_node(nodemgr, PSL_SERECONCAT, l,
-                      psl_new_node(nodemgr, PSL_SERE,
-                         psl_new_node(nodemgr, PSL_EVENTUALLYBANG, PSL_NULL, PSL_NULL),
-                            PSL_NULL))),
-                          PSL_NULL);
+      return psl_new_node(
+          nodemgr, PSL_SERECOMPOUND,
+          psl_new_node(
+              nodemgr, OR, l,
+              psl_new_node(
+                  nodemgr, PSL_SERECONCAT, l,
+                  psl_new_node(nodemgr, PSL_SERE,
+                               psl_new_node(nodemgr, PSL_EVENTUALLYBANG,
+                                            PSL_NULL, PSL_NULL),
+                               PSL_NULL))),
+          PSL_NULL);
     }
 
     if (psl_node_is_propstar(psl_node_get_right(e))) {
@@ -2193,20 +2200,24 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
 
       l = psl_node_sere_remove_star(env, psl_node_get_left(e), false, modified);
       p_star = psl_node_get_right(e);
-      while (psl_node_get_op(p_star)==PSL_SERE) p_star = psl_node_get_left(p_star);
+      while (psl_node_get_op(p_star) == PSL_SERE)
+        p_star = psl_node_get_left(p_star);
       /* gets the expression that is argument of [*] */
       p = psl_node_sere_repeated_get_expr(p_star);
 
       /* regardless the effects of the recursive call on tail, the
          expression has been modified */
       *modified = true;
-      return psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                psl_new_node(nodemgr, OR, l,
-                   psl_new_node(nodemgr, PSL_SERECONCAT, l,
-                                psl_new_node(nodemgr, PSL_SERE,
-                                             psl_new_node(nodemgr, PSL_UNTILBANG, p, p),
-                                             PSL_NULL))),
-                          PSL_NULL);
+      return psl_new_node(
+          nodemgr, PSL_SERECOMPOUND,
+          psl_new_node(
+              nodemgr, OR, l,
+              psl_new_node(
+                  nodemgr, PSL_SERECONCAT, l,
+                  psl_new_node(nodemgr, PSL_SERE,
+                               psl_new_node(nodemgr, PSL_UNTILBANG, p, p),
+                               PSL_NULL))),
+          PSL_NULL);
     }
 
     if (psl_node_sere_is_standalone_star(psl_node_get_left(e))) {
@@ -2214,19 +2225,24 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
 
       /* {[*];r1} --> {r1 | {{F};r1}} */
 
-      r = psl_node_sere_remove_star(env, psl_node_get_right(e), false, modified);
+      r = psl_node_sere_remove_star(env, psl_node_get_right(e), false,
+                                    modified);
 
       /* regardless the effects of the recursive call on tail, the
          expression has been modified */
       *modified = true;
-      return psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                psl_new_node(nodemgr, OR, r,
-                   psl_new_node(nodemgr, PSL_SERECONCAT,
-                      psl_new_node(nodemgr, PSL_SERE,
-                         psl_new_node(nodemgr, PSL_EVENTUALLYBANG, PSL_NULL, PSL_NULL),
-                            PSL_NULL), r)),
-                          PSL_NULL);
-
+      return psl_new_node(
+          nodemgr, PSL_SERECOMPOUND,
+          psl_new_node(
+              nodemgr, OR, r,
+              psl_new_node(
+                  nodemgr, PSL_SERECONCAT,
+                  psl_new_node(nodemgr, PSL_SERE,
+                               psl_new_node(nodemgr, PSL_EVENTUALLYBANG,
+                                            PSL_NULL, PSL_NULL),
+                               PSL_NULL),
+                  r)),
+          PSL_NULL);
     }
 
     if (psl_node_is_propstar(psl_node_get_left(e))) {
@@ -2236,27 +2252,33 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
 
       /* b[*];r2 --> r2 | {bUb};r2 */
 
-      r = psl_node_sere_remove_star(env, psl_node_get_right(e), false, modified);
+      r = psl_node_sere_remove_star(env, psl_node_get_right(e), false,
+                                    modified);
       p_star = psl_node_get_left(e);
-      while (psl_node_get_op(p_star)==PSL_SERE) p_star = psl_node_get_left(p_star);
+      while (psl_node_get_op(p_star) == PSL_SERE)
+        p_star = psl_node_get_left(p_star);
       /* gets the expression that is argument of [*] */
       p = psl_node_sere_repeated_get_expr(p_star);
 
       /* regardless the effects of the recursive call on tail, the
          expression has been modified */
       *modified = true;
-      return psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                psl_new_node(nodemgr, OR, r,
-                   psl_new_node(nodemgr, PSL_SERECONCAT,
-                                psl_new_node(nodemgr, PSL_SERE,
-                                             psl_new_node(nodemgr, PSL_UNTILBANG, p, p),
-                                             PSL_NULL), r)),
-                          PSL_NULL);
+      return psl_new_node(
+          nodemgr, PSL_SERECOMPOUND,
+          psl_new_node(
+              nodemgr, OR, r,
+              psl_new_node(
+                  nodemgr, PSL_SERECONCAT,
+                  psl_new_node(nodemgr, PSL_SERE,
+                               psl_new_node(nodemgr, PSL_UNTILBANG, p, p),
+                               PSL_NULL),
+                  r)),
+          PSL_NULL);
     }
-
   }
 
-  /* either not PSL_SERECONCAT, or PSL_SERECONCAT but no star on left and right */
+  /* either not PSL_SERECONCAT, or PSL_SERECONCAT but no star on left and right
+   */
 
   /* fallback rule */
   {
@@ -2267,10 +2289,10 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
     boolean toplevel_r = toplevel;
     boolean rec_modified;
 
-    if (psl_node_get_op(e)==PSL_SERECONCAT || psl_node_get_op(e)==PSL_SEREFUSION) {
+    if (psl_node_get_op(e) == PSL_SERECONCAT ||
+        psl_node_get_op(e) == PSL_SEREFUSION) {
       toplevel_l = false;
     }
-
 
     if (psl_node_is_sere_compound_binary(e)) {
 
@@ -2285,11 +2307,13 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
       r = psl_node_sere_remove_star(env, r, toplevel_r, &rec_modified);
       *modified |= rec_modified;
 
-      if (l == PSL_NULL) return r;
-      if (r == PSL_NULL) return l;
+      if (l == PSL_NULL)
+        return r;
+      if (r == PSL_NULL)
+        return l;
 
-      return psl_node_make_sere_compound(nodemgr, l,
-                psl_node_get_op(psl_node_get_left(e)), r);
+      return psl_node_make_sere_compound(
+          nodemgr, l, psl_node_get_op(psl_node_get_left(e)), r);
     }
 
     l = psl_node_sere_remove_star(env, psl_node_get_left(e), toplevel_l,
@@ -2307,7 +2331,7 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves trailing standalone stars
 
-  
+
 
   \se required
 
@@ -2315,22 +2339,24 @@ static PslNode_ptr psl_node_sere_remove_star(const NuSMVEnv_ptr env,
 */
 static PslNode_ptr psl_node_sere_remove_trailing_star(const NuSMVEnv_ptr env,
                                                       PslNode_ptr e,
-                                                      boolean* modified)
-{
+                                                      boolean *modified) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   PslNode_ptr head;
   PslNode_ptr tail;
   PslNode_ptr tail_rec;
 
-  if (e == PSL_NULL) return PSL_NULL;
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (e == PSL_NULL)
+    return PSL_NULL;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
   if (psl_node_sere_is_star(e)) {
     *modified = true;
     return PSL_NULL;
   }
 
-  if (!(psl_node_get_op(e) == PSL_SERECONCAT)) return e;
+  if (!(psl_node_get_op(e) == PSL_SERECONCAT))
+    return e;
 
   head = psl_node_get_left(e);
   tail = psl_node_get_right(e);
@@ -2346,28 +2372,31 @@ static PslNode_ptr psl_node_sere_remove_trailing_star(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves the last trailing standalone plus
 
-  
+
 
   \se required
 
   \sa optional
 */
 static PslNode_ptr psl_node_sere_remove_trailing_plus(const NuSMVEnv_ptr env,
-                                                      PslNode_ptr e)
-{
+                                                      PslNode_ptr e) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   PslNode_ptr head;
   PslNode_ptr tail;
   PslNode_ptr tail_rec;
 
-  if (e == PSL_NULL) return PSL_NULL;
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (e == PSL_NULL)
+    return PSL_NULL;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
   if (psl_node_sere_is_standalone_plus(e)) {
-    return psl_new_node(nodemgr, PSL_SERE, psl_node_make_true(nodemgr), PSL_NULL);
+    return psl_new_node(nodemgr, PSL_SERE, psl_node_make_true(nodemgr),
+                        PSL_NULL);
   }
 
-  if (!(psl_node_get_op(e) == PSL_SERECONCAT)) return e;
+  if (!(psl_node_get_op(e) == PSL_SERECONCAT))
+    return e;
 
   head = psl_node_get_left(e);
   tail = psl_node_get_right(e);
@@ -2379,35 +2408,37 @@ static PslNode_ptr psl_node_sere_remove_trailing_plus(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves {a}&{a}
 
-  
+
 
   \se required
 
   \sa optional
 */
-static PslNode_ptr
-psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env,
-                               PslNode_ptr e, boolean* modified)
-{
+static PslNode_ptr psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env,
+                                                  PslNode_ptr e,
+                                                  boolean *modified) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  *modified=false;
+  *modified = false;
 
-  if (e == PSL_NULL) return PSL_NULL;
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
-  if (psl_node_sere_is_propositional(e)) return e;
+  if (e == PSL_NULL)
+    return PSL_NULL;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
+  if (psl_node_sere_is_propositional(e))
+    return e;
 
   /* recursion step */
   if (psl_node_sere_is_ampersand(e)) {
 
     /* found an ampersand */
-    PslNode_ptr exp = psl_node_get_left(e); /* gets r1 & r2 */
-    PslNode_ptr l=psl_node_get_left(exp); /* gets r1 */
-    PslNode_ptr r=psl_node_get_right(exp); /* gets r2 */
-    boolean lb=psl_node_sere_is_propositional(l);
-    boolean rb=psl_node_sere_is_propositional(r);
-    boolean lc=psl_node_sere_is_concat_holes_free(l);
-    boolean rc=psl_node_sere_is_concat_holes_free(r);
+    PslNode_ptr exp = psl_node_get_left(e);  /* gets r1 & r2 */
+    PslNode_ptr l = psl_node_get_left(exp);  /* gets r1 */
+    PslNode_ptr r = psl_node_get_right(exp); /* gets r2 */
+    boolean lb = psl_node_sere_is_propositional(l);
+    boolean rb = psl_node_sere_is_propositional(r);
+    boolean lc = psl_node_sere_is_concat_holes_free(l);
+    boolean rc = psl_node_sere_is_concat_holes_free(r);
     PslNode_ptr head_l;
     PslNode_ptr head_r;
     PslNode_ptr heads;
@@ -2419,12 +2450,15 @@ psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env,
     if ((lb || lc) && (rb || rc)) {
       head_l = psl_node_sere_get_leftmost(l);
       head_r = psl_node_sere_get_leftmost(r);
-      heads = psl_new_node(nodemgr, PSL_SERE,
-                           psl_new_node(nodemgr, AND /* here is logical "and" */,
-                                        psl_node_get_left(head_l), /* extracts proposition from atomic sere */
-                                        psl_node_get_left(head_r) /* extracts proposition from atomic sere */
-                                        ),
-                           PSL_NULL);
+      heads = psl_new_node(
+          nodemgr, PSL_SERE,
+          psl_new_node(nodemgr, AND /* here is logical "and" */,
+                       psl_node_get_left(
+                           head_l), /* extracts proposition from atomic sere */
+                       psl_node_get_left(
+                           head_r) /* extracts proposition from atomic sere */
+                       ),
+          PSL_NULL);
 
       if (lb && rb) {
         *modified = true;
@@ -2436,11 +2470,11 @@ psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env,
            they are bot concatenations we are guaranteed the tails ar
            not null */
         PslNode_ptr tails_rec;
-        PslNode_ptr tails = psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                                         psl_new_node(nodemgr, AND,
-                                                      psl_node_prune(nodemgr, l, head_l),
-                                                      psl_node_prune(nodemgr, r, head_r)),
-                                         PSL_NULL);
+        PslNode_ptr tails = psl_new_node(
+            nodemgr, PSL_SERECOMPOUND,
+            psl_new_node(nodemgr, AND, psl_node_prune(nodemgr, l, head_l),
+                         psl_node_prune(nodemgr, r, head_r)),
+            PSL_NULL);
 
         tails_rec = psl_node_sere_remove_ampersand(env, tails, modified);
         /* regardless the effects of the recursive call on tail, the
@@ -2449,51 +2483,56 @@ psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env,
         return psl_new_node(nodemgr, PSL_SERECONCAT, heads, tails_rec);
       }
 
-      /* here one is propositional and the other is "non atomic" concatenation */
+      /* here one is propositional and the other is "non atomic" concatenation
+       */
 
       if (rc && !rb) { /* iff is_propositional(l) */
         *modified = true;
-        return psl_new_node(nodemgr, PSL_SERECONCAT, heads, psl_node_prune(nodemgr, r, head_r));
+        return psl_new_node(nodemgr, PSL_SERECONCAT, heads,
+                            psl_node_prune(nodemgr, r, head_r));
       }
 
       if (lc && !lb) { /* iff is_propositional(r) */
         *modified = true;
-        return psl_new_node(nodemgr, PSL_SERECONCAT, heads, psl_node_prune(nodemgr, l, head_l));
+        return psl_new_node(nodemgr, PSL_SERECONCAT, heads,
+                            psl_node_prune(nodemgr, l, head_l));
       }
     }
   }
 
   /* fallback rec rule */
-  /* either the top level is not a &, or the two arguments are not concatenations */
+  /* either the top level is not a &, or the two arguments are not
+   * concatenations */
   {
     boolean lm, rm;
 
     if (psl_node_sere_is_ampersand(e)) {
       /* special handling of & */
-      PslNode_ptr exp = psl_node_get_left(e); /* gets r1 & r2 */
-      PslNode_ptr lexp=psl_node_get_left(exp); /* gets r1 */
-      PslNode_ptr rexp=psl_node_get_right(exp); /* gets r2 */
+      PslNode_ptr exp = psl_node_get_left(e);     /* gets r1 & r2 */
+      PslNode_ptr lexp = psl_node_get_left(exp);  /* gets r1 */
+      PslNode_ptr rexp = psl_node_get_right(exp); /* gets r2 */
       PslNode_ptr lrec = psl_node_sere_remove_ampersand(env, lexp, &lm);
       PslNode_ptr rrec = psl_node_sere_remove_ampersand(env, rexp, &rm);
 
-      if (lm||rm) {
+      if (lm || rm) {
         boolean m;
-        PslNode_ptr rec = psl_node_sere_remove_ampersand(env, 
-                                 psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                                              psl_new_node(nodemgr, AND, lrec, rrec),
-                                              PSL_NULL),
-                                 &m);
+        PslNode_ptr rec = psl_node_sere_remove_ampersand(
+            env,
+            psl_new_node(nodemgr, PSL_SERECOMPOUND,
+                         psl_new_node(nodemgr, AND, lrec, rrec), PSL_NULL),
+            &m);
         *modified = m;
         return rec;
-      }
-      else return e;
+      } else
+        return e;
 
-    }
-    else {
-      PslNode_ptr l = psl_node_sere_remove_ampersand(env, psl_node_get_left(e), &lm);
-      PslNode_ptr r = psl_node_sere_remove_ampersand(env, psl_node_get_right(e), &rm);
+    } else {
+      PslNode_ptr l =
+          psl_node_sere_remove_ampersand(env, psl_node_get_left(e), &lm);
+      PslNode_ptr r =
+          psl_node_sere_remove_ampersand(env, psl_node_get_right(e), &rm);
 
-      *modified=(lm || rm);
+      *modified = (lm || rm);
       return psl_new_node(nodemgr, psl_node_get_op(e), l, r);
     }
   }
@@ -2502,23 +2541,25 @@ psl_node_sere_remove_ampersand(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves {a} && {a}
 
-  
+
 
   \se required
 
   \sa optional
 */
 static PslNode_ptr psl_node_sere_remove_2ampersand(const NuSMVEnv_ptr env,
-                                                   PslNode_ptr e, boolean *modified)
-{
+                                                   PslNode_ptr e,
+                                                   boolean *modified) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-*modified=false;
+  *modified = false;
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
-  if (psl_node_get_op(e)==PSL_SERE &&
+  if (psl_node_get_op(e) == PSL_SERE &&
       PslNode_is_propositional(psl_node_get_left(e))) {
     return e;
   }
@@ -2527,13 +2568,13 @@ static PslNode_ptr psl_node_sere_remove_2ampersand(const NuSMVEnv_ptr env,
   if (psl_node_sere_is_2ampersand(e)) {
 
     /* found an ampersand */
-    PslNode_ptr exp = psl_node_get_left(e); /* gets r1 && r2 */
-    PslNode_ptr l=psl_node_get_left(exp); /* gets r1 */
-    PslNode_ptr r=psl_node_get_right(exp); /* gets r2 */
-    boolean lb=psl_node_sere_is_propositional(l);
-    boolean rb=psl_node_sere_is_propositional(r);
-    boolean lc=psl_node_sere_is_concat_holes_free(l);
-    boolean rc=psl_node_sere_is_concat_holes_free(r);
+    PslNode_ptr exp = psl_node_get_left(e);  /* gets r1 && r2 */
+    PslNode_ptr l = psl_node_get_left(exp);  /* gets r1 */
+    PslNode_ptr r = psl_node_get_right(exp); /* gets r2 */
+    boolean lb = psl_node_sere_is_propositional(l);
+    boolean rb = psl_node_sere_is_propositional(r);
+    boolean lc = psl_node_sere_is_concat_holes_free(l);
+    boolean rc = psl_node_sere_is_concat_holes_free(r);
 
     /* it could be the case that one of the two arguments is FALSEEXP
        (as a result of a recursion) */
@@ -2547,84 +2588,93 @@ static PslNode_ptr psl_node_sere_remove_2ampersand(const NuSMVEnv_ptr env,
     if (lb && rb) {
       PslNode_ptr head_l = psl_node_sere_get_leftmost(l);
       PslNode_ptr head_r = psl_node_sere_get_leftmost(r);
-      PslNode_ptr heads =
-        psl_new_node(nodemgr, PSL_SERE,
-                     psl_new_node(nodemgr, AND, /* here is logical "and" */
-                                  psl_node_get_left(head_l), /* extracts proposition from atomic sere */
-                                  psl_node_get_left(head_r) /* extracts proposition from atomic sere */
-                                  ),
-                     PSL_NULL);
-      *modified=true;
+      PslNode_ptr heads = psl_new_node(
+          nodemgr, PSL_SERE,
+          psl_new_node(nodemgr, AND, /* here is logical "and" */
+                       psl_node_get_left(
+                           head_l), /* extracts proposition from atomic sere */
+                       psl_node_get_left(
+                           head_r) /* extracts proposition from atomic sere */
+                       ),
+          PSL_NULL);
+      *modified = true;
       return heads;
     }
 
     /* if one of the two arguments is propositional and the other
        is a concatenation there is no use in proceeding */
     if ((lb && rc) || (lc && rb)) {
-      *modified=true;
-      return psl_new_node(nodemgr, PSL_SERE, psl_node_make_false(nodemgr), PSL_NULL);
+      *modified = true;
+      return psl_new_node(nodemgr, PSL_SERE, psl_node_make_false(nodemgr),
+                          PSL_NULL);
     }
 
     /* this function assumes both arguments are concatenations */
     if (lc && rc) {
-      /* if both ampersand arguments are non atomic concatenations ("; ") , apply
-         recursive rule: merge&&({a; r_1}, {b; r_2})={(a\and b); merge&&(r_1, r_2)*/
+      /* if both ampersand arguments are non atomic concatenations ("; ") ,
+         apply recursive rule: merge&&({a; r_1}, {b; r_2})={(a\and b);
+         merge&&(r_1, r_2)*/
 
       PslNode_ptr head_l = psl_node_sere_get_leftmost(l);
       PslNode_ptr head_r = psl_node_sere_get_leftmost(r);
-      PslNode_ptr heads =
-        psl_new_node(nodemgr, PSL_SERE,
-                     psl_new_node(nodemgr, AND, /* here is logical "and" */
-                                  psl_node_get_left(head_l), /* extracts proposition from atomic sere */
-                                  psl_node_get_left(head_r) /* extracts proposition from atomic sere */
-                                  ),
-                     PSL_NULL);
+      PslNode_ptr heads = psl_new_node(
+          nodemgr, PSL_SERE,
+          psl_new_node(nodemgr, AND, /* here is logical "and" */
+                       psl_node_get_left(
+                           head_l), /* extracts proposition from atomic sere */
+                       psl_node_get_left(
+                           head_r) /* extracts proposition from atomic sere */
+                       ),
+          PSL_NULL);
 
-      /* since arguments are bot concatenations we are guaranteed the tails ar not null */
+      /* since arguments are bot concatenations we are guaranteed the tails ar
+       * not null */
       PslNode_ptr tails =
-        psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                     psl_new_node(nodemgr, PSL_AMPERSANDAMPERSAND,
-                                  psl_node_prune(nodemgr, l, head_l),
-                                  psl_node_prune(nodemgr, r, head_r)),
-                     PSL_NULL);
+          psl_new_node(nodemgr, PSL_SERECOMPOUND,
+                       psl_new_node(nodemgr, PSL_AMPERSANDAMPERSAND,
+                                    psl_node_prune(nodemgr, l, head_l),
+                                    psl_node_prune(nodemgr, r, head_r)),
+                       PSL_NULL);
 
-      *modified=true;
-      return psl_new_node(nodemgr, PSL_SERECONCAT,
-                          heads,
-                          psl_node_sere_remove_2ampersand(env, tails, modified));
-
-
+      *modified = true;
+      return psl_new_node(
+          nodemgr, PSL_SERECONCAT, heads,
+          psl_node_sere_remove_2ampersand(env, tails, modified));
     }
   }
 
   /* fallback rec rule */
-  /* either the top level is not a &&, or the two arguments are not concatenations */
+  /* either the top level is not a &&, or the two arguments are not
+   * concatenations */
   {
     boolean lm, rm;
 
     if (psl_node_sere_is_2ampersand(e)) {
       /* special handling of && */
-      PslNode_ptr exp = psl_node_get_left(e); /* gets r1 && r2 */
-      PslNode_ptr lexp=psl_node_get_left(exp); /* gets r1 */
-      PslNode_ptr rexp=psl_node_get_right(exp); /* gets r2 */
+      PslNode_ptr exp = psl_node_get_left(e);     /* gets r1 && r2 */
+      PslNode_ptr lexp = psl_node_get_left(exp);  /* gets r1 */
+      PslNode_ptr rexp = psl_node_get_right(exp); /* gets r2 */
       PslNode_ptr lrec = psl_node_sere_remove_2ampersand(env, lexp, &lm);
       PslNode_ptr rrec = psl_node_sere_remove_2ampersand(env, rexp, &rm);
 
       if (lm || rm) {
         boolean m;
-        PslNode_ptr rec = psl_node_sere_remove_2ampersand(env, 
-                                  psl_new_node(nodemgr, PSL_SERECOMPOUND,
-                                               psl_new_node(nodemgr, PSL_AMPERSANDAMPERSAND, lrec, rrec),
-                                               PSL_NULL),
-                                  &m);
+        PslNode_ptr rec = psl_node_sere_remove_2ampersand(
+            env,
+            psl_new_node(
+                nodemgr, PSL_SERECOMPOUND,
+                psl_new_node(nodemgr, PSL_AMPERSANDAMPERSAND, lrec, rrec),
+                PSL_NULL),
+            &m);
         *modified = *modified || m;
         return rec;
-      }
-      else return e;
-    }
-    else {
-      PslNode_ptr l = psl_node_sere_remove_2ampersand(env, psl_node_get_left(e), &lm);
-      PslNode_ptr r = psl_node_sere_remove_2ampersand(env, psl_node_get_right(e), &rm);
+      } else
+        return e;
+    } else {
+      PslNode_ptr l =
+          psl_node_sere_remove_2ampersand(env, psl_node_get_left(e), &lm);
+      PslNode_ptr r =
+          psl_node_sere_remove_2ampersand(env, psl_node_get_right(e), &rm);
 
       *modified = (lm || rm);
       return psl_new_node(nodemgr, psl_node_get_op(e), l, r);
@@ -2635,27 +2685,29 @@ static PslNode_ptr psl_node_sere_remove_2ampersand(const NuSMVEnv_ptr env,
 /*!
   \brief Resolves {a}:{a}
 
-  
+
 
   \se required
 
   \sa optional
 */
-static PslNode_ptr
-psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
-                            PslNode_ptr e, boolean *modified)
-{
+static PslNode_ptr psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
+                                               PslNode_ptr e,
+                                               boolean *modified) {
   NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   PslNode_ptr l;
   PslNode_ptr r;
 
-  *modified=false;
+  *modified = false;
 
-  if (e == PSL_NULL) return PSL_NULL;
+  if (e == PSL_NULL)
+    return PSL_NULL;
 
-  if (psl_node_is_leaf(e) || psl_node_is_id(e)) return e;
+  if (psl_node_is_leaf(e) || psl_node_is_id(e))
+    return e;
 
-  if (psl_node_sere_is_propositional(e)) return e;
+  if (psl_node_sere_is_propositional(e))
+    return e;
 
   /* if the top level operator is a : and the arguments are
      concatenation_or_fusion, then merges the arguments by conjoyning
@@ -2663,7 +2715,7 @@ psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
      element of the right operand */
   l = psl_node_get_left(e);
   r = psl_node_get_right(e);
-  if (psl_node_get_op(e)==PSL_SEREFUSION &&
+  if (psl_node_get_op(e) == PSL_SEREFUSION &&
       psl_node_sere_is_concat_fusion_holes_free(l) &&
       psl_node_sere_is_concat_fusion_holes_free(r)) {
     boolean lb = psl_node_sere_is_propositional(l);
@@ -2671,13 +2723,13 @@ psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
 
     /* if both arguments are propositional, returns their conjunction */
     if (lb && rb) {
-      *modified=true;
-      return psl_new_node(nodemgr, PSL_SERE,
-                          psl_new_node(nodemgr, AND, /* here is logical "and" */
-                                       psl_node_get_left(psl_node_sere_get_leftmost(l)),
-                                       psl_node_get_left(psl_node_sere_get_leftmost(r))),
-                          PSL_NULL);
-
+      *modified = true;
+      return psl_new_node(
+          nodemgr, PSL_SERE,
+          psl_new_node(nodemgr, AND, /* here is logical "and" */
+                       psl_node_get_left(psl_node_sere_get_leftmost(l)),
+                       psl_node_get_left(psl_node_sere_get_leftmost(r))),
+          PSL_NULL);
     }
 
     /* if only one argument is propositional, recurs on the other
@@ -2693,19 +2745,21 @@ psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
       PslNode_ptr rec = psl_node_sere_remove_fusion(env, r, &m);
       PslNode_ptr b = psl_node_sere_get_leftmost(rec); /* r head */
       PslNode_ptr head =
-        psl_new_node(nodemgr, PSL_SERE,
-                     psl_new_node(nodemgr, AND, /* here is logical "and" */
-                                  psl_node_get_left(a), psl_node_get_left(b)),
-                     PSL_NULL);
+          psl_new_node(nodemgr, PSL_SERE,
+                       psl_new_node(nodemgr, AND, /* here is logical "and" */
+                                    psl_node_get_left(a), psl_node_get_left(b)),
+                       PSL_NULL);
 
       PslNode_ptr tail = psl_node_prune(nodemgr, rec, b);
 
-      *modified=true;
+      *modified = true;
 
-      /* recurring on one argument could make it propositional (e.g. {a:b} -> {a&b}),
-         and its tail could be null */
-      if (tail == PSL_NULL) return head;
-      else return psl_new_node(nodemgr, PSL_SERECONCAT, head, tail);
+      /* recurring on one argument could make it propositional (e.g. {a:b} ->
+         {a&b}), and its tail could be null */
+      if (tail == PSL_NULL)
+        return head;
+      else
+        return psl_new_node(nodemgr, PSL_SERECONCAT, head, tail);
     }
 
     if (rb) {
@@ -2718,19 +2772,21 @@ psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
       PslNode_ptr rec = psl_node_sere_remove_fusion(env, l, &m);
       PslNode_ptr b = psl_node_sere_get_rightmost(rec); /* r tail */
       PslNode_ptr tail =
-        psl_new_node(nodemgr, PSL_SERE,
-                     psl_new_node(nodemgr, AND, /* here is logical "and" */
-                                  psl_node_get_left(b), psl_node_get_left(a)),
-                     PSL_NULL);
+          psl_new_node(nodemgr, PSL_SERE,
+                       psl_new_node(nodemgr, AND, /* here is logical "and" */
+                                    psl_node_get_left(b), psl_node_get_left(a)),
+                       PSL_NULL);
 
       PslNode_ptr head = psl_node_prune(nodemgr, rec, b);
 
-      *modified=true;
+      *modified = true;
 
-      /* recurring on one argument could make it propositional (e.g. {a:b} -> {a&b}),
-         and its tail could be null */
-      if (head == PSL_NULL) return tail;
-      else return psl_new_node(nodemgr, PSL_SERECONCAT, head, tail);
+      /* recurring on one argument could make it propositional (e.g. {a:b} ->
+         {a&b}), and its tail could be null */
+      if (head == PSL_NULL)
+        return tail;
+      else
+        return psl_new_node(nodemgr, PSL_SERECONCAT, head, tail);
     }
 
     /* both arguments are concat_or_fusion */
@@ -2749,37 +2805,30 @@ psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
       PslNode_ptr l_rest = psl_node_prune(nodemgr, l_rec, l_tail);
       PslNode_ptr r_rest = psl_node_prune(nodemgr, r_rec, r_head);
 
-      PslNode_ptr merge_point =
-        psl_new_node(nodemgr, PSL_SERE,
-                     psl_new_node(nodemgr, AND, /* here is logical "and" */
-                                  psl_node_get_left(l_tail),
-                                  psl_node_get_left(r_head)),
-                     PSL_NULL);
+      PslNode_ptr merge_point = psl_new_node(
+          nodemgr, PSL_SERE,
+          psl_new_node(nodemgr, AND, /* here is logical "and" */
+                       psl_node_get_left(l_tail), psl_node_get_left(r_head)),
+          PSL_NULL);
       if ((l_rest == PSL_NULL) && (r_rest == PSL_NULL)) {
-        *modified=true;
+        *modified = true;
         return merge_point;
       }
 
       if (l_rest == PSL_NULL) {
-        *modified=true;
-        return psl_new_node(nodemgr, PSL_SERECONCAT,
-                            merge_point,
-                            r_rest);
+        *modified = true;
+        return psl_new_node(nodemgr, PSL_SERECONCAT, merge_point, r_rest);
       }
 
       if (r_rest == PSL_NULL) {
-        *modified=true;
-        return psl_new_node(nodemgr, PSL_SERECONCAT,
-                            l_rest,
-                            merge_point);
+        *modified = true;
+        return psl_new_node(nodemgr, PSL_SERECONCAT, l_rest, merge_point);
       }
 
-      *modified=m;
-      return psl_new_node(nodemgr, PSL_SERECONCAT,
-                          l_rest,
-                          psl_new_node(nodemgr, PSL_SERECONCAT,
-                                       merge_point,
-                                       r_rest));
+      *modified = m;
+      return psl_new_node(
+          nodemgr, PSL_SERECONCAT, l_rest,
+          psl_new_node(nodemgr, PSL_SERECONCAT, merge_point, r_rest));
     }
   }
 
@@ -2789,7 +2838,8 @@ psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
     boolean lm, rm;
 
     PslNode_ptr l = psl_node_sere_remove_fusion(env, psl_node_get_left(e), &lm);
-    PslNode_ptr r = psl_node_sere_remove_fusion(env, psl_node_get_right(e), &rm);
+    PslNode_ptr r =
+        psl_node_sere_remove_fusion(env, psl_node_get_right(e), &rm);
     PslNode_ptr result;
 
     *modified = lm || rm;
@@ -2798,4 +2848,3 @@ psl_node_sere_remove_fusion(const NuSMVEnv_ptr env,
     return result;
   }
 }
-

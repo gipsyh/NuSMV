@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,26 +35,24 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_COMPILE_INT_H__
 #define __NUSMV_CORE_COMPILE_COMPILE_INT_H__
 
-
 #include "nusmv/core/compile/compile.h"
 
-#include "nusmv/core/compile/symb_table/symb_table_int.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/compile/symb_table/SymbLayer.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/compile/symb_table/symb_table_int.h"
 
 #include "nusmv/core/fsm/FsmBuilder.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/NodeList.h"
 #include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/dd/dd.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/set/set.h"
 
 #include "nusmv/core/hrc/HrcNode.h"
@@ -130,7 +128,7 @@
 #define ST_CONE_COI0_HASH "cc0h"
 
 /*!
-  \brief  This hash associates to each formula --> 1 (false) or 2 (true) 
+  \brief  This hash associates to each formula --> 1 (false) or 2 (true)
   depending on expr contains attime nodes or not in it. */
 /*!
   \brief \todo Missing synopsis
@@ -157,7 +155,7 @@ extern cmp_struct_ptr cmps;
   <tt>image_verbosity</tt>, <tt>image_cluster_size</tt> and
   <tt>image_W{1,2,3,4}</tt>.
 */
-int CommandIwls95PrintOption(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandIwls95PrintOption(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{print_clusterinfo} Prints out  information about the
@@ -184,21 +182,21 @@ int CommandIwls95PrintOption(NuSMVEnv_ptr env, int argc, char** argv);
        <dd> Redirects the generated output to the file
             <tt>output-file</tt>.
   </dl>
-  
+
 */
-int CommandCPPrintClusterInfo(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandCPPrintClusterInfo(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \brief Initializes the cmp structure
 
-  
+
 */
 cmp_struct_ptr cmp_struct_init(void);
 
 /*!
   \brief Free the cmp structure
 
-  
+
 */
 void cmp_struct_quit(cmp_struct_ptr);
 
@@ -222,11 +220,12 @@ void cmp_struct_quit(cmp_struct_ptr);
    a full list of variables declared in the hierarchy,
    a hash table associating variables to their assignments and constrains.
    See FlatHierarchy class for more info.
-   
+
 */
-void Compile_ConstructHierarchy(const NuSMVEnv_ptr env, SymbTable_ptr symb_table,
-SymbLayer_ptr, node_ptr, node_ptr,
-node_ptr, FlatHierarchy_ptr, HrcNode_ptr, hash_ptr, boolean);
+void Compile_ConstructHierarchy(const NuSMVEnv_ptr env,
+                                SymbTable_ptr symb_table, SymbLayer_ptr,
+                                node_ptr, node_ptr, node_ptr, FlatHierarchy_ptr,
+                                HrcNode_ptr, hash_ptr, boolean);
 
 /*!
   \brief Builds the parameters of a module from the list of formal
@@ -244,11 +243,9 @@ flattening information that is implicit in the hierarchy.
   \se In <tt>hrc_result</tt> the lists of formal and
 actual parameter used to instatiate a module is changed.
 */
-void compile_make_params_hrc(const NuSMVEnv_ptr env,
-                                    node_ptr basename,
-                                    node_ptr actual_list,
-                                    node_ptr formal_list,
-                                    HrcNode_ptr hrc_result);
+void compile_make_params_hrc(const NuSMVEnv_ptr env, node_ptr basename,
+                             node_ptr actual_list, node_ptr formal_list,
+                             HrcNode_ptr hrc_result);
 
 /*!
   \brief Add assign declarations in hrc_result.
@@ -260,9 +257,8 @@ void compile_make_params_hrc(const NuSMVEnv_ptr env,
   \se Contents of hrc_result is changed adding an
   assign constraint.
 */
-void compile_add_assign_hrc(NodeMgr_ptr nodemgr,
-                                   HrcNode_ptr hrc_result,
-                                   node_ptr assign_list);
+void compile_add_assign_hrc(NodeMgr_ptr nodemgr, HrcNode_ptr hrc_result,
+                            node_ptr assign_list);
 
 /* This will be removed when assignment of bit selection is implemented */
 
@@ -272,10 +268,10 @@ void compile_add_assign_hrc(NodeMgr_ptr nodemgr,
 /*!
   \brief Error message for unsupported feature
 
-  
+
 */
 void error_bit_selection_assignment_not_supported(NuSMVEnv_ptr env,
-                                                         node_ptr name);
+                                                  node_ptr name);
 
 /*!
   \brief Rewrites the toint operator for word expressions
@@ -306,11 +302,8 @@ void error_bit_selection_assignment_not_supported(NuSMVEnv_ptr env,
                        (w[N-2:N-2] = 0ud1_1 ? 0 : 2^(N-2)) + 1);
                        esac
 */
-node_ptr
-compile_flatten_rewrite_word_toint_cast(const NuSMVEnv_ptr env,
-                                        node_ptr body,
-                                        SymbType_ptr type);
-
-
+node_ptr compile_flatten_rewrite_word_toint_cast(const NuSMVEnv_ptr env,
+                                                 node_ptr body,
+                                                 SymbType_ptr type);
 
 #endif /* __NUSMV_CORE_COMPILE_COMPILE_INT_H__ */

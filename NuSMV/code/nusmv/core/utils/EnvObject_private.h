@@ -34,8 +34,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_ENV_OBJECT_PRIVATE_H__
 #define __NUSMV_CORE_UTILS_ENV_OBJECT_PRIVATE_H__
 
@@ -43,7 +41,6 @@
 #include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/object_private.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief EnvObject class definition derived from
@@ -54,8 +51,7 @@
   \sa Base class Object
 */
 
-typedef struct EnvObject_TAG
-{
+typedef struct EnvObject_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(Object);
 
@@ -65,14 +61,11 @@ typedef struct EnvObject_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } EnvObject;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -107,6 +100,5 @@ void env_object_deinit(EnvObject_ptr self);
   \sa EnvObject_create
 */
 void env_object_copy_aux(const EnvObject_ptr self, EnvObject_ptr copy);
-
 
 #endif /* __NUSMV_CORE_UTILS_ENV_OBJECT_PRIVATE_H__ */

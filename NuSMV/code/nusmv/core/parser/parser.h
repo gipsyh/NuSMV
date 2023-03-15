@@ -1,28 +1,28 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``parser'' package of NuSMV version 2. 
-  Copyright (C) 1998-2001 by CMU and FBK-irst. 
+  This file is part of the ``parser'' package of NuSMV version 2.
+  Copyright (C) 1998-2001 by CMU and FBK-irst.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,13 +36,11 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_PARSER_PARSER_H__
 #define __NUSMV_CORE_PARSER_PARSER_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Macros definitions                                                        */
@@ -53,7 +51,7 @@
 
   \todo Missing description
 */
-#define OPT_PARSER_IS_LAX  "parser_is_lax"
+#define OPT_PARSER_IS_LAX "parser_is_lax"
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -78,8 +76,7 @@ void Parser_Quit(NuSMVEnv_ptr env);
 
   Reads a NuSMV file into NuSMV.
 */
-int Parser_read_model(NuSMVEnv_ptr env,
-                             char* ifile);
+int Parser_read_model(NuSMVEnv_ptr env, char *ifile);
 
 /*!
   \brief Parse a comand from a given string.
@@ -89,27 +86,26 @@ int Parser_read_model(NuSMVEnv_ptr env,
   If a parsing error occurs than return 1, else return 0.
   The result of parsing is stored in <tt>pc</tt> to be used from the caller.
 */
-int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char** argv, 
-                                    const char* head, const char* tail, 
-                                    node_ptr* pc);
+int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char **argv,
+                             const char *head, const char *tail, node_ptr *pc);
 
 /*!
   \brief Parse a simple expression from string
 
    The resulting parse tree is returned through res. If a
-  parsing error occurs then return 1, else return 0. 
+  parsing error occurs then return 1, else return 0.
 */
-int Parser_ReadSimpExprFromString(NuSMVEnv_ptr env, const char* str_expr, 
-                                         node_ptr* res);
+int Parser_ReadSimpExprFromString(NuSMVEnv_ptr env, const char *str_expr,
+                                  node_ptr *res);
 
 /*!
   \brief Parse a command expression from file
 
    The resulting parse tree is returned through res. If a
-  parsing error occurs then return 1, else return 0. 
+  parsing error occurs then return 1, else return 0.
 */
-int Parser_ReadCmdFromFile(NuSMVEnv_ptr env, const char *filename, 
-                                  node_ptr* res);
+int Parser_ReadCmdFromFile(NuSMVEnv_ptr env, const char *filename,
+                           node_ptr *res);
 
 /*!
   \brief Parse SMV code from a given file.
@@ -119,7 +115,7 @@ int Parser_ReadCmdFromFile(NuSMVEnv_ptr env, const char *filename,
   return 1, else return 0. The result of parsing is stored in
   the global variable <tt>parsed_tree</tt> to be used from the caller.
 */
-int Parser_ReadSMVFromFile(NuSMVEnv_ptr env, const char* filename);
+int Parser_ReadSMVFromFile(NuSMVEnv_ptr env, const char *filename);
 
 /*!
   \brief Parse LTL expression from a given file.
@@ -129,7 +125,7 @@ int Parser_ReadSMVFromFile(NuSMVEnv_ptr env, const char* filename);
   return 1, else return 0. The result of parsing is stored in
   the global variable <tt>parsed_tree</tt> to be used from the caller.
 */
-int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char* filename);
+int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char *filename);
 
 /*!
   \brief Parses a PSL expression from the given string.
@@ -137,9 +133,8 @@ int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char* filename);
   The PSL parser is directly called. The resulting
   parse tree is returned through res. 1 is returned if an error occurred.
 */
-int Parser_read_psl_from_string(const NuSMVEnv_ptr env,
-                                       int argc, const char** argv,
-                                       node_ptr* res);
+int Parser_read_psl_from_string(const NuSMVEnv_ptr env, int argc,
+                                const char **argv, node_ptr *res);
 
 /*!
   \brief Parses a PSL expression from the given file.
@@ -147,49 +142,48 @@ int Parser_read_psl_from_string(const NuSMVEnv_ptr env,
   The PSL parser is directly called. The resulting
   parse tree is returned through res. 1 is returned if an error occurred.
 */
-int Parser_read_psl_from_file(const NuSMVEnv_ptr env,
-                                     const char* filename, node_ptr* res);
+int Parser_read_psl_from_file(const NuSMVEnv_ptr env, const char *filename,
+                              node_ptr *res);
 
 /*!
   \brief Parse a next expression from string
 
    The resulting parse tree is returned through res. If a
-  parsing error occurs then return 1, else return 0. 
+  parsing error occurs then return 1, else return 0.
 */
-int
-Parser_ReadNextExprFromString(NuSMVEnv_ptr env, const char* str_expr, node_ptr* res);
+int Parser_ReadNextExprFromString(NuSMVEnv_ptr env, const char *str_expr,
+                                  node_ptr *res);
 
 /*!
   \brief Parse a type declaration from string
 
    The resulting parse tree is returned through res. If a
-  parsing error occurs then return 1, else return 0. 
+  parsing error occurs then return 1, else return 0.
 
   E.g. "2..5" will return a ITYPE node containing TWODOTS node. It
   works with all itypes of the language, i.e. all var types but
   process and module instances.
 */
-int Parser_ReadTypeFromString(NuSMVEnv_ptr env,
-                                     const char* str_type,
-                                     node_ptr* res);
+int Parser_ReadTypeFromString(NuSMVEnv_ptr env, const char *str_type,
+                              node_ptr *res);
 
 /*!
   \brief Parse an identifier expression from string
 
    The resulting parse tree is returned through res. If a
-  parsing error occurs then return 1, else return 0. 
+  parsing error occurs then return 1, else return 0.
 */
-int
-Parser_ReadIdentifierExprFromString(NuSMVEnv_ptr env, const char* str_expr, node_ptr* res);
+int Parser_ReadIdentifierExprFromString(NuSMVEnv_ptr env, const char *str_expr,
+                                        node_ptr *res);
 
 /*!
   \brief Parse a next expression from file
 
    The resulting parse tree is returned through res. If a
-  parsing error occurs then return 1, else return 0. 
+  parsing error occurs then return 1, else return 0.
 */
-int
-Parser_ReadNextExprFromFile(NuSMVEnv_ptr env, const char *filename, node_ptr* res);
+int Parser_ReadNextExprFromFile(NuSMVEnv_ptr env, const char *filename,
+                                node_ptr *res);
 
 /*!
   \brief Returns a list of SYNTAX_ERROR nodes
@@ -213,11 +207,9 @@ node_ptr Parser_get_syntax_errors_list(const NuSMVEnv_ptr env);
 
   \sa Parser_get_syntax_errors_list
 */
-void Parser_get_syntax_error(node_ptr node, 
-                                    const char** out_filename, 
-                                    int* out_lineno, 
-                                    const char** out_token,
-                                    const char** out_message);
+void Parser_get_syntax_error(node_ptr node, const char **out_filename,
+                             int *out_lineno, const char **out_token,
+                             const char **out_message);
 
 /*!
   \brief Prints information contained in one node ot the list
@@ -228,7 +220,7 @@ void Parser_get_syntax_error(node_ptr node,
 
   \sa Parser_get_syntax_errors_list
 */
-void Parser_print_syntax_error(node_ptr error, FILE* fout);
+void Parser_print_syntax_error(node_ptr error, FILE *fout);
 
 /*!
   \brief \todo Missing synopsis

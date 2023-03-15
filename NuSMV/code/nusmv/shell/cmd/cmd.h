@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_SHELL_CMD_CMD_H__
 #define __NUSMV_SHELL_CMD_CMD_H__
 
@@ -42,18 +41,18 @@
 /* Nested includes                                                           */
 /*---------------------------------------------------------------------------*/
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_START_TIME          "cmdStartTime"
+#define ENV_START_TIME "cmdStartTime"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -65,7 +64,6 @@
   \todo Missing description
 */
 typedef int (*PFI)(NuSMVEnv_ptr env, int argc, char **argv);
-
 
 /**AutomaticStart*************************************************************/
 
@@ -96,7 +94,7 @@ void add_history(char *line);
 
   \todo Missing description
 */
-int setvbuf(FILE*, char*, int mode, size_t size);
+int setvbuf(FILE *, char *, int mode, size_t size);
 #endif
 #ifdef PURIFY
 
@@ -124,8 +122,8 @@ void purify_all_inuse();
                 }<p>
 
   argv\[0\] will generally
-  be the command name, and argv\[1\] ... argv\[argc-1\] are the arguments for the
-  command.  util_getopt() can be used to parse the arguments, but
+  be the command name, and argv\[1\] ... argv\[argc-1\] are the arguments for
+  the command.  util_getopt() can be used to parse the arguments, but
   util_getopt_reset() must be used before calling util_getopt().  The command
   function should return 0 for normal operation, 1 for any error.  The changes
   flag is used to automatically save the hmgr before executing the command (in
@@ -134,8 +132,8 @@ void purify_all_inuse();
   leaving the internal status inconsistent.
 
 */
-void Cmd_CommandAdd(NuSMVEnv_ptr env, char* name, PFI funcFp, int changes,
-                           boolean reentrant);
+void Cmd_CommandAdd(NuSMVEnv_ptr env, char *name, PFI funcFp, int changes,
+                    boolean reentrant);
 
 /*!
   \brief Removes given command from the command table.
@@ -143,7 +141,7 @@ void Cmd_CommandAdd(NuSMVEnv_ptr env, char* name, PFI funcFp, int changes,
   Returns true if command was found and removed,
   false if not found
 */
-boolean Cmd_CommandRemove(NuSMVEnv_ptr env, const char* name);
+boolean Cmd_CommandRemove(NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief Executes a command line.
@@ -154,7 +152,7 @@ boolean Cmd_CommandRemove(NuSMVEnv_ptr env, const char* name);
   easiest way to accomplish a given task. For example, to set a variable, use
   the code: Cmd_CommandExecute("set color blue").
 */
-int Cmd_CommandExecute(NuSMVEnv_ptr env, char* command);
+int Cmd_CommandExecute(NuSMVEnv_ptr env, char *command);
 
 /*!
   \brief Secure layer for Cmd_CommandExecute
@@ -163,7 +161,7 @@ int Cmd_CommandExecute(NuSMVEnv_ptr env, char* command);
   Do not call Cmd_CommandExecute directly from a scripting language, otherwise
   the script execution could be aborted without any warning.
 */
-int Cmd_SecureCommandExecute(NuSMVEnv_ptr env, char* command);
+int Cmd_SecureCommandExecute(NuSMVEnv_ptr env, char *command);
 
 /*!
   \brief Opens the file with the given mode.
@@ -177,9 +175,8 @@ int Cmd_SecureCommandExecute(NuSMVEnv_ptr env, char* command);
   returned in the pointer realFileName, if realFileName is non-empty.  This
   is a pointer which should be free'd when you are done with it.
 */
-FILE* Cmd_FileOpen(const NuSMVEnv_ptr env,
-                          char* fileName, char* mode,
-                          char** realFileName_p, int silent);
+FILE *Cmd_FileOpen(const NuSMVEnv_ptr env, char *fileName, char *mode,
+                   char **realFileName_p, int silent);
 
 /*!
   \brief Initializes the command package.
@@ -210,7 +207,7 @@ void Cmd_End(NuSMVEnv_ptr env);
 
   \sa optional
 */
-FILE* CmdOpenPipe(const NuSMVEnv_ptr env, int useMore);
+FILE *CmdOpenPipe(const NuSMVEnv_ptr env, int useMore);
 
 /*!
   \brief Closes a previously opened pipe
@@ -221,7 +218,7 @@ FILE* CmdOpenPipe(const NuSMVEnv_ptr env, int useMore);
 
   \sa optional
 */
-void CmdClosePipe(FILE* file);
+void CmdClosePipe(FILE *file);
 
 /*!
   \brief Open a file whose name is given
@@ -232,7 +229,7 @@ void CmdClosePipe(FILE* file);
 
   \sa optional
 */
-FILE* CmdOpenFile(const NuSMVEnv_ptr env, const char* filename);
+FILE *CmdOpenFile(const NuSMVEnv_ptr env, const char *filename);
 
 /*!
   \brief Closes a previously opened file
@@ -243,7 +240,7 @@ FILE* CmdOpenFile(const NuSMVEnv_ptr env, const char* filename);
 
   \sa optional
 */
-void CmdCloseFile(FILE* file);
+void CmdCloseFile(FILE *file);
 
 /*!
   \brief Tries to set the stream as a pipe or as a given file
@@ -253,8 +250,7 @@ void CmdCloseFile(FILE* file);
   \se outstream is changed
 */
 Outcome Cmd_Misc_open_pipe_or_file(NuSMVEnv_ptr const env,
-                                          const char* dbgFileName,
-                                          FILE** outstream);
+                                   const char *dbgFileName, FILE **outstream);
 
 /*!
   \brief Open a file or a pipe and sets them into the StreamMgr
@@ -266,10 +262,8 @@ Outcome Cmd_Misc_open_pipe_or_file(NuSMVEnv_ptr const env,
 
   \sa Cmd_Misc_restore_global_out_stream
 */
-int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env,
-                                          char* filename,
-                                          boolean useMore,
-                                          FILE** prev_outstream);
+int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env, char *filename,
+                                   boolean useMore, FILE **prev_outstream);
 
 /*!
   \brief Closes the outstream in the stream mgr, previously opened
@@ -280,12 +274,9 @@ int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env,
 
   \sa Cmd_Misc_set_global_out_stream
 */
-void Cmd_Misc_restore_global_out_stream(NuSMVEnv_ptr env,
-                                               char* filename,
-                                               boolean use_a_pipe,
-                                               FILE* prev_outstream);
-
-
+void Cmd_Misc_restore_global_out_stream(NuSMVEnv_ptr env, char *filename,
+                                        boolean use_a_pipe,
+                                        FILE *prev_outstream);
 
 /*!
   \brief Sources the .nusmvrc file.
@@ -296,7 +287,6 @@ void Cmd_Misc_restore_global_out_stream(NuSMVEnv_ptr env,
   is present.  Returns 1 if scripts were successfully executed, else return 0.
 */
 int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env);
-
 
 /**AutomaticEnd***************************************************************/
 

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,17 +37,15 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/rbc/rbcInt.h"
 #include "nusmv/core/rbc/clg/clg.h"
+#include "nusmv/core/rbc/rbcInt.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -60,16 +58,16 @@
 */
 
 struct CnfCompactDfsData {
-  Rbc_Manager_t*  rbcManager;
-  ClgManager_ptr  clgManager;
-  int             maxVar;     /* Maximum variable index so far */
-  clause_graph    clauses;    /* List of clauses generated so far */
-  Slist_ptr       vars;       /* List of variables used so far */
-  clause_graph    posClauses; /* Current clause list for positive polarity */
-  clause_graph    negClauses; /* Current clause list for negative polarity */
-  int             pol;        /* Current polarity */
-  boolean         zeroiff;    /* Current node is a zero-polarity IFF, or a */
-};                            /* zero-polarity ITE */
+  Rbc_Manager_t *rbcManager;
+  ClgManager_ptr clgManager;
+  int maxVar;              /* Maximum variable index so far */
+  clause_graph clauses;    /* List of clauses generated so far */
+  Slist_ptr vars;          /* List of variables used so far */
+  clause_graph posClauses; /* Current clause list for positive polarity */
+  clause_graph negClauses; /* Current clause list for negative polarity */
+  int pol;                 /* Current polarity */
+  boolean zeroiff;         /* Current node is a zero-polarity IFF, or a */
+};                         /* zero-polarity ITE */
 
 /*!
   \brief Per-node data in compact cnf-DFS.
@@ -78,13 +76,13 @@ struct CnfCompactDfsData {
 */
 
 struct CnfCompactDfsNode {
-  int                  negRef;     /* Number of negative polarity references */
-  int                  posRef;     /* Number of negative polarity references */
-  boolean              unseen;     /* Whether this node has been processed */
-  clause_graph         posClauses; /* Result of pos conversion at this node */
-  clause_graph         negClauses; /* Result of neg conversion at this node */
-  clause_graph         ifClauses;  /* Result of pos conversion for IF branch */
-};                                 /* of ITE node (not used for other types) */
+  int negRef;              /* Number of negative polarity references */
+  int posRef;              /* Number of negative polarity references */
+  boolean unseen;          /* Whether this node has been processed */
+  clause_graph posClauses; /* Result of pos conversion at this node */
+  clause_graph negClauses; /* Result of neg conversion at this node */
+  clause_graph ifClauses;  /* Result of pos conversion for IF branch */
+};                         /* of ITE node (not used for other types) */
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -95,19 +93,16 @@ struct CnfCompactDfsNode {
 
   \todo Missing description
 */
-typedef struct CnfCompactDfsData    CnfCompactDfsData_t;
-typedef struct CnfCompactDfsNode    CnfCompactDfsNode_t;
-
+typedef struct CnfCompactDfsData CnfCompactDfsData_t;
+typedef struct CnfCompactDfsNode CnfCompactDfsNode_t;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -115,39 +110,35 @@ typedef struct CnfCompactDfsNode    CnfCompactDfsNode_t;
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
-static void CnfCompactPolFirstBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
-static void CnfEmpty(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
+static int CnfCompactPolSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
+static void CnfCompactPolFirstBack(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
+static void CnfEmpty(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
 
-static int CnfCompactSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
-static void CnfCompactFirst(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
-static void CnfCompactBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
-static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
+static int CnfCompactSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
+static void CnfCompactFirst(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
+static void CnfCompactBack(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
+static void CnfCompactLast(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
 
-static int CnfCompactCleanSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
-static void CnfCompactCleanFirst(Rbc_t* f, char* cnfData, nusmv_ptrint sign);
+static int CnfCompactCleanSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
+static void CnfCompactCleanFirst(Rbc_t *f, char *cnfData, nusmv_ptrint sign);
 
-static void rename_clauses(ClgManager_ptr clgManager,
-                           clause_graph* clauses, int var, clause_graph* saved);
+static void rename_clauses(ClgManager_ptr clgManager, clause_graph *clauses,
+                           int var, clause_graph *saved);
 
-static inline void disjunction(ClgManager_ptr clgManager,
-                               clause_graph* Left, clause_graph* Right,
-                               int* maxVar, clause_graph* clauses,
-                               Rbc_Manager_t* rbcm);
+static inline void disjunction(ClgManager_ptr clgManager, clause_graph *Left,
+                               clause_graph *Right, int *maxVar,
+                               clause_graph *clauses, Rbc_Manager_t *rbcm);
 
-static inline void disjunction2(ClgManager_ptr clgManager,
-                                clause_graph* Left1, clause_graph* Right1,
-                                clause_graph* Left2, clause_graph* Right2,
-                                int* maxVar, clause_graph* clauses,
-                                Rbc_Manager_t* rbcm);
+static inline void disjunction2(ClgManager_ptr clgManager, clause_graph *Left1,
+                                clause_graph *Right1, clause_graph *Left2,
+                                clause_graph *Right2, int *maxVar,
+                                clause_graph *clauses, Rbc_Manager_t *rbcm);
 
 static inline int testSizes(clause_graph left, clause_graph right);
 
-static void CnfCompactCommit(void* data, int* cl, int size);
-
+static void CnfCompactCommit(void *data, int *cl, int size);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of external functions                                          */
@@ -176,11 +167,10 @@ static void CnfCompactCommit(void* data, int* cl, int size);
                `f' was false.
 */
 
-int Rbc_Convert2CnfCompact(Rbc_Manager_t* rbcManager, Rbc_t* f,
-                           int polarity, Slist_ptr clauses, Slist_ptr vars,
-                           int* literalAssignedToWholeFormula)
-{
-  Dag_DfsFunctions_t  cnfFunctions;
+int Rbc_Convert2CnfCompact(Rbc_Manager_t *rbcManager, Rbc_t *f, int polarity,
+                           Slist_ptr clauses, Slist_ptr vars,
+                           int *literalAssignedToWholeFormula) {
+  Dag_DfsFunctions_t cnfFunctions;
   CnfCompactDfsData_t cnfData;
   int renamed = 0;
   const NuSMVEnv_ptr env = Rbc_ManagerGetEnvironment(rbcManager);
@@ -191,21 +181,20 @@ int Rbc_Convert2CnfCompact(Rbc_Manager_t* rbcManager, Rbc_t* f,
   /* Setting up the DFS data. */
   cnfData.clgManager = ClgManager_create();
   cnfData.rbcManager = rbcManager;
-  cnfData.clauses    = NULL;
-  cnfData.vars       = vars;
+  cnfData.clauses = NULL;
+  cnfData.vars = vars;
   cnfData.posClauses = NULL;
   cnfData.negClauses = NULL;
-  cnfData.pol        = polarity;
-  cnfData.zeroiff    = 0;
-  cnfData.maxVar     = rbcManager->maxCnfVariable;
+  cnfData.pol = polarity;
+  cnfData.zeroiff = 0;
+  cnfData.maxVar = rbcManager->maxCnfVariable;
 
   /* First, compute the polarity for the whole tree */
-  cnfFunctions.Set        = (PF_IVPCPI)CnfCompactPolSet;
+  cnfFunctions.Set = (PF_IVPCPI)CnfCompactPolSet;
   cnfFunctions.FirstVisit = (PF_VPVPCPI)CnfCompactPolFirstBack;
-  cnfFunctions.BackVisit  = (PF_VPVPCPI)CnfCompactPolFirstBack;
-  cnfFunctions.LastVisit  = (PF_VPVPCPI)CnfEmpty;
-  Dag_Dfs(f, &cnfFunctions, (char*) (&cnfData));
-
+  cnfFunctions.BackVisit = (PF_VPVPCPI)CnfCompactPolFirstBack;
+  cnfFunctions.LastVisit = (PF_VPVPCPI)CnfEmpty;
+  Dag_Dfs(f, &cnfFunctions, (char *)(&cnfData));
 
   /* Reset our opinion of the polarity (the previous DFS returns the polarity
      of the top node; we need to start again with a positive polarity to ensure
@@ -213,11 +202,11 @@ int Rbc_Convert2CnfCompact(Rbc_Manager_t* rbcManager, Rbc_t* f,
   cnfData.pol = 1;
 
   /* Now, use the polarity to compute the clauses */
-  cnfFunctions.Set        = (PF_IVPCPI)CnfCompactSet;
+  cnfFunctions.Set = (PF_IVPCPI)CnfCompactSet;
   cnfFunctions.FirstVisit = (PF_VPVPCPI)CnfCompactFirst;
-  cnfFunctions.BackVisit  = (PF_VPVPCPI)CnfCompactBack;
-  cnfFunctions.LastVisit  = (PF_VPVPCPI)CnfCompactLast;
-  Dag_Dfs(f, &cnfFunctions, (char*) (&cnfData));
+  cnfFunctions.BackVisit = (PF_VPVPCPI)CnfCompactBack;
+  cnfFunctions.LastVisit = (PF_VPVPCPI)CnfCompactLast;
+  Dag_Dfs(f, &cnfFunctions, (char *)(&cnfData));
 
   /* Rename the clause sets to be returned. In the case where the polarity is
      zero (where we want to represent 'f' both positively and negatively), the
@@ -225,35 +214,33 @@ int Rbc_Convert2CnfCompact(Rbc_Manager_t* rbcManager, Rbc_t* f,
   if (polarity >= 0) {
     renamed = Rbc_get_node_cnf(rbcManager, RBCDUMMY, &(cnfData.maxVar));
     nusmv_assert(0 != renamed);
-    rename_clauses(cnfData.clgManager,
-                   &(cnfData.posClauses), renamed, &(cnfData.clauses));
+    rename_clauses(cnfData.clgManager, &(cnfData.posClauses), renamed,
+                   &(cnfData.clauses));
   }
   if (polarity <= 0) {
     if (polarity < 0) {
       renamed = Rbc_get_node_cnf(rbcManager, RBCDUMMY, &(cnfData.maxVar));
     }
     nusmv_assert(0 != renamed);
-    rename_clauses(cnfData.clgManager,
-                   &(cnfData.negClauses), -renamed, &(cnfData.clauses));
+    rename_clauses(cnfData.clgManager, &(cnfData.negClauses), -renamed,
+                   &(cnfData.clauses));
   }
 
   *literalAssignedToWholeFormula = renamed;
 
-  Clg_Extract(env, cnfData.clauses, CLG_NUSMV,
-              (Clg_Commit) CnfCompactCommit, (void*) &(clauses));
+  Clg_Extract(env, cnfData.clauses, CLG_NUSMV, (Clg_Commit)CnfCompactCommit,
+              (void *)&(clauses));
   ClgManager_destroy(cnfData.clgManager);
 
-
   /* Clean the graph of the allocated data */
-  cnfFunctions.Set        = (PF_IVPCPI)CnfCompactCleanSet;
+  cnfFunctions.Set = (PF_IVPCPI)CnfCompactCleanSet;
   cnfFunctions.FirstVisit = (PF_VPVPCPI)CnfCompactCleanFirst;
-  cnfFunctions.BackVisit  = (PF_VPVPCPI)CnfEmpty;
-  cnfFunctions.LastVisit  = (PF_VPVPCPI)CnfEmpty;
-  Dag_Dfs(f, &cnfFunctions, (char*) (&cnfData));
+  cnfFunctions.BackVisit = (PF_VPVPCPI)CnfEmpty;
+  cnfFunctions.LastVisit = (PF_VPVPCPI)CnfEmpty;
+  Dag_Dfs(f, &cnfFunctions, (char *)(&cnfData));
 
   /* Adjust max var in the RBC manager to be the last generated index. */
   rbcManager->maxCnfVariable = cnfData.maxVar;
-
 
   return (cnfData.maxVar);
 } /* End of Rbc_Convert2CnfCompact. */
@@ -270,11 +257,10 @@ int Rbc_Convert2CnfCompact(Rbc_Manager_t* rbcManager, Rbc_t* f,
   \se None
 */
 
-static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
-{
+static int CnfCompactPolSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
   int result; /* What we will tell dagDfs */
-  CnfCompactDfsData_t* cd = (CnfCompactDfsData_t*)cnfData;
-  CnfCompactDfsNode_t* nd = (CnfCompactDfsNode_t*)(f->gRef);
+  CnfCompactDfsData_t *cd = (CnfCompactDfsData_t *)cnfData;
+  CnfCompactDfsNode_t *nd = (CnfCompactDfsNode_t *)(f->gRef);
 
   /* This function is called to decide whether to continue down the
      current route. If we get here, and it is a node that has already
@@ -288,7 +274,7 @@ static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   /* Create per-node data structure */
   if (nd == NULL) {
     nd = ALLOC(CnfCompactDfsNode_t, 1);
-    f->gRef = (char*) nd;
+    f->gRef = (char *)nd;
 
     nd->posRef = 0;
     nd->negRef = 0;
@@ -321,11 +307,11 @@ static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
 
     /* If this node is an IFF then the polarity of the children should be 0  */
     if (f->symbol == RBCIFF) {
-      if (( sign && cd->pol >= 0 && nd->negRef == 0) ||
-          ( sign && cd->pol <= 0 && nd->posRef == 0) ||
+      if ((sign && cd->pol >= 0 && nd->negRef == 0) ||
+          (sign && cd->pol <= 0 && nd->posRef == 0) ||
           (!sign && cd->pol >= 0 && nd->posRef == 0) ||
           (!sign && cd->pol <= 0 && nd->negRef == 0)) {
-        nusmv_assert(f->iRef == 0);  /* Should already be set to 0 */
+        nusmv_assert(f->iRef == 0); /* Should already be set to 0 */
         result = -1;
       } else {
         result = 1; /* Don't visit */
@@ -346,8 +332,8 @@ static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
         f->iRef = -1;
       } else if (nd->negRef == 0 && nd->posRef == 0) { /* Shouldn't happen! */
         f->iRef = 0;
-      } else { /* Seen both polarities */
-        result = 1;  /* Don't visit */
+      } else {      /* Seen both polarities */
+        result = 1; /* Don't visit */
       }
 
     } else if (cd->pol > 0) {
@@ -357,7 +343,7 @@ static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
         result = -1; /* Do visit */
       } else if (sign && nd->negRef == 0) {
         f->iRef = -1;
-        result = -1;  /* Do visit */
+        result = -1; /* Do visit */
       } else {
         result = 1;
       }
@@ -366,14 +352,13 @@ static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
 
       if (!sign && nd->negRef == 0) {
         f->iRef = -1;
-        result = -1;  /* Do visit */
+        result = -1; /* Do visit */
       } else if (sign && nd->posRef == 0) {
         f->iRef = 1;
-        result = -1;  /* Do visit */
+        result = -1; /* Do visit */
       } else {
         result = 1;
       }
-
     }
   }
 
@@ -410,7 +395,6 @@ static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   return result;
 } /* End of CnfCompactPolSet. */
 
-
 /*!
   \brief Dfs FirstVisit and BackVisit for CNF conversion.
 
@@ -420,21 +404,21 @@ static int CnfCompactPolSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   \se None
 */
 
-static void CnfCompactPolFirstBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
-{
-  CnfCompactDfsData_t* cd = (CnfCompactDfsData_t*)cnfData;
+static void CnfCompactPolFirstBack(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
+  CnfCompactDfsData_t *cd = (CnfCompactDfsData_t *)cnfData;
 
   /* Save polarity and check for zero-polarity IFFs, or for ITEs */
   if (f->iRef < -1) {
     if (f->symbol == RBCITE) {
-    /* For ITE nodes, the IF branch has to be considered for both polarities,
-       whereas the other branches only have to be considered for the polarity
-       of the ITE node itself */
-      f->iRef += 10;  /* Reset polarity for THEN and ELSE branches */
-      cd->pol = 0;    /* IF branch has to be considered in both polarities */
+      /* For ITE nodes, the IF branch has to be considered for both polarities,
+         whereas the other branches only have to be considered for the polarity
+         of the ITE node itself */
+      f->iRef += 10; /* Reset polarity for THEN and ELSE branches */
+      cd->pol = 0;   /* IF branch has to be considered in both polarities */
 
-     /* If this is a zero-polarity ITE, then the IF branch will get referencd
-         twice for each polarity - the same as for zero-polarity IFF children */
+      /* If this is a zero-polarity ITE, then the IF branch will get referencd
+          twice for each polarity - the same as for zero-polarity IFF children
+       */
       if (f->iRef == 0) {
         cd->zeroiff = true;
       }
@@ -450,7 +434,6 @@ static void CnfCompactPolFirstBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
 
 } /* End of CnfCompactPolFirstBack. */
 
-
 /*!
   \brief Dfs Set for CNF conversion.
 
@@ -459,10 +442,9 @@ static void CnfCompactPolFirstBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   \se None
 */
 
-static int CnfCompactSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
-{
-  CnfCompactDfsData_t* cd = (CnfCompactDfsData_t*) cnfData;
-  CnfCompactDfsNode_t* nd = (CnfCompactDfsNode_t*) (f->gRef);
+static int CnfCompactSet(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
+  CnfCompactDfsData_t *cd = (CnfCompactDfsData_t *)cnfData;
+  CnfCompactDfsNode_t *nd = (CnfCompactDfsNode_t *)(f->gRef);
 
   /* The per-node data is intact */
   nusmv_assert(nd != NULL);
@@ -489,7 +471,6 @@ static int CnfCompactSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
 
 } /* End of CnfCompactSet. */
 
-
 /*!
   \brief Dfs FirstVisit for CNF conversion.
 
@@ -498,13 +479,11 @@ static int CnfCompactSet(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   \se None
 */
 
-static void CnfCompactFirst(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
-{
-  CnfCompactDfsNode_t* nd = (CnfCompactDfsNode_t*) (f->gRef);
+static void CnfCompactFirst(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
+  CnfCompactDfsNode_t *nd = (CnfCompactDfsNode_t *)(f->gRef);
 
   nusmv_assert(nd->unseen);
 } /* End of CnfCompactFirst. */
-
 
 /*!
   \brief Dfs BackVisit for CNF conversion.
@@ -514,18 +493,16 @@ static void CnfCompactFirst(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   \se None
 */
 
-static void CnfCompactBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
-{
-  CnfCompactDfsData_t* cd = (CnfCompactDfsData_t*) cnfData;
-  CnfCompactDfsNode_t* nd = (CnfCompactDfsNode_t*) (f->gRef);
+static void CnfCompactBack(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
+  CnfCompactDfsData_t *cd = (CnfCompactDfsData_t *)cnfData;
+  CnfCompactDfsNode_t *nd = (CnfCompactDfsNode_t *)(f->gRef);
 
   /* Store copies of the LHS clause sets */
   if (f->symbol != RBCVAR) {
     if (nd->posClauses == NULL && nd->negClauses == NULL) {
       nd->posClauses = cd->posClauses;
       nd->negClauses = cd->negClauses;
-    }
-    else if (f->symbol == RBCITE && nd->ifClauses == NULL) {
+    } else if (f->symbol == RBCITE && nd->ifClauses == NULL) {
       /* Both nd->posClauses and nd->negClauses should be non-null, since
          the IF branch will have been considered for both polarities */
       nusmv_assert(nd->posClauses);
@@ -536,21 +513,22 @@ static void CnfCompactBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
 
       /* Save (~IF|THEN) and/or (~IF|~THEN) based upon reference counts */
       if (nd->posRef > 0) {
-        disjunction(cd->clgManager,
-                    &(nd->negClauses), &(cd->posClauses), &(cd->maxVar),
-                    &(cd->clauses), cd->rbcManager);
-        nd->posClauses = Clg_Disj(cd->clgManager, nd->negClauses, cd->posClauses);
-      } else nd->posClauses = NULL;
+        disjunction(cd->clgManager, &(nd->negClauses), &(cd->posClauses),
+                    &(cd->maxVar), &(cd->clauses), cd->rbcManager);
+        nd->posClauses =
+            Clg_Disj(cd->clgManager, nd->negClauses, cd->posClauses);
+      } else
+        nd->posClauses = NULL;
       if (nd->negRef > 0) {
-        disjunction(cd->clgManager,
-                    &(nd->negClauses), &(cd->negClauses), &(cd->maxVar),
-                    &(cd->clauses), cd->rbcManager);
-        nd->negClauses = Clg_Disj(cd->clgManager, nd->negClauses, cd->negClauses);
-      } else nd->negClauses = NULL;
+        disjunction(cd->clgManager, &(nd->negClauses), &(cd->negClauses),
+                    &(cd->maxVar), &(cd->clauses), cd->rbcManager);
+        nd->negClauses =
+            Clg_Disj(cd->clgManager, nd->negClauses, cd->negClauses);
+      } else
+        nd->negClauses = NULL;
     }
   }
 } /* End of CnfCompactBack. */
-
 
 /*!
   \brief Dfs LastVisit for CNF conversion.
@@ -560,21 +538,18 @@ static void CnfCompactBack(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   \se None
 */
 
-static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
-{
-  int cnfVar = 0;  /* Equivalent CNF variable used for RBCVAR node */
-  CnfCompactDfsData_t* cd = (CnfCompactDfsData_t*) cnfData;
-  CnfCompactDfsNode_t* nd = (CnfCompactDfsNode_t*) (f->gRef);
+static void CnfCompactLast(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
+  int cnfVar = 0; /* Equivalent CNF variable used for RBCVAR node */
+  CnfCompactDfsData_t *cd = (CnfCompactDfsData_t *)cnfData;
+  CnfCompactDfsNode_t *nd = (CnfCompactDfsNode_t *)(f->gRef);
 
-  const NuSMVEnv_ptr env = Rbc_ManagerGetEnvironment(cd -> rbcManager);
+  const NuSMVEnv_ptr env = Rbc_ManagerGetEnvironment(cd->rbcManager);
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   /* Aliases to improve readability */
-  clause_graph leftPos  = nd->posClauses,
-               leftNeg  = nd->negClauses,
-               rightPos = cd->posClauses,
-               rightNeg = cd->negClauses;
+  clause_graph leftPos = nd->posClauses, leftNeg = nd->negClauses,
+               rightPos = cd->posClauses, rightNeg = cd->negClauses;
 
   clause_graph resultPos, resultNeg;
 
@@ -589,7 +564,7 @@ static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   switch (f->symbol) {
   case RBCVAR:
     /* Fill in vars list */
-    Slist_push(cd->vars, PTR_FROM_INT(void*, cnfVar));
+    Slist_push(cd->vars, PTR_FROM_INT(void *, cnfVar));
 
     resultPos = Clg_Lit(cd->clgManager, cnfVar);
     resultNeg = Clg_Lit(cd->clgManager, -cnfVar);
@@ -598,40 +573,37 @@ static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   case RBCAND: /* Conjunction or disjunction */
     if (nd->posRef > 0) {
       resultPos = Clg_Conj(cd->clgManager, leftPos, rightPos);
-    }
-    else resultPos = NULL;
+    } else
+      resultPos = NULL;
 
     if (nd->negRef > 0) {
-      disjunction(cd->clgManager,
-                  &leftNeg, &rightNeg, &(cd->maxVar), &(cd->clauses),
-                  cd->rbcManager);
+      disjunction(cd->clgManager, &leftNeg, &rightNeg, &(cd->maxVar),
+                  &(cd->clauses), cd->rbcManager);
       resultNeg = Clg_Disj(cd->clgManager, leftNeg, rightNeg);
-    }
-    else resultNeg = NULL;
+    } else
+      resultNeg = NULL;
     break;
 
   case RBCIFF:
     if ((nd->posRef) > 0) {
       /* Positive polarity: compute (~a|b)&(a|~b) */
-      disjunction2(cd->clgManager,
-                   &leftNeg, &rightPos, &leftPos, &rightNeg,
+      disjunction2(cd->clgManager, &leftNeg, &rightPos, &leftPos, &rightNeg,
                    &(cd->maxVar), &(cd->clauses), cd->rbcManager);
-      resultPos = Clg_Conj(cd->clgManager,
-                           Clg_Disj(cd->clgManager, leftNeg, rightPos),
-                           Clg_Disj(cd->clgManager, leftPos, rightNeg));
-    }
-    else resultPos = NULL;
+      resultPos =
+          Clg_Conj(cd->clgManager, Clg_Disj(cd->clgManager, leftNeg, rightPos),
+                   Clg_Disj(cd->clgManager, leftPos, rightNeg));
+    } else
+      resultPos = NULL;
 
     if ((nd->negRef) > 0) {
       /* Negative polarity: compute (a|b)&(~a|~b) */
-      disjunction2(cd->clgManager,
-                   &leftPos, &rightPos, &leftNeg, &rightNeg,
+      disjunction2(cd->clgManager, &leftPos, &rightPos, &leftNeg, &rightNeg,
                    &(cd->maxVar), &(cd->clauses), cd->rbcManager);
-      resultNeg = Clg_Conj(cd->clgManager,
-                           Clg_Disj(cd->clgManager, leftPos, rightPos),
-                           Clg_Disj(cd->clgManager, leftNeg, rightNeg));
-    }
-    else resultNeg = NULL;
+      resultNeg =
+          Clg_Conj(cd->clgManager, Clg_Disj(cd->clgManager, leftPos, rightPos),
+                   Clg_Disj(cd->clgManager, leftNeg, rightNeg));
+    } else
+      resultNeg = NULL;
     break;
 
   case RBCITE:
@@ -642,31 +614,25 @@ static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
 
     if (nd->posRef > 0) {
       /* Positive polarity: compute (~IF|THEN)&(IF|ELSE) */
-      disjunction(cd->clgManager,
-                  &(nd->ifClauses), &(cd->posClauses), &(cd->maxVar),
-                  &(cd->clauses), cd->rbcManager);
+      disjunction(cd->clgManager, &(nd->ifClauses), &(cd->posClauses),
+                  &(cd->maxVar), &(cd->clauses), cd->rbcManager);
 
-      resultPos = Clg_Conj(cd->clgManager,
-                           nd->posClauses,
-                           Clg_Disj(cd->clgManager,
-                                    nd->ifClauses,
-                                    cd->posClauses));
-    }
-    else resultPos = NULL;
+      resultPos =
+          Clg_Conj(cd->clgManager, nd->posClauses,
+                   Clg_Disj(cd->clgManager, nd->ifClauses, cd->posClauses));
+    } else
+      resultPos = NULL;
 
     if (nd->negRef > 0) {
       /* Negative polarity: compute (~IF|~THEN)&(IF|~ELSE) */
-      disjunction(cd->clgManager,
-                  &(nd->ifClauses), &(cd->negClauses), &(cd->maxVar),
-                  &(cd->clauses), cd->rbcManager);
+      disjunction(cd->clgManager, &(nd->ifClauses), &(cd->negClauses),
+                  &(cd->maxVar), &(cd->clauses), cd->rbcManager);
 
-      resultNeg = Clg_Conj(cd->clgManager,
-                           nd->negClauses,
-                           Clg_Disj(cd->clgManager,
-                                    nd->ifClauses,
-                                    cd->negClauses));
-    }
-    else resultNeg = NULL;
+      resultNeg =
+          Clg_Conj(cd->clgManager, nd->negClauses,
+                   Clg_Disj(cd->clgManager, nd->ifClauses, cd->negClauses));
+    } else
+      resultNeg = NULL;
     break;
 
   default:
@@ -697,8 +663,7 @@ static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   if (sign) {
     cd->posClauses = nd->negClauses = resultNeg;
     cd->negClauses = nd->posClauses = resultPos;
-  }
-  else {
+  } else {
     cd->posClauses = nd->posClauses = resultPos;
     cd->negClauses = nd->negClauses = resultNeg;
   }
@@ -710,8 +675,6 @@ static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
 
 } /* End of CnfCompactLast. */
 
-
-
 /*!
   \brief Dfs Set for cleaning.
 
@@ -720,13 +683,11 @@ static void CnfCompactLast(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   \se None
 */
 
-static int CnfCompactCleanSet(Dag_Vertex_t* f, char* cleanData,
-                              nusmv_ptrint sign)
-{
+static int CnfCompactCleanSet(Dag_Vertex_t *f, char *cleanData,
+                              nusmv_ptrint sign) {
   /* All the nodes are visited once and only once. */
   return 0;
 } /* End of CleanSet. */
-
 
 /*!
   \brief Dfs FirstVisit for cleaning.
@@ -736,16 +697,14 @@ static int CnfCompactCleanSet(Dag_Vertex_t* f, char* cleanData,
   \se None
 */
 
-static void CnfCompactCleanFirst(Dag_Vertex_t* f, char* cleanData,
-                                 nusmv_ptrint sign)
-{
+static void CnfCompactCleanFirst(Dag_Vertex_t *f, char *cleanData,
+                                 nusmv_ptrint sign) {
   /* Clean data. */
   FREE(f->gRef);
   f->gRef = NIL(char);
   f->iRef = 0;
   return;
 } /* End of CnfCompactCleanFirst. */
-
 
 /*!
   \brief Dfs empty function.
@@ -755,12 +714,10 @@ static void CnfCompactCleanFirst(Dag_Vertex_t* f, char* cleanData,
   \se None
 */
 
-static void CnfEmpty(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
-{
+static void CnfEmpty(Rbc_t *f, char *cnfData, nusmv_ptrint sign) {
   /* Nothing to do */
   return;
 } /* End of CnfEmpty */
-
 
 /*!
   \brief Renames a set of clauses.
@@ -774,10 +731,8 @@ static void CnfEmpty(Rbc_t* f, char* cnfData, nusmv_ptrint sign)
   renamed clauses
 */
 
-static void rename_clauses(ClgManager_ptr clgManager,
-                           clause_graph* clauses, int var,
-                           clause_graph* saved)
-{
+static void rename_clauses(ClgManager_ptr clgManager, clause_graph *clauses,
+                           int var, clause_graph *saved) {
   clause_graph clause, lit;
 
   nusmv_assert(0 != var);
@@ -788,23 +743,20 @@ static void rename_clauses(ClgManager_ptr clgManager,
   *clauses = Clg_Lit(clgManager, var);
 } /* End of rename_clauses. */
 
-
 /*!
   \brief Compute the disjunction of two clause sets
 
-  
+
 
   \se None
 */
 
-static inline void disjunction(ClgManager_ptr clgManager,
-                               clause_graph* Left, clause_graph* Right,
-                               int* maxVar, clause_graph* clauses,
-                               Rbc_Manager_t* rbcm)
-{
+static inline void disjunction(ClgManager_ptr clgManager, clause_graph *Left,
+                               clause_graph *Right, int *maxVar,
+                               clause_graph *clauses, Rbc_Manager_t *rbcm) {
   /* Ensure Left is largest */
   if (Clg_Size(*Left) < Clg_Size(*Right)) {
-    clause_graph* temp = Right;
+    clause_graph *temp = Right;
     Right = Left;
     Left = temp;
   }
@@ -820,27 +772,25 @@ static inline void disjunction(ClgManager_ptr clgManager,
   }
 } /* End of disjunction */
 
-
 /*!
   \brief Compute the disjunction of two clause sets
 
-  
+
 
   \se None
 */
 
-static inline void disjunction2(ClgManager_ptr clgManager,
-                                clause_graph* Left1, clause_graph* Right1,
-                                clause_graph* Left2, clause_graph* Right2,
-                                int* maxVar, clause_graph* clauses,
-                                Rbc_Manager_t* rbcm)
-{
-  int var=0;
+static inline void disjunction2(ClgManager_ptr clgManager, clause_graph *Left1,
+                                clause_graph *Right1, clause_graph *Left2,
+                                clause_graph *Right2, int *maxVar,
+                                clause_graph *clauses, Rbc_Manager_t *rbcm) {
+  int var = 0;
 
   /* Ensure Left is largest */
-  if (Clg_Size(*Left1)+Clg_Size(*Left2) < Clg_Size(*Right1)+Clg_Size(*Right2)) {
-    clause_graph* temp1 = Right1;
-    clause_graph* temp2 = Right2;
+  if (Clg_Size(*Left1) + Clg_Size(*Left2) <
+      Clg_Size(*Right1) + Clg_Size(*Right2)) {
+    clause_graph *temp1 = Right1;
+    clause_graph *temp2 = Right2;
     Right1 = Left1;
     Left1 = temp1;
     Right2 = Left2;
@@ -862,13 +812,12 @@ static inline void disjunction2(ClgManager_ptr clgManager,
 /*!
   \brief Check whether two clause sets are big enough to require renaming
 
-  
+
 
   \se None
 */
 
-static inline int testSizes(clause_graph left, clause_graph right)
-{
+static inline int testSizes(clause_graph left, clause_graph right) {
   int l = Clg_Size(left);
   int r = Clg_Size(right);
 
@@ -876,39 +825,43 @@ static inline int testSizes(clause_graph left, clause_graph right)
   return 1;
 #endif
 
-  if (l>r) {int t = l; l=r; r=t;};
+  if (l > r) {
+    int t = l;
+    l = r;
+    r = t;
+  };
 
-  if (l==2 && r >= 3) return 1;
-  if (l > 2) return 1;
+  if (l == 2 && r >= 3)
+    return 1;
+  if (l > 2)
+    return 1;
 
   return 0;
 }
 
-
 /*!
   \brief Extracts the cnf from the CLG
 
-  
+
 
   \se None
 */
 
-static void CnfCompactCommit(void* data, int* cl, int size)
-{
+static void CnfCompactCommit(void *data, int *cl, int size) {
   if (1 <= size) {
     int i;
-    Slist_ptr* clauses = (Slist_ptr*)data;
-    int * clause = (int *)NULL;
+    Slist_ptr *clauses = (Slist_ptr *)data;
+    int *clause = (int *)NULL;
 
-    clause = ALLOC(int, size+1);
+    clause = ALLOC(int, size + 1);
     nusmv_assert((int *)NULL != clause);
 
-    for(i = size; i > 0; i--) {
-      clause[size - i] = cl[i-1];
+    for (i = size; i > 0; i--) {
+      clause[size - i] = cl[i - 1];
     }
     /* Clauses are terminated by the literal 0 */
     clause[size] = 0;
 
-    Slist_push(*clauses, (void*)clause);
+    Slist_push(*clauses, (void *)clause);
   }
 }

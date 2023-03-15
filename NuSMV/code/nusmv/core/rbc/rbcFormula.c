@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -101,36 +101,32 @@
 
   \sa Rbc_MakeAnd()
 */
-#define REDUCE_ONE_POSITIVE_SIDE(a, b, c, d, rbcManager, changed, s)    \
-  (!RbcIsSet(a) && (RbcGetRef(a)->symbol == RBCAND))                    \
-  {                                                                     \
-  if (a == left) {                                                      \
-    RBC_GET_CHILDREN_WITH_ASSERT(a, NIL(Rbc_t), c, d, c, d)             \
-  }                                                                     \
-  /* if (a == right) */                                                 \
-  else {                                                                \
-    RBC_GET_CHILDREN_WITH_ASSERT(NIL(Rbc_t), a, c, d, c, d)             \
-  }                                                                     \
-                                                                        \
-  if CHECK_ASYMMETRIC_CONTRADICTION_O2(c, d, b, rbcManager, s)          \
-                                                                        \
-  if (RBC_ENABLE_LOCAL_MINIMIZATION_WITHOUT_BLOWUP == 1) {              \
-    if CHECK_IDEMPOTENCE_O2(c, d, b, a, s)                              \
-  }                                                                     \
-  else {                                                                \
-    if (b == c) {                                                       \
-      /* (s)AND(AND(a,b),a) = (s)AND(b,a) */                            \
-      /* Idempotence, o2 */                                             \
-      a = d;                                                            \
-      changed = 1;                                                      \
-    }                                                                   \
-    else if (b == d) {                                                  \
-      /* (s)AND(AND(a,b),b) = (s)AND(a,b) */                            \
-      /* Idempotence, o2 */                                             \
-      a = c;                                                            \
-      changed = 1;                                                      \
-    }                                                                   \
-  }                                                                     \
+#define REDUCE_ONE_POSITIVE_SIDE(a, b, c, d, rbcManager, changed, s)           \
+  (!RbcIsSet(a) && (RbcGetRef(a)->symbol == RBCAND)) {                         \
+    if (a == left) {                                                           \
+      RBC_GET_CHILDREN_WITH_ASSERT(a, NIL(Rbc_t), c, d, c, d)                  \
+    } /* if (a == right) */                                                    \
+    else {                                                                     \
+      RBC_GET_CHILDREN_WITH_ASSERT(NIL(Rbc_t), a, c, d, c, d)                  \
+    }                                                                          \
+                                                                               \
+    if CHECK_ASYMMETRIC_CONTRADICTION_O2 (c, d, b, rbcManager, s)              \
+                                                                               \
+      if (RBC_ENABLE_LOCAL_MINIMIZATION_WITHOUT_BLOWUP == 1) {                 \
+        if CHECK_IDEMPOTENCE_O2 (c, d, b, a, s)                                \
+      } else {                                                                 \
+        if (b == c) {                                                          \
+          /* (s)AND(AND(a,b),a) = (s)AND(b,a) */                               \
+          /* Idempotence, o2 */                                                \
+          a = d;                                                               \
+          changed = 1;                                                         \
+        } else if (b == d) {                                                   \
+          /* (s)AND(AND(a,b),b) = (s)AND(a,b) */                               \
+          /* Idempotence, o2 */                                                \
+          a = c;                                                               \
+          changed = 1;                                                         \
+        }                                                                      \
+      }                                                                        \
   }
 
 /*!
@@ -150,20 +146,19 @@
 
   \sa Rbc_MakeAnd()
 */
-#define REDUCE_ONE_NEGATIVE_SIDE(a, b, c, d, changed, s)                \
-  (RbcIsSet(a) && (RbcGetRef(a)->symbol == RBCAND))                     \
-  {                                                                     \
-  if (a == left) {                                                      \
-    RBC_GET_CHILDREN_WITH_ASSERT(a, NIL(Rbc_t), c, d, c, d)             \
-  }                                                                     \
-  /* if (a == right) */                                                 \
-  else {                                                                \
-    RBC_GET_CHILDREN_WITH_ASSERT(NIL(Rbc_t), a, c, d, c, d)             \
-  }                                                                     \
-                                                                        \
-  if CHECK_ASYMMETRIC_SUBSTITUTION_O3(c, d, b, a, changed)              \
-  else if CHECK_ASYMMETRIC_SUBSTITUTION_O3(d, c, b, a, changed)         \
-  else if CHECK_ASYMMETRIC_SUBSUMPTION_O2(c, d, b, s)                   \
+#define REDUCE_ONE_NEGATIVE_SIDE(a, b, c, d, changed, s)                       \
+  (RbcIsSet(a) && (RbcGetRef(a)->symbol == RBCAND)) {                          \
+    if (a == left) {                                                           \
+      RBC_GET_CHILDREN_WITH_ASSERT(a, NIL(Rbc_t), c, d, c, d)                  \
+    } /* if (a == right) */                                                    \
+    else {                                                                     \
+      RBC_GET_CHILDREN_WITH_ASSERT(NIL(Rbc_t), a, c, d, c, d)                  \
+    }                                                                          \
+                                                                               \
+    if CHECK_ASYMMETRIC_SUBSTITUTION_O3 (c, d, b, a, changed)                  \
+      else if CHECK_ASYMMETRIC_SUBSTITUTION_O3 (                               \
+          d, c, b, a, changed) else if CHECK_ASYMMETRIC_SUBSUMPTION_O2 (c, d,  \
+                                                                        b, s)  \
   }
 
 /*!
@@ -183,17 +178,16 @@
 
   \sa Rbc_MakeAnd()
 */
-#define REDUCE_ONE_NEG_AND_ONE_POS_SIDES(a, b, c, d, e, f, changed, s)  \
-  (RbcIsSet(a) &&                                                       \
-   !RbcIsSet(b) &&                                                      \
-   (RbcGetRef(a)->symbol == RBCAND) &&                                  \
-   (RbcGetRef(b)->symbol == RBCAND))                                    \
-  {                                                                     \
-    RBC_GET_CHILDREN_WITH_ASSERT(a, b, c, d, e, f)                      \
-                                                                        \
-    if CHECK_SYMMETRIC_SUBSUMPTION_O2(c, d, e, f, b, s)                 \
-    else if CHECK_SYMMETRIC_SUBSTITUTION_O3(c, d, e, f, a, changed, s)  \
-    else if CHECK_SYMMETRIC_SUBSTITUTION_O3(d, c, e, f, a, changed, s)  \
+#define REDUCE_ONE_NEG_AND_ONE_POS_SIDES(a, b, c, d, e, f, changed, s)         \
+  (RbcIsSet(a) && !RbcIsSet(b) && (RbcGetRef(a)->symbol == RBCAND) &&          \
+   (RbcGetRef(b)->symbol == RBCAND)) {                                         \
+    RBC_GET_CHILDREN_WITH_ASSERT(a, b, c, d, e, f)                             \
+                                                                               \
+    if CHECK_SYMMETRIC_SUBSUMPTION_O2 (c, d, e, f, b, s)                       \
+      else if CHECK_SYMMETRIC_SUBSTITUTION_O3 (                                \
+          c, d, e, f, a, changed,                                              \
+          s) else if CHECK_SYMMETRIC_SUBSTITUTION_O3 (d, c, e, f, a, changed,  \
+                                                      s)                       \
   }
 
 /*!
@@ -207,28 +201,28 @@
 
   \sa Rbc_MakeAnd()
 */
-#define RBC_GET_CHILDREN_WITH_ASSERT(left, right, l1, l2, r1, r2)   \
-  if (NIL(Rbc_t) != left) {                                         \
-    l1 = NIL(Rbc_t);                                                \
-    l2 = NIL(Rbc_t);                                                \
-                                                                    \
-    nusmv_assert(RbcGetRef(left)->numSons == 2);                    \
-                                                                    \
-    l1 = RbcGetRef(left)->outList[0];                               \
-    l2 = RbcGetRef(left)->outList[1];                               \
-                                                                    \
-    nusmv_assert((l1 != NIL(Rbc_t)) && (l2 != NIL(Rbc_t)));         \
-  }                                                                 \
-  if (NIL(Rbc_t) != right) {                                        \
-    r1 = NIL(Rbc_t);                                                \
-    r2 = NIL(Rbc_t);                                                \
-                                                                    \
-    nusmv_assert(RbcGetRef(right)->numSons == 2);                   \
-                                                                    \
-    r1 = RbcGetRef(right)->outList[0];                              \
-    r2 = RbcGetRef(right)->outList[1];                              \
-                                                                    \
-    nusmv_assert((r1 != NIL(Rbc_t)) && (r2 != NIL(Rbc_t)));         \
+#define RBC_GET_CHILDREN_WITH_ASSERT(left, right, l1, l2, r1, r2)              \
+  if (NIL(Rbc_t) != left) {                                                    \
+    l1 = NIL(Rbc_t);                                                           \
+    l2 = NIL(Rbc_t);                                                           \
+                                                                               \
+    nusmv_assert(RbcGetRef(left)->numSons == 2);                               \
+                                                                               \
+    l1 = RbcGetRef(left)->outList[0];                                          \
+    l2 = RbcGetRef(left)->outList[1];                                          \
+                                                                               \
+    nusmv_assert((l1 != NIL(Rbc_t)) && (l2 != NIL(Rbc_t)));                    \
+  }                                                                            \
+  if (NIL(Rbc_t) != right) {                                                   \
+    r1 = NIL(Rbc_t);                                                           \
+    r2 = NIL(Rbc_t);                                                           \
+                                                                               \
+    nusmv_assert(RbcGetRef(right)->numSons == 2);                              \
+                                                                               \
+    r1 = RbcGetRef(right)->outList[0];                                         \
+    r2 = RbcGetRef(right)->outList[1];                                         \
+                                                                               \
+    nusmv_assert((r1 != NIL(Rbc_t)) && (r2 != NIL(Rbc_t)));                    \
   }
 
 /*!
@@ -244,11 +238,9 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_ASYMMETRIC_CONTRADICTION_O2(a, b, c, rbcManager, s)       \
-  ((c == RbcId(a, RBC_FALSE)) ||                                        \
-   (c == RbcId(b, RBC_FALSE)))                                          \
-  {                                                                     \
-    return RbcId(rbcManager->zero, s);                                \
+#define CHECK_ASYMMETRIC_CONTRADICTION_O2(a, b, c, rbcManager, s)              \
+  ((c == RbcId(a, RBC_FALSE)) || (c == RbcId(b, RBC_FALSE))) {                 \
+    return RbcId(rbcManager->zero, s);                                         \
   }
 
 /*!
@@ -263,11 +255,8 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_IDEMPOTENCE_O2(a, b, c, d, s)                             \
-  ((c == a) || (c == b))                                                \
-  {                                                                     \
-    return RbcId(d, s);                                                 \
-  }
+#define CHECK_IDEMPOTENCE_O2(a, b, c, d, s)                                    \
+  ((c == a) || (c == b)) { return RbcId(d, s); }
 
 /*!
   \brief The Biere/Brummayer asymm. substitution (O3) reduction rule
@@ -286,11 +275,10 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_ASYMMETRIC_SUBSTITUTION_O3(a, b, c, d, changed)   \
-  (a == c)                                                      \
-  {                                                             \
-    d = RbcId(b, RBC_FALSE);                                    \
-    changed = 1;                                                \
+#define CHECK_ASYMMETRIC_SUBSTITUTION_O3(a, b, c, d, changed)                  \
+  (a == c) {                                                                   \
+    d = RbcId(b, RBC_FALSE);                                                   \
+    changed = 1;                                                               \
   }
 
 /*!
@@ -305,11 +293,9 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_ASYMMETRIC_SUBSUMPTION_O2(a, b, c, s)                     \
-  ((a == RbcId(c, RBC_FALSE)) ||                                        \
-   (b == RbcId(c, RBC_FALSE)))                                          \
-  {                                                                     \
-    return RbcId(c, s);                                                 \
+#define CHECK_ASYMMETRIC_SUBSUMPTION_O2(a, b, c, s)                            \
+  ((a == RbcId(c, RBC_FALSE)) || (b == RbcId(c, RBC_FALSE))) {                 \
+    return RbcId(c, s);                                                        \
   }
 
 /*!
@@ -330,11 +316,10 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_IDEMPOTENCE_O4(a, b, c, d, e, changed)                    \
-  ((c == a) || (c == b))                                                \
-  {                                                                     \
-    e = d;                                                              \
-    changed = 1;                                                        \
+#define CHECK_IDEMPOTENCE_O4(a, b, c, d, e, changed)                           \
+  ((c == a) || (c == b)) {                                                     \
+    e = d;                                                                     \
+    changed = 1;                                                               \
   }
 
 /*!
@@ -350,11 +335,10 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_RESOLUTION_O3(a, b, c, d, s)                              \
-  (((d == a) && (c == RbcId(b, RBC_FALSE))) ||                          \
-   ((c == a) && (d == RbcId(b, RBC_FALSE))))                            \
-  {                                                                     \
-    return RbcId(a, s ^ RBC_FALSE);                                     \
+#define CHECK_RESOLUTION_O3(a, b, c, d, s)                                     \
+  (((d == a) && (c == RbcId(b, RBC_FALSE))) ||                                 \
+   ((c == a) && (d == RbcId(b, RBC_FALSE)))) {                                 \
+    return RbcId(a, s ^ RBC_FALSE);                                            \
   }
 
 /*!
@@ -369,13 +353,10 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_SYMMETRIC_SUBSUMPTION_O2(a, b, c, d, e, s)        \
-  ((a == RbcId(c, RBC_FALSE)) ||                                \
-   (a == RbcId(d, RBC_FALSE)) ||                                \
-   (b == RbcId(c, RBC_FALSE)) ||                                \
-   (b == RbcId(d, RBC_FALSE)))                                  \
-  {                                                             \
-    return RbcId(e, s);                                         \
+#define CHECK_SYMMETRIC_SUBSUMPTION_O2(a, b, c, d, e, s)                       \
+  ((a == RbcId(c, RBC_FALSE)) || (a == RbcId(d, RBC_FALSE)) ||                 \
+   (b == RbcId(c, RBC_FALSE)) || (b == RbcId(d, RBC_FALSE))) {                 \
+    return RbcId(e, s);                                                        \
   }
 
 /*!
@@ -396,51 +377,41 @@
 
   \sa Rbc_MakeAnd()
 */
-#define CHECK_SYMMETRIC_SUBSTITUTION_O3(a, b, c, d, e, changed, s)      \
-  ((b == c) || (b == d))                                                \
-  {                                                                     \
-    e = RbcId(a, RBC_FALSE);                                            \
-    changed = 1;                                                        \
+#define CHECK_SYMMETRIC_SUBSTITUTION_O3(a, b, c, d, e, changed, s)             \
+  ((b == c) || (b == d)) {                                                     \
+    e = RbcId(a, RBC_FALSE);                                                   \
+    changed = 1;                                                               \
   }
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static Rbc_t*
-Reduce(Rbc_Manager_t* rbcManager, int op, Rbc_t* left, Rbc_t* right);
+static Rbc_t *Reduce(Rbc_Manager_t *rbcManager, int op, Rbc_t *left,
+                     Rbc_t *right);
 
 /**AutomaticEnd***************************************************************/
 /*---------------------------------------------------------------------------*/
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Rbc_t* Rbc_GetOne(Rbc_Manager_t* rbcManager)
-{
-  return(rbcManager->one);
-}
+Rbc_t *Rbc_GetOne(Rbc_Manager_t *rbcManager) { return (rbcManager->one); }
 
-Rbc_t* Rbc_GetZero(Rbc_Manager_t* rbcManager)
-{
-  return (rbcManager->zero);
-}
+Rbc_t *Rbc_GetZero(Rbc_Manager_t *rbcManager) { return (rbcManager->zero); }
 
-boolean Rbc_IsConstant(Rbc_Manager_t* manager, Rbc_t* f)
-{
+boolean Rbc_IsConstant(Rbc_Manager_t *manager, Rbc_t *f) {
   return (Rbc_GetOne(manager) == f || Rbc_GetZero(manager) == f);
 }
 
-Rbc_t* Rbc_GetIthVar(Rbc_Manager_t* rbcManager,int varIndex)
-{
+Rbc_t *Rbc_GetIthVar(Rbc_Manager_t *rbcManager, int varIndex) {
   int i;
 
   nusmv_assert(0 <= varIndex);
 
   /* Allocate more room for the varTable if needed. */
   if (rbcManager->varCapacity <= varIndex) {
-    rbcManager->varTable =
-      REALLOC(Rbc_t*, rbcManager->varTable, varIndex + 1);
-    for (i = rbcManager->varCapacity; i < varIndex + 1; i ++) {
+    rbcManager->varTable = REALLOC(Rbc_t *, rbcManager->varTable, varIndex + 1);
+    for (i = rbcManager->varCapacity; i < varIndex + 1; i++) {
       rbcManager->varTable[i] = NIL(Rbc_t);
     }
     rbcManager->varCapacity = varIndex + 1;
@@ -448,12 +419,9 @@ Rbc_t* Rbc_GetIthVar(Rbc_Manager_t* rbcManager,int varIndex)
 
   /* Create the variable if needed. */
   if (rbcManager->varTable[varIndex] == NIL(Rbc_t)) {
-    rbcManager->varTable[varIndex] =
-      Dag_VertexInsert(rbcManager->dagManager,
-                       RBCVAR,
-                       PTR_FROM_INT(char*, varIndex),
-                       (Dag_Vertex_t**) NULL,
-                       0);
+    rbcManager->varTable[varIndex] = Dag_VertexInsert(
+        rbcManager->dagManager, RBCVAR, PTR_FROM_INT(char *, varIndex),
+        (Dag_Vertex_t **)NULL, 0);
     /* Make the node permanent. */
     Dag_VertexMark(rbcManager->varTable[varIndex]);
     ++(rbcManager->stats[RBCVAR_NO]);
@@ -464,24 +432,18 @@ Rbc_t* Rbc_GetIthVar(Rbc_Manager_t* rbcManager,int varIndex)
 
 } /* End of Rbc_GetIthVar. */
 
-Rbc_t* Rbc_MakeNot(Rbc_Manager_t* rbcManager, Rbc_t* left)
-{
+Rbc_t *Rbc_MakeNot(Rbc_Manager_t *rbcManager, Rbc_t *left) {
   return RbcId(left, RBC_FALSE);
 }
 
-Rbc_t*
-Rbc_MakeAnd(
-  Rbc_Manager_t* rbcManager,
-  Rbc_t*         left,
-  Rbc_t*         right,
-  Rbc_Bool_c     sign)
-{
-  Rbc_t* rTemp;
-  Dag_Vertex_t** sons;
-  Rbc_t* l1;
-  Rbc_t* l2;
-  Rbc_t* r1;
-  Rbc_t* r2;
+Rbc_t *Rbc_MakeAnd(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
+                   Rbc_Bool_c sign) {
+  Rbc_t *rTemp;
+  Dag_Vertex_t **sons;
+  Rbc_t *l1;
+  Rbc_t *l2;
+  Rbc_t *r1;
+  Rbc_t *r2;
 
   int changed = 1;
 
@@ -493,27 +455,22 @@ Rbc_MakeAnd(
       /* (s)AND(x,x) = (s)x */
       /* Idempotence, o1 */
       right = NIL(Rbc_t);
-    }
-    else if (left == RbcId(right, RBC_FALSE)) {
+    } else if (left == RbcId(right, RBC_FALSE)) {
       /* (s)AND(x,~x) = (s)F */
       /* Contradiction, o1 */
       left = rbcManager->zero;
       right = NIL(Rbc_t);
-    }
-    else if ((left == rbcManager->zero) ||
-             (right == rbcManager->zero)) {
+    } else if ((left == rbcManager->zero) || (right == rbcManager->zero)) {
       /* (s)AND(F,y) = (s)AND(x,F) = (s)F */
       /* Boundedness, o1 */
       left = rbcManager->zero;
       right = NIL(Rbc_t);
-    }
-    else if (left == rbcManager->one) {
+    } else if (left == rbcManager->one) {
       /* (s)AND(T,y) = (s)y */
       /* Neutrality, o1 */
       left = right;
       right = NIL(Rbc_t);
-    }
-    else if (right == rbcManager->one) {
+    } else if (right == rbcManager->one) {
       /* (s)AND(x,T) = (s)x */
       /* Neutrality, o1 */
       right = NIL(Rbc_t);
@@ -527,67 +484,63 @@ Rbc_MakeAnd(
 
     /* here starts two level minimization */
     /* case: AND(AND(a,b),c) */
-    if REDUCE_ONE_POSITIVE_SIDE(left, right, l1, l2, rbcManager, changed, sign)
-    /* case: AND(~AND(a,b),c) */
-    else if REDUCE_ONE_NEGATIVE_SIDE(left, right, l1, l2, changed, sign)
-    else {
-      l1 = l2 = (Rbc_t*) NULL; /* to silent warnings */
-    }
+    if REDUCE_ONE_POSITIVE_SIDE (left, right, l1, l2, rbcManager, changed, sign)
+      /* case: AND(~AND(a,b),c) */
+      else if REDUCE_ONE_NEGATIVE_SIDE (left, right, l1, l2, changed,
+                                        sign) else {
+        l1 = l2 = (Rbc_t *)NULL; /* to silent warnings */
+      }
 
     /* case: AND(c,AND(a,b)) */
-    if REDUCE_ONE_POSITIVE_SIDE(right, left, r1, r2, rbcManager, changed, sign)
-    /* case: AND(c,~AND(a,b)) */
-    else if REDUCE_ONE_NEGATIVE_SIDE(right, left, r1, r2, changed, sign)
-    else {
-      r1 = r2 = (Rbc_t*) NULL; /* to silent warnings */
-    }
+    if REDUCE_ONE_POSITIVE_SIDE (right, left, r1, r2, rbcManager, changed, sign)
+      /* case: AND(c,~AND(a,b)) */
+      else if REDUCE_ONE_NEGATIVE_SIDE (right, left, r1, r2, changed,
+                                        sign) else {
+        r1 = r2 = (Rbc_t *)NULL; /* to silent warnings */
+      }
 
 #if RBC_ENABLE_LOCAL_MINIMIZATION_WITHOUT_BLOWUP
     /* case: AND(AND(a,b),AND(c,d)) */
-    if (!RbcIsSet(left) &&
-        !RbcIsSet(right) &&
+    if (!RbcIsSet(left) && !RbcIsSet(right) &&
         (RbcGetRef(left)->symbol == RBCAND) &&
-        (RbcGetRef(right)->symbol == RBCAND))
-    {
+        (RbcGetRef(right)->symbol == RBCAND)) {
       RBC_GET_CHILDREN_WITH_ASSERT(left, right, l1, l2, r1, r2)
 
-      if ((l1 == RbcId(r1, RBC_FALSE)) ||
-          (l1 == RbcId(r2, RBC_FALSE)) ||
-          (l2 == RbcId(r1, RBC_FALSE)) ||
-          (l2 == RbcId(r2, RBC_FALSE))) {
+      if ((l1 == RbcId(r1, RBC_FALSE)) || (l1 == RbcId(r2, RBC_FALSE)) ||
+          (l2 == RbcId(r1, RBC_FALSE)) || (l2 == RbcId(r2, RBC_FALSE))) {
         /* (s)AND(AND(a,b),AND(~a,c)) = (s)F */
         /* the other conditions simply applies commutativity to the rule */
         /* Symmetric contradiction, o2 */
         return RbcId(rbcManager->zero, sign);
-      }
-      else if CHECK_IDEMPOTENCE_O4(l1, l2, r1, r2, right, changed)
-      else if CHECK_IDEMPOTENCE_O4(r1, r2, l2, l1, left, changed)
-      else if CHECK_IDEMPOTENCE_O4(l1, l2, r2, r1, right, changed)
-      else if CHECK_IDEMPOTENCE_O4(r1, r2, l1, l2, left, changed)
+      } else if CHECK_IDEMPOTENCE_O4 (l1, l2, r1, r2, right, changed)
+        else if CHECK_IDEMPOTENCE_O4 (r1, r2, l2, l1, left, changed) else if CHECK_IDEMPOTENCE_O4 (
+            l1, l2, r2, r1, right,
+            changed) else if CHECK_IDEMPOTENCE_O4 (r1, r2, l1, l2, left,
+                                                   changed)
     }
     /* case: AND(~AND(a,b),~AND(c,d)) */
-    else if (RbcIsSet(left) &&
-             RbcIsSet(right) &&
+    else if (RbcIsSet(left) && RbcIsSet(right) &&
              (RbcGetRef(left)->symbol == RBCAND) &&
-             (RbcGetRef(right)->symbol == RBCAND))
-    {
+             (RbcGetRef(right)->symbol == RBCAND)) {
       RBC_GET_CHILDREN_WITH_ASSERT(left, right, l1, l2, r1, r2)
 
-      if CHECK_RESOLUTION_O3(l1, l2, r1, r2, sign)
-      else if CHECK_RESOLUTION_O3(l2, l1, r1, r2, sign)
+      if CHECK_RESOLUTION_O3 (l1, l2, r1, r2, sign)
+        else if CHECK_RESOLUTION_O3 (l2, l1, r1, r2, sign)
     }
     /* case: AND(~AND(a,b),AND(c,d)) */
-    else if REDUCE_ONE_NEG_AND_ONE_POS_SIDES(left, right, l1, l2, r1, r2, \
-                                             changed, sign)
-    /* case: AND(AND(a,b),~AND(c,d)) */
-    else if REDUCE_ONE_NEG_AND_ONE_POS_SIDES(right, left, r1, r2, l1, l2, \
-                                             changed, sign)
+    else if REDUCE_ONE_NEG_AND_ONE_POS_SIDES (left, right, l1, l2, r1, r2,
+                                              changed, sign)
+      /* case: AND(AND(a,b),~AND(c,d)) */
+      else if REDUCE_ONE_NEG_AND_ONE_POS_SIDES (right, left, r1, r2, l1, l2,
+                                                changed, sign)
 #endif
- }
+  }
 
   /* Order the vertices. */
   if (right < left) {
-    rTemp = right; right = left; left = rTemp;
+    rTemp = right;
+    right = left;
+    left = rTemp;
   }
 
   nusmv_assert(left != NIL(Rbc_t));
@@ -596,7 +549,7 @@ Rbc_MakeAnd(
   nusmv_assert(left != RbcId(right, RBC_FALSE));
 
   /* Create the list of sons. */
-  sons = ALLOC(Dag_Vertex_t*, 2);
+  sons = ALLOC(Dag_Vertex_t *, 2);
 
   sons[0] = left;
   sons[1] = right;
@@ -608,41 +561,31 @@ Rbc_MakeAnd(
 
 } /* End of Rbc_MakeAnd. */
 
-Rbc_t*
-Rbc_MakeOr(
-  Rbc_Manager_t* rbcManager,
-  Rbc_t*         left,
-  Rbc_t*         right,
-  Rbc_Bool_c     sign)
-{
+Rbc_t *Rbc_MakeOr(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
+                  Rbc_Bool_c sign) {
   /* Use De Morgan's law. */
-  return Rbc_MakeAnd(rbcManager,
-                     RbcId(left, RBC_FALSE),
-                     RbcId(right, RBC_FALSE),
-                     (Rbc_Bool_c)(sign ^ RBC_FALSE));
+  return Rbc_MakeAnd(rbcManager, RbcId(left, RBC_FALSE),
+                     RbcId(right, RBC_FALSE), (Rbc_Bool_c)(sign ^ RBC_FALSE));
 
 } /* End of Rbc_MakeOr. */
 
-Rbc_t*
-Rbc_MakeIff(
-  Rbc_Manager_t* rbcManager,
-  Rbc_t*         left,
-  Rbc_t*         right,
-  Rbc_Bool_c     sign)
-{
+Rbc_t *Rbc_MakeIff(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
+                   Rbc_Bool_c sign) {
 #if RBC_ENABLE_IFF_CONNECTIVE
-  Rbc_t* rTemp;
-  Dag_Vertex_t** sons;
+  Rbc_t *rTemp;
+  Dag_Vertex_t **sons;
 
   rTemp = Reduce(rbcManager, RBCIFF, left, right);
 
   /* First, perform the reduction stage. */
-  if (rTemp != NIL(Rbc_t)) return RbcId(rTemp, sign);
-
+  if (rTemp != NIL(Rbc_t))
+    return RbcId(rTemp, sign);
 
   /* Order the  vertices. */
   if (right < left) {
-    rTemp = right; right = left; left = rTemp;
+    rTemp = right;
+    right = left;
+    left = rTemp;
   }
 
   /* Negation always on top. */
@@ -651,7 +594,7 @@ Rbc_MakeIff(
   RbcClear(right);
 
   /* Create the list of sons. */
-  sons = ALLOC(Dag_Vertex_t*, 2);
+  sons = ALLOC(Dag_Vertex_t *, 2);
 
   sons[0] = left;
   sons[1] = right;
@@ -664,91 +607,63 @@ Rbc_MakeIff(
 /* Eliminate the IFF connective changing it in an AND formula. */
 #else
   /* (s)IFF(x,y) = (s)AND(~AND(x,~y),~AND(~x,y)) */
-  return Rbc_MakeAnd(rbcManager,
-                     (Rbc_MakeAnd(rbcManager,
-                                  left,
-                                  RbcId(right, RBC_FALSE),
-                                  RBC_FALSE)),
-                     (Rbc_MakeAnd(rbcManager,
-                                  RbcId(left, RBC_FALSE),
-                                  right,
-                                  RBC_FALSE)),
-                     (Rbc_Bool_c)(sign));
+  return Rbc_MakeAnd(
+      rbcManager,
+      (Rbc_MakeAnd(rbcManager, left, RbcId(right, RBC_FALSE), RBC_FALSE)),
+      (Rbc_MakeAnd(rbcManager, RbcId(left, RBC_FALSE), right, RBC_FALSE)),
+      (Rbc_Bool_c)(sign));
 #endif
 } /* End of Rbc_MakeIff. */
 
-Rbc_t*
-Rbc_MakeXor(
-  Rbc_Manager_t* rbcManager,
-  Rbc_t*         left,
-  Rbc_t*         right,
-  Rbc_Bool_c     sign)
-{
+Rbc_t *Rbc_MakeXor(Rbc_Manager_t *rbcManager, Rbc_t *left, Rbc_t *right,
+                   Rbc_Bool_c sign) {
   /* Simply a negation of a coimplication. */
-  return Rbc_MakeIff(rbcManager,
-                     left,
-                     right,
-                     (Rbc_Bool_c)(sign ^ RBC_FALSE));
+  return Rbc_MakeIff(rbcManager, left, right, (Rbc_Bool_c)(sign ^ RBC_FALSE));
 }
 
-Rbc_t*
-Rbc_MakeIte(
-  Rbc_Manager_t* rbcManager,
-  Rbc_t*         i,
-  Rbc_t*         t,
-  Rbc_t*         e,
-  Rbc_Bool_c     sign)
-{
+Rbc_t *Rbc_MakeIte(Rbc_Manager_t *rbcManager, Rbc_t *i, Rbc_t *t, Rbc_t *e,
+                   Rbc_Bool_c sign) {
 #if RBC_ENABLE_ITE_CONNECTIVE
-  Rbc_t* rTemp;
-  Dag_Vertex_t** sons;
+  Rbc_t *rTemp;
+  Dag_Vertex_t **sons;
 
   /* Bottom up simplification */
   int changed = 1;
-  while(changed) {
+  while (changed) {
     changed = 0;
 
     if (i == rbcManager->one) {
       /* ITE(T,t,e) == t */
       return RbcId(t, sign);
-    }
-    else if (i == rbcManager->zero) {
+    } else if (i == rbcManager->zero) {
       /* ITE(F,t,e) == e */
       return RbcId(e, sign);
-    }
-    else if (t == rbcManager->one) {
+    } else if (t == rbcManager->one) {
       /* ITE(i,T,e) == OR(i,e) */
       return Rbc_MakeOr(rbcManager, i, e, sign);
-    }
-    else if (t == rbcManager->zero) {
+    } else if (t == rbcManager->zero) {
       /* ITE(i,F,e) == AND(~i,e) */
       return Rbc_MakeAnd(rbcManager, Rbc_MakeNot(rbcManager, i), e, sign);
-    }
-    else if (e == rbcManager->one) {
+    } else if (e == rbcManager->one) {
       /* ITE(i,t,T) == OR(~i,t) */
       return Rbc_MakeOr(rbcManager, Rbc_MakeNot(rbcManager, i), t, sign);
-    }
-    else if (e == rbcManager->zero) {
+    } else if (e == rbcManager->zero) {
       /* ITE(i,t,F) == AND(i,t) */
       return Rbc_MakeAnd(rbcManager, i, t, sign);
     }
     if (i == t) {
       /* ITE(i,i,e) == OR(i,e) */
       return Rbc_MakeOr(rbcManager, i, e, sign);
-    }
-    else if (i == e) {
+    } else if (i == e) {
       /* ITE(i,t,i) == AND(i,t) */
       return Rbc_MakeAnd(rbcManager, i, t, sign);
-    }
-    else if (t == e) {
+    } else if (t == e) {
       /* ITE(i,t,t) == t */
       return RbcId(t, sign);
-    }
-    else if (i == RbcId(t, RBC_FALSE)) {
+    } else if (i == RbcId(t, RBC_FALSE)) {
       /* ITE(i,~i,e) == AND(~i,e) */
       return Rbc_MakeAnd(rbcManager, Rbc_MakeNot(rbcManager, i), e, sign);
-    }
-    else if (i == RbcId(e, RBC_FALSE)) {
+    } else if (i == RbcId(e, RBC_FALSE)) {
       /* ITE(i,t,~i) == OR(~i,t) */
       return Rbc_MakeOr(rbcManager, Rbc_MakeNot(rbcManager, i), t, sign);
     }
@@ -760,7 +675,7 @@ Rbc_MakeIte(
   }
 
   /* Create the list of sons. */
-  sons = ALLOC(Dag_Vertex_t*, 3);
+  sons = ALLOC(Dag_Vertex_t *, 3);
 
   sons[0] = i;
   sons[1] = t;
@@ -774,86 +689,82 @@ Rbc_MakeIte(
 /* Eliminate the ITE connective changing it in an AND formula. */
 #else
   /* ITE(i,t,e,s) = (~s)AND(~AND(i,t),~AND(~i,e)) */
-  return Rbc_MakeAnd(rbcManager,
-                     (Rbc_MakeAnd(rbcManager, i, t, RBC_FALSE)),
-                     (Rbc_MakeAnd(rbcManager,
-                                  RbcId(i, RBC_FALSE),
-                                  e,
-                                  RBC_FALSE)),
-                     (Rbc_Bool_c)(sign ^ RBC_FALSE));
+  return Rbc_MakeAnd(
+      rbcManager, (Rbc_MakeAnd(rbcManager, i, t, RBC_FALSE)),
+      (Rbc_MakeAnd(rbcManager, RbcId(i, RBC_FALSE), e, RBC_FALSE)),
+      (Rbc_Bool_c)(sign ^ RBC_FALSE));
 #endif
 } /* End of Rbc_MakeIte. */
 
-Rbc_t* Rbc_GetLeftOpnd(Rbc_t* f)
-{
-  if (RbcGetRef(f)->outList != (Dag_Vertex_t**)NULL) {
+Rbc_t *Rbc_GetLeftOpnd(Rbc_t *f) {
+  if (RbcGetRef(f)->outList != (Dag_Vertex_t **)NULL) {
     /* Reusing f to avoid introduction of new variables. */
-    f = (Rbc_t*) RbcGetRef(f)->outList[0];
+    f = (Rbc_t *)RbcGetRef(f)->outList[0];
   }
   return f;
 }
 
-Rbc_t* Rbc_GetRightOpnd(Rbc_t* f)
-{
-  if (RbcGetRef(f)->outList != (Dag_Vertex_t**)NULL) {
+Rbc_t *Rbc_GetRightOpnd(Rbc_t *f) {
+  if (RbcGetRef(f)->outList != (Dag_Vertex_t **)NULL) {
     /* Reusing f to avoid introduction of new variables. */
-    f = (Rbc_t*) RbcGetRef(f)->outList[RbcGetRef(f)->numSons -1];
+    f = (Rbc_t *)RbcGetRef(f)->outList[RbcGetRef(f)->numSons - 1];
   }
   return f;
 }
 
-int Rbc_GetVarIndex(Rbc_t* f)
-{
+int Rbc_GetVarIndex(Rbc_t *f) {
   if (RbcGetRef(f)->symbol == RBCVAR) {
     return PTR_TO_INT(RbcGetRef(f)->data);
   }
   return -1;
 }
 
-void
-Rbc_Mark(
-  Rbc_Manager_t* rbc,
-  Rbc_t*         f)
-{
+void Rbc_Mark(Rbc_Manager_t *rbc, Rbc_t *f) {
   /* To avoid calling another function, do it directly! */
   ++(RbcGetRef(f)->mark);
   return;
 }
 
-void
-Rbc_Unmark(
-  Rbc_Manager_t* rbc,
-  Rbc_t*         f)
-{
+void Rbc_Unmark(Rbc_Manager_t *rbc, Rbc_t *f) {
   if (RbcGetRef(f)->mark > 0) {
     --(RbcGetRef(f)->mark);
   }
   return;
 }
 
-boolean Rbc_is_top(Rbc_t* rbc) {
-  if(Rbc_get_type(RbcGetRef(rbc)) == RBCTOP) return true;
-  else return false;
+boolean Rbc_is_top(Rbc_t *rbc) {
+  if (Rbc_get_type(RbcGetRef(rbc)) == RBCTOP)
+    return true;
+  else
+    return false;
 }
 
-boolean Rbc_is_and(Rbc_t* rbc) {
-  if (Rbc_get_type(RbcGetRef(rbc)) == RBCAND) return true;
-  else return false;
+boolean Rbc_is_and(Rbc_t *rbc) {
+  if (Rbc_get_type(RbcGetRef(rbc)) == RBCAND)
+    return true;
+  else
+    return false;
 }
 
-boolean Rbc_is_iff(Rbc_t* rbc) {
-  if (Rbc_get_type(RbcGetRef(rbc)) == RBCIFF) return true;
-  else return false;
+boolean Rbc_is_iff(Rbc_t *rbc) {
+  if (Rbc_get_type(RbcGetRef(rbc)) == RBCIFF)
+    return true;
+  else
+    return false;
 }
 
-boolean Rbc_is_var(Rbc_t* rbc) {
-  if (Rbc_get_type(RbcGetRef(rbc)) == RBCVAR) return true;
-  else return false;
+boolean Rbc_is_var(Rbc_t *rbc) {
+  if (Rbc_get_type(RbcGetRef(rbc)) == RBCVAR)
+    return true;
+  else
+    return false;
 }
 
-boolean Rbc_is_ite(Rbc_t* rbc) {
-  if (Rbc_get_type(RbcGetRef(rbc)) == RBCITE) return true;
-  else return false;
+boolean Rbc_is_ite(Rbc_t *rbc) {
+  if (Rbc_get_type(RbcGetRef(rbc)) == RBCITE)
+    return true;
+  else
+    return false;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -868,13 +779,8 @@ boolean Rbc_is_ite(Rbc_t* rbc) {
   \se none
 */
 
-static Rbc_t*
-Reduce(
- Rbc_Manager_t* rbcManager,
- int            op,
- Rbc_t*         left,
- Rbc_t*         right)
-{
+static Rbc_t *Reduce(Rbc_Manager_t *rbcManager, int op, Rbc_t *left,
+                     Rbc_t *right) {
   switch (op) {
   /* case never entered! */
   case RBCAND:
@@ -884,8 +790,7 @@ Reduce(
     } else if (left == RbcId(right, RBC_FALSE)) {
       /* AND(x,~x) = F */
       return rbcManager->zero;
-    } else if ((left == rbcManager->zero) ||
-               (right == rbcManager->zero)) {
+    } else if ((left == rbcManager->zero) || (right == rbcManager->zero)) {
       /* AND(F,x)  = AND(x,F) = F */
       return rbcManager->zero;
     } else if (left == rbcManager->one) {
@@ -923,4 +828,3 @@ Reduce(
 
   return NIL(Rbc_t);
 } /* End of Reduce. */
-

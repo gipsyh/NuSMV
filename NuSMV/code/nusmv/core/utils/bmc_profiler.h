@@ -39,7 +39,7 @@
 #define __NUSMV_CORE_UTILS_BMC_PROFILER_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/cinit/NuSMVEnv.h"
@@ -53,11 +53,9 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -70,19 +68,17 @@
   The structure is used to know if the profiler is enabled and the name
   to the output file.
 */
-typedef struct BmcProfilerStruct_TAG
-{
+typedef struct BmcProfilerStruct_TAG {
   boolean enabled;
-  char* out_file_name;
+  char *out_file_name;
 } BmcProfilerStruct;
 
-typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
+typedef BmcProfilerStruct *BmcProfilerStruct_ptr;
 #endif
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -102,15 +98,16 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro does nothing.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_INIT_ENV(env)                                      \
-  nusmv_assert(! NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));            \
-  {                                                                     \
-     BmcProfilerStruct_ptr prof;                                        \
-     prof = ALLOC(BmcProfilerStruct, 1);                                \
-     nusmv_assert((BmcProfilerStruct_ptr) NULL != prof);                \
-     prof->enabled = false;                                             \
-     prof->out_file_name = (char*) NULL;                                \
-     NuSMVEnv_set_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__, prof);                   \
+#define BMC_PROFILER_INIT_ENV(env)                                             \
+  nusmv_assert(                                                                \
+      !NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));       \
+  {                                                                            \
+    BmcProfilerStruct_ptr prof;                                                \
+    prof = ALLOC(BmcProfilerStruct, 1);                                        \
+    nusmv_assert((BmcProfilerStruct_ptr)NULL != prof);                         \
+    prof->enabled = false;                                                     \
+    prof->out_file_name = (char *)NULL;                                        \
+    NuSMVEnv_set_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__, prof);     \
   }
 #else
 #define BMC_PROFILER_INIT_ENV(env)
@@ -122,13 +119,18 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro does nothing.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_DEINIT_ENV(env)                                    \
-  nusmv_assert(NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));              \
-  {                                                                     \
-    if (BMC_PROFILER_IS_ENABLED(env)) {BMC_PROFILER_DISABLE(env);}       \
-    BmcProfilerStruct_ptr prof = (BmcProfilerStruct_ptr)                \
-      NuSMVEnv_remove_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__);                     \
-    if ( (char*) NULL != prof->out_file_name) {FREE(prof->out_file_name);} \
+#define BMC_PROFILER_DEINIT_ENV(env)                                           \
+  nusmv_assert(                                                                \
+      NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));        \
+  {                                                                            \
+    if (BMC_PROFILER_IS_ENABLED(env)) {                                        \
+      BMC_PROFILER_DISABLE(env);                                               \
+    }                                                                          \
+    BmcProfilerStruct_ptr prof = (BmcProfilerStruct_ptr)NuSMVEnv_remove_value( \
+        env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__);                          \
+    if ((char *)NULL != prof->out_file_name) {                                 \
+      FREE(prof->out_file_name);                                               \
+    }                                                                          \
   }
 #else
 #define BMC_PROFILER_DEINIT_ENV(env)
@@ -141,8 +143,10 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro returns false.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_IS_ENABLED(env)                                    \
-  ((BmcProfilerStruct_ptr) NuSMVEnv_get_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__))->enabled
+#define BMC_PROFILER_IS_ENABLED(env)                                           \
+  ((BmcProfilerStruct_ptr)NuSMVEnv_get_value(                                  \
+       env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__))                           \
+      ->enabled
 #else
 #define BMC_PROFILER_IS_ENABLED(env) false
 #endif
@@ -154,12 +158,13 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro returns false.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_GET_OUT_FILE(env)                                  \
-  ((BmcProfilerStruct_ptr) NuSMVEnv_get_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__))->out_file_name
+#define BMC_PROFILER_GET_OUT_FILE(env)                                         \
+  ((BmcProfilerStruct_ptr)NuSMVEnv_get_value(                                  \
+       env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__))                           \
+      ->out_file_name
 #else
-#define BMC_PROFILER_GET_OUT_FILE(env) (char*) NULL
+#define BMC_PROFILER_GET_OUT_FILE(env) (char *)NULL
 #endif
-
 
 /*!
   \brief Initialize the BMC profiler library
@@ -168,9 +173,9 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_INITIALIZE(env)                                \
-  if (BMC_PROFILER_IS_ENABLED(env)) {                               \
-    profiler_initialize();                                          \
+#define BMC_PROFILER_INITIALIZE(env)                                           \
+  if (BMC_PROFILER_IS_ENABLED(env)) {                                          \
+    profiler_initialize();                                                     \
   }
 #else
 #define BMC_PROFILER_INITIALIZE(env)
@@ -188,19 +193,21 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_ENABLE(env, filename)                              \
-  nusmv_assert(NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));              \
-  {                                                                     \
-    BmcProfilerStruct_ptr prof;                                         \
-    prof = (BmcProfilerStruct_ptr) NuSMVEnv_get_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__); \
-    nusmv_assert(! prof->enabled);                                      \
-    if ( (char*) NULL != prof->out_file_name) {                         \
-      FREE(prof->out_file_name);                                        \
-    }                                                                   \
-    prof->enabled = true;                                               \
-    prof->out_file_name = util_strsav(filename);                        \
-    /* actual call to the library */                                    \
-    profiler_enable(prof->out_file_name);                               \
+#define BMC_PROFILER_ENABLE(env, filename)                                     \
+  nusmv_assert(                                                                \
+      NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));        \
+  {                                                                            \
+    BmcProfilerStruct_ptr prof;                                                \
+    prof = (BmcProfilerStruct_ptr)NuSMVEnv_get_value(                          \
+        env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__);                          \
+    nusmv_assert(!prof->enabled);                                              \
+    if ((char *)NULL != prof->out_file_name) {                                 \
+      FREE(prof->out_file_name);                                               \
+    }                                                                          \
+    prof->enabled = true;                                                      \
+    prof->out_file_name = util_strsav(filename);                               \
+    /* actual call to the library */                                           \
+    profiler_enable(prof->out_file_name);                                      \
   }
 #else
 #define BMC_PROFILER_ENABLE(env, file)
@@ -217,19 +224,21 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_DISABLE(env)                                       \
-  nusmv_assert(NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));              \
-  {                                                                     \
-    BmcProfilerStruct_ptr prof;                                         \
-    prof = (BmcProfilerStruct_ptr) NuSMVEnv_get_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__); \
-    nusmv_assert(prof->enabled);                                        \
-    if ( (char*) NULL != prof->out_file_name) {                         \
-      FREE(prof->out_file_name);                                        \
-      prof->out_file_name = (char*) NULL;                               \
-    }                                                                   \
-    prof->enabled = false;                                              \
-    /* actual call to the library */                                    \
-    profiler_disable();                                                 \
+#define BMC_PROFILER_DISABLE(env)                                              \
+  nusmv_assert(                                                                \
+      NuSMVEnv_has_value(env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__));        \
+  {                                                                            \
+    BmcProfilerStruct_ptr prof;                                                \
+    prof = (BmcProfilerStruct_ptr)NuSMVEnv_get_value(                          \
+        env, ENV__NUSMV_CORE_UTILS_BMC_PROFILER_H__);                          \
+    nusmv_assert(prof->enabled);                                               \
+    if ((char *)NULL != prof->out_file_name) {                                 \
+      FREE(prof->out_file_name);                                               \
+      prof->out_file_name = (char *)NULL;                                      \
+    }                                                                          \
+    prof->enabled = false;                                                     \
+    /* actual call to the library */                                           \
+    profiler_disable();                                                        \
   }
 #else
 #define BMC_PROFILER_DISABLE(env)
@@ -250,9 +259,10 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_SAMPLING_SOLVE_START(env, bmc_step)                \
-  if (BMC_PROFILER_IS_ENABLED(env)) {                                   \
-    profiler_output_message("\n-- start of problem solving for bound", bmc_step); \
+#define BMC_PROFILER_SAMPLING_SOLVE_START(env, bmc_step)                       \
+  if (BMC_PROFILER_IS_ENABLED(env)) {                                          \
+    profiler_output_message("\n-- start of problem solving for bound",         \
+                            bmc_step);                                         \
   }
 #else
 #define BMC_PROFILER_SAMPLING_SOLVE_START(env, bmc_step)
@@ -273,15 +283,15 @@ typedef BmcProfilerStruct* BmcProfilerStruct_ptr;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE__NUSMV_CORE_UTILS_BMC_PROFILER_H___LIBRARY
-#define BMC_PROFILER_SAMPLING_SOLVE_END(env, bmc_step)                  \
-  if (BMC_PROFILER_IS_ENABLED(env)) {                                   \
-    profiler_output_message("\n-- end of problem solving for bound", bmc_step); \
-    profiler_sampling(bmc_step);                                        \
+#define BMC_PROFILER_SAMPLING_SOLVE_END(env, bmc_step)                         \
+  if (BMC_PROFILER_IS_ENABLED(env)) {                                          \
+    profiler_output_message("\n-- end of problem solving for bound",           \
+                            bmc_step);                                         \
+    profiler_sampling(bmc_step);                                               \
   }
 #else
 #define BMC_PROFILER_SAMPLING_SOLVE_END(env, bmc_step)
 #endif
-
 
 /**AutomaticStart*************************************************************/
 

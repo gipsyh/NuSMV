@@ -22,7 +22,7 @@
    or email to <nusmv-users@fbk.eu>.
    Please report bugs to <nusmv-users@fbk.eu>.
 
-   To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+   To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,18 +34,17 @@
 
 */
 
-
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/normalizers/NormalizerCore.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/normalizers/NormalizerCore_private.h"
 
 #include "nusmv/core/parser/symbols.h"
 
-#include "nusmv/core/utils/WordNumberMgr.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/utils/error.h"
 #include "nusmv/core/compile/compile.h"
+#include "nusmv/core/utils/WordNumberMgr.h"
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/ustring.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -74,8 +73,7 @@
   Use this macro to recursively recall normalize_node
 */
 
-#define _THROW(n)                                                       \
-  normalizer_base_throw_normalize_node(NORMALIZER_BASE(self), n)
+#define _THROW(n) normalizer_base_throw_normalize_node(NORMALIZER_BASE(self), n)
 
 /**AutomaticStart*************************************************************/
 
@@ -83,62 +81,53 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void normalizer_core_finalize(Object_ptr object, void* dummy);
+static void normalizer_core_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-NormalizerCore_ptr NormalizerCore_create(const NuSMVEnv_ptr env, const char* name)
-{
+NormalizerCore_ptr NormalizerCore_create(const NuSMVEnv_ptr env,
+                                         const char *name) {
   NormalizerCore_ptr self = ALLOC(NormalizerCore, 1);
   NORMALIZER_CORE_CHECK_INSTANCE(self);
 
-  normalizer_core_init(self, env, name,
-                       NUSMV_CORE_SYMBOL_FIRST,
+  normalizer_core_init(self, env, name, NUSMV_CORE_SYMBOL_FIRST,
                        NUSMV_CORE_SYMBOL_LAST - NUSMV_CORE_SYMBOL_FIRST);
   return self;
 }
-
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void normalizer_core_init(NormalizerCore_ptr self,
-                          const NuSMVEnv_ptr env,
-                          const char* name, int low, size_t num)
-{
+void normalizer_core_init(NormalizerCore_ptr self, const NuSMVEnv_ptr env,
+                          const char *name, int low, size_t num) {
   /* base class initialization */
-  normalizer_base_init(NORMALIZER_BASE(self), env, name, low,
-                       num, true /*handles NULL*/);
+  normalizer_base_init(NORMALIZER_BASE(self), env, name, low, num,
+                       true /*handles NULL*/);
 
   /* members initialization */
 
   /* virtual methods settings */
   OVERRIDE(Object, finalize) = normalizer_core_finalize;
   OVERRIDE(NormalizerBase, normalize_node) = normalizer_core_normalize_node;
-
 }
 
-void normalizer_core_deinit(NormalizerCore_ptr self)
-{
+void normalizer_core_deinit(NormalizerCore_ptr self) {
   /* members deinitialization */
-
 
   /* base class initialization */
   normalizer_base_deinit(NORMALIZER_BASE(self));
 }
 
-node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self, node_ptr node)
-{
+node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self,
+                                        node_ptr node) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (Nil == node) return Nil;
+  if (Nil == node)
+    return Nil;
 
   switch (node_get_type(node)) {
   case FAILURE:
@@ -154,22 +143,22 @@ node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self, node_ptr node)
     return find_atom(nodemgr, node);
 
   case NUMBER_SIGNED_WORD:
-  case NUMBER_UNSIGNED_WORD:
-    {
-      const WordNumberMgr_ptr words =
+  case NUMBER_UNSIGNED_WORD: {
+    const WordNumberMgr_ptr words =
         WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
-      const WordNumber_ptr num = (const WordNumber_ptr) car(node);
-      return find_node(nodemgr, node_get_type(node),
-                       NODE_PTR(WordNumberMgr_normalize_word_number(words, num)), Nil);
-    }
+    const WordNumber_ptr num = (const WordNumber_ptr)car(node);
+    return find_node(nodemgr, node_get_type(node),
+                     NODE_PTR(WordNumberMgr_normalize_word_number(words, num)),
+                     Nil);
+  }
   default:
     break;
   }
 
-  return find_node(nodemgr, node_get_type(node), _THROW(car(node)), _THROW(cdr(node)));
+  return find_node(nodemgr, node_get_type(node), _THROW(car(node)),
+                   _THROW(cdr(node)));
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions*/
@@ -180,8 +169,7 @@ node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self, node_ptr node)
 
   Called by the class destructor
 */
-static void normalizer_core_finalize(Object_ptr object, void* dummy)
-{
+static void normalizer_core_finalize(Object_ptr object, void *dummy) {
   NormalizerCore_ptr self = NORMALIZER_CORE(object);
 
   normalizer_core_deinit(self);
@@ -189,4 +177,3 @@ static void normalizer_core_finalize(Object_ptr object, void* dummy)
 }
 
 /**AutomaticEnd***************************************************************/
-

@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -54,7 +54,7 @@
 
   \todo Missing description
 */
-#define MAX_DEPTH  100000
+#define MAX_DEPTH 100000
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -72,25 +72,25 @@ typedef struct StatData StatData_t;
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 
 struct Statistics {
-  int degree_stat    [MAX_DEGREE];
-  int depth_stat     [MAX_DEPTH];
-  int var_depth_stat [MAX_DEPTH];
+  int degree_stat[MAX_DEGREE];
+  int depth_stat[MAX_DEPTH];
+  int var_depth_stat[MAX_DEPTH];
   int nodes_num;
 };
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 
-struct StatData{
+struct StatData {
   int fatherNum;
   int depth;
   int knownDepthFatherNum;
@@ -108,65 +108,64 @@ struct StatData{
 
   Makes the code more readable
 */
-#define FatherNum(N)           ((StatData_t*)((N)->gRef))->fatherNum
+#define FatherNum(N) ((StatData_t *)((N)->gRef))->fatherNum
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define KnownDepthFatherNum(N) ((StatData_t*)((N)->gRef))->knownDepthFatherNum
+#define KnownDepthFatherNum(N) ((StatData_t *)((N)->gRef))->knownDepthFatherNum
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define Depth(N)               ((StatData_t*)((N)->gRef))->depth
+#define Depth(N) ((StatData_t *)((N)->gRef))->depth
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void
-doNothingAndReturnVoid(Dag_Vertex_t* f, char* visData, nusmv_ptrint sign);
+static void doNothingAndReturnVoid(Dag_Vertex_t *f, char *visData,
+                                   nusmv_ptrint sign);
 
-static int
-doNothingAndReturnZero(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign);
+static int doNothingAndReturnZero(Dag_Vertex_t *f, char *visData,
+                                  nusmv_ptrint sign);
 
-static void ResetStat(Statistics_t* stat);
+static void ResetStat(Statistics_t *stat);
 
-static int
-ComputeFatherAndSonNum(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign);
+static int ComputeFatherAndSonNum(Dag_Vertex_t *f, char *visData,
+                                  nusmv_ptrint sign);
 
-static void ComputeDepth(Dag_Vertex_t* v, int p_depth, Statistics_t* stat);
+static void ComputeDepth(Dag_Vertex_t *v, int p_depth, Statistics_t *stat);
 
-static void _PrintStat(Statistics_t* stat, FILE* statFile, char* prefix);
+static void _PrintStat(Statistics_t *stat, FILE *statFile, char *prefix);
 
 /**AutomaticEnd***************************************************************/
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void PrintStat(Dag_Vertex_t* dfsRoot, FILE* statFile, char* prefix)
-{
-  if (dfsRoot != (Dag_Vertex_t*)NULL) {
+void PrintStat(Dag_Vertex_t *dfsRoot, FILE *statFile, char *prefix) {
+  if (dfsRoot != (Dag_Vertex_t *)NULL) {
 
     Dag_DfsFunctions_t fathnsonDFS, statDFS;
     Statistics_t stat;
     ResetStat(&stat);
 
-    fathnsonDFS.FirstVisit = statDFS.FirstVisit =
-      fathnsonDFS.BackVisit  = statDFS.BackVisit  =
-      fathnsonDFS.LastVisit  = statDFS.LastVisit  = (PF_VPVPCPI)doNothingAndReturnVoid;
+    fathnsonDFS.FirstVisit = statDFS.FirstVisit = fathnsonDFS.BackVisit =
+        statDFS.BackVisit = fathnsonDFS.LastVisit = statDFS.LastVisit =
+            (PF_VPVPCPI)doNothingAndReturnVoid;
 
     fathnsonDFS.Set = (PF_IVPCPI)ComputeFatherAndSonNum;
-    statDFS.Set     = (PF_IVPCPI)doNothingAndReturnZero;
+    statDFS.Set = (PF_IVPCPI)doNothingAndReturnZero;
 
-    Dag_Dfs     (dfsRoot, Dag_ManagerGetDfsCleanFun(dfsRoot->dag),   NIL(char));
-    Dag_Dfs     (dfsRoot, &fathnsonDFS, (char*)&stat);
-    ComputeDepth(dfsRoot, 0           ,        &stat);
-    Dag_Dfs     (dfsRoot, &statDFS    , (char*)&stat);
+    Dag_Dfs(dfsRoot, Dag_ManagerGetDfsCleanFun(dfsRoot->dag), NIL(char));
+    Dag_Dfs(dfsRoot, &fathnsonDFS, (char *)&stat);
+    ComputeDepth(dfsRoot, 0, &stat);
+    Dag_Dfs(dfsRoot, &statDFS, (char *)&stat);
 
     _PrintStat(&stat, statFile, prefix);
   }
@@ -181,9 +180,8 @@ void PrintStat(Dag_Vertex_t* dfsRoot, FILE* statFile, char* prefix)
   Dfs function doing nothing
 */
 
-static void
-doNothingAndReturnVoid(Dag_Vertex_t* f, char* visData, nusmv_ptrint sign)
-{}
+static void doNothingAndReturnVoid(Dag_Vertex_t *f, char *visData,
+                                   nusmv_ptrint sign) {}
 
 /*!
   \brief Dfs function returning zero
@@ -191,9 +189,10 @@ doNothingAndReturnVoid(Dag_Vertex_t* f, char* visData, nusmv_ptrint sign)
   Dfs function returning zero
 */
 
-static int
-doNothingAndReturnZero(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign)
-{ return 0; }
+static int doNothingAndReturnZero(Dag_Vertex_t *f, char *visData,
+                                  nusmv_ptrint sign) {
+  return 0;
+}
 
 /*!
   \brief Reset the statistics data
@@ -201,17 +200,16 @@ doNothingAndReturnZero(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign)
   Reset the statistics data
 */
 
-static void ResetStat(Statistics_t* stat)
-{
+static void ResetStat(Statistics_t *stat) {
   int i;
 
   stat->nodes_num = 0;
 
-  for (i=0;i<MAX_DEGREE; i++)
-    (stat->degree_stat)[i]=0;
+  for (i = 0; i < MAX_DEGREE; i++)
+    (stat->degree_stat)[i] = 0;
 
-  for (i=0;i<MAX_DEPTH; i++)
-    (stat->var_depth_stat)[i]=(stat->depth_stat)[i]=0;
+  for (i = 0; i < MAX_DEPTH; i++)
+    (stat->var_depth_stat)[i] = (stat->depth_stat)[i] = 0;
 }
 
 /*!
@@ -220,16 +218,15 @@ static void ResetStat(Statistics_t* stat)
   Dfs function
 */
 
-static int
-ComputeFatherAndSonNum(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign)
-{
-  if (f->gRef == (char*)NULL) {
+static int ComputeFatherAndSonNum(Dag_Vertex_t *f, char *visData,
+                                  nusmv_ptrint sign) {
+  if (f->gRef == (char *)NULL) {
 
-    f->gRef = (char *)ALLOC(StatData_t,1);
+    f->gRef = (char *)ALLOC(StatData_t, 1);
     KnownDepthFatherNum(f) = FatherNum(f) = Depth(f) = 0;
 
-    (((Statistics_t*)visData)->
-      degree_stat[((f->outList)==NULL) ? 0 : f->numSons])++;
+    (((Statistics_t *)visData)
+         ->degree_stat[((f->outList) == NULL) ? 0 : f->numSons])++;
   }
 
   FatherNum(f)++;
@@ -242,32 +239,30 @@ ComputeFatherAndSonNum(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign)
   Dfs function
 */
 
-static void ComputeDepth(Dag_Vertex_t* v, int p_depth, Statistics_t* stat)
-{
+static void ComputeDepth(Dag_Vertex_t *v, int p_depth, Statistics_t *stat) {
   unsigned gen;
-  Dag_Vertex_t* vSon;
+  Dag_Vertex_t *vSon;
 
   v = Dag_VertexGetRef(v);
 
-  Depth(v) = MAX(p_depth,Depth(v));
+  Depth(v) = MAX(p_depth, Depth(v));
 
   if ((++(KnownDepthFatherNum(v))) == FatherNum(v)) {
 
-     ((stat->depth_stat)[Depth(v)])++;
+    ((stat->depth_stat)[Depth(v)])++;
 
-    if (v -> outList != (Dag_Vertex_t**) NULL) {
-      if ((v->numSons)==0) {
-         ((stat->var_depth_stat)[Depth(v)])++;
+    if (v->outList != (Dag_Vertex_t **)NULL) {
+      if ((v->numSons) == 0) {
+        ((stat->var_depth_stat)[Depth(v)])++;
       }
 
-      for (gen=0; gen<v->numSons; gen++) {
+      for (gen = 0; gen < v->numSons; gen++) {
         vSon = v->outList[gen];
 
-        ComputeDepth(vSon, Depth(v)+1,stat);
+        ComputeDepth(vSon, Depth(v) + 1, stat);
       }
-    }
-    else {
-       ((stat->var_depth_stat)[Depth(v)])++;
+    } else {
+      ((stat->var_depth_stat)[Depth(v)])++;
     }
   }
 
@@ -286,25 +281,16 @@ static void ComputeDepth(Dag_Vertex_t* v, int p_depth, Statistics_t* stat)
   \sa PrintStat()
 */
 
-static void _PrintStat(Statistics_t* stat, FILE* statFile, char* prefix)
-{
+static void _PrintStat(Statistics_t *stat, FILE *statFile, char *prefix) {
   int i;
 
-  for (i=0;i<MAX_DEGREE; i++)
-    if ((stat->degree_stat)[i]>0)
-      fprintf(statFile,
-              "%s Nodes with %i sons: %i\n",
-              prefix,
-              i,
+  for (i = 0; i < MAX_DEGREE; i++)
+    if ((stat->degree_stat)[i] > 0)
+      fprintf(statFile, "%s Nodes with %i sons: %i\n", prefix, i,
               (stat->degree_stat)[i]);
 
-  for (i=0;i<MAX_DEPTH; i++)
-    if ((stat->depth_stat)[i]>0)
-      fprintf(statFile,
-              "%s Nodes at depth %i: %i, leaves among them: %i\n",
-              prefix,
-              i,
-              (stat->depth_stat)[i],
-              (stat->var_depth_stat)[i]);
+  for (i = 0; i < MAX_DEPTH; i++)
+    if ((stat->depth_stat)[i] > 0)
+      fprintf(statFile, "%s Nodes at depth %i: %i, leaves among them: %i\n",
+              prefix, i, (stat->depth_stat)[i], (stat->var_depth_stat)[i]);
 }
-

@@ -37,24 +37,23 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/shell/cmd/cmd.h"
-#include "nusmv/shell/bmc/sbmc/sbmcCmd.h"
 #include "nusmv/shell/bmc/bmcCmd.h"
+#include "nusmv/shell/bmc/sbmc/sbmcCmd.h"
+#include "nusmv/shell/cmd/cmd.h"
 
-#include "nusmv/core/compile/compile.h"
+#include "nusmv/core/bmc/bmc.h"
+#include "nusmv/core/bmc/bmcUtils.h"
 #include "nusmv/core/bmc/sbmc/sbmcBmc.h"
 #include "nusmv/core/bmc/sbmc/sbmcBmcInc.h"
 #include "nusmv/core/bmc/sbmc/sbmcGen.h"
-#include "nusmv/core/bmc/bmc.h"
-#include "nusmv/core/bmc/bmcUtils.h"
+#include "nusmv/core/compile/compile.h"
 
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/core/prop/Prop.h"
 #include "nusmv/core/prop/PropDb.h"
@@ -64,7 +63,6 @@
 #include "nusmv/core/sat/sat.h"
 
 /* ---------------------------------------------------------------------- */
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -106,10 +104,12 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc, char** argv);
+static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc,
+                                        char **argv);
 
 #if NUSMV_HAVE_INCREMENTAL_SAT
-static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** argv);
+static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc,
+                                           char **argv);
 #endif
 
 static int UsageSBMCCheckLtlSpec(const NuSMVEnv_ptr env);
@@ -118,57 +118,36 @@ static int UsageSBMCIncCheck(const NuSMVEnv_ptr env);
 static int UsageCheckPslSpecSbmc(const NuSMVEnv_ptr env);
 static int UsageCheckPslSpecSbmcInc(const NuSMVEnv_ptr env);
 
-static Outcome
-sbmc_cmd_options_handling(NuSMVEnv_ptr env,
-                          int argc, char** argv,
-                          Prop_Type prop_type,
+static Outcome sbmc_cmd_options_handling(NuSMVEnv_ptr env, int argc,
+                                         char **argv, Prop_Type prop_type,
 
-                          /* output parameters: */
-                          Prop_ptr* res_prop,
-                          int* res_k,
-                          int* res_l,
-                          char** res_o,
-                          boolean* res_N,
-                          boolean* res_c,
-                          boolean* res_1);
+                                         /* output parameters: */
+                                         Prop_ptr *res_prop, int *res_k,
+                                         int *res_l, char **res_o,
+                                         boolean *res_N, boolean *res_c,
+                                         boolean *res_1);
 
-static inline int
-sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(const NuSMVEnv_ptr env,
-                                                    const Prop_ptr ltlprop,
-                                                    const int k,
-                                                    const boolean do_virtual_unrolling,
-                                                    const boolean do_completeness_check);
+static inline int sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(
+    const NuSMVEnv_ptr env, const Prop_ptr ltlprop, const int k,
+    const boolean do_virtual_unrolling, const boolean do_completeness_check);
 
-static inline int
-sbmc_cmd_gen_solve_ltl_selected_or_all_props(const NuSMVEnv_ptr env,
-                                             const Prop_ptr ltlprop,
-                                             const int k,
-                                             const int relative_loop,
-                                             const char* fname,
-                                             const boolean is_single_prob,
-                                             const boolean has_to_solve);
+static inline int sbmc_cmd_gen_solve_ltl_selected_or_all_props(
+    const NuSMVEnv_ptr env, const Prop_ptr ltlprop, const int k,
+    const int relative_loop, const char *fname, const boolean is_single_prob,
+    const boolean has_to_solve);
 
-static inline int
-sbmc_cmd_gen_solve_psl_selected_or_all_props(NuSMVEnv_ptr const env,
-                                             const int prop_no,
-                                             const boolean bmc_dump,
-                                             const boolean inc_sat,
-                                             const boolean single_bmc_prob,
-                                             const int k,
-                                             const int l,
-                                             const boolean check_compl,
-                                             const boolean does_virtual_unrol);
+static inline int sbmc_cmd_gen_solve_psl_selected_or_all_props(
+    NuSMVEnv_ptr const env, const int prop_no, const boolean bmc_dump,
+    const boolean inc_sat, const boolean single_bmc_prob, const int k,
+    const int l, const boolean check_compl, const boolean does_virtual_unrol);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void SBmc_AddCmd(NuSMVEnv_ptr env)
-{
+void SBmc_AddCmd(NuSMVEnv_ptr env) {
   /* These commands are re-entrant wrt Ctrl+C */
   Cmd_CommandAdd(env, "check_ltlspec_sbmc", Sbmc_CommandCheckLtlSpecSBmc, 0,
                  true);
@@ -182,11 +161,9 @@ void SBmc_AddCmd(NuSMVEnv_ptr env)
   Cmd_CommandAdd(env, "check_pslspec_sbmc_inc", sbmc_CommandCheckPslSpecSbmcInc,
                  0, true);
 #endif
-
 }
 
-void Sbmc_Cmd_quit(NuSMVEnv_ptr env)
-{
+void Sbmc_Cmd_quit(NuSMVEnv_ptr env) {
   boolean status = true;
 
   status = status && Cmd_CommandRemove(env, "check_ltlspec_sbmc");
@@ -201,55 +178,53 @@ void Sbmc_Cmd_quit(NuSMVEnv_ptr env)
   nusmv_assert(status);
 }
 
-int Sbmc_CommandCheckLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int Sbmc_CommandCheckLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char **argv) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  Prop_ptr ltlprop=(Prop_ptr)NULL;
+  Prop_ptr ltlprop = (Prop_ptr)NULL;
   Outcome opt_handling_res;
   int k = get_bmc_pb_length(opts);
   boolean is_single_prob = false;
   char *fname = (char *)NULL;
   int relative_loop =
-    Bmc_Utils_ConvertLoopFromString(get_bmc_pb_loop(opts), NULL);
+      Bmc_Utils_ConvertLoopFromString(get_bmc_pb_loop(opts), NULL);
   int res = 1;
 
   /* ----------------------------------------------------------------------- */
   /* Options handling: */
-  opt_handling_res = sbmc_cmd_options_handling(env, argc, argv,
-                                               Prop_Ltl, &ltlprop,
-                                               &k, &relative_loop,
-                                               &fname,
-                                               NULL, /* -N */
-                                               NULL, /* -c */
-                                               &is_single_prob);
+  opt_handling_res =
+      sbmc_cmd_options_handling(env, argc, argv, Prop_Ltl, &ltlprop, &k,
+                                &relative_loop, &fname, NULL, /* -N */
+                                NULL,                         /* -c */
+                                &is_single_prob);
 
   if (opt_handling_res == OUTCOME_SUCCESS_REQUIRED_HELP) {
     return UsageSBMCCheckLtlSpec(env);
   }
   if (opt_handling_res != OUTCOME_SUCCESS) {
-    if (fname != (char *)NULL) FREE(fname);
+    if (fname != (char *)NULL)
+      FREE(fname);
     return 1;
   }
 
   /* makes sure bmc has been set up */
   if (Bmc_check_if_model_was_built(env, errstream, false)) {
-    if (fname != (char*) NULL) FREE(fname);
+    if (fname != (char *)NULL)
+      FREE(fname);
     return 1;
   }
 
   /* ----------------------------------------------------------------------- */
 
-  res =
-    sbmc_cmd_gen_solve_ltl_selected_or_all_props(env, ltlprop, k, relative_loop,
-                                                 fname, is_single_prob,
-                                                 BMC_HAS_TO_SOLVE);
+  res = sbmc_cmd_gen_solve_ltl_selected_or_all_props(
+      env, ltlprop, k, relative_loop, fname, is_single_prob, BMC_HAS_TO_SOLVE);
 
-  FREE(fname); fname = (char*)NULL;
+  FREE(fname);
+  fname = (char *)NULL;
 
   return res;
 }
@@ -259,72 +234,84 @@ int Sbmc_CommandCheckLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv)
 
 
 */
-static int UsageSBMCCheckLtlSpec(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "\nusage: check_ltlspec_sbmc [-h | -n idx | -p \"formula\"] [-k max_length] [-l loopback]\n\t\t\t [-1] [-o <filename>]\n");
-  StreamMgr_print_error(streams,  "  -h \t\tPrints the command usage\n");
-  StreamMgr_print_error(streams,  "  -n idx\tChecks the LTL property specified with <idx>\n");
-  StreamMgr_print_error(streams,  "  -p \"formula\"\tChecks the specified LTL property\n");
-  StreamMgr_print_error(streams,  "  -P \"name\"\tChecks the LTL property specified with <name>.\n");
-  StreamMgr_print_error(streams,  "\t\tIf no property is specified, checks all LTL properties.\n");
-  StreamMgr_print_error(streams,  "  -k max_length\tChecks the property using <max_length> value instead of using the\n\t\tvariable <bmc_length> value\n");
-  StreamMgr_print_error(streams,  "  -l loopback\tChecks the property using <loopback> value instead of using the\n\t\tvariable <bmc_loopback> value\n");
-  StreamMgr_print_error(streams,  "  -1 \t\tGenerates and solves a single problem.\n");
-  StreamMgr_print_error(streams,  "  -o filename\tGenerates dimacs output file too. <filename> may contain patterns\n\n");
+static int UsageSBMCCheckLtlSpec(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(
+      streams, "\nusage: check_ltlspec_sbmc [-h | -n idx | -p \"formula\"] [-k "
+               "max_length] [-l loopback]\n\t\t\t [-1] [-o <filename>]\n");
+  StreamMgr_print_error(streams, "  -h \t\tPrints the command usage\n");
+  StreamMgr_print_error(
+      streams, "  -n idx\tChecks the LTL property specified with <idx>\n");
+  StreamMgr_print_error(
+      streams, "  -p \"formula\"\tChecks the specified LTL property\n");
+  StreamMgr_print_error(
+      streams,
+      "  -P \"name\"\tChecks the LTL property specified with <name>.\n");
+  StreamMgr_print_error(
+      streams, "\t\tIf no property is specified, checks all LTL properties.\n");
+  StreamMgr_print_error(
+      streams, "  -k max_length\tChecks the property using <max_length> value "
+               "instead of using the\n\t\tvariable <bmc_length> value\n");
+  StreamMgr_print_error(
+      streams, "  -l loopback\tChecks the property using <loopback> value "
+               "instead of using the\n\t\tvariable <bmc_loopback> value\n");
+  StreamMgr_print_error(streams,
+                        "  -1 \t\tGenerates and solves a single problem.\n");
+  StreamMgr_print_error(streams, "  -o filename\tGenerates dimacs output file "
+                                 "too. <filename> may contain patterns\n\n");
 
   return 1;
 }
 
-int Sbmc_CommandGenLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int Sbmc_CommandGenLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char **argv) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  Prop_ptr ltlprop=(Prop_ptr)NULL;   /* The property being processed */
+  Prop_ptr ltlprop = (Prop_ptr)NULL; /* The property being processed */
   Outcome opt_handling_res;
   int k = get_bmc_pb_length(opts);
   boolean is_single_prob = false;
   char *fname = (char *)NULL;
   int relative_loop =
-    Bmc_Utils_ConvertLoopFromString(get_bmc_pb_loop(opts), NULL);
+      Bmc_Utils_ConvertLoopFromString(get_bmc_pb_loop(opts), NULL);
 
   /* ----------------------------------------------------------------------- */
   /* Options handling: */
-  opt_handling_res = sbmc_cmd_options_handling(env, argc, argv, Prop_Ltl,
-                                               &ltlprop,
-                                               &k, &relative_loop,
-                                               &fname,
-                                               NULL, NULL /* -N -c */,
-                                               &is_single_prob);
+  opt_handling_res = sbmc_cmd_options_handling(
+      env, argc, argv, Prop_Ltl, &ltlprop, &k, &relative_loop, &fname, NULL,
+      NULL /* -N -c */, &is_single_prob);
 
   if (opt_handling_res == OUTCOME_SUCCESS_REQUIRED_HELP) {
     return UsageSBMCGenLtlSpec(env);
   }
   if (opt_handling_res != OUTCOME_SUCCESS) {
-    if (fname != (char *)NULL) FREE(fname);
+    if (fname != (char *)NULL)
+      FREE(fname);
     return 1;
   }
 
   /* makes sure bmc has been set up */
   if (Bmc_check_if_model_was_built(env, errstream, false)) {
-    if (fname != (char*) NULL) FREE(fname);
+    if (fname != (char *)NULL)
+      FREE(fname);
     return 1;
   }
 
   /* ----------------------------------------------------------------------- */
 
-  if (fname == (char*) NULL) {
+  if (fname == (char *)NULL) {
     fname = util_strsav(get_bmc_dimacs_filename(opts));
   }
 
-  (void)sbmc_cmd_gen_solve_ltl_selected_or_all_props(env, ltlprop, k, relative_loop,
-                                                 fname, is_single_prob, ! BMC_HAS_TO_SOLVE);
+  (void)sbmc_cmd_gen_solve_ltl_selected_or_all_props(
+      env, ltlprop, k, relative_loop, fname, is_single_prob, !BMC_HAS_TO_SOLVE);
 
-  FREE(fname); fname = (char*)NULL;
+  FREE(fname);
+  fname = (char *)NULL;
 
   return 0;
 }
@@ -334,32 +321,44 @@ int Sbmc_CommandGenLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv)
 
   \todo Missing description
 */
-static int UsageSBMCGenLtlSpec(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "\nusage: gen_ltlspec_sbmc [-h | -n idx | -p \"formula\"] [-k max_length] [-l loopback]\n\t\t\t [-1] [-o <filename>]\n");
-  StreamMgr_print_error(streams,  "  -h \t\tPrints the command usage\n");
-  StreamMgr_print_error(streams,  "  -n idx\tChecks the LTL property specified with <idx>\n");
-  StreamMgr_print_error(streams,  "  -p \"formula\"\tChecks the specified LTL property\n");
-  StreamMgr_print_error(streams,  "  -P \"name\"\tChecks the LTL property specified with <name>.\n");
-  StreamMgr_print_error(streams,  "\t\tIf no property is specified, checks all LTL properties.\n");
-  StreamMgr_print_error(streams,  "  -k max_length\tChecks the property using <max_length> value instead of using the\n\t\tvariable <bmc_length> value\n");
-  StreamMgr_print_error(streams,  "  -l loopback\tChecks the property using <loopback> value instead of using the\n\t\tvariable <bmc_loopback> value\n");
-  StreamMgr_print_error(streams,  "  -1 \t\tGenerates and solves a single problem.\n");
-  StreamMgr_print_error(streams,  "  -o filename\tGenerates dimacs output file too. <filename> may contain patterns\n\n");
+static int UsageSBMCGenLtlSpec(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(
+      streams, "\nusage: gen_ltlspec_sbmc [-h | -n idx | -p \"formula\"] [-k "
+               "max_length] [-l loopback]\n\t\t\t [-1] [-o <filename>]\n");
+  StreamMgr_print_error(streams, "  -h \t\tPrints the command usage\n");
+  StreamMgr_print_error(
+      streams, "  -n idx\tChecks the LTL property specified with <idx>\n");
+  StreamMgr_print_error(
+      streams, "  -p \"formula\"\tChecks the specified LTL property\n");
+  StreamMgr_print_error(
+      streams,
+      "  -P \"name\"\tChecks the LTL property specified with <name>.\n");
+  StreamMgr_print_error(
+      streams, "\t\tIf no property is specified, checks all LTL properties.\n");
+  StreamMgr_print_error(
+      streams, "  -k max_length\tChecks the property using <max_length> value "
+               "instead of using the\n\t\tvariable <bmc_length> value\n");
+  StreamMgr_print_error(
+      streams, "  -l loopback\tChecks the property using <loopback> value "
+               "instead of using the\n\t\tvariable <bmc_loopback> value\n");
+  StreamMgr_print_error(streams,
+                        "  -1 \t\tGenerates and solves a single problem.\n");
+  StreamMgr_print_error(streams, "  -o filename\tGenerates dimacs output file "
+                                 "too. <filename> may contain patterns\n\n");
 
   return 1;
 }
 
-int Sbmc_CommandLTLCheckZigzagInc(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int Sbmc_CommandLTLCheckZigzagInc(NuSMVEnv_ptr env, int argc, char **argv) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
-  Prop_ptr ltlprop = PROP(NULL);   /* The property being processed */
+  Prop_ptr ltlprop = PROP(NULL); /* The property being processed */
   Outcome opt_handling_res;
   int k = get_bmc_pb_length(opts);
   boolean do_virtual_unrolling = true;
@@ -368,29 +367,24 @@ int Sbmc_CommandLTLCheckZigzagInc(NuSMVEnv_ptr env, int argc, char** argv)
 
   /* ----------------------------------------------------------------------- */
   /* Options handling: */
-  opt_handling_res = sbmc_cmd_options_handling(env, argc, argv,
-                                               Prop_Ltl, &ltlprop,
-                                               &k,
-                                               NULL, NULL, /* l, o */
-                                               &do_virtual_unrolling,
-                                               &do_completeness_check,
-                                               NULL /* single problem */
-                                               );
+  opt_handling_res = sbmc_cmd_options_handling(
+      env, argc, argv, Prop_Ltl, &ltlprop, &k, NULL, NULL, /* l, o */
+      &do_virtual_unrolling, &do_completeness_check, NULL  /* single problem */
+  );
 
   if (opt_handling_res == OUTCOME_SUCCESS_REQUIRED_HELP) {
     return UsageSBMCIncCheck(env);
   }
-  if (opt_handling_res != OUTCOME_SUCCESS)  return 1;
+  if (opt_handling_res != OUTCOME_SUCCESS)
+    return 1;
 
   if (Bmc_check_if_model_was_built(env, errstream, false)) {
     return 1;
   }
   /* ----------------------------------------------------------------------- */
 
-  res =
-    sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(env, ltlprop, k,
-                                                        do_virtual_unrolling,
-                                                        do_completeness_check);
+  res = sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(
+      env, ltlprop, k, do_virtual_unrolling, do_completeness_check);
 
   return res;
 }
@@ -400,20 +394,31 @@ int Sbmc_CommandLTLCheckZigzagInc(NuSMVEnv_ptr env, int argc, char** argv)
 
 
 */
-static int UsageSBMCIncCheck(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "\nusage: check_ltlspec_sbmc_inc [-h | -n idx | -p \"formula\"] [-k max_length] [-N] [-c]\n");
-  StreamMgr_print_error(streams,  "  -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "  -n idx\tChecks the LTL property specified with <idx>\n"
-                        "        \t(using incremental algorithms).\n");
-  StreamMgr_print_error(streams,  "  -p \"formula\"\tChecks the specified LTL property\n");
-  StreamMgr_print_error(streams,  "  -P \"name\"\tChecks the LTL property specified with <name>.\n");
-  StreamMgr_print_error(streams,  "\t\tIf no property is specified, checks all LTL properties (using \n"
-                        "\t\tincremental algorithms).\n");
-  StreamMgr_print_error(streams,  "  -k max_length\tChecks the property using <max_length> value instead of using \n\t\tthe variable <bmc_length> value.\n");
-  StreamMgr_print_error(streams,  "  -N \t\tDoes not perform virtual unrolling.\n");
-  StreamMgr_print_error(streams,  "  -c \t\tPerforms completeness check.\n");
+static int UsageSBMCIncCheck(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(streams,
+                        "\nusage: check_ltlspec_sbmc_inc [-h | -n idx | -p "
+                        "\"formula\"] [-k max_length] [-N] [-c]\n");
+  StreamMgr_print_error(streams, "  -h \t\tPrints the command usage.\n");
+  StreamMgr_print_error(
+      streams, "  -n idx\tChecks the LTL property specified with <idx>\n"
+               "        \t(using incremental algorithms).\n");
+  StreamMgr_print_error(
+      streams, "  -p \"formula\"\tChecks the specified LTL property\n");
+  StreamMgr_print_error(
+      streams,
+      "  -P \"name\"\tChecks the LTL property specified with <name>.\n");
+  StreamMgr_print_error(
+      streams,
+      "\t\tIf no property is specified, checks all LTL properties (using \n"
+      "\t\tincremental algorithms).\n");
+  StreamMgr_print_error(
+      streams, "  -k max_length\tChecks the property using <max_length> value "
+               "instead of using \n\t\tthe variable <bmc_length> value.\n");
+  StreamMgr_print_error(streams,
+                        "  -N \t\tDoes not perform virtual unrolling.\n");
+  StreamMgr_print_error(streams, "  -c \t\tPerforms completeness check.\n");
 
   return 1;
 }
@@ -421,7 +426,8 @@ static int UsageSBMCIncCheck(const NuSMVEnv_ptr env)
 /*!
   \command{check_pslspec_sbmc} Performs fair PSL model checking.
 
-  \command_args{[-h] [-m | -o output-file] [-n number | -p "psl-expr [IN context]" | -P "name"]
+  \command_args{[-h] [-m | -o output-file] [-n number | -p "psl-expr [IN
+  context]" | -P "name"]
   [-g] [-1] [-k bmc_length] [-l loopback]\}
 
   Performs fair PSL model checking using SBMC.<p>
@@ -485,34 +491,34 @@ static int UsageSBMCIncCheck(const NuSMVEnv_ptr env)
 
 
 */
-static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc,
+                                        char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   PropDb_ptr const prop_db = PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB));
   OptsHandler_ptr const opts =
-     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  FILE* errstream = StreamMgr_get_error_stream(streams);
-  FILE* outstream = StreamMgr_get_output_stream(streams);
-  FILE* old_outstream = outstream;
+  FILE *errstream = StreamMgr_get_error_stream(streams);
+  FILE *outstream = StreamMgr_get_output_stream(streams);
+  FILE *old_outstream = outstream;
   int c;
 
   int k = -1;
   int l = 0;
-  char* str_loop = (char*) NULL;
+  char *str_loop = (char *)NULL;
   boolean l_specified = false;
   boolean bmc_dump = false;
   boolean single_bmc_prob = false;
 
   int prop_no = -1;
-  char* formula = NIL(char);
-  char* formula_name = NIL(char);
+  char *formula = NIL(char);
+  char *formula_name = NIL(char);
   int status = 0;
   boolean useMore = false;
-  char* dbgFileName = NIL(char);
+  char *dbgFileName = NIL(char);
 
   /* It is possible to extend sbmc_cmd_options_handling in order to handle the
      extra options of this function g m */
@@ -520,53 +526,59 @@ static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc, char** argv)
   while ((c = util_getopt(argc, argv, "h1gmo:n:p:P:k:l:")) != EOF) {
     switch (c) {
     case 'h': {
-      status = BMC_USAGE; goto label_clean_and_exit;
+      status = BMC_USAGE;
+      goto label_clean_and_exit;
     }
-    case 'n':
-      {
-        if (formula != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (prop_no != -1) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula_name != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-
-        prop_no = PropDb_get_prop_index_from_string(prop_db,
-                                                    util_optarg);
-        if (prop_no == -1) {
-          status = 1; goto label_clean_and_exit;
-        }
-
-        break;
+    case 'n': {
+      if (formula != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
-    case 'P':
-      {
-        if (formula != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (prop_no != -1) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula_name != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-
-        formula_name = util_strsav(util_optarg);
-
-        prop_no = PropDb_prop_parse_name(prop_db,
-                                         formula_name);
-
-        if (prop_no == -1) {
-          StreamMgr_print_error(streams,  "No property named \"%s\"\n", formula_name);
-
-          status = 1; goto label_clean_and_exit;
-        }
-
-        break;
+      if (prop_no != -1) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
+      if (formula_name != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+
+      prop_no = PropDb_get_prop_index_from_string(prop_db, util_optarg);
+      if (prop_no == -1) {
+        status = 1;
+        goto label_clean_and_exit;
+      }
+
+      break;
+    }
+    case 'P': {
+      if (formula != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+      if (prop_no != -1) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+      if (formula_name != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+
+      formula_name = util_strsav(util_optarg);
+
+      prop_no = PropDb_prop_parse_name(prop_db, formula_name);
+
+      if (prop_no == -1) {
+        StreamMgr_print_error(streams, "No property named \"%s\"\n",
+                              formula_name);
+
+        status = 1;
+        goto label_clean_and_exit;
+      }
+
+      break;
+    }
 
     case 'g':
       bmc_dump = true;
@@ -576,35 +588,37 @@ static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc, char** argv)
       single_bmc_prob = true;
       break;
 
-    case 'k':
-      {
-        char* str_k;
+    case 'k': {
+      char *str_k;
 
-        /* check if a value has already been specified: */
-        if (k != -1) {
-          StreamMgr_print_error(streams,
-                                "Option -k cannot be specified more than once.\n");
-          status = 1; goto label_clean_and_exit;
-        }
-
-        str_k = util_strsav(util_optarg);
-
-        if ((util_str2int(str_k, &k) != 0) || k<0) {
-          ErrorMgr_error_invalid_number(errmgr, str_k);
-          FREE(str_k);
-          status = 1; goto label_clean_and_exit;
-        }
-
-        FREE(str_k);
-        break;
+      /* check if a value has already been specified: */
+      if (k != -1) {
+        StreamMgr_print_error(
+            streams, "Option -k cannot be specified more than once.\n");
+        status = 1;
+        goto label_clean_and_exit;
       }
+
+      str_k = util_strsav(util_optarg);
+
+      if ((util_str2int(str_k, &k) != 0) || k < 0) {
+        ErrorMgr_error_invalid_number(errmgr, str_k);
+        FREE(str_k);
+        status = 1;
+        goto label_clean_and_exit;
+      }
+
+      FREE(str_k);
+      break;
+    }
 
     case 'l':
       /* check if a value has already been specified: */
       if (l_specified) {
-        StreamMgr_print_error(streams,
-                              "Option -l cannot be specified more than once.\n");
-        status = 1; goto label_clean_and_exit;
+        StreamMgr_print_error(
+            streams, "Option -l cannot be specified more than once.\n");
+        status = 1;
+        goto label_clean_and_exit;
       }
 
       str_loop = util_strsav(util_optarg);
@@ -614,85 +628,93 @@ static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc, char** argv)
          the cheking code below) */
       break;
 
-    case 'p':
-      {
-        if (prop_no != -1) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula_name != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-
-        formula = util_strsav(util_optarg);
-        break;
+    case 'p': {
+      if (prop_no != -1) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
+      if (formula != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+      if (formula_name != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+
+      formula = util_strsav(util_optarg);
+      break;
+    }
     case 'o':
       if (useMore) {
-        status = BMC_USAGE; goto label_clean_and_exit;
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
       dbgFileName = util_strsav(util_optarg);
-      StreamMgr_print_output(streams,  "Output to file: %s\n", dbgFileName);
+      StreamMgr_print_output(streams, "Output to file: %s\n", dbgFileName);
       break;
 
     case 'm':
       if (dbgFileName != NIL(char)) {
-        status = BMC_USAGE; goto label_clean_and_exit;
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
       useMore = true;
       break;
     default:
-      status = BMC_USAGE; goto label_clean_and_exit;
+      status = BMC_USAGE;
+      goto label_clean_and_exit;
     }
   }
   if (argc != util_optind) {
-    status = BMC_USAGE; goto label_clean_and_exit;
+    status = BMC_USAGE;
+    goto label_clean_and_exit;
   }
 
   /* ---------------------------------------------------------------------- */
-  if (k == -1) k = get_bmc_pb_length(opts); /* default for k */
+  if (k == -1)
+    k = get_bmc_pb_length(opts); /* default for k */
 
   if (OUTCOME_SUCCESS != Bmc_Cmd_compute_rel_loop(env, &l, str_loop, k)) {
-    status = 1; goto label_clean_and_exit;
+    status = 1;
+    goto label_clean_and_exit;
   }
 
   /* Checking compilation status */
   if (Compile_check_if_encoding_was_built(env, errstream)) {
-    status = 1; goto label_clean_and_exit;
+    status = 1;
+    goto label_clean_and_exit;
   }
 
   if (Bmc_check_if_model_was_built(env, errstream, false)) {
-    status = 1; goto label_clean_and_exit;
+    status = 1;
+    goto label_clean_and_exit;
   }
 
   if (formula != NIL(char)) {
     SymbTable_ptr st = SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
-    prop_no = PropDb_prop_parse_and_add(prop_db, st,
-                                        formula, Prop_Psl, Nil);
-    if (prop_no == -1) { status = 1; goto label_clean_and_exit; }
+    prop_no = PropDb_prop_parse_and_add(prop_db, st, formula, Prop_Psl, Nil);
+    if (prop_no == -1) {
+      status = 1;
+      goto label_clean_and_exit;
+    }
   }
 
-  if (OUTCOME_SUCCESS != Cmd_Misc_open_pipe_or_file(env, dbgFileName, &outstream)) {
-    status = 1; goto label_clean_and_exit;
+  if (OUTCOME_SUCCESS !=
+      Cmd_Misc_open_pipe_or_file(env, dbgFileName, &outstream)) {
+    status = 1;
+    goto label_clean_and_exit;
   }
-
-
 
   if (0 == status) {
-    status =
-      sbmc_cmd_gen_solve_psl_selected_or_all_props(env, prop_no, bmc_dump,
-                                                   ! IS_INC_SAT,
-                                                   single_bmc_prob,
-                                                   k, l,
-                                                   ! HAS_TO_CHECK_COMPL,
-                                                   HAS_TO_UNROLL);
+    status = sbmc_cmd_gen_solve_psl_selected_or_all_props(
+        env, prop_no, bmc_dump, !IS_INC_SAT, single_bmc_prob, k, l,
+        !HAS_TO_CHECK_COMPL, HAS_TO_UNROLL);
   }
 
- label_clean_and_exit:
+label_clean_and_exit:
   if (useMore) {
-    FILE* reset_stream;
+    FILE *reset_stream;
 
     CmdClosePipe(outstream);
     reset_stream = StreamMgr_reset_output_stream(streams);
@@ -700,27 +722,32 @@ static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc, char** argv)
 
     nusmv_assert(reset_stream == outstream);
 
-    outstream = (FILE*)NULL;
+    outstream = (FILE *)NULL;
   }
 
-  if ((char*)NULL != dbgFileName) {
+  if ((char *)NULL != dbgFileName) {
     /* this closes the file stream as well  */
     StreamMgr_set_output_stream(streams, old_outstream);
 
-    outstream = (FILE*)NULL;
+    outstream = (FILE *)NULL;
   }
 
-  FREE(str_loop); str_loop = (char*)NULL;
-  FREE(formula_name); formula_name = (char*)NULL;
+  FREE(str_loop);
+  str_loop = (char *)NULL;
+  FREE(formula_name);
+  formula_name = (char *)NULL;
 
-  if (BMC_USAGE == status) return UsageCheckPslSpecSbmc(env);
-  else return status;
+  if (BMC_USAGE == status)
+    return UsageCheckPslSpecSbmc(env);
+  else
+    return status;
 }
 
 /*!
   \command{check_pslspec_sbmc_inc} Performs fair PSL model checking.
 
-  \command_args{[-h] [-m | -o output-file] [-n number | -p "psl-expr [IN context]" | -P "name"]
+  \command_args{[-h] [-m | -o output-file] [-n number | -p "psl-expr [IN
+  context]" | -P "name"]
   [-1] [-k bmc_length] [-l loopback]\}
 
   Performs fair PSL model checking using SBMC.<p>
@@ -787,24 +814,24 @@ static int sbmc_CommandCheckPslSpecSbmc(NuSMVEnv_ptr env, int argc, char** argv)
 
   \todo Missing description
 */
-static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc,
+                                           char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   PropDb_ptr const prop_db = PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB));
   OptsHandler_ptr const opts =
-     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  FILE* errstream = StreamMgr_get_error_stream(streams);
-  FILE* outstream = StreamMgr_get_output_stream(streams);
-  FILE* old_outstream = outstream;
+  FILE *errstream = StreamMgr_get_error_stream(streams);
+  FILE *outstream = StreamMgr_get_output_stream(streams);
+  FILE *old_outstream = outstream;
   int c;
 
   int k = -1;
   int l = 0;
-  char* str_loop = (char*) NULL;
+  char *str_loop = (char *)NULL;
   boolean l_specified = false;
   boolean single_bmc_prob = false;
   boolean does_virtual_unrol = true;
@@ -812,10 +839,10 @@ static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** ar
   boolean useMore = false;
 
   int prop_no = -1;
-  char* formula = NIL(char);
-  char* formula_name = NIL(char);
+  char *formula = NIL(char);
+  char *formula_name = NIL(char);
   int status = 0;
-  char* dbgFileName = NIL(char);
+  char *dbgFileName = NIL(char);
 
   /* It is possible to extend sbmc_cmd_options_handling in order to handle the
      extra options of this function: g m */
@@ -823,53 +850,59 @@ static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** ar
   while ((c = util_getopt(argc, argv, "hicN1gmo:n:p:P:k:l:")) != EOF) {
     switch (c) {
     case 'h': {
-      status = BMC_USAGE; goto label_clean_and_exit;
+      status = BMC_USAGE;
+      goto label_clean_and_exit;
     }
-    case 'n':
-      {
-        if (formula != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (prop_no != -1) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula_name != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-
-        prop_no = PropDb_get_prop_index_from_string(prop_db,
-                                                    util_optarg);
-        if (prop_no == -1) {
-          status = 1; goto label_clean_and_exit;
-        }
-
-        break;
+    case 'n': {
+      if (formula != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
-    case 'P':
-      {
-        if (formula != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (prop_no != -1) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula_name != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-
-        formula_name = util_strsav(util_optarg);
-
-        prop_no = PropDb_prop_parse_name(prop_db,
-                                         formula_name);
-
-        if (prop_no == -1) {
-          StreamMgr_print_error(streams,  "No property named \"%s\"\n", formula_name);
-
-          status = 1; goto label_clean_and_exit;
-        }
-
-        break;
+      if (prop_no != -1) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
+      if (formula_name != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+
+      prop_no = PropDb_get_prop_index_from_string(prop_db, util_optarg);
+      if (prop_no == -1) {
+        status = 1;
+        goto label_clean_and_exit;
+      }
+
+      break;
+    }
+    case 'P': {
+      if (formula != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+      if (prop_no != -1) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+      if (formula_name != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+
+      formula_name = util_strsav(util_optarg);
+
+      prop_no = PropDb_prop_parse_name(prop_db, formula_name);
+
+      if (prop_no == -1) {
+        StreamMgr_print_error(streams, "No property named \"%s\"\n",
+                              formula_name);
+
+        status = 1;
+        goto label_clean_and_exit;
+      }
+
+      break;
+    }
 
     case 'N':
       does_virtual_unrol = false;
@@ -883,35 +916,37 @@ static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** ar
       single_bmc_prob = true;
       break;
 
-    case 'k':
-      {
-        char* str_k;
+    case 'k': {
+      char *str_k;
 
-        /* check if a value has already been specified: */
-        if (k != -1) {
-          StreamMgr_print_error(streams,
-                                "Option -k cannot be specified more than once.\n");
-          status = 1; goto label_clean_and_exit;
-        }
-
-        str_k = util_strsav(util_optarg);
-
-        if ((util_str2int(str_k, &k) != 0) || k<0) {
-          ErrorMgr_error_invalid_number(errmgr, str_k);
-          FREE(str_k);
-          status = 1; goto label_clean_and_exit;
-        }
-
-        FREE(str_k);
-        break;
+      /* check if a value has already been specified: */
+      if (k != -1) {
+        StreamMgr_print_error(
+            streams, "Option -k cannot be specified more than once.\n");
+        status = 1;
+        goto label_clean_and_exit;
       }
+
+      str_k = util_strsav(util_optarg);
+
+      if ((util_str2int(str_k, &k) != 0) || k < 0) {
+        ErrorMgr_error_invalid_number(errmgr, str_k);
+        FREE(str_k);
+        status = 1;
+        goto label_clean_and_exit;
+      }
+
+      FREE(str_k);
+      break;
+    }
 
     case 'l':
       /* check if a value has already been specified: */
       if (l_specified) {
-        StreamMgr_print_error(streams,
-                              "Option -l cannot be specified more than once.\n");
-        status = 1; goto label_clean_and_exit;
+        StreamMgr_print_error(
+            streams, "Option -l cannot be specified more than once.\n");
+        status = 1;
+        goto label_clean_and_exit;
       }
 
       str_loop = util_strsav(util_optarg);
@@ -921,83 +956,93 @@ static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** ar
          the cheking code below) */
       break;
 
-    case 'p':
-      {
-        if (prop_no != -1) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-        if (formula_name != NIL(char)) {
-          status = BMC_USAGE; goto label_clean_and_exit;
-        }
-
-        formula = util_strsav(util_optarg);
-        break;
+    case 'p': {
+      if (prop_no != -1) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
+      if (formula != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+      if (formula_name != NIL(char)) {
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
+      }
+
+      formula = util_strsav(util_optarg);
+      break;
+    }
     case 'o':
       if (useMore) {
-        status = BMC_USAGE; goto label_clean_and_exit;
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
       dbgFileName = util_strsav(util_optarg);
-      StreamMgr_print_output(streams,  "Output to file: %s\n", dbgFileName);
+      StreamMgr_print_output(streams, "Output to file: %s\n", dbgFileName);
       break;
 
     case 'm':
       if (dbgFileName != NIL(char)) {
-        status = BMC_USAGE; goto label_clean_and_exit;
+        status = BMC_USAGE;
+        goto label_clean_and_exit;
       }
       useMore = true;
       break;
     default:
-      status = BMC_USAGE; goto label_clean_and_exit;
+      status = BMC_USAGE;
+      goto label_clean_and_exit;
     }
   }
   if (argc != util_optind) {
-    status = BMC_USAGE; goto label_clean_and_exit;
+    status = BMC_USAGE;
+    goto label_clean_and_exit;
   }
 
   /* ---------------------------------------------------------------------- */
-  if (k == -1) k = get_bmc_pb_length(opts); /* default for k */
+  if (k == -1)
+    k = get_bmc_pb_length(opts); /* default for k */
 
   if (OUTCOME_SUCCESS != Bmc_Cmd_compute_rel_loop(env, &l, str_loop, k)) {
-    status = 1; goto label_clean_and_exit;
+    status = 1;
+    goto label_clean_and_exit;
   }
 
   /* Checking compilation status */
   if (Compile_check_if_encoding_was_built(env, errstream)) {
-    status = 1; goto label_clean_and_exit;
+    status = 1;
+    goto label_clean_and_exit;
   }
 
   if (Bmc_check_if_model_was_built(env, errstream, false)) {
-    status = 1; goto label_clean_and_exit;
+    status = 1;
+    goto label_clean_and_exit;
   }
 
   if (formula != NIL(char)) {
     SymbTable_ptr st = SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
-    prop_no = PropDb_prop_parse_and_add(prop_db, st,
-                                        formula, Prop_Psl, Nil);
-    if (prop_no == -1) { status = 1; goto label_clean_and_exit; }
+    prop_no = PropDb_prop_parse_and_add(prop_db, st, formula, Prop_Psl, Nil);
+    if (prop_no == -1) {
+      status = 1;
+      goto label_clean_and_exit;
+    }
   }
 
-  if (OUTCOME_SUCCESS != Cmd_Misc_open_pipe_or_file(env, dbgFileName, &outstream)) {
-    status = 1; goto label_clean_and_exit;
+  if (OUTCOME_SUCCESS !=
+      Cmd_Misc_open_pipe_or_file(env, dbgFileName, &outstream)) {
+    status = 1;
+    goto label_clean_and_exit;
   }
 
   if (0 == status) {
-    status =
-      sbmc_cmd_gen_solve_psl_selected_or_all_props(env, prop_no, ! IS_BMC_DUMP,
-                                                   IS_INC_SAT,
-                                                   single_bmc_prob,
-                                                   k, l,
-                                                   check_compl,
-                                                   does_virtual_unrol);
+    status = sbmc_cmd_gen_solve_psl_selected_or_all_props(
+        env, prop_no, !IS_BMC_DUMP, IS_INC_SAT, single_bmc_prob, k, l,
+        check_compl, does_virtual_unrol);
   }
 
- label_clean_and_exit:
+label_clean_and_exit:
   if (useMore) {
-    FILE* reset_stream;
+    FILE *reset_stream;
 
     CmdClosePipe(outstream);
     reset_stream = StreamMgr_reset_output_stream(streams);
@@ -1005,28 +1050,31 @@ static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** ar
 
     nusmv_assert(reset_stream == outstream);
 
-    outstream = (FILE*)NULL;
+    outstream = (FILE *)NULL;
   }
 
-  if ((char*)NULL != dbgFileName) {
+  if ((char *)NULL != dbgFileName) {
     /* this closes the file stream as well  */
     StreamMgr_set_output_stream(streams, old_outstream);
 
-    outstream = (FILE*)NULL;
+    outstream = (FILE *)NULL;
   }
 
-  FREE(str_loop); str_loop = (char*)NULL;
-  FREE(formula_name); formula_name = (char*)NULL;
+  FREE(str_loop);
+  str_loop = (char *)NULL;
+  FREE(formula_name);
+  formula_name = (char *)NULL;
 
-  if (BMC_USAGE == status) return UsageCheckPslSpecSbmcInc(env);
-  else return status;
+  if (BMC_USAGE == status)
+    return UsageCheckPslSpecSbmcInc(env);
+  else
+    return status;
 }
 #endif
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -1066,76 +1114,73 @@ static int sbmc_CommandCheckPslSpecSbmcInc(NuSMVEnv_ptr env, int argc, char** ar
 
   \se Result parameters might change
 */
-static Outcome
-sbmc_cmd_options_handling(NuSMVEnv_ptr env,
-                          int argc, char** argv,
-                          Prop_Type prop_type,
+static Outcome sbmc_cmd_options_handling(NuSMVEnv_ptr env, int argc,
+                                         char **argv, Prop_Type prop_type,
 
-                          /* output parameters: */
-                          Prop_ptr* res_prop,
-                          int* res_k,
-                          int* res_l,
-                          char** res_o,
-                          boolean* res_N,
-                          boolean* res_c,
-                          boolean* res_1)
-{
+                                         /* output parameters: */
+                                         Prop_ptr *res_prop, int *res_k,
+                                         int *res_l, char **res_o,
+                                         boolean *res_N, boolean *res_c,
+                                         boolean *res_1) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   int c;
   int prop_idx;
-  char* formula_name = (char*) NULL;
-  char* str_formula = (char*) NULL;
-  char* str_loop = (char*) NULL;
+  char *formula_name = (char *)NULL;
+  char *str_formula = (char *)NULL;
+  char *str_loop = (char *)NULL;
 
   boolean k_specified = false;
   boolean l_specified = false;
 
   /* If one or more options are added here, the size of this array
      must be changed. At the moment eight options are supported.  */
-  char opt_string[9*2+1];
-
+  char opt_string[9 * 2 + 1];
 
   /* ---------------------------------------------------------------------- */
   /* Fills up the string to pass to util_getopt, depending on which
      options are actually required */
-  strcpy(opt_string, "h");  /* h is always needed */
+  strcpy(opt_string, "h"); /* h is always needed */
 
-  if (res_prop != (Prop_ptr*) NULL) {
-    *res_prop = (Prop_ptr) NULL;
+  if (res_prop != (Prop_ptr *)NULL) {
+    *res_prop = (Prop_ptr)NULL;
     strcat(opt_string, "n:p:P:");
   }
 
-  if (res_k != (int*) NULL) strcat(opt_string, "k:");
-  if (res_l != (int*) NULL) strcat(opt_string, "l:");
+  if (res_k != (int *)NULL)
+    strcat(opt_string, "k:");
+  if (res_l != (int *)NULL)
+    strcat(opt_string, "l:");
 
-  if (res_o != (char**) NULL) {
-    *res_o = (char*) NULL;
+  if (res_o != (char **)NULL) {
+    *res_o = (char *)NULL;
     strcat(opt_string, "o:");
   }
 
-  if (res_N != (boolean*) NULL) strcat(opt_string, "N");
-  if (res_c != (boolean*) NULL) strcat(opt_string, "c");
-  if (res_1 != (boolean*) NULL) strcat(opt_string, "1");
-
+  if (res_N != (boolean *)NULL)
+    strcat(opt_string, "N");
+  if (res_c != (boolean *)NULL)
+    strcat(opt_string, "c");
+  if (res_1 != (boolean *)NULL)
+    strcat(opt_string, "1");
 
   util_getopt_reset();
-  while ((c = util_getopt((int)argc, (char**) argv, opt_string)) != EOF) {
+  while ((c = util_getopt((int)argc, (char **)argv, opt_string)) != EOF) {
     switch (c) {
     case 'h':
       return OUTCOME_SUCCESS_REQUIRED_HELP;
 
     case 'n': {
-      char* str_prop_idx = (char*) NULL;
+      char *str_prop_idx = (char *)NULL;
 
-      nusmv_assert(res_prop != (Prop_ptr*) NULL);
+      nusmv_assert(res_prop != (Prop_ptr *)NULL);
 
       /* check if a formula has already been specified: */
-      if ((*res_prop != PROP(NULL)) || (str_formula != (char*) NULL)) {
+      if ((*res_prop != PROP(NULL)) || (str_formula != (char *)NULL)) {
         ErrorMgr_error_property_already_specified(errmgr);
         return OUTCOME_GENERIC_ERROR;
       }
@@ -1143,8 +1188,8 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
       str_prop_idx = util_strsav(util_optarg);
 
       /* check if property idx is ok */
-      prop_idx = PropDb_get_prop_index_from_string(PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)),
-                                                   str_prop_idx);
+      prop_idx = PropDb_get_prop_index_from_string(
+          PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)), str_prop_idx);
       FREE(str_prop_idx);
 
       if (prop_idx == -1) {
@@ -1153,9 +1198,9 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
       }
 
       /* here property idx is ok */
-      *res_prop = PropDb_get_prop_at_index(PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)),
-                                           prop_idx);
-      if ( Prop_check_type(*res_prop, prop_type) != 0 ) {
+      *res_prop = PropDb_get_prop_at_index(
+          PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)), prop_idx);
+      if (Prop_check_type(*res_prop, prop_type) != 0) {
         /* specified property's type is not what the caller expected */
         return OUTCOME_GENERIC_ERROR;
       }
@@ -1163,46 +1208,47 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
       break;
     } /* case 'n' */
 
-    case 'P':
-      {
-        nusmv_assert(res_prop != (Prop_ptr*) NULL);
-
-        /* check if a formula has already been specified: */
-        if ((*res_prop != PROP(NULL)) || (str_formula != (char*) NULL) || (formula_name != (char*) NULL)) {
-          ErrorMgr_error_property_already_specified(errmgr);
-          return OUTCOME_GENERIC_ERROR;
-        }
-
-        formula_name = util_strsav(util_optarg);
-
-        prop_idx = PropDb_prop_parse_name(PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)),
-                                          formula_name);
-
-        if (prop_idx == -1) {
-          StreamMgr_print_error(streams,  "No property named \"%s\"\n", formula_name);
-          FREE(formula_name);
-          /* error messages have already been shown */
-          return OUTCOME_GENERIC_ERROR;
-        }
-
-        FREE(formula_name);
-
-        /* here property idx is ok */
-        *res_prop = PropDb_get_prop_at_index(PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)),
-                                             prop_idx);
-        if ( Prop_check_type(*res_prop, prop_type) != 0 ) {
-          /* specified property's type is not what the caller expected */
-          return OUTCOME_GENERIC_ERROR;
-        }
-
-        break;
-      } /* case 'P' */
-
-    case 'p':
-      nusmv_assert(res_prop != (Prop_ptr*) NULL);
+    case 'P': {
+      nusmv_assert(res_prop != (Prop_ptr *)NULL);
 
       /* check if a formula has already been specified: */
-      if ((*res_prop != PROP(NULL)) || (str_formula != (char*) NULL)) {
+      if ((*res_prop != PROP(NULL)) || (str_formula != (char *)NULL) ||
+          (formula_name != (char *)NULL)) {
+        ErrorMgr_error_property_already_specified(errmgr);
+        return OUTCOME_GENERIC_ERROR;
+      }
+
+      formula_name = util_strsav(util_optarg);
+
+      prop_idx = PropDb_prop_parse_name(
+          PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)), formula_name);
+
+      if (prop_idx == -1) {
+        StreamMgr_print_error(streams, "No property named \"%s\"\n",
+                              formula_name);
+        FREE(formula_name);
+        /* error messages have already been shown */
+        return OUTCOME_GENERIC_ERROR;
+      }
+
+      FREE(formula_name);
+
+      /* here property idx is ok */
+      *res_prop = PropDb_get_prop_at_index(
+          PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)), prop_idx);
+      if (Prop_check_type(*res_prop, prop_type) != 0) {
+        /* specified property's type is not what the caller expected */
+        return OUTCOME_GENERIC_ERROR;
+      }
+
+      break;
+    } /* case 'P' */
+
+    case 'p':
+      nusmv_assert(res_prop != (Prop_ptr *)NULL);
+
+      /* check if a formula has already been specified: */
+      if ((*res_prop != PROP(NULL)) || (str_formula != (char *)NULL)) {
         ErrorMgr_error_property_already_specified(errmgr);
         return OUTCOME_GENERIC_ERROR;
       }
@@ -1211,15 +1257,15 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
       break;
 
     case 'k': {
-      char* str_k;
+      char *str_k;
       int k;
 
-      nusmv_assert(res_k != (int*) NULL);
+      nusmv_assert(res_k != (int *)NULL);
 
       /* check if a value has already been specified: */
       if (k_specified) {
-        StreamMgr_print_error(streams,
-                "Option -k cannot be specified more than once.\n");
+        StreamMgr_print_error(
+            streams, "Option -k cannot be specified more than once.\n");
         return OUTCOME_GENERIC_ERROR;
       }
 
@@ -1244,12 +1290,12 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
     }
 
     case 'l':
-      nusmv_assert(res_l != (int*) NULL);
+      nusmv_assert(res_l != (int *)NULL);
 
       /* check if a value has already been specified: */
       if (l_specified) {
-        StreamMgr_print_error(streams,
-                "Option -l cannot be specified more than once.\n");
+        StreamMgr_print_error(
+            streams, "Option -l cannot be specified more than once.\n");
         return OUTCOME_GENERIC_ERROR;
       }
 
@@ -1261,38 +1307,40 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
       break;
 
     case 'o':
-      nusmv_assert(res_o != (char**) NULL);
+      nusmv_assert(res_o != (char **)NULL);
 
       *res_o = util_strsav(util_optarg);
       break;
 
     case 'N':
-      nusmv_assert(res_N != (boolean*) NULL);
+      nusmv_assert(res_N != (boolean *)NULL);
       *res_N = false;
       break;
 
     case '1':
-      nusmv_assert(res_1 != (boolean*) NULL);
+      nusmv_assert(res_1 != (boolean *)NULL);
       *res_1 = true;
       break;
 
     case 'c':
-      nusmv_assert(res_c != (boolean*) NULL);
+      nusmv_assert(res_c != (boolean *)NULL);
       *res_c = true;
       break;
 
-    default:  return OUTCOME_GENERIC_ERROR;
+    default:
+      return OUTCOME_GENERIC_ERROR;
     } /* switch case */
-  } /* end of cmd line processing */
+  }   /* end of cmd line processing */
 
   /* checks if there are unexpected options: */
   if (argc != util_optind) {
-    StreamMgr_print_error(streams,  "You specified one or more invalid options.\n\n");
+    StreamMgr_print_error(streams,
+                          "You specified one or more invalid options.\n\n");
     return OUTCOME_GENERIC_ERROR;
   }
 
   /* Checking of k,l constrains: */
-  if (str_loop != (char*) NULL) {
+  if (str_loop != (char *)NULL) {
     Outcome res;
     int rel_loop;
 
@@ -1305,9 +1353,8 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
     }
     FREE(str_loop);
 
-    if (Bmc_Utils_Check_k_l(*res_k,
-                            Bmc_Utils_RelLoop2AbsLoop(rel_loop, *res_k))
-        != OUTCOME_SUCCESS) {
+    if (Bmc_Utils_Check_k_l(*res_k, Bmc_Utils_RelLoop2AbsLoop(
+                                        rel_loop, *res_k)) != OUTCOME_SUCCESS) {
       ErrorMgr_error_bmc_invalid_k_l(errmgr, *res_k, rel_loop);
       return OUTCOME_GENERIC_ERROR;
     }
@@ -1315,9 +1362,8 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
     *res_l = rel_loop;
   } /* k,l consistency check */
 
-
   /* Formula checking and commitment: */
-  if (str_formula != (char*) NULL) {
+  if (str_formula != (char *)NULL) {
     int idx;
     SymbTable_ptr st = SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
 
@@ -1327,8 +1373,9 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
       return OUTCOME_GENERIC_ERROR;
     }
 
-    idx = PropDb_prop_parse_and_add(PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)), st,
-                                    str_formula, prop_type, Nil);
+    idx =
+        PropDb_prop_parse_and_add(PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)),
+                                  st, str_formula, prop_type, Nil);
     if (idx == -1) {
       FREE(str_formula);
       return OUTCOME_GENERIC_ERROR;
@@ -1336,7 +1383,8 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
 
     /* index is ok */
     nusmv_assert(*res_prop == PROP(NULL));
-    *res_prop = PropDb_get_prop_at_index(PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)), idx);
+    *res_prop = PropDb_get_prop_at_index(
+        PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB)), idx);
 
     FREE(str_formula);
   } /* formula checking and commit */
@@ -1352,44 +1400,32 @@ sbmc_cmd_options_handling(NuSMVEnv_ptr env,
   all the properties
 */
 
-static inline
-int sbmc_cmd_gen_solve_ltl_selected_or_all_props(const NuSMVEnv_ptr env,
-                                                 const Prop_ptr ltlprop,
-                                                 const int k,
-                                                 const int relative_loop,
-                                                 const char* fname,
-                                                 const boolean is_single_prob,
-                                                 const boolean has_to_solve)
-{
+static inline int sbmc_cmd_gen_solve_ltl_selected_or_all_props(
+    const NuSMVEnv_ptr env, const Prop_ptr ltlprop, const int k,
+    const int relative_loop, const char *fname, const boolean is_single_prob,
+    const boolean has_to_solve) {
   const Bmc_DumpType dump_type =
-    (fname != (char*)NULL) ? BMC_DUMP_DIMACS : BMC_DUMP_NONE;
+      (fname != (char *)NULL) ? BMC_DUMP_DIMACS : BMC_DUMP_NONE;
 
   if (ltlprop == PROP(NULL)) {
     const PropDb_ptr prop_db = PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB));
     lsList props;
-    lsGen  iterator;
+    lsGen iterator;
     Prop_ptr prop;
 
     props = PropDb_prepare_prop_list(prop_db, Prop_Ltl);
 
     lsForEachItem(props, iterator, prop) {
-      if  (Bmc_SBMCGenSolveLtl(env, prop, k, relative_loop,
-                               ! is_single_prob,
-                               has_to_solve,
-                               dump_type,
-                               fname) != 0) {
+      if (Bmc_SBMCGenSolveLtl(env, prop, k, relative_loop, !is_single_prob,
+                              has_to_solve, dump_type, fname) != 0) {
         return 1;
       }
     }
 
     lsDestroy(props, NULL);
-  }
-  else {
-    if (Bmc_SBMCGenSolveLtl(env, ltlprop, k, relative_loop,
-                               ! is_single_prob,
-                               has_to_solve,
-                               dump_type,
-                               fname) != 0) {
+  } else {
+    if (Bmc_SBMCGenSolveLtl(env, ltlprop, k, relative_loop, !is_single_prob,
+                            has_to_solve, dump_type, fname) != 0) {
       return 1;
     }
   }
@@ -1404,16 +1440,12 @@ int sbmc_cmd_gen_solve_ltl_selected_or_all_props(const NuSMVEnv_ptr env,
   Call Sbmc_zigzag_incr on a selected property or over all
   the properties
 */
-static inline int
-sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(const NuSMVEnv_ptr env,
-                                                    const Prop_ptr ltlprop,
-                                                    const int k,
-                                                    const boolean do_virtual_unrolling,
-                                                    const boolean do_completeness_check)
-{
+static inline int sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(
+    const NuSMVEnv_ptr env, const Prop_ptr ltlprop, const int k,
+    const boolean do_virtual_unrolling, const boolean do_completeness_check) {
   if (ltlprop == PROP(NULL)) {
     PropDb_ptr const prop_db = PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB));
-    lsGen  iterator;
+    lsGen iterator;
     Prop_ptr prop;
     lsList const props = PropDb_prepare_prop_list(prop_db, Prop_Ltl);
 
@@ -1424,8 +1456,7 @@ sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(const NuSMVEnv_ptr env,
       }
     }
     lsDestroy(props, NULL);
-  }
-  else {
+  } else {
     if (Sbmc_zigzag_incr(env, ltlprop, k, do_virtual_unrolling,
                          do_completeness_check) != 0)
       return 1;
@@ -1442,51 +1473,38 @@ sbmc_cmd_gen_solve_zigzag_inc_selected_or_all_props(const NuSMVEnv_ptr env,
   property or over all the psl properties. The PSL properties not convertible
   to LTL will be skipped.
 */
-static inline int
-sbmc_cmd_gen_solve_psl_selected_or_all_props(NuSMVEnv_ptr const env,
-                                             const int prop_no,
-                                             const boolean bmc_dump,
-                                             const boolean inc_sat,
-                                             const boolean single_bmc_prob,
-                                             const int k,
-                                             const int l,
-                                             const boolean check_compl,
-                                             const boolean does_virtual_unrol)
-{
+static inline int sbmc_cmd_gen_solve_psl_selected_or_all_props(
+    NuSMVEnv_ptr const env, const int prop_no, const boolean bmc_dump,
+    const boolean inc_sat, const boolean single_bmc_prob, const int k,
+    const int l, const boolean check_compl, const boolean does_virtual_unrol) {
   const PropDb_ptr prop_db = PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB));
   int status = 0;
 
   if (prop_no != -1) {
-    if (Prop_check_type(PropDb_get_prop_at_index(prop_db,
-                                                 prop_no),
-                        Prop_Psl) != 0) {
+    if (Prop_check_type(PropDb_get_prop_at_index(prop_db, prop_no), Prop_Psl) !=
+        0) {
       status = 1;
+    } else {
+      status = Sbmc_Gen_check_psl_property(
+          env, PropDb_get_prop_at_index(prop_db, prop_no), bmc_dump, inc_sat,
+          check_compl, does_virtual_unrol, single_bmc_prob, k, l);
     }
-    else {
-      status =
-        Sbmc_Gen_check_psl_property(env,
-                                    PropDb_get_prop_at_index(prop_db, prop_no),
-                                    bmc_dump, inc_sat, check_compl,
-                                    does_virtual_unrol, single_bmc_prob, k, l);
-
-    }
-  }
-  else {
+  } else {
     lsList props;
-    lsGen  iterator;
+    lsGen iterator;
     Prop_ptr prop;
 
     props = PropDb_prepare_prop_list(prop_db, Prop_Psl);
 
     lsForEachItem(props, iterator, prop) {
       if (Prop_is_psl_ltl(prop)) {
-        status =
-          Sbmc_Gen_check_psl_property(env, prop, bmc_dump, inc_sat, check_compl,
-                                      does_virtual_unrol, single_bmc_prob, k,
-                                      l);
+        status = Sbmc_Gen_check_psl_property(env, prop, bmc_dump, inc_sat,
+                                             check_compl, does_virtual_unrol,
+                                             single_bmc_prob, k, l);
       }
 
-      if (0 != status) break;
+      if (0 != status)
+        break;
     }
 
     lsDestroy(props, NULL);
@@ -1500,25 +1518,45 @@ sbmc_cmd_gen_solve_psl_selected_or_all_props(NuSMVEnv_ptr const env,
 
   the output of -h option
 */
-static int UsageCheckPslSpecSbmc(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+static int UsageCheckPslSpecSbmc(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  StreamMgr_print_error(streams, "usage: check_pslspec_sbmc [-h] [-m | -o file] [-n number | -p \"psl-expr\" | -P \"name\"]\n");
+  StreamMgr_print_error(streams,
+                        "usage: check_pslspec_sbmc [-h] [-m | -o file] [-n "
+                        "number | -p \"psl-expr\" | -P \"name\"]\n");
   StreamMgr_print_error(streams, "                          [-g] [-1] \n");
-  StreamMgr_print_error(streams, "                          [-k bmc_length] [-l loopback]\n");
+  StreamMgr_print_error(
+      streams, "                          [-k bmc_length] [-l loopback]\n");
   StreamMgr_print_error(streams, "   -h \t\t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams, "   -m \t\t\tPipes output through the program specified\n");
-  StreamMgr_print_error(streams, "      \t\t\tby the \"PAGER\" environment variable if defined,\n");
-  StreamMgr_print_error(streams, "      \t\t\telse through the UNIX command \"more\".\n");
-  StreamMgr_print_error(streams, "   -o file\t\tWrites the generated output to \"file\".\n");
-  StreamMgr_print_error(streams, "   -n number\t\tChecks only the PSLSPEC with the given index number.\n");
-  StreamMgr_print_error(streams, "   -p \"psl-expr\"\tChecks only the given PSL formula.\n");
-  StreamMgr_print_error(streams, "   -P \"name\"\t\tChecks only the PSLSPEC with the given name.\n");
-  StreamMgr_print_error(streams, "   -g \t\t\tDumps generated problems in DIMACS format.\n");
-  StreamMgr_print_error(streams, "   -1 \t\t\tGenerates and solves single problems.\n");
-  StreamMgr_print_error(streams, "   -k bmc_length\tChecks the property using <bmc_length> value instead \n\t\t\tof using the variable <bmc_length> value.\n");
-  StreamMgr_print_error(streams, "   -l loopback\t\tChecks the property using <loopback> value\n\t\t\tinstead of using the variable <bmc_loopback> value.\n");
+  StreamMgr_print_error(
+      streams, "   -m \t\t\tPipes output through the program specified\n");
+  StreamMgr_print_error(
+      streams,
+      "      \t\t\tby the \"PAGER\" environment variable if defined,\n");
+  StreamMgr_print_error(
+      streams, "      \t\t\telse through the UNIX command \"more\".\n");
+  StreamMgr_print_error(
+      streams, "   -o file\t\tWrites the generated output to \"file\".\n");
+  StreamMgr_print_error(
+      streams,
+      "   -n number\t\tChecks only the PSLSPEC with the given index number.\n");
+  StreamMgr_print_error(
+      streams, "   -p \"psl-expr\"\tChecks only the given PSL formula.\n");
+  StreamMgr_print_error(
+      streams,
+      "   -P \"name\"\t\tChecks only the PSLSPEC with the given name.\n");
+  StreamMgr_print_error(
+      streams, "   -g \t\t\tDumps generated problems in DIMACS format.\n");
+  StreamMgr_print_error(streams,
+                        "   -1 \t\t\tGenerates and solves single problems.\n");
+  StreamMgr_print_error(
+      streams, "   -k bmc_length\tChecks the property using <bmc_length> value "
+               "instead \n\t\t\tof using the variable <bmc_length> value.\n");
+  StreamMgr_print_error(
+      streams,
+      "   -l loopback\t\tChecks the property using <loopback> "
+      "value\n\t\t\tinstead of using the variable <bmc_loopback> value.\n");
 
   return 1;
 }
@@ -1528,26 +1566,49 @@ static int UsageCheckPslSpecSbmc(const NuSMVEnv_ptr env)
 
   the output of -h option
 */
-static int UsageCheckPslSpecSbmcInc(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+static int UsageCheckPslSpecSbmcInc(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  StreamMgr_print_error(streams, "usage: check_pslspec_sbmc_inc [-h] [-m | -o file] [-n number | -p \"psl-expr\" | -P \"name\"]\n");
-  StreamMgr_print_error(streams, "                              [-1] [-c] [-N]\n");
-  StreamMgr_print_error(streams, "                              [-k bmc_length] [-l loopback]\n");
+  StreamMgr_print_error(streams,
+                        "usage: check_pslspec_sbmc_inc [-h] [-m | -o file] [-n "
+                        "number | -p \"psl-expr\" | -P \"name\"]\n");
+  StreamMgr_print_error(streams,
+                        "                              [-1] [-c] [-N]\n");
+  StreamMgr_print_error(
+      streams, "                              [-k bmc_length] [-l loopback]\n");
   StreamMgr_print_error(streams, "   -h \t\t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams, "   -m \t\t\tPipes output through the program specified\n");
-  StreamMgr_print_error(streams, "      \t\t\tby the \"PAGER\" environment variable if defined,\n");
-  StreamMgr_print_error(streams, "      \t\t\telse through the UNIX command \"more\".\n");
-  StreamMgr_print_error(streams, "   -o file\t\tWrites the generated output to \"file\".\n");
-  StreamMgr_print_error(streams, "   -n number\t\tChecks only the PSLSPEC with the given index number.\n");
-  StreamMgr_print_error(streams, "   -p \"psl-expr\"\tChecks only the given PSL formula.\n");
-  StreamMgr_print_error(streams, "   -P \"name\"\t\tChecks only the PSLSPEC with the given name.\n");
-  StreamMgr_print_error(streams, "   -1 \t\t\tGenerates and solves single problems.\n");
-  StreamMgr_print_error(streams, "   -k bmc_length\tChecks the property using <bmc_length> value instead \n\t\t\tof using the variable <bmc_length> value.\n");
-  StreamMgr_print_error(streams, "   -l loopback\t\tChecks the property using <loopback> value\n\t\t\tinstead of using the variable <bmc_loopback> value.\n");
-  StreamMgr_print_error(streams, "   -c \t\t\tPerforms completeness check (implies -i)\n");
-  StreamMgr_print_error(streams, "   -N \t\t\tDoes not perform virtual unrolling (implies -i).\n\n");
+  StreamMgr_print_error(
+      streams, "   -m \t\t\tPipes output through the program specified\n");
+  StreamMgr_print_error(
+      streams,
+      "      \t\t\tby the \"PAGER\" environment variable if defined,\n");
+  StreamMgr_print_error(
+      streams, "      \t\t\telse through the UNIX command \"more\".\n");
+  StreamMgr_print_error(
+      streams, "   -o file\t\tWrites the generated output to \"file\".\n");
+  StreamMgr_print_error(
+      streams,
+      "   -n number\t\tChecks only the PSLSPEC with the given index number.\n");
+  StreamMgr_print_error(
+      streams, "   -p \"psl-expr\"\tChecks only the given PSL formula.\n");
+  StreamMgr_print_error(
+      streams,
+      "   -P \"name\"\t\tChecks only the PSLSPEC with the given name.\n");
+  StreamMgr_print_error(streams,
+                        "   -1 \t\t\tGenerates and solves single problems.\n");
+  StreamMgr_print_error(
+      streams, "   -k bmc_length\tChecks the property using <bmc_length> value "
+               "instead \n\t\t\tof using the variable <bmc_length> value.\n");
+  StreamMgr_print_error(
+      streams,
+      "   -l loopback\t\tChecks the property using <loopback> "
+      "value\n\t\t\tinstead of using the variable <bmc_loopback> value.\n");
+  StreamMgr_print_error(
+      streams, "   -c \t\t\tPerforms completeness check (implies -i)\n");
+  StreamMgr_print_error(
+      streams,
+      "   -N \t\t\tDoes not perform virtual unrolling (implies -i).\n\n");
 
   return 1;
 }

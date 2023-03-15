@@ -36,7 +36,7 @@
 */
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include <sys/stat.h>
@@ -48,24 +48,24 @@
 #endif
 
 #include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/Olist.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/ustring.h"
 #include "nusmv/core/utils/utils_io.h"
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Olist.h"
 
 #include "nusmv/core/bmc/bmc.h"
 #include "nusmv/core/trans/trans.h"
 
 typedef struct CmdLineOpt_TAG {
-  char* name;
-  char* usage;
-  char* parameter;
+  char *name;
+  char *usage;
+  char *parameter;
 
   /* Used for special options */
-  boolean (*check_and_apply)(OptsHandler_ptr, char*, NuSMVEnv_ptr);
+  boolean (*check_and_apply)(OptsHandler_ptr, char *, NuSMVEnv_ptr);
 
   /* Used for options which have an associated env var. */
-  char* env_option;
+  char *env_option;
 
   boolean deprecated;
   boolean public;
@@ -79,27 +79,27 @@ typedef struct CmdLineOpt_TAG {
 
   \todo Missing description
 */
-typedef CmdLineOpt* CmdLineOpt_ptr;
+typedef CmdLineOpt *CmdLineOpt_ptr;
 
 typedef struct CoreData_TAG {
-  char* tool_name;
-  char* tool_rcfile;
-  char* tool_version;
-  char* build_date;
-  char* prompt_string;
-  char* email;
-  char* website;
-  char* bug_report_message;
-  char* linked_addons;
+  char *tool_name;
+  char *tool_rcfile;
+  char *tool_version;
+  char *build_date;
+  char *prompt_string;
+  char *email;
+  char *website;
+  char *bug_report_message;
+  char *linked_addons;
 
-  char* library_name;
-  char* library_version;
-  char* library_build_date;
-  char* library_email;
-  char* library_website;
-  char* library_bug_report_message;
+  char *library_name;
+  char *library_version;
+  char *library_build_date;
+  char *library_email;
+  char *library_website;
+  char *library_bug_report_message;
 
-  void (*print_banner)(FILE*);
+  void (*print_banner)(FILE *);
   /* [AMa] The batch function should defenitely return an exit value.. */
   void (*batch)(NuSMVEnv_ptr);
 
@@ -113,7 +113,7 @@ typedef struct CoreData_TAG {
 
   \todo Missing description
 */
-typedef  CoreData* CoreData_ptr;
+typedef CoreData *CoreData_ptr;
 /* Shouldn't introduce reentrancy problems */
 static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
@@ -131,21 +131,21 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define ENV_FLAG_CORE_INITIALIZED    "_nusmv_core_init_"
+#define ENV_FLAG_CORE_INITIALIZED "_nusmv_core_init_"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_INIT_FUNS                "_nusmv_core_init_funs_"
+#define ENV_INIT_FUNS "_nusmv_core_init_funs_"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_INIT_FUNS_NUM            "_nusmv_core_init_funs_num_"
+#define ENV_INIT_FUNS_NUM "_nusmv_core_init_funs_num_"
 
 /* End of environment related constants */
 
@@ -165,7 +165,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_SUCCESS                0
+#define RET_SUCCESS 0
 
 /* The script file does not exits or it contains an error and
    set_on_failure_script_quits is set. */
@@ -175,7 +175,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_SCRIPT_ERROR          -1
+#define RET_SCRIPT_ERROR -1
 
 /* The help has been printed out */
 
@@ -184,7 +184,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_HELP_PRINT             2
+#define RET_HELP_PRINT 2
 
 /* An unknown option is given */
 
@@ -193,7 +193,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_UNKNOWN_OPTION        -1
+#define RET_UNKNOWN_OPTION -1
 
 /* An error occurred with this option */
 
@@ -202,7 +202,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_INVALID_OPTION        -1
+#define RET_INVALID_OPTION -1
 
 /* An invalid parameter is given */
 
@@ -211,7 +211,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_INVALID_OPTION_PARAM  -1
+#define RET_INVALID_OPTION_PARAM -1
 
 /* A required parameter is not given */
 
@@ -220,7 +220,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_MISSING_OPTION_PARAM  -1
+#define RET_MISSING_OPTION_PARAM -1
 
 /* The option depends among another option which is not given */
 
@@ -229,7 +229,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_MISSING_OPTION_DEP    -1
+#define RET_MISSING_OPTION_DEP -1
 
 /* The option conflicts with another option which is given */
 
@@ -238,7 +238,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_CONFLICT_OPTION       -1
+#define RET_CONFLICT_OPTION -1
 
 /* The option is given more than once */
 
@@ -247,7 +247,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define RET_DUPLICATE_OPTION       -1
+#define RET_DUPLICATE_OPTION -1
 
 /* Max width of a printed string (in characters) */
 /* #define MAX_PRINT_WIDTH           75 */
@@ -257,7 +257,7 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 
   \todo Missing description
 */
-#define MAX_PRINT_WIDTH           70
+#define MAX_PRINT_WIDTH 70
 
 /**AutomaticStart*************************************************************/
 
@@ -268,59 +268,54 @@ static CoreData_ptr core_data = (CoreData_ptr)NULL;
 static CoreData_ptr nusmv_core_get_instance(void);
 static void nusmv_core_deinit(void);
 
-static int nusmv_core_parse_line_options(NuSMVEnv_ptr env,
-                                         int argc, char ** argv);
+static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc,
+                                         char **argv);
 
-static void nusmv_core_print_usage(NuSMVEnv_ptr env,
-                                   boolean print_banner);
+static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner);
 
 static CmdLineOpt_ptr nusmv_core_init_opt(void);
 static void nusmv_core_deinit_opt(CmdLineOpt_ptr opt);
 
-static void nusmv_core_print_string(FILE* out, char* str, int padding);
+static void nusmv_core_print_string(FILE *out, char *str, int padding);
 
 static void nusmv_core_olist_union(Olist_ptr a, Olist_ptr b);
-static Olist_ptr
-nusmv_core_olist_intersection(Olist_ptr a, Olist_ptr b);
+static Olist_ptr nusmv_core_olist_intersection(Olist_ptr a, Olist_ptr b);
 
-static char* nusmv_core_merge(Olist_ptr set);
-static Olist_ptr nusmv_core_split( UStringMgr_ptr strmgr, char* str);
-static char* nusmv_core_tolower(char* str);
+static char *nusmv_core_merge(Olist_ptr set);
+static Olist_ptr nusmv_core_split(UStringMgr_ptr strmgr, char *str);
+static char *nusmv_core_tolower(char *str);
 
-static void
-nusmv_core_free_line_options(CoreData_ptr core_data);
+static void nusmv_core_free_line_options(CoreData_ptr core_data);
 
 /* ------------------------- CHECK AND APPLY FUNCTIONS --------------------- */
-static boolean
-nusmv_core_check_sin_fun(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-nusmv_core_check_rbc_fun(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-nusmv_core_set_mono_partition(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-nusmv_core_set_iwls95_partition(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-nusmv_core_set_thresh_partition(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-nusmv_core_set_cpp(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-nusmv_core_set_dp(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-core_data_set_fs(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
-static boolean
-nusmv_core_set_pre(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env);
+static boolean nusmv_core_check_sin_fun(OptsHandler_ptr opt, char *val,
+                                        NuSMVEnv_ptr env);
+static boolean nusmv_core_check_rbc_fun(OptsHandler_ptr opt, char *val,
+                                        NuSMVEnv_ptr env);
+static boolean nusmv_core_set_mono_partition(OptsHandler_ptr opt, char *val,
+                                             NuSMVEnv_ptr env);
+static boolean nusmv_core_set_iwls95_partition(OptsHandler_ptr opt, char *val,
+                                               NuSMVEnv_ptr env);
+static boolean nusmv_core_set_thresh_partition(OptsHandler_ptr opt, char *val,
+                                               NuSMVEnv_ptr env);
+static boolean nusmv_core_set_cpp(OptsHandler_ptr opt, char *val,
+                                  NuSMVEnv_ptr env);
+static boolean nusmv_core_set_dp(OptsHandler_ptr opt, char *val,
+                                 NuSMVEnv_ptr env);
+static boolean core_data_set_fs(OptsHandler_ptr opt, char *val,
+                                NuSMVEnv_ptr env);
+static boolean nusmv_core_set_pre(OptsHandler_ptr opt, char *val,
+                                  NuSMVEnv_ptr env);
 
 static int nusmv_core_start_interactive_shell_loop(NuSMVEnv_ptr env);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void NuSMVCore_init_data(void)
-{
+void NuSMVCore_init_data(void) {
   CoreData_ptr data = nusmv_core_get_instance();
 
   NuSMVCore_set_tool_name(NUSMV_PACKAGE_NAME);
@@ -330,8 +325,8 @@ void NuSMVCore_init_data(void)
   NuSMVCore_set_email("nusmv-users@list.fbk.eu");
   NuSMVCore_set_website("http://nusmv.fbk.eu");
   {
-    char* fmt = "Please report bugs to <%s>";
-    char* tmp = ALLOC(char, strlen(fmt) + strlen(NUSMV_PACKAGE_BUGREPORT) + 1);
+    char *fmt = "Please report bugs to <%s>";
+    char *tmp = ALLOC(char, strlen(fmt) + strlen(NUSMV_PACKAGE_BUGREPORT) + 1);
     sprintf(tmp, fmt, NUSMV_PACKAGE_BUGREPORT);
     NuSMVCore_set_bug_report_message(tmp);
     FREE(tmp);
@@ -351,16 +346,15 @@ void NuSMVCore_init_data(void)
   data->print_banner = CInit_BannerPrint;
 }
 
-void NuSMVCore_init(NuSMVEnv_ptr env, FP_V_E funs[][2], int num_funs)
-{
-  FP_V_E** init_quit_funs = NULL;
+void NuSMVCore_init(NuSMVEnv_ptr env, FP_V_E funs[][2], int num_funs) {
+  FP_V_E **init_quit_funs = NULL;
 
   int i;
 
   if (num_funs > 0) {
     nusmv_assert(NULL != funs);
 
-    init_quit_funs = ALLOC(FP_V_E*, num_funs);
+    init_quit_funs = ALLOC(FP_V_E *, num_funs);
     for (i = 0; i < num_funs; i++) {
       init_quit_funs[i] = ALLOC(FP_V_E, 2);
       init_quit_funs[i][0] = funs[i][0];
@@ -368,7 +362,7 @@ void NuSMVCore_init(NuSMVEnv_ptr env, FP_V_E funs[][2], int num_funs)
     }
 
     NuSMVEnv_set_value(env, ENV_INIT_FUNS, init_quit_funs);
-    NuSMVEnv_set_value(env, ENV_INIT_FUNS_NUM, PTR_FROM_INT(void*, num_funs));
+    NuSMVEnv_set_value(env, ENV_INIT_FUNS_NUM, PTR_FROM_INT(void *, num_funs));
   }
 
   CInit_init(env);
@@ -377,7 +371,7 @@ void NuSMVCore_init(NuSMVEnv_ptr env, FP_V_E funs[][2], int num_funs)
   /* this is not very coorect, as shell gets initialized in core
    * (although only when shell is enabled at compile-time). This is
    * due to the current design of the init/deinit mechanism */
-  Cmd_Init(env);  /* inits the cmd services for the shell */
+  Cmd_Init(env); /* inits the cmd services for the shell */
 #endif
 
   for (i = 0; i < num_funs; ++i) {
@@ -387,16 +381,15 @@ void NuSMVCore_init(NuSMVEnv_ptr env, FP_V_E funs[][2], int num_funs)
   NuSMVEnv_set_flag(env, ENV_FLAG_CORE_INITIALIZED, true);
 }
 
-void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
-{
-  char* libraryName = CInit_NuSMVObtainLibrary();
+void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env) {
+  char *libraryName = CInit_NuSMVObtainLibrary();
   CoreData_ptr data = nusmv_core_get_instance();
 
   {
-    const char* fmt = "does not read any initialization file "
-      "(%s/master%s, ~/%s) (default in batch mode)";
-    char* tmp = ALLOC(char, strlen(fmt) + strlen(libraryName) +
-                (2 * strlen(data->tool_rcfile)) + 1);
+    const char *fmt = "does not read any initialization file "
+                      "(%s/master%s, ~/%s) (default in batch mode)";
+    char *tmp = ALLOC(char, strlen(fmt) + strlen(libraryName) +
+                                (2 * strlen(data->tool_rcfile)) + 1);
 
     sprintf(tmp, fmt, libraryName, data->tool_rcfile, data->tool_rcfile);
     NuSMVCore_add_env_command_line_option("-s", tmp, NULL, IGNORE_INIT_FILE,
@@ -408,25 +401,26 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
                                         "enables the old semantics of \"/\" "
                                         "and \"mod\" operations instead"
                                         " of ANSI C semantics",
-                                        NULL, USE_ANSI_C_DIV_OP,
-                                        true, false, NULL, NULL);
+                                        NULL, USE_ANSI_C_DIV_OP, true, false,
+                                        NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-m", "sets the variable ordering "
+  NuSMVCore_add_env_command_line_option("-m",
+                                        "sets the variable ordering "
                                         "method to \"method\". "
                                         "Reordering will be activated",
-                                        "method", REORDER_METHOD,
-                                        true, false, NULL, NULL);
+                                        "method", REORDER_METHOD, true, false,
+                                        NULL, NULL);
 
   {
     BddOregJusticeEmptinessBddAlgorithmType alg, a1, a2;
-    const char* fmt = "sets the algorthim used for BDD-based language "
-      "emptiness of Buchi fair transition systems "
-      "(default is %s). The available algorthims are: %s, %s";
+    const char *fmt = "sets the algorthim used for BDD-based language "
+                      "emptiness of Buchi fair transition systems "
+                      "(default is %s). The available algorthims are: %s, %s";
 
-    const char* salg;
-    const char* sa1;
-    const char* sa2;
-    char* tmp;
+    const char *salg;
+    const char *sa1;
+    const char *sa2;
+    char *tmp;
 
     alg = DEFAULT_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM;
     a1 = BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD;
@@ -436,8 +430,8 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
     sa1 = Bdd_BddOregJusticeEmptinessBddAlgorithmType_to_string(a1);
     sa2 = Bdd_BddOregJusticeEmptinessBddAlgorithmType_to_string(a2);
 
-    tmp = ALLOC(char, strlen(fmt) + strlen(salg) +
-                strlen(sa1) + strlen(sa2) + 1);
+    tmp =
+        ALLOC(char, strlen(fmt) + strlen(salg) + strlen(sa1) + strlen(sa2) + 1);
     nusmv_assert(NULL != tmp);
 
     sprintf(tmp, fmt, salg, sa1, sa2);
@@ -449,22 +443,21 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
   }
 
   {
-    char* tmp;
-    char* preps_tmp;
-    const char* fmt = "defines a space-separated list of pre-processors "
-      "to run (in the order given) on the input file. "
-      "The list must be in double quotes if there is more "
-      "than one pre-processor named.\n%s";
+    char *tmp;
+    char *preps_tmp;
+    const char *fmt = "defines a space-separated list of pre-processors "
+                      "to run (in the order given) on the input file. "
+                      "The list must be in double quotes if there is more "
+                      "than one pre-processor named.\n%s";
 
     if (get_preprocessors_num(env) > 0) {
-      const char* preps_fmt = "The available preprocessors are: %s";
-      char* preps = get_preprocessor_names(env);
+      const char *preps_fmt = "The available preprocessors are: %s";
+      char *preps = get_preprocessor_names(env);
       preps_tmp = ALLOC(char, strlen(preps_fmt) + strlen(preps) + 1);
       sprintf(preps_tmp, preps_fmt, preps);
       FREE(preps);
-    }
-    else {
-      const char* preps_fmt = "Warning: there are no available preprocessors";
+    } else {
+      const char *preps_fmt = "Warning: there are no available preprocessors";
       preps_tmp = ALLOC(char, strlen(preps_fmt) + 1);
       sprintf(preps_tmp, preps_fmt);
     }
@@ -472,46 +465,45 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
     tmp = ALLOC(char, strlen(fmt) + strlen(preps_tmp) + 1);
     sprintf(tmp, fmt, preps_tmp);
 
-    NuSMVCore_add_command_line_option("-pre", tmp, "pp_list",
-                                      nusmv_core_set_pre,
-                                      true, false, NULL, NULL);
+    NuSMVCore_add_command_line_option(
+        "-pre", tmp, "pp_list", nusmv_core_set_pre, true, false, NULL, NULL);
 
     FREE(preps_tmp);
     FREE(tmp);
   }
 
   {
-    const char* fmt = "sets the sat_solver variable, used by BMC. "
-      "The available SAT solvers are: %s";
+    const char *fmt = "sets the sat_solver variable, used by BMC. "
+                      "The available SAT solvers are: %s";
 
-    char* tmp;
-    char* solvers = Sat_GetAvailableSolversString();
+    char *tmp;
+    char *solvers = Sat_GetAvailableSolversString();
 
     tmp = ALLOC(char, strlen(fmt) + strlen(solvers) + 1);
     sprintf(tmp, fmt, solvers);
 
-    NuSMVCore_add_env_command_line_option("-sat_solver", tmp,
-                                           "str", A_SAT_SOLVER,
-                                          true, false, NULL, NULL);
+    NuSMVCore_add_env_command_line_option(
+        "-sat_solver", tmp, "str", A_SAT_SOLVER, true, false, NULL, NULL);
 
     FREE(solvers);
     FREE(tmp);
   }
 
-  NuSMVCore_add_command_line_option("-sin", "enables (on) or disables sexp"
-                                    " inlining (default is off)", "on|off",
-                                    nusmv_core_check_sin_fun, true,
+  NuSMVCore_add_command_line_option("-sin",
+                                    "enables (on) or disables sexp"
+                                    " inlining (default is off)",
+                                    "on|off", nusmv_core_check_sin_fun, true,
                                     false, NULL, NULL);
 
-  NuSMVCore_add_command_line_option("-rin", "enables (on) or disables rbc"
-                                    " inlining (default is on)", "on|off",
-                                    nusmv_core_check_rbc_fun, true, false,
-                                    NULL, NULL);
+  NuSMVCore_add_command_line_option("-rin",
+                                    "enables (on) or disables rbc"
+                                    " inlining (default is on)",
+                                    "on|off", nusmv_core_check_rbc_fun, true,
+                                    false, NULL, NULL);
 
-  NuSMVCore_add_command_line_option("-mono",
-                                    "enables monolithic transition relation",
-                                    NULL, nusmv_core_set_mono_partition, true,
-                                    false, NULL, "-thresh -iwls95 -cp");
+  NuSMVCore_add_command_line_option(
+      "-mono", "enables monolithic transition relation", NULL,
+      nusmv_core_set_mono_partition, true, false, NULL, "-thresh -iwls95 -cp");
 
   NuSMVCore_add_command_line_option("-iwls95",
                                     "enables Iwls95 conjunctive "
@@ -540,41 +532,42 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
   NuSMVCore_add_command_line_option("-cpp",
                                     "runs preprocessor on SMV files before "
                                     "any specified with -pre. "
-# if NUSMV_HAVE_CPP
-#   if NUSMV_HAVE_GETENV
+#if NUSMV_HAVE_CPP
+#if NUSMV_HAVE_GETENV
                                     "Environment variable 'CPP' can be used to "
                                     "specify a different preprocessor. "
-#   endif
-# else
+#endif
+#else
                                     "Preprocessor was not found when NuSMV"
                                     " had been configured, then 'cpp' will"
                                     " be searched at runtime when needed"
-#   if NUSMV_HAVE_GETENV
+#if NUSMV_HAVE_GETENV
                                     ", or the 'CPP' environment variable "
                                     "will be used when defined by the user"
-#   endif
+#endif
                                     "."
-# endif
-                                    , NULL, nusmv_core_set_cpp,
-                                    true, true, NULL, NULL);
+#endif
+                                    ,
+                                    NULL, nusmv_core_set_cpp, true, true, NULL,
+                                    NULL);
   /* --------------------------------------------------------------- */
 #endif
 
-  NuSMVCore_add_env_command_line_option("-r",
-                                        "enables printing of reachable states",
-                                        NULL, PRINT_REACHABLE, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option(
+      "-r", "enables printing of reachable states", NULL, PRINT_REACHABLE, true,
+      false, NULL, NULL);
 
   NuSMVCore_add_command_line_option("-f",
                                     "computes the reachable states"
                                     " (forward search) (default)",
-                                    NULL, core_data_set_fs, true, true,
-                                    NULL, "-df");
+                                    NULL, core_data_set_fs, true, true, NULL,
+                                    "-df");
 
-  NuSMVCore_add_env_command_line_option("-df", "disables the computation of"
+  NuSMVCore_add_env_command_line_option("-df",
+                                        "disables the computation of"
                                         " reachable states",
-                                        NULL, FORWARD_SEARCH, true, false,
-                                        NULL, "-f");
+                                        NULL, FORWARD_SEARCH, true, false, NULL,
+                                        "-f");
 
   NuSMVCore_add_command_line_option("-dp", "UNSUPPORTED", NULL,
                                     nusmv_core_set_dp, false, true, NULL, NULL);
@@ -588,33 +581,33 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
   NuSMVCore_add_env_command_line_option("-ctt",
                                         "enables checking for the totality"
                                         " of the transition relation",
-                                        NULL, OPT_CHECK_FSM, true,
-                                        false, NULL, NULL);
+                                        NULL, OPT_CHECK_FSM, true, false, NULL,
+                                        NULL);
 
-  NuSMVCore_add_env_command_line_option("-lp",
-                                        "lists all properties in SMV model",
-                                        NULL, LIST_PROPERTIES, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option(
+      "-lp", "lists all properties in SMV model", NULL, LIST_PROPERTIES, true,
+      false, NULL, NULL);
 
   NuSMVCore_add_env_command_line_option("-n",
                                         "specifies which property of SMV "
-                                        "model should be checked", "idx",
-                                        PROP_NO, true, false, NULL, NULL);
+                                        "model should be checked",
+                                        "idx", PROP_NO, true, false, NULL,
+                                        NULL);
 
   NuSMVCore_add_env_command_line_option("-is", "does not check SPEC", NULL,
                                         IGNORE_SPEC, true, false, NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-ic", "does not check COMPUTE",
-                                        NULL, IGNORE_COMPUTE, true, false,
-                                        NULL, NULL);
+  NuSMVCore_add_env_command_line_option("-ic", "does not check COMPUTE", NULL,
+                                        IGNORE_COMPUTE, true, false, NULL,
+                                        NULL);
 
-  NuSMVCore_add_env_command_line_option("-ils", "does not check LTLSPEC",
-                                        NULL, IGNORE_LTLSPEC, true, false,
-                                        NULL, NULL);
+  NuSMVCore_add_env_command_line_option("-ils", "does not check LTLSPEC", NULL,
+                                        IGNORE_LTLSPEC, true, false, NULL,
+                                        NULL);
 
-  NuSMVCore_add_env_command_line_option("-ips", "does not check PSLSPEC",
-                                        NULL, IGNORE_PSLSPEC, true, false,
-                                        NULL, NULL);
+  NuSMVCore_add_env_command_line_option("-ips", "does not check PSLSPEC", NULL,
+                                        IGNORE_PSLSPEC, true, false, NULL,
+                                        NULL);
 
   NuSMVCore_add_env_command_line_option("-ii", "does not check INVARSPEC", NULL,
                                         IGNORE_INVAR, true, false, NULL, NULL);
@@ -622,8 +615,8 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
   NuSMVCore_add_env_command_line_option("-flt",
                                         "computes the reachable states"
                                         " also for the LTL Tableau",
-                                        NULL, LTL_TABLEAU_FORWARD_SEARCH,
-                                        true, false, NULL, NULL);
+                                        NULL, LTL_TABLEAU_FORWARD_SEARCH, true,
+                                        false, NULL, NULL);
 
   NuSMVCore_add_env_command_line_option("-i",
                                         "reads order of variables "
@@ -643,50 +636,45 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
                                         "tv_file", TRANS_ORDER_FILE, true,
                                         false, NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-AG",
-                                        "enables AG only search",
-                                        NULL, AG_ONLY_SEARCH, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option("-AG", "enables AG only search", NULL,
+                                        AG_ONLY_SEARCH, true, false, NULL,
+                                        NULL);
 
   NuSMVCore_add_env_command_line_option("-reorder",
                                         "enables reordering of "
                                         "variables before exiting",
-                                        NULL, ENABLE_REORDER, true,
-                                        false, NULL, NULL);
+                                        NULL, ENABLE_REORDER, true, false, NULL,
+                                        NULL);
 
   NuSMVCore_add_env_command_line_option("-dynamic",
                                         "enables dynamic reordering "
                                         "of variables",
-                                        NULL, DYNAMIC_REORDER, true,
-                                        false, NULL, NULL);
+                                        NULL, DYNAMIC_REORDER, true, false,
+                                        NULL, NULL);
 
   NuSMVCore_add_env_command_line_option("-disable_sexp2bdd_caching",
                                         "disables caching of expressions"
                                         "evaluation to BDD",
-                                        NULL, ENABLE_SEXP2BDD_CACHING,
-                                        true, false, NULL, NULL);
-
-  NuSMVCore_add_env_command_line_option("-bdd_soh",
-                                        "sets the static variable ordering "
-                                        "heuristics to \"heuristics\"",
-                                        "heuristics",
-                                        BDD_STATIC_ORDER_HEURISTICS, true,
+                                        NULL, ENABLE_SEXP2BDD_CACHING, true,
                                         false, NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-coi",
-                                        "enables cone of influence reduction",
-                                        NULL, CONE_OF_INFLUENCE, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option(
+      "-bdd_soh",
+      "sets the static variable ordering "
+      "heuristics to \"heuristics\"",
+      "heuristics", BDD_STATIC_ORDER_HEURISTICS, true, false, NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-noaffinity",
-                                        "disables affinity clustering",
-                                        NULL, AFFINITY_CLUSTERING, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option(
+      "-coi", "enables cone of influence reduction", NULL, CONE_OF_INFLUENCE,
+      true, false, NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-iwl95preorder",
-                                        "enables iwls95 preordering",
-                                        NULL, IWLS95_PREORDER, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option(
+      "-noaffinity", "disables affinity clustering", NULL, AFFINITY_CLUSTERING,
+      true, false, NULL, NULL);
+
+  NuSMVCore_add_env_command_line_option(
+      "-iwl95preorder", "enables iwls95 preordering", NULL, IWLS95_PREORDER,
+      true, false, NULL, NULL);
 
   NuSMVCore_add_env_command_line_option("-ofm",
                                         "prints flattened model to file "
@@ -697,8 +685,8 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
   NuSMVCore_add_env_command_line_option("-disable_daggifier",
                                         "disables the SMV model "
                                         "dumper daggifier",
-                                        NULL, DAGGIFIER_ENABLED,
-                                        true, false, NULL, NULL);
+                                        NULL, DAGGIFIER_ENABLED, true, false,
+                                        NULL, NULL);
 
   NuSMVCore_add_env_command_line_option("-obm",
                                         "prints boolean model to"
@@ -706,48 +694,40 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
                                         "bn_file", OUTPUT_BOOLEAN_MODEL_FILE,
                                         true, false, NULL, NULL);
 #if NUSMV_HAVE_INCREMENTAL_SAT
-  NuSMVCore_add_env_command_line_option("-bmc_length",
-                                        "sets bmc_length variable, used by BMC",
-                                        "k", BMC_PB_LENGTH, true,
-                                        false, "-bmc", NULL);
+  NuSMVCore_add_env_command_line_option(
+      "-bmc_length", "sets bmc_length variable, used by BMC", "k",
+      BMC_PB_LENGTH, true, false, "-bmc", NULL);
 
   NuSMVCore_add_env_command_line_option("-bmc",
                                         "enables BMC instead of "
                                         "BDD model checking",
-                                        NULL, BMC_MODE, true,
-                                        false, NULL, NULL);
+                                        NULL, BMC_MODE, true, false, NULL,
+                                        NULL);
 #endif /* HAVE_INCREMENTAL_SAT */
 
-  NuSMVCore_add_env_command_line_option("-int",
-                                        "enables interactive mode",
-                                        NULL, BATCH, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option("-int", "enables interactive mode",
+                                        NULL, BATCH, true, false, NULL, NULL);
 
   NuSMVCore_add_env_command_line_option("-dcx",
                                         "disables computation of"
                                         " counter-examples",
-                                        NULL, COUNTER_EXAMPLES, true,
-                                        false, NULL, NULL);
+                                        NULL, COUNTER_EXAMPLES, true, false,
+                                        NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-load",
-                                        "executes NuSMV commands from file",
-                                        "sc_file", SCRIPT_FILE, true,
-                                        true, NULL, "-source");
+  NuSMVCore_add_env_command_line_option(
+      "-load", "executes NuSMV commands from file", "sc_file", SCRIPT_FILE,
+      true, true, NULL, "-source");
 
-  NuSMVCore_add_env_command_line_option("-source",
-                                        "executes NuSMV commands from file",
-                                        "sc_file", SCRIPT_FILE, true,
-                                        false, NULL, "-load");
+  NuSMVCore_add_env_command_line_option(
+      "-source", "executes NuSMV commands from file", "sc_file", SCRIPT_FILE,
+      true, false, NULL, "-load");
 
-  NuSMVCore_add_env_command_line_option("-quiet",
-                                        "Quiet mode",
-                                        NULL, QUIET_MODE, false,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option("-quiet", "Quiet mode", NULL,
+                                        QUIET_MODE, false, false, NULL, NULL);
 
-  NuSMVCore_add_env_command_line_option("-v",
-                                        "sets verbose level to \"vl\"",
-                                        "vl", VERBOSE_LEVEL, true,
-                                        false, NULL, NULL);
+  NuSMVCore_add_env_command_line_option("-v", "sets verbose level to \"vl\"",
+                                        "vl", VERBOSE_LEVEL, true, false, NULL,
+                                        NULL);
 
   NuSMVCore_add_env_command_line_option("-disable_syntactic_checks",
                                         "Skips some correctness checks over "
@@ -767,17 +747,16 @@ void NuSMVCore_init_cmd_options(NuSMVEnv_ptr env)
   FREE(libraryName);
 }
 
-boolean NuSMVCore_main(NuSMVEnv_ptr env, int argc, char ** argv, int* status)
-{
+boolean NuSMVCore_main(NuSMVEnv_ptr env, int argc, char **argv, int *status) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* outstream = StreamMgr_get_output_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *outstream = StreamMgr_get_output_stream(streams);
   OptsHandler_ptr opts = NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
   CoreData_ptr data = nusmv_core_get_instance();
   int quit_flag = 0;
   boolean requires_shutdown = true;
 
-  nusmv_assert((int*)status != NULL);
+  nusmv_assert((int *)status != NULL);
   nusmv_assert(NuSMVEnv_get_flag(env, ENV_FLAG_CORE_INITIALIZED));
 
   *status = RET_SUCCESS;
@@ -798,8 +777,7 @@ boolean NuSMVCore_main(NuSMVEnv_ptr env, int argc, char ** argv, int* status)
       }
       quit_flag = nusmv_core_start_interactive_shell_loop(env);
       *status = RET_SUCCESS;
-    }
-    else {
+    } else {
       if (!opt_get_quiet_mode(opts)) {
         data->print_banner(outstream);
       }
@@ -832,16 +810,11 @@ boolean NuSMVCore_main(NuSMVEnv_ptr env, int argc, char ** argv, int* status)
   return requires_shutdown;
 }
 
-void NuSMVCore_quit(NuSMVEnv_ptr env)
-{
-  NuSMVCore_quit_extended(env, false);
-}
+void NuSMVCore_quit(NuSMVEnv_ptr env) { NuSMVCore_quit_extended(env, false); }
 
-void NuSMVCore_quit_extended(NuSMVEnv_ptr env,
-                             const boolean keep_core_data)
-{
+void NuSMVCore_quit_extended(NuSMVEnv_ptr env, const boolean keep_core_data) {
   int i;
-  FP_V_E ** init_quit_funs = NuSMVEnv_get_value(env, ENV_INIT_FUNS);
+  FP_V_E **init_quit_funs = NuSMVEnv_get_value(env, ENV_INIT_FUNS);
   int num = PTR_TO_INT(NuSMVEnv_get_value(env, ENV_INIT_FUNS_NUM));
 
   nusmv_assert(NuSMVEnv_get_flag(env, ENV_FLAG_CORE_INITIALIZED));
@@ -859,7 +832,7 @@ void NuSMVCore_quit_extended(NuSMVEnv_ptr env,
   /* this is not very coorect, as shell gets initialized in core
    * (although only when shell is enabled at compile-time). This is
    * due to the current design of the init/deinit mechanism */
-  Cmd_End(env);  /* quits the cmd services for the shell */
+  Cmd_End(env); /* quits the cmd services for the shell */
 #endif
 
   CInit_end(env);
@@ -868,7 +841,7 @@ void NuSMVCore_quit_extended(NuSMVEnv_ptr env,
      end. nusmv_core_deinit is garanteed to use only simple
      independant structures */
   /* Free line_options if not already done by NuSMVCore_main */
-  if (! keep_core_data) {
+  if (!keep_core_data) {
     CoreData_ptr data = nusmv_core_get_instance();
     nusmv_core_free_line_options(data);
     nusmv_core_deinit();
@@ -877,10 +850,9 @@ void NuSMVCore_quit_extended(NuSMVEnv_ptr env,
   NuSMVEnv_set_flag(env, ENV_FLAG_CORE_INITIALIZED, false);
 }
 
-void NuSMVCore_reset(NuSMVEnv_ptr env)
-{
+void NuSMVCore_reset(NuSMVEnv_ptr env) {
   OptsHandler_ptr opts = NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
-  FP_V_E ** init_quit_funs = NuSMVEnv_get_value(env, ENV_INIT_FUNS);
+  FP_V_E **init_quit_funs = NuSMVEnv_get_value(env, ENV_INIT_FUNS);
   int num = PTR_TO_INT(NuSMVEnv_get_value(env, ENV_INIT_FUNS_NUM));
   int i = 0;
 
@@ -901,8 +873,7 @@ void NuSMVCore_reset(NuSMVEnv_ptr env)
 
   if (opt_verbose_level_gt(opts, 1)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-               "Shutdown completed, rebooting the system...\n");
+    Logger_log(logger, "Shutdown completed, rebooting the system...\n");
   }
 
   CInit_reset_last(env);
@@ -916,42 +887,36 @@ void NuSMVCore_reset(NuSMVEnv_ptr env)
     Logger_log(logger, "The system is now up and ready\n");
     Logger_dec_indent_size(logger);
   }
-
 }
 
-void NuSMVCore_add_env_command_line_option(char* name,
-                                           char* usage,
-                                           char* parameter,
-                                           char* env_var,
-                                           boolean public,
-                                           boolean deprecated,
-                                           char* dependency,
-                                           char* conflict)
-{
+void NuSMVCore_add_env_command_line_option(char *name, char *usage,
+                                           char *parameter, char *env_var,
+                                           boolean public, boolean deprecated,
+                                           char *dependency, char *conflict) {
   CoreData_ptr data = nusmv_core_get_instance();
   CmdLineOpt_ptr opt = nusmv_core_init_opt();
 
-  nusmv_assert((char*)NULL != name);
+  nusmv_assert((char *)NULL != name);
   opt->name = util_strsav(name);
 
-  nusmv_assert((char*)NULL != usage);
+  nusmv_assert((char *)NULL != usage);
   opt->usage = util_strsav(usage);
 
-  if ((char*)NULL != parameter) {
+  if ((char *)NULL != parameter) {
     opt->parameter = util_strsav(parameter);
   }
 
-  nusmv_assert((char*)NULL != env_var);
+  nusmv_assert((char *)NULL != env_var);
   opt->env_option = util_strsav(env_var);
 
   opt->deprecated = deprecated;
   opt->public = public;
 
-  if ((char*)NULL != dependency) {
-    opt->dependency =  UStringMgr_find_string(data->string_mgr, dependency);
+  if ((char *)NULL != dependency) {
+    opt->dependency = UStringMgr_find_string(data->string_mgr, dependency);
   }
 
-  if ((char*)NULL != conflict) {
+  if ((char *)NULL != conflict) {
     Olist_ptr split = nusmv_core_split(data->string_mgr, conflict);
     nusmv_core_olist_union(opt->conflicts, split);
     Olist_destroy(split);
@@ -960,30 +925,24 @@ void NuSMVCore_add_env_command_line_option(char* name,
   nusmv_assert((hash_ptr)NULL != data->line_options);
 
   insert_assoc(data->line_options,
-               NODE_PTR( UStringMgr_find_string(data->string_mgr, name)),
+               NODE_PTR(UStringMgr_find_string(data->string_mgr, name)),
                NODE_PTR(opt));
 }
 
-void
-NuSMVCore_add_command_line_option(char* name,
-                                  char* usage,
-                                  char* parameter,
-                                  boolean (*check_and_apply)(OptsHandler_ptr, char*, NuSMVEnv_ptr),
-                                  boolean public,
-                                  boolean deprecated,
-                                  char* dependency,
-                                  char* conflict)
-{
+void NuSMVCore_add_command_line_option(
+    char *name, char *usage, char *parameter,
+    boolean (*check_and_apply)(OptsHandler_ptr, char *, NuSMVEnv_ptr),
+    boolean public, boolean deprecated, char *dependency, char *conflict) {
   CoreData_ptr data = nusmv_core_get_instance();
   CmdLineOpt_ptr opt = nusmv_core_init_opt();
 
-  nusmv_assert((char*)NULL != name);
+  nusmv_assert((char *)NULL != name);
   opt->name = util_strsav(name);
 
-  nusmv_assert((char*)NULL != usage);
+  nusmv_assert((char *)NULL != usage);
   opt->usage = util_strsav(usage);
 
-  if ((char*)NULL != parameter) {
+  if ((char *)NULL != parameter) {
     opt->parameter = util_strsav(parameter);
   }
 
@@ -993,11 +952,11 @@ NuSMVCore_add_command_line_option(char* name,
   opt->deprecated = deprecated;
   opt->public = public;
 
-  if ((char*)NULL != dependency) {
-    opt->dependency =  UStringMgr_find_string(data->string_mgr, dependency);
+  if ((char *)NULL != dependency) {
+    opt->dependency = UStringMgr_find_string(data->string_mgr, dependency);
   }
 
-  if ((char*)NULL != conflict) {
+  if ((char *)NULL != conflict) {
     Olist_ptr split = nusmv_core_split(data->string_mgr, conflict);
     nusmv_core_olist_union(opt->conflicts, split);
     Olist_destroy(split);
@@ -1006,32 +965,29 @@ NuSMVCore_add_command_line_option(char* name,
   nusmv_assert((hash_ptr)NULL != data->line_options);
 
   insert_assoc(data->line_options,
-               NODE_PTR( UStringMgr_find_string(data->string_mgr, name)),
+               NODE_PTR(UStringMgr_find_string(data->string_mgr, name)),
                NODE_PTR(opt));
 }
 
-char* NuSMVCore_get_tool_name(void)
-{
+char *NuSMVCore_get_tool_name(void) {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->tool_name;
 }
 
-char* NuSMVCore_get_tool_rc_file_name(void)
-{
+char *NuSMVCore_get_tool_rc_file_name(void) {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->tool_rcfile;
 }
 
-void NuSMVCore_set_tool_name(char* tool_name)
-{
+void NuSMVCore_set_tool_name(char *tool_name) {
   CoreData_ptr self = nusmv_core_get_instance();
-  char* tmp = (char*)NULL;
-  char* l_tool_name = (char*)NULL;
+  char *tmp = (char *)NULL;
+  char *l_tool_name = (char *)NULL;
 
-  if ((char*)NULL != self->tool_name) {
+  if ((char *)NULL != self->tool_name) {
     FREE(self->tool_name);
   }
-  if ((char*)NULL != self->tool_rcfile) {
+  if ((char *)NULL != self->tool_rcfile) {
     FREE(self->tool_rcfile);
   }
   self->tool_name = util_strsav(tool_name);
@@ -1045,188 +1001,161 @@ void NuSMVCore_set_tool_name(char* tool_name)
   FREE(l_tool_name);
 }
 
-char* NuSMVCore_get_tool_version()
-{
+char *NuSMVCore_get_tool_version() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->tool_version;
 }
 
-void NuSMVCore_set_tool_version(char* tool_version)
-{
+void NuSMVCore_set_tool_version(char *tool_version) {
   CoreData_ptr self = nusmv_core_get_instance();
-  if ((char*)NULL != self->tool_version) {
+  if ((char *)NULL != self->tool_version) {
     FREE(self->tool_version);
   }
   self->tool_version = util_strsav(tool_version);
 }
 
-char* NuSMVCore_get_build_date()
-{
+char *NuSMVCore_get_build_date() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->build_date;
 }
 
-void NuSMVCore_set_build_date(char* build_date)
-{
+void NuSMVCore_set_build_date(char *build_date) {
   CoreData_ptr self = nusmv_core_get_instance();
-  if ((char*)NULL != self->build_date) {
+  if ((char *)NULL != self->build_date) {
     FREE(self->build_date);
   }
   self->build_date = util_strsav(build_date);
 }
 
-char* NuSMVCore_get_prompt_string(void)
-{
+char *NuSMVCore_get_prompt_string(void) {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->prompt_string;
 }
 
-void NuSMVCore_set_prompt_string(char* prompt_string)
-{
+void NuSMVCore_set_prompt_string(char *prompt_string) {
   CoreData_ptr self = nusmv_core_get_instance();
-  if ((char*)NULL != self->prompt_string) {
+  if ((char *)NULL != self->prompt_string) {
     FREE(self->prompt_string);
   }
   self->prompt_string = util_strsav(prompt_string);
 }
 
-char* NuSMVCore_get_email()
-{
+char *NuSMVCore_get_email() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->email;
 }
 
-void NuSMVCore_set_email(char* email)
-{
+void NuSMVCore_set_email(char *email) {
   CoreData_ptr self = nusmv_core_get_instance();
-  if ((char*)NULL != self->email) {
+  if ((char *)NULL != self->email) {
     FREE(self->email);
   }
   self->email = util_strsav(email);
 }
 
-char* NuSMVCore_get_website()
-{
+char *NuSMVCore_get_website() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->website;
 }
 
-void NuSMVCore_set_website(char* website)
-{
+void NuSMVCore_set_website(char *website) {
   CoreData_ptr self = nusmv_core_get_instance();
-  if ((char*)NULL != self->website) {
+  if ((char *)NULL != self->website) {
     FREE(self->website);
   }
   self->website = util_strsav(website);
 }
 
-char* NuSMVCore_get_bug_report_message()
-{
+char *NuSMVCore_get_bug_report_message() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->bug_report_message;
 }
 
-void NuSMVCore_set_bug_report_message(char* bug_report_message)
-{
+void NuSMVCore_set_bug_report_message(char *bug_report_message) {
   CoreData_ptr self = nusmv_core_get_instance();
-  if ((char*)NULL != self->bug_report_message) {
+  if ((char *)NULL != self->bug_report_message) {
     FREE(self->bug_report_message);
   }
   self->bug_report_message = util_strsav(bug_report_message);
 }
 
-char* NuSMVCore_get_linked_addons()
-{
+char *NuSMVCore_get_linked_addons() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->linked_addons;
 }
 
-void NuSMVCore_set_linked_addons(char* linked_addons)
-{
+void NuSMVCore_set_linked_addons(char *linked_addons) {
   CoreData_ptr self = nusmv_core_get_instance();
-  if ((char*)NULL != self->linked_addons) {
+  if ((char *)NULL != self->linked_addons) {
     FREE(self->linked_addons);
   }
   self->linked_addons = util_strsav(linked_addons);
 }
 
-char* NuSMVCore_get_library_name()
-{
+char *NuSMVCore_get_library_name() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->library_name;
 }
 
-void NuSMVCore_set_library_name(const char * library_name)
-{
+void NuSMVCore_set_library_name(const char *library_name) {
   CoreData_ptr self = nusmv_core_get_instance();
   self->library_name = util_strsav(library_name);
 }
 
-char* NuSMVCore_get_library_version()
-{
+char *NuSMVCore_get_library_version() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->library_version;
 }
 
-char* NuSMVCore_get_library_build_date()
-{
+char *NuSMVCore_get_library_build_date() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->library_build_date;
 }
 
-void NuSMVCore_set_library_build_date(const char * library_build_date)
-{
+void NuSMVCore_set_library_build_date(const char *library_build_date) {
   CoreData_ptr self = nusmv_core_get_instance();
   self->library_build_date = util_strsav(library_build_date);
 }
 
-char* NuSMVCore_get_library_email()
-{
+char *NuSMVCore_get_library_email() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->library_email;
 }
 
-void NuSMVCore_set_library_email(const char * library_email)
-{
+void NuSMVCore_set_library_email(const char *library_email) {
   CoreData_ptr self = nusmv_core_get_instance();
   self->library_email = util_strsav(library_email);
 }
 
-char* NuSMVCore_get_library_website()
-{
+char *NuSMVCore_get_library_website() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->library_website;
 }
 
-void NuSMVCore_set_library_website(const char * library_website)
-{
+void NuSMVCore_set_library_website(const char *library_website) {
   CoreData_ptr self = nusmv_core_get_instance();
-  self->library_website = util_strsav(library_website);;
+  self->library_website = util_strsav(library_website);
+  ;
 }
 
-char* NuSMVCore_get_library_bug_report_message()
-{
+char *NuSMVCore_get_library_bug_report_message() {
   CoreData_ptr self = nusmv_core_get_instance();
   return self->library_bug_report_message;
 }
 
-void NuSMVCore_set_banner_print_fun(void (*banner_print_fun)(FILE *))
-{
+void NuSMVCore_set_banner_print_fun(void (*banner_print_fun)(FILE *)) {
   CoreData_ptr self = nusmv_core_get_instance();
   self->print_banner = banner_print_fun;
 }
 
-void NuSMVCore_set_batch_fun(void (*batch_fun)(NuSMVEnv_ptr))
-{
+void NuSMVCore_set_batch_fun(void (*batch_fun)(NuSMVEnv_ptr)) {
   CoreData_ptr self = nusmv_core_get_instance();
   self->batch = batch_fun;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -1239,36 +1168,35 @@ void NuSMVCore_set_batch_fun(void (*batch_fun)(NuSMVEnv_ptr))
 
   \sa nusmv_core_deinit
 */
-static CoreData_ptr nusmv_core_get_instance(void)
-{
+static CoreData_ptr nusmv_core_get_instance(void) {
   if ((CoreData_ptr)NULL == core_data) {
     core_data = ALLOC(CoreData, 1);
 
     nusmv_assert((CoreData_ptr)NULL != core_data);
 
-    core_data->tool_name = (char*)NULL;
-    core_data->tool_rcfile = (char*)NULL;
-    core_data->tool_version = (char*)NULL;
-    core_data->build_date = (char*)NULL;
-    core_data->prompt_string = (char*)NULL;
-    core_data->email = (char*)NULL;
-    core_data->website = (char*)NULL;
-    core_data->bug_report_message = (char*)NULL;
-    core_data->linked_addons = (char*)NULL;
+    core_data->tool_name = (char *)NULL;
+    core_data->tool_rcfile = (char *)NULL;
+    core_data->tool_version = (char *)NULL;
+    core_data->build_date = (char *)NULL;
+    core_data->prompt_string = (char *)NULL;
+    core_data->email = (char *)NULL;
+    core_data->website = (char *)NULL;
+    core_data->bug_report_message = (char *)NULL;
+    core_data->linked_addons = (char *)NULL;
 
-    core_data->library_name = (char*)NULL;
-    core_data->library_version = (char*)NULL;
-    core_data->library_build_date = (char*)NULL;
-    core_data->library_email = (char*)NULL;
-    core_data->library_website = (char*)NULL;
-    core_data->library_bug_report_message = (char*)NULL;
+    core_data->library_name = (char *)NULL;
+    core_data->library_version = (char *)NULL;
+    core_data->library_build_date = (char *)NULL;
+    core_data->library_email = (char *)NULL;
+    core_data->library_website = (char *)NULL;
+    core_data->library_bug_report_message = (char *)NULL;
 
     core_data->print_banner = NULL;
     core_data->batch = NULL;
 
     core_data->line_options = new_assoc();
 
-    core_data->string_mgr =  UStringMgr_create();
+    core_data->string_mgr = UStringMgr_create();
   }
 
   return core_data;
@@ -1284,58 +1212,57 @@ static CoreData_ptr nusmv_core_get_instance(void)
 
   \sa nusmv_core_get_instance
 */
-static void nusmv_core_deinit(void)
-{
+static void nusmv_core_deinit(void) {
   if ((CoreData_ptr)NULL != core_data) {
 
-    if ((char*)NULL != core_data->tool_name) {
+    if ((char *)NULL != core_data->tool_name) {
       FREE(core_data->tool_name);
     }
-    if ((char*)NULL != core_data->tool_rcfile) {
+    if ((char *)NULL != core_data->tool_rcfile) {
       FREE(core_data->tool_rcfile);
     }
-    if ((char*)NULL != core_data->tool_version) {
+    if ((char *)NULL != core_data->tool_version) {
       FREE(core_data->tool_version);
     }
-    if ((char*)NULL != core_data->build_date) {
+    if ((char *)NULL != core_data->build_date) {
       FREE(core_data->build_date);
     }
-    if ((char*)NULL != core_data->prompt_string) {
+    if ((char *)NULL != core_data->prompt_string) {
       FREE(core_data->prompt_string);
     }
-    if ((char*)NULL != core_data->email) {
+    if ((char *)NULL != core_data->email) {
       FREE(core_data->email);
     }
-    if ((char*)NULL != core_data->website) {
+    if ((char *)NULL != core_data->website) {
       FREE(core_data->website);
     }
-    if ((char*)NULL != core_data->bug_report_message) {
+    if ((char *)NULL != core_data->bug_report_message) {
       FREE(core_data->bug_report_message);
     }
-    if ((char*)NULL != core_data->linked_addons) {
+    if ((char *)NULL != core_data->linked_addons) {
       FREE(core_data->linked_addons);
     }
 
-    if ((char*)NULL != core_data->library_name) {
+    if ((char *)NULL != core_data->library_name) {
       FREE(core_data->library_name);
     }
-    if ((char*)NULL != core_data->library_version) {
+    if ((char *)NULL != core_data->library_version) {
       FREE(core_data->library_version);
     }
-    if ((char*)NULL != core_data->library_build_date) {
+    if ((char *)NULL != core_data->library_build_date) {
       FREE(core_data->library_build_date);
     }
-    if ((char*)NULL != core_data->library_email) {
+    if ((char *)NULL != core_data->library_email) {
       FREE(core_data->library_email);
     }
-    if ((char*)NULL != core_data->library_bug_report_message) {
+    if ((char *)NULL != core_data->library_bug_report_message) {
       FREE(core_data->library_bug_report_message);
     }
-    if ((char*)NULL != core_data->library_website) {
+    if ((char *)NULL != core_data->library_website) {
       FREE(core_data->library_website);
     }
 
-     UStringMgr_destroy(core_data->string_mgr);
+    UStringMgr_destroy(core_data->string_mgr);
 
     FREE(core_data);
   }
@@ -1350,16 +1277,15 @@ static void nusmv_core_deinit(void)
 
   \sa nusmv_core_deinit_opt
 */
-static CmdLineOpt_ptr nusmv_core_init_opt()
-{
+static CmdLineOpt_ptr nusmv_core_init_opt() {
   CmdLineOpt_ptr opt = ALLOC(CmdLineOpt, 1);
 
-  opt->name = (char*)NULL;
-  opt->usage = (char*)NULL;
-  opt->parameter = (char*)NULL;
+  opt->name = (char *)NULL;
+  opt->usage = (char *)NULL;
+  opt->parameter = (char *)NULL;
 
   opt->check_and_apply = NULL;
-  opt->env_option = (char*)NULL;
+  opt->env_option = (char *)NULL;
 
   opt->deprecated = false;
   opt->public = false;
@@ -1379,17 +1305,20 @@ static CmdLineOpt_ptr nusmv_core_init_opt()
 
   \sa nusmv_core_init_opt
 */
-static void nusmv_core_deinit_opt(CmdLineOpt_ptr opt)
-{
+static void nusmv_core_deinit_opt(CmdLineOpt_ptr opt) {
   nusmv_assert((CmdLineOpt_ptr)NULL != opt);
 
-  nusmv_assert((char*)NULL != opt->name);
+  nusmv_assert((char *)NULL != opt->name);
   FREE(opt->name);
-  nusmv_assert((char*)NULL != opt->usage);
+  nusmv_assert((char *)NULL != opt->usage);
   FREE(opt->usage);
 
-  if ((char*)NULL != opt->parameter) { FREE(opt->parameter); }
-  if ((char*)NULL != opt->env_option) { FREE(opt->env_option); }
+  if ((char *)NULL != opt->parameter) {
+    FREE(opt->parameter);
+  }
+  if ((char *)NULL != opt->env_option) {
+    FREE(opt->env_option);
+  }
 
   Olist_destroy(opt->conflicts);
 
@@ -1407,19 +1336,18 @@ static void nusmv_core_deinit_opt(CmdLineOpt_ptr opt)
   \sa NuSMVCore_add_command_line_option
    NuSMVCore_add_env_command_line_option
 */
-static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
-{
+static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
   CoreData_ptr data = nusmv_core_get_instance();
   OptsHandler_ptr opts = NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
 
   /* For lexical ordered printing */
-  avl_tree* avl = avl_init_table((int (*)(char *, char *))Utils_strcasecmp);
-  avl_generator* gen;
-  char* option_name;
-  char* option_struct_ptr;
+  avl_tree *avl = avl_init_table((int (*)(char *, char *))Utils_strcasecmp);
+  avl_generator *gen;
+  char *option_name;
+  char *option_struct_ptr;
 
   string_ptr key;
   CmdLineOpt_ptr opt;
@@ -1432,7 +1360,7 @@ static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
     /* We print the usage only if the option should be available to
        the user */
     if (opt->public) {
-      avl_insert(avl, (char*) UStringMgr_get_string_text(key), (char*)opt);
+      avl_insert(avl, (char *)UStringMgr_get_string_text(key), (char *)opt);
     }
   }
 
@@ -1441,26 +1369,26 @@ static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
     data->print_banner(errstream);
   }
 
-  StreamMgr_print_error(streams,  "Usage:  %s [-h | -help] [options]* [input_file]\n",
-          data->tool_name);
+  StreamMgr_print_error(streams,
+                        "Usage:  %s [-h | -help] [options]* [input_file]\n",
+                        data->tool_name);
 
   gen = avl_init_gen(avl, AVL_FORWARD);
 
-  StreamMgr_print_error(streams,  "   -h | -help\n");
+  StreamMgr_print_error(streams, "   -h | -help\n");
   nusmv_core_print_string(errstream, "prints out current message", 6);
 
   /* Now print all options.. */
   while (avl_gen(gen, &option_name, &option_struct_ptr)) {
     CmdLineOpt_ptr option_struct = (CmdLineOpt_ptr)option_struct_ptr;
-    char* tmp;
+    char *tmp;
 
     /* ---------- OPTION NAME + PARAMETER -------------- */
-    if ((char*)NULL != option_struct->parameter) {
-      tmp = ALLOC(char, strlen(option_name) +
-                  strlen(option_struct->parameter) + 2);
+    if ((char *)NULL != option_struct->parameter) {
+      tmp = ALLOC(char,
+                  strlen(option_name) + strlen(option_struct->parameter) + 2);
       sprintf(tmp, "%s %s", option_name, option_struct->parameter);
-    }
-    else {
+    } else {
       tmp = ALLOC(char, strlen(option_name) + 1);
       sprintf(tmp, "%s", option_name);
     }
@@ -1471,9 +1399,12 @@ static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
 
     /* ---------- OPTION DEPENDENCIES ------------------ */
     if ((string_ptr)NULL != option_struct->dependency) {
-      const char* fmt = "NOTE: Requires option \"%s\"";
-      tmp = REALLOC(char, tmp, strlen(fmt) +
-                    strlen(UStringMgr_get_string_text(option_struct->dependency)) + 1);
+      const char *fmt = "NOTE: Requires option \"%s\"";
+      tmp = REALLOC(
+          char, tmp,
+          strlen(fmt) +
+              strlen(UStringMgr_get_string_text(option_struct->dependency)) +
+              1);
 
       sprintf(tmp, fmt, UStringMgr_get_string_text(option_struct->dependency));
       nusmv_core_print_string(errstream, tmp, 6);
@@ -1481,13 +1412,12 @@ static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
 
     /* ---------- OPTION CONFICTS ---------------------- */
     if (!Olist_is_empty(option_struct->conflicts)) {
-      const char* fmt = "NOTE: Incompatible with option%s %s";
-      char* conf = nusmv_core_merge(option_struct->conflicts);
+      const char *fmt = "NOTE: Incompatible with option%s %s";
+      char *conf = nusmv_core_merge(option_struct->conflicts);
       tmp = REALLOC(char, tmp, strlen(fmt) + strlen(conf) + 2);
 
       sprintf(tmp, fmt,
-              (Olist_get_size(option_struct->conflicts) > 1 ? "s" : ""),
-              conf);
+              (Olist_get_size(option_struct->conflicts) > 1 ? "s" : ""), conf);
 
       nusmv_core_print_string(errstream, tmp, 6);
       FREE(conf);
@@ -1495,7 +1425,7 @@ static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
 
     /* ---------- OPTION IS DEPRECATED ----------------- */
     if (option_struct->deprecated) {
-      const char* fmt = "WARNING: option \"%s\" is deprecated";
+      const char *fmt = "WARNING: option \"%s\" is deprecated";
       tmp = REALLOC(char, tmp, strlen(fmt) + strlen(option_name) + 1);
 
       sprintf(tmp, fmt, option_name);
@@ -1505,10 +1435,11 @@ static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
     FREE(tmp);
   }
 
-  StreamMgr_print_error(streams,  "   input-file\n");
+  StreamMgr_print_error(streams, "   input-file\n");
   nusmv_core_print_string(errstream,
                           "the file both the model and "
-                          "the spec were read from", 6);
+                          "the spec were read from",
+                          6);
 
   avl_free_gen(gen);
   avl_free_table(avl, 0, 0);
@@ -1524,8 +1455,7 @@ static void nusmv_core_print_usage(NuSMVEnv_ptr env, boolean print_banner)
    (padded as the previous one). The string is divided in such way
    that no words are truncated. Words are separated by spaces.
 */
-static void nusmv_core_print_string(FILE* out, char* str, int padding)
-{
+static void nusmv_core_print_string(FILE *out, char *str, int padding) {
 #if 1
   /*
      This version may generate lines longer than
@@ -1536,33 +1466,38 @@ static void nusmv_core_print_string(FILE* out, char* str, int padding)
    */
   int j = 0, i = 0, c = 0, d = 0;
 
-  for (i = 0; i < padding; ++i, ++c) {fputc(' ', out); }
+  for (i = 0; i < padding; ++i, ++c) {
+    fputc(' ', out);
+  }
 
   for (i = 0; '\0' != str[i]; ++i) {
     if (0 == c) {
-      for (j = 0; j < padding; ++j, ++c) {fputc(' ', out); }
-    }
-    if ('\n' == str[i]) {
-      if ('\0' != str[i+1] && '\n' != str[i+1]) {
-        fputc(str[i], out);
-        c = 0; d = 0;
+      for (j = 0; j < padding; ++j, ++c) {
+        fputc(' ', out);
       }
     }
-    else if (' ' == str[i]) {
-     if ('\0' != str[i+1] && ' ' != str[i+1] && 0 != d) {
-       fputc(str[i], out);
-       if (c >= MAX_PRINT_WIDTH) {
-         fputc('\n', out);
-         c = 0; d = 0;
-       }
-     }
-    }
-    else {
-      c += 1; d += 1;
+    if ('\n' == str[i]) {
+      if ('\0' != str[i + 1] && '\n' != str[i + 1]) {
+        fputc(str[i], out);
+        c = 0;
+        d = 0;
+      }
+    } else if (' ' == str[i]) {
+      if ('\0' != str[i + 1] && ' ' != str[i + 1] && 0 != d) {
+        fputc(str[i], out);
+        if (c >= MAX_PRINT_WIDTH) {
+          fputc('\n', out);
+          c = 0;
+          d = 0;
+        }
+      }
+    } else {
+      c += 1;
+      d += 1;
       fputc(str[i], out);
     }
   }
-  if (0 < i && '\n' != str[i-1]) {
+  if (0 < i && '\n' != str[i - 1]) {
     fputc('\n', out);
   }
 #else
@@ -1589,10 +1524,14 @@ static void nusmv_core_print_string(FILE* out, char* str, int padding)
         char tmp[MAX_PRINT_WIDTH + 1] = "";
 
         /* Find where the last word ends.. */
-        while (str[i - z] != ' ' && str[i - z] != '\n') { ++z; }
+        while (str[i - z] != ' ' && str[i - z] != '\n') {
+          ++z;
+        }
 
         /* Same the partial word, should be printed later.. */
-        for (k = 0; k < z; k++) { tmp[k] = str[(i - z) + k]; }
+        for (k = 0; k < z; k++) {
+          tmp[k] = str[(i - z) + k];
+        }
 
         /* Remove the last partial word to the buffer... */
         buff[j - z] = '\0';
@@ -1602,14 +1541,12 @@ static void nusmv_core_print_string(FILE* out, char* str, int padding)
         for (k = 0, j = padding; j < (padding + z); ++k) {
           if (tmp[k] != ' ' && tmp[k] != '\n') {
             buff[j++] = tmp[k];
-          }
-          else {
+          } else {
             stolen++;
           }
         }
         j -= stolen;
-      }
-      else {
+      } else {
         buff[j] = '\0';
         fprintf(out, "%s\n", buff);
         j = padding;
@@ -1622,7 +1559,6 @@ static void nusmv_core_print_string(FILE* out, char* str, int padding)
         !(str[i] == ' ' && (j == padding || j >= MAX_PRINT_WIDTH))) {
       buff[j++] = str[i];
     }
-
   }
 
   buff[j] = '\0';
@@ -1642,11 +1578,11 @@ static void nusmv_core_print_string(FILE* out, char* str, int padding)
   \sa NuSMVCore_add_env_command_line_option
    NuSMVCore_add_command_line_option
 */
-static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc, char ** argv)
-{
+static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc,
+                                         char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
   int status = RET_SUCCESS;
   CoreData_ptr data = nusmv_core_get_instance();
   OptsHandler_ptr opts = NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
@@ -1661,98 +1597,98 @@ static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc, char ** arg
 
   while (argc > 0) {
     /* -help is hardcoded */
-    if (strcmp(*argv, "-help") == 0 ||
-        strcmp(*argv, "-h") == 0) {
-      argv++; argc--;
+    if (strcmp(*argv, "-help") == 0 || strcmp(*argv, "-h") == 0) {
+      argv++;
+      argc--;
       nusmv_core_print_usage(env, true);
       status = RET_HELP_PRINT;
       break;
     }
     /* The input file (last argument) is hardcoded */
-    else if (argc == 1 && (**argv) != '-'){
+    else if (argc == 1 && (**argv) != '-') {
       set_input_file(opts, *(argv++));
       argc--;
-    }
-    else {
+    } else {
       /* Lookup for the cmd line option. */
-      char* opt_string = *argv;
-      string_ptr opt_name =  UStringMgr_find_string(data->string_mgr, opt_string);
-      CmdLineOpt_ptr opt = (CmdLineOpt_ptr)find_assoc(data->line_options,
-                                                      NODE_PTR(opt_name));
+      char *opt_string = *argv;
+      string_ptr opt_name =
+          UStringMgr_find_string(data->string_mgr, opt_string);
+      CmdLineOpt_ptr opt =
+          (CmdLineOpt_ptr)find_assoc(data->line_options, NODE_PTR(opt_name));
 
       /* Skip already given command options. */
       if (Olist_contains(line_options, opt_name)) {
-        StreamMgr_print_error(streams,
-                "Warning: Option \"%s\" given more than once.\n"
-                "Warning: Only the first occurrence will be taken into account\n",
-                opt_string);
-      }
-      else {
+        StreamMgr_print_error(
+            streams,
+            "Warning: Option \"%s\" given more than once.\n"
+            "Warning: Only the first occurrence will be taken into account\n",
+            opt_string);
+      } else {
 
         /* Add the cmd line option to the set of all defined cmd options. */
         Olist_append(line_options, opt_name);
 
         /* The cmd line option exists! */
         if ((CmdLineOpt_ptr)NULL != opt) {
-          char* param = (char*)NULL;
+          char *param = (char *)NULL;
 
           /* Add to the required table the dependencies of this option */
           insert_assoc(required, NODE_PTR(opt_name), NODE_PTR(opt->dependency));
 
           /* Add to the conflicting table the options conflicting with the
              current one */
-          insert_assoc(conflicting, NODE_PTR(opt_name), NODE_PTR(opt->conflicts));
+          insert_assoc(conflicting, NODE_PTR(opt_name),
+                       NODE_PTR(opt->conflicts));
 
           /* A parameter is requested! */
-          if ((char*)NULL != opt->parameter) {
+          if ((char *)NULL != opt->parameter) {
             if (argc < 2) {
-              StreamMgr_print_error(streams,
-                      "The \"%s\" command line option requires an argument.\n",
-                      opt_string);
+              StreamMgr_print_error(
+                  streams,
+                  "The \"%s\" command line option requires an argument.\n",
+                  opt_string);
               status = RET_MISSING_OPTION_PARAM;
               break;
             }
-            argc--; argv++;
+            argc--;
+            argv++;
             param = *argv;
           }
 
           /* The cmd line option has an env option associated. */
-          if ((char*)NULL != opt->env_option) {
+          if ((char *)NULL != opt->env_option) {
 
             /* The cmd line option should not have both an env var and a
                check&apply fun.*/
             nusmv_assert(NULL == opt->check_and_apply);
 
             /* The env var has to exist.*/
-            nusmv_assert(OptsHandler_is_option_registered(opts,
-                                                          opt->env_option));
+            nusmv_assert(
+                OptsHandler_is_option_registered(opts, opt->env_option));
 
             /* If the option is boolean, invert the value. */
             if (OptsHandler_is_bool_option(opts, opt->env_option)) {
               boolean res;
               boolean curr;
 
-              nusmv_assert((char*)NULL == param);
-              curr = OptsHandler_get_bool_option_default_value(
-                  opts,
-                  opt->env_option);
+              nusmv_assert((char *)NULL == param);
+              curr = OptsHandler_get_bool_option_default_value(opts,
+                                                               opt->env_option);
 
-              res = OptsHandler_set_bool_option_value(opts,
-                                                      opt->env_option,
+              res = OptsHandler_set_bool_option_value(opts, opt->env_option,
                                                       !curr);
               if (!res) {
                 StreamMgr_print_error(streams,
-                        "An error occurred with option \"%s\"\n", opt_string);
+                                      "An error occurred with option \"%s\"\n",
+                                      opt_string);
                 status = RET_INVALID_OPTION;
               }
-            }
-            else {
+            } else {
               boolean res;
 
-              nusmv_assert((char*)NULL != param);
+              nusmv_assert((char *)NULL != param);
 
-              res = OptsHandler_set_option_value(opts,
-                                                 opt->env_option, param);
+              res = OptsHandler_set_option_value(opts, opt->env_option, param);
               if (!res) {
                 StreamMgr_print_error(streams,
                                       "Cannot set value \"%s\" "
@@ -1772,13 +1708,13 @@ static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc, char ** arg
             res = opt->check_and_apply(opts, param, env);
 
             if (!res) {
-              if ((char*)NULL != param) {
-                StreamMgr_print_error(streams, "Cannot set value \"%s\" "
+              if ((char *)NULL != param) {
+                StreamMgr_print_error(streams,
+                                      "Cannot set value \"%s\" "
                                       "to option \"%s\"\n",
                                       param, opt_string);
                 status = RET_INVALID_OPTION_PARAM;
-              }
-              else {
+              } else {
                 StreamMgr_print_error(streams, "Cannot use option \"%s\"\n",
                                       opt_string);
                 status = RET_INVALID_OPTION;
@@ -1791,17 +1727,17 @@ static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc, char ** arg
             StreamMgr_print_error(streams, "Warning: %s is deprecated\n",
                                   opt_string);
           }
-        }
-        else { /* The option does not exist */
+        } else { /* The option does not exist */
           StreamMgr_print_error(streams,
-                  "The command line option \"%s\" is unknown\n",
-                  opt_string);
+                                "The command line option \"%s\" is unknown\n",
+                                opt_string);
           status = RET_UNKNOWN_OPTION;
           break;
         }
       } /* Command line option not already given */
 
-      argc--; argv++;
+      argc--;
+      argv++;
     } /* Non-existing or not hardcoded option */
   }
 
@@ -1811,31 +1747,29 @@ static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc, char ** arg
     Olist_ptr printed = Olist_create();
 
     OLIST_FOREACH(line_options, iter) {
-      string_ptr option =
-        (string_ptr)Oiter_element(iter);
+      string_ptr option = (string_ptr)Oiter_element(iter);
 
       Olist_ptr conflicts =
-        (Olist_ptr)find_assoc(conflicting, NODE_PTR(option));
+          (Olist_ptr)find_assoc(conflicting, NODE_PTR(option));
 
       string_ptr dependency =
-        (string_ptr)find_assoc(required, NODE_PTR(option));
+          (string_ptr)find_assoc(required, NODE_PTR(option));
 
       /* Found conflicts which have not been already printed! */
-      if (!Olist_is_empty(conflicts) &&
-          !Olist_contains(printed, option)) {
+      if (!Olist_is_empty(conflicts) && !Olist_contains(printed, option)) {
         Olist_ptr intersect =
-          nusmv_core_olist_intersection(conflicts, line_options);
+            nusmv_core_olist_intersection(conflicts, line_options);
 
         nusmv_core_olist_union(printed, intersect);
 
         if (!Olist_is_empty(intersect)) {
-          const char* fmt = "Option %s cannot be used with option%s %s";
-          char* conf = nusmv_core_merge(intersect);
-          char* tmp;
+          const char *fmt = "Option %s cannot be used with option%s %s";
+          char *conf = nusmv_core_merge(intersect);
+          char *tmp;
 
-          tmp = ALLOC(char, strlen(conf) +
-                      strlen(UStringMgr_get_string_text(option)) +
-                      strlen(fmt) + 1 + (Olist_get_size(intersect) > 1));
+          tmp = ALLOC(
+              char, strlen(conf) + strlen(UStringMgr_get_string_text(option)) +
+                        strlen(fmt) + 1 + (Olist_get_size(intersect) > 1));
 
           sprintf(tmp, fmt, UStringMgr_get_string_text(option),
                   (Olist_get_size(intersect) > 1 ? "s" : ""), conf);
@@ -1853,8 +1787,7 @@ static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc, char ** arg
       if (((string_ptr)NULL != dependency) &&
           (!Olist_contains(line_options, dependency))) {
 
-        StreamMgr_print_error(streams,
-                              "Option \"%s\" requires option \"%s\"\n",
+        StreamMgr_print_error(streams, "Option \"%s\" requires option \"%s\"\n",
                               UStringMgr_get_string_text(option),
                               UStringMgr_get_string_text(dependency));
 
@@ -1883,17 +1816,16 @@ static int nusmv_core_parse_line_options(NuSMVEnv_ptr env, int argc, char ** arg
 
   \sa nusmv_core_split
 */
-static char* nusmv_core_merge(Olist_ptr set)
-{
-  char* result = ALLOC(char, 1);
+static char *nusmv_core_merge(Olist_ptr set) {
+  char *result = ALLOC(char, 1);
   Oiter iter;
 
   result[0] = '\0';
 
   OLIST_FOREACH(set, iter) {
     string_ptr conf = (string_ptr)Oiter_element(iter);
-    const char* str = UStringMgr_get_string_text(conf);
-    char* tmp;
+    const char *str = UStringMgr_get_string_text(conf);
+    char *tmp;
 
     tmp = ALLOC(char, strlen(result) + 1);
     sprintf(tmp, "%s", result);
@@ -1905,7 +1837,6 @@ static char* nusmv_core_merge(Olist_ptr set)
   return result;
 }
 
-
 /*!
   \brief Aux function for the nusmv_core_split function
 
@@ -1914,18 +1845,19 @@ static char* nusmv_core_merge(Olist_ptr set)
   \sa nusmv_core_split
 */
 
-static int nusmv_core_get_next_word_length(char* string)
-{
-  char* pos;
-  nusmv_assert((char*)NULL != string);
+static int nusmv_core_get_next_word_length(char *string) {
+  char *pos;
+  nusmv_assert((char *)NULL != string);
 
   /* Skip prefix white spaces */
-  while (string[0] == ' ') { string++; }
+  while (string[0] == ' ') {
+    string++;
+  }
 
   pos = strchr(string, ' ');
 
   /* No spaces, but a word exists. */
-  if ((char*)pos == NULL) {
+  if ((char *)pos == NULL) {
     return strlen(string);
   }
 
@@ -1941,10 +1873,9 @@ static int nusmv_core_get_next_word_length(char* string)
 
   \sa nusmv_core_merge
 */
-static Olist_ptr nusmv_core_split( UStringMgr_ptr strmgr, char* string)
-{
+static Olist_ptr nusmv_core_split(UStringMgr_ptr strmgr, char *string) {
   Olist_ptr result = Olist_create();
-  char* tmp = (char*)NULL;
+  char *tmp = (char *)NULL;
   int i = 0;
   int j = 0;
   int next_length = nusmv_core_get_next_word_length(string);
@@ -1962,7 +1893,7 @@ static Olist_ptr nusmv_core_split( UStringMgr_ptr strmgr, char* string)
           /* Found a word, put the terminal and push the ustring in
              the list */
           tmp[j] = '\0';
-          Olist_append(result,  UStringMgr_find_string(strmgr, tmp));
+          Olist_append(result, UStringMgr_find_string(strmgr, tmp));
 
           /* Reset the index and re-allocate memory for the next
              word */
@@ -1970,18 +1901,19 @@ static Olist_ptr nusmv_core_split( UStringMgr_ptr strmgr, char* string)
           next_length = nusmv_core_get_next_word_length(string);
 
           /* No new words left */
-          if (next_length <= 0) { break; }
+          if (next_length <= 0) {
+            break;
+          }
           tmp = REALLOC(char, tmp, next_length + 1);
         }
-      }
-      else {
+      } else {
         tmp[j++] = string[i];
       }
     }
 
     if (j > 0) {
       tmp[j] = '\0';
-      Olist_append(result,  UStringMgr_find_string(strmgr, tmp));
+      Olist_append(result, UStringMgr_find_string(strmgr, tmp));
     }
 
     FREE(tmp);
@@ -1997,9 +1929,8 @@ static Olist_ptr nusmv_core_split( UStringMgr_ptr strmgr, char* string)
 
   \sa nusmv_core_merge
 */
-static char* nusmv_core_tolower(char* str)
-{
-  char* ret = ALLOC(char, strlen(str) + 1);
+static char *nusmv_core_tolower(char *str) {
+  char *ret = ALLOC(char, strlen(str) + 1);
   int i;
 
   *ret = '\0';
@@ -2015,13 +1946,11 @@ static char* nusmv_core_tolower(char* str)
 
   Check and apply function for the -sin cmd line opt
 */
-static boolean nusmv_core_check_sin_fun(OptsHandler_ptr opt, char* val,
-                                        NuSMVEnv_ptr env)
-{
+static boolean nusmv_core_check_sin_fun(OptsHandler_ptr opt, char *val,
+                                        NuSMVEnv_ptr env) {
   if (strcmp(val, "off") == 0) {
     return OptsHandler_set_bool_option_value(opt, SYMB_INLINING, false);
-  }
-  else if (strcmp(val, "on") == 0) {
+  } else if (strcmp(val, "on") == 0) {
     return OptsHandler_set_bool_option_value(opt, SYMB_INLINING, true);
   }
 
@@ -2033,13 +1962,11 @@ static boolean nusmv_core_check_sin_fun(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -rbc cmd line opt
 */
-static boolean nusmv_core_check_rbc_fun(OptsHandler_ptr opt, char* val,
-                                        NuSMVEnv_ptr env)
-{
+static boolean nusmv_core_check_rbc_fun(OptsHandler_ptr opt, char *val,
+                                        NuSMVEnv_ptr env) {
   if (strcmp(val, "off") == 0) {
     return OptsHandler_set_bool_option_value(opt, RBC_INLINING, false);
-  }
-  else if (strcmp(val, "on") == 0) {
+  } else if (strcmp(val, "on") == 0) {
     return OptsHandler_set_bool_option_value(opt, RBC_INLINING, true);
   }
 
@@ -2051,9 +1978,8 @@ static boolean nusmv_core_check_rbc_fun(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -mono cmd line opt
 */
-static boolean nusmv_core_set_mono_partition(OptsHandler_ptr opt, char* val,
-                                             NuSMVEnv_ptr env)
-{
+static boolean nusmv_core_set_mono_partition(OptsHandler_ptr opt, char *val,
+                                             NuSMVEnv_ptr env) {
   return OptsHandler_set_enum_option_value(opt, PARTITION_METHOD,
                                            TRANS_TYPE_MONOLITHIC_STRING);
 }
@@ -2063,9 +1989,8 @@ static boolean nusmv_core_set_mono_partition(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -iwls95 cmd line opt
 */
-static boolean nusmv_core_set_iwls95_partition(OptsHandler_ptr opt, char* val,
-                                               NuSMVEnv_ptr env)
-{
+static boolean nusmv_core_set_iwls95_partition(OptsHandler_ptr opt, char *val,
+                                               NuSMVEnv_ptr env) {
   boolean res = OptsHandler_set_enum_option_value(opt, PARTITION_METHOD,
                                                   TRANS_TYPE_IWLS95_STRING);
 
@@ -2079,9 +2004,8 @@ static boolean nusmv_core_set_iwls95_partition(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -thresh cmd line opt
 */
-static boolean nusmv_core_set_thresh_partition(OptsHandler_ptr opt, char* val,
-                                               NuSMVEnv_ptr env)
-{
+static boolean nusmv_core_set_thresh_partition(OptsHandler_ptr opt, char *val,
+                                               NuSMVEnv_ptr env) {
   boolean res = OptsHandler_set_enum_option_value(opt, PARTITION_METHOD,
                                                   TRANS_TYPE_THRESHOLD_STRING);
 
@@ -2095,15 +2019,13 @@ static boolean nusmv_core_set_thresh_partition(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -cpp cmd line opt
 */
-static boolean nusmv_core_set_cpp(OptsHandler_ptr opt, char* val,
-                                  NuSMVEnv_ptr env)
-{
-  char* pp_list = OptsHandler_get_string_option_value(opt, PP_LIST);
+static boolean nusmv_core_set_cpp(OptsHandler_ptr opt, char *val,
+                                  NuSMVEnv_ptr env) {
+  char *pp_list = OptsHandler_get_string_option_value(opt, PP_LIST);
   if (strcmp(pp_list, "") == 0) {
     set_pp_list(opt, "cpp", env);
-  }
-  else {
-    char* new_pp_list;
+  } else {
+    char *new_pp_list;
     new_pp_list = ALLOC(char, strlen(pp_list) + 5);
     strcpy(new_pp_list, "cpp ");
     strcat(new_pp_list, pp_list);
@@ -2119,17 +2041,15 @@ static boolean nusmv_core_set_cpp(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -pre cmd line opt
 */
-static boolean nusmv_core_set_pre(OptsHandler_ptr opt, char* val,
-                                  NuSMVEnv_ptr env)
-{
-  char* pp_list = OptsHandler_get_string_option_value(opt, PP_LIST);
-  char* new_value;
+static boolean nusmv_core_set_pre(OptsHandler_ptr opt, char *val,
+                                  NuSMVEnv_ptr env) {
+  char *pp_list = OptsHandler_get_string_option_value(opt, PP_LIST);
+  char *new_value;
   boolean result;
 
   if (strcmp(pp_list, "") == 0) {
     new_value = util_strsav(val);
-  }
-  else {
+  } else {
     new_value = ALLOC(char, strlen(pp_list) + strlen(val) + 2);
     sprintf(new_value, "%s %s", val, pp_list);
   }
@@ -2145,14 +2065,13 @@ static boolean nusmv_core_set_pre(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -dp cmd line opt
 */
-static boolean nusmv_core_set_dp(OptsHandler_ptr opt, char* val,
-                                 NuSMVEnv_ptr env)
-{
+static boolean nusmv_core_set_dp(OptsHandler_ptr opt, char *val,
+                                 NuSMVEnv_ptr env) {
   StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  StreamMgr_print_error(streams,
-                        "WARNING: Disjunctive partitioning is no longer supported.\n");
+  StreamMgr_print_error(
+      streams, "WARNING: Disjunctive partitioning is no longer supported.\n");
   return false;
 }
 
@@ -2161,9 +2080,8 @@ static boolean nusmv_core_set_dp(OptsHandler_ptr opt, char* val,
 
   Check and apply function for the -f cmd line opt
 */
-static boolean
-core_data_set_fs(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env)
-{
+static boolean core_data_set_fs(OptsHandler_ptr opt, char *val,
+                                NuSMVEnv_ptr env) {
   return true;
 }
 
@@ -2173,13 +2091,12 @@ core_data_set_fs(OptsHandler_ptr opt, char* val, NuSMVEnv_ptr env)
   Calculates the intersection list between a and b.
                        The returned list must be freed by the caller
 */
-static Olist_ptr nusmv_core_olist_intersection(Olist_ptr a, Olist_ptr b)
-{
+static Olist_ptr nusmv_core_olist_intersection(Olist_ptr a, Olist_ptr b) {
   Olist_ptr res = Olist_create();
   Oiter iter;
 
   OLIST_FOREACH(a, iter) {
-    void* el = Oiter_element(iter);
+    void *el = Oiter_element(iter);
     if (Olist_contains(b, el)) {
       Olist_append(res, el);
     }
@@ -2195,17 +2112,15 @@ static Olist_ptr nusmv_core_olist_intersection(Olist_ptr a, Olist_ptr b)
   Adds all elements in b to a, if a does
                        not contain it already
 */
-static void nusmv_core_olist_union(Olist_ptr a, Olist_ptr b)
-{
+static void nusmv_core_olist_union(Olist_ptr a, Olist_ptr b) {
   Oiter iter;
 
   OLIST_FOREACH(b, iter) {
-    void* el = Oiter_element(iter);
+    void *el = Oiter_element(iter);
     if (!Olist_contains(a, el)) {
       Olist_append(a, el);
     }
   }
-
 }
 
 /*!
@@ -2213,8 +2128,7 @@ static void nusmv_core_olist_union(Olist_ptr a, Olist_ptr b)
 
   Frees the line_options hash and all it's contents
 */
-static void nusmv_core_free_line_options(CoreData_ptr core_data)
-{
+static void nusmv_core_free_line_options(CoreData_ptr core_data) {
   /* We need to destroy complex structure BEFORE quitting all
      packages. */
 
@@ -2229,15 +2143,12 @@ static void nusmv_core_free_line_options(CoreData_ptr core_data)
     free_assoc(core_data->line_options);
     core_data->line_options = (hash_ptr)NULL;
   }
-
 }
 
-
 /* This starts the interactive loop of the shell */
-static int nusmv_core_start_interactive_shell_loop(NuSMVEnv_ptr env)
-{
+static int nusmv_core_start_interactive_shell_loop(NuSMVEnv_ptr env) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   OptsHandler_ptr opts = NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
 
   int quit_flag = 0;
@@ -2248,19 +2159,17 @@ static int nusmv_core_start_interactive_shell_loop(NuSMVEnv_ptr env)
   }
 
   /* There exists a script file */
-  if ((char*)NULL != get_script_file(opts)) {
-    char* script_file = get_script_file(opts);
+  if ((char *)NULL != get_script_file(opts)) {
+    char *script_file = get_script_file(opts);
 
     if (Utils_file_exists(script_file)) {
-      char* command = ALLOC(char, strlen(script_file)
-                            + strlen("source ") + 1);
+      char *command = ALLOC(char, strlen(script_file) + strlen("source ") + 1);
       nusmv_assert(NULL != command);
       sprintf(command, "source %s", script_file);
       quit_flag = Cmd_CommandExecute(env, command);
       FREE(command);
-    }
-    else {
-      StreamMgr_print_error(streams,  "No such file or directory. Exiting...\n");
+    } else {
+      StreamMgr_print_error(streams, "No such file or directory. Exiting...\n");
       quit_flag = -5; /* require immediate quit */
     }
   }
@@ -2270,9 +2179,10 @@ static int nusmv_core_start_interactive_shell_loop(NuSMVEnv_ptr env)
   }
 
 #else  /* NUSMV_HAVE_INTERACTIVE_SHELL */
-  StreamMgr_print_error(streams,  "Interactive shell not available, use batch mode\n");
+  StreamMgr_print_error(streams,
+                        "Interactive shell not available, use batch mode\n");
   quit_flag = -5; /* require immediate quit */
-#endif  /* NUSMV_HAVE_INTERACTIVE_SHELL */
+#endif /* NUSMV_HAVE_INTERACTIVE_SHELL */
 
   return quit_flag;
 }

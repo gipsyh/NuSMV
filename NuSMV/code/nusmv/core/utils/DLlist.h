@@ -14,8 +14,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_DLLIST_H__
 #define __NUSMV_CORE_UTILS_DLLIST_H__
 
@@ -30,33 +28,32 @@
   \struct DLlist
   \brief Implementation of DLlist class
 
-  
+
 */
-typedef struct DLlist_TAG* DLlist_ptr;
+typedef struct DLlist_TAG *DLlist_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DL_LIST(x) \
-         ((DLlist_ptr) x)
+#define DL_LIST(x) ((DLlist_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DL_LIST_CHECK_INSTANCE(x) \
-         ( nusmv_assert(DL_LIST(x) != DL_LIST(NULL)) )
+#define DL_LIST_CHECK_INSTANCE(x) (nusmv_assert(DL_LIST(x) != DL_LIST(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DL_LIST_FOREACH(list, iter) \
- for (iter = DLlist_first(list); !DLiter_is_end(iter); iter = DLiter_next(iter))
+#define DL_LIST_FOREACH(list, iter)                                            \
+  for (iter = DLlist_first(list); !DLiter_is_end(iter);                        \
+       iter = DLiter_next(iter))
 
 /* internal type. it cannot be used outside. */
 
@@ -64,12 +61,14 @@ typedef struct DLlist_TAG* DLlist_ptr;
   \struct DLnode
   \brief A node of the list
 
-  
+
 */
-typedef struct DLnode_TAG* DLnode_ptr;
+typedef struct DLnode_TAG *DLnode_ptr;
 /* here a struct definition is used only to create a new type. Thus
    C type checker will be able to catch incorrect use of iterators */
-typedef struct DLiter_TAG {DLnode_ptr node;} DLiter;
+typedef struct DLiter_TAG {
+  DLnode_ptr node;
+} DLiter;
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -78,9 +77,9 @@ typedef struct DLiter_TAG {DLnode_ptr node;} DLiter;
 
 /*!
   \methodof DLlist
-  \brief Creates an instance of a Two-dimentional List 
+  \brief Creates an instance of a Two-dimentional List
 
-  
+
 */
 DLlist_ptr DLlist_create(void);
 
@@ -115,17 +114,15 @@ DLlist_ptr DLlist_copy(DLlist_ptr self);
 */
 DLlist_ptr DLlist_copy_reversed(DLlist_ptr self);
 
-
 /* Getters and Setters ********************************************************/
 
 /*!
   \methodof DLlist
   \brief Returns the size of a list
 
-  
+
 */
 int DLlist_get_size(DLlist_ptr self);
-
 
 /* Checkers *******************************************************************/
 
@@ -133,12 +130,12 @@ int DLlist_get_size(DLlist_ptr self);
   \methodof DLlist
   \brief Returns true iff the list is empty
 
-  
+
 */
 boolean DLlist_is_empty(DLlist_ptr self);
 
-
-/* SubInterface: DLiter ********************************************************/
+/* SubInterface: DLiter
+ * ********************************************************/
 
 /*!
   \brief Returns true iff an iterator points to the first
@@ -197,10 +194,10 @@ DLiter DLiter_prev(DLiter iter);
 
   \sa DLlist_first, DLlist_end, DLiter_is_end, DLiter_prev, DLiter_next
 */
-void* DLiter_element(DLiter iter);
+void *DLiter_element(DLiter iter);
 
-
-/* Methods that work with a DLiter *********************************************/
+/* Methods that work with a DLiter
+ * *********************************************/
 
 /*!
   \methodof DLlist
@@ -216,10 +213,10 @@ void* DLiter_element(DLiter iter);
   NOTE: it is allowed to assign one iterator to another one.
   NOTE: deletion the elements of the list may make the iterator invalid
   (see corresponding delete functions).
-  
+
 
   \sa DLiter_is_end, DLiter_next, Iiter_prev, DLiter_element,
-  
+
 */
 DLiter DLlist_first(DLlist_ptr self);
 
@@ -235,7 +232,7 @@ DLiter DLlist_first(DLlist_ptr self);
   NOTE: it is allowed to assign one iterator to another one.
   NOTE: deletion the elements of the list may make the iterator invalid
   (see corresponding delete functions).
-  
+
 
   \sa DLiter_is_end, DLiter_next, Iiter_prev, DLiter_element,
   DLlist_first
@@ -257,8 +254,7 @@ DLiter DLlist_end(DLlist_ptr self);
 
   Returns an iterator pointing to the newly inserted element.
 */
-DLiter DLlist_insert_after(DLlist_ptr self, DLiter iter,
-                               void* element);
+DLiter DLlist_insert_after(DLlist_ptr self, DLiter iter, void *element);
 
 /*!
   \methodof DLlist
@@ -276,14 +272,13 @@ DLiter DLlist_insert_after(DLlist_ptr self, DLiter iter,
 
   Returns an iterator pointing to the newly inserted element.
 */
-DLiter DLlist_insert_before(DLlist_ptr self, DLiter iter,
-                               void* element);
+DLiter DLlist_insert_before(DLlist_ptr self, DLiter iter, void *element);
 
 /*!
   \methodof DLlist
   \brief Removes an element pointed by an iterator from a list
 
-  
+
   Precondition: iter must point to elements of list "self" and
   NOT the past the last element of the list.
 
@@ -297,8 +292,7 @@ DLiter DLlist_insert_before(DLlist_ptr self, DLiter iter,
   ADVICE: do not use several iterators over the same list if deletion
   operation is possible.
 */
-DLiter DLlist_delete(DLlist_ptr self, DLiter iter, void** element);
-
+DLiter DLlist_delete(DLlist_ptr self, DLiter iter, void **element);
 
 /* Miscellaneous **************************************************************/
 
@@ -317,21 +311,21 @@ void DLlist_reverse(DLlist_ptr self);
   \methodof DLlist
   \brief Adds at the beginning of a list a new element
 
-  
+
 
   \sa DLlist_append
 */
-void DLlist_prepend(DLlist_ptr self, void* element);
+void DLlist_prepend(DLlist_ptr self, void *element);
 
 /*!
   \methodof DLlist
   \brief Adds at the end of a list a new element
 
-  
+
 
   \sa DLlist_prepend
 */
-void DLlist_append(DLlist_ptr self, void* element);
+void DLlist_append(DLlist_ptr self, void *element);
 
 /*!
   \methodof DLlist
@@ -342,7 +336,7 @@ void DLlist_append(DLlist_ptr self, void* element);
 
   \sa DLlist_append, DLlist_prepend, DLlist_delete_last
 */
-void* DLlist_delete_first(DLlist_ptr self);
+void *DLlist_delete_first(DLlist_ptr self);
 
 /*!
   \methodof DLlist
@@ -353,8 +347,7 @@ void* DLlist_delete_first(DLlist_ptr self);
 
   \sa DLlist_append, DLlist_prepend, DLlist_delete_first
 */
-void* DLlist_delete_last(DLlist_ptr self);
-
+void *DLlist_delete_last(DLlist_ptr self);
 
 /* Self-test/Debug ************************************************************/
 
@@ -368,6 +361,5 @@ void* DLlist_delete_last(DLlist_ptr self);
   added the declaration in the header.
 */
 void dl_list_testing_function(StreamMgr_ptr streams);
-
 
 #endif /* __NUSMV_CORE_UTILS_DLLIST_H__ */

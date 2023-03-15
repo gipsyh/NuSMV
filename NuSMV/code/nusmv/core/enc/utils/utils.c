@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,15 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/enc/encInt.h"
 #include "nusmv/core/parser/ord/ParserOrd.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/NodeList.h"
-#include "nusmv/core/utils/ucmd.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/ucmd.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -65,23 +64,21 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-OrdGroups_ptr
-enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
-                              const char* order_filename,
-                              const BoolEnc_ptr bool_enc)
-{
+OrdGroups_ptr enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
+                                            const char *order_filename,
+                                            const BoolEnc_ptr bool_enc) {
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   OrdGroups_ptr groups;
 
   if (!util_is_string_null(order_filename)) {
     ParserOrd_ptr parser;
-    FILE* f;
+    FILE *f;
 
     /* Parses the provided ordering file */
     parser = ParserOrd_create(env);
     f = fopen(order_filename, "r");
-    if (f == (FILE*) NULL) {
+    if (f == (FILE *)NULL) {
       ErrorMgr_error_file_not_found(errmgr, order_filename);
     }
     /* parse the ordering file */
@@ -91,19 +88,17 @@ enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
                                               ParserOrd_get_vars_list(parser));
     fclose(f);
     ParserOrd_destroy(parser);
-  }
-  else {
+  } else {
     groups = OrdGroups_create();
   }
   return groups;
 }
 
 OrdGroups_ptr enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
-                                               NodeList_ptr vars)
-{
+                                               NodeList_ptr vars) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(bool_enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   OrdGroups_ptr groups;
   SymbTable_ptr symb_table;
@@ -139,10 +134,9 @@ OrdGroups_ptr enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
       if (gr == -1) {
         gr = OrdGroups_create_group(groups);
         OrdGroups_add_variable(groups, name, gr);
-      }
-      else ErrorMgr_warning_var_appear_twice_in_order_file(errmgr, name);
-    }
-    else {
+      } else
+        ErrorMgr_warning_var_appear_twice_in_order_file(errmgr, name);
+    } else {
       /* Variable is scalar. If one or more bits of that scalar var
          have been previously specified in the ordering file, than
          the single bits that belong to the scalar variable will NOT
@@ -181,7 +175,7 @@ OrdGroups_ptr enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
 
       NodeList_destroy(bits);
     } /* scalar case */
-  } /* loop on variables */
+  }   /* loop on variables */
 
   return groups;
 }

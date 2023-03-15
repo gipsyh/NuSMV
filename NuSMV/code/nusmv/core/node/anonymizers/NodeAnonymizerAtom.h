@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,22 +34,19 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ATOM_H__
 #define __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ATOM_H__
 
-
-#include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h" 
+#include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
 #include "nusmv/core/utils/defs.h"
 
 /*!
   \struct NodeAnonymizerAtom
   \brief Definition of the public accessor for class NodeAnonymizerAtom
 
-  
+
 */
-typedef struct NodeAnonymizerAtom_TAG*  NodeAnonymizerAtom_ptr;
+typedef struct NodeAnonymizerAtom_TAG *NodeAnonymizerAtom_ptr;
 
 /*!
   \brief To cast and check instances of class NodeAnonymizerAtom
@@ -57,18 +54,15 @@ typedef struct NodeAnonymizerAtom_TAG*  NodeAnonymizerAtom_ptr;
   These macros must be used respectively to cast and to check
   instances of class NodeAnonymizerAtom
 */
-#define NODE_ANONYMIZER_ATOM(self) \
-         ((NodeAnonymizerAtom_ptr) self)
+#define NODE_ANONYMIZER_ATOM(self) ((NodeAnonymizerAtom_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_ANONYMIZER_ATOM_CHECK_INSTANCE(self) \
-         (nusmv_assert(NODE_ANONYMIZER_ATOM(self) != NODE_ANONYMIZER_ATOM(NULL)))
-
-
+#define NODE_ANONYMIZER_ATOM_CHECK_INSTANCE(self)                              \
+  (nusmv_assert(NODE_ANONYMIZER_ATOM(self) != NODE_ANONYMIZER_ATOM(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,8 +79,8 @@ typedef struct NodeAnonymizerAtom_TAG*  NodeAnonymizerAtom_ptr;
   \sa NodeAnonymizerAtom_destroy
 */
 NodeAnonymizerAtom_ptr NodeAnonymizerAtom_create(NuSMVEnv_ptr env,
-                                                        const char* default_prefix,
-                                                        size_t memoization_threshold);
+                                                 const char *default_prefix,
+                                                 size_t memoization_threshold);
 
 /*!
   \methodof NodeAnonymizerAtom
@@ -98,9 +92,6 @@ NodeAnonymizerAtom_ptr NodeAnonymizerAtom_create(NuSMVEnv_ptr env,
 */
 void NodeAnonymizerAtom_destroy(NodeAnonymizerAtom_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ATOM_H__ */

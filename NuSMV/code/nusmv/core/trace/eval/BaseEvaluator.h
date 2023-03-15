@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,20 +37,20 @@
 #ifndef __NUSMV_CORE_TRACE_EVAL_BASE_EVALUATOR_H__
 #define __NUSMV_CORE_TRACE_EVAL_BASE_EVALUATOR_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/object.h"
+#include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/wff/ExprMgr.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/wff/ExprMgr.h"
 
 /*!
   \struct BaseEvaluator
   \brief Definition of the public accessor for class BaseEvaluator
 
-  
+
 */
-typedef struct BaseEvaluator_TAG*  BaseEvaluator_ptr;
+typedef struct BaseEvaluator_TAG *BaseEvaluator_ptr;
 
 /*!
   \brief To cast and check instances of class BaseEvaluator
@@ -58,18 +58,15 @@ typedef struct BaseEvaluator_TAG*  BaseEvaluator_ptr;
   These macros must be used respectively to cast and to check
   instances of class BaseEvaluator
 */
-#define BASE_EVALUATOR(self) \
-         ((BaseEvaluator_ptr) self)
+#define BASE_EVALUATOR(self) ((BaseEvaluator_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BASE_EVALUATOR_CHECK_INSTANCE(self) \
-         (nusmv_assert(BASE_EVALUATOR(self) != BASE_EVALUATOR(NULL)))
-
-
+#define BASE_EVALUATOR_CHECK_INSTANCE(self)                                    \
+  (nusmv_assert(BASE_EVALUATOR(self) != BASE_EVALUATOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -109,9 +106,8 @@ void BaseEvaluator_destroy(BaseEvaluator_ptr self);
 
   \sa BaseEvaluator_evaluate
 */
-void BaseEvaluator_set_context(BaseEvaluator_ptr self,
-                                      const SymbTable_ptr st,
-                                      const hash_ptr env);
+void BaseEvaluator_set_context(BaseEvaluator_ptr self, const SymbTable_ptr st,
+                               const hash_ptr env);
 
 /*!
   \methodof BaseEvaluator
@@ -125,11 +121,8 @@ void BaseEvaluator_set_context(BaseEvaluator_ptr self,
 
   \sa BaseEvaluator_set_context
 */
-Expr_ptr BaseEvaluator_evaluate(BaseEvaluator_ptr self,
-                                       Expr_ptr const_expr);
+Expr_ptr BaseEvaluator_evaluate(BaseEvaluator_ptr self, Expr_ptr const_expr);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_TRACE_EVAL_BASE_EVALUATOR_H__ */

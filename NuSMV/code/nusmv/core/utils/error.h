@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,23 +34,21 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_ERROR_H__
 #define __NUSMV_CORE_UTILS_ERROR_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include <stdio.h>
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/portability.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/utils/NodeList.h"
+#include "nusmv/core/utils/portability.h"
+#include "nusmv/core/utils/utils.h"
+#include <stdio.h>
 
 /* warning [MD] Why Prop.h is included here? */
 #include "nusmv/core/prop/Prop.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -63,11 +61,11 @@
 
   \todo Missing description
 */
-#define error_unreachable_code()                                        \
-  do {                                                                  \
-    fprintf(stderr, "%s:%d:%s: reached invalid code\n",                 \
-            __FILE__, __LINE__, __func__);                              \
-    exit(4);                                                            \
+#define error_unreachable_code()                                               \
+  do {                                                                         \
+    fprintf(stderr, "%s:%d:%s: reached invalid code\n", __FILE__, __LINE__,    \
+            __func__);                                                         \
+    exit(4);                                                                   \
   } while (0)
 
 /* Define the alternative for nusmv_assert(0 && "message") */
@@ -77,12 +75,12 @@
 
   \todo Missing description
 */
-#define error_unreachable_code_msg(...)                                 \
-  do {                                                                  \
-    printf(__VA_ARGS__);                                                \
-    fprintf(stderr, "%s:%d:%s: reached invalid code\n",                 \
-            __FILE__, __LINE__, __func__);                              \
-    exit(4);                                                            \
+#define error_unreachable_code_msg(...)                                        \
+  do {                                                                         \
+    printf(__VA_ARGS__);                                                       \
+    fprintf(stderr, "%s:%d:%s: reached invalid code\n", __FILE__, __LINE__,    \
+            __func__);                                                         \
+    exit(4);                                                                   \
   } while (0)
 
 /*!
@@ -105,30 +103,27 @@
                 actually truncate a string. The macro will always abort,
                 because the return value of snprintf is always the length of
                 the original string. See man snprintf.
-                  
+
 
   \sa snprintf
 */
-#define SNPRINTF_CHECK(chars, buffsize)                         \
-  do {                                                          \
-    if (chars < 0) {                                            \
-      fprintf(stderr, "%s:%d:%s: Error in buffer writing",      \
-              __FILE__, __LINE__, __func__);                    \
-      exit(5);                                                  \
-    }                                                           \
-    else if ((unsigned int)chars >= buffsize) {                 \
-      fprintf(stderr, "%s:%d:%s: String buffer overflow",       \
-              __FILE__, __LINE__, __func__);                    \
-      exit(5);                                                  \
-    }                                                           \
-    else {};                                                    \
+#define SNPRINTF_CHECK(chars, buffsize)                                        \
+  do {                                                                         \
+    if (chars < 0) {                                                           \
+      fprintf(stderr, "%s:%d:%s: Error in buffer writing", __FILE__, __LINE__, \
+              __func__);                                                       \
+      exit(5);                                                                 \
+    } else if ((unsigned int)chars >= buffsize) {                              \
+      fprintf(stderr, "%s:%d:%s: String buffer overflow", __FILE__, __LINE__,  \
+              __func__);                                                       \
+      exit(5);                                                                 \
+    } else {                                                                   \
+    };                                                                         \
   } while (0)
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -165,6 +160,5 @@ void Error_quit(NuSMVEnv_ptr env);
    allocation routines fails to allocate memory.
 */
 void init_memory(void);
-
 
 #endif /* __NUSMV_CORE_UTILS_ERROR_H__ */

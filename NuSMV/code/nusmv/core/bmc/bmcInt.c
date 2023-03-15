@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,9 +34,8 @@
 
 */
 
-
-#include "nusmv/core/bmc/bmc.h"
 #include "nusmv/core/bmc/bmcInt.h"
+#include "nusmv/core/bmc/bmc.h"
 #include "nusmv/core/utils/assoc.h"
 
 /*---------------------------------------------------------------------------*/
@@ -71,16 +70,13 @@
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-be_ptr Bmc_GetTestTableau (const BeEnc_ptr be_enc,
-                           const node_ptr ltl_wff,
-                           const int k, const int l)
-{
+be_ptr Bmc_GetTestTableau(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
+                          const int k, const int l) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  return (isPureFuture(ltl_wff) && !opt_bmc_force_pltl_tableau(opts)) ?
-    BmcInt_Tableau_GetAtTime(be_enc,ltl_wff,0,k,l) :
-    Bmc_TableauPLTL_GetTableau(be_enc,ltl_wff,k,l);
+  return (isPureFuture(ltl_wff) && !opt_bmc_force_pltl_tableau(opts))
+             ? BmcInt_Tableau_GetAtTime(be_enc, ltl_wff, 0, k, l)
+             : Bmc_TableauPLTL_GetTableau(be_enc, ltl_wff, k, l);
 }
-

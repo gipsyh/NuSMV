@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,24 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_PRIVATE_H__
 
-
-#include "nusmv/core/trace/exec/SATCompleteTraceExecutor.h"
-#include "nusmv/core/trace/exec/CompleteTraceExecutor.h" /* fix this */
+#include "nusmv/core/trace/exec/CompleteTraceExecutor.h"         /* fix this */
 #include "nusmv/core/trace/exec/CompleteTraceExecutor_private.h" /* fix this */
+#include "nusmv/core/trace/exec/SATCompleteTraceExecutor.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief SATCompleteTraceExecutor class definition derived from
                class CompleteTraceExecutor
 
-  
+
 
   \sa Base class CompleteTraceExecutor
 */
 
-typedef struct SATCompleteTraceExecutor_TAG
-{
+typedef struct SATCompleteTraceExecutor_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(CompleteTraceExecutor);
 
@@ -75,8 +70,6 @@ typedef struct SATCompleteTraceExecutor_TAG
 
 } SATCompleteTraceExecutor;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -89,11 +82,9 @@ typedef struct SATCompleteTraceExecutor_TAG
 
   \sa SATCompleteTraceExecutor_create
 */
-void
-sat_complete_trace_executor_init(SATCompleteTraceExecutor_ptr self,
-                                 const BeFsm_ptr fsm,
-                                 const BeEnc_ptr enc,
-                                 const BddEnc_ptr bdd_enc);
+void sat_complete_trace_executor_init(SATCompleteTraceExecutor_ptr self,
+                                      const BeFsm_ptr fsm, const BeEnc_ptr enc,
+                                      const BddEnc_ptr bdd_enc);
 
 /*!
   \methodof SATCompleteTraceExecutor
@@ -103,7 +94,6 @@ sat_complete_trace_executor_init(SATCompleteTraceExecutor_ptr self,
 
   \sa SATCompleteTraceExecutor_destroy
 */
-void
-sat_complete_trace_executor_deinit(SATCompleteTraceExecutor_ptr self);
+void sat_complete_trace_executor_deinit(SATCompleteTraceExecutor_ptr self);
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_PRIVATE_H__ */

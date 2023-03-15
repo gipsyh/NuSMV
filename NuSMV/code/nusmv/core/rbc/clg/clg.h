@@ -37,7 +37,6 @@ This file is part of the ``rbc.clg'' package
 
 */
 
-
 #ifndef __NUSMV_CORE_RBC_CLG_CLG_H__
 #define __NUSMV_CORE_RBC_CLG_CLG_H__
 
@@ -59,14 +58,15 @@ This file is part of the ``rbc.clg'' package
 
   \todo Missing description
 */
-#define CLG_ZCHAFF 21 /* Create clauses suitable for feeding to ZChaff directly */
+#define CLG_ZCHAFF                                                             \
+  21 /* Create clauses suitable for feeding to ZChaff directly */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CLG_NUSMV  22 /* Create clauses suitable for feeding to NuMSV */
+#define CLG_NUSMV 22 /* Create clauses suitable for feeding to NuMSV */
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -78,14 +78,14 @@ This file is part of the ``rbc.clg'' package
 
   \todo Missing description
 */
-typedef struct Clg_Vertex* clause_graph;
+typedef struct Clg_Vertex *clause_graph;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef void(*Clg_Commit)(void*, int*, int);
+typedef void (*Clg_Commit)(void *, int *, int);
 
 /*!
   \struct ClgManager
@@ -93,7 +93,7 @@ typedef void(*Clg_Commit)(void*, int*, int);
 
   \todo Missing description
 */
-typedef struct ClgManager_TAG* ClgManager_ptr;
+typedef struct ClgManager_TAG *ClgManager_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -106,7 +106,6 @@ typedef struct ClgManager_TAG* ClgManager_ptr;
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -125,32 +124,32 @@ ClgManager_ptr ClgManager_create(void);
 /*!
   \brief Free all CLGs
 
-  
+
 */
 void ClgManager_destroy(ClgManager_ptr clgManager);
 
 /*!
   \brief Create a CLG representing a single literal
 
-  
+
 */
 clause_graph Clg_Lit(ClgManager_ptr clgmgr, int literal);
 
 /*!
   \brief Create a CLG representing a conjunction of two CLGs
 
-  
+
 */
-clause_graph Clg_Conj(ClgManager_ptr clgmgr,
-                             clause_graph left, clause_graph right);
+clause_graph Clg_Conj(ClgManager_ptr clgmgr, clause_graph left,
+                      clause_graph right);
 
 /*!
   \brief Create a CLG representing a disjunction of two CLGs
 
-  
+
 */
-clause_graph Clg_Disj(ClgManager_ptr clgmgr,
-                             clause_graph left, clause_graph right);
+clause_graph Clg_Disj(ClgManager_ptr clgmgr, clause_graph left,
+                      clause_graph right);
 
 /*!
   \brief Extract the real clauses from the CLG
@@ -164,17 +163,16 @@ clause_graph Clg_Disj(ClgManager_ptr clgmgr,
                       clauses with both positive and negative
                       occurrences of the same literal are skipped.
 */
-void Clg_Extract(const NuSMVEnv_ptr env, clause_graph head,
-                        int type, Clg_Commit commit, void *data);
+void Clg_Extract(const NuSMVEnv_ptr env, clause_graph head, int type,
+                 Clg_Commit commit, void *data);
 
 /*!
   \brief Return the number of clauses stored in the CLG
 
-  
+
 */
 int Clg_Size(clause_graph graph);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_RBC_CLG_CLG_H__ */
-

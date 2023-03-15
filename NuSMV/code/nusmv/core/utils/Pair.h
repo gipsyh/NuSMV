@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_PAIR_H__
 #define __NUSMV_CORE_UTILS_PAIR_H__
-
 
 #include "nusmv/core/utils/utils.h"
 
@@ -46,9 +43,9 @@
   \struct Pair
   \brief Definition of the public accessor for class Pair
 
-  
+
 */
-typedef struct Pair_TAG*  Pair_ptr;
+typedef struct Pair_TAG *Pair_ptr;
 
 /*!
   \brief To cast and check instances of class Pair
@@ -56,31 +53,26 @@ typedef struct Pair_TAG*  Pair_ptr;
   These macros must be used respectively to cast and to check
   instances of class Pair
 */
-#define PAIR(self) \
-         ((Pair_ptr) self)
+#define PAIR(self) ((Pair_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PAIR_CHECK_INSTANCE(self) \
-         (nusmv_assert(PAIR(self) != PAIR(NULL)))
-
+#define PAIR_CHECK_INSTANCE(self) (nusmv_assert(PAIR(self) != PAIR(NULL)))
 
 /*!
   \brief Pair class definition
 
-  
+
 */
 
-typedef struct Pair_TAG
-{
-  void* first;
-  void* second;
+typedef struct Pair_TAG {
+  void *first;
+  void *second;
   boolean frozen;
 } Pair;
-
 
 /**AutomaticStart*************************************************************/
 
@@ -96,18 +88,18 @@ typedef struct Pair_TAG
 
   \sa Pair_destroy
 */
-Pair_ptr Pair_create(void* first, void* second);
+Pair_ptr Pair_create(void *first, void *second);
 
 /*!
   \methodof Pair
   \brief The Pair class initializer
 
   The Pair class initializer.  Use this function if
-                      declaring a Pair in the stack 
+                      declaring a Pair in the stack
 
   \sa Pair_create
 */
-void Pair_init(Pair_ptr self, void* first, void* second);
+void Pair_init(Pair_ptr self, void *first, void *second);
 
 /*!
   \methodof Pair
@@ -134,7 +126,7 @@ boolean Pair_is_freezed(const Pair_ptr self);
 
   Get the first value of the Pair instance
 */
-void* Pair_get_first(const Pair_ptr self);
+void *Pair_get_first(const Pair_ptr self);
 
 /*!
   \methodof Pair
@@ -142,7 +134,7 @@ void* Pair_get_first(const Pair_ptr self);
 
   Get the second value of the Pair instance
 */
-void* Pair_get_second(const Pair_ptr self);
+void *Pair_get_second(const Pair_ptr self);
 
 /*!
   \methodof Pair
@@ -151,7 +143,7 @@ void* Pair_get_second(const Pair_ptr self);
   Sets the first value for the Pair instance.
                       The Pair must not be frozen
 */
-void Pair_set_first(Pair_ptr self, void* first);
+void Pair_set_first(Pair_ptr self, void *first);
 
 /*!
   \methodof Pair
@@ -160,7 +152,7 @@ void Pair_set_first(Pair_ptr self, void* first);
   Sets the second value for the Pair instance.
                       The Pair must not be frozen
 */
-void Pair_set_second(Pair_ptr self, void* second);
+void Pair_set_second(Pair_ptr self, void *second);
 
 /*!
   \methodof Pair
@@ -169,8 +161,7 @@ void Pair_set_second(Pair_ptr self, void* second);
   Sets both the values for the Pair instance.
                       The Pair must not be frozen
 */
-void Pair_set_values(Pair_ptr self,
-                            void* first, void* second);
+void Pair_set_values(Pair_ptr self, void *first, void *second);
 
 /*!
   \methodof Pair
@@ -194,8 +185,7 @@ void Pair_destroy(Pair_ptr self);
                       Casts to char* are added to prevent "warning: pointer of
                       type ‘void *’ used in subtraction".
 */
-int Pair_compare(const Pair_ptr a,
-                        const Pair_ptr b);
+int Pair_compare(const Pair_ptr a, const Pair_ptr b);
 
 /*!
   \methodof Pair
@@ -208,9 +198,6 @@ int Pair_compare(const Pair_ptr a,
 */
 unsigned long Pair_hash(const Pair_ptr self, int size);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_PAIR_H__ */

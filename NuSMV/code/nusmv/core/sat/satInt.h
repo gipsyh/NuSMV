@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -30,44 +30,36 @@
   \author Andrei Tchaltsev, Roberto Cavada
   \brief The internal header file for the <tt>sat</tt> package
 
-  At the momemnt this file just provide the facilities to 
+  At the momemnt this file just provide the facilities to
   access 'options' unitilities
 
 */
- 
 
 #ifndef __NUSMV_CORE_SAT_SAT_INT_H__
 #define __NUSMV_CORE_SAT_SAT_INT_H__
 
-
-#include "nusmv/core/sat/sat.h"
 #include "nusmv/core/opt/opt.h"
-
+#include "nusmv/core/sat/sat.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -75,8 +67,6 @@
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_SAT_SAT_INT_H__ */

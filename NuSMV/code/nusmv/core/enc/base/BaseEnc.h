@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,8 +33,6 @@
   \todo: Missing description
 
 */
-
-
 
 #ifndef __NUSMV_CORE_ENC_BASE_BASE_ENC_H__
 #define __NUSMV_CORE_ENC_BASE_BASE_ENC_H__
@@ -48,9 +46,9 @@
   \struct BaseEnc
   \brief Definition of the public accessor for class BaseEnc
 
-  
+
 */
-typedef struct BaseEnc_TAG*  BaseEnc_ptr;
+typedef struct BaseEnc_TAG *BaseEnc_ptr;
 
 /*!
   \brief To cast and check instances of class BaseEnc
@@ -58,18 +56,15 @@ typedef struct BaseEnc_TAG*  BaseEnc_ptr;
   These macros must be used respectively to cast and to check
   instances of class BaseEnc
 */
-#define BASE_ENC(self) \
-         ((BaseEnc_ptr) self)
+#define BASE_ENC(self) ((BaseEnc_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BASE_ENC_CHECK_INSTANCE(self) \
-         (nusmv_assert(BASE_ENC(self) != BASE_ENC(NULL)))
-
-
+#define BASE_ENC_CHECK_INSTANCE(self)                                          \
+  (nusmv_assert(BASE_ENC(self) != BASE_ENC(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -99,18 +94,16 @@ SymbTable_ptr BaseEnc_get_symb_table(const BaseEnc_ptr self);
 
   \sa BaseEnc_get_symb_table
 */
-TypeChecker_ptr
-BaseEnc_get_type_checker(const BaseEnc_ptr self);
+TypeChecker_ptr BaseEnc_get_type_checker(const BaseEnc_ptr self);
 
 /*!
   \methodof BaseEnc
   \brief Returns true whether the given layer name is the
   name of a layer that is currently committed to self.
 
-  
+
 */
-boolean
-BaseEnc_layer_occurs(const BaseEnc_ptr self, const char* layer_name);
+boolean BaseEnc_layer_occurs(const BaseEnc_ptr self, const char *layer_name);
 
 /*!
   \methodof BaseEnc
@@ -120,8 +113,7 @@ BaseEnc_layer_occurs(const BaseEnc_ptr self, const char* layer_name);
   returned list is ordered wrt to layers insert policy. The list and
   its content still belongs to self, do not destroy or change it
 */
-NodeList_ptr
-BaseEnc_get_committed_layers(const BaseEnc_ptr self);
+NodeList_ptr BaseEnc_get_committed_layers(const BaseEnc_ptr self);
 
 /*!
   \methodof BaseEnc
@@ -132,8 +124,7 @@ BaseEnc_get_committed_layers(const BaseEnc_ptr self);
   layer into self, any previoulsy returned array will become
   invalid.
 */
-const array_t*
-BaseEnc_get_committed_layer_names(BaseEnc_ptr self);
+const array_t *BaseEnc_get_committed_layer_names(BaseEnc_ptr self);
 
 /*!
   \methodof BaseEnc
@@ -142,9 +133,7 @@ BaseEnc_get_committed_layer_names(BaseEnc_ptr self);
   Use this to commit e.g. all layers already committed
   to another encoder. Returns the number of committed layers
 */
-int
-BaseEnc_commit_layers(BaseEnc_ptr self,
-                      const array_t* layer_names);
+int BaseEnc_commit_layers(BaseEnc_ptr self, const array_t *layer_names);
 
 /*!
   \methodof BaseEnc
@@ -156,9 +145,7 @@ BaseEnc_commit_layers(BaseEnc_ptr self,
 
   \sa BaseEnc_commit_layers
 */
-int
-BaseEnc_remove_layers(BaseEnc_ptr self,
-                      const array_t* layer_names);
+int BaseEnc_remove_layers(BaseEnc_ptr self, const array_t *layer_names);
 
 /*!
   \methodof BaseEnc
@@ -177,8 +164,7 @@ VIRTUAL void BaseEnc_destroy(BaseEnc_ptr self);
   This method is virtual. The result of the encoding
   depends on the actual instance (its actual class) it is invoked on.
 */
-VIRTUAL void BaseEnc_commit_layer(BaseEnc_ptr self,
-                                         const char* layer_name);
+VIRTUAL void BaseEnc_commit_layer(BaseEnc_ptr self, const char *layer_name);
 
 /*!
   \methodof BaseEnc
@@ -189,12 +175,8 @@ VIRTUAL void BaseEnc_commit_layer(BaseEnc_ptr self,
   This method is virtual. The result of the removal
   depends on the actual instance (its actual class) it is invoked on.
 */
-VIRTUAL void BaseEnc_remove_layer(BaseEnc_ptr self,
-                                         const char* layer_name);
-
+VIRTUAL void BaseEnc_remove_layer(BaseEnc_ptr self, const char *layer_name);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_ENC_BASE_BASE_ENC_H__ */

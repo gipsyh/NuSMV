@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,37 +34,31 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_PKG_H__
 #define __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_PKG_H__
 
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/utils/defs.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -74,7 +68,6 @@
 
 void DependencyPkg_init(NuSMVEnv_ptr env);
 void DependencyPkg_quit(NuSMVEnv_ptr env);
-
 
 /**AutomaticEnd***************************************************************/
 

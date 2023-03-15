@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,10 @@
 
 */
 
-
 #include "nusmv/core/wff/lr/LogicRecognizerBase.h"
-#include "nusmv/core/wff/lr/LogicRecognizerBase_private.h"
 #include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/utils/portability.h"  /* for __func__ */
+#include "nusmv/core/utils/portability.h" /* for __func__ */
+#include "nusmv/core/wff/lr/LogicRecognizerBase_private.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -51,7 +50,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'LogicRecognizerBase_private.h' for class 'LogicRecognizerBase' definition. */
+/* See 'LogicRecognizerBase_private.h' for class 'LogicRecognizerBase'
+ * definition. */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -61,24 +61,20 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void logic_recognizer_base_finalize(Object_ptr object, void* dummy);
-
+static void logic_recognizer_base_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 LogicType LogicRecognizerBase_recognize(LogicRecognizerBase_ptr self,
-                                              node_ptr wff,
-                                              node_ptr context)
-{
+                                        node_ptr wff, node_ptr context) {
   LogicType retval = EXP_NONE;
 
   LOGIC_RECOGNIZER_BASE_CHECK_INSTANCE(self);
@@ -93,11 +89,8 @@ LogicType LogicRecognizerBase_recognize(LogicRecognizerBase_ptr self,
 /*---------------------------------------------------------------------------*/
 
 void logic_recognizer_base_init(LogicRecognizerBase_ptr self,
-                                const NuSMVEnv_ptr env,
-                                const char* name,
-                                int low,
-                                size_t num)
-{
+                                const NuSMVEnv_ptr env, const char *name,
+                                int low, size_t num) {
   /* base class initialization */
   node_walker_init(NODE_WALKER(self), env, name, low, num, false);
 
@@ -108,22 +101,18 @@ void logic_recognizer_base_init(LogicRecognizerBase_ptr self,
   OVERRIDE(LogicRecognizerBase, recognize) = logic_recognizer_base_recognize;
 }
 
-void logic_recognizer_base_deinit(LogicRecognizerBase_ptr self)
-{
+void logic_recognizer_base_deinit(LogicRecognizerBase_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   node_walker_deinit(NODE_WALKER(self));
 }
 
 LogicType logic_recognizer_base_recognize(LogicRecognizerBase_ptr self,
-                                                node_ptr wff,
-                                                node_ptr context)
-{
+                                          node_ptr wff, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   ErrorMgr_internal_error(errmgr, "%s: Pure virtual method\n", __func__);
 }
@@ -137,15 +126,11 @@ LogicType logic_recognizer_base_recognize(LogicRecognizerBase_ptr self,
 
   Called by the class destructor
 */
-static void logic_recognizer_base_finalize(Object_ptr object, void* dummy)
-{
+static void logic_recognizer_base_finalize(Object_ptr object, void *dummy) {
   LogicRecognizerBase_ptr self = LOGIC_RECOGNIZER_BASE(object);
 
   logic_recognizer_base_deinit(self);
   FREE(self);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

@@ -35,15 +35,14 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/core/parser/parserInt.h"
 #include "nusmv/core/parser/symbols.h"
@@ -80,9 +79,9 @@
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 /* TODO[REAMa] NOT REENTRANT (But the parser is not reentrant too) */
-static char* tmpfname1 = (char*) NULL;
+static char *tmpfname1 = (char *)NULL;
 /* TODO[REAMa] NOT REENTRANT (But the parser is not reentrant too) */
-static char* tmpfname2 = (char*) NULL;
+static char *tmpfname2 = (char *)NULL;
 
 /* the current buffer of the lexer - only one buffer can exist at any time*/
 /* TODO[REAMa] NOT REENTRANT */
@@ -93,12 +92,10 @@ static YY_BUFFER_STATE nusmv_yy_current_buffer = NULL;
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename);
+static void parser_open_input_pp(const NuSMVEnv_ptr env, const char *filename);
 static void parser_close_input_pp(const NuSMVEnv_ptr env);
 
-
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -115,19 +112,18 @@ static void parser_close_input_pp(const NuSMVEnv_ptr env);
   \sa Parser_CloseInput
 */
 
-extern FILE* psl_yyin;
+extern FILE *psl_yyin;
 
-void Parser_OpenInput(const NuSMVEnv_ptr env, const char *filename)
-{
+void Parser_OpenInput(const NuSMVEnv_ptr env, const char *filename) {
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  if (filename != (char*) NULL) {
-    nusmv_yyin = fopen(filename,"r");
-    if (nusmv_yyin == (FILE*) NULL) ErrorMgr_rpterr(errmgr, "cannot open input file %s",filename);
+  if (filename != (char *)NULL) {
+    nusmv_yyin = fopen(filename, "r");
+    if (nusmv_yyin == (FILE *)NULL)
+      ErrorMgr_rpterr(errmgr, "cannot open input file %s", filename);
     nusmv_yylineno = 1;
-  }
-  else {
+  } else {
     nusmv_yyin = stdin;
     nusmv_yylineno = 0;
   }
@@ -138,44 +134,40 @@ void Parser_OpenInput(const NuSMVEnv_ptr env, const char *filename)
   nusmv_assert(NULL == YY_CURRENT_BUFFER);
   YY_CURRENT_BUFFER = nusmv_yy_create_buffer(nusmv_yyin, YY_BUF_SIZE);
   /* Flushes the current input buffer */
-  (void) nusmv_yy_switch_to_buffer(YY_CURRENT_BUFFER);
+  (void)nusmv_yy_switch_to_buffer(YY_CURRENT_BUFFER);
 
-  (void) nusmv_yyrestart(nusmv_yyin);
+  (void)nusmv_yyrestart(nusmv_yyin);
 }
 
-void Parser_CloseInput(void)
-{
-  nusmv_assert(NULL != YY_CURRENT_BUFFER);/* buffer should be initialized before */
+void Parser_CloseInput(void) {
+  nusmv_assert(NULL !=
+               YY_CURRENT_BUFFER); /* buffer should be initialized before */
   nusmv_yy_delete_buffer(YY_CURRENT_BUFFER);
   YY_CURRENT_BUFFER = NULL;
 
-  if (stdin != nusmv_yyin) fclose(nusmv_yyin);
+  if (stdin != nusmv_yyin)
+    fclose(nusmv_yyin);
 }
 
-void Parser_switch_to_psl()
-{
-  psl_yyrestart(psl_yyin);
-}
+void Parser_switch_to_psl() { psl_yyrestart(psl_yyin); }
 
+void Parser_switch_to_smv() { nusmv_yyrestart(nusmv_yyin); }
 
-void Parser_switch_to_smv()
-{
-  nusmv_yyrestart(nusmv_yyin);
-}
-
-int Parser_ReadSMVFromFile(NuSMVEnv_ptr env, const char *filename)
-{
+int Parser_ReadSMVFromFile(NuSMVEnv_ptr env, const char *filename) {
   int retval = 0;
 
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   extern NuSMVEnv_ptr __nusmv_parser_env__;
   extern NuSMVEnv_ptr __psl_parser_env__;
 
-  if (strcmp(get_pp_list(opts), "") != 0) parser_open_input_pp(env, filename);
-  else Parser_OpenInput(env, filename);
+  if (strcmp(get_pp_list(opts), "") != 0)
+    parser_open_input_pp(env, filename);
+  else
+    Parser_OpenInput(env, filename);
 
   __nusmv_parser_env__ = env;
   __psl_parser_env__ = env;
@@ -185,39 +177,43 @@ int Parser_ReadSMVFromFile(NuSMVEnv_ptr env, const char *filename)
   parse_mode_flag = PARSE_MODULES;
 
   CATCH(errmgr) {
-    if (nusmv_yyparse()) retval = 1;
+    if (nusmv_yyparse())
+      retval = 1;
     else {
       nusmv_yylineno = 0;
     }
   }
   FAIL(errmgr) {
-    if (strcmp(get_pp_list(opts), "") != 0) parser_close_input_pp(env);
-    else Parser_CloseInput();
+    if (strcmp(get_pp_list(opts), "") != 0)
+      parser_close_input_pp(env);
+    else
+      Parser_CloseInput();
     ErrorMgr_rpterr(errmgr, "Parser error");
   }
 
-  if (strcmp(get_pp_list(opts), "") != 0) parser_close_input_pp(env);
-  else Parser_CloseInput();
+  if (strcmp(get_pp_list(opts), "") != 0)
+    parser_close_input_pp(env);
+  else
+    Parser_CloseInput();
 
   return retval;
 }
 
-int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char** argv,
-                             const char* head, const char* tail,
-                             node_ptr* pc)
-{
+int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char **argv,
+                             const char *head, const char *tail, node_ptr *pc) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   int i;
-  char * old_input_file;
+  char *old_input_file;
   int l;
   int status = 0;
-  char* cmd = NIL(char);
-  char* cmd1 = NIL(char);
+  char *cmd = NIL(char);
+  char *cmd1 = NIL(char);
   YY_BUFFER_STATE buf;
   extern NuSMVEnv_ptr __nusmv_parser_env__;
   extern NuSMVEnv_ptr __psl_parser_env__;
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   l = strlen(head);
 
@@ -225,8 +221,9 @@ int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char** argv,
   nusmv_assert(l >= 0);
   nusmv_assert(l == strlen(head));
 
-  for (i = 1; i < argc; i++) l += strlen(argv[i]) + 1;
-  l += strlen(tail) +2+1; /* 2 is for last two YY_END_OF_BUFFER_CHAR */
+  for (i = 1; i < argc; i++)
+    l += strlen(argv[i]) + 1;
+  l += strlen(tail) + 2 + 1; /* 2 is for last two YY_END_OF_BUFFER_CHAR */
   cmd = ALLOC(char, l);
   cmd1 = ALLOC(char, l);
   nusmv_assert(cmd != NIL(char));
@@ -237,11 +234,11 @@ int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char** argv,
     sprintf(cmd1, "%s%s ", cmd, argv[i]);
     strcpy(cmd, cmd1);
   }
-  sprintf(cmd1, "%s%s%c%c", cmd, tail,
-          YY_END_OF_BUFFER_CHAR, YY_END_OF_BUFFER_CHAR);
+  sprintf(cmd1, "%s%s%c%c", cmd, tail, YY_END_OF_BUFFER_CHAR,
+          YY_END_OF_BUFFER_CHAR);
 
   if (opt_verbose_level_gt(opts, 3))
-    StreamMgr_print_error(streams,  "%s\n", cmd1);
+    StreamMgr_print_error(streams, "%s\n", cmd1);
 
   /* Get a local copy of the old input file. */
   old_input_file = get_input_file(opts);
@@ -256,8 +253,8 @@ int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char** argv,
   parsed_tree = Nil;
   parser_free_parsed_syntax_errors(env);
   parse_mode_flag = PARSE_COMMAND;
-  buf = nusmv_yy_scan_buffer(cmd1, l-1);
-  nusmv_assert(buf != (YY_BUFFER_STATE) NULL);
+  buf = nusmv_yy_scan_buffer(cmd1, l - 1);
+  nusmv_assert(buf != (YY_BUFFER_STATE)NULL);
 
   status = (nusmv_yyparse() != 0);
 
@@ -274,19 +271,19 @@ int Parser_ReadCmdFromString(NuSMVEnv_ptr env, int argc, const char** argv,
   }
 
   *pc = parsed_tree;
-  return(status);
+  return (status);
 }
 
-int Parser_ReadCmdFromFile(NuSMVEnv_ptr env,
-                           const char *filename, node_ptr* res)
-{
+int Parser_ReadCmdFromFile(NuSMVEnv_ptr env, const char *filename,
+                           node_ptr *res) {
   int status;
-  char * old_input_file;
+  char *old_input_file;
 
   /* TODO[REAMa] Change when the parser will be reentrant */
   extern NuSMVEnv_ptr __nusmv_parser_env__;
   extern NuSMVEnv_ptr __psl_parser_env__;
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   __nusmv_parser_env__ = env;
   __psl_parser_env__ = env;
@@ -299,8 +296,7 @@ int Parser_ReadCmdFromFile(NuSMVEnv_ptr env,
   if (NIL(char) != old_input_file) {
     old_input_file = util_strsav(old_input_file);
   }
-  set_input_file(opts,
-                 (char*)(NULL == filename ? "<stdin>" : filename));
+  set_input_file(opts, (char *)(NULL == filename ? "<stdin>" : filename));
 
   Parser_OpenInput(env, filename);
   status = nusmv_yyparse();
@@ -316,83 +312,78 @@ int Parser_ReadCmdFromFile(NuSMVEnv_ptr env,
   return status;
 }
 
-int Parser_ReadNextExprFromFile(NuSMVEnv_ptr env,
-                                const char *filename, node_ptr* res)
-{
+int Parser_ReadNextExprFromFile(NuSMVEnv_ptr env, const char *filename,
+                                node_ptr *res) {
   return Parser_ReadCmdFromFile(env, filename, res);
 }
 
-int Parser_ReadSimpExprFromString(NuSMVEnv_ptr env,
-                                  const char* str_expr, node_ptr* res)
-{
-  const char* argv[2];
-  const char* head = "SIMPWFF ";
-  const char* tail =  ";\n";
+int Parser_ReadSimpExprFromString(NuSMVEnv_ptr env, const char *str_expr,
+                                  node_ptr *res) {
+  const char *argv[2];
+  const char *head = "SIMPWFF ";
+  const char *tail = ";\n";
 
   /* prepare argv for parsing */
-  argv[0] = (const char*) NULL;
+  argv[0] = (const char *)NULL;
   argv[1] = str_expr;
 
   *res = Nil;
-  return Parser_ReadCmdFromString(env, sizeof(argv)/sizeof(argv[0]), argv,
+  return Parser_ReadCmdFromString(env, sizeof(argv) / sizeof(argv[0]), argv,
                                   head, tail, res);
 }
 
-int Parser_ReadNextExprFromString(NuSMVEnv_ptr env,
-                                  const char* str_expr, node_ptr* res)
-{
-  const char* argv[2];
-  const char* head = "NEXTWFF ";
-  const char* tail =  ";\n";
+int Parser_ReadNextExprFromString(NuSMVEnv_ptr env, const char *str_expr,
+                                  node_ptr *res) {
+  const char *argv[2];
+  const char *head = "NEXTWFF ";
+  const char *tail = ";\n";
 
   /* prepare argv for parsing */
-  argv[0] = (const char*) NULL;
+  argv[0] = (const char *)NULL;
   argv[1] = str_expr;
 
   *res = Nil;
-  return Parser_ReadCmdFromString(env, sizeof(argv)/sizeof(argv[0]), argv,
+  return Parser_ReadCmdFromString(env, sizeof(argv) / sizeof(argv[0]), argv,
                                   head, tail, res);
 }
 
-int Parser_ReadTypeFromString(NuSMVEnv_ptr env,
-                              const char* str_type, node_ptr* res)
-{
-  const char* argv[2];
-  const char* head = "ITYPE ";
-  const char* tail =  ";\n";
+int Parser_ReadTypeFromString(NuSMVEnv_ptr env, const char *str_type,
+                              node_ptr *res) {
+  const char *argv[2];
+  const char *head = "ITYPE ";
+  const char *tail = ";\n";
 
   /* prepare argv for parsing */
-  argv[0] = (const char*) NULL;
+  argv[0] = (const char *)NULL;
   argv[1] = str_type;
 
   *res = Nil;
-  return Parser_ReadCmdFromString(env, sizeof(argv)/sizeof(argv[0]), argv,
+  return Parser_ReadCmdFromString(env, sizeof(argv) / sizeof(argv[0]), argv,
                                   head, tail, res);
 }
 
-int Parser_ReadIdentifierExprFromString(NuSMVEnv_ptr env,
-                                        const char* str_expr, node_ptr* res)
-{
-  const char* argv[2];
-  const char* head = "COMPID ";
-  const char* tail =  ";\n";
+int Parser_ReadIdentifierExprFromString(NuSMVEnv_ptr env, const char *str_expr,
+                                        node_ptr *res) {
+  const char *argv[2];
+  const char *head = "COMPID ";
+  const char *tail = ";\n";
 
   /* prepare argv for parsing */
-  argv[0] = (const char*) NULL;
+  argv[0] = (const char *)NULL;
   argv[1] = str_expr;
 
   *res = Nil;
-  return Parser_ReadCmdFromString(env, sizeof(argv)/sizeof(argv[0]), argv,
+  return Parser_ReadCmdFromString(env, sizeof(argv) / sizeof(argv[0]), argv,
                                   head, tail, res);
 }
 
-int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char *filename)
-{
+int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char *filename) {
   int retval;
-  char * old_input_file;
+  char *old_input_file;
   extern NuSMVEnv_ptr __nusmv_parser_env__;
   extern NuSMVEnv_ptr __psl_parser_env__;
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   __nusmv_parser_env__ = env;
   __psl_parser_env__ = env;
@@ -406,8 +397,7 @@ int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char *filename)
     old_input_file = util_strsav(old_input_file);
   }
 
-  set_input_file(opts,
-                 (char*)(NULL == filename ? "<stdin>" : filename));
+  set_input_file(opts, (char *)(NULL == filename ? "<stdin>" : filename));
 
   Parser_OpenInput(env, filename);
   retval = nusmv_yyparse();
@@ -422,12 +412,11 @@ int Parser_ReadLtlExprFromFile(NuSMVEnv_ptr env, const char *filename)
   return retval;
 }
 
-int Parser_read_psl_from_string(const NuSMVEnv_ptr env,
-                                int argc, const char** argv, node_ptr* res)
-{
+int Parser_read_psl_from_string(const NuSMVEnv_ptr env, int argc,
+                                const char **argv, node_ptr *res) {
   /* Invokes the PSL parser directly */
-  char* cmd;
-  char* cmd1;
+  char *cmd;
+  char *cmd1;
   int len = 0;
   int i;
   int status = 0;
@@ -437,17 +426,18 @@ int Parser_read_psl_from_string(const NuSMVEnv_ptr env,
 
   *res = Nil;
 
-  for (i=0; i < argc; ++i) {
-    if (argv[i] != (char*) NULL) len += strlen(argv[i]) + 1;
+  for (i = 0; i < argc; ++i) {
+    if (argv[i] != (char *)NULL)
+      len += strlen(argv[i]) + 1;
   }
 
-  len += 1+2+1;  /* semicolon, last two YY_END_OF_BUFFER_CHAR, terminator */
+  len += 1 + 2 + 1; /* semicolon, last two YY_END_OF_BUFFER_CHAR, terminator */
   cmd = ALLOC(char, len);
   cmd1 = ALLOC(char, len);
 
   cmd[0] = '\0';
-  for (i=0; i < argc; ++i) {
-    if (argv[i] != (char*) NULL) {
+  for (i = 0; i < argc; ++i) {
+    if (argv[i] != (char *)NULL) {
       strcat(cmd, argv[i]);
       strcat(cmd, " ");
     }
@@ -460,8 +450,8 @@ int Parser_read_psl_from_string(const NuSMVEnv_ptr env,
   parser_free_parsed_syntax_errors(env);
 
   psl_property_name = Nil;
-  buf = psl_yy_scan_buffer(cmd1, len-1);
-  nusmv_assert(buf != (YY_BUFFER_STATE) NULL);
+  buf = psl_yy_scan_buffer(cmd1, len - 1);
+  nusmv_assert(buf != (YY_BUFFER_STATE)NULL);
   status = (psl_yyparse() != 0);
   psl_yy_delete_buffer(buf); /* frees the buffer */
 
@@ -469,23 +459,23 @@ int Parser_read_psl_from_string(const NuSMVEnv_ptr env,
   FREE(cmd1);
 
   /* We need to reset the input buffer */
-  //psl_yyrestart(psl_yyin);
+  // psl_yyrestart(psl_yyin);
   *res = psl_parsed_tree;
   return status;
 }
 
-int Parser_read_psl_from_file(const NuSMVEnv_ptr env,
-                              const char* filename, node_ptr* res)
-{
+int Parser_read_psl_from_file(const NuSMVEnv_ptr env, const char *filename,
+                              node_ptr *res) {
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   extern NuSMVEnv_ptr __psl_parser_env__;
   extern NuSMVEnv_ptr __nusmv_parser_env__;
 
   int status = 1; /* by default there is a problem */
-  char * old_input_file;
+  char *old_input_file;
 
   __nusmv_parser_env__ = env;
   __psl_parser_env__ = env;
@@ -495,10 +485,11 @@ int Parser_read_psl_from_file(const NuSMVEnv_ptr env,
   psl_property_name = Nil;
 
   /* open the file */
-  nusmv_assert(filename != (char*) NULL);
+  nusmv_assert(filename != (char *)NULL);
 
-  psl_yyin = fopen(filename,"r");
-  if (psl_yyin == (FILE*) NULL) ErrorMgr_rpterr(errmgr, "cannot open input file %s",filename);
+  psl_yyin = fopen(filename, "r");
+  if (psl_yyin == (FILE *)NULL)
+    ErrorMgr_rpterr(errmgr, "cannot open input file %s", filename);
   nusmv_yylineno = 1;
   psl_yylineno = 1;
 
@@ -507,15 +498,15 @@ int Parser_read_psl_from_file(const NuSMVEnv_ptr env,
     old_input_file = util_strsav(old_input_file);
   }
 
-  set_input_file(opts, (char*)filename);
+  set_input_file(opts, (char *)filename);
 
   /* buffer has not been initialized before: */
   nusmv_assert(NULL == YY_CURRENT_BUFFER);
   YY_CURRENT_BUFFER = psl_yy_create_buffer(psl_yyin, YY_BUF_SIZE);
   /* Flushes the current input buffer */
-  (void) psl_yy_switch_to_buffer(YY_CURRENT_BUFFER);
+  (void)psl_yy_switch_to_buffer(YY_CURRENT_BUFFER);
 
-  (void) psl_yyrestart(psl_yyin);
+  (void)psl_yyrestart(psl_yyin);
 
   CATCH(errmgr) { /* catch errors in parsing */
     /* parse the file */
@@ -536,10 +527,12 @@ int Parser_read_psl_from_file(const NuSMVEnv_ptr env,
       char buf[buf_size]; /* output just buf_size-1 bytes */
       size_t n;
       nusmv_yylineno = psl_yylineno;
-      n = fread(buf, 1, buf_size-1, psl_yyin);
+      n = fread(buf, 1, buf_size - 1, psl_yyin);
       buf[n] = '\0';
-      ErrorMgr_rpterr(errmgr, "unexpected text left after parsing "
-                      "done : \"%s\".", buf);
+      ErrorMgr_rpterr(errmgr,
+                      "unexpected text left after parsing "
+                      "done : \"%s\".",
+                      buf);
     }
   }
   FAIL(errmgr) {
@@ -548,7 +541,8 @@ int Parser_read_psl_from_file(const NuSMVEnv_ptr env,
   }
 
   /* close the file */
-  nusmv_assert(NULL != YY_CURRENT_BUFFER);/* buffer is to be initialized before */
+  nusmv_assert(NULL !=
+               YY_CURRENT_BUFFER); /* buffer is to be initialized before */
   psl_yy_delete_buffer(YY_CURRENT_BUFFER);
   YY_CURRENT_BUFFER = NULL;
 
@@ -560,13 +554,13 @@ int Parser_read_psl_from_file(const NuSMVEnv_ptr env,
     FREE(old_input_file);
   }
 
-  if (!status) *res = psl_parsed_tree;
+  if (!status)
+    *res = psl_parsed_tree;
 
   return status;
 }
 
-node_ptr Parser_get_syntax_errors_list(const NuSMVEnv_ptr env)
-{
+node_ptr Parser_get_syntax_errors_list(const NuSMVEnv_ptr env) {
   node_ptr parsed_errors = Nil;
 
   if (NuSMVEnv_has_value(env, ENV_PARSED_ERRORS)) {
@@ -576,90 +570,80 @@ node_ptr Parser_get_syntax_errors_list(const NuSMVEnv_ptr env)
       parsed_errors = reverse(parsed_errors);
       NuSMVEnv_set_value(env, ENV_PARSED_ERRORS, parsed_errors);
       NuSMVEnv_set_flag(env, ENV_ERROR_REVERSED, true);
-    }
-    else {
+    } else {
       parsed_errors = NODE_PTR(NuSMVEnv_get_value(env, ENV_PARSED_ERRORS));
     }
-
   }
 
   return parsed_errors;
 }
 
-void Parser_get_syntax_error(node_ptr node,
-                             const char** out_filename,
-                             int* out_lineno,
-                             const char** out_token,
-                             const char** out_message)
-{
+void Parser_get_syntax_error(node_ptr node, const char **out_filename,
+                             int *out_lineno, const char **out_token,
+                             const char **out_message) {
   nusmv_assert(Nil != node);
   nusmv_assert(SYNTAX_ERROR == node_get_type(node));
 
-  if ((const char**) NULL != out_filename) {
+  if ((const char **)NULL != out_filename) {
     nusmv_assert(COLON == node_get_type(car(node)));
-    *out_filename = UStringMgr_get_string_text((string_ptr) caar(node));
+    *out_filename = UStringMgr_get_string_text((string_ptr)caar(node));
   }
 
-  if ((int*) NULL != out_lineno) {
+  if ((int *)NULL != out_lineno) {
     nusmv_assert(COLON == node_get_type(car(node)));
     *out_lineno = PTR_TO_INT(cdar(node));
   }
 
-  if ((const char**) NULL != out_token) {
+  if ((const char **)NULL != out_token) {
     nusmv_assert(COLON == node_get_type(cdr(node)));
-    *out_token = (const char*) cadr(node);
+    *out_token = (const char *)cadr(node);
   }
 
-  if ((const char**) NULL != out_message) {
+  if ((const char **)NULL != out_message) {
     nusmv_assert(COLON == node_get_type(cdr(node)));
-    *out_message = (const char*) cddr(node);
+    *out_message = (const char *)cddr(node);
   }
 }
 
-void Parser_print_syntax_error(node_ptr error, FILE* fout)
-{
-  const char* fname;
-  const char* token;
-  const char* msg;
+void Parser_print_syntax_error(node_ptr error, FILE *fout) {
+  const char *fname;
+  const char *token;
+  const char *msg;
   int lineno;
 
   Parser_get_syntax_error(error, &fname, &lineno, &token, &msg);
-  if ((char*) NULL != fname) {
+  if ((char *)NULL != fname) {
     fprintf(fout, "file %s: ", fname);
-  }
-  else {
+  } else {
     fprintf(fout, "file stdin: ");
   }
 
   fprintf(fout, "line %d: ", lineno);
 
-  if ((const char*) NULL != token) {
+  if ((const char *)NULL != token) {
     fprintf(fout, "at token \"%s\"", token);
   }
   fprintf(fout, ": %s\n", msg);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void parser_add_syntax_error(const NuSMVEnv_ptr env,
-                             const char* fname, int lineno,
-                             const char* token, const char* err_msg)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+void parser_add_syntax_error(const NuSMVEnv_ptr env, const char *fname,
+                             int lineno, const char *token,
+                             const char *err_msg) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   UStringMgr_ptr strings = USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
-  node_ptr  parsed_errors = Nil;
+  node_ptr parsed_errors = Nil;
 
-  node_ptr err = new_node(nodemgr, SYNTAX_ERROR,
-                          new_node(nodemgr, COLON,
-                                   (node_ptr) UStringMgr_find_string(strings, (char*) fname),
-                                   NODE_FROM_INT(lineno)),
-                          new_node(nodemgr, COLON,
-                                   (node_ptr) util_strsav((char*) token),
-                                   (node_ptr) util_strsav((char*) err_msg)));
+  node_ptr err = new_node(
+      nodemgr, SYNTAX_ERROR,
+      new_node(nodemgr, COLON,
+               (node_ptr)UStringMgr_find_string(strings, (char *)fname),
+               NODE_FROM_INT(lineno)),
+      new_node(nodemgr, COLON, (node_ptr)util_strsav((char *)token),
+               (node_ptr)util_strsav((char *)err_msg)));
 
   if (NuSMVEnv_has_value(env, ENV_PARSED_ERRORS)) {
     parsed_errors = NODE_PTR(NuSMVEnv_remove_value(env, ENV_PARSED_ERRORS));
@@ -669,10 +653,8 @@ void parser_add_syntax_error(const NuSMVEnv_ptr env,
   NuSMVEnv_set_value(env, ENV_PARSED_ERRORS, parsed_errors);
 }
 
-void parser_free_parsed_syntax_errors(const NuSMVEnv_ptr env)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+void parser_free_parsed_syntax_errors(const NuSMVEnv_ptr env) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   node_ptr iter = Nil;
 
   if (NuSMVEnv_has_value(env, ENV_PARSED_ERRORS)) {
@@ -681,7 +663,7 @@ void parser_free_parsed_syntax_errors(const NuSMVEnv_ptr env)
 
   while (iter != Nil) {
     node_ptr se;
-    char* str;
+    char *str;
 
     nusmv_assert(CONS == node_get_type(iter));
 
@@ -693,10 +675,14 @@ void parser_free_parsed_syntax_errors(const NuSMVEnv_ptr env)
     free_node(nodemgr, car(se)); /* COLON fname and lineno */
 
     /*token string*/
-    str = (char*) cadr(se); if ((char*) NULL != str) FREE(str);
+    str = (char *)cadr(se);
+    if ((char *)NULL != str)
+      FREE(str);
 
     /*message string*/
-    str = (char*) cddr(se); if ((char*) NULL != str) FREE(str);
+    str = (char *)cddr(se);
+    if ((char *)NULL != str)
+      FREE(str);
 
     free_node(nodemgr, cdr(se)); /* COLON token and message */
 
@@ -704,13 +690,12 @@ void parser_free_parsed_syntax_errors(const NuSMVEnv_ptr env)
 
     { /* frees the list node */
       node_ptr tmp = iter;
-      iter=cdr(iter);
+      iter = cdr(iter);
       free_node(nodemgr, tmp);
     }
   }
   NuSMVEnv_set_flag(env, ENV_ERROR_REVERSED, false);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -726,43 +711,43 @@ void parser_free_parsed_syntax_errors(const NuSMVEnv_ptr env)
 
   \se Creates temporary files which are subsequently deleted.
 */
-static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
-{
+static void parser_open_input_pp(const NuSMVEnv_ptr env, const char *filename) {
   Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
 #if NUSMV_HAVE_POPEN
-  const char* STDIN_OPT_NAME = " -";
+  const char *STDIN_OPT_NAME = " -";
   char c;
 
-  char* pp_curr;
-  char* pp_next;
-  char* pp_cmd;
-  char* pp_exec;
+  char *pp_curr;
+  char *pp_next;
+  char *pp_cmd;
+  char *pp_exec;
 
-  char* path;
+  char *path;
 
   int tmp_len;
 
-  FILE* tempstream1;
-  FILE* tempstream2;
+  FILE *tempstream1;
+  FILE *tempstream2;
 
-  char* pp_list = get_pp_list(opts);
-  char* pp_list_copy;
+  char *pp_list = get_pp_list(opts);
+  char *pp_list_copy;
 
   pp_list_copy = ALLOC(char, strlen(pp_list) + 1);
   nusmv_assert(pp_list_copy != NULL);
   pp_list_copy[0] = '\0';
 
   /* Set tmpfname1 to initial file to use as input */
-  if (tmpfname1 != (char*) NULL) FREE(tmpfname1);
+  if (tmpfname1 != (char *)NULL)
+    FREE(tmpfname1);
 
-  if (filename != (char*) NULL) {
+  if (filename != (char *)NULL) {
     tmpfname1 = ALLOC(char, strlen(filename) + 1);
-    nusmv_assert(tmpfname1 != (char*) NULL);
+    nusmv_assert(tmpfname1 != (char *)NULL);
     strcpy(tmpfname1, filename);
 
     /* Get path to initial file */
@@ -770,9 +755,8 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
     path = ALLOC(char, tmp_len + 1);
     strncpy(path, filename, tmp_len);
     path[tmp_len] = '\0';
-  }
-  else {
-    tmpfname1 = (char*) NULL;
+  } else {
+    tmpfname1 = (char *)NULL;
 
     path = ALLOC(char, 1);
     path[0] = '\0';
@@ -787,19 +771,20 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
      so that it does not get deleted when Parser_ClosePP() is called.
      This is done by making tmpfname2 not NULL */
   if (pp_next == NULL) {
-    if (tmpfname2 != (char*) NULL) FREE(tmpfname2);
+    if (tmpfname2 != (char *)NULL)
+      FREE(tmpfname2);
     tmpfname2 = ALLOC(char, 2);
-    nusmv_assert(tmpfname2 != (char*) NULL);
+    nusmv_assert(tmpfname2 != (char *)NULL);
     strcpy(tmpfname2, "x");
   }
 
   while (pp_next != NULL) {
-    if (tmpfname1 != (char*) NULL) {
+    if (tmpfname1 != (char *)NULL) {
       /* Test whether it is possible to open the file */
-      if(!(tempstream1 = fopen(tmpfname1, "r"))) {
-        ErrorMgr_rpterr(errmgr, "cannot open input file %s",tmpfname1);
+      if (!(tempstream1 = fopen(tmpfname1, "r"))) {
+        ErrorMgr_rpterr(errmgr, "cannot open input file %s", tmpfname1);
       }
-      (void) fclose(tempstream1);
+      (void)fclose(tempstream1);
     }
 
     if (opt_verbose_level_gt(opts, 1)) {
@@ -807,24 +792,24 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
       Logger_log(logger, "Calling %s preprocessor\n", pp_curr);
     }
     pp_exec = get_preprocessor_call(env, pp_curr);
-    if (pp_exec == (char*) NULL) {
+    if (pp_exec == (char *)NULL) {
       ErrorMgr_error_unknown_preprocessor(errmgr, pp_curr);
     }
 
-    if (tmpfname1 != (char*)NULL) {
+    if (tmpfname1 != (char *)NULL) {
       pp_cmd = ALLOC(char, strlen(pp_exec) + strlen(tmpfname1) + 2);
-    }
-    else {
+    } else {
       pp_cmd = ALLOC(char, strlen(pp_exec) + strlen(STDIN_OPT_NAME) + 1);
     }
     nusmv_assert(pp_cmd != NIL(char));
 
     strcpy(pp_cmd, pp_exec);
-    if (tmpfname1 != (char*)NULL) {
+    if (tmpfname1 != (char *)NULL) {
       strcat(pp_cmd, " ");
       strcat(pp_cmd, tmpfname1);
+    } else {
+      strcat(pp_cmd, STDIN_OPT_NAME);
     }
-    else { strcat(pp_cmd, STDIN_OPT_NAME); }
     nusmv_yylineno = 1;
 
     if (opt_verbose_level_gt(opts, 2)) {
@@ -833,41 +818,51 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
     }
     /* Invoke command */
 
-    if ( !(tempstream1 = popen(pp_cmd, "r")) ) {
+    if (!(tempstream1 = popen(pp_cmd, "r"))) {
       ErrorMgr_rpterr(errmgr, "error executing command \"%s\"", pp_cmd);
     }
 
     /* Get unique temporary filename */
-    if (tmpfname2 != (char*) NULL) FREE(tmpfname2);
+    if (tmpfname2 != (char *)NULL)
+      FREE(tmpfname2);
     tmpfname2 = Utils_get_temp_filename_in_dir(path, "NuSMVXXXXXX");
     if (tmpfname2 == NULL) {
-      ErrorMgr_rpterr(errmgr, "Unable to generate unique temporary file. (Previously generated temporary file: %s)\n", tmpfname1);
+      ErrorMgr_rpterr(errmgr,
+                      "Unable to generate unique temporary file. (Previously "
+                      "generated temporary file: %s)\n",
+                      tmpfname1);
     }
 
     tempstream2 = fopen(tmpfname2, "w");
-    if(!tempstream2) ErrorMgr_rpterr(errmgr, "cannot open input file %s",tmpfname2);
+    if (!tempstream2)
+      ErrorMgr_rpterr(errmgr, "cannot open input file %s", tmpfname2);
 
     while (feof(tempstream1) == 0) {
       c = getc(tempstream1);
-      if (c != EOF) {putc(c, tempstream2);}
+      if (c != EOF) {
+        putc(c, tempstream2);
+      }
     }
-    (void) pclose(tempstream1);
-    (void) fclose(tempstream2);
+    (void)pclose(tempstream1);
+    (void)fclose(tempstream2);
 
-    if (((char*)NULL == filename || strcmp(tmpfname1, filename) != 0) &&
-        (tempstream1 = fopen(tmpfname1,"r"))) {
-      (void) fclose(tempstream1);
+    if (((char *)NULL == filename || strcmp(tmpfname1, filename) != 0) &&
+        (tempstream1 = fopen(tmpfname1, "r"))) {
+      (void)fclose(tempstream1);
       if (remove(tmpfname1) == -1) {
-        ErrorMgr_rpterr(errmgr, "error deleting temporary file \"%s\"", tmpfname1);
+        ErrorMgr_rpterr(errmgr, "error deleting temporary file \"%s\"",
+                        tmpfname1);
       }
     }
 
-    if (tmpfname1 != (char*) NULL) FREE(tmpfname1);
+    if (tmpfname1 != (char *)NULL)
+      FREE(tmpfname1);
     tmpfname1 = ALLOC(char, strlen(tmpfname2) + 1);
-    nusmv_assert(tmpfname1 != (char*) NULL);
+    nusmv_assert(tmpfname1 != (char *)NULL);
     strcpy(tmpfname1, tmpfname2);
 
-    FREE(tmpfname2); tmpfname2 = (char*) NULL;
+    FREE(tmpfname2);
+    tmpfname2 = (char *)NULL;
     FREE(pp_cmd);
 
     pp_curr = pp_next;
@@ -875,24 +870,23 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
   } /* End of while (pp_list != NULL) */
 
   pp_exec = get_preprocessor_call(env, pp_curr);
-  if (pp_exec == (char*) NULL) {
+  if (pp_exec == (char *)NULL) {
     ErrorMgr_error_unknown_preprocessor(errmgr, pp_curr);
   }
 
   /* Set nusmv_yyin to result of running last pre-processor */
-  if (tmpfname1 != (char*) NULL) {
+  if (tmpfname1 != (char *)NULL) {
     /* Test whether it is possible to open the file */
-    if(!(tempstream1 = fopen(tmpfname1, "r"))) {
-      ErrorMgr_rpterr(errmgr, "cannot open input file %s",tmpfname1);
+    if (!(tempstream1 = fopen(tmpfname1, "r"))) {
+      ErrorMgr_rpterr(errmgr, "cannot open input file %s", tmpfname1);
     }
-    (void) fclose(tempstream1);
+    (void)fclose(tempstream1);
 
     pp_cmd = ALLOC(char, strlen(pp_exec) + strlen(tmpfname1) + 2);
     strcpy(pp_cmd, pp_exec);
     strcat(pp_cmd, " ");
     strcat(pp_cmd, tmpfname1);
-  }
-  else {
+  } else {
     pp_cmd = ALLOC(char, strlen(pp_exec) + strlen(STDIN_OPT_NAME) + 1);
     strcpy(pp_cmd, pp_exec);
     strcat(pp_cmd, STDIN_OPT_NAME);
@@ -905,7 +899,7 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
   if (opt_verbose_level_gt(opts, 2)) {
     Logger_log(logger, "\nInvoking the command: '%s'...\n", pp_cmd);
   }
-  if( !(nusmv_yyin = popen(pp_cmd, "r")) ) {
+  if (!(nusmv_yyin = popen(pp_cmd, "r"))) {
     FREE(pp_list_copy);
     ErrorMgr_rpterr(errmgr, "error executing command \"%s\"", pp_cmd);
   }
@@ -916,8 +910,9 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
   psl_yyin = nusmv_yyin;
 
   /* Flushes the current input buffer */
-  (void) nusmv_yy_switch_to_buffer(nusmv_yy_create_buffer(nusmv_yyin, YY_BUF_SIZE));
-  (void) nusmv_yyrestart(nusmv_yyin);
+  (void)nusmv_yy_switch_to_buffer(
+      nusmv_yy_create_buffer(nusmv_yyin, YY_BUF_SIZE));
+  (void)nusmv_yyrestart(nusmv_yyin);
 
 #endif /* NUSMV_HAVE_POPEN */
 }
@@ -930,28 +925,29 @@ static void parser_open_input_pp(const NuSMVEnv_ptr env, const char* filename)
   \se Deletes any temporary files created by
   parser_open_input_pp.
 */
-static void parser_close_input_pp(const NuSMVEnv_ptr env)
-{
+static void parser_close_input_pp(const NuSMVEnv_ptr env) {
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
 #if NUSMV_HAVE_POPEN
-  FILE* stream;
+  FILE *stream;
 
   /* tmpfname refers to original input file */
-  if (tmpfname2 != NULL) FREE(tmpfname2);
+  if (tmpfname2 != NULL)
+    FREE(tmpfname2);
   else {
-    stream = fopen(tmpfname1,"r");
-    if (stream != (FILE*) NULL) {
-      (void) fclose(stream);
+    stream = fopen(tmpfname1, "r");
+    if (stream != (FILE *)NULL) {
+      (void)fclose(stream);
       if (remove(tmpfname1) == -1) {
         ErrorMgr_rpterr(errmgr, "error deleting file \"%s\"", tmpfname1);
       }
     }
   }
 
-  FREE(tmpfname1); tmpfname1 = (char*) NULL;
+  FREE(tmpfname1);
+  tmpfname1 = (char *)NULL;
 
-  (void) pclose(nusmv_yyin);
+  (void)pclose(nusmv_yyin);
 #endif
 }

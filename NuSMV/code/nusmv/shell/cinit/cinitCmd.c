@@ -34,45 +34,39 @@
 
 */
 
-#include "nusmv/shell/cmd/cmd.h"
 #include "nusmv/shell/cinit/cinitCmd.h"
+#include "nusmv/shell/cmd/cmd.h"
 
+#include "nusmv/core/cinit/cinit.h"
 #include "nusmv/core/utils/OStream.h"
 #include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/cinit/cinit.h"
 
-#include "nusmv/core/utils/error.h"
+#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/enc/enc.h"
 #include "nusmv/core/trace/pkg_trace.h"
-#include "nusmv/core/compile/compile.h"
-#include "nusmv/core/compile/compile.h"
+#include "nusmv/core/utils/error.h"
 
-int CommandCmdReset(NuSMVEnv_ptr env, int argc, char** argv);
-int CommandPrintUsage(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandCmdReset(NuSMVEnv_ptr env, int argc, char **argv);
+int CommandPrintUsage(NuSMVEnv_ptr env, int argc, char **argv);
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -84,12 +78,10 @@ static int UsagePrintUsage(const NuSMVEnv_ptr env);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
-void cinit_AddCmd(NuSMVEnv_ptr env)
-{
+void cinit_AddCmd(NuSMVEnv_ptr env) {
   Cmd_CommandAdd(env, "reset", CommandCmdReset, 0, false);
   Cmd_CommandAdd(env, "print_usage", CommandPrintUsage, 0, true);
 }
@@ -113,18 +105,20 @@ void cinit_AddCmd(NuSMVEnv_ptr env)
   </dl>
 */
 
-int CommandCmdReset(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int CommandCmdReset(NuSMVEnv_ptr env, int argc, char **argv) {
   int c;
 
   util_getopt_reset();
-  while((c = util_getopt(argc,argv,"h")) != EOF){
-    switch(c){
-    case 'h': return(UsageCmdReset(env));
-    default:  return(UsageCmdReset(env));
+  while ((c = util_getopt(argc, argv, "h")) != EOF) {
+    switch (c) {
+    case 'h':
+      return (UsageCmdReset(env));
+    default:
+      return (UsageCmdReset(env));
     }
   }
-  if (argc != util_optind) return(UsageCmdReset(env));
+  if (argc != util_optind)
+    return (UsageCmdReset(env));
 
   NuSMVCore_reset(env);
 
@@ -136,14 +130,13 @@ int CommandCmdReset(NuSMVEnv_ptr env, int argc, char** argv)
 
 
 */
-static int UsageCmdReset(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "usage: reset [-h]\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-  return(1);
+static int UsageCmdReset(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(streams, "usage: reset [-h]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  return (1);
 }
-
 
 /*!
   \command{print_usage} Prints processor and BDD statistics.
@@ -162,19 +155,20 @@ static int UsageCmdReset(const NuSMVEnv_ptr env)
 
 */
 
-int CommandPrintUsage(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int CommandPrintUsage(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
   int c;
   int retval = 0;
 
   util_getopt_reset();
-  while((c = util_getopt(argc,argv,"h")) != EOF){
-    switch(c) {
-    case 'h': return(UsagePrintUsage(env));
-    default:  return(UsagePrintUsage(env));
+  while ((c = util_getopt(argc, argv, "h")) != EOF) {
+    switch (c) {
+    case 'h':
+      return (UsagePrintUsage(env));
+    default:
+      return (UsagePrintUsage(env));
     }
   }
 
@@ -188,10 +182,10 @@ int CommandPrintUsage(NuSMVEnv_ptr env, int argc, char** argv)
 
   \todo Missing description
 */
-static int UsagePrintUsage(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "usage: print_usage [-h]\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-  return(1);
+static int UsagePrintUsage(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(streams, "usage: print_usage [-h]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  return (1);
 }

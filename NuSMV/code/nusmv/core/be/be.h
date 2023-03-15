@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BE_BE_H__
 #define __NUSMV_CORE_BE_BE_H__
 
@@ -50,8 +49,7 @@
   Be_Manager_ptr
 */
 
-typedef struct Be_Manager_TAG* Be_Manager_ptr; /* generic be manger */
-
+typedef struct Be_Manager_TAG *Be_Manager_ptr; /* generic be manger */
 
 /*!
   \brief A Boolean Expression represented in Conjunctive Normal Form
@@ -63,8 +61,7 @@ typedef struct Be_Manager_TAG* Be_Manager_ptr; /* generic be manger */
   empty clause.
 */
 
-typedef struct Be_Cnf_TAG* Be_Cnf_ptr; /* cnf representation */
-
+typedef struct Be_Cnf_TAG *Be_Cnf_ptr; /* cnf representation */
 
 /*!
   \brief The Boolean Expression type
@@ -72,14 +69,12 @@ typedef struct Be_Cnf_TAG* Be_Cnf_ptr; /* cnf representation */
 
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef void* be_ptr;
-
+typedef void *be_ptr;
 
 /*!
   \brief Specific to generic BE conversion gateway type
@@ -89,14 +84,12 @@ typedef void* be_ptr;
   to generic Boolean Expression type (for example from rbc to be_ptr).
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef be_ptr (*Be_Spec2Be_fun)(Be_Manager_ptr self, void* spec_be);
-
+typedef be_ptr (*Be_Spec2Be_fun)(Be_Manager_ptr self, void *spec_be);
 
 /*!
   \brief Generic to specific BE conversion gateway type
@@ -106,8 +99,7 @@ typedef be_ptr (*Be_Spec2Be_fun)(Be_Manager_ptr self, void* spec_be);
   to specific Boolean Expression type (for example from be_ptr to rbc).
 */
 
-typedef void*  (*Be_Be2Spec_fun)(Be_Manager_ptr self, be_ptr be);
-
+typedef void *(*Be_Be2Spec_fun)(Be_Manager_ptr self, be_ptr be);
 
 /*!
   \brief BE equivalent of RBC CNF conversion algorithm.
@@ -117,7 +109,6 @@ typedef void*  (*Be_Be2Spec_fun)(Be_Manager_ptr self, be_ptr be);
 #include "nusmv/core/rbc/rbc.h"
 typedef Rbc_2CnfAlgorithm Be_CnfAlgorithm;
 
-
 #include <limits.h>
 /* ================================================== */
 /* Put here any specific boolean expression manager
@@ -125,9 +116,8 @@ typedef Rbc_2CnfAlgorithm Be_CnfAlgorithm;
 #include "nusmv/core/be/beRbcManager.h"
 /* ================================================== */
 
-#include "nusmv/core/utils/Slist.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
-
+#include "nusmv/core/utils/Slist.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -151,7 +141,6 @@ typedef Rbc_2CnfAlgorithm Be_CnfAlgorithm;
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -183,7 +172,6 @@ void Be_Init(void);
 void Be_Quit(void);
 /* ================================================== */
 
-
 /* ================================================== */
 /* Be_Manager public interface: */
 
@@ -208,8 +196,7 @@ NuSMVEnv_ptr Be_Manager_GetEnvironment(const Be_Manager_ptr self);
 
   \sa Be_Manager_Be2Spec
 */
-be_ptr Be_Manager_Spec2Be(const Be_Manager_ptr self,
-                                  void* spec_expr);
+be_ptr Be_Manager_Spec2Be(const Be_Manager_ptr self, void *spec_expr);
 
 /*!
   \methodof Be_Manager
@@ -220,7 +207,7 @@ be_ptr Be_Manager_Spec2Be(const Be_Manager_ptr self,
 
   \sa Be_Manager_Spec2Be
 */
-void* Be_Manager_Be2Spec(const Be_Manager_ptr self, be_ptr be);
+void *Be_Manager_Be2Spec(const Be_Manager_ptr self, be_ptr be);
 
 /*!
   \methodof Be_Manager
@@ -228,9 +215,8 @@ void* Be_Manager_Be2Spec(const Be_Manager_ptr self, be_ptr be);
 
   Gets the specific manager under the be manager
 */
-void* Be_Manager_GetSpecManager(Be_Manager_ptr self);
+void *Be_Manager_GetSpecManager(Be_Manager_ptr self);
 /* ================================================== */
-
 
 /* ==================================================  */
 /* Be_Cnf class constructor, destructor and modifiers */
@@ -336,8 +322,7 @@ size_t Be_Cnf_GetClausesNumber(const Be_Cnf_ptr self);
 
 
 */
-void Be_Cnf_SetFormulaLiteral(const Be_Cnf_ptr self,
-                                         const int formula_literal);
+void Be_Cnf_SetFormulaLiteral(const Be_Cnf_ptr self, const int formula_literal);
 
 /*!
   \methodof Be_Cnf
@@ -345,10 +330,8 @@ void Be_Cnf_SetFormulaLiteral(const Be_Cnf_ptr self,
 
 
 */
-void Be_Cnf_SetMaxVarIndex(const Be_Cnf_ptr self,
-                                      const int max_idx);
+void Be_Cnf_SetMaxVarIndex(const Be_Cnf_ptr self, const int max_idx);
 /* ================================================== */
-
 
 /* ================================================== */
 /* BE logical operations interface: */
@@ -382,21 +365,21 @@ boolean Be_IsConstant(Be_Manager_ptr manager, be_ptr arg);
 
 
 */
-be_ptr  Be_Truth(Be_Manager_ptr manager);
+be_ptr Be_Truth(Be_Manager_ptr manager);
 
 /*!
   \brief Builds a 'false' constant value
 
 
 */
-be_ptr  Be_Falsity(Be_Manager_ptr manager);
+be_ptr Be_Falsity(Be_Manager_ptr manager);
 
 /*!
   \brief Negates its argument
 
 
 */
-be_ptr  Be_Not(Be_Manager_ptr manager, be_ptr arg);
+be_ptr Be_Not(Be_Manager_ptr manager, be_ptr arg);
 
 /*!
   \brief Builds a new be which is the conjunction between
@@ -404,8 +387,7 @@ be_ptr  Be_Not(Be_Manager_ptr manager, be_ptr arg);
 
 
 */
-be_ptr
-Be_And(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
+be_ptr Be_And(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 /*!
   \brief Builds a new be which is the disjunction of
@@ -413,8 +395,7 @@ Be_And(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 
 */
-be_ptr
-Be_Or(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
+be_ptr Be_Or(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 /*!
   \brief Builds a new be which is the exclusive-disjunction
@@ -422,8 +403,7 @@ Be_Or(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 
 */
-be_ptr
-Be_Xor(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
+be_ptr Be_Xor(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 /*!
   \brief Builds a new be which is the implication between
@@ -431,8 +411,7 @@ Be_Xor(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 
 */
-be_ptr
-Be_Implies(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
+be_ptr Be_Implies(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 /*!
   \brief Builds a new be which is the logical equivalence
@@ -440,8 +419,7 @@ Be_Implies(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 
 */
-be_ptr
-Be_Iff(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
+be_ptr Be_Iff(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
 /*!
   \brief Builds an if-then-else operation be
@@ -450,9 +428,8 @@ Be_Iff(Be_Manager_ptr manager, be_ptr arg1, be_ptr arg2);
 
   \se ...
 */
-be_ptr
-Be_Ite(Be_Manager_ptr manager, be_ptr arg_if,
-       be_ptr arg_then, be_ptr arg_else);
+be_ptr Be_Ite(Be_Manager_ptr manager, be_ptr arg_if, be_ptr arg_then,
+              be_ptr arg_else);
 
 /*!
   \brief Creates a fresh copy G(X') of the be F(X) by shifting
@@ -478,11 +455,8 @@ Be_Ite(Be_Manager_ptr manager, be_ptr arg_if,
                  information are not available at this stage.
 
 */
-be_ptr
-Be_LogicalShiftVar(Be_Manager_ptr manager, be_ptr f,
-                   int shift,
-                   const int* log2phy,
-                   const int* phy2log);
+be_ptr Be_LogicalShiftVar(Be_Manager_ptr manager, be_ptr f, int shift,
+                          const int *log2phy, const int *phy2log);
 
 /*!
   \brief Replaces all variables in f with other variables, taking
@@ -510,15 +484,10 @@ Be_LogicalShiftVar(Be_Manager_ptr manager, be_ptr f,
                been introduced with NuSMV-2.3 that ships dynamic
                encodings.
 */
-be_ptr
-Be_LogicalVarSubst(Be_Manager_ptr manager, be_ptr f,
-                   int* subst,
-                   const int* log2phy,
-                   const int* phy2log);
-
+be_ptr Be_LogicalVarSubst(Be_Manager_ptr manager, be_ptr f, int *subst,
+                          const int *log2phy, const int *phy2log);
 
 /* ================================================== */
-
 
 /* ================================================== */
 /* Utilities interface: */
@@ -546,9 +515,8 @@ Be_LogicalVarSubst(Be_Manager_ptr manager, be_ptr f,
 
   \sa Be_Cnf_Delete
 */
-Be_Cnf_ptr
-Be_ConvertToCnf(Be_Manager_ptr manager, be_ptr f, int polarity,
-                Be_CnfAlgorithm alg);
+Be_Cnf_ptr Be_ConvertToCnf(Be_Manager_ptr manager, be_ptr f, int polarity,
+                           Be_CnfAlgorithm alg);
 
 /*!
   \brief Converts a CNF literal into a BE literal
@@ -559,8 +527,7 @@ Be_ConvertToCnf(Be_Manager_ptr manager, be_ptr f, int polarity,
 
   \sa Be_ConvertToCnf
 */
-int Be_CnfLiteral2BeLiteral(const Be_Manager_ptr self,
-                                   int cnfLiteral);
+int Be_CnfLiteral2BeLiteral(const Be_Manager_ptr self, int cnfLiteral);
 
 /*!
   \brief Converts a BE literal into a CNF literal (sign is taken into
@@ -570,8 +537,7 @@ int Be_CnfLiteral2BeLiteral(const Be_Manager_ptr self,
 
   \sa Be_ConvertToCnf
 */
-int Be_BeLiteral2CnfLiteral(const Be_Manager_ptr self,
-                                   int beLiteral);
+int Be_BeLiteral2CnfLiteral(const Be_Manager_ptr self, int beLiteral);
 
 /*!
   \brief Converts a BE literal into a CNF literal
@@ -580,8 +546,7 @@ int Be_BeLiteral2CnfLiteral(const Be_Manager_ptr self,
 
   \sa Be_ConvertToCnf
 */
-int Be_BeLiteral2BeIndex(const Be_Manager_ptr self,
-                                int beLiteral);
+int Be_BeLiteral2BeIndex(const Be_Manager_ptr self, int beLiteral);
 
 /*!
   \brief Converts a BE index into a BE literal (always positive)
@@ -590,8 +555,7 @@ int Be_BeLiteral2BeIndex(const Be_Manager_ptr self,
 
   \sa Be_ConvertToCnf
 */
-int Be_BeIndex2BeLiteral(const Be_Manager_ptr self,
-                                int beIndex);
+int Be_BeIndex2BeLiteral(const Be_Manager_ptr self, int beIndex);
 
 /*!
   \brief Returns a CNF literal (always positive) associated with a
@@ -603,8 +567,7 @@ int Be_BeIndex2BeLiteral(const Be_Manager_ptr self,
 
   \sa Be_ConvertToCnf
 */
-int Be_BeIndex2CnfLiteral(const Be_Manager_ptr self,
-                                 int beIndex);
+int Be_BeIndex2CnfLiteral(const Be_Manager_ptr self, int beIndex);
 
 /*!
   \brief Converts the given CNF model into BE model
@@ -614,31 +577,28 @@ int Be_BeIndex2CnfLiteral(const Be_Manager_ptr self,
   (via lsDestroy)
 */
 Slist_ptr Be_CnfModelToBeModel(Be_Manager_ptr manager,
-                                      const Slist_ptr cnfModel);
+                               const Slist_ptr cnfModel);
 
 /*!
   \brief Dumps the given be into a file with Davinci format
 
 
 */
-void
-Be_DumpDavinci(Be_Manager_ptr manager, be_ptr f, FILE* outFile);
+void Be_DumpDavinci(Be_Manager_ptr manager, be_ptr f, FILE *outFile);
 
 /*!
   \brief Dumps the given be into a file with Davinci format
 
 
 */
-void
-Be_DumpGdl(Be_Manager_ptr manager, be_ptr f, FILE* outFile);
+void Be_DumpGdl(Be_Manager_ptr manager, be_ptr f, FILE *outFile);
 
 /*!
   \brief Dumps the given be into a file
 
 
 */
-void
-Be_DumpSexpr(Be_Manager_ptr manager, be_ptr f, FILE* outFile);
+void Be_DumpSexpr(Be_Manager_ptr manager, be_ptr f, FILE *outFile);
 
 /* index<->be conversion layer: */
 
@@ -668,8 +628,7 @@ int Be_Var2Index(Be_Manager_ptr manager, be_ptr var);
 
   \sa Be_CnfLiteral_Negate, Be_BeLiteral_IsSignPositive
 */
-boolean Be_CnfLiteral_IsSignPositive(const Be_Manager_ptr self,
-                                            int cnfLiteral);
+boolean Be_CnfLiteral_IsSignPositive(const Be_Manager_ptr self, int cnfLiteral);
 
 /*!
   \brief Returns negated literal.
@@ -678,8 +637,7 @@ boolean Be_CnfLiteral_IsSignPositive(const Be_Manager_ptr self,
 
   \sa Be_CnfLiteral_IsSignPositive, Be_BeLiteral_Negate
 */
-int Be_CnfLiteral_Negate(const Be_Manager_ptr self,
-                                int cnfLiteral);
+int Be_CnfLiteral_Negate(const Be_Manager_ptr self, int cnfLiteral);
 
 /*!
   \brief Returns true iff sign of literal is positive.
@@ -688,8 +646,7 @@ int Be_CnfLiteral_Negate(const Be_Manager_ptr self,
 
   \sa Be_BeLiteral_Negate, Be_CnfLiteral_IsSignPositive
 */
-boolean Be_BeLiteral_IsSignPositive(const Be_Manager_ptr self,
-                                           int beLiteral);
+boolean Be_BeLiteral_IsSignPositive(const Be_Manager_ptr self, int beLiteral);
 
 /*!
   \brief Returns negated literal.
@@ -698,8 +655,7 @@ boolean Be_BeLiteral_IsSignPositive(const Be_Manager_ptr self,
 
   \sa Be_BeLiteral_IsSignPositive, Be_CnfLiteral_Negate
 */
-int Be_BeLiteral_Negate(const Be_Manager_ptr self,
-                               int beLiteral);
+int Be_BeLiteral_Negate(const Be_Manager_ptr self, int beLiteral);
 
 /*!
   \brief Performs the inlining of f, either including or not
@@ -710,8 +666,7 @@ int Be_BeLiteral_Negate(const Be_Manager_ptr self,
 
   \sa InlineResult
 */
-be_ptr
-Be_apply_inlining(Be_Manager_ptr self, be_ptr f, boolean add_conj);
+be_ptr Be_apply_inlining(Be_Manager_ptr self, be_ptr f, boolean add_conj);
 
 /*!
   \methodof Be_Cnf
@@ -723,8 +678,7 @@ Be_apply_inlining(Be_Manager_ptr self, be_ptr f, boolean add_conj);
 
   \se "outFile" is written
 */
-void
-Be_Cnf_PrintStat(const Be_Cnf_ptr self, FILE* outFile, char* prefix);
+void Be_Cnf_PrintStat(const Be_Cnf_ptr self, FILE *outFile, char *prefix);
 
 /* ================================================== */
 

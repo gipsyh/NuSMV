@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,39 +35,33 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_HRC_HRC_SYMB_TABLE_UTILS_H__
 #define __NUSMV_CORE_HRC_HRC_SYMB_TABLE_UTILS_H__
 
+#include "nusmv/core/compile/symb_table/SymbLayer.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/hrc/HrcNode.h"
 #include "nusmv/core/node/node.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
-#include "nusmv/core/compile/symb_table/SymbLayer.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 

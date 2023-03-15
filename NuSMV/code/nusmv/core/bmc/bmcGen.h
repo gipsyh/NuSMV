@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_GEN_H__
 #define __NUSMV_CORE_BMC_BMC_GEN_H__
 
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/fsm/be/BeFsm.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/prop/PropDb.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /**AutomaticStart*************************************************************/
 
@@ -61,20 +59,16 @@
 
   \sa Bmc_Gen_InvarBaseStep, Bmc_Gen_InvarInductStep
 */
-be_ptr
-Bmc_Gen_InvarProblem(const BeFsm_ptr be_fsm,
-                     const node_ptr wff);
+be_ptr Bmc_Gen_InvarProblem(const BeFsm_ptr be_fsm, const node_ptr wff);
 
 /*!
   \brief Returns the LTL problem at length k with loopback l
   (single loop, no loop and all loopbacks are allowed)
 
-  
+
 */
-be_ptr
-Bmc_Gen_LtlProblem(const BeFsm_ptr be_fsm,
-                   const node_ptr ltl_wff,
-                   const int k, const int l);
+be_ptr Bmc_Gen_LtlProblem(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
+                          const int k, const int l);
 
 /*!
   \brief Returns the base step of the invariant construction
@@ -84,9 +78,7 @@ Bmc_Gen_LtlProblem(const BeFsm_ptr be_fsm,
 
   \sa Bmc_Gen_InvarInductStep
 */
-be_ptr
-Bmc_Gen_InvarBaseStep(const BeFsm_ptr be_fsm,
-                      const node_ptr wff);
+be_ptr Bmc_Gen_InvarBaseStep(const BeFsm_ptr be_fsm, const node_ptr wff);
 
 /*!
   \brief Returns the induction step of the invariant construction
@@ -97,28 +89,24 @@ Bmc_Gen_InvarBaseStep(const BeFsm_ptr be_fsm,
 
   \sa Bmc_Gen_InvarBaseStep
 */
-be_ptr
-Bmc_Gen_InvarInductStep(const BeFsm_ptr be_fsm,
-                        const node_ptr wff);
+be_ptr Bmc_Gen_InvarInductStep(const BeFsm_ptr be_fsm, const node_ptr wff);
 
 /*!
   \brief Generates i-th fragment of BMC unrolling
 
-  
+
 
   \se None
 */
-be_ptr
-Bmc_Gen_UnrollingFragment(const BeFsm_ptr self,
-                           const int i);
+be_ptr Bmc_Gen_UnrollingFragment(const BeFsm_ptr self, const int i);
 
 /*!
   \brief Top-level function for bmc of PSL properties
 
   The parameters are:
   - prop is the PSL property to be checked
-  - dump_prob is true if the problem must be dumped as DIMACS file (default filename
-  from system corresponding variable)
+  - dump_prob is true if the problem must be dumped as DIMACS file (default
+  filename from system corresponding variable)
   - inc_sat is true if incremental sat must be used. If there is no
   support for inc sat, an internal error will occur.
   - single_prob is true if k must be not incremented from 0 to k_max
@@ -127,12 +115,9 @@ Bmc_Gen_UnrollingFragment(const BeFsm_ptr self,
 
   \se None
 */
-int Bmc_Gen_check_psl_property(NuSMVEnv_ptr env,
-                                  Prop_ptr prop,
-                                  boolean dump_prob,
-                                  boolean inc_sat,
-                                  boolean single_prob,
-                                  int k, int rel_loop);
+int Bmc_Gen_check_psl_property(NuSMVEnv_ptr env, Prop_ptr prop,
+                               boolean dump_prob, boolean inc_sat,
+                               boolean single_prob, int k, int rel_loop);
 
 /**AutomaticEnd***************************************************************/
 

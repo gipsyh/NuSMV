@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -66,11 +66,10 @@
   </dl>
   <br>
   This Class inherits from TracePlugin class.
-  
+
 */
 
-typedef struct TraceTable_TAG
-{
+typedef struct TraceTable_TAG {
   INHERITS_FROM(TracePlugin);
 
   TraceTableStyle style;
@@ -107,4 +106,3 @@ int trace_table_action(const TracePlugin_ptr plugin);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_TRACE_PLUGINS_TRACE_TABLE_PRIVATE_H__ */
-

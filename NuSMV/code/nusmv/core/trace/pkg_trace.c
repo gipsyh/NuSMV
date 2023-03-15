@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -31,24 +31,23 @@
   \brief Routines related to the trace Package.
 
   This file contains routines related to Initializing and
-               Quitting trace package. 
+               Quitting trace package.
 
 */
-
 
 #if HAVE_CONFIG_H
 #include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/trace/loaders/TraceXmlLoader.h"
 #include "nusmv/core/trace/pkg_trace.h"
 #include "nusmv/core/trace/pkg_traceInt.h"
-#include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/trace/loaders/TraceXmlLoader.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #if NUSMV_HAVE_REGEX_H
- #include <regex.h>
+#include <regex.h>
 #endif
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -62,7 +61,6 @@
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
@@ -71,8 +69,7 @@
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void TracePkg_init(NuSMVEnv_ptr env)
-{
+void TracePkg_init(NuSMVEnv_ptr env) {
   TraceMgr_ptr tm;
 
   if (NuSMVEnv_has_value(env, ENV_TRACE_MGR)) {
@@ -90,30 +87,32 @@ void TracePkg_init(NuSMVEnv_ptr env)
   TraceMgr_register_evaluator(tm, BaseEvaluator_create());
 }
 
-void TracePkg_quit(NuSMVEnv_ptr env)
-{
+void TracePkg_quit(NuSMVEnv_ptr env) {
   TraceMgr_ptr tm = NuSMVEnv_remove_value(env, ENV_TRACE_MGR);
 
-  if (tm != TRACE_MGR(NULL)) { TraceMgr_destroy(tm); }
+  if (tm != TRACE_MGR(NULL)) {
+    TraceMgr_destroy(tm);
+  }
 }
 
-boolean TracePkg_set_default_trace_plugin(TraceMgr_ptr gtm, int dp)
-{
+boolean TracePkg_set_default_trace_plugin(TraceMgr_ptr gtm, int dp) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(gtm));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
   int avail_plugins = 1 + TraceMgr_get_plugin_size(gtm);
 
   /* negative indexes not allowed */
   if (dp < 0) {
-    StreamMgr_print_error(streams, "Error: Not a proper plugin to show a trace \n");
+    StreamMgr_print_error(streams,
+                          "Error: Not a proper plugin to show a trace \n");
     return false;
   }
 
   /* dp must be one of avail plugins */
   if (avail_plugins < dp) {
-    StreamMgr_print_error(streams, "Error: Plugin %d is not currently available\n", dp);
+    StreamMgr_print_error(streams,
+                          "Error: Plugin %d is not currently available\n", dp);
     return false;
   }
 
@@ -121,14 +120,12 @@ boolean TracePkg_set_default_trace_plugin(TraceMgr_ptr gtm, int dp)
   return true;
 }
 
-int TracePkg_get_default_trace_plugin(TraceMgr_ptr gtm)
-{
+int TracePkg_get_default_trace_plugin(TraceMgr_ptr gtm) {
   return TraceMgr_get_default_plugin(gtm);
 }
 
 NodeList_ptr TracePkg_get_filtered_symbols(TraceMgr_ptr gtm,
-                                           const NodeList_ptr symbols)
-{
+                                           const NodeList_ptr symbols) {
   NodeList_ptr res = NodeList_create();
   ListIter_ptr iter;
 
@@ -142,17 +139,14 @@ NodeList_ptr TracePkg_get_filtered_symbols(TraceMgr_ptr gtm,
   return res;
 }
 
-Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env,
-                              SexpFsm_ptr sexp_fsm,
-                              const char* filename,
-                              boolean halt_if_undef,
-                              boolean halt_if_wrong_section)
-{
+Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env, SexpFsm_ptr sexp_fsm,
+                              const char *filename, boolean halt_if_undef,
+                              boolean halt_if_wrong_section) {
   Trace_ptr trace = NULL;
 
 #if NUSMV_HAVE_LIBXML2
   TraceXmlLoader_ptr loader =
-    TraceXmlLoader_create(filename, halt_if_undef, halt_if_wrong_section);
+      TraceXmlLoader_create(filename, halt_if_undef, halt_if_wrong_section);
 
   trace = TraceLoader_load_trace(TRACE_LOADER(loader),
                                  SexpFsm_get_symb_table(sexp_fsm),
@@ -164,38 +158,32 @@ Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env,
   return trace;
 }
 
-int TracePkg_execute_traces(NuSMVEnv_ptr env,
-                            TraceMgr_ptr trace_mgr,
-                            FILE* output_stream,
-                            char* engine,
-                            int verbosity,
-                            int trace_no)
-{
+int TracePkg_execute_traces(NuSMVEnv_ptr env, TraceMgr_ptr trace_mgr,
+                            FILE *output_stream, char *engine, int verbosity,
+                            int trace_no) {
   int first_trace = 0;
   int last_trace = 0;
   int res = 0;
   int old_verbosity = 0;
-  FILE* old_stream = NULL;
+  FILE *old_stream = NULL;
 
   BaseTraceExecutor_ptr executor = NULL;
-  
+
   if (NULL == engine) {
-    executor =
-      BASE_TRACE_EXECUTOR(TraceMgr_get_default_complete_trace_executor(trace_mgr));
-  }
-  else {
-    executor =
-      BASE_TRACE_EXECUTOR(TraceMgr_get_complete_trace_executor(trace_mgr, engine));
+    executor = BASE_TRACE_EXECUTOR(
+        TraceMgr_get_default_complete_trace_executor(trace_mgr));
+  } else {
+    executor = BASE_TRACE_EXECUTOR(
+        TraceMgr_get_complete_trace_executor(trace_mgr, engine));
   }
 
   BASE_TRACE_EXECUTOR_CHECK_INSTANCE(executor);
-  
+
   /* select traces range to be executed */
   if (0 == trace_no) {
     first_trace = 1;
     last_trace = TraceMgr_get_size(trace_mgr);
-  }
-  else {
+  } else {
     first_trace = trace_no;
     last_trace = trace_no;
   }
@@ -217,38 +205,32 @@ int TracePkg_execute_traces(NuSMVEnv_ptr env,
   return res;
 }
 
-int TracePkg_execute_partial_traces(NuSMVEnv_ptr env,
-                                    TraceMgr_ptr trace_mgr,
-                                    FILE* output_stream,
-                                    char* engine,
-                                    int verbosity,
-                                    int trace_no)
-{
+int TracePkg_execute_partial_traces(NuSMVEnv_ptr env, TraceMgr_ptr trace_mgr,
+                                    FILE *output_stream, char *engine,
+                                    int verbosity, int trace_no) {
   int first_trace = 0;
   int last_trace = 0;
   int res = 0;
   int old_verbosity = 0;
-  FILE* old_stream = NULL;
+  FILE *old_stream = NULL;
 
   BaseTraceExecutor_ptr executor = NULL;
-  
+
   if (NULL == engine) {
-    executor =
-      BASE_TRACE_EXECUTOR(TraceMgr_get_default_partial_trace_executor(trace_mgr));
-  }
-  else {
-    executor =
-      BASE_TRACE_EXECUTOR(TraceMgr_get_partial_trace_executor(trace_mgr, engine));
+    executor = BASE_TRACE_EXECUTOR(
+        TraceMgr_get_default_partial_trace_executor(trace_mgr));
+  } else {
+    executor = BASE_TRACE_EXECUTOR(
+        TraceMgr_get_partial_trace_executor(trace_mgr, engine));
   }
 
   BASE_TRACE_EXECUTOR_CHECK_INSTANCE(executor);
-  
+
   /* select traces range to be executed */
   if (0 == trace_no) {
     first_trace = 1;
     last_trace = TraceMgr_get_size(trace_mgr);
-  }
-  else {
+  } else {
     first_trace = trace_no;
     last_trace = trace_no;
   }
@@ -260,8 +242,8 @@ int TracePkg_execute_partial_traces(NuSMVEnv_ptr env,
 
   BaseTraceExecutor_set_output_stream(executor, output_stream);
 
-  res = TraceMgr_execute_partial_traces(trace_mgr, PARTIAL_TRACE_EXECUTOR(executor),
-                                        first_trace, last_trace);
+  res = TraceMgr_execute_partial_traces(
+      trace_mgr, PARTIAL_TRACE_EXECUTOR(executor), first_trace, last_trace);
 
   /* restore previous values into the executor instance */
   BaseTraceExecutor_set_verbosity(executor, old_verbosity);

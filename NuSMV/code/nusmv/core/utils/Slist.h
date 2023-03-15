@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,13 +34,11 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_SLIST_H__
 #define __NUSMV_CORE_UTILS_SLIST_H__
 
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/defs.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -50,35 +48,31 @@
   \struct Slist
   \brief Implementation of Slist class
 
-  
+
 */
-typedef struct Slist_TAG* Slist_ptr;
+typedef struct Slist_TAG *Slist_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SLIST(x) \
-         ((Slist_ptr) x)
+#define SLIST(x) ((Slist_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SLIST_CHECK_INSTANCE(x) \
-         ( nusmv_assert(SLIST(x) != SLIST(NULL)) )
+#define SLIST_CHECK_INSTANCE(x) (nusmv_assert(SLIST(x) != SLIST(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SLIST_FOREACH(list, iter)                               \
-   for (iter=Slist_first(list); !Siter_is_end(iter); \
-        iter=Siter_next(iter))
-
+#define SLIST_FOREACH(list, iter)                                              \
+  for (iter = Slist_first(list); !Siter_is_end(iter); iter = Siter_next(iter))
 
 /* internal type. it cannot be used outside. */
 
@@ -86,16 +80,18 @@ typedef struct Slist_TAG* Slist_ptr;
   \struct Snode
   \brief A node of the list
 
-  
+
 */
-typedef struct Snode_TAG* Snode_ptr;
+typedef struct Snode_TAG *Snode_ptr;
 
 /* Iterator type.
    here a struct definition is used only to create a new type. Thus
    C type checker will be able to catch incorrect use of iterators.
    This does not influence on efficiency
 */
-typedef struct Siter_TAG {Snode_ptr node;} Siter;
+typedef struct Siter_TAG {
+  Snode_ptr node;
+} Siter;
 
 /* Frre function type */
 
@@ -104,7 +100,7 @@ typedef struct Siter_TAG {Snode_ptr node;} Siter;
 
   \todo Missing description
 */
-typedef void (*Slist_free_function)(void*);
+typedef void (*Slist_free_function)(void *);
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -112,9 +108,9 @@ typedef void (*Slist_free_function)(void*);
 
 /*!
   \methodof Slist
-  \brief Creates an instance of a Simple List 
+  \brief Creates an instance of a Simple List
 
-  
+
 */
 Slist_ptr Slist_create(void);
 
@@ -133,10 +129,9 @@ void Slist_destroy(Slist_ptr self);
   \brief Destroys the list and every element contained using the
                       specified function
 
-  
+
 */
-void Slist_destroy_and_free_elements(Slist_ptr self,
-                                            Slist_free_function f);
+void Slist_destroy_and_free_elements(Slist_ptr self, Slist_free_function f);
 
 /*!
   \methodof Slist
@@ -175,11 +170,11 @@ void Slist_reverse(Slist_ptr self);
   \methodof Slist
   \brief Adds at the beginning of a list a new element
 
-  
+
 
   \sa Slist_append
 */
-void Slist_push(Slist_ptr self, void* element);
+void Slist_push(Slist_ptr self, void *element);
 
 /*!
   \methodof Slist
@@ -191,23 +186,23 @@ void Slist_push(Slist_ptr self, void* element);
 
   \sa Slist_append
 */
-void* Slist_pop(Slist_ptr self);
+void *Slist_pop(Slist_ptr self);
 
 /*!
   \methodof Slist
   \brief Returns the element at the beginning of a list
 
-  
+
 
   \sa Slist_append
 */
-void* Slist_top(Slist_ptr self);
+void *Slist_top(Slist_ptr self);
 
 /*!
   \methodof Slist
   \brief Returns true iff the list is empty
 
-  
+
 */
 boolean Slist_is_empty(Slist_ptr self);
 
@@ -220,7 +215,7 @@ boolean Slist_is_empty(Slist_ptr self);
   Siter_is_end will return true in this case.
   NOTE: there is no need to free the iterator after using it.
   NOTE: it is allowed to assign one iterator to another one.
-  
+
 
   \sa Siter_is_end, Siter_next, Siter_element
 */
@@ -233,7 +228,7 @@ Siter Slist_first(Slist_ptr self);
   Siter_is_end(Slist_end()) is always true.
   NOTE: there is no need to free the iterator after using it.
   NOTE: it is allowed to assign one iterator to another one.
-  
+
 
   \sa Siter_is_end, Siter_next, Siter_element
 */
@@ -254,7 +249,7 @@ boolean Siter_is_end(Siter iter);
   \brief Returns true iff the iterator points to the last element
                       of a list.
 
-  
+
 
   \sa Siter_is_end, Siter_next
 */
@@ -265,7 +260,7 @@ boolean Siter_is_last(Siter iter);
   of a list w.r.t. the element pointed by a provided iterator.
 
    Precondition: this function can be applied only if
-  Siter_is_end(iter) returns false.  
+  Siter_is_end(iter) returns false.
 
   \sa Slist_first, Siter_is_end, Siter_element
 */
@@ -280,30 +275,30 @@ Siter Siter_next(Siter iter);
 
   \sa Slist_first, Siter_is_end, Siter_next
 */
-void* Siter_element(Siter iter);
+void *Siter_element(Siter iter);
 
 /*!
   \methodof Slist
   \brief Returns an iterator pointing to the first element
   equal to the given one
 
-  
+
   If there is no such element then on the returned iterator
   Siter_is_end(iter) will be true.
 
   \sa Slist_first, Siter_is_end, Siter_next
 */
-Siter Slist_find(Slist_ptr self, const void* element);
+Siter Slist_find(Slist_ptr self, const void *element);
 
 /*!
   \methodof Slist
   \brief Checks whether the specified element is in the list or not
 
-  
+
 
   \sa Slist_first, Siter_is_end, Siter_next
 */
-boolean Slist_contains(Slist_ptr self, const void* element);
+boolean Slist_contains(Slist_ptr self, const void *element);
 
 /*!
   \methodof Slist
@@ -311,17 +306,17 @@ boolean Slist_contains(Slist_ptr self, const void* element);
                       present in the list. Returns true if the element was
                       removed, false otherwise
 
-  
+
 
   \sa Slist_first, Siter_is_end, Siter_next
 */
-boolean Slist_remove(Slist_ptr self, const void* element);
+boolean Slist_remove(Slist_ptr self, const void *element);
 
 /*!
   \methodof Slist
   \brief Appends two lists modifying self
 
-  
+
 
   \se self is extended
 */
@@ -332,7 +327,7 @@ void Slist_append(Slist_ptr self, const Slist_ptr other);
   \brief Returns true iff the two lists are equal
                       (contains the same elements in the same order)
 
-  
+
 */
 boolean Slist_equals(const Slist_ptr self, const Slist_ptr other);
 
@@ -340,7 +335,7 @@ boolean Slist_equals(const Slist_ptr self, const Slist_ptr other);
   \methodof Slist
   \brief Returns the size of a list
 
-  
+
 
   \sa Slist_append
 */
@@ -356,15 +351,14 @@ unsigned int Slist_get_size(Slist_ptr self);
   cmp is comparison function returning value v, v < 0, v == 0 or v > 0
   extra is a user parameter that is passed to every invocation of cmp
 */
-void Slist_sort(Slist_ptr self,
-                       int (*cmp)(void* el1, void* el2, void* extra),
-                       void* extra);
+void Slist_sort(Slist_ptr self, int (*cmp)(void *el1, void *el2, void *extra),
+                void *extra);
 
 /*!
   \methodof Slist
   \brief Pops all the elements of this list
 
-  
+
 */
 void Slist_clear(Slist_ptr self);
 
@@ -377,10 +371,8 @@ void Slist_clear(Slist_ptr self);
   print_node is called. printer_arg is an optional argument to be
   passed to the printer (can be NULL)
 */
-void Slist_print(Slist_ptr const self,
-                        MasterPrinter_ptr wffprint,
-                        void (*printer)(FILE* file, void* el, void* arg),
-                        FILE* file,
-                        void* printer_arg);
+void Slist_print(Slist_ptr const self, MasterPrinter_ptr wffprint,
+                 void (*printer)(FILE *file, void *el, void *arg), FILE *file,
+                 void *printer_arg);
 
 #endif /* __NUSMV_CORE_UTILS_SLIST_H__ */

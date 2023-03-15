@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,23 +36,23 @@
 */
 
 #include "nusmv/core/node/nodeInt.h"
-#include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/utils/WordNumberMgr.h" /* for WordNumber_ptr printing */
 #include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/WordNumberMgr.h" /* for WordNumber_ptr printing */
+#include "nusmv/core/utils/ustring.h"
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void print_array_type_rec(const NuSMVEnv_ptr env, FILE* out, const node_ptr body);
-
+static void print_array_type_rec(const NuSMVEnv_ptr env, FILE *out,
+                                 const node_ptr body);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void print_array_type(const NuSMVEnv_ptr env, FILE* output_stream, const node_ptr body)
-{
+void print_array_type(const NuSMVEnv_ptr env, FILE *output_stream,
+                      const node_ptr body) {
   nusmv_assert(ARRAY_TYPE == node_get_type(body));
   print_array_type_rec(env, output_stream, body);
 }
@@ -60,14 +60,14 @@ void print_array_type(const NuSMVEnv_ptr env, FILE* output_stream, const node_pt
 /*!
   \brief Private function of print_array_type
 
-  
+
 
   \sa print_array_type
 */
-static void print_array_type_rec(const NuSMVEnv_ptr env, FILE* out, const node_ptr body)
-{
+static void print_array_type_rec(const NuSMVEnv_ptr env, FILE *out,
+                                 const node_ptr body) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   switch (node_get_type(body)) {
   case ARRAY_TYPE:

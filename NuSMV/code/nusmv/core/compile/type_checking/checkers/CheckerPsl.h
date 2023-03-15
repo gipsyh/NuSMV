@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``compile.type_checking.checkers'' package of NuSMV version 2.
-  Copyright (C) 2004 by FBK-irst.
+  This file is part of the ``compile.type_checking.checkers'' package of NuSMV
+version 2. Copyright (C) 2004 by FBK-irst.
 
   NuSMV version 2 is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_PSL_H__
 #define __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_PSL_H__
-
 
 #include "nusmv/core/compile/type_checking/checkers/CheckerBase.h"
 #include "nusmv/core/utils/utils.h"
@@ -47,9 +44,9 @@
   \struct CheckerPsl
   \brief Definition of the public accessor for class CheckerPsl
 
-  
+
 */
-typedef struct CheckerPsl_TAG*  CheckerPsl_ptr;
+typedef struct CheckerPsl_TAG *CheckerPsl_ptr;
 
 /*!
   \brief To cast and check instances of class CheckerPsl
@@ -57,18 +54,15 @@ typedef struct CheckerPsl_TAG*  CheckerPsl_ptr;
   These macros must be used respectively to cast and to check
   instances of class CheckerPsl
 */
-#define CHECKER_PSL(self) \
-         ((CheckerPsl_ptr) self)
+#define CHECKER_PSL(self) ((CheckerPsl_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CHECKER_PSL_CHECK_INSTANCE(self) \
-         (nusmv_assert(CHECKER_PSL(self) != CHECKER_PSL(NULL)))
-
-
+#define CHECKER_PSL_CHECK_INSTANCE(self)                                       \
+  (nusmv_assert(CHECKER_PSL(self) != CHECKER_PSL(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,9 +80,6 @@ typedef struct CheckerPsl_TAG*  CheckerPsl_ptr;
 */
 CheckerPsl_ptr CheckerPsl_create(const NuSMVEnv_ptr env);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_PSL_H__ */

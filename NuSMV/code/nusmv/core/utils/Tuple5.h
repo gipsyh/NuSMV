@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_TUPLE5_H__
 #define __NUSMV_CORE_UTILS_TUPLE5_H__
 
@@ -44,24 +43,22 @@
   \struct Tuple5
   \brief Definition of the public accessor for class Tuple5
 
-  
-*/
-typedef struct Tuple5_TAG*  Tuple5_ptr;
 
+*/
+typedef struct Tuple5_TAG *Tuple5_ptr;
 
 /*!
   \brief Tuple5 class definition
 
-  
+
 */
 
-typedef struct Tuple5_TAG
-{
-  void* first;
-  void* second;
-  void* third;
-  void* forth;
-  void* fifth;
+typedef struct Tuple5_TAG {
+  void *first;
+  void *second;
+  void *third;
+  void *forth;
+  void *fifth;
   boolean frozen;
 } Tuple5;
 
@@ -71,18 +68,15 @@ typedef struct Tuple5_TAG
   These macros must be used respectively to cast and to check
   instances of class Tuple5
 */
-#define TUPLE_5(self) \
-         ((Tuple5_ptr) self)
+#define TUPLE_5(self) ((Tuple5_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TUPLE_5_CHECK_INSTANCE(self) \
-         (nusmv_assert(TUPLE_5(self) != TUPLE_5(NULL)))
-
-
+#define TUPLE_5_CHECK_INSTANCE(self)                                           \
+  (nusmv_assert(TUPLE_5(self) != TUPLE_5(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -98,20 +92,20 @@ typedef struct Tuple5_TAG
 
   \sa Tuple5_destroy
 */
-Tuple5_ptr Tuple5_create(void* first, void* second, void* third,
-                                void* forth, void* fifth);
+Tuple5_ptr Tuple5_create(void *first, void *second, void *third, void *forth,
+                         void *fifth);
 
 /*!
   \methodof Tuple5
   \brief The Tuple5 class initializer
 
   The Tuple5 class initializer.  Use this function if
-                      declaring a Tuple5 in the stack 
+                      declaring a Tuple5 in the stack
 
   \sa Tuple5_create
 */
-void Tuple5_init(Tuple5_ptr self, void* first, void* second,
-                        void* third, void* forth, void* fifth);
+void Tuple5_init(Tuple5_ptr self, void *first, void *second, void *third,
+                 void *forth, void *fifth);
 
 /*!
   \methodof Tuple5
@@ -138,7 +132,7 @@ boolean Tuple5_is_freezed(const Tuple5_ptr self);
 
   Get the first value of the Tuple5 instance
 */
-void* Tuple5_get_first(const Tuple5_ptr self);
+void *Tuple5_get_first(const Tuple5_ptr self);
 
 /*!
   \methodof Tuple5
@@ -146,7 +140,7 @@ void* Tuple5_get_first(const Tuple5_ptr self);
 
   Get the second value of the Tuple5 instance
 */
-void* Tuple5_get_second(const Tuple5_ptr self);
+void *Tuple5_get_second(const Tuple5_ptr self);
 
 /*!
   \methodof Tuple5
@@ -154,7 +148,7 @@ void* Tuple5_get_second(const Tuple5_ptr self);
 
   Get the third value of the Tuple5 instance
 */
-void* Tuple5_get_third(const Tuple5_ptr self);
+void *Tuple5_get_third(const Tuple5_ptr self);
 
 /*!
   \methodof Tuple5
@@ -162,7 +156,7 @@ void* Tuple5_get_third(const Tuple5_ptr self);
 
   Get the forth value of the Tuple5 instance
 */
-void* Tuple5_get_forth(const Tuple5_ptr self);
+void *Tuple5_get_forth(const Tuple5_ptr self);
 
 /*!
   \methodof Tuple5
@@ -170,7 +164,7 @@ void* Tuple5_get_forth(const Tuple5_ptr self);
 
   Get the fifth value of the Tuple5 instance
 */
-void* Tuple5_get_fifth(const Tuple5_ptr self);
+void *Tuple5_get_fifth(const Tuple5_ptr self);
 
 /*!
   \methodof Tuple5
@@ -179,7 +173,7 @@ void* Tuple5_get_fifth(const Tuple5_ptr self);
   Sets the first value for the Tuple5 instance.
                       The Tuple5 must not be frozen
 */
-void Tuple5_set_first(Tuple5_ptr self, void* first);
+void Tuple5_set_first(Tuple5_ptr self, void *first);
 
 /*!
   \methodof Tuple5
@@ -188,7 +182,7 @@ void Tuple5_set_first(Tuple5_ptr self, void* first);
   Sets the second value for the Tuple5 instance.
                       The Tuple5 must not be frozen
 */
-void Tuple5_set_second(Tuple5_ptr self, void* second);
+void Tuple5_set_second(Tuple5_ptr self, void *second);
 
 /*!
   \methodof Tuple5
@@ -197,7 +191,7 @@ void Tuple5_set_second(Tuple5_ptr self, void* second);
   Sets the third value for the Tuple5 instance.
                       The Tuple5 must not be frozen
 */
-void Tuple5_set_third(Tuple5_ptr self, void* third);
+void Tuple5_set_third(Tuple5_ptr self, void *third);
 
 /*!
   \methodof Tuple5
@@ -206,7 +200,7 @@ void Tuple5_set_third(Tuple5_ptr self, void* third);
   Sets the forth value for the Tuple5 instance.
                       The Tuple5 must not be frozen
 */
-void Tuple5_set_forth(Tuple5_ptr self, void* forth);
+void Tuple5_set_forth(Tuple5_ptr self, void *forth);
 
 /*!
   \methodof Tuple5
@@ -215,7 +209,7 @@ void Tuple5_set_forth(Tuple5_ptr self, void* forth);
   Sets the fifth value for the Tuple5 instance.
                       The Tuple5 must not be frozen
 */
-void Tuple5_set_fifth(Tuple5_ptr self, void* fifth);
+void Tuple5_set_fifth(Tuple5_ptr self, void *fifth);
 
 /*!
   \methodof Tuple5
@@ -224,8 +218,8 @@ void Tuple5_set_fifth(Tuple5_ptr self, void* fifth);
   Sets both the values for the Tuple5 instance.
                       The Tuple5 must not be frozen
 */
-void Tuple5_set_values(Tuple5_ptr self, void* first, void* second,
-                              void* third, void* forth, void* fifth);
+void Tuple5_set_values(Tuple5_ptr self, void *first, void *second, void *third,
+                       void *forth, void *fifth);
 
 /*!
   \methodof Tuple5
@@ -249,8 +243,7 @@ void Tuple5_destroy(Tuple5_ptr self);
                       Casts to char* are added to prevent "warning: pointer of
                       type ‘void *’ used in subtraction".
 */
-int Tuple5_compare(const Tuple5_ptr a,
-                          const Tuple5_ptr b);
+int Tuple5_compare(const Tuple5_ptr a, const Tuple5_ptr b);
 
 /*!
   \methodof Tuple5
@@ -264,7 +257,5 @@ int Tuple5_compare(const Tuple5_ptr a,
 unsigned long Tuple5_hash(const Tuple5_ptr self, int size);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_TUPLE5_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-   To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+   To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,13 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_LAYER_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_LAYER_PRIVATE_H__
 
-#include "nusmv/core/compile/symb_table/SymbLayer.h"
 #include "nusmv/core/compile/symb_table/SymbCache.h"
-
+#include "nusmv/core/compile/symb_table/SymbLayer.h"
 
 #include "nusmv/core/utils/utils.h"
-
 
 /* ---------------------------------------------------------------------- */
 /*     Private methods                                                    */
@@ -55,9 +52,8 @@
 
   name is copied, the caller keeps ownership of cache.
 */
-SymbLayer_ptr
-SymbLayer_create(const char* name, const LayerInsertPolicy policy,
-                 SymbCache_ptr cache);
+SymbLayer_ptr SymbLayer_create(const char *name, const LayerInsertPolicy policy,
+                               SymbCache_ptr cache);
 
 /*!
   \methodof SymbLayer
@@ -86,8 +82,7 @@ void SymbLayer_destroy_raw(SymbLayer_ptr self);
   This method is protected (not usable by users, only
    used by the symbol table when renaming a layer
 */
-void
-SymbLayer_set_name(SymbLayer_ptr self, const char* new_name);
+void SymbLayer_set_name(SymbLayer_ptr self, const char *new_name);
 
 /*!
   \methodof SymbLayer
@@ -105,8 +100,7 @@ SymbLayer_set_name(SymbLayer_ptr self, const char* new_name);
 
   \sa removed_from_enc
 */
-void
-SymbLayer_committed_to_enc(SymbLayer_ptr self);
+void SymbLayer_committed_to_enc(SymbLayer_ptr self);
 
 /*!
   \methodof SymbLayer
@@ -124,8 +118,6 @@ SymbLayer_committed_to_enc(SymbLayer_ptr self);
 
   \sa commit_to_enc
 */
-void
-SymbLayer_removed_from_enc(SymbLayer_ptr self);
-
+void SymbLayer_removed_from_enc(SymbLayer_ptr self);
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_LAYER_PRIVATE_H__ */

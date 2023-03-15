@@ -35,30 +35,28 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
+#include "nusmv/core/node/MasterNodeWalker_private.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/node/printers/MasterPrinter_private.h"
 #include "nusmv/core/node/printers/PrinterBase.h"
 #include "nusmv/core/node/printers/PrinterBase_private.h"
-#include "nusmv/core/node/MasterNodeWalker_private.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
-#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/node/printers/printersInt.h"
+#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/NodeList.h"
 #include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/utils.h"
 
 #if NUSMV_HAVE_STRING_H
-#  include <string.h> /* for strdup */
+#include <string.h> /* for strdup */
 #else
-#  ifndef strdup
-char* strdup(const char*); /* forward declaration */
-#  endif
+#ifndef strdup
+char *strdup(const char *); /* forward declaration */
+#endif
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -73,8 +71,7 @@ char* strdup(const char*); /* forward declaration */
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct MasterPrinter_TAG
-{
+typedef struct MasterPrinter_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(MasterNodeWalker);
 
@@ -85,19 +82,19 @@ typedef struct MasterPrinter_TAG
   union StreamTypeArg stream_arg;
 
   NodeList_ptr indent_stack; /* internal indentation levels stack */
-  int current_ofs;  /* current offset on the current line */
+  int current_ofs;           /* current offset on the current line */
 
   /* string stream is handled by using these varaibles: */
-  char* sstream;       /* string stream */
-  size_t sstream_cap;  /* sstream allocation capacity */
-  size_t sstream_len;  /* sstream current usage */
+  char *sstream;           /* string stream */
+  size_t sstream_cap;      /* sstream allocation capacity */
+  size_t sstream_len;      /* sstream current usage */
   size_t sstream_grow_sum; /* sstream grow sum */
-  int sstream_grow_num; /* number of resizes */
+  int sstream_grow_num;    /* number of resizes */
 
   StreamMgr_ptr streams;
 
-  int (*inner_stream_print)(MasterPrinter_ptr self, const char* str);
-  int (*external_stream_print)(void* stream, const char* str);
+  int (*inner_stream_print)(MasterPrinter_ptr self, const char *str);
+  int (*external_stream_print)(void *stream, const char *str);
 
 } MasterPrinter;
 
@@ -143,129 +140,107 @@ typedef struct MasterPrinter_TAG
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void master_printer_init(MasterPrinter_ptr self,
-                                const NuSMVEnv_ptr env);
+static void master_printer_init(MasterPrinter_ptr self, const NuSMVEnv_ptr env);
 
 static void master_printer_deinit(MasterPrinter_ptr self);
 
-static void master_printer_finalize(Object_ptr object, void* dummy);
+static void master_printer_finalize(Object_ptr object, void *dummy);
 
-static int
-master_printer_fprint(MasterPrinter_ptr self, const char* str);
+static int master_printer_fprint(MasterPrinter_ptr self, const char *str);
 
-static int
-master_printer_sprint(MasterPrinter_ptr self, const char* str);
+static int master_printer_sprint(MasterPrinter_ptr self, const char *str);
 
-static int
-master_printer_get_level(MasterPrinter_ptr self);
+static int master_printer_get_level(MasterPrinter_ptr self);
 
-static void
-master_printer_reset_string_stream(MasterPrinter_ptr self);
+static void master_printer_reset_string_stream(MasterPrinter_ptr self);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of TOP LEVEL exported functions                                */
 /*---------------------------------------------------------------------------*/
 
-void debug_print_node(NuSMVEnv_ptr env, node_ptr node)
-{
+void debug_print_node(NuSMVEnv_ptr env, node_ptr node) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* out = StreamMgr_get_output_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *out = StreamMgr_get_output_stream(streams);
 
   print_node(wffprint, out, node);
 }
 
-void debug_print_sexp(NuSMVEnv_ptr env, node_ptr node)
-{
+void debug_print_sexp(NuSMVEnv_ptr env, node_ptr node) {
   const MasterPrinter_ptr sexpprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
   StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* out = StreamMgr_get_output_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *out = StreamMgr_get_output_stream(streams);
 
   print_node(sexpprint, out, node);
 }
 
-int print_node(MasterPrinter_ptr wff_printer, FILE *stream, node_ptr n)
-{
+int print_node(MasterPrinter_ptr wff_printer, FILE *stream, node_ptr n) {
   union StreamTypeArg sta;
   sta.file = stream;
 
   MasterPrinter_set_stream_type(wff_printer, STREAM_TYPE_FILE, &sta);
   MasterPrinter_reset_stream(wff_printer, 0);
 
-  return
-    MasterPrinter_print_node(wff_printer, n)  &&
+  return MasterPrinter_print_node(wff_printer, n) &&
 
-    /* ensure proper flushing */
-    MasterPrinter_flush_stream(wff_printer);
+         /* ensure proper flushing */
+         MasterPrinter_flush_stream(wff_printer);
 }
 
-char* sprint_node(MasterPrinter_ptr mp, node_ptr n)
-{
+char *sprint_node(MasterPrinter_ptr mp, node_ptr n) {
   boolean success;
-  MasterPrinter_set_stream_type(mp,
-                                STREAM_TYPE_STRING,
-                                STREAM_TYPE_ARG_UNUSED);
+  MasterPrinter_set_stream_type(mp, STREAM_TYPE_STRING, STREAM_TYPE_ARG_UNUSED);
   MasterPrinter_reset_stream(mp, 0);
 
-  success = (MasterPrinter_print_node(mp, n) &&
-             MasterPrinter_flush_stream(mp));
+  success = (MasterPrinter_print_node(mp, n) && MasterPrinter_flush_stream(mp));
 
-  return (success)? strdup(MasterPrinter_get_streamed_string(mp)) : NULL;
+  return (success) ? strdup(MasterPrinter_get_streamed_string(mp)) : NULL;
 }
 
-int print_node_indent_at(MasterPrinter_ptr mp,
-                         FILE *stream, node_ptr n, int ofs)
-{
+int print_node_indent_at(MasterPrinter_ptr mp, FILE *stream, node_ptr n,
+                         int ofs) {
   union StreamTypeArg sta;
   sta.file = stream;
 
   MasterPrinter_set_stream_type(mp, STREAM_TYPE_FILE, &sta);
   MasterPrinter_reset_stream(mp, ofs);
 
-  return
-    MasterPrinter_print_node(mp, n) &&
+  return MasterPrinter_print_node(mp, n) &&
 
-    /* ensure proper flushing */
-    MasterPrinter_flush_stream(mp);
+         /* ensure proper flushing */
+         MasterPrinter_flush_stream(mp);
 }
 
-char* sprint_node_indent_at(MasterPrinter_ptr mp, node_ptr n, int ofs)
-{
+char *sprint_node_indent_at(MasterPrinter_ptr mp, node_ptr n, int ofs) {
   boolean success;
 
-  MasterPrinter_set_stream_type(mp,
-                                STREAM_TYPE_STRING,
-                                STREAM_TYPE_ARG_UNUSED);
+  MasterPrinter_set_stream_type(mp, STREAM_TYPE_STRING, STREAM_TYPE_ARG_UNUSED);
   MasterPrinter_reset_stream(mp, ofs);
 
   success = (MasterPrinter_print_node(mp, n) &&
              /* ensure proper flushing */
              MasterPrinter_flush_stream(mp));
 
-  return (success)? strdup(MasterPrinter_get_streamed_string(mp)) : NULL;
+  return (success) ? strdup(MasterPrinter_get_streamed_string(mp)) : NULL;
 }
 
-int print_node_indent(MasterPrinter_ptr mp, FILE *stream, node_ptr n)
-{
+int print_node_indent(MasterPrinter_ptr mp, FILE *stream, node_ptr n) {
   return print_node_indent_at(mp, stream, n, 0);
 }
 
-char* sprint_node_indent(MasterPrinter_ptr mp, node_ptr n)
-{
+char *sprint_node_indent(MasterPrinter_ptr mp, node_ptr n) {
   return sprint_node_indent_at(mp, n, 0);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-MasterPrinter_ptr MasterPrinter_create(const NuSMVEnv_ptr env)
-{
+MasterPrinter_ptr MasterPrinter_create(const NuSMVEnv_ptr env) {
   MasterPrinter_ptr self = ALLOC(MasterPrinter, 1);
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
@@ -273,18 +248,16 @@ MasterPrinter_ptr MasterPrinter_create(const NuSMVEnv_ptr env)
   return self;
 }
 
-int MasterPrinter_print_node(MasterPrinter_ptr self, node_ptr n)
-{
+int MasterPrinter_print_node(MasterPrinter_ptr self, node_ptr n) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
   return master_printer_print_node(self, n, 0);
 }
 
-int MasterPrinter_print_string(MasterPrinter_ptr self, const char* str)
-{
-  int res = 1;    /* defaults to ok */
-  char* s = strdup(str);
-  char* p = s;  /* beginning, end pointers to the current chunk */
-  char* q;
+int MasterPrinter_print_string(MasterPrinter_ptr self, const char *str) {
+  int res = 1; /* defaults to ok */
+  char *s = strdup(str);
+  char *p = s; /* beginning, end pointers to the current chunk */
+  char *q;
 
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
@@ -297,9 +270,10 @@ int MasterPrinter_print_string(MasterPrinter_ptr self, const char* str)
   do {
     boolean pad = false;
 
-    if ((q=strchr(p, NEWLINE_CHR))) {
+    if ((q = strchr(p, NEWLINE_CHR))) {
       /* side effects on p */
-      (*q) = TERM_CHR; q++;
+      (*q) = TERM_CHR;
+      q++;
       pad = true;
     }
 
@@ -322,23 +296,22 @@ int MasterPrinter_print_string(MasterPrinter_ptr self, const char* str)
       }
       break;
 
-    case STREAM_TYPE_FUNCTION:
-      {
-        void* arg = self->stream_arg.function.argument;
-        if (!self->stream_arg.function.func_ptr(p, arg)) {
-          res = 0; /* failure */
-          goto leave;
-        }
-        break;
+    case STREAM_TYPE_FUNCTION: {
+      void *arg = self->stream_arg.function.argument;
+      if (!self->stream_arg.function.func_ptr(p, arg)) {
+        res = 0; /* failure */
+        goto leave;
       }
+      break;
+    }
 
-    default:
-      {
-        const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-        const ErrorMgr_ptr errmgr =
+    default: {
+      const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+      const ErrorMgr_ptr errmgr =
           ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-        ErrorMgr_internal_error(errmgr, "MasterPrinter::print_string: Invalid stream type\n");
-      }
+      ErrorMgr_internal_error(
+          errmgr, "MasterPrinter::print_string: Invalid stream type\n");
+    }
     }
 
     /* update current ofs */
@@ -349,7 +322,7 @@ int MasterPrinter_print_string(MasterPrinter_ptr self, const char* str)
       int i, padding = master_printer_get_level(self);
 
       /* add a newline and #padding spaces */
-      for (i=0; i<=padding; i++) {
+      for (i = 0; i <= padding; i++) {
         char *tmp = (!i) ? NEWLINE_STR : BLANK_STR;
 
         switch (self->stream_type) {
@@ -370,23 +343,22 @@ int MasterPrinter_print_string(MasterPrinter_ptr self, const char* str)
           }
           break;
 
-        case STREAM_TYPE_FUNCTION:
-          {
-            void* arg = self->stream_arg.function.argument;
-            if (!self->stream_arg.function.func_ptr(tmp, arg)) {
-              res = 0; /* failure */
-              goto leave;
-            }
-            break;
+        case STREAM_TYPE_FUNCTION: {
+          void *arg = self->stream_arg.function.argument;
+          if (!self->stream_arg.function.func_ptr(tmp, arg)) {
+            res = 0; /* failure */
+            goto leave;
           }
+          break;
+        }
 
-        default:
-          {
-            const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-            const ErrorMgr_ptr errmgr =
+        default: {
+          const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
+          const ErrorMgr_ptr errmgr =
               ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-            ErrorMgr_internal_error(errmgr, "MasterPrinter::print_string: Invalid stream type\n");
-          }
+          ErrorMgr_internal_error(
+              errmgr, "MasterPrinter::print_string: Invalid stream type\n");
+        }
         }
       }
 
@@ -394,32 +366,29 @@ int MasterPrinter_print_string(MasterPrinter_ptr self, const char* str)
       self->current_ofs = padding;
     }
 
-    p=q;
+    p = q;
   } while (p); /* is there anything left to print? */
 
- leave:
+leave:
   FREE(s);
   return res; /* 1 if no failures occurred */
 }
 
-const char* MasterPrinter_get_streamed_string(const MasterPrinter_ptr self)
-{
+const char *MasterPrinter_get_streamed_string(const MasterPrinter_ptr self) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
   nusmv_assert(self->stream_type == STREAM_TYPE_STRING);
 
-  return (const char*) (self->sstream);
+  return (const char *)(self->sstream);
 }
 
-void MasterPrinter_set_stream_type(MasterPrinter_ptr self,
-                                   StreamType type,
-                                   const union StreamTypeArg* arg)
-{
+void MasterPrinter_set_stream_type(MasterPrinter_ptr self, StreamType type,
+                                   const union StreamTypeArg *arg) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
     switch (type) {
     case STREAM_TYPE_DEFAULT:
@@ -440,8 +409,8 @@ void MasterPrinter_set_stream_type(MasterPrinter_ptr self,
       break;
 
     case STREAM_TYPE_FILE:
-      self->stream_arg.file = ((STREAM_TYPE_ARG_UNUSED != arg)?
-                               arg->file : NULL);
+      self->stream_arg.file =
+          ((STREAM_TYPE_ARG_UNUSED != arg) ? arg->file : NULL);
       break;
 
     case STREAM_TYPE_FUNCTION:
@@ -453,25 +422,24 @@ void MasterPrinter_set_stream_type(MasterPrinter_ptr self,
       break;
 
     default:
-      ErrorMgr_internal_error(errmgr, "MasterPrinter::set_stream_type: Invalid stream type\n");
+      ErrorMgr_internal_error(
+          errmgr, "MasterPrinter::set_stream_type: Invalid stream type\n");
     }
 
     self->stream_type = type;
   }
 }
 
-StreamType MasterPrinter_get_stream_type(const MasterPrinter_ptr self)
-{
+StreamType MasterPrinter_get_stream_type(const MasterPrinter_ptr self) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
   return self->stream_type;
 }
 
-void  MasterPrinter_reset_stream(MasterPrinter_ptr self, int initial_offset)
-{
+void MasterPrinter_reset_stream(MasterPrinter_ptr self, int initial_offset) {
   ListIter_ptr p;
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
-  self->current_ofs = (0<initial_offset) ? initial_offset : 0;
+  self->current_ofs = (0 < initial_offset) ? initial_offset : 0;
 
   /* clear stack (should be empty anyway) */
   p = NodeList_get_first_iter(self->indent_stack);
@@ -499,8 +467,7 @@ void  MasterPrinter_reset_stream(MasterPrinter_ptr self, int initial_offset)
   }
 }
 
-void MasterPrinter_close_stream(MasterPrinter_ptr self)
-{
+void MasterPrinter_close_stream(MasterPrinter_ptr self) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
   switch (self->stream_type) {
@@ -515,12 +482,12 @@ void MasterPrinter_close_stream(MasterPrinter_ptr self)
     break;
 
   case STREAM_TYPE_FILE:
-      /* closes the file stream if not nusmv_std{out,err} */
-      if ((self->stream_arg.file != StreamMgr_get_output_stream(self->streams)) &&
-          (self->stream_arg.file != StreamMgr_get_error_stream(self->streams))) {
-        fclose(self->stream_arg.file);
-      }
-      break;
+    /* closes the file stream if not nusmv_std{out,err} */
+    if ((self->stream_arg.file != StreamMgr_get_output_stream(self->streams)) &&
+        (self->stream_arg.file != StreamMgr_get_error_stream(self->streams))) {
+      fclose(self->stream_arg.file);
+    }
+    break;
 
   case STREAM_TYPE_FUNCTION:
     break;
@@ -534,8 +501,7 @@ void MasterPrinter_close_stream(MasterPrinter_ptr self)
                                 STREAM_TYPE_ARG_UNUSED);
 }
 
-int MasterPrinter_flush_stream(MasterPrinter_ptr self)
-{
+int MasterPrinter_flush_stream(MasterPrinter_ptr self) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
   switch (self->stream_type) {
@@ -574,15 +540,13 @@ int MasterPrinter_flush_stream(MasterPrinter_ptr self)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-int master_printer_print_node(MasterPrinter_ptr self,
-                              node_ptr n, int priority)
-{
+int master_printer_print_node(MasterPrinter_ptr self, node_ptr n,
+                              int priority) {
   ListIter_ptr iter;
   iter = NodeList_get_first_iter(MASTER_NODE_WALKER(self)->walkers);
   while (!ListIter_is_end(iter)) {
-    PrinterBase_ptr pr =
-      PRINTER_BASE(NodeList_get_elem_at(MASTER_NODE_WALKER(self)->walkers,
-                                        iter));
+    PrinterBase_ptr pr = PRINTER_BASE(
+        NodeList_get_elem_at(MASTER_NODE_WALKER(self)->walkers, iter));
 
     if (NodeWalker_can_handle(NODE_WALKER(pr), n)) {
 
@@ -606,10 +570,10 @@ int master_printer_print_node(MasterPrinter_ptr self,
 
   \sa MasterPrinter_create
 */
-static void master_printer_init(MasterPrinter_ptr self, const NuSMVEnv_ptr env)
-{
+static void master_printer_init(MasterPrinter_ptr self,
+                                const NuSMVEnv_ptr env) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
   /* base class initialization */
   master_node_walker_init(MASTER_NODE_WALKER(self), env);
@@ -625,16 +589,14 @@ static void master_printer_init(MasterPrinter_ptr self, const NuSMVEnv_ptr env)
 
   /* initialize internal structure for pretty printing */
   self->indent_stack = NodeList_create();
-  self->current_ofs  = 0;
+  self->current_ofs = 0;
 
   /* default stream */
-  MasterPrinter_set_stream_type(self,
-                                STREAM_TYPE_DEFAULT,
+  MasterPrinter_set_stream_type(self, STREAM_TYPE_DEFAULT,
                                 STREAM_TYPE_ARG_UNUSED);
 
   /* virtual methods settings */
   OVERRIDE(Object, finalize) = master_printer_finalize;
-
 }
 
 /*!
@@ -644,12 +606,11 @@ static void master_printer_init(MasterPrinter_ptr self, const NuSMVEnv_ptr env)
 
   \sa MasterPrinter_destroy
 */
-static void master_printer_deinit(MasterPrinter_ptr self)
-{
+static void master_printer_deinit(MasterPrinter_ptr self) {
   NodeList_destroy(self->indent_stack);
   self->indent_stack = NODE_LIST(NULL);
   FREE(self->sstream);
-  self->sstream = (char*) NULL;
+  self->sstream = (char *)NULL;
 
   /* base class deinitialization */
   master_node_walker_deinit(MASTER_NODE_WALKER(self));
@@ -660,8 +621,7 @@ static void master_printer_deinit(MasterPrinter_ptr self)
 
   Called by the class destructor
 */
-static void master_printer_finalize(Object_ptr object, void* dummy)
-{
+static void master_printer_finalize(Object_ptr object, void *dummy) {
   MasterPrinter_ptr self = MASTER_PRINTER(object);
 
   master_printer_deinit(self);
@@ -673,8 +633,7 @@ static void master_printer_finalize(Object_ptr object, void* dummy)
 
   Warning: current stream type must be STREAM_TYPE_STRING
 */
-static int master_printer_sprint(MasterPrinter_ptr self, const char* str)
-{
+static int master_printer_sprint(MasterPrinter_ptr self, const char *str) {
   int len;
 
   nusmv_assert(self->stream_type == STREAM_TYPE_STRING);
@@ -689,10 +648,10 @@ static int master_printer_sprint(MasterPrinter_ptr self, const char* str)
       self->sstream_grow_sum += self->sstream_len;
       self->sstream_grow_num += 1;
       self->sstream_cap = self->sstream_len + 1 +
-        (self->sstream_grow_sum / self->sstream_grow_num);
+                          (self->sstream_grow_sum / self->sstream_grow_num);
 
-      self->sstream = (char*) REALLOC(char, self->sstream, self->sstream_cap);
-      nusmv_assert(self->sstream != (char*) NULL);
+      self->sstream = (char *)REALLOC(char, self->sstream, self->sstream_cap);
+      nusmv_assert(self->sstream != (char *)NULL);
     }
 
     strcat(self->sstream, str);
@@ -707,12 +666,11 @@ static int master_printer_sprint(MasterPrinter_ptr self, const char* str)
 
   Warning: current stream type must be compatible
 */
-static int master_printer_fprint(MasterPrinter_ptr self, const char* str)
-{
-  nusmv_assert( (self->stream_type == STREAM_TYPE_DEFAULT) ||
-                (self->stream_type == STREAM_TYPE_STDOUT) ||
-                (self->stream_type == STREAM_TYPE_STDERR) ||
-                (self->stream_type == STREAM_TYPE_FILE));
+static int master_printer_fprint(MasterPrinter_ptr self, const char *str) {
+  nusmv_assert((self->stream_type == STREAM_TYPE_DEFAULT) ||
+               (self->stream_type == STREAM_TYPE_STDOUT) ||
+               (self->stream_type == STREAM_TYPE_STDERR) ||
+               (self->stream_type == STREAM_TYPE_FILE));
 
   if (str[0] != '\0') {
     nusmv_assert(NULL != self->stream_arg.file);
@@ -720,22 +678,20 @@ static int master_printer_fprint(MasterPrinter_ptr self, const char* str)
     return fprintf(self->stream_arg.file, "%s", str);
   }
 
-  else return 1;
+  else
+    return 1;
 }
 
-int master_printer_indent(MasterPrinter_ptr self)
-{
+int master_printer_indent(MasterPrinter_ptr self) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
-  NodeList_prepend(self->indent_stack,
-                   NODE_FROM_INT (self->current_ofs));
+  NodeList_prepend(self->indent_stack, NODE_FROM_INT(self->current_ofs));
 
   /* never fails */
   return 1;
 }
 
-int master_printer_deindent(MasterPrinter_ptr self)
-{
+int master_printer_deindent(MasterPrinter_ptr self) {
   ListIter_ptr head;
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
@@ -743,16 +699,16 @@ int master_printer_deindent(MasterPrinter_ptr self)
   if (NULL == head) {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-    ErrorMgr_internal_error(errmgr, "printout failure: empty indentation stack!");
+    ErrorMgr_internal_error(errmgr,
+                            "printout failure: empty indentation stack!");
   }
 
   NodeList_remove_elem_at(self->indent_stack, head);
 
   /* never fails */
   return 1;
-
 }
 
 /*!
@@ -764,17 +720,15 @@ int master_printer_deindent(MasterPrinter_ptr self)
   for backward compatibility.
 */
 
-static int
-master_printer_get_level(MasterPrinter_ptr self)
-{
+static int master_printer_get_level(MasterPrinter_ptr self) {
   ListIter_ptr head;
 
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
   head = NodeList_get_first_iter(self->indent_stack);
   return (NULL != head)
-    ? NODE_TO_INT(NodeList_get_elem_at(self->indent_stack, head))
-    : 0 ;
+             ? NODE_TO_INT(NodeList_get_elem_at(self->indent_stack, head))
+             : 0;
 }
 
 /*!
@@ -786,8 +740,7 @@ master_printer_get_level(MasterPrinter_ptr self)
   \sa get_streamed_string
 */
 
-static void master_printer_reset_string_stream(MasterPrinter_ptr self)
-{
+static void master_printer_reset_string_stream(MasterPrinter_ptr self) {
   MASTER_PRINTER_CHECK_INSTANCE(self);
 
   self->sstream[0] = '\0';

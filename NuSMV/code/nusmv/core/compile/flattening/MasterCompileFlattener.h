@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,25 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_H__
 #define __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_H__
 
-
-#include "nusmv/core/node/MasterNodeWalker.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/node/MasterNodeWalker.h"
 #include "nusmv/core/utils/defs.h"
 
 /*!
   \struct MasterCompileFlattener
   \brief Definition of the public accessor for class MasterCompileFlattener
 
-  
-*/
-typedef struct MasterCompileFlattener_TAG*  MasterCompileFlattener_ptr;
 
+*/
+typedef struct MasterCompileFlattener_TAG *MasterCompileFlattener_ptr;
 
 /*!
   \brief Enumeration used to select the handling of defines
 
-  
+
 */
 
 typedef enum MasterCompileFlattener_def_mode_type_TAG {
@@ -70,18 +66,16 @@ typedef enum MasterCompileFlattener_def_mode_type_TAG {
   These macros must be used respectively to cast and to check
   instances of class MasterCompileFlattener
 */
-#define MASTER_COMPILE_FLATTENER(self) \
-         ((MasterCompileFlattener_ptr) self)
+#define MASTER_COMPILE_FLATTENER(self) ((MasterCompileFlattener_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MASTER_COMPILE_FLATTENER_CHECK_INSTANCE(self) \
-         (nusmv_assert(MASTER_COMPILE_FLATTENER(self) != MASTER_COMPILE_FLATTENER(NULL)))
-
-
+#define MASTER_COMPILE_FLATTENER_CHECK_INSTANCE(self)                          \
+  (nusmv_assert(MASTER_COMPILE_FLATTENER(self) !=                              \
+                MASTER_COMPILE_FLATTENER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -118,11 +112,9 @@ void MasterCompileFlattener_destroy(MasterCompileFlattener_ptr self);
   expression. It does not expand defined symbols with the
   corresponding body.
 */
-node_ptr
-MasterCompileFlattener_flatten(MasterCompileFlattener_ptr self,
-                               SymbTable_ptr symb_table,
-                               node_ptr sexp,
-                               node_ptr context);
+node_ptr MasterCompileFlattener_flatten(MasterCompileFlattener_ptr self,
+                                        SymbTable_ptr symb_table, node_ptr sexp,
+                                        node_ptr context);
 
 /*!
   \methodof MasterCompileFlattener
@@ -135,8 +127,7 @@ MasterCompileFlattener_flatten(MasterCompileFlattener_ptr self,
 node_ptr
 MasterCompileFlattener_flatten_expand_define(MasterCompileFlattener_ptr self,
                                              SymbTable_ptr symb_table,
-                                             node_ptr sexp,
-                                             node_ptr context);
+                                             node_ptr sexp, node_ptr context);
 
 /*!
   \methodof MasterCompileFlattener
@@ -152,8 +143,7 @@ MasterCompileFlattener_flatten_expand_define(MasterCompileFlattener_ptr self,
 */
 node_ptr
 MasterCompileFlattener_get_definition(MasterCompileFlattener_ptr self,
-                                      SymbTable_ptr symb_table,
-                                      node_ptr sexp,
+                                      SymbTable_ptr symb_table, node_ptr sexp,
                                       MasterCompileFlattener_def_mode mode);
 
 /*!
@@ -161,15 +151,12 @@ MasterCompileFlattener_get_definition(MasterCompileFlattener_ptr self,
   \brief Remove the information associated to name from
   the define hash
 
-  
+
 */
-void
-MasterCompileFlattener_remove_define_info(MasterCompileFlattener_ptr self,
-                                          SymbTable_ptr symb_table,
-                                          node_ptr name);
+void MasterCompileFlattener_remove_define_info(MasterCompileFlattener_ptr self,
+                                               SymbTable_ptr symb_table,
+                                               node_ptr name);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_FLATTENING_MASTER_COMPILE_FLATTENER_H__ */

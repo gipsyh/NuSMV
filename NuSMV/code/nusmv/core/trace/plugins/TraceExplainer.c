@@ -35,16 +35,15 @@
 
 */
 
-
-#include "nusmv/core/utils/OStream.h"
-#include "nusmv/core/trace/plugins/TraceExplainer_private.h"
 #include "nusmv/core/trace/plugins/TraceExplainer.h"
-#include "nusmv/core/trace/plugins/TracePlugin.h"
+#include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/trace/pkg_traceInt.h"
+#include "nusmv/core/trace/plugins/TraceExplainer_private.h"
+#include "nusmv/core/trace/plugins/TracePlugin.h"
+#include "nusmv/core/utils/OStream.h"
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/utils_io.h"
-#include "nusmv/core/parser/symbols.h"
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
@@ -60,14 +59,13 @@
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void trace_explainer_finalize(Object_ptr object, void* dummy);
+static void trace_explainer_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-TraceExplainer_ptr TraceExplainer_create(boolean changes_only)
-{
+TraceExplainer_ptr TraceExplainer_create(boolean changes_only) {
   TraceExplainer_ptr self = ALLOC(TraceExplainer, 1);
 
   TRACE_EXPLAINER_CHECK_INSTANCE(self);
@@ -86,13 +84,11 @@ TraceExplainer_ptr TraceExplainer_create(boolean changes_only)
 
 */
 
-void trace_explainer_init(TraceExplainer_ptr self, boolean changes_only)
-{
+void trace_explainer_init(TraceExplainer_ptr self, boolean changes_only) {
   if (changes_only) {
     trace_plugin_init(TRACE_PLUGIN(self),
                       "BASIC TRACE EXPLAINER - shows changes only");
-  }
-  else {
+  } else {
     trace_plugin_init(TRACE_PLUGIN(self),
                       "BASIC TRACE EXPLAINER - shows all variables");
   }
@@ -109,8 +105,7 @@ void trace_explainer_init(TraceExplainer_ptr self, boolean changes_only)
 
 */
 
-void trace_explainer_deinit(TraceExplainer_ptr self)
-{
+void trace_explainer_deinit(TraceExplainer_ptr self) {
   trace_plugin_deinit(TRACE_PLUGIN(self));
 }
 
@@ -118,15 +113,14 @@ void trace_explainer_deinit(TraceExplainer_ptr self)
   \brief Action method associated with TraceExplainer class.
 
    The action associated with TraceExplainer is to print the trace
-  on the TraceOpt_output_stream(self->opt). If <tt>changes_only</tt> is 1, than only state variables
-  which assume a different value from the previous printed one are printed
-  out.
+  on the TraceOpt_output_stream(self->opt). If <tt>changes_only</tt> is 1, than
+  only state variables which assume a different value from the previous printed
+  one are printed out.
 
   \se <tt>print_hash</tt> is modified.
 */
 
-int trace_explainer_action(const TracePlugin_ptr self)
-{
+int trace_explainer_action(const TracePlugin_ptr self) {
   const Trace_ptr trace = self->trace;
   const SymbTable_ptr symb_table = Trace_get_symb_table(trace);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(symb_table));
@@ -143,27 +137,28 @@ int trace_explainer_action(const TracePlugin_ptr self)
   OStream_ptr out = TraceOpt_output_stream(self->opt);
 
   start_iter = (0 != TraceOpt_from_here(self->opt))
-    ? trace_ith_iter(trace, TraceOpt_from_here(self->opt))
-    : trace_first_iter(trace);
+                   ? trace_ith_iter(trace, TraceOpt_from_here(self->opt))
+                   : trace_first_iter(trace);
 
   stop_iter = (0 != TraceOpt_to_here(self->opt))
-    ? trace_ith_iter(trace, 1 + TraceOpt_to_here(self->opt))
-    : TRACE_END_ITER;
+                  ? trace_ith_iter(trace, 1 + TraceOpt_to_here(self->opt))
+                  : TRACE_END_ITER;
 
-  input_iter_type = TraceOpt_show_defines(self->opt)
-    ? TRACE_ITER_I_SYMBOLS : TRACE_ITER_I_VARS;
+  input_iter_type = TraceOpt_show_defines(self->opt) ? TRACE_ITER_I_SYMBOLS
+                                                     : TRACE_ITER_I_VARS;
 
-  state_iter_type = TraceOpt_show_defines(self->opt)
-    ? TRACE_ITER_SF_SYMBOLS : TRACE_ITER_SF_VARS;
+  state_iter_type = TraceOpt_show_defines(self->opt) ? TRACE_ITER_SF_SYMBOLS
+                                                     : TRACE_ITER_SF_VARS;
 
   combo_iter_type = TraceOpt_show_defines(self->opt)
-    ? (TraceOpt_show_defines_with_next(self->opt)
-       ? TRACE_ITER_COMBINATORIAL
-       : TRACE_ITER_SI_DEFINES)
-    : TRACE_ITER_NONE;
+                        ? (TraceOpt_show_defines_with_next(self->opt)
+                               ? TRACE_ITER_COMBINATORIAL
+                               : TRACE_ITER_SI_DEFINES)
+                        : TRACE_ITER_NONE;
 
   OStream_printf(out, "Trace Description: %s \n", Trace_get_desc(trace));
-  OStream_printf(out, "Trace Type: %s \n", TraceType_to_string(env, Trace_get_type(trace)));
+  OStream_printf(out, "Trace Type: %s \n",
+                 TraceType_to_string(env, Trace_get_type(trace)));
 
   /* indent */
   OStream_inc_indent_size(out);
@@ -171,7 +166,8 @@ int trace_explainer_action(const TracePlugin_ptr self)
   changed_states = new_assoc();
   nusmv_assert(changed_states != (hash_ptr)NULL);
 
-  i = MAX(1, TraceOpt_from_here(self->opt)); step = start_iter;
+  i = MAX(1, TraceOpt_from_here(self->opt));
+  step = start_iter;
   while (stop_iter != step) {
     TraceStepIter iter;
     node_ptr symb;
@@ -187,11 +183,14 @@ int trace_explainer_action(const TracePlugin_ptr self)
     /* COMBINATORIAL SECTION (optional) */
     TRACE_STEP_FOREACH(trace, step, combo_iter_type, iter, symb, val) {
       /* skip non-visible symbols */
-      if (!trace_plugin_is_visible_symbol(self, symb)) continue;
+      if (!trace_plugin_is_visible_symbol(self, symb))
+        continue;
 
       /* if required, print only symbols with changed values */
       if (TRACE_EXPLAINER(self)->changes_only) {
-        if (val == find_assoc(changed_states, symb)) { continue; }
+        if (val == find_assoc(changed_states, symb)) {
+          continue;
+        }
         insert_assoc(changed_states, symb, val);
       }
 
@@ -205,11 +204,14 @@ int trace_explainer_action(const TracePlugin_ptr self)
         input_header = true;
       }
       /* skip non-visible symbols */
-      if (!trace_plugin_is_visible_symbol(self, symb)) continue;
+      if (!trace_plugin_is_visible_symbol(self, symb))
+        continue;
 
       /* if required, print only symbols with changed values */
       if (TRACE_EXPLAINER(self)->changes_only) {
-        if (val == find_assoc(changed_states, symb)) { continue; }
+        if (val == find_assoc(changed_states, symb)) {
+          continue;
+        }
         insert_assoc(changed_states, symb, val);
       }
 
@@ -224,18 +226,22 @@ int trace_explainer_action(const TracePlugin_ptr self)
     OStream_printf(out, "-> State: %d.%d <-\n", Trace_get_id(trace), i);
     TRACE_STEP_FOREACH(trace, step, state_iter_type, iter, symb, val) {
       /* skip non-visible symbols */
-      if (!trace_plugin_is_visible_symbol(self, symb)) continue;
+      if (!trace_plugin_is_visible_symbol(self, symb))
+        continue;
 
       /* if required, print only symbols with changed values */
       if (TRACE_EXPLAINER(self)->changes_only) {
-        if (val == find_assoc(changed_states, symb)) { continue; }
+        if (val == find_assoc(changed_states, symb)) {
+          continue;
+        }
         insert_assoc(changed_states, symb, val);
       }
 
       TracePlugin_print_assignment(self, symb, val);
     } /* foreach SF_SYMBOLS */
 
-    ++ i; step = TraceIter_get_next(step);
+    ++i;
+    step = TraceIter_get_next(step);
   } /* while */
 
   free_assoc(changed_states);
@@ -255,8 +261,7 @@ int trace_explainer_action(const TracePlugin_ptr self)
 
 
 */
-static void trace_explainer_finalize(Object_ptr object, void* dummy)
-{
+static void trace_explainer_finalize(Object_ptr object, void *dummy) {
   TraceExplainer_ptr self = TRACE_EXPLAINER(object);
 
   trace_explainer_deinit(self);

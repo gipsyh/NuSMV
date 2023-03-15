@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,15 +34,14 @@
 
 */
 
-
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/trace/TraceLabel.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/node.h"
-#include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/parser/parser.h"
+#include "nusmv/core/parser/symbols.h"
 
 #include "nusmv/core/utils/portability.h" /* for errno */
-#include <limits.h> /* for INT_MAX */
+#include <limits.h>                       /* for INT_MAX */
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -60,31 +59,29 @@
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr,
-                             int trace_id, int state_id)
-{
+TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr, int trace_id, int state_id) {
   TraceLabel self;
 
-  self = find_node(nodemgr, DOT, find_node(nodemgr, NUMBER, NODE_FROM_INT(trace_id), Nil),
+  self = find_node(nodemgr, DOT,
+                   find_node(nodemgr, NUMBER, NODE_FROM_INT(trace_id), Nil),
                    find_node(nodemgr, NUMBER, NODE_FROM_INT(state_id), Nil));
   return self;
 }
 
-TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr, const char* str)
-{
-  char* startptr;
-  char* endptr;
+TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr, const char *str) {
+  char *startptr;
+  char *endptr;
   long traceno, stateno;
 
   /* Start reading the string */
-  startptr = (char*)str;
+  startptr = (char *)str;
 
   /* First number must be a positive integer */
   errno = 0;
   traceno = strtol(str, &endptr, 10);
 
-  if((startptr == endptr) || (errno == ERANGE) ||
-     (errno == EINVAL) || (traceno < 0) || (traceno > INT_MAX)) {
+  if ((startptr == endptr) || (errno == ERANGE) || (errno == EINVAL) ||
+      (traceno < 0) || (traceno > INT_MAX)) {
     /*
       No chars read or error in reading or negative number or
       number too big
@@ -94,15 +91,14 @@ TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr, const char* str)
   startptr = endptr;
 
   /* We can have some spaces */
-  while(' ' == *startptr) {
+  while (' ' == *startptr) {
     startptr++;
   }
 
   /* Then we have a '.' char */
   if ('.' == *startptr) {
     startptr++;
-  }
-  else {
+  } else {
     /* We have something which is not a '.' */
     return TRACE_LABEL_INVALID;
   }
@@ -111,38 +107,34 @@ TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr, const char* str)
   errno = 0;
   stateno = strtol(startptr, &endptr, 10);
 
-  if((startptr == endptr) || (errno == ERANGE) ||
-     (errno == EINVAL) || (stateno > INT_MAX) || (stateno < INT_MIN)) {
+  if ((startptr == endptr) || (errno == ERANGE) || (errno == EINVAL) ||
+      (stateno > INT_MAX) || (stateno < INT_MIN)) {
     /* No chars read or error in reading or invalid int */
     return TRACE_LABEL_INVALID;
   }
   startptr = endptr;
 
   /* Skip final spaces */
-  while(' ' == *startptr) {
+  while (' ' == *startptr) {
     startptr++;
   }
 
   if ('\0' == *startptr) {
     return TraceLabel_create(nodemgr, (int)(traceno - 1), (int)(stateno - 1));
-  }
-  else {
+  } else {
     /* Something unexpected at the end of the file */
     return TRACE_LABEL_INVALID;
   }
 }
 
-int TraceLabel_get_trace(TraceLabel self)
-{
+int TraceLabel_get_trace(TraceLabel self) {
   int result = NODE_TO_INT(car(car((node_ptr)self)));
 
   return result;
 }
 
-int TraceLabel_get_state(TraceLabel self)
-{
+int TraceLabel_get_state(TraceLabel self) {
   int result = NODE_TO_INT(car(cdr((node_ptr)self)));
 
   return result;
 }
-

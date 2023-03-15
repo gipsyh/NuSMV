@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------------
 
-This file is part of the ``rbc.clg'' package 
+This file is part of the ``rbc.clg'' package
   of NuSMV version 2. Copyright (C) 2007 by FBK-irst.
 
   NuSMV version 2 is free software; you can redistribute it and/or
@@ -15,7 +15,7 @@ This file is part of the ``rbc.clg'' package
 
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA. 
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
@@ -33,13 +33,11 @@ This file is part of the ``rbc.clg'' package
 
 */
 
-
 #ifndef __NUSMV_CORE_RBC_CLG_CLG_INT_H__
 #define __NUSMV_CORE_RBC_CLG_CLG_INT_H__
 
 #include "nusmv/core/rbc/clg/clg.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -70,25 +68,22 @@ This file is part of the ``rbc.clg'' package
 struct Clg_Vertex {
   int label;
   int size;
-  struct Clg_Vertex* left; 
-  struct Clg_Vertex* right; 
+  struct Clg_Vertex *left;
+  struct Clg_Vertex *right;
 };
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticEnd***************************************************************/
 

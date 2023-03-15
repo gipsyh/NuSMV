@@ -38,7 +38,7 @@
 #define __NUSMV_CORE_UTILS_WATCHDOG_UTIL_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/cinit/NuSMVEnv.h"
@@ -52,11 +52,9 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -66,7 +64,6 @@
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 static NuSMVEnv_ptr watchdog_env;
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -84,7 +81,7 @@ static NuSMVEnv_ptr watchdog_env;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE_WATCHDOG_LIBRARY
-#define WATCHDOG_INIT(env, name, period, action, options) \
+#define WATCHDOG_INIT(env, name, period, action, options)                      \
   watchdog_mod(name, period, action, options, env)
 #else
 #define WATCHDOG_INIT(env, name, period, action, options)
@@ -102,8 +99,7 @@ static NuSMVEnv_ptr watchdog_env;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE_WATCHDOG_LIBRARY
-#define WATCHDOG_START(env, name) \
-  watchdog_start(name)
+#define WATCHDOG_START(env, name) watchdog_start(name)
 #else
 #define WATCHDOG_START(env, name)
 #endif
@@ -120,8 +116,7 @@ static NuSMVEnv_ptr watchdog_env;
   If the library is not linked the macro will do nothing.
 */
 #if NUSMV_HAVE_WATCHDOG_LIBRARY
-#define WATCHDOG_PAUSE(env, name) \
-  watchdog_pause(name)
+#define WATCHDOG_PAUSE(env, name) watchdog_pause(name)
 #else
 #define WATCHDOG_PAUSE(env, name)
 #endif
@@ -145,8 +140,7 @@ static NuSMVEnv_ptr watchdog_env;
   If the library is not linked the macro returns -1.
 */
 #if NUSMV_HAVE_WATCHDOG_LIBRARY
-#define WATCHDOG_GET_STATUS(env, name, status)  \
-  -1
+#define WATCHDOG_GET_STATUS(env, name, status) -1
 #else
 #define WATCHDOG_GET_STATUS(env, name, status) -1
 #endif
@@ -162,10 +156,7 @@ static NuSMVEnv_ptr watchdog_env;
 
   Callback function when the watchdog expires.
 */
-void watchdog_action(void* env);
-
-
-
+void watchdog_action(void *env);
 
 /**AutomaticEnd***************************************************************/
 

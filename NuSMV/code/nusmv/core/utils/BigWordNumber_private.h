@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,8 +36,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_BIG_WORD_NUMBER_PRIVATE_H__
 #define __NUSMV_CORE_UTILS_BIG_WORD_NUMBER_PRIVATE_H__
 
@@ -49,20 +47,18 @@
 #error "big number cannot be compiled as it was not configured"
 #endif
 
-
-#include "nusmv/core/utils/WordNumber.h"
 #include "nusmv/core/utils/BigWordNumber_private.h"
+#include "nusmv/core/utils/WordNumber.h"
 
 #include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/utils/bignumbers/bignumbers.h"
 #include "nusmv/core/utils/ustring.h"
 
-
 /*!
   \brief WordNumberValue_intern struct
 
-  
+
 */
 
 typedef struct wordnumvale_intern {
@@ -75,18 +71,16 @@ typedef struct wordnumvale_intern {
 
   \todo Missing description
 */
-typedef WordNumberValue_intern* WordNumberValue_intern_ptr;
-
+typedef WordNumberValue_intern *WordNumberValue_intern_ptr;
 
 /*!
   \brief WordNumber struct.
 
-  
+
 */
 
 /* We do not use the parsedString anymore, a lot of space can be saved */
-typedef struct WordNumber_TAG
-{
+typedef struct WordNumber_TAG {
   WordNumberValue_intern value; /* Words are unsigned */
   /* string_ptr parsedString; */
 } WordNumber;
@@ -98,8 +92,7 @@ typedef struct WordNumber_TAG
   returns a new WordNumberValue_intern struct, which
                      represents a word with value number and width width
 */
-WordNumberValue_intern
-WordNumber_create_WordNumberValue_intern(Number, int);
+WordNumberValue_intern WordNumber_create_WordNumberValue_intern(Number, int);
 
 /*!
   \brief returns a new WordNumberValue_intern struct, which
@@ -109,28 +102,23 @@ WordNumber_create_WordNumberValue_intern(Number, int);
                      represents a copy of the word original
 */
 WordNumberValue_intern
-WordNumber_copy_WordNumberValue_intern(WordNumberValue_intern*);
+WordNumber_copy_WordNumberValue_intern(WordNumberValue_intern *);
 
-void WordNumber_free_WordNumberValue_intern(WordNumberValue_intern*);
-
+void WordNumber_free_WordNumberValue_intern(WordNumberValue_intern *);
 
 /* ---------------------------------------------------------------------- */
 /*     Private methods                                                    */
 /* ---------------------------------------------------------------------- */
-char*
-WordNumber_Internal_value_to_based_string(WordNumberValue_intern value,
-                                          int base, boolean
-                                          isSigned);
+char *WordNumber_Internal_value_to_based_string(WordNumberValue_intern value,
+                                                int base, boolean isSigned);
 
 /*!
   \methodof WordNumber
   \todo
 */
-WordNumberValue
-word_number_to_signed_c_value(const WordNumber_ptr self);
+WordNumberValue word_number_to_signed_c_value(const WordNumber_ptr self);
 
-void
-WNV_free_WordNumberValue_intern(WordNumberValue_intern_ptr value);
+void WNV_free_WordNumberValue_intern(WordNumberValue_intern_ptr value);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -151,8 +139,7 @@ WordNumber_evaluate_unsigned_extend(WordNumberValue_intern v,
                       the signed extension of v of size numberOfTimes
 */
 WordNumberValue_intern
-WordNumber_evaluate_signed_extend(WordNumberValue_intern v,
-                                  int numberOfTimes);
+WordNumber_evaluate_signed_extend(WordNumberValue_intern v, int numberOfTimes);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -162,8 +149,7 @@ WordNumber_evaluate_signed_extend(WordNumberValue_intern v,
                       a right rotation of v applied numberOfBits times
 */
 WordNumberValue_intern
-WordNumber_evaluate_right_rotate(WordNumberValue_intern v,
-                                 int numberOfBits);
+WordNumber_evaluate_right_rotate(WordNumberValue_intern v, int numberOfBits);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -172,9 +158,8 @@ WordNumber_evaluate_right_rotate(WordNumberValue_intern v,
   returns a WordNumberValue_intern which represents
                       a left rotation of v applied numberOfBits times
 */
-WordNumberValue_intern
-WordNumber_evaluate_left_rotate(WordNumberValue_intern v,
-                                int numberOfBits);
+WordNumberValue_intern WordNumber_evaluate_left_rotate(WordNumberValue_intern v,
+                                                       int numberOfBits);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -183,9 +168,8 @@ WordNumber_evaluate_left_rotate(WordNumberValue_intern v,
   returns a WordNumberValue_intern which represents
                       a left shift of v applied numberOfBits times
 */
-WordNumberValue_intern
-WordNumber_evaluate_left_shift(WordNumberValue_intern v,
-                               int numberOfBits);
+WordNumberValue_intern WordNumber_evaluate_left_shift(WordNumberValue_intern v,
+                                                      int numberOfBits);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -195,8 +179,7 @@ WordNumber_evaluate_left_shift(WordNumberValue_intern v,
                       a signed right shift of v applied numberOfBits times
 */
 WordNumberValue_intern
-WordNumber_evaluate_sright_shift(WordNumberValue_intern v,
-                                 int numberOfBits);
+WordNumber_evaluate_sright_shift(WordNumberValue_intern v, int numberOfBits);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -206,8 +189,7 @@ WordNumber_evaluate_sright_shift(WordNumberValue_intern v,
                       a unsigned right shift of v applied numberOfBits times
 */
 WordNumberValue_intern
-WordNumber_evaluate_uright_shift(WordNumberValue_intern v,
-                                 int numberOfBits);
+WordNumber_evaluate_uright_shift(WordNumberValue_intern v, int numberOfBits);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -220,7 +202,8 @@ WordNumber_evaluate_uright_shift(WordNumberValue_intern v,
 
   SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   returns a WordNumberValue_intern which represents
@@ -230,19 +213,18 @@ WordNumber_evaluate_uright_shift(WordNumberValue_intern v,
 
   SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 */
-WordNumberValue_intern
-WordNumber_evaluate_select(WordNumberValue_intern v1,
-                           int highBit,
-                           int lowBit);
+WordNumberValue_intern WordNumber_evaluate_select(WordNumberValue_intern v1,
+                                                  int highBit, int lowBit);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
                      the value of an addition of 1 to the bitwise NOT of v
 
-  
+
 */
 WordNumberValue_intern
 WordNumber_evaluate_unary_minus(WordNumberValue_intern v);
@@ -254,9 +236,8 @@ WordNumber_evaluate_unary_minus(WordNumberValue_intern v);
   returns a WordNumberValue_intern which represents
                      the result of the concatination v1 :: v2
 */
-WordNumberValue_intern
-WordNumber_evaluate_concat(WordNumberValue_intern v1,
-                           WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_concat(WordNumberValue_intern v1,
+                                                  WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -265,9 +246,8 @@ WordNumber_evaluate_concat(WordNumberValue_intern v1,
   returns a WordNumberValue_intern which represents
                      the value of a bitwise NOT(v1) OR v2
 */
-WordNumberValue_intern
-WordNumber_evaluate_implies(WordNumberValue_intern v1,
-                            WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_implies(WordNumberValue_intern v1,
+                                                   WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -276,9 +256,8 @@ WordNumber_evaluate_implies(WordNumberValue_intern v1,
   returns a WordNumberValue_intern which represents
                      of a bitwise v1 XNOR v2
 */
-WordNumberValue_intern
-WordNumber_evaluate_xnor(WordNumberValue_intern v1,
-                         WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_xnor(WordNumberValue_intern v1,
+                                                WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -287,9 +266,8 @@ WordNumber_evaluate_xnor(WordNumberValue_intern v1,
   returns a WordNumberValue_intern which represents
                      the the value of a bitwise v1 XOR v2
 */
-WordNumberValue_intern
-WordNumber_evaluate_xor(WordNumberValue_intern v1,
-                        WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_xor(WordNumberValue_intern v1,
+                                               WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -298,9 +276,8 @@ WordNumber_evaluate_xor(WordNumberValue_intern v1,
   returns a WordNumberValue_intern which represents
                      the value of a bitwise v1 OR v2
 */
-WordNumberValue_intern
-WordNumber_evaluate_or(WordNumberValue_intern v1,
-                       WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_or(WordNumberValue_intern v1,
+                                              WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -309,9 +286,8 @@ WordNumber_evaluate_or(WordNumberValue_intern v1,
   returns a WordNumberValue_intern which represents
                      the value of a bitwise v1 AND v2
 */
-WordNumberValue_intern
-WordNumber_evaluate_and(WordNumberValue_intern v1,
-                        WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_and(WordNumberValue_intern v1,
+                                               WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -326,13 +302,12 @@ WordNumber_evaluate_and(WordNumberValue_intern v1,
                        (ite (and (= ?msb_s #b0) (= ?msb_t #b1))
                        (bvurem s (bvneg t)))
                        (bvneg (bvurem (bvneg s) (bvneg t))))))
-                     
 
-  
+
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_srem(WordNumberValue_intern v1,
-                         WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_srem(WordNumberValue_intern v1,
+                                                WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -347,13 +322,12 @@ WordNumber_evaluate_srem(WordNumberValue_intern v1,
                        (ite (and (= ?msb_s #b0) (= ?msb_t #b1))
                        (bvurem s (bvneg t)))
                        (bvneg (bvurem (bvneg s) (bvneg t))))))
-                      
 
-  
+
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_urem(WordNumberValue_intern v1,
-                         WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_urem(WordNumberValue_intern v1,
+                                                WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
@@ -369,66 +343,58 @@ WordNumber_evaluate_urem(WordNumberValue_intern v1,
                         (ite (and (= ?msb_s #b0) (= ?msb_t #b1))
                              (bvneg (bvudiv s (bvneg t)))
                              (bvudiv (bvneg s) (bvneg t))))))
-                      
 
-  
+
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_sdiv(WordNumberValue_intern v1,
-                         WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_sdiv(WordNumberValue_intern v1,
+                                                WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
                      the value of a bitwise NOT(v)
 
-  
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_not(WordNumberValue_intern v1);
+WordNumberValue_intern WordNumber_evaluate_not(WordNumberValue_intern v1);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
                      the value of a unsigned division of v1 by v2.
 
-  
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_udiv(WordNumberValue_intern v1,
-                         WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_udiv(WordNumberValue_intern v1,
+                                                WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
                      the value of a multiplication v1 by v2, modulo size
                      v2
 
-  
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_mul(WordNumberValue_intern v1,
-                        WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_mul(WordNumberValue_intern v1,
+                                               WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
                      the value of a subtraction of v1 by v2, modulo size
                      v2
 
-  
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_minus(WordNumberValue_intern v1,
-                          WordNumberValue_intern v2);
+WordNumberValue_intern WordNumber_evaluate_minus(WordNumberValue_intern v1,
+                                                 WordNumberValue_intern v2);
 
 /*!
   \brief returns a WordNumberValue_intern which represents
                      the value of an addition of v1 by v2, modulo size
                      v2
 
-  
+
 */
-WordNumberValue_intern
-WordNumber_evaluate_plus(WordNumberValue_intern v1,
-                         WordNumberValue_intern v2);
-
-
+WordNumberValue_intern WordNumber_evaluate_plus(WordNumberValue_intern v1,
+                                                WordNumberValue_intern v2);
 
 #endif /* __WORD_NUMBER_PRIVATE_H__ */

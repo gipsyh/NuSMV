@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,14 +34,12 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_FSM_SEXP_SEXP_INT_H__
 #define __NUSMV_CORE_FSM_SEXP_SEXP_INT_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/opt/opt.h"
-
+#include "nusmv/core/utils/utils.h"
 
 extern int nusmv_yylineno;
 

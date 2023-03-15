@@ -36,23 +36,22 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/fsm/sexp/SexpFsm.h"
 #include "nusmv/core/fsm/sexp/SexpFsm_private.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/core/fsm/sexp/sexpInt.h"
 
 /* there are still some variables to be accessed there: */
-#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/compile/PredicateNormaliser.h"
+#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/compile/symb_table/ResolveSymbol.h"
 #include "nusmv/core/parser/symbols.h"
 
-#include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/sexp/SexpInliner.h"
@@ -85,77 +84,67 @@ typedef node_ptr VarFsm_ptr;
 
   \todo Missing description
 */
-#define VAR_FSM(x)  ((VarFsm_ptr) x)
-
+#define VAR_FSM(x) ((VarFsm_ptr)x)
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-#define _PRINT(txt)                             \
-  StreamMgr_print_error(streams,  "%s", txt);             \
+#define _PRINT(txt)                                                            \
+  StreamMgr_print_error(streams, "%s", txt);                                   \
   fflush(errstream)
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void sexp_fsm_hash_var_fsm_init(SexpFsm_ptr self,
-                                       hash_ptr simp_hash);
+static void sexp_fsm_hash_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash);
 
-static void sexp_fsm_const_var_fsm_init(SexpFsm_ptr self,
-                                        hash_ptr simp_hash);
+static void sexp_fsm_const_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash);
 
-static void sexp_fsm_finalize(Object_ptr object, void* dummy);
+static void sexp_fsm_finalize(Object_ptr object, void *dummy);
 
 static Object_ptr sexp_fsm_copy(const Object_ptr object);
 
-static Expr_ptr sexp_fsm_simplify_expr(SexpFsm_ptr self,
-                                       hash_ptr hash, Expr_ptr expr,
-                                       const int group);
+static Expr_ptr sexp_fsm_simplify_expr(SexpFsm_ptr self, hash_ptr hash,
+                                       Expr_ptr expr, const int group);
 
 static hash_ptr simplifier_hash_create(void);
 static void simplifier_hash_destroy(hash_ptr hash);
-static void simplifier_hash_add_expr(hash_ptr hash,
-                                     Expr_ptr expr, const int group);
+static void simplifier_hash_add_expr(hash_ptr hash, Expr_ptr expr,
+                                     const int group);
 static boolean simplifier_hash_query_expr(hash_ptr hash, Expr_ptr expr,
                                           const int group);
 
 static void sexp_fsm_hash_var_fsm_destroy(SexpFsm_ptr self);
-static assoc_retval
-sexp_fsm_callback_var_fsm_free(char *key, char *data, char * arg);
-static VarFsm_ptr
-sexp_fsm_hash_var_fsm_lookup_var(SexpFsm_ptr self, node_ptr var);
-static void
-sexp_fsm_hash_var_fsm_insert_var(SexpFsm_ptr self,
-                                 node_ptr var, VarFsm_ptr varfsm);
+static assoc_retval sexp_fsm_callback_var_fsm_free(char *key, char *data,
+                                                   char *arg);
+static VarFsm_ptr sexp_fsm_hash_var_fsm_lookup_var(SexpFsm_ptr self,
+                                                   node_ptr var);
+static void sexp_fsm_hash_var_fsm_insert_var(SexpFsm_ptr self, node_ptr var,
+                                             VarFsm_ptr varfsm);
 
-static VarFsm_ptr var_fsm_create(SexpFsm_ptr self,
-                                 Expr_ptr init, Expr_ptr invar,
-                                 Expr_ptr next);
+static VarFsm_ptr var_fsm_create(SexpFsm_ptr self, Expr_ptr init,
+                                 Expr_ptr invar, Expr_ptr next);
 
 static void var_fsm_destroy(SexpFsm_ptr self, VarFsm_ptr vf);
 static Expr_ptr var_fsm_get_init(SexpFsm_ptr self, VarFsm_ptr vf);
 static Expr_ptr var_fsm_get_invar(SexpFsm_ptr self, VarFsm_ptr vf);
 static Expr_ptr var_fsm_get_next(SexpFsm_ptr self, VarFsm_ptr vf);
 static Expr_ptr var_fsm_get_input(SexpFsm_ptr self, VarFsm_ptr vf);
-static VarFsm_ptr var_fsm_synchronous_product(SexpFsm_ptr self,
-                                              VarFsm_ptr fsm1,
+static VarFsm_ptr var_fsm_synchronous_product(SexpFsm_ptr self, VarFsm_ptr fsm1,
                                               VarFsm_ptr fsm2);
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-SexpFsm_ptr SexpFsm_create(const FlatHierarchy_ptr hierarchy, const Set_t vars)
-{
+SexpFsm_ptr SexpFsm_create(const FlatHierarchy_ptr hierarchy,
+                           const Set_t vars) {
   SexpFsm_ptr self;
 
   /* allocation: */
@@ -172,44 +161,48 @@ SexpFsm_ptr SexpFsm_create(const FlatHierarchy_ptr hierarchy, const Set_t vars)
   return self;
 }
 
-VIRTUAL SexpFsm_ptr SexpFsm_copy(const SexpFsm_ptr self)
-{
+VIRTUAL SexpFsm_ptr SexpFsm_copy(const SexpFsm_ptr self) {
   return SEXP_FSM(Object_copy(OBJECT(self)));
 }
 
 SexpFsm_ptr
 SexpFsm_create_predicate_normalised_copy(const SexpFsm_ptr self,
-                                         PredicateNormaliser_ptr normaliser)
-{
+                                         PredicateNormaliser_ptr normaliser) {
   SexpFsm_ptr copy;
 
   SEXP_FSM_CHECK_INSTANCE(self);
 
   copy = SexpFsm_copy(self);
 
-  FlatHierarchy_set_init(copy->hierarchy,
-                         PredicateNormaliser_normalise_expr(normaliser,
-                                 FlatHierarchy_get_init(copy->hierarchy)));
+  FlatHierarchy_set_init(
+      copy->hierarchy,
+      PredicateNormaliser_normalise_expr(
+          normaliser, FlatHierarchy_get_init(copy->hierarchy)));
 
-  FlatHierarchy_set_invar(copy->hierarchy,
-                         PredicateNormaliser_normalise_expr(normaliser,
-                                 FlatHierarchy_get_invar(copy->hierarchy)));
+  FlatHierarchy_set_invar(
+      copy->hierarchy,
+      PredicateNormaliser_normalise_expr(
+          normaliser, FlatHierarchy_get_invar(copy->hierarchy)));
 
-  FlatHierarchy_set_trans(copy->hierarchy,
-                          PredicateNormaliser_normalise_expr(normaliser,
-                                 FlatHierarchy_get_trans(copy->hierarchy)));
+  FlatHierarchy_set_trans(
+      copy->hierarchy,
+      PredicateNormaliser_normalise_expr(
+          normaliser, FlatHierarchy_get_trans(copy->hierarchy)));
 
-  FlatHierarchy_set_input(copy->hierarchy,
-                          PredicateNormaliser_normalise_expr(normaliser,
-                                 FlatHierarchy_get_input(copy->hierarchy)));
+  FlatHierarchy_set_input(
+      copy->hierarchy,
+      PredicateNormaliser_normalise_expr(
+          normaliser, FlatHierarchy_get_input(copy->hierarchy)));
 
-  FlatHierarchy_set_justice(copy->hierarchy,
-                            PredicateNormaliser_normalise_expr(normaliser,
-                                 FlatHierarchy_get_justice(copy->hierarchy)));
+  FlatHierarchy_set_justice(
+      copy->hierarchy,
+      PredicateNormaliser_normalise_expr(
+          normaliser, FlatHierarchy_get_justice(copy->hierarchy)));
 
-  FlatHierarchy_set_compassion(copy->hierarchy,
-                    PredicateNormaliser_normalise_expr(normaliser,
-                         FlatHierarchy_get_compassion(copy->hierarchy)));
+  FlatHierarchy_set_compassion(
+      copy->hierarchy,
+      PredicateNormaliser_normalise_expr(
+          normaliser, FlatHierarchy_get_compassion(copy->hierarchy)));
 
 #if SEXP_FSM__ENABLE_SELF_CHECK
   SexpFsm_self_check(copy);
@@ -218,58 +211,49 @@ SexpFsm_create_predicate_normalised_copy(const SexpFsm_ptr self,
   return copy;
 }
 
-VIRTUAL void SexpFsm_destroy(SexpFsm_ptr self)
-{
+VIRTUAL void SexpFsm_destroy(SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   Object_destroy(OBJECT(self), NULL);
 }
 
-boolean SexpFsm_is_boolean(const SexpFsm_ptr self)
-{
+boolean SexpFsm_is_boolean(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return self->is_boolean;
 }
 
-SymbTable_ptr SexpFsm_get_symb_table(const SexpFsm_ptr self)
-{
+SymbTable_ptr SexpFsm_get_symb_table(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return self->st;
 }
 
-FlatHierarchy_ptr SexpFsm_get_hierarchy(const SexpFsm_ptr self)
-{
+FlatHierarchy_ptr SexpFsm_get_hierarchy(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return self->hierarchy;
 }
 
-Expr_ptr SexpFsm_get_init(const SexpFsm_ptr self)
-{
+Expr_ptr SexpFsm_get_init(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return FlatHierarchy_get_init(self->hierarchy);
 }
 
-Expr_ptr SexpFsm_get_invar(const SexpFsm_ptr self)
-{
+Expr_ptr SexpFsm_get_invar(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return FlatHierarchy_get_invar(self->hierarchy);
 }
 
-Expr_ptr SexpFsm_get_trans(const SexpFsm_ptr self)
-{
+Expr_ptr SexpFsm_get_trans(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return FlatHierarchy_get_trans(self->hierarchy);
 }
 
-Expr_ptr SexpFsm_get_input(const SexpFsm_ptr self)
-{
+Expr_ptr SexpFsm_get_input(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   /* Currently no constraints over input are allowed, thus we return
      true to inidicate this. */
   return FlatHierarchy_get_input(self->hierarchy);
 }
 
-Expr_ptr SexpFsm_get_var_init(const SexpFsm_ptr self, node_ptr var_name)
-{
+Expr_ptr SexpFsm_get_var_init(const SexpFsm_ptr self, node_ptr var_name) {
   VarFsm_ptr var_fsm;
   SEXP_FSM_CHECK_INSTANCE(self);
 
@@ -277,8 +261,7 @@ Expr_ptr SexpFsm_get_var_init(const SexpFsm_ptr self, node_ptr var_name)
   return var_fsm_get_init(self, var_fsm);
 }
 
-Expr_ptr SexpFsm_get_var_invar(const SexpFsm_ptr self, node_ptr var_name)
-{
+Expr_ptr SexpFsm_get_var_invar(const SexpFsm_ptr self, node_ptr var_name) {
   VarFsm_ptr var_fsm;
 
   SEXP_FSM_CHECK_INSTANCE(self);
@@ -287,8 +270,7 @@ Expr_ptr SexpFsm_get_var_invar(const SexpFsm_ptr self, node_ptr var_name)
   return var_fsm_get_invar(self, var_fsm);
 }
 
-Expr_ptr SexpFsm_get_var_trans(const SexpFsm_ptr self, node_ptr var_name)
-{
+Expr_ptr SexpFsm_get_var_trans(const SexpFsm_ptr self, node_ptr var_name) {
   VarFsm_ptr var_fsm;
 
   SEXP_FSM_CHECK_INSTANCE(self);
@@ -297,8 +279,7 @@ Expr_ptr SexpFsm_get_var_trans(const SexpFsm_ptr self, node_ptr var_name)
   return var_fsm_get_next(self, var_fsm);
 }
 
-Expr_ptr SexpFsm_get_var_input(const SexpFsm_ptr self, node_ptr var_name)
-{
+Expr_ptr SexpFsm_get_var_input(const SexpFsm_ptr self, node_ptr var_name) {
   VarFsm_ptr var_fsm;
 
   SEXP_FSM_CHECK_INSTANCE(self);
@@ -307,26 +288,22 @@ Expr_ptr SexpFsm_get_var_input(const SexpFsm_ptr self, node_ptr var_name)
   return var_fsm_get_input(self, var_fsm);
 }
 
-node_ptr SexpFsm_get_justice(const SexpFsm_ptr self)
-{
+node_ptr SexpFsm_get_justice(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return FlatHierarchy_get_justice(self->hierarchy);
 }
 
-node_ptr SexpFsm_get_compassion(const SexpFsm_ptr self)
-{
+node_ptr SexpFsm_get_compassion(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return FlatHierarchy_get_compassion(self->hierarchy);
 }
 
-NodeList_ptr SexpFsm_get_vars_list(const SexpFsm_ptr self)
-{
+NodeList_ptr SexpFsm_get_vars_list(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return Set_Set2List(self->vars_set);
 }
 
-NodeList_ptr SexpFsm_get_symbols_list(const SexpFsm_ptr self)
-{
+NodeList_ptr SexpFsm_get_symbols_list(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
 
   if (NODE_LIST(NULL) == self->symbols) {
@@ -346,14 +323,12 @@ NodeList_ptr SexpFsm_get_symbols_list(const SexpFsm_ptr self)
   return self->symbols;
 }
 
-Set_t SexpFsm_get_vars(const SexpFsm_ptr self)
-{
+Set_t SexpFsm_get_vars(const SexpFsm_ptr self) {
   SEXP_FSM_CHECK_INSTANCE(self);
   return self->vars_set;
 }
 
-void SexpFsm_apply_synchronous_product(SexpFsm_ptr self, SexpFsm_ptr other)
-{
+void SexpFsm_apply_synchronous_product(SexpFsm_ptr self, SexpFsm_ptr other) {
   Set_Iterator_t iter;
   node_ptr var;
   VarFsm_ptr fsm_self;
@@ -375,8 +350,7 @@ void SexpFsm_apply_synchronous_product(SexpFsm_ptr self, SexpFsm_ptr other)
 
   /* Merge const_var_fsm */
   fsm_self = self->const_var_fsm;
-  self->const_var_fsm = var_fsm_synchronous_product(self,
-                                                    self->const_var_fsm,
+  self->const_var_fsm = var_fsm_synchronous_product(self, self->const_var_fsm,
                                                     other->const_var_fsm);
   var_fsm_destroy(self, fsm_self);
 
@@ -407,13 +381,12 @@ void SexpFsm_apply_synchronous_product(SexpFsm_ptr self, SexpFsm_ptr other)
   if (*(self->family_counter) > 1) {
     *(self->family_counter) -= 1;
     self->family_counter = ALLOC(int, 1);
-    nusmv_assert(self->family_counter != (int*) NULL);
+    nusmv_assert(self->family_counter != (int *)NULL);
     *(self->family_counter) = 1;
   }
 }
 
-boolean SexpFsm_is_syntactically_universal(SexpFsm_ptr self)
-{
+boolean SexpFsm_is_syntactically_universal(SexpFsm_ptr self) {
   NuSMVEnv_ptr env;
   ExprMgr_ptr exprs;
   Expr_ptr init, invar, trans, input, justice, compassion;
@@ -450,34 +423,30 @@ boolean SexpFsm_is_syntactically_universal(SexpFsm_ptr self)
   return true;
 }
 
-void SexpFsm_self_check(const SexpFsm_ptr self)
-{
+void SexpFsm_self_check(const SexpFsm_ptr self) {
   FlatHierarchy_self_check(self->hierarchy);
 
   if (!Set_Contains(self->vars_set, FlatHierarchy_get_vars(self->hierarchy))) {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->st));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
     ErrorMgr_internal_error(errmgr, "SexpFsm failed self-check.");
   }
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Static function definitions                                               */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void sexp_fsm_init(SexpFsm_ptr self,
-                   const FlatHierarchy_ptr hierarchy, const Set_t vars_set)
-{
+void sexp_fsm_init(SexpFsm_ptr self, const FlatHierarchy_ptr hierarchy,
+                   const Set_t vars_set) {
   const NuSMVEnv_ptr env = FlatHierarchy_get_environment(hierarchy);
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   /* -------------------------------------------------------------------- */
@@ -500,7 +469,7 @@ void sexp_fsm_init(SexpFsm_ptr self,
   self->const_var_fsm = VAR_FSM(NULL);
 
   self->family_counter = ALLOC(int, 1);
-  nusmv_assert(self->family_counter != (int*) NULL);
+  nusmv_assert(self->family_counter != (int *)NULL);
   *(self->family_counter) = 1; /* this is adam for this family */
 
   /* -------------------------------------------------------------------- */
@@ -517,38 +486,45 @@ void sexp_fsm_init(SexpFsm_ptr self,
     sexp_fsm_const_var_fsm_init(self, hash);
 
     /* init */
-    FlatHierarchy_set_init(self->hierarchy,
-                           sexp_fsm_simplify_expr(self, hash,
-                                                  FlatHierarchy_get_init(self->hierarchy), INIT));
+    FlatHierarchy_set_init(
+        self->hierarchy,
+        sexp_fsm_simplify_expr(self, hash,
+                               FlatHierarchy_get_init(self->hierarchy), INIT));
 
     /* invar */
-    FlatHierarchy_set_invar(self->hierarchy,
-                            sexp_fsm_simplify_expr(self, hash,
-                                                   FlatHierarchy_get_invar(self->hierarchy), INVAR));
+    FlatHierarchy_set_invar(
+        self->hierarchy,
+        sexp_fsm_simplify_expr(
+            self, hash, FlatHierarchy_get_invar(self->hierarchy), INVAR));
 
     /* trans */
-    FlatHierarchy_set_trans(self->hierarchy,
-                            sexp_fsm_simplify_expr(self, hash,
-                                                   FlatHierarchy_get_trans(self->hierarchy), TRANS));
+    FlatHierarchy_set_trans(
+        self->hierarchy,
+        sexp_fsm_simplify_expr(
+            self, hash, FlatHierarchy_get_trans(self->hierarchy), TRANS));
 
     /* now integrates information coming from the variables FSMs
        (assign and constraints) and the constant FSM */
     /* [MR]: Here we do side effect on the hierarchy stored within the SexpFSM
        as to provide */
-    /* [MR]: Sexp_get_init/invar/trans to return the whole FSM with exprs and assings */
+    /* [MR]: Sexp_get_init/invar/trans to return the whole FSM with exprs and
+     * assings */
 
     /* inits */
-    FlatHierarchy_set_init(self->hierarchy,
-                           ExprMgr_and_nil(exprs, FlatHierarchy_get_init(self->hierarchy),
-                                           var_fsm_get_init(self, self->const_var_fsm)));
+    FlatHierarchy_set_init(
+        self->hierarchy,
+        ExprMgr_and_nil(exprs, FlatHierarchy_get_init(self->hierarchy),
+                        var_fsm_get_init(self, self->const_var_fsm)));
     /* invars */
-    FlatHierarchy_set_invar(self->hierarchy,
-                            ExprMgr_and_nil(exprs, FlatHierarchy_get_invar(self->hierarchy),
-                                            var_fsm_get_invar(self, self->const_var_fsm)));
+    FlatHierarchy_set_invar(
+        self->hierarchy,
+        ExprMgr_and_nil(exprs, FlatHierarchy_get_invar(self->hierarchy),
+                        var_fsm_get_invar(self, self->const_var_fsm)));
     /* next */
-    FlatHierarchy_set_trans(self->hierarchy,
-                            ExprMgr_and_nil(exprs, FlatHierarchy_get_trans(self->hierarchy),
-                                            var_fsm_get_next(self, self->const_var_fsm)));
+    FlatHierarchy_set_trans(
+        self->hierarchy,
+        ExprMgr_and_nil(exprs, FlatHierarchy_get_trans(self->hierarchy),
+                        var_fsm_get_next(self, self->const_var_fsm)));
 
     SET_FOREACH(self->vars_set, iter) {
       node_ptr var = Set_GetMember(self->vars_set, iter);
@@ -559,19 +535,22 @@ void sexp_fsm_init(SexpFsm_ptr self,
 
         /* inits */
         tmp = var_fsm_get_init(self, varfsm);
-        FlatHierarchy_set_init(self->hierarchy,
-                ExprMgr_and_nil(exprs, FlatHierarchy_get_init(self->hierarchy),
-                             tmp));
+        FlatHierarchy_set_init(
+            self->hierarchy,
+            ExprMgr_and_nil(exprs, FlatHierarchy_get_init(self->hierarchy),
+                            tmp));
         /* invars */
         tmp = var_fsm_get_invar(self, varfsm);
-        FlatHierarchy_set_invar(self->hierarchy,
-                      ExprMgr_and_nil(exprs, FlatHierarchy_get_invar(self->hierarchy),
-                                   tmp));
+        FlatHierarchy_set_invar(
+            self->hierarchy,
+            ExprMgr_and_nil(exprs, FlatHierarchy_get_invar(self->hierarchy),
+                            tmp));
         /* next */
         tmp = var_fsm_get_next(self, varfsm);
-        FlatHierarchy_set_trans(self->hierarchy,
-                      ExprMgr_and_nil(exprs, FlatHierarchy_get_trans(self->hierarchy),
-                                   tmp));
+        FlatHierarchy_set_trans(
+            self->hierarchy,
+            ExprMgr_and_nil(exprs, FlatHierarchy_get_trans(self->hierarchy),
+                            tmp));
       }
     } /* loop over vars */
 
@@ -608,8 +587,9 @@ void sexp_fsm_init(SexpFsm_ptr self,
     /* Re-learn invariant equivalences */
     /* TODO[MD] Probably it should be better to check the ret val */
     (void)SexpInliner_force_equivalences(inliner,
-                                   InlineRes_get_equivalences(invar_res));
-    (void)SexpInliner_force_invariants(inliner, InlineRes_get_invariants(invar_res));
+                                         InlineRes_get_equivalences(invar_res));
+    (void)SexpInliner_force_invariants(inliner,
+                                       InlineRes_get_invariants(invar_res));
 
     /* Inline trans (with re-learned invariants) */
     trans_res = SexpInliner_inline(inliner, trans, NULL);
@@ -635,8 +615,7 @@ void sexp_fsm_init(SexpFsm_ptr self,
   OVERRIDE(Object, copy) = sexp_fsm_copy;
 }
 
-void sexp_fsm_deinit(SexpFsm_ptr self)
-{
+void sexp_fsm_deinit(SexpFsm_ptr self) {
   nusmv_assert(*(self->family_counter) > 0);
   *(self->family_counter) -= 1; /* self de-ref */
 
@@ -650,7 +629,7 @@ void sexp_fsm_deinit(SexpFsm_ptr self)
 
   if (*(self->family_counter) == 0) {
     FREE(self->family_counter);
-    self->family_counter = (int*) NULL;
+    self->family_counter = (int *)NULL;
   }
 
   if (NODE_LIST(NULL) != self->symbols) {
@@ -659,23 +638,22 @@ void sexp_fsm_deinit(SexpFsm_ptr self)
   }
 }
 
-void sexp_fsm_copy_aux(const SexpFsm_ptr self, SexpFsm_ptr copy)
-{
+void sexp_fsm_copy_aux(const SexpFsm_ptr self, SexpFsm_ptr copy) {
   /* copies the base class: */
   object_copy_aux(OBJECT(self), OBJECT(copy));
 
   /* copies private members */
   copy->st = self->st;
-  copy->vars_set   = Set_Copy(self->vars_set);
-  copy->symbols    = NODE_LIST(NULL);
+  copy->vars_set = Set_Copy(self->vars_set);
+  copy->symbols = NODE_LIST(NULL);
   copy->hierarchy = FlatHierarchy_copy(self->hierarchy);
 
   /* This could be a bug, see issue 4479 */
   copy->hash_var_fsm = copy_assoc(self->hash_var_fsm);
-  copy->const_var_fsm = var_fsm_create(self,
-                                       var_fsm_get_init(self, self->const_var_fsm),
-                                       var_fsm_get_invar(self, self->const_var_fsm),
-                                       var_fsm_get_next(self, self->const_var_fsm));
+  copy->const_var_fsm =
+      var_fsm_create(self, var_fsm_get_init(self, self->const_var_fsm),
+                     var_fsm_get_invar(self, self->const_var_fsm),
+                     var_fsm_get_next(self, self->const_var_fsm));
 
   copy->inlining = self->inlining;
   copy->is_boolean = self->is_boolean;
@@ -687,8 +665,6 @@ void sexp_fsm_copy_aux(const SexpFsm_ptr self, SexpFsm_ptr copy)
   /* copies local virtual methods */
 }
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -698,8 +674,7 @@ void sexp_fsm_copy_aux(const SexpFsm_ptr self, SexpFsm_ptr copy)
 
 
 */
-static Object_ptr sexp_fsm_copy(const Object_ptr object)
-{
+static Object_ptr sexp_fsm_copy(const Object_ptr object) {
   SexpFsm_ptr self = SEXP_FSM(object);
   SexpFsm_ptr copy;
 
@@ -717,8 +692,7 @@ static Object_ptr sexp_fsm_copy(const Object_ptr object)
 
   Called by the class destructor
 */
-static void sexp_fsm_finalize(Object_ptr object, void* dummy)
-{
+static void sexp_fsm_finalize(Object_ptr object, void *dummy) {
   SexpFsm_ptr self = SEXP_FSM(object);
 
   sexp_fsm_deinit(self);
@@ -732,18 +706,15 @@ static void sexp_fsm_finalize(Object_ptr object, void* dummy)
                  sexp_fsm_simplify_expr. For this reason a
                  simplification hash is required as input
 */
-static void sexp_fsm_const_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash)
-{
-  NuSMVEnv_ptr env =
-      EnvObject_get_environment(ENV_OBJECT(self->st));
-  ExprMgr_ptr exprs =
-      EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+static void sexp_fsm_const_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash) {
+  NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->st));
+  ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   node_ptr invar_const =
-    FlatHierarchy_lookup_constant_constrains(self->hierarchy, INVAR);
+      FlatHierarchy_lookup_constant_constrains(self->hierarchy, INVAR);
   node_ptr trans_const =
-    FlatHierarchy_lookup_constant_constrains(self->hierarchy, TRANS);
+      FlatHierarchy_lookup_constant_constrains(self->hierarchy, TRANS);
   node_ptr init_const =
-    FlatHierarchy_lookup_constant_constrains(self->hierarchy, INIT);
+      FlatHierarchy_lookup_constant_constrains(self->hierarchy, INIT);
 
   if (invar_const == Nil)
     invar_const = ExprMgr_true(exprs);
@@ -767,14 +738,12 @@ static void sexp_fsm_const_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash)
                  sexp_fsm_simplify_expr. For this reason a
                  simplification hash is required as input
 */
-static void sexp_fsm_hash_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash)
-{
+static void sexp_fsm_hash_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash) {
   Set_Iterator_t iter;
   SymbTable_ptr symb_table = SexpFsm_get_symb_table(self);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(symb_table));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   SET_FOREACH(self->vars_set, iter) {
     int saved_yylineno = nusmv_yylineno;
@@ -785,50 +754,52 @@ static void sexp_fsm_hash_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash)
     node_ptr var_name_i = find_node(nodemgr, SMALLINIT, var_name, Nil);
     node_ptr var_name_n = ExprMgr_next(exprs, var_name, symb_table);
 
-    node_ptr init_a =
-      FlatHierarchy_lookup_assign(self->hierarchy, var_name_i);
+    node_ptr init_a = FlatHierarchy_lookup_assign(self->hierarchy, var_name_i);
 
-    node_ptr invar_a =
-      FlatHierarchy_lookup_assign(self->hierarchy, var_name);
+    node_ptr invar_a = FlatHierarchy_lookup_assign(self->hierarchy, var_name);
 
-    node_ptr next_a =
-      FlatHierarchy_lookup_assign(self->hierarchy, var_name_n);
+    node_ptr next_a = FlatHierarchy_lookup_assign(self->hierarchy, var_name_n);
 
     node_ptr init_c =
-      FlatHierarchy_lookup_constrains(self->hierarchy, var_name_i);
+        FlatHierarchy_lookup_constrains(self->hierarchy, var_name_i);
 
     node_ptr invar_c =
-      FlatHierarchy_lookup_constrains(self->hierarchy, var_name);
+        FlatHierarchy_lookup_constrains(self->hierarchy, var_name);
 
     node_ptr next_c =
-      FlatHierarchy_lookup_constrains(self->hierarchy, var_name_n);
+        FlatHierarchy_lookup_constrains(self->hierarchy, var_name_n);
 
-    Expr_ptr init_sexp  = ExprMgr_true(exprs);
+    Expr_ptr init_sexp = ExprMgr_true(exprs);
     Expr_ptr invar_sexp = ExprMgr_true(exprs);
     Expr_ptr trans_sexp = ExprMgr_true(exprs);
 
     /* add all the constrains */
-    if (Nil != init_c) init_sexp = ExprMgr_and(exprs, init_sexp, EXPR(init_c));
-    if (Nil != invar_c) invar_sexp = ExprMgr_and(exprs, invar_sexp, EXPR(invar_c));
-    if (Nil != next_c)  trans_sexp = ExprMgr_and(exprs, trans_sexp, EXPR(next_c));
+    if (Nil != init_c)
+      init_sexp = ExprMgr_and(exprs, init_sexp, EXPR(init_c));
+    if (Nil != invar_c)
+      invar_sexp = ExprMgr_and(exprs, invar_sexp, EXPR(invar_c));
+    if (Nil != next_c)
+      trans_sexp = ExprMgr_and(exprs, trans_sexp, EXPR(next_c));
 
     /* add all assignments */
     if (Nil != init_a) {
       nusmv_yylineno = init_a->lineno;
-      init_sexp = ExprMgr_and(exprs, init_sexp,
-                           EXPR(find_node(nodemgr, EQDEF, var_name_i, init_a)));
+      init_sexp =
+          ExprMgr_and(exprs, init_sexp,
+                      EXPR(find_node(nodemgr, EQDEF, var_name_i, init_a)));
     }
 
     if (Nil != invar_a) {
       nusmv_yylineno = invar_a->lineno;
-      invar_sexp = ExprMgr_and(exprs, invar_sexp,
-                            EXPR(new_node(nodemgr, EQDEF, var_name, invar_a)));
+      invar_sexp = ExprMgr_and(
+          exprs, invar_sexp, EXPR(new_node(nodemgr, EQDEF, var_name, invar_a)));
     }
 
     if (Nil != next_a) {
       nusmv_yylineno = next_a->lineno;
-      trans_sexp = ExprMgr_and(exprs, trans_sexp,
-                            EXPR(new_node(nodemgr, EQDEF, var_name_n, next_a)));
+      trans_sexp =
+          ExprMgr_and(exprs, trans_sexp,
+                      EXPR(new_node(nodemgr, EQDEF, var_name_n, next_a)));
     }
 
     /* simplification */
@@ -837,8 +808,7 @@ static void sexp_fsm_hash_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash)
     trans_sexp = sexp_fsm_simplify_expr(self, simp_hash, trans_sexp, TRANS);
 
     /* inserts the var fsm inside the hash table */
-    var_fsm = var_fsm_create(self,
-                             init_sexp, invar_sexp, trans_sexp);
+    var_fsm = var_fsm_create(self, init_sexp, invar_sexp, trans_sexp);
     sexp_fsm_hash_var_fsm_insert_var(self, var_name, var_fsm);
 
     nusmv_yylineno = saved_yylineno;
@@ -850,28 +820,24 @@ static void sexp_fsm_hash_var_fsm_init(SexpFsm_ptr self, hash_ptr simp_hash)
 
   group identifies INVAR, TRANS or INIT group.
 */
-static Expr_ptr
-sexp_fsm_simplify_expr(SexpFsm_ptr self, hash_ptr hash, Expr_ptr expr,
-                       const int group)
-{
+static Expr_ptr sexp_fsm_simplify_expr(SexpFsm_ptr self, hash_ptr hash,
+                                       Expr_ptr expr, const int group) {
   Expr_ptr result;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->st));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   if ((expr == EXPR(NULL)) || simplifier_hash_query_expr(hash, expr, group)) {
     result = ExprMgr_true(exprs);
-  }
-  else {
+  } else {
     switch (node_get_type(NODE_PTR(expr))) {
-    case AND:
-      {
-        Expr_ptr left = sexp_fsm_simplify_expr(self, hash, car(NODE_PTR(expr)),
-                                               group);
-        Expr_ptr right = sexp_fsm_simplify_expr(self, hash, cdr(NODE_PTR(expr)),
-                                                group);
-        result = ExprMgr_and(exprs, left, right);
-        break;
-      }
+    case AND: {
+      Expr_ptr left =
+          sexp_fsm_simplify_expr(self, hash, car(NODE_PTR(expr)), group);
+      Expr_ptr right =
+          sexp_fsm_simplify_expr(self, hash, cdr(NODE_PTR(expr)), group);
+      result = ExprMgr_and(exprs, left, right);
+      break;
+    }
 
     default:
       result = expr;
@@ -888,12 +854,11 @@ sexp_fsm_simplify_expr(SexpFsm_ptr self, hash_ptr hash, Expr_ptr expr,
 
 
 */
-static hash_ptr simplifier_hash_create()
-{
+static hash_ptr simplifier_hash_create() {
   hash_ptr result;
 
   result = st_init_table(st_ptrcmp, st_ptrhash);
-  nusmv_assert(result != ((hash_ptr) NULL));
+  nusmv_assert(result != ((hash_ptr)NULL));
 
   return result;
 }
@@ -903,9 +868,8 @@ static hash_ptr simplifier_hash_create()
 
 
 */
-static void simplifier_hash_destroy(hash_ptr hash)
-{
-  nusmv_assert(hash != (hash_ptr) NULL);
+static void simplifier_hash_destroy(hash_ptr hash) {
+  nusmv_assert(hash != (hash_ptr)NULL);
   st_free_table(hash);
 }
 
@@ -916,12 +880,11 @@ static void simplifier_hash_destroy(hash_ptr hash)
 
   \se The hash can change
 */
-static void
-simplifier_hash_add_expr(hash_ptr hash, Expr_ptr expr, const int group)
-{
+static void simplifier_hash_add_expr(hash_ptr hash, Expr_ptr expr,
+                                     const int group) {
   int res;
 
-  res = st_add_direct(hash, (char*) expr, PTR_FROM_INT(char*, group));
+  res = st_add_direct(hash, (char *)expr, PTR_FROM_INT(char *, group));
   nusmv_assert(res != ST_OUT_OF_MEM);
 }
 
@@ -931,20 +894,18 @@ simplifier_hash_add_expr(hash_ptr hash, Expr_ptr expr, const int group)
 
 
 */
-static boolean
-simplifier_hash_query_expr(hash_ptr hash, Expr_ptr expr,
-                           const int group)
-{
+static boolean simplifier_hash_query_expr(hash_ptr hash, Expr_ptr expr,
+                                          const int group) {
   nusmv_ptrint hashed_group;
   boolean result;
 
-  result = st_lookup(hash, (char*) expr, (char**) &hashed_group);
+  result = st_lookup(hash, (char *)expr, (char **)&hashed_group);
 
   /* groups are checked consecutively, i.e. at first, *all* INIT expressions
      are checked, then *all* INVAR, and then *all* TRANS. So hash_group
      will not interfere with each other
   */
-  return (result && ((int) hashed_group == group));
+  return (result && ((int)hashed_group == group));
 }
 
 /*!
@@ -952,14 +913,12 @@ simplifier_hash_query_expr(hash_ptr hash, Expr_ptr expr,
 
   Private method, used internally
 */
-static void sexp_fsm_hash_var_fsm_destroy(SexpFsm_ptr self)
-{
-  nusmv_assert(self->hash_var_fsm != (hash_ptr) NULL);
+static void sexp_fsm_hash_var_fsm_destroy(SexpFsm_ptr self) {
+  nusmv_assert(self->hash_var_fsm != (hash_ptr)NULL);
 
   if (*(self->family_counter) == 0) {
-    clear_assoc_and_free_entries_arg(self->hash_var_fsm,
-                                     sexp_fsm_callback_var_fsm_free,
-                                     (char*)self);
+    clear_assoc_and_free_entries_arg(
+        self->hash_var_fsm, sexp_fsm_callback_var_fsm_free, (char *)self);
   }
   free_assoc(self->hash_var_fsm);
 }
@@ -970,9 +929,8 @@ static void sexp_fsm_hash_var_fsm_destroy(SexpFsm_ptr self)
 
 
 */
-static assoc_retval sexp_fsm_callback_var_fsm_free(char *key,
-                                                   char *data, char * arg)
-{
+static assoc_retval sexp_fsm_callback_var_fsm_free(char *key, char *data,
+                                                   char *arg) {
   VarFsm_ptr varfsm = VAR_FSM(data);
   SexpFsm_ptr self = SEXP_FSM(arg);
 
@@ -986,12 +944,11 @@ static assoc_retval sexp_fsm_callback_var_fsm_free(char *key,
 
 
 */
-static VarFsm_ptr
-sexp_fsm_hash_var_fsm_lookup_var(SexpFsm_ptr self, node_ptr var)
-{
-  nusmv_assert(self->hash_var_fsm != (hash_ptr) NULL);
+static VarFsm_ptr sexp_fsm_hash_var_fsm_lookup_var(SexpFsm_ptr self,
+                                                   node_ptr var) {
+  nusmv_assert(self->hash_var_fsm != (hash_ptr)NULL);
 
-  return VAR_FSM( find_assoc(self->hash_var_fsm, var) );
+  return VAR_FSM(find_assoc(self->hash_var_fsm, var));
 }
 
 /*!
@@ -999,11 +956,9 @@ sexp_fsm_hash_var_fsm_lookup_var(SexpFsm_ptr self, node_ptr var)
 
 
 */
-static void
-sexp_fsm_hash_var_fsm_insert_var(SexpFsm_ptr self,
-                                 node_ptr var, VarFsm_ptr varfsm)
-{
-  nusmv_assert(self->hash_var_fsm != (hash_ptr) NULL);
+static void sexp_fsm_hash_var_fsm_insert_var(SexpFsm_ptr self, node_ptr var,
+                                             VarFsm_ptr varfsm) {
+  nusmv_assert(self->hash_var_fsm != (hash_ptr)NULL);
 
   insert_assoc(self->hash_var_fsm, var, varfsm);
 }
@@ -1013,17 +968,13 @@ sexp_fsm_hash_var_fsm_insert_var(SexpFsm_ptr self,
 
 
 */
-static VarFsm_ptr var_fsm_create(SexpFsm_ptr self,
-                                 Expr_ptr init,
-                                 Expr_ptr invar,
-                                 Expr_ptr next)
-{
+static VarFsm_ptr var_fsm_create(SexpFsm_ptr self, Expr_ptr init,
+                                 Expr_ptr invar, Expr_ptr next) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->st));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  return VAR_FSM( cons(nodemgr, NODE_PTR(init),
-                       cons(nodemgr, NODE_PTR(invar), NODE_PTR(next))) );
+  return VAR_FSM(cons(nodemgr, NODE_PTR(init),
+                      cons(nodemgr, NODE_PTR(invar), NODE_PTR(next))));
 }
 
 /*!
@@ -1032,12 +983,9 @@ static VarFsm_ptr var_fsm_create(SexpFsm_ptr self,
 
 
 */
-static void var_fsm_destroy(SexpFsm_ptr self,
-                            VarFsm_ptr vfsm)
-{
+static void var_fsm_destroy(SexpFsm_ptr self, VarFsm_ptr vfsm) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->st));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr node = NODE_PTR(vfsm);
 
@@ -1050,9 +998,8 @@ static void var_fsm_destroy(SexpFsm_ptr self,
 
 
 */
-static Expr_ptr var_fsm_get_init(SexpFsm_ptr self, VarFsm_ptr vf)
-{
-  return EXPR( car(NODE_PTR(vf)) );
+static Expr_ptr var_fsm_get_init(SexpFsm_ptr self, VarFsm_ptr vf) {
+  return EXPR(car(NODE_PTR(vf)));
 }
 
 /*!
@@ -1060,9 +1007,8 @@ static Expr_ptr var_fsm_get_init(SexpFsm_ptr self, VarFsm_ptr vf)
 
 
 */
-static Expr_ptr var_fsm_get_invar(SexpFsm_ptr self, VarFsm_ptr vf)
-{
-  return EXPR( car(cdr(NODE_PTR(vf))) );
+static Expr_ptr var_fsm_get_invar(SexpFsm_ptr self, VarFsm_ptr vf) {
+  return EXPR(car(cdr(NODE_PTR(vf))));
 }
 
 /*!
@@ -1070,9 +1016,8 @@ static Expr_ptr var_fsm_get_invar(SexpFsm_ptr self, VarFsm_ptr vf)
 
 
 */
-static Expr_ptr var_fsm_get_next(SexpFsm_ptr self, VarFsm_ptr vf)
-{
-  return EXPR( cdr(cdr(NODE_PTR(vf))) );
+static Expr_ptr var_fsm_get_next(SexpFsm_ptr self, VarFsm_ptr vf) {
+  return EXPR(cdr(cdr(NODE_PTR(vf))));
 }
 
 /*!
@@ -1080,8 +1025,7 @@ static Expr_ptr var_fsm_get_next(SexpFsm_ptr self, VarFsm_ptr vf)
 
 
 */
-static Expr_ptr var_fsm_get_input(SexpFsm_ptr self, VarFsm_ptr vf)
-{
+static Expr_ptr var_fsm_get_input(SexpFsm_ptr self, VarFsm_ptr vf) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->st));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
@@ -1097,10 +1041,8 @@ static Expr_ptr var_fsm_get_input(SexpFsm_ptr self, VarFsm_ptr vf)
   Any argument can be Nil. When both are Nil the product
   has all arguments true.
 */
-static VarFsm_ptr var_fsm_synchronous_product(SexpFsm_ptr self,
-                                              VarFsm_ptr fsm1,
-                                              VarFsm_ptr fsm2)
-{
+static VarFsm_ptr var_fsm_synchronous_product(SexpFsm_ptr self, VarFsm_ptr fsm1,
+                                              VarFsm_ptr fsm2) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->st));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   VarFsm_ptr prod;
@@ -1121,18 +1063,18 @@ static VarFsm_ptr var_fsm_synchronous_product(SexpFsm_ptr self,
     prod_invar = var_fsm_get_invar(self, fsm1);
     prod_next = var_fsm_get_next(self, fsm1);
   } else {
-    prod_init = NODE_PTR(ExprMgr_and_nil(exprs, EXPR(var_fsm_get_init(self, fsm1)),
-                                      EXPR(var_fsm_get_init(self, fsm2))));
-    prod_invar = NODE_PTR(ExprMgr_and_nil(exprs, EXPR(var_fsm_get_invar(self, fsm1)),
-                                       EXPR(var_fsm_get_invar(self, fsm2))));
-    prod_next = NODE_PTR(ExprMgr_and_nil(exprs, EXPR(var_fsm_get_next(self, fsm1)),
-                                      EXPR(var_fsm_get_next(self, fsm2))));
+    prod_init =
+        NODE_PTR(ExprMgr_and_nil(exprs, EXPR(var_fsm_get_init(self, fsm1)),
+                                 EXPR(var_fsm_get_init(self, fsm2))));
+    prod_invar =
+        NODE_PTR(ExprMgr_and_nil(exprs, EXPR(var_fsm_get_invar(self, fsm1)),
+                                 EXPR(var_fsm_get_invar(self, fsm2))));
+    prod_next =
+        NODE_PTR(ExprMgr_and_nil(exprs, EXPR(var_fsm_get_next(self, fsm1)),
+                                 EXPR(var_fsm_get_next(self, fsm2))));
   }
 
-  prod = var_fsm_create(self,
-                        prod_init,
-                        prod_invar,
-                        prod_next);
+  prod = var_fsm_create(self, prod_init, prod_invar, prod_next);
   nusmv_assert(NULL != prod);
 
   return prod;

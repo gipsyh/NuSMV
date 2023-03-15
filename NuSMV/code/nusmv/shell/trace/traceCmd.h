@@ -3,7 +3,7 @@
 
   This file is part of the ``trace'' package.
   %COPYRIGHT%
-  
+
 
 -----------------------------------------------------------------------------*/
 
@@ -15,7 +15,6 @@
 
 */
 
-
 #ifndef __NUSMV_SHELL_TRACE_TRACE_CMD_H__
 #define __NUSMV_SHELL_TRACE_TRACE_CMD_H__
 
@@ -24,26 +23,21 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -68,8 +62,8 @@ void traceCmd_init(NuSMVEnv_ptr env);
    Shows the traces currently stored in system memory, if
   any. By default it shows the last generated trace, if any. A trace number
   can be specified optionally followed by a slice denoting the steps top be
-  shown. Negative numbers can be used to denote steps in a right-to-left fashion.
-  (i.e. -1 denotes last step, -2 is the previous and so forth.)
+  shown. Negative numbers can be used to denote steps in a right-to-left
+  fashion. (i.e. -1 denotes last step, -2 is the previous and so forth.)
 
   <p> Command Options:<p>
   <dl>
@@ -99,15 +93,15 @@ void traceCmd_init(NuSMVEnv_ptr env);
       <dd> Denotes left end of the trace slice to be printed.
     <dt> <tt>to_state</tt>
      <dd> Denotes right end of the trace slice to be printed.
-  </dl> 
+  </dl>
 
   \sa pick_state goto_state simulate
 */
-int CommandShowTraces(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandShowTraces(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
-  \command{show_plugins} Lists out all the available plugins inside the system. In
-  addition, it prints [D] in front of the default plugin.
+  \command{show_plugins} Lists out all the available plugins inside the system.
+In addition, it prints [D] in front of the default plugin.
 
   \command_args{[ [-h] [-n plugin_index| -a]]
 
@@ -124,10 +118,11 @@ int CommandShowTraces(NuSMVEnv_ptr env, int argc, char** argv);
        <dd> Prints all the available plugins with their description.
   </dl> ]
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 }
 
-  
+
   Sets the default plugin to print traces.
   <p> Command Options:<p>
   <dl>
@@ -138,16 +133,16 @@ int CommandShowTraces(NuSMVEnv_ptr env, int argc, char** argv);
        only.
     <dt> <tt>-a</tt>
        <dd> Prints all the available plugins with their description.
-  </dl> 
+  </dl>
 */
-int CommandShowPlugins(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandShowPlugins(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{read_trace} Reads the trace from the specified file into the memory
 
   \command_args{ [-h] | [-i filename] | [-u] [-s] filename}
 
-  
+
   Reads a trace from a specified XML file into the memory.
   <p>
   Command Options:<p>
@@ -163,11 +158,11 @@ int CommandShowPlugins(NuSMVEnv_ptr env, int argc, char** argv);
     <dt> <tt>filename</tt>
        <dd> Specifies the name of the xml trace file to read
     </dl>
-    
+
 
   \sa show_traces
 */
-int CommandReadTrace(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandReadTrace(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{execute_traces} Executes complete traces on the model FSM
@@ -196,11 +191,11 @@ int CommandReadTrace(NuSMVEnv_ptr env, int argc, char** argv);
        <dd> Selects an executor for trace re-execution.
     <dt> <tt>trace_number</tt>
        <dd> The (ordinal) identifier number of the trace to be printed.
-  </dl> 
+  </dl>
 
   \sa CommandExecutePartialTraces
 */
-int CommandExecuteTraces(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandExecuteTraces(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{execute_partial_traces} Executes partial traces on the model FSM
@@ -234,23 +229,23 @@ int CommandExecuteTraces(NuSMVEnv_ptr env, int argc, char** argv);
        'sat'.
     <dt> <tt>trace_number</tt>
        <dd> The (ordinal) identifier number of the trace to be printed.
-  </dl> 
+  </dl>
 
   \sa CommandExecuteTraces
 */
-int CommandExecutePartialTraces(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandExecutePartialTraces(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
-  \brief Parse and checks whether the argument 's' contains valid 
-   types for trace number and state number/slices 'from' and 'to'. 
+  \brief Parse and checks whether the argument 's' contains valid
+   types for trace number and state number/slices 'from' and 'to'.
 
-   Return 0 iff the parse and checks of the argument 's' 
-   (format trace.from:to) contains valid  types (integer) for 
+   Return 0 iff the parse and checks of the argument 's'
+   (format trace.from:to) contains valid  types (integer) for
    trace number and state number/slices 'from' and 'to'. Moreover,
    the values for 'trace', 'from', and 'to' are assigned.
 */
-int traceCmd_parse_slice(const NuSMVEnv_ptr env, const char* s,
-                         int* trace, int* from, int* to);
+int traceCmd_parse_slice(const NuSMVEnv_ptr env, const char *s, int *trace,
+                         int *from, int *to);
 
 /**AutomaticEnd***************************************************************/
 

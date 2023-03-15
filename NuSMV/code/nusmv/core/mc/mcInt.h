@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,19 +34,18 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_MC_MC_INT_H__
 #define __NUSMV_CORE_MC_MC_INT_H__
 
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/dd/dd.h"
+#include "nusmv/core/fsm/FsmBuilder.h"
+#include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/opt/opt.h"
-#include "nusmv/core/compile/compile.h"
-#include "nusmv/core/fsm/bdd/BddFsm.h"
-#include "nusmv/core/fsm/FsmBuilder.h"
-#include "nusmv/core/trace/TraceMgr.h"
 #include "nusmv/core/trace/Trace.h"
+#include "nusmv/core/trace/TraceMgr.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -102,24 +101,22 @@ node_ptr ex_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr);
    to minterm.
 
    If a witness is not found then Nil is return and nothing is modified.
-   
+
 
   \sa explain
 */
-node_ptr eu_explain(BddFsm_ptr, BddEnc_ptr,
-                           node_ptr, bdd_ptr, bdd_ptr);
+node_ptr eu_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief This function finds a path that is a witness
-   for <i>E\[f U g\]</i> when g is a set of  state-inputs 
+   for <i>E\[f U g\]</i> when g is a set of  state-inputs
 
-  
+
 
   \sa explain
 */
-node_ptr eu_si_explain(BddFsm_ptr fsm, BddEnc_ptr enc,
-                              node_ptr path, bdd_ptr f, bdd_ptr g_si,
-                              bdd_ptr hulk);
+node_ptr eu_si_explain(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path, bdd_ptr f,
+                       bdd_ptr g_si, bdd_ptr hulk);
 
 /*!
   \brief Set of states satisfying <i>EG(g)</i>.
@@ -134,14 +131,14 @@ BddStatesInputs ex_si(BddFsm_ptr fsm, bdd_ptr si);
   \brief Computes the set of state-input pairs that satisfy
   E(f U g), with f and g sets of state-input pairs.
 
-  
+
 */
 BddStatesInputs eu_si(BddFsm_ptr fsm, bdd_ptr f, bdd_ptr g);
 
 /*!
   \brief Set of states-inputs satisfying <i>EG(g)</i>.
 
-  
+
 
   \sa eu ex
 */
@@ -162,9 +159,8 @@ BddStatesInputs eg_si(BddFsm_ptr fsm, bdd_ptr g_si);
 
   \sa explain
 */
-node_ptr
-ebu_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr,
-            bdd_ptr, int, int);
+node_ptr ebu_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, bdd_ptr, int,
+                     int);
 
 /*!
   \brief This function finds a path that is an example
@@ -205,7 +201,6 @@ node_ptr eg_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr);
 
   \sa explain
 */
-node_ptr ebg_explain(BddFsm_ptr, BddEnc_ptr, node_ptr,
-                            bdd_ptr, int, int);
+node_ptr ebg_explain(BddFsm_ptr, BddEnc_ptr, node_ptr, bdd_ptr, int, int);
 
 #endif /* __NUSMV_CORE_MC_MC_INT_H__ */

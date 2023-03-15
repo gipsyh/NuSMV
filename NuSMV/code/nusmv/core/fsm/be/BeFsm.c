@@ -22,7 +22,7 @@
    or email to <nusmv-users@fbk.eu>.
    Please report bugs to <nusmv-users@fbk.eu>.
 
-   To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+   To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,7 +33,6 @@
   \todo: Missing description
 
 */
-
 
 #include "nusmv/core/fsm/be/BeFsm.h"
 
@@ -58,7 +57,6 @@ typedef struct BeFsm_TAG {
 
 } BeFsm;
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
@@ -77,8 +75,7 @@ typedef struct BeFsm_TAG {
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void be_fsm_init(BeFsm_ptr self,
-                        BeEnc_ptr be_enc, const be_ptr init,
+static void be_fsm_init(BeFsm_ptr self, BeEnc_ptr be_enc, const be_ptr init,
                         const be_ptr invar, const be_ptr trans,
                         const node_ptr list_of_be_fairness);
 
@@ -86,17 +83,14 @@ static void be_fsm_deinit(BeFsm_ptr self);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 BeFsm_ptr BeFsm_create_from_sexp_fsm(BeEnc_ptr be_enc,
-                                     const BoolSexpFsm_ptr bfsm)
-{
+                                     const BoolSexpFsm_ptr bfsm) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   BeFsm_ptr self;
   SexpFsm_ptr _bfsm = SEXP_FSM(bfsm);
@@ -104,11 +98,10 @@ BeFsm_ptr BeFsm_create_from_sexp_fsm(BeEnc_ptr be_enc,
 
   nusmv_assert(SexpFsm_is_boolean(_bfsm));
 
-  list_of_valid_fairness =
-    Bmc_CheckFairnessListForPropositionalFormulae(env, SexpFsm_get_justice(_bfsm));
+  list_of_valid_fairness = Bmc_CheckFairnessListForPropositionalFormulae(
+      env, SexpFsm_get_justice(_bfsm));
 
-  self = BeFsm_create(be_enc,
-                      Bmc_Conv_Bexp2Be(be_enc, SexpFsm_get_init(_bfsm)),
+  self = BeFsm_create(be_enc, Bmc_Conv_Bexp2Be(be_enc, SexpFsm_get_init(_bfsm)),
                       Bmc_Conv_Bexp2Be(be_enc, SexpFsm_get_invar(_bfsm)),
                       Bmc_Conv_Bexp2Be(be_enc, SexpFsm_get_trans(_bfsm)),
                       Bmc_Conv_BexpList2BeList(be_enc, list_of_valid_fairness));
@@ -117,12 +110,8 @@ BeFsm_ptr BeFsm_create_from_sexp_fsm(BeEnc_ptr be_enc,
   return self;
 }
 
-BeFsm_ptr BeFsm_create(BeEnc_ptr be_enc,
-                       const be_ptr init,
-                       const be_ptr invar,
-                       const be_ptr trans,
-                       const node_ptr list_of_be_fairness)
-{
+BeFsm_ptr BeFsm_create(BeEnc_ptr be_enc, const be_ptr init, const be_ptr invar,
+                       const be_ptr trans, const node_ptr list_of_be_fairness) {
   BeFsm_ptr self = ALLOC(BeFsm, 1);
   BE_FSM_CHECK_INSTANCE(self);
 
@@ -131,54 +120,44 @@ BeFsm_ptr BeFsm_create(BeEnc_ptr be_enc,
   return self;
 }
 
-void BeFsm_destroy(BeFsm_ptr self)
-{
+void BeFsm_destroy(BeFsm_ptr self) {
   BE_FSM_CHECK_INSTANCE(self);
 
   be_fsm_deinit(self);
   FREE(self);
 }
 
-BeFsm_ptr BeFsm_copy(BeFsm_ptr self)
-{
+BeFsm_ptr BeFsm_copy(BeFsm_ptr self) {
   BeFsm_ptr copy;
   BE_FSM_CHECK_INSTANCE(self);
 
   /* Necessary since the master in BE is built only after be_setup */
-  copy = BeFsm_create(self->be_enc,
-                      BeFsm_get_init(self),
-                      BeFsm_get_invar(self),
-                      BeFsm_get_trans(self),
-                      BeFsm_get_fairness_list(self));
+  copy = BeFsm_create(self->be_enc, BeFsm_get_init(self), BeFsm_get_invar(self),
+                      BeFsm_get_trans(self), BeFsm_get_fairness_list(self));
   return copy;
 }
 
-BeEnc_ptr BeFsm_get_be_encoding(const BeFsm_ptr self)
-{
+BeEnc_ptr BeFsm_get_be_encoding(const BeFsm_ptr self) {
   BE_FSM_CHECK_INSTANCE(self);
   return self->be_enc;
 }
 
-be_ptr BeFsm_get_init(const BeFsm_ptr self)
-{
+be_ptr BeFsm_get_init(const BeFsm_ptr self) {
   BE_FSM_CHECK_INSTANCE(self);
   return self->init;
 }
 
-be_ptr BeFsm_get_invar(const BeFsm_ptr self)
-{
+be_ptr BeFsm_get_invar(const BeFsm_ptr self) {
   BE_FSM_CHECK_INSTANCE(self);
   return self->invar;
 }
 
-be_ptr BeFsm_get_trans(const BeFsm_ptr self)
-{
+be_ptr BeFsm_get_trans(const BeFsm_ptr self) {
   BE_FSM_CHECK_INSTANCE(self);
   return self->trans;
 }
 
-node_ptr BeFsm_get_fairness_list(const BeFsm_ptr self)
-{
+node_ptr BeFsm_get_fairness_list(const BeFsm_ptr self) {
   BE_FSM_CHECK_INSTANCE(self);
   return self->fairness_list;
 }
@@ -219,15 +198,13 @@ void BeFsm_apply_synchronous_product(BeFsm_ptr self, const BeFsm_ptr other) {
 /*!
   \brief Private service to initialize the internal members
 
-  
+
 
   \se self will change internally
 */
-static void be_fsm_init(BeFsm_ptr self,
-                        BeEnc_ptr be_enc, const be_ptr init,
+static void be_fsm_init(BeFsm_ptr self, BeEnc_ptr be_enc, const be_ptr init,
                         const be_ptr invar, const be_ptr trans,
-                        const node_ptr list_of_be_fairness)
-{
+                        const node_ptr list_of_be_fairness) {
   self->be_enc = be_enc;
   self->init = init;
   self->invar = invar;
@@ -238,11 +215,6 @@ static void be_fsm_init(BeFsm_ptr self,
 /*!
   \brief Private service to deinitialize the internal members
 
-  
+
 */
-static void be_fsm_deinit(BeFsm_ptr self)
-{
-
-}
-
-
+static void be_fsm_deinit(BeFsm_ptr self) {}

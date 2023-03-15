@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -38,9 +38,9 @@
 #ifndef __NUSMV_CORE_UTILS_USTRING_H__
 #define __NUSMV_CORE_UTILS_USTRING_H__
 
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/UStringMgr.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/utils/UStringMgr.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */

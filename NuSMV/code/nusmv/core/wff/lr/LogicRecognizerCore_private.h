@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,18 +34,14 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_CORE_PRIVATE_H__
 #define __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_CORE_PRIVATE_H__
 
-
-#include "nusmv/core/wff/lr/LogicRecognizerCore.h"
+#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/wff/lr/LogicRecognizerBase.h"
 #include "nusmv/core/wff/lr/LogicRecognizerBase_private.h"
+#include "nusmv/core/wff/lr/LogicRecognizerCore.h"
 #include "nusmv/core/wff/lr/MasterLogicRecognizer_private.h"
-#include "nusmv/core/utils/defs.h"
-
 
 /*!
   \brief LogicRecognizerCore class definition derived from
@@ -56,8 +52,7 @@
   \sa Base class LogicRecognizerBase
 */
 
-typedef struct LogicRecognizerCore_TAG
-{
+typedef struct LogicRecognizerCore_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(LogicRecognizerBase);
 
@@ -69,10 +64,7 @@ typedef struct LogicRecognizerCore_TAG
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
-
 } LogicRecognizerCore;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -87,10 +79,8 @@ typedef struct LogicRecognizerCore_TAG
   \sa LogicRecognizerCore_create
 */
 void logic_recognizer_core_init(LogicRecognizerCore_ptr self,
-                                       const NuSMVEnv_ptr env,
-                                       const char* name,
-                                       int low,
-                                       size_t num);
+                                const NuSMVEnv_ptr env, const char *name,
+                                int low, size_t num);
 
 /*!
   \methodof LogicRecognizerCore
@@ -114,8 +104,6 @@ void logic_recognizer_core_deinit(LogicRecognizerCore_ptr self);
   * LTL operators
 */
 LogicType logic_recognizer_core_recognize(LogicRecognizerBase_ptr self,
-                                                       node_ptr wff,
-                                                       node_ptr context);
-
+                                          node_ptr wff, node_ptr context);
 
 #endif /* __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_CORE_PRIVATE_H__ */

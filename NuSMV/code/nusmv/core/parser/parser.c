@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,35 +35,30 @@
 */
 
 #include "nusmv/core/parser/parserInt.h"
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/error.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -73,20 +68,18 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-int Parser_read_model(NuSMVEnv_ptr env,
-                      char* ifile)
-{
+int Parser_read_model(NuSMVEnv_ptr env, char *ifile) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
   if (NULL != ifile) {
     set_input_file(opts, ifile);
@@ -95,8 +88,7 @@ int Parser_read_model(NuSMVEnv_ptr env,
   /* Parse the input file */
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "Parsing file \"%s\" ..... ",
-            get_input_file(opts));
+    Logger_log(logger, "Parsing file \"%s\" ..... ", get_input_file(opts));
   }
 
   if (Parser_ReadSMVFromFile(env, get_input_file(opts))) {
@@ -106,7 +98,7 @@ int Parser_read_model(NuSMVEnv_ptr env,
   { /* dumps erros if there are any */
     node_ptr errors = Parser_get_syntax_errors_list(env);
     if (Nil != errors) {
-      StreamMgr_print_error(streams,  "\n");
+      StreamMgr_print_error(streams, "\n");
       fflush(NULL); /* to flush all existing messages before outputting */
 
       while (Nil != errors) {
@@ -127,27 +119,26 @@ int Parser_read_model(NuSMVEnv_ptr env,
   return 0;
 }
 
-int Parser_skip_multiline_comment(int (*read_function)(void))
-{
+int Parser_skip_multiline_comment(int (*read_function)(void)) {
   register int c;
-  int comment[3] = { 0, 0, 0 };
+  int comment[3] = {0, 0, 0};
   int comment_value[3] = {'/', '-', '-'};
   register int k;
 
   do {
     c = read_function();
 
-    for (k=(sizeof(comment)/sizeof(comment[0])-1); k>0; --k) {
-      comment[k] = comment[k-1];
+    for (k = (sizeof(comment) / sizeof(comment[0]) - 1); k > 0; --k) {
+      comment[k] = comment[k - 1];
     }
     comment[0] = c;
-     /* On Mac OS X, input return 0 instead of EOF, see
-        https://gitlab.fbk.eu/es-tools-dev/ESTools/issues/66 */
+    /* On Mac OS X, input return 0 instead of EOF, see
+       https://gitlab.fbk.eu/es-tools-dev/ESTools/issues/66 */
 #if __APPLE__
-  } while ( memcmp(comment, comment_value, sizeof(comment)) != 0
-            && c != EOF && c != 0);
+  } while (memcmp(comment, comment_value, sizeof(comment)) != 0 && c != EOF &&
+           c != 0);
 #else
-  } while ( memcmp(comment, comment_value, sizeof(comment)) != 0 && c != EOF );
+  } while (memcmp(comment, comment_value, sizeof(comment)) != 0 && c != EOF);
 #endif
 
 #if __APPLE__
@@ -161,26 +152,24 @@ int Parser_skip_multiline_comment(int (*read_function)(void))
   return 0;
 }
 
-int Parser_skip_one_line_comment(int (*read_function)(void))
-{
-   register int c;
+int Parser_skip_one_line_comment(int (*read_function)(void)) {
+  register int c;
 
-   do {
-     c = read_function();
-     /* On Mac OS X, input return 0 instead of EOF, see
-        https://gitlab.fbk.eu/es-tools-dev/ESTools/issues/66 */
+  do {
+    c = read_function();
+    /* On Mac OS X, input return 0 instead of EOF, see
+       https://gitlab.fbk.eu/es-tools-dev/ESTools/issues/66 */
 #if __APPLE__
-   } while ( c != '\n' && c != EOF && c != 0);
+  } while (c != '\n' && c != EOF && c != 0);
 #else
-   } while ( c != '\n' && c != EOF );
+  } while (c != '\n' && c != EOF);
 #endif
-   return(0);
+  return (0);
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */

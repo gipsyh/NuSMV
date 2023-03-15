@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,43 +34,37 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/mc/mc.h"
 #include "nusmv/core/mc/mcInt.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
+#include "nusmv/core/enc/enc.h"
+#include "nusmv/core/fsm/bdd/bdd.h" /* to check preconditions for EL_fwd */
+#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/utils_io.h"
-#include "nusmv/core/enc/enc.h"
-#include "nusmv/core/opt/opt.h"
-#include "nusmv/core/fsm/bdd/bdd.h" /* to check preconditions for EL_fwd */
 
 #include <math.h>
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -89,30 +83,26 @@ static void mc_check_language_emptiness_el_fwd(NuSMVEnv_ptr env,
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env, const BddFsm_ptr fsm,
-                               boolean allinit, boolean verbose)
-{
+                               boolean allinit, boolean verbose) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   BddOregJusticeEmptinessBddAlgorithmType alg;
-  BddELFwdSavedOptions_ptr elfwd_saved_options =
-    (BddELFwdSavedOptions_ptr) NULL;
+  BddELFwdSavedOptions_ptr elfwd_saved_options = (BddELFwdSavedOptions_ptr)NULL;
 
   alg = get_oreg_justice_emptiness_bdd_algorithm(opts);
 
   if (alg == BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD) {
-    elfwd_saved_options =
-      Bdd_elfwd_check_set_and_save_options(env, BDD_ELFWD_OPT_FORWARD_SEARCH |
-                                           BDD_ELFWD_OPT_USE_REACHABLE_STATES);
+    elfwd_saved_options = Bdd_elfwd_check_set_and_save_options(
+        env, BDD_ELFWD_OPT_FORWARD_SEARCH | BDD_ELFWD_OPT_USE_REACHABLE_STATES);
   }
 
-  switch(alg) {
+  switch (alg) {
   case BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD:
     mc_check_language_emptiness_el_bwd(env, fsm, allinit, verbose);
     break;
@@ -124,11 +114,10 @@ void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env, const BddFsm_ptr fsm,
     break;
   }
 
-  if (elfwd_saved_options != (BddELFwdSavedOptions_ptr) NULL) {
-    Bdd_elfwd_restore_options(env,
-                              BDD_ELFWD_OPT_FORWARD_SEARCH |
-                              BDD_ELFWD_OPT_USE_REACHABLE_STATES,
-                              elfwd_saved_options);
+  if (elfwd_saved_options != (BddELFwdSavedOptions_ptr)NULL) {
+    Bdd_elfwd_restore_options(
+        env, BDD_ELFWD_OPT_FORWARD_SEARCH | BDD_ELFWD_OPT_USE_REACHABLE_STATES,
+        elfwd_saved_options);
   }
 }
 
@@ -151,10 +140,9 @@ void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env, const BddFsm_ptr fsm,
 static void mc_check_language_emptiness_el_bwd(NuSMVEnv_ptr env,
                                                const BddFsm_ptr fsm,
                                                boolean allinit,
-                                               boolean verbose)
-{
+                                               boolean verbose) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   bdd_ptr fair_states;
   bdd_ptr init, invar;
   BddEnc_ptr bddenc;
@@ -182,34 +170,33 @@ static void mc_check_language_emptiness_el_bwd(NuSMVEnv_ptr env,
      moving fprintf outside of ifs. */
   if (allinit) {
     if (0 == bdd_entailed(dd, init, fair_states)) {
-      StreamMgr_print_output(streams,  "The language is empty\n");
-    }
-    else {
-      StreamMgr_print_output(streams,  "The language is not empty\n");
+      StreamMgr_print_output(streams, "The language is empty\n");
+    } else {
+      StreamMgr_print_output(streams, "The language is not empty\n");
       if (verbose) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger, "Mc_CheckLanguageEmptiness: verbose not yet implemented\n");
+        Logger_log(logger,
+                   "Mc_CheckLanguageEmptiness: verbose not yet implemented\n");
       }
     }
-  }
-  else {
+  } else {
     bdd_ptr fair_init;
 
     fair_init = bdd_and(dd, init, fair_states);
 
     if (bdd_is_false(dd, fair_init)) {
-      StreamMgr_print_output(streams,  "The language is empty\n");
-    }
-    else {
-      StreamMgr_print_output(streams,  "The language is not empty\n");
+      StreamMgr_print_output(streams, "The language is empty\n");
+    } else {
+      StreamMgr_print_output(streams, "The language is not empty\n");
 
       if (verbose) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger, "Mc_CheckLanguageEmptiness: verbose not yet implemented\n");
+        Logger_log(logger,
+                   "Mc_CheckLanguageEmptiness: verbose not yet implemented\n");
       }
     }
 
-    {/* prints the number of fair-init states */
+    { /* prints the number of fair-init states */
       double reached_cardinality;
       double search_space_cardinality;
       bdd_ptr mask = BddEnc_get_state_frozen_vars_mask_bdd(bddenc);
@@ -218,9 +205,10 @@ static void mc_check_language_emptiness_el_bwd(NuSMVEnv_ptr env,
       reached_cardinality = BddEnc_count_states_of_bdd(bddenc, fair_init);
       search_space_cardinality = BddEnc_count_states_of_bdd(bddenc, mask);
       bdd_free(dd, mask);
-      StreamMgr_print_output(streams,  "fair states: %g (2^%g) out of %g (2^%g)\n",
-              reached_cardinality, log(reached_cardinality)/log(2.0),
-              search_space_cardinality, log(search_space_cardinality)/log(2.0));
+      StreamMgr_print_output(
+          streams, "fair states: %g (2^%g) out of %g (2^%g)\n",
+          reached_cardinality, log(reached_cardinality) / log(2.0),
+          search_space_cardinality, log(search_space_cardinality) / log(2.0));
     }
     /* No longer needed */
     bdd_free(dd, fair_init);
@@ -243,10 +231,9 @@ static void mc_check_language_emptiness_el_bwd(NuSMVEnv_ptr env,
 static void mc_check_language_emptiness_el_fwd(NuSMVEnv_ptr env,
                                                const BddFsm_ptr fsm,
                                                boolean allinit,
-                                               boolean verbose)
-{
+                                               boolean verbose) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   BddEnc_ptr bddenc;
   DDMgr_ptr dd;
   bdd_ptr revfair_states;
@@ -258,9 +245,9 @@ static void mc_check_language_emptiness_el_fwd(NuSMVEnv_ptr env,
      state; rather one would really have to compute the set of
      (standard, not reverse) fair states. */
   nusmv_assert(!allinit);
-  nusmv_assert(Bdd_elfwd_check_options(env, BDD_ELFWD_OPT_FORWARD_SEARCH |
-                                       BDD_ELFWD_OPT_USE_REACHABLE_STATES,
-                                       false));
+  nusmv_assert(Bdd_elfwd_check_options(
+      env, BDD_ELFWD_OPT_FORWARD_SEARCH | BDD_ELFWD_OPT_USE_REACHABLE_STATES,
+      false));
 
   /* Extracting the DD manager */
   bddenc = BddFsm_get_bdd_encoding(fsm);
@@ -269,15 +256,14 @@ static void mc_check_language_emptiness_el_fwd(NuSMVEnv_ptr env,
   revfair_states = BddFsm_get_revfair_states(fsm);
 
   if (bdd_is_false(dd, revfair_states)) {
-    StreamMgr_print_output(streams,  "The language is empty\n");
-  }
-  else {
-    StreamMgr_print_output(streams,  "The language is not empty\n");
+    StreamMgr_print_output(streams, "The language is empty\n");
+  } else {
+    StreamMgr_print_output(streams, "The language is not empty\n");
 
     if (verbose) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_log(logger,
-              "Mc_CheckLanguageEmptiness: verbose not yet implemented\n");
+                 "Mc_CheckLanguageEmptiness: verbose not yet implemented\n");
     }
   }
 

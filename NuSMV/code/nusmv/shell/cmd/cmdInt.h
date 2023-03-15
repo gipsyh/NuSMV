@@ -34,36 +34,34 @@
 
 */
 
-
 #ifndef __NUSMV_SHELL_CMD_CMD_INT_H__
 #define __NUSMV_SHELL_CMD_CMD_INT_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/shell/cmd/cmd.h"
 
 #include "nusmv/core/cinit/cinit.h"
-#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/dd/dd.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/utils/array.h"
 #include "nusmv/core/utils/avl.h"
-
+#include "nusmv/core/utils/utils.h"
 
 #if NUSMV_STDC_HEADERS
-#  include <string.h>
-#  include <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
 #else
- void free();
-# if NUSMV_HAVE_STRING_H
-#  include <string.h>
-# else
-# ifndef strncpy
-char* strncpy(char*, const char*, size_t);
-# endif
-# endif
+void free();
+#if NUSMV_HAVE_STRING_H
+#include <string.h>
+#else
+#ifndef strncpy
+char *strncpy(char *, const char *, size_t);
+#endif
+#endif
 #endif
 
 /*
@@ -80,28 +78,28 @@ char* strncpy(char*, const char*, size_t);
 #define BSD_COMP
 
 #if defined(IOCTL_WITH_TERMIOS) && IOCTL_WITH_TERMIOS
-#  include <sys/ioctl.h>
-#  include <sys/termios.h>
+#include <sys/ioctl.h>
+#include <sys/termios.h>
 #else
-#  if NUSMV_HAVE_SYS_IOCTL_H
-#    include <sys/ioctl.h>
-#  else
-#    if NUSMV_HAVE_SYS_TERMIOS_H
-#      include <sys/termios.h>
-#    endif
-#  endif
+#if NUSMV_HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#else
+#if NUSMV_HAVE_SYS_TERMIOS_H
+#include <sys/termios.h>
+#endif
+#endif
 #endif
 
 /* Linux and its wacky header files... */
 #if defined NUSMV_HAVE_BSD_SGTTY_H && NUSMV_HAVE_BSD_SGTTY_H
-#  include <bsd/sgtty.h>
+#include <bsd/sgtty.h>
 #endif
 
 #if NUSMV_HAVE_SYS_SIGNAL_H
-#  include <sys/signal.h>
+#include <sys/signal.h>
 #endif
 #if NUSMV_HAVE_SIGNAL_H
-#  include <signal.h>
+#include <signal.h>
 #endif
 
 /*
@@ -111,23 +109,23 @@ char* strncpy(char*, const char*, size_t);
  */
 
 #if NUSMV_HAVE_DIRENT_H
-# if NUSMV_HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-# endif
-#  include <dirent.h>
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
+#if NUSMV_HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#include <dirent.h>
+#define NAMLEN(dirent) strlen((dirent)->d_name)
 #else
-#  define dirent direct
-#  define NAMLEN(dirent) (dirent)->d_namlen
-#  if NUSMV_HAVE_SYS_NDIR_H
-#    include <sys/ndir.h>
-#  endif
-#  if NUSMV_HAVE_SYS_DIR_H
-#    include <sys/dir.h>
-#  endif
-#  if NUSMV_HAVE_NDIR_H
-#    include <ndir.h>
-#  endif
+#define dirent direct
+#define NAMLEN(dirent) (dirent)->d_namlen
+#if NUSMV_HAVE_SYS_NDIR_H
+#include <sys/ndir.h>
+#endif
+#if NUSMV_HAVE_SYS_DIR_H
+#include <sys/dir.h>
+#endif
+#if NUSMV_HAVE_NDIR_H
+#include <ndir.h>
+#endif
 #endif
 
 /* Environment internal structures */
@@ -137,14 +135,14 @@ char* strncpy(char*, const char*, size_t);
 
   \todo Missing description
 */
-#define ENV_CMD_ALIAS_TABLE     "__cmd_alias_table__"
+#define ENV_CMD_ALIAS_TABLE "__cmd_alias_table__"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_CMD_COMMAND_TABLE   "__cmd_cmd_table__"
+#define ENV_CMD_COMMAND_TABLE "__cmd_cmd_table__"
 
 /*!
   \brief \todo Missing synopsis
@@ -184,14 +182,14 @@ typedef struct CommandDescrStruct {
 
 
 */
-boolean Cmd_CommandDefined(NuSMVEnv_ptr env, const char* name);
+boolean Cmd_CommandDefined(NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief Returns the command stored under 'name' in the command table.
 
   Returned value does not belong to caller.
 */
-CommandDescr_t *Cmd_CommandGet(NuSMVEnv_ptr env, const char* name);
+CommandDescr_t *Cmd_CommandGet(NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief required
@@ -202,14 +200,14 @@ CommandDescr_t *Cmd_CommandGet(NuSMVEnv_ptr env, const char* name);
 
   \sa optional
 */
-void CmdCommandFree(char * value);
+void CmdCommandFree(char *value);
 
 /*!
   \brief Copies value.
 
 
 */
-CommandDescr_t * CmdCommandCopy(CommandDescr_t * value);
+CommandDescr_t *CmdCommandCopy(CommandDescr_t *value);
 
 /*!
   \brief Duplicates the function of fgets, but also provides file
@@ -226,8 +224,8 @@ CommandDescr_t * CmdCommandCopy(CommandDescr_t * value);
   The file completion routines are derived from the source code for csh, which
   is copyrighted by the Regents of the University of California.
 */
-char * CmdFgetsFilec(NuSMVEnv_ptr env, char * buf, unsigned int size,
-                            FILE * stream, char * prompt);
+char *CmdFgetsFilec(NuSMVEnv_ptr env, char *buf, unsigned int size,
+                    FILE *stream, char *prompt);
 
 /*!
   \brief Simple history substitution routine.
@@ -253,7 +251,7 @@ char * CmdFgetsFilec(NuSMVEnv_ptr env, char * buf, unsigned int size,
   if any changes were made.  Sets `changed' to 1 if a history substitution
   took place, o/w set to 0.  Returns NULL if error occurred.
 */
-char * CmdHistorySubstitution(NuSMVEnv_ptr env, char * line, int * changed);
+char *CmdHistorySubstitution(NuSMVEnv_ptr env, char *line, int *changed);
 
 /*!
   \brief required
@@ -264,7 +262,7 @@ char * CmdHistorySubstitution(NuSMVEnv_ptr env, char * line, int * changed);
 
   \sa optional
 */
-void CmdFreeArgv(int argc, char ** argv);
+void CmdFreeArgv(int argc, char **argv);
 
 /*!
   \brief required
@@ -275,7 +273,7 @@ void CmdFreeArgv(int argc, char ** argv);
 
   \sa optional
 */
-void CmdAliasFree(char * value);
+void CmdAliasFree(char *value);
 
 /**AutomaticEnd***************************************************************/
 

@@ -33,28 +33,27 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_TABLE_CLASS_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_TABLE_CLASS_H__
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/compile/symb_table/SymbLayer.h"
-#include "nusmv/core/compile/symb_table/SymbCache.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/compile/symb_table/NFunction.h"
+#include "nusmv/core/compile/symb_table/ResolveSymbol.h"
+#include "nusmv/core/compile/symb_table/SymbCache.h"
+#include "nusmv/core/compile/symb_table/SymbLayer.h"
 #include "nusmv/core/compile/type_checking/TypeChecker.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/set/set.h"
+#include "nusmv/core/utils/Pair.h"
+#include "nusmv/core/utils/UStringMgr.h"
 #include "nusmv/core/utils/array.h"
 #include "nusmv/core/utils/assoc.h"
-#include "nusmv/core/node/node.h"
-#include "nusmv/core/compile/symb_table/NFunction.h"
-#include "nusmv/core/set/set.h"
-#include "nusmv/core/compile/symb_table/ResolveSymbol.h"
-#include "nusmv/core/utils/UStringMgr.h"
-#include "nusmv/core/utils/Pair.h"
-#include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct SymbTable
@@ -62,24 +61,22 @@
 
 
 */
-typedef struct SymbTable_TAG* SymbTable_ptr;
+typedef struct SymbTable_TAG *SymbTable_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_TABLE(x)                           \
-  ((SymbTable_ptr) x)
+#define SYMB_TABLE(x) ((SymbTable_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_TABLE_CHECK_INSTANCE(x)                    \
+#define SYMB_TABLE_CHECK_INSTANCE(x)                                           \
   (nusmv_assert(SYMB_TABLE(x) != SYMB_TABLE(NULL)))
-
 
 /*!
   \brief Controls the filter type in some search dependencies routines
@@ -131,25 +128,24 @@ typedef struct SymbTable_TAG* SymbTable_ptr;
 */
 
 typedef enum SymbFilterType_TAG {
-  VFT_CURRENT     = 1,
-  VFT_NEXT        = VFT_CURRENT << 1,
-  VFT_INPUT       = VFT_CURRENT << 2,
-  VFT_FROZEN      = VFT_CURRENT << 3,
-  VFT_DEFINE      = VFT_CURRENT << 4,
-  VFT_FUNCTION    = VFT_CURRENT << 5,
-  VFT_CONSTANTS   = VFT_CURRENT << 6,  /* only symbols */
+  VFT_CURRENT = 1,
+  VFT_NEXT = VFT_CURRENT << 1,
+  VFT_INPUT = VFT_CURRENT << 2,
+  VFT_FROZEN = VFT_CURRENT << 3,
+  VFT_DEFINE = VFT_CURRENT << 4,
+  VFT_FUNCTION = VFT_CURRENT << 5,
+  VFT_CONSTANTS = VFT_CURRENT << 6, /* only symbols */
 
   /* handy combinations */
-  VFT_STATE       = (VFT_CURRENT | VFT_NEXT),
-  VFT_CURR_INPUT  = (VFT_CURRENT | VFT_INPUT),
+  VFT_STATE = (VFT_CURRENT | VFT_NEXT),
+  VFT_CURR_INPUT = (VFT_CURRENT | VFT_INPUT),
   VFT_CURR_FROZEN = (VFT_CURRENT | VFT_FROZEN),
-  VFT_CNIF        = (VFT_CURRENT | VFT_NEXT   |
-                     VFT_INPUT   | VFT_FROZEN), /* It was VFT_ALL */
-  VFT_CNIFD       = (VFT_CNIF | VFT_DEFINE),    /* It was VFT_ALL_DEFINE */
-  VFT_ALL         = (VFT_CNIFD | VFT_FUNCTION | VFT_CONSTANTS),
+  VFT_CNIF =
+      (VFT_CURRENT | VFT_NEXT | VFT_INPUT | VFT_FROZEN), /* It was VFT_ALL */
+  VFT_CNIFD = (VFT_CNIF | VFT_DEFINE), /* It was VFT_ALL_DEFINE */
+  VFT_ALL = (VFT_CNIFD | VFT_FUNCTION | VFT_CONSTANTS),
 
 } SymbFilterType;
-
 
 /*!
   \brief Describes the kind of symbol
@@ -177,29 +173,26 @@ typedef enum SymbCategory_TAG {
   SYMBOL_VARIABLE_ARRAY,
 } SymbCategory;
 
-
 typedef enum SymbTableType_TAG {
-  STT_NONE           = 0,
-  STT_CONSTANT       = 1,
+  STT_NONE = 0,
+  STT_CONSTANT = 1,
 
-  STT_STATE_VAR      = STT_CONSTANT << 1, /* 2 */
-  STT_INPUT_VAR      = STT_CONSTANT << 2, /* 4 */
-  STT_FROZEN_VAR     = STT_CONSTANT << 3, /* 8 */
-  STT_VAR            = (STT_STATE_VAR | STT_INPUT_VAR |
-                        STT_FROZEN_VAR), /* 14 */
+  STT_STATE_VAR = STT_CONSTANT << 1,                          /* 2 */
+  STT_INPUT_VAR = STT_CONSTANT << 2,                          /* 4 */
+  STT_FROZEN_VAR = STT_CONSTANT << 3,                         /* 8 */
+  STT_VAR = (STT_STATE_VAR | STT_INPUT_VAR | STT_FROZEN_VAR), /* 14 */
 
-  STT_DEFINE         = STT_CONSTANT << 4, /* 16 */
-  STT_ARRAY_DEFINE   = STT_CONSTANT << 5, /* 32 */
+  STT_DEFINE = STT_CONSTANT << 4,       /* 16 */
+  STT_ARRAY_DEFINE = STT_CONSTANT << 5, /* 32 */
 
-  STT_PARAMETER      = STT_CONSTANT << 6, /* 64 */
+  STT_PARAMETER = STT_CONSTANT << 6, /* 64 */
 
-  STT_FUNCTION       = STT_CONSTANT << 7, /* 128 */
+  STT_FUNCTION = STT_CONSTANT << 7, /* 128 */
 
   STT_VARIABLE_ARRAY = STT_CONSTANT << 8, /* 256 */
 
-  STT_ALL            = (STT_CONSTANT | STT_VAR | STT_DEFINE |
-                        STT_ARRAY_DEFINE | STT_PARAMETER | STT_FUNCTION |
-                        STT_VARIABLE_ARRAY), /* 511 */
+  STT_ALL = (STT_CONSTANT | STT_VAR | STT_DEFINE | STT_ARRAY_DEFINE |
+             STT_PARAMETER | STT_FUNCTION | STT_VARIABLE_ARRAY), /* 511 */
 } SymbTableType;
 
 typedef enum SymbTableTriggerAction_TAG {
@@ -213,9 +206,8 @@ typedef enum SymbTableTriggerAction_TAG {
 
   \todo Missing description
 */
-typedef void (*SymbTableForeachFun)(const SymbTable_ptr,
-                                    const node_ptr sym,
-                                    void* arg);
+typedef void (*SymbTableForeachFun)(const SymbTable_ptr, const node_ptr sym,
+                                    void *arg);
 
 /*!
   \brief \todo Missing synopsis
@@ -223,8 +215,7 @@ typedef void (*SymbTableForeachFun)(const SymbTable_ptr,
   \todo Missing description
 */
 typedef boolean (*SymbTableIterFilterFun)(const SymbTable_ptr table,
-                                          const node_ptr sym, void* arg);
-
+                                          const node_ptr sym, void *arg);
 
 /*!
   \brief Trigger called by the symbol table when a symbol change status
@@ -234,15 +225,14 @@ typedef boolean (*SymbTableIterFilterFun)(const SymbTable_ptr table,
 
 typedef void (*SymbTableTriggerFun)(const SymbTable_ptr table,
                                     const node_ptr sym,
-                                    SymbTableTriggerAction action,
-                                    void* arg);
+                                    SymbTableTriggerAction action, void *arg);
 
 typedef struct SymbTableIter_TAG {
   unsigned int index;
   unsigned int mask;
   SymbTableIterFilterFun filter;
   SymbTable_ptr st;
-  void* arg;
+  void *arg;
 } SymbTableIter;
 
 /*!
@@ -250,21 +240,19 @@ typedef struct SymbTableIter_TAG {
 
   \todo Missing description
 */
-#define SYMB_TABLE_FOREACH(self, iter, mask)    \
-  for (SymbTable_gen_iter(self, &iter, mask);   \
-       !SymbTable_iter_is_end(self, &iter);     \
-       SymbTable_iter_next(self, &iter))
+#define SYMB_TABLE_FOREACH(self, iter, mask)                                   \
+  for (SymbTable_gen_iter(self, &iter, mask);                                  \
+       !SymbTable_iter_is_end(self, &iter); SymbTable_iter_next(self, &iter))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_TABLE_FOREACH_FILTER(self, iter, mask, filter, arg)        \
-  for (SymbTable_gen_iter(self, &iter, mask),                           \
-           SymbTable_iter_set_filter(self, &iter, filter, arg);         \
-       !SymbTable_iter_is_end(self, &iter);                             \
-       SymbTable_iter_next(self, &iter))
+#define SYMB_TABLE_FOREACH_FILTER(self, iter, mask, filter, arg)               \
+  for (SymbTable_gen_iter(self, &iter, mask),                                  \
+       SymbTable_iter_set_filter(self, &iter, filter, arg);                    \
+       !SymbTable_iter_is_end(self, &iter); SymbTable_iter_next(self, &iter))
 
 /* ---------------------------------------------------------------------- */
 /*     Public methods                                                     */
@@ -298,8 +286,7 @@ void SymbTable_destroy(SymbTable_ptr self);
 
   Returned instance belongs to self
 */
-TypeChecker_ptr
-SymbTable_get_type_checker(const SymbTable_ptr self);
+TypeChecker_ptr SymbTable_get_type_checker(const SymbTable_ptr self);
 
 /* -------------------------------------- */
 /*            ITERATORS                   */
@@ -317,8 +304,7 @@ SymbTable_get_type_checker(const SymbTable_ptr self);
   automaticaly call this function, so the caller
   does not have to worry about that.
 */
-void SymbTable_gen_iter(const SymbTable_ptr self,
-                        SymbTableIter* iter,
+void SymbTable_gen_iter(const SymbTable_ptr self, SymbTableIter *iter,
                         unsigned int mask);
 
 /*!
@@ -327,8 +313,7 @@ void SymbTable_gen_iter(const SymbTable_ptr self,
 
   Moves the iterator to the next valid symbol
 */
-void SymbTable_iter_next(const SymbTable_ptr self,
-                         SymbTableIter* iter);
+void SymbTable_iter_next(const SymbTable_ptr self, SymbTableIter *iter);
 
 /*!
   \methodof SymbTable
@@ -337,7 +322,7 @@ void SymbTable_iter_next(const SymbTable_ptr self,
   Checks if the iterator is at it's end
 */
 boolean SymbTable_iter_is_end(const SymbTable_ptr self,
-                              const SymbTableIter* iter);
+                              const SymbTableIter *iter);
 
 /*!
   \methodof SymbTable
@@ -347,7 +332,7 @@ boolean SymbTable_iter_is_end(const SymbTable_ptr self,
   The given iterator must not be at it's end
 */
 node_ptr SymbTable_iter_get_symbol(const SymbTable_ptr self,
-                                   const SymbTableIter* iter);
+                                   const SymbTableIter *iter);
 
 /*!
   \methodof SymbTable
@@ -358,10 +343,8 @@ node_ptr SymbTable_iter_get_symbol(const SymbTable_ptr self,
   valid symbol that satisfies both the filter and
   the mask
 */
-void SymbTable_iter_set_filter(const SymbTable_ptr self,
-                               SymbTableIter* iter,
-                               SymbTableIterFilterFun fun,
-                               void* arg);
+void SymbTable_iter_set_filter(const SymbTable_ptr self, SymbTableIter *iter,
+                               SymbTableIterFilterFun fun, void *arg);
 
 /*!
   \methodof SymbTable
@@ -372,7 +355,7 @@ void SymbTable_iter_set_filter(const SymbTable_ptr self,
   that satisfies the given symbol mask
 */
 void SymbTable_foreach(const SymbTable_ptr self, unsigned int mask,
-                       SymbTableForeachFun fun, void* arg);
+                       SymbTableForeachFun fun, void *arg);
 
 /*!
   \methodof SymbTable
@@ -382,8 +365,7 @@ void SymbTable_foreach(const SymbTable_ptr self, unsigned int mask,
   must be freed. The iterator is NOT changed (it
   is passed as value..)
 */
-Set_t SymbTable_iter_to_set(const SymbTable_ptr self,
-                            SymbTableIter iter);
+Set_t SymbTable_iter_to_set(const SymbTable_ptr self, SymbTableIter iter);
 
 /*!
   \methodof SymbTable
@@ -403,8 +385,7 @@ NodeList_ptr SymbTable_iter_to_list(const SymbTable_ptr self,
   Counts the elements of the iterator. The iterator
   is NOT changed (it is passed as value..)
 */
-unsigned int SymbTable_iter_count(const SymbTable_ptr self,
-                                  SymbTableIter iter);
+unsigned int SymbTable_iter_count(const SymbTable_ptr self, SymbTableIter iter);
 
 /*!
   \methodof SymbTable
@@ -444,11 +425,10 @@ unsigned int SymbTable_iter_count(const SymbTable_ptr self,
 
   \sa SymbTable_remove_trigger
 */
-void
-SymbTable_add_trigger(const SymbTable_ptr self,
-                      SymbTableTriggerFun trigger,
-                      SymbTableTriggerAction action,
-                      void* arg1, boolean must_free_arg);
+void SymbTable_add_trigger(const SymbTable_ptr self,
+                           SymbTableTriggerFun trigger,
+                           SymbTableTriggerAction action, void *arg1,
+                           boolean must_free_arg);
 
 /*!
   \methodof SymbTable
@@ -458,10 +438,9 @@ SymbTable_add_trigger(const SymbTable_ptr self,
 
   \sa SymbTable_add_trigger
 */
-void
-SymbTable_remove_trigger(const SymbTable_ptr self,
-                         SymbTableTriggerFun trigger,
-                         SymbTableTriggerAction action);
+void SymbTable_remove_trigger(const SymbTable_ptr self,
+                              SymbTableTriggerFun trigger,
+                              SymbTableTriggerAction action);
 
 /* -------------------------------------- */
 /*            Built-in filters            */
@@ -476,10 +455,8 @@ SymbTable_remove_trigger(const SymbTable_ptr self,
   or input variables themselfs satisfy this
   filter.
 */
-boolean
-SymbTable_iter_filter_i_symbols(const SymbTable_ptr self,
-                                const node_ptr sym,
-                                void* arg);
+boolean SymbTable_iter_filter_i_symbols(const SymbTable_ptr self,
+                                        const node_ptr sym, void *arg);
 
 /*!
   \methodof SymbTable
@@ -490,10 +467,8 @@ SymbTable_iter_filter_i_symbols(const SymbTable_ptr self,
   AND input variables or variables themselfs
   satisfy this filter.
 */
-boolean
-SymbTable_iter_filter_sf_i_symbols(const SymbTable_ptr self,
-                                   const node_ptr sym,
-                                   void* arg);
+boolean SymbTable_iter_filter_sf_i_symbols(const SymbTable_ptr self,
+                                           const node_ptr sym, void *arg);
 
 /*!
   \methodof SymbTable
@@ -504,10 +479,8 @@ SymbTable_iter_filter_sf_i_symbols(const SymbTable_ptr self,
   variables or state / frozen variables themselfs
   satisfy this filter.
 */
-boolean
-SymbTable_iter_filter_sf_symbols(const SymbTable_ptr self,
-                                 const node_ptr sym,
-                                 void* arg);
+boolean SymbTable_iter_filter_sf_symbols(const SymbTable_ptr self,
+                                         const node_ptr sym, void *arg);
 
 /*!
   \methodof SymbTable
@@ -517,8 +490,7 @@ SymbTable_iter_filter_sf_symbols(const SymbTable_ptr self,
 */
 boolean SymbTable_iter_filter_out_var_array_elems(const SymbTable_ptr self,
                                                   const node_ptr sym,
-                                                  void* arg);
-
+                                                  void *arg);
 
 /* -------------------------------------- */
 /*            Layers handling             */
@@ -536,9 +508,8 @@ boolean SymbTable_iter_filter_out_var_array_elems(const SymbTable_ptr self,
 
   \sa remove_layer
 */
-SymbLayer_ptr
-SymbTable_create_layer(SymbTable_ptr self, const char* layer_name,
-                       const LayerInsertPolicy ins_policy);
+SymbLayer_ptr SymbTable_create_layer(SymbTable_ptr self, const char *layer_name,
+                                     const LayerInsertPolicy ins_policy);
 
 /*!
   \methodof SymbTable
@@ -556,8 +527,7 @@ SymbTable_create_layer(SymbTable_ptr self, const char* layer_name,
 
   \sa create_layer
 */
-void
-SymbTable_remove_layer(SymbTable_ptr self, SymbLayer_ptr layer);
+void SymbTable_remove_layer(SymbTable_ptr self, SymbLayer_ptr layer);
 
 /*!
   \methodof SymbTable
@@ -565,9 +535,8 @@ SymbTable_remove_layer(SymbTable_ptr self, SymbLayer_ptr layer);
 
   \todo Missing description
 */
-SymbLayer_ptr
-SymbTable_get_layer(const SymbTable_ptr self,
-                    const char* layer_name);
+SymbLayer_ptr SymbTable_get_layer(const SymbTable_ptr self,
+                                  const char *layer_name);
 
 /*!
   \methodof SymbTable
@@ -575,9 +544,7 @@ SymbTable_get_layer(const SymbTable_ptr self,
 
   True if layer_name belongs to self
 */
-boolean
-SymbTable_has_layer(const SymbTable_ptr self,
-                    const char* layer_name);
+boolean SymbTable_has_layer(const SymbTable_ptr self, const char *layer_name);
 
 /*!
   \methodof SymbTable
@@ -586,9 +553,8 @@ SymbTable_has_layer(const SymbTable_ptr self,
   Use to rename an existing layer. Useful for example to
   substitute an existing layer with another.
 */
-void
-SymbTable_rename_layer(const SymbTable_ptr self,
-                       const char* layer_name, const char* new_name);
+void SymbTable_rename_layer(const SymbTable_ptr self, const char *layer_name,
+                            const char *new_name);
 
 /*!
   \methodof SymbTable
@@ -598,7 +564,6 @@ SymbTable_rename_layer(const SymbTable_ptr self,
   change it.
 */
 NodeList_ptr SymbTable_get_layers(const SymbTable_ptr self);
-
 
 /* -------------------------------------- */
 /*                Symbols                 */
@@ -616,9 +581,8 @@ NodeList_ptr SymbTable_get_layers(const SymbTable_ptr self);
   WARNING: The returned instance must be destroyed by the caller.
   Note: state symbols include frozen variables.
 */
-NodeList_ptr
-SymbTable_get_layers_sf_symbols(SymbTable_ptr self,
-                                const array_t* layer_names);
+NodeList_ptr SymbTable_get_layers_sf_symbols(SymbTable_ptr self,
+                                             const array_t *layer_names);
 
 /*!
   \methodof SymbTable
@@ -629,9 +593,8 @@ SymbTable_get_layers_sf_symbols(SymbTable_ptr self,
   calculate a new list. layers is an array of strings.
   WARNING: The returned instance must be destroyed by the caller
 */
-NodeList_ptr
-SymbTable_get_layers_sf_vars(SymbTable_ptr self,
-                             const array_t* layer_names);
+NodeList_ptr SymbTable_get_layers_sf_vars(SymbTable_ptr self,
+                                          const array_t *layer_names);
 
 /*!
   \methodof SymbTable
@@ -642,9 +605,8 @@ SymbTable_get_layers_sf_vars(SymbTable_ptr self,
   calculate a new list. layers is an array of strings.
   WARNING: The returned instance must be destroyed by the caller
 */
-NodeList_ptr
-SymbTable_get_layers_i_symbols(SymbTable_ptr self,
-                               const array_t* layer_names);
+NodeList_ptr SymbTable_get_layers_i_symbols(SymbTable_ptr self,
+                                            const array_t *layer_names);
 
 /*!
   \methodof SymbTable
@@ -655,9 +617,8 @@ SymbTable_get_layers_i_symbols(SymbTable_ptr self,
   calculate a new list. layers is an array of strings.
   WARNING: The returned instance must be destroyed by the caller
 */
-NodeList_ptr
-SymbTable_get_layers_i_vars(SymbTable_ptr self,
-                            const array_t* layer_names);
+NodeList_ptr SymbTable_get_layers_i_vars(SymbTable_ptr self,
+                                         const array_t *layer_names);
 
 /*!
   \methodof SymbTable
@@ -670,9 +631,8 @@ SymbTable_get_layers_i_vars(SymbTable_ptr self,
   calculate a new list. layers is an array of strings.
   WARNING: The returned instance must be destroyed by the caller
 */
-NodeList_ptr
-SymbTable_get_layers_sf_i_symbols(SymbTable_ptr self,
-                                  const array_t* layer_names);
+NodeList_ptr SymbTable_get_layers_sf_i_symbols(SymbTable_ptr self,
+                                               const array_t *layer_names);
 
 /*!
   \methodof SymbTable
@@ -682,9 +642,8 @@ SymbTable_get_layers_sf_i_symbols(SymbTable_ptr self,
   calculate a new list. layers is an array of strings.
   WARNING: The returned instance must be destroyed by the caller
 */
-NodeList_ptr
-SymbTable_get_layers_sf_i_vars(SymbTable_ptr self,
-                               const array_t* layer_names);
+NodeList_ptr SymbTable_get_layers_sf_i_vars(SymbTable_ptr self,
+                                            const array_t *layer_names);
 
 /* Number of symbols: */
 
@@ -768,7 +727,6 @@ int SymbTable_get_functions_num(const SymbTable_ptr self);
 */
 int SymbTable_get_symbols_num(const SymbTable_ptr self);
 
-
 /* Classes of layers: */
 
 /*!
@@ -786,9 +744,7 @@ int SymbTable_get_symbols_num(const SymbTable_ptr self);
 
   \sa SymbTable_layer_add_to_class
 */
-void
-SymbTable_create_layer_class(SymbTable_ptr self,
-                             const char* class_name);
+void SymbTable_create_layer_class(SymbTable_ptr self, const char *class_name);
 
 /*!
   \methodof SymbTable
@@ -800,9 +756,8 @@ SymbTable_create_layer_class(SymbTable_ptr self,
 
   \se None
 */
-boolean
-SymbTable_layer_class_exists(SymbTable_ptr self,
-                             const char* class_name);
+boolean SymbTable_layer_class_exists(SymbTable_ptr self,
+                                     const char *class_name);
 
 /*!
   \methodof SymbTable
@@ -818,10 +773,8 @@ SymbTable_layer_class_exists(SymbTable_ptr self,
 
   \sa SymbTable_layer_remove_from_class
 */
-void
-SymbTable_layer_add_to_class(SymbTable_ptr self,
-                             const char* layer_name,
-                             const char* class_name);
+void SymbTable_layer_add_to_class(SymbTable_ptr self, const char *layer_name,
+                                  const char *class_name);
 
 /*!
   \methodof SymbTable
@@ -834,10 +787,9 @@ SymbTable_layer_add_to_class(SymbTable_ptr self,
 
   \sa SymbTable_layer_add_to_class
 */
-void
-SymbTable_layer_remove_from_class(SymbTable_ptr self,
-                                  const char* layer_name,
-                                  const char* class_name);
+void SymbTable_layer_remove_from_class(SymbTable_ptr self,
+                                       const char *layer_name,
+                                       const char *class_name);
 
 /*!
   \methodof SymbTable
@@ -850,9 +802,8 @@ SymbTable_layer_remove_from_class(SymbTable_ptr self,
   array belongs to self and has NOT to be destroyed or changed by
   the caller.
 */
-array_t*
-SymbTable_get_class_layer_names(SymbTable_ptr self,
-                                const char* class_name);
+array_t *SymbTable_get_class_layer_names(SymbTable_ptr self,
+                                         const char *class_name);
 
 /*!
   \methodof SymbTable
@@ -860,10 +811,8 @@ SymbTable_get_class_layer_names(SymbTable_ptr self,
 
   If class_name is NULL, the default class will be checked
 */
-boolean
-SymbTable_is_layer_in_class(SymbTable_ptr self,
-                            const char* layer_name,
-                            const char* class_name);
+boolean SymbTable_is_layer_in_class(SymbTable_ptr self, const char *layer_name,
+                                    const char *class_name);
 
 /*!
   \methodof SymbTable
@@ -871,9 +820,8 @@ SymbTable_is_layer_in_class(SymbTable_ptr self,
 
 
 */
-void
-SymbTable_set_default_layers_class_name(SymbTable_ptr self,
-                                        const char* class_name);
+void SymbTable_set_default_layers_class_name(SymbTable_ptr self,
+                                             const char *class_name);
 
 /*!
   \methodof SymbTable
@@ -889,9 +837,7 @@ SymbTable_set_default_layers_class_name(SymbTable_ptr self,
 
   \sa SymbTable_set_default_layers_class_name
 */
-const char*
-SymbTable_get_default_layers_class_name(const SymbTable_ptr self);
-
+const char *SymbTable_get_default_layers_class_name(const SymbTable_ptr self);
 
 /* Symbols related info: */
 
@@ -902,8 +848,8 @@ SymbTable_get_default_layers_class_name(const SymbTable_ptr self);
   The type belongs to the layer, do not destroy it.
   "name" is assumed to be a var
 */
-SymbType_ptr
-SymbTable_get_var_type(const SymbTable_ptr self, const node_ptr name);
+SymbType_ptr SymbTable_get_var_type(const SymbTable_ptr self,
+                                    const node_ptr name);
 
 /* Symbols related info: */
 
@@ -913,8 +859,8 @@ SymbTable_get_var_type(const SymbTable_ptr self, const node_ptr name);
 
   "name" is assumed to be a function
 */
-SymbType_ptr
-SymbTable_get_function_type(const SymbTable_ptr self, const node_ptr name);
+SymbType_ptr SymbTable_get_function_type(const SymbTable_ptr self,
+                                         const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -922,9 +868,8 @@ SymbTable_get_function_type(const SymbTable_ptr self, const node_ptr name);
 
 
 */
-node_ptr
-SymbTable_get_define_body(const SymbTable_ptr self,
-                          const node_ptr name);
+node_ptr SymbTable_get_define_body(const SymbTable_ptr self,
+                                   const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -932,9 +877,8 @@ SymbTable_get_define_body(const SymbTable_ptr self,
 
 
 */
-NFunction_ptr
-SymbTable_get_function(const SymbTable_ptr self,
-                       const node_ptr name);
+NFunction_ptr SymbTable_get_function(const SymbTable_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -942,9 +886,8 @@ SymbTable_get_function(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_actual_parameter(const SymbTable_ptr self,
-                               const node_ptr name);
+node_ptr SymbTable_get_actual_parameter(const SymbTable_ptr self,
+                                        const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -952,9 +895,8 @@ SymbTable_get_actual_parameter(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_array_define_body(const SymbTable_ptr self,
-                                const node_ptr name);
+node_ptr SymbTable_get_array_define_body(const SymbTable_ptr self,
+                                         const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -962,9 +904,8 @@ SymbTable_get_array_define_body(const SymbTable_ptr self,
 
 
 */
-SymbType_ptr
-SymbTable_get_variable_array_type(const SymbTable_ptr self,
-                                  const node_ptr name);
+SymbType_ptr SymbTable_get_variable_array_type(const SymbTable_ptr self,
+                                               const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -973,9 +914,8 @@ SymbTable_get_variable_array_type(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_define_flatten_body(const SymbTable_ptr self,
-                                  const node_ptr name);
+node_ptr SymbTable_get_define_flatten_body(const SymbTable_ptr self,
+                                           const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -984,9 +924,8 @@ SymbTable_get_define_flatten_body(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_flatten_actual_parameter(const SymbTable_ptr self,
-                                       const node_ptr name);
+node_ptr SymbTable_get_flatten_actual_parameter(const SymbTable_ptr self,
+                                                const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -994,9 +933,8 @@ SymbTable_get_flatten_actual_parameter(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_array_define_flatten_body(const SymbTable_ptr self,
-                                        const node_ptr name);
+node_ptr SymbTable_get_array_define_flatten_body(const SymbTable_ptr self,
+                                                 const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1004,9 +942,8 @@ SymbTable_get_array_define_flatten_body(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_define_context(const SymbTable_ptr self,
-                             const node_ptr name);
+node_ptr SymbTable_get_define_context(const SymbTable_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1014,9 +951,8 @@ SymbTable_get_define_context(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_function_context(const SymbTable_ptr self,
-                               const node_ptr name);
+node_ptr SymbTable_get_function_context(const SymbTable_ptr self,
+                                        const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1025,9 +961,8 @@ SymbTable_get_function_context(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_actual_parameter_context(const SymbTable_ptr self,
-                                       const node_ptr name);
+node_ptr SymbTable_get_actual_parameter_context(const SymbTable_ptr self,
+                                                const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1035,9 +970,8 @@ SymbTable_get_actual_parameter_context(const SymbTable_ptr self,
 
 
 */
-node_ptr
-SymbTable_get_array_define_context(const SymbTable_ptr self,
-                                   const node_ptr name);
+node_ptr SymbTable_get_array_define_context(const SymbTable_ptr self,
+                                            const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1052,9 +986,8 @@ SymbTable_get_array_define_context(const SymbTable_ptr self,
 
   \se None
 */
-SymbCategory
-SymbTable_get_symbol_category(const SymbTable_ptr self,
-                              const node_ptr name);
+SymbCategory SymbTable_get_symbol_category(const SymbTable_ptr self,
+                                           const node_ptr name);
 
 /* Queries: */
 
@@ -1064,9 +997,8 @@ SymbTable_get_symbol_category(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_state_var(const SymbTable_ptr self,
-                              const node_ptr name);
+boolean SymbTable_is_symbol_state_var(const SymbTable_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1076,9 +1008,8 @@ SymbTable_is_symbol_state_var(const SymbTable_ptr self,
   Symbol must be declared, but if has no type (e.g. is a define), NULL is
   returned
 */
-SymbType_ptr
-SymbTable_get_symbol_type(const SymbTable_ptr self,
-                          const node_ptr name);
+SymbType_ptr SymbTable_get_symbol_type(const SymbTable_ptr self,
+                                       const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1086,9 +1017,8 @@ SymbTable_get_symbol_type(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_frozen_var(const SymbTable_ptr self,
-                               const node_ptr name);
+boolean SymbTable_is_symbol_frozen_var(const SymbTable_ptr self,
+                                       const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1096,9 +1026,8 @@ SymbTable_is_symbol_frozen_var(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_state_frozen_var(const SymbTable_ptr self,
-                                     const node_ptr name);
+boolean SymbTable_is_symbol_state_frozen_var(const SymbTable_ptr self,
+                                             const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1106,9 +1035,8 @@ SymbTable_is_symbol_state_frozen_var(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_input_var(const SymbTable_ptr self,
-                              const node_ptr name);
+boolean SymbTable_is_symbol_input_var(const SymbTable_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1117,8 +1045,7 @@ SymbTable_is_symbol_input_var(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_var(const SymbTable_ptr self, const node_ptr name);
+boolean SymbTable_is_symbol_var(const SymbTable_ptr self, const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1127,9 +1054,8 @@ SymbTable_is_symbol_var(const SymbTable_ptr self, const node_ptr name);
 
 
 */
-boolean
-SymbTable_is_symbol_bool_var(const SymbTable_ptr self,
-                             const node_ptr name);
+boolean SymbTable_is_symbol_bool_var(const SymbTable_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1137,9 +1063,8 @@ SymbTable_is_symbol_bool_var(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_declared(const SymbTable_ptr self,
-                             const node_ptr name);
+boolean SymbTable_is_symbol_declared(const SymbTable_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1148,9 +1073,8 @@ SymbTable_is_symbol_declared(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_define(const SymbTable_ptr self,
-                           const node_ptr name);
+boolean SymbTable_is_symbol_define(const SymbTable_ptr self,
+                                   const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1159,9 +1083,8 @@ SymbTable_is_symbol_define(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_function(const SymbTable_ptr self,
-                             const node_ptr name);
+boolean SymbTable_is_symbol_function(const SymbTable_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1170,9 +1093,8 @@ SymbTable_is_symbol_function(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_parameter(const SymbTable_ptr self,
-                              const node_ptr name);
+boolean SymbTable_is_symbol_parameter(const SymbTable_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1181,9 +1103,8 @@ SymbTable_is_symbol_parameter(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_array_define(const SymbTable_ptr self,
-                                 const node_ptr name);
+boolean SymbTable_is_symbol_array_define(const SymbTable_ptr self,
+                                         const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1192,9 +1113,8 @@ SymbTable_is_symbol_array_define(const SymbTable_ptr self,
 
 
 */
-boolean
-SymbTable_is_symbol_variable_array(const SymbTable_ptr self,
-                                   const node_ptr name);
+boolean SymbTable_is_symbol_variable_array(const SymbTable_ptr self,
+                                           const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1207,18 +1127,16 @@ SymbTable_is_symbol_variable_array(const SymbTable_ptr self,
   expressions, consider using function node_is_leaf which performs a
   purely-syntactly check.
 */
-boolean
-SymbTable_is_symbol_constant(const SymbTable_ptr self,
-                             const node_ptr name);
+boolean SymbTable_is_symbol_constant(const SymbTable_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbTable
   \brief Returns true iff this name is sub-element of
   a variable array.
 */
-boolean
-SymbTable_is_symbol_array_var_element(const SymbTable_ptr symb_table,
-                                      const node_ptr name);
+boolean SymbTable_is_symbol_array_var_element(const SymbTable_ptr symb_table,
+                                              const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1270,15 +1188,13 @@ boolean SymbTable_is_symbol_frozen_var_array(const SymbTable_ptr self,
 boolean SymbTable_is_symbol_state_var_array(const SymbTable_ptr self,
                                             node_ptr array);
 
-
 /*!
   \methodof SymbTable
   \brief Returns true if the given variable has a finite domain
 
 
 */
-boolean
-SymbTable_is_var_finite(const SymbTable_ptr self, const node_ptr name);
+boolean SymbTable_is_var_finite(const SymbTable_ptr self, const node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1288,9 +1204,8 @@ SymbTable_is_var_finite(const SymbTable_ptr self, const node_ptr name);
   The given list of variables is traversed until an input
   variable is found
 */
-boolean
-SymbTable_list_contains_input_var(const SymbTable_ptr self,
-                                  const NodeList_ptr var_list);
+boolean SymbTable_list_contains_input_var(const SymbTable_ptr self,
+                                          const NodeList_ptr var_list);
 
 /*!
   \methodof SymbTable
@@ -1300,9 +1215,8 @@ SymbTable_list_contains_input_var(const SymbTable_ptr self,
   The given list of variables is traversed until
   a state or frozen variable is found
 */
-boolean
-SymbTable_list_contains_state_frozen_var(const SymbTable_ptr self,
-                                         const NodeList_ptr var_list);
+boolean SymbTable_list_contains_state_frozen_var(const SymbTable_ptr self,
+                                                 const NodeList_ptr var_list);
 
 /*!
   \methodof SymbTable
@@ -1312,9 +1226,8 @@ SymbTable_list_contains_state_frozen_var(const SymbTable_ptr self,
   Iterates through the elements in var_list
   checking each one to see if it is one undeclared variable.
 */
-boolean
-SymbTable_list_contains_undef_var(const SymbTable_ptr self,
-                                  const NodeList_ptr var_list);
+boolean SymbTable_list_contains_undef_var(const SymbTable_ptr self,
+                                          const NodeList_ptr var_list);
 
 /*!
   \methodof SymbTable
@@ -1342,8 +1255,7 @@ SymbTable_contains_infinite_precision_variables(const SymbTable_ptr self);
 
   Checks whether the Symbol Table contains enum variables
 */
-boolean
-SymbTable_contains_enum_variables(const SymbTable_ptr self);
+boolean SymbTable_contains_enum_variables(const SymbTable_ptr self);
 
 /*!
   \methodof SymbTable
@@ -1351,8 +1263,7 @@ SymbTable_contains_enum_variables(const SymbTable_ptr self);
 
   Checks whether the Symbol Table contains word variables
 */
-boolean
-SymbTable_contains_word_variables(const SymbTable_ptr self);
+boolean SymbTable_contains_word_variables(const SymbTable_ptr self);
 
 /*!
   \methodof SymbTable
@@ -1360,8 +1271,7 @@ SymbTable_contains_word_variables(const SymbTable_ptr self);
 
   Checks whether the Symbol Table contains array variables
 */
-boolean
-SymbTable_contains_array_variables(const SymbTable_ptr self);
+boolean SymbTable_contains_array_variables(const SymbTable_ptr self);
 
 /*!
   \methodof SymbTable
@@ -1369,8 +1279,7 @@ SymbTable_contains_array_variables(const SymbTable_ptr self);
 
   Checks whether the Symbol Table contains functions
 */
-boolean
-SymbTable_contains_functions(const SymbTable_ptr self);
+boolean SymbTable_contains_functions(const SymbTable_ptr self);
 
 /*!
   \methodof SymbTable
@@ -1379,8 +1288,7 @@ SymbTable_contains_functions(const SymbTable_ptr self);
   Returns the layer a variable is defined in, NULL
   if there is no layer containing it.
 */
-SymbLayer_ptr
-SymbTable_variable_get_layer(SymbTable_ptr  self, node_ptr name);
+SymbLayer_ptr SymbTable_variable_get_layer(SymbTable_ptr self, node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1389,8 +1297,7 @@ SymbTable_variable_get_layer(SymbTable_ptr  self, node_ptr name);
   Returns the layer a DEFINE is defined in, NULL
   if there is no layer containing it.
 */
-SymbLayer_ptr
-SymbTable_define_get_layer(SymbTable_ptr  self, node_ptr name);
+SymbLayer_ptr SymbTable_define_get_layer(SymbTable_ptr self, node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1399,8 +1306,7 @@ SymbTable_define_get_layer(SymbTable_ptr  self, node_ptr name);
   Returns the layer a symbol is defined in, NULL
   if there is no layer containing it.
 */
-SymbLayer_ptr
-SymbTable_symbol_get_layer(SymbTable_ptr  self, node_ptr name);
+SymbLayer_ptr SymbTable_symbol_get_layer(SymbTable_ptr self, node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1409,8 +1315,7 @@ SymbTable_symbol_get_layer(SymbTable_ptr  self, node_ptr name);
   Returns the layer a NFunction is defined in, NULL
   if there is no layer containing it.
 */
-SymbLayer_ptr
-SymbTable_function_get_layer(SymbTable_ptr  self, node_ptr name);
+SymbLayer_ptr SymbTable_function_get_layer(SymbTable_ptr self, node_ptr name);
 
 /*!
   \methodof SymbTable
@@ -1429,8 +1334,7 @@ SymbTable_function_get_layer(SymbTable_ptr  self, node_ptr name);
 
   \sa symb_table_deinit
 */
-node_ptr
-SymbTable_get_determinization_var_name(const SymbTable_ptr self);
+node_ptr SymbTable_get_determinization_var_name(const SymbTable_ptr self);
 
 /*!
   \methodof SymbTable
@@ -1440,10 +1344,8 @@ SymbTable_get_determinization_var_name(const SymbTable_ptr self);
 
   If prefix is NULL then a valid fresh symbol is choosed.
 */
-node_ptr
-SymbTable_get_fresh_symbol_name(const SymbTable_ptr self,
-                                const char * prefix);
-
+node_ptr SymbTable_get_fresh_symbol_name(const SymbTable_ptr self,
+                                         const char *prefix);
 
 /*!
   \methodof SymbTable
@@ -1454,24 +1356,22 @@ SymbTable_get_fresh_symbol_name(const SymbTable_ptr self,
   construct a node out of a string.
 */
 node_ptr SymbTable_get_symbol_from_str(const SymbTable_ptr self,
-                                       const char* symbol_str);
+                                       const char *symbol_str);
 
 /*!
   \methodof SymbTable
   \brief Returns the name of the class in which the given layer is
   declared or NULL if there is no such a class.
 */
-const char*
-SymbTable_get_class_of_layer(const SymbTable_ptr self,
-                             const char* layer_name);
+const char *SymbTable_get_class_of_layer(const SymbTable_ptr self,
+                                         const char *layer_name);
 
 /*!
   \methodof SymbTable
   \todo
 */
-ResolveSymbol_ptr
-SymbTable_resolve_symbol(SymbTable_ptr self,
-                         node_ptr expr, node_ptr context);
+ResolveSymbol_ptr SymbTable_resolve_symbol(SymbTable_ptr self, node_ptr expr,
+                                           node_ptr context);
 
 /*!
   \methodof SymbTable
@@ -1486,8 +1386,7 @@ SymbTable_resolve_symbol(SymbTable_ptr self,
 
   \sa SymbTable_create SymbTable_destroy
 */
-SymbTable_ptr SymbTable_copy(SymbTable_ptr self,
-                             Set_t blacklist);
+SymbTable_ptr SymbTable_copy(SymbTable_ptr self, Set_t blacklist);
 
 /*!
   \methodof SymbTable
@@ -1512,15 +1411,10 @@ SymbTable_ptr SymbTable_copy(SymbTable_ptr self,
   <remove_action>. For remove_action, for clearing the hash it may be useful
   to use function SymbTable_clear_handled_remove_action_hash.
 */
-hash_ptr SymbTable_get_handled_hash_ptr(SymbTable_ptr self,
-                                        const char* key,
-                                        ST_PFICPCP compare_func,
-                                        ST_PFICPI hash_func,
-                                        ST_PFSR destroy_func,
-                                        SymbTableTriggerFun add_action,
-                                        SymbTableTriggerFun remove_action,
-                                        SymbTableTriggerFun redeclare_action
-                                        );
+hash_ptr SymbTable_get_handled_hash_ptr(
+    SymbTable_ptr self, const char *key, ST_PFICPCP compare_func,
+    ST_PFICPI hash_func, ST_PFSR destroy_func, SymbTableTriggerFun add_action,
+    SymbTableTriggerFun remove_action, SymbTableTriggerFun redeclare_action);
 
 /*!
   \brief This function can be used with SymbTable_get_handled_hash_ptr
@@ -1531,19 +1425,17 @@ hash_ptr SymbTable_get_handled_hash_ptr(SymbTable_ptr self,
 
   \sa SymbTable_get_handled_hash_ptr
 */
-void
-SymbTable_clear_handled_remove_action_hash(const SymbTable_ptr st,
-                                           const node_ptr sym,
-                                           SymbTableTriggerAction action,
-                                           void* arg);
+void SymbTable_clear_handled_remove_action_hash(const SymbTable_ptr st,
+                                                const node_ptr sym,
+                                                SymbTableTriggerAction action,
+                                                void *arg);
 
 /*!
   \methodof SymbTable
   \brief Return the string version of the SymbCategory of symbol
   Returned string must NOT be freed
 */
-char* SymbTable_sprint_category(SymbTable_ptr self,
-                                node_ptr symbol);
+char *SymbTable_sprint_category(SymbTable_ptr self, node_ptr symbol);
 
 /*!
   \methodof SymbTable
@@ -1551,9 +1443,7 @@ char* SymbTable_sprint_category(SymbTable_ptr self,
 
   \todo input symbol table is copied
 */
-SymbTable_ptr SymbTable_anonymize(const SymbTable_ptr self,
-                                  Set_t blacklist,
+SymbTable_ptr SymbTable_anonymize(const SymbTable_ptr self, Set_t blacklist,
                                   NodeAnonymizerBase_ptr anonymizer);
-
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_TABLE_CLASS_H__ */

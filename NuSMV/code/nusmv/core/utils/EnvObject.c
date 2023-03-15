@@ -34,11 +34,9 @@
 
 */
 
-
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -61,22 +59,19 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void env_object_finalize(Object_ptr object, void* dummy);
-
+static void env_object_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-EnvObject_ptr EnvObject_create(const NuSMVEnv_ptr env)
-{
+EnvObject_ptr EnvObject_create(const NuSMVEnv_ptr env) {
   EnvObject_ptr self = ALLOC(EnvObject, 1);
   ENV_OBJECT_CHECK_INSTANCE(self);
 
@@ -84,15 +79,13 @@ EnvObject_ptr EnvObject_create(const NuSMVEnv_ptr env)
   return self;
 }
 
-void EnvObject_destroy(EnvObject_ptr self)
-{
+void EnvObject_destroy(EnvObject_ptr self) {
   ENV_OBJECT_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-NuSMVEnv_ptr EnvObject_get_environment(const EnvObject_ptr self)
-{
+NuSMVEnv_ptr EnvObject_get_environment(const EnvObject_ptr self) {
   ENV_OBJECT_CHECK_INSTANCE(self);
 
   return self->environment;
@@ -102,8 +95,7 @@ NuSMVEnv_ptr EnvObject_get_environment(const EnvObject_ptr self)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void env_object_init(EnvObject_ptr self, NuSMVEnv_ptr env)
-{
+void env_object_init(EnvObject_ptr self, NuSMVEnv_ptr env) {
   /* base class initialization */
   object_init(OBJECT(self));
 
@@ -118,22 +110,18 @@ void env_object_init(EnvObject_ptr self, NuSMVEnv_ptr env)
   /*OVERRIDE(Object, virtual_method) = env_object_virtual_method;*/
 }
 
-void env_object_copy_aux(const EnvObject_ptr self, EnvObject_ptr copy)
-{
+void env_object_copy_aux(const EnvObject_ptr self, EnvObject_ptr copy) {
   object_copy_aux(OBJECT(self), OBJECT(copy));
 
   copy->environment = self->environment;
 }
 
-void env_object_deinit(EnvObject_ptr self)
-{
+void env_object_deinit(EnvObject_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   object_deinit(OBJECT(self));
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -144,14 +132,11 @@ void env_object_deinit(EnvObject_ptr self)
 
   Called by the class destructor
 */
-static void env_object_finalize(Object_ptr object, void* dummy)
-{
+static void env_object_finalize(Object_ptr object, void *dummy) {
   EnvObject_ptr self = ENV_OBJECT(object);
 
   env_object_deinit(self);
   FREE(self);
 }
-
-
 
 /**AutomaticEnd***************************************************************/

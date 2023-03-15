@@ -34,32 +34,31 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/shell/cmd/cmd.h"
 #include "nusmv/shell/ltl/ltlCmd.h"
 
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/error.h" /* for CATCH(errmgr) */
 
 #include "nusmv/core/prop/Prop.h"
-#include "nusmv/core/prop/propPkg.h"
 #include "nusmv/core/prop/PropDb.h"
+#include "nusmv/core/prop/propPkg.h"
 
-#include "nusmv/core/mc/mc.h"
-#include "nusmv/core/enc/enc.h"
 #include "nusmv/core/compile/compile.h" /* to check for presence of compassion */
+#include "nusmv/core/enc/enc.h"
+#include "nusmv/core/mc/mc.h"
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 extern cmp_struct_ptr cmps;
 
-int CommandCheckLtlSpec(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandCheckLtlSpec(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
@@ -70,15 +69,15 @@ static int UsageCheckLtlSpec(const NuSMVEnv_ptr env);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Ltl_Init(NuSMVEnv_ptr env)
-{
+void Ltl_Init(NuSMVEnv_ptr env) {
   Cmd_CommandAdd(env, "check_ltlspec", CommandCheckLtlSpec, 0, false);
 }
 
 /*!
   \command{check_ltlspec} Performs LTL model checking
 
-  \command_args{[-h] [-m | -o output-file] [-n number | -p "ltl-expr [IN context]" | -P \"name\"] }
+  \command_args{[-h] [-m | -o output-file] [-n number | -p "ltl-expr [IN
+  context]" | -P \"name\"] }
 
    Performs model checking of LTL formulas. LTL
   model checking is reduced to CTL model checking as described in the
@@ -114,149 +113,155 @@ void Ltl_Init(NuSMVEnv_ptr env)
 
 */
 
-int CommandCheckLtlSpec(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int CommandCheckLtlSpec(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   int c;
   int prop_no = -1;
-  char* formula = NIL(char);
-  char* formula_name = NIL(char);
+  char *formula = NIL(char);
+  char *formula_name = NIL(char);
   int status = 0;
   int useMore = 0;
-  char* dbgFileName = NIL(char);
-  FILE* outstream = StreamMgr_get_output_stream(streams);
-  FILE* old_outstream = outstream;
+  char *dbgFileName = NIL(char);
+  FILE *outstream = StreamMgr_get_output_stream(streams);
+  FILE *old_outstream = outstream;
   SymbTable_ptr st = SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
   PropDb_ptr prop_db = PROP_DB(NuSMVEnv_get_value(env, ENV_PROP_DB));
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   util_getopt_reset();
-  while ((c = util_getopt(argc,argv,"hmo:n:p:P:")) != EOF) {
+  while ((c = util_getopt(argc, argv, "hmo:n:p:P:")) != EOF) {
 
     switch (c) {
-    case 'h': return UsageCheckLtlSpec(env);
+    case 'h':
+      return UsageCheckLtlSpec(env);
 
     case 'n':
-      if (formula != NIL(char)) return UsageCheckLtlSpec(env);
-      if (prop_no != -1) return UsageCheckLtlSpec(env);
-      if (formula_name != NIL(char)) return UsageCheckLtlSpec(env);
+      if (formula != NIL(char))
+        return UsageCheckLtlSpec(env);
+      if (prop_no != -1)
+        return UsageCheckLtlSpec(env);
+      if (formula_name != NIL(char))
+        return UsageCheckLtlSpec(env);
 
-      prop_no = PropDb_get_prop_index_from_string(prop_db,
-                                                  util_optarg);
-      if (prop_no == -1) return 1;
+      prop_no = PropDb_get_prop_index_from_string(prop_db, util_optarg);
+      if (prop_no == -1)
+        return 1;
       break;
 
     case 'P':
-        if (formula != NIL(char)) return UsageCheckLtlSpec(env);
-        if (prop_no != -1) return UsageCheckLtlSpec(env);
-        if (formula_name != NIL(char)) return UsageCheckLtlSpec(env);
+      if (formula != NIL(char))
+        return UsageCheckLtlSpec(env);
+      if (prop_no != -1)
+        return UsageCheckLtlSpec(env);
+      if (formula_name != NIL(char))
+        return UsageCheckLtlSpec(env);
 
-        formula_name = util_strsav(util_optarg);
-        prop_no = PropDb_prop_parse_name(prop_db,
-                                         formula_name);
+      formula_name = util_strsav(util_optarg);
+      prop_no = PropDb_prop_parse_name(prop_db, formula_name);
 
-        if (prop_no == -1) {
-          StreamMgr_print_error(streams,  "No property named \"%s\"\n", formula_name);
-          FREE(formula_name);
-          return 1;
-        }
+      if (prop_no == -1) {
+        StreamMgr_print_error(streams, "No property named \"%s\"\n",
+                              formula_name);
         FREE(formula_name);
-        break;
+        return 1;
+      }
+      FREE(formula_name);
+      break;
 
     case 'p':
-      if (prop_no != -1) return UsageCheckLtlSpec(env);
-      if (formula != NIL(char)) return UsageCheckLtlSpec(env);
-      if (formula_name != NIL(char)) return UsageCheckLtlSpec(env);
+      if (prop_no != -1)
+        return UsageCheckLtlSpec(env);
+      if (formula != NIL(char))
+        return UsageCheckLtlSpec(env);
+      if (formula_name != NIL(char))
+        return UsageCheckLtlSpec(env);
 
       formula = util_strsav(util_optarg);
       break;
 
     case 'o':
-      if (useMore == 1) return UsageCheckLtlSpec(env);
+      if (useMore == 1)
+        return UsageCheckLtlSpec(env);
       dbgFileName = util_strsav(util_optarg);
-      StreamMgr_print_output(streams,  "Output to file: %s\n", dbgFileName);
+      StreamMgr_print_output(streams, "Output to file: %s\n", dbgFileName);
       break;
 
     case 'm':
-      if (dbgFileName != NIL(char)) return UsageCheckLtlSpec(env);
+      if (dbgFileName != NIL(char))
+        return UsageCheckLtlSpec(env);
       useMore = 1;
       break;
 
-    default:  return UsageCheckLtlSpec(env);
+    default:
+      return UsageCheckLtlSpec(env);
     }
   }
-  if (argc != util_optind) return UsageCheckLtlSpec(env);
+  if (argc != util_optind)
+    return UsageCheckLtlSpec(env);
 
   if (cmp_struct_get_read_model(cmps) == 0) {
-    StreamMgr_print_error(streams,
-            "A model must be read before. Use the \"read_model\" command.\n");
+    StreamMgr_print_error(
+        streams,
+        "A model must be read before. Use the \"read_model\" command.\n");
     return 1;
   }
 
   if (cmp_struct_get_encode_variables(cmps) == 0) {
-    StreamMgr_print_error(streams,
-            "The variables must be built before. Use the \"encode_variables\" command.\n");
+    StreamMgr_print_error(streams, "The variables must be built before. Use "
+                                   "the \"encode_variables\" command.\n");
     return 1;
   }
 
-  if ( (!cmp_struct_get_build_model(cmps))
-       && (opt_cone_of_influence(opts) == false) ) {
-    StreamMgr_print_error(streams,  "The current partition method %s has not yet be computed.\n",
-            TransType_to_string(get_partition_method(opts)));
-    StreamMgr_print_error(streams,  "Use \t \"build_model -f -m %s\"\nto build the transition relation.\n",
-            TransType_to_string(get_partition_method(opts)));
+  if ((!cmp_struct_get_build_model(cmps)) &&
+      (opt_cone_of_influence(opts) == false)) {
+    StreamMgr_print_error(
+        streams, "The current partition method %s has not yet be computed.\n",
+        TransType_to_string(get_partition_method(opts)));
+    StreamMgr_print_error(
+        streams,
+        "Use \t \"build_model -f -m %s\"\nto build the transition relation.\n",
+        TransType_to_string(get_partition_method(opts)));
     return 1;
   }
 
-  if (useMore || (char*)NULL != dbgFileName) {
+  if (useMore || (char *)NULL != dbgFileName) {
     if (OUTCOME_SUCCESS !=
         Cmd_Misc_open_pipe_or_file(env, dbgFileName, &outstream)) {
-      status = 1; goto check_ltlspec_exit;
+      status = 1;
+      goto check_ltlspec_exit;
     }
   }
 
   if (formula != NIL(char)) {
-    prop_no = PropDb_prop_parse_and_add(prop_db, st,
-                                        formula, Prop_Ltl, Nil);
+    prop_no = PropDb_prop_parse_and_add(prop_db, st, formula, Prop_Ltl, Nil);
 
-    if (prop_no == -1) { status = 1; goto check_ltlspec_exit; }
+    if (prop_no == -1) {
+      status = 1;
+      goto check_ltlspec_exit;
+    }
 
-    CATCH(errmgr) {
-      PropDb_verify_prop_at_index(prop_db, prop_no);
-    }
-    FAIL(errmgr) {
+    CATCH(errmgr) { PropDb_verify_prop_at_index(prop_db, prop_no); }
+    FAIL(errmgr) { status = 1; }
+  } else if (prop_no != -1) {
+    if (Prop_check_type(PropDb_get_prop_at_index(prop_db, prop_no), Prop_Ltl) !=
+        0) {
       status = 1;
+    } else {
+      CATCH(errmgr) { PropDb_verify_prop_at_index(prop_db, prop_no); }
+      FAIL(errmgr) { status = 1; }
     }
-  }
-  else if (prop_no != -1) {
-    if (Prop_check_type(PropDb_get_prop_at_index(
-                  prop_db, prop_no), Prop_Ltl) != 0) {
-      status = 1;
-    }
-    else {
-      CATCH(errmgr) {
-        PropDb_verify_prop_at_index(prop_db, prop_no);
-      }
-      FAIL(errmgr) {
-        status = 1;
-      }
-    }
-  }
-  else {
-    CATCH(errmgr) {
-      PropDb_verify_all_type_wrapper(prop_db, Prop_Ltl);
-    }
-    FAIL(errmgr) {
-      status = 1;
-    }
+  } else {
+    CATCH(errmgr) { PropDb_verify_all_type_wrapper(prop_db, Prop_Ltl); }
+    FAIL(errmgr) { status = 1; }
   }
 
 check_ltlspec_exit:
   if (useMore) {
-    FILE* reset_stream;
+    FILE *reset_stream;
 
     CmdClosePipe(outstream);
     reset_stream = StreamMgr_reset_output_stream(streams);
@@ -264,14 +269,14 @@ check_ltlspec_exit:
 
     nusmv_assert(reset_stream == outstream);
 
-    outstream = (FILE*)NULL;
+    outstream = (FILE *)NULL;
   }
 
-  if ((char*)NULL != dbgFileName) {
+  if ((char *)NULL != dbgFileName) {
     /* this closes the file stream as well  */
     StreamMgr_set_output_stream(streams, old_outstream);
 
-    outstream = (FILE*)NULL;
+    outstream = (FILE *)NULL;
   }
 
   return status;
@@ -282,17 +287,27 @@ check_ltlspec_exit:
 
   \todo Missing description
 */
-static int UsageCheckLtlSpec(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "usage: check_ltlspec [-h] [-m | -o file] [-n number | -p \"ltl_expr\" | -P \"name\"]\n");
-  StreamMgr_print_error(streams,  "   -h \t\t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "   -m \t\t\tPipes output through the program specified by\n");
-  StreamMgr_print_error(streams,  "      \t\t\tthe \"PAGER\" environment variable if any,\n");
-  StreamMgr_print_error(streams,  "      \t\t\telse through the UNIX command \"more\".\n");
-  StreamMgr_print_error(streams,  "   -o file\t\tWrites the debugger output to \"file\".\n");
-  StreamMgr_print_error(streams,  "   -n number\t\tChecks only the LTLSPEC with the given index number.\n");
-  StreamMgr_print_error(streams,  "   -p \"ltl-expr\"\tChecks only the given LTL formula.\n");
-  StreamMgr_print_error(streams,  "   -P \"name\"\t\tChecks only the LTLSPEC with the given name.\n");
-  return(1);
+static int UsageCheckLtlSpec(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(streams, "usage: check_ltlspec [-h] [-m | -o file] [-n "
+                                 "number | -p \"ltl_expr\" | -P \"name\"]\n");
+  StreamMgr_print_error(streams, "   -h \t\t\tPrints the command usage.\n");
+  StreamMgr_print_error(
+      streams, "   -m \t\t\tPipes output through the program specified by\n");
+  StreamMgr_print_error(
+      streams, "      \t\t\tthe \"PAGER\" environment variable if any,\n");
+  StreamMgr_print_error(
+      streams, "      \t\t\telse through the UNIX command \"more\".\n");
+  StreamMgr_print_error(
+      streams, "   -o file\t\tWrites the debugger output to \"file\".\n");
+  StreamMgr_print_error(
+      streams,
+      "   -n number\t\tChecks only the LTLSPEC with the given index number.\n");
+  StreamMgr_print_error(
+      streams, "   -p \"ltl-expr\"\tChecks only the given LTL formula.\n");
+  StreamMgr_print_error(
+      streams,
+      "   -P \"name\"\t\tChecks only the LTLSPEC with the given name.\n");
+  return (1);
 }

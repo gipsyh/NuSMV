@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -53,7 +53,7 @@
 
   \todo Missing description
 */
-typedef struct TraceExplainer_TAG* TraceExplainer_ptr;
+typedef struct TraceExplainer_TAG *TraceExplainer_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -68,16 +68,15 @@ typedef struct TraceExplainer_TAG* TraceExplainer_ptr;
 
   \todo Missing description
 */
-#define TRACE_EXPLAINER(x) \
-         ((TraceExplainer_ptr) x)
+#define TRACE_EXPLAINER(x) ((TraceExplainer_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_EXPLAINER_CHECK_INSTANCE(x) \
-         (nusmv_assert(TRACE_EXPLAINER(x) != TRACE_EXPLAINER(NULL)))
+#define TRACE_EXPLAINER_CHECK_INSTANCE(x)                                      \
+  (nusmv_assert(TRACE_EXPLAINER(x) != TRACE_EXPLAINER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -94,10 +93,8 @@ typedef struct TraceExplainer_TAG* TraceExplainer_ptr;
   variables which assume a different value from the previous printed one are
   printed out.
 */
-TraceExplainer_ptr
-TraceExplainer_create(boolean changes_only);
+TraceExplainer_ptr TraceExplainer_create(boolean changes_only);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_TRACE_PLUGINS_TRACE_EXPLAINER_H__ */
-

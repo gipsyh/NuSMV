@@ -28,13 +28,12 @@
 #define LS_DEFINED
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
-
 
 /* This can be typedef'ed to void if supported */
 typedef struct ls_dummy_defn {
-    int dummy;                  /* Not used */
+  int dummy; /* Not used */
 } ls_dummy;
 
 /*!
@@ -42,9 +41,9 @@ typedef struct ls_dummy_defn {
 
   \todo Missing description
 */
-typedef ls_dummy *lsList;       /* List handle           */
-typedef ls_dummy *lsGen;        /* List generator handle */
-typedef ls_dummy *lsHandle;     /* Handle to an item     */
+typedef ls_dummy *lsList;   /* List handle           */
+typedef ls_dummy *lsGen;    /* List generator handle */
+typedef ls_dummy *lsHandle; /* Handle to an item     */
 
 /*!
   \brief Used for return codes.
@@ -59,61 +58,60 @@ typedef void *lsGeneric;
 /*!
   \brief Nil for lsList
 */
-#define LS_NIL          0
+#define LS_NIL 0
 
 /*!
   \brief Bad generator state
 */
-#define LS_BADSTATE     -3
+#define LS_BADSTATE -3
 
 /*!
   \brief Bad parameter value
 */
-#define LS_BADPARAM     -2
+#define LS_BADPARAM -2
 
 /*!
   \brief No more items
 */
-#define LS_NOMORE       -1
+#define LS_NOMORE -1
 
 /*!
   \brief Succeeded operation
 */
-#define LS_OK           0
+#define LS_OK 0
 
 /*!
   \brief Set spot before object
 */
-#define LS_BEFORE       1
+#define LS_BEFORE 1
 
 /*!
   \brief Set spot after object
 */
-#define LS_AFTER        2
+#define LS_AFTER 2
 
 /*!
   \brief Stop generating items
 */
-#define LS_STOP         3
+#define LS_STOP 3
 
 /*!
   \brief Delete generated item
 */
-#define LS_DELETE       4
+#define LS_DELETE 4
 
 /*!
   \brief For all those routines that take a handle, this macro can be
   used when no handle is required.
 */
-#define LS_NH           (lsHandle *) 0
-
+#define LS_NH (lsHandle *)0
 
 typedef lsGeneric (*LS_PFLSG)(lsGeneric);
 
 /*!
   \brief Used for LS_PFLSG to copy a list
 */
-#define LS_COPY         (LS_PFLSG) (-1)
+#define LS_COPY (LS_PFLSG)(-1)
 
 /*!
   \brief Create a new list
@@ -409,7 +407,7 @@ lsStatus lsRemoveItem(lsHandle, lsGeneric *);
 
   The routine uses a generic merge sort written by Rick Rudell.
 */
-lsStatus lsSort(lsList, int (*compare)(char*, char*));
+lsStatus lsSort(lsList, int (*compare)(char *, char *));
 
 /*!
   \brief Removes duplicates from a sorted list
@@ -425,7 +423,8 @@ lsStatus lsSort(lsList, int (*compare)(char*, char*));
  duplicate destroyed.  `delFunc' can be zero if no clean up
  is required.
 */
-lsStatus lsUniq(lsList, int (*compare)(char*, char*), void (*delFunc)(lsGeneric));
+lsStatus lsUniq(lsList, int (*compare)(char *, char *),
+                void (*delFunc)(lsGeneric));
 
 /*!
   \brief Calls given function to all element of the list
@@ -445,8 +444,7 @@ lsStatus lsUniq(lsList, int (*compare)(char*, char*), void (*delFunc)(lsGeneric)
   does not return an appropriate value,  the routine will return
   LS_BADPARAM.
 */
-lsStatus lsForeach(lsList list,
-                   lsStatus (*userFunc)(lsGeneric, lsGeneric),
+lsStatus lsForeach(lsList list, lsStatus (*userFunc)(lsGeneric, lsGeneric),
                    lsGeneric arg);
 
 /*!
@@ -457,8 +455,7 @@ lsStatus lsForeach(lsList list,
 
   \sa lsForeach
 */
-lsStatus lsBackeach(lsList list,
-                    lsStatus (*userFunc)(lsGeneric, lsGeneric),
+lsStatus lsBackeach(lsList list, lsStatus (*userFunc)(lsGeneric, lsGeneric),
                     lsGeneric arg);
 
 /*!
@@ -471,15 +468,12 @@ lsStatus lsBackeach(lsList list,
   3) the comma operator returns the value of its second argument.
 
 */
-#define lsForEachItem(                                         \
-  list,  /* lsList, list to iterate */                         \
-  gen,   /* lsGen, local variable for iterator */              \
-  data   /* lsGeneric, variable to return data */              \
-)                                                              \
-  for(gen = lsStart(list);                                     \
-      (lsNext(gen, (lsGeneric *) &data, LS_NH) == LS_OK)       \
-      || ((void) lsFinish(gen), 0);                            \
-      )
-
+#define lsForEachItem(list, /* lsList, list to iterate */                      \
+                      gen,  /* lsGen, local variable for iterator */           \
+                      data  /* lsGeneric, variable to return data */           \
+)                                                                              \
+  for (gen = lsStart(list);                                                    \
+       (lsNext(gen, (lsGeneric *)&data, LS_NH) == LS_OK) ||                    \
+       ((void)lsFinish(gen), 0);)
 
 #endif /* __NUSMV_CORE_UTILS_LIST_H__ */

@@ -3,7 +3,7 @@
 
   This file is part of the ``simulate'' package.
   %COPYRIGHT%
-  
+
 
 -----------------------------------------------------------------------------*/
 
@@ -15,8 +15,8 @@
 
 */
 
-#include "nusmv/core/simulate/simulateInt.h"
 #include "nusmv/core/simulate/SimulateState.h"
+#include "nusmv/core/simulate/simulateInt.h"
 
 #include "nusmv/core/cinit/NuSMVEnv.h"
 
@@ -24,26 +24,21 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -53,24 +48,22 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Simulate_Pkg_init(NuSMVEnv_ptr env)
-{
+void Simulate_Pkg_init(NuSMVEnv_ptr env) {
   /* Does nothing, added for simmetry */
   UNUSED_PARAM(env);
 }
 
-void Simulate_Pkg_quit(NuSMVEnv_ptr env)
-{
+void Simulate_Pkg_quit(NuSMVEnv_ptr env) {
   SimulateState_ptr current;
 
   if (NuSMVEnv_has_value(env, ENV_SIMULATE_STATE)) {
     current = SIMULATE_STATE(NuSMVEnv_remove_value(env, ENV_SIMULATE_STATE));
-    SimulateState_destroy(current); current = SIMULATE_STATE(NULL);
+    SimulateState_destroy(current);
+    current = SIMULATE_STATE(NULL);
   }
 }
 
@@ -78,10 +71,6 @@ void Simulate_Pkg_quit(NuSMVEnv_ptr env)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
-

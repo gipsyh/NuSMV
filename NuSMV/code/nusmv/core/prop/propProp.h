@@ -3,7 +3,7 @@
 
   This file is part of the ``prop'' package.
   %COPYRIGHT%
-  
+
 
 -----------------------------------------------------------------------------*/
 
@@ -18,42 +18,36 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_PROP_PROP_PROP_H__
 #define __NUSMV_CORE_PROP_PROP_PROP_H__
 
 #include "nusmv/core/utils/defs.h"
 #include "nusmv/core/utils/list.h"
 
-#include "nusmv/core/prop/PropDb.h"
 #include "nusmv/core/prop/Prop.h"
-#include "nusmv/core/prop/propPkg.h"
+#include "nusmv/core/prop/PropDb.h"
 #include "nusmv/core/prop/Prop_Rewriter.h"
+#include "nusmv/core/prop/propPkg.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -78,8 +72,7 @@ lsList Prop_convert_props_to_invar(PropDb_ptr prop_db, lsList props);
   A range can be specified with 'A-B' where B >= A.
   Empty set is returned in case of error.
 */
-Set_t Prop_propset_from_indices(NuSMVEnv_ptr env, const char* indices);
-
+Set_t Prop_propset_from_indices(NuSMVEnv_ptr env, const char *indices);
 
 /**AutomaticEnd***************************************************************/
 

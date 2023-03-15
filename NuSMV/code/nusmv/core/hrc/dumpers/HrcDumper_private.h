@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_PRIVATE_H__
 #define __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_PRIVATE_H__
-
 
 #include "nusmv/core/hrc/dumpers/HrcDumper.h"
 
@@ -47,18 +44,16 @@
 #include "nusmv/core/utils/EnvObject_private.h"
 #include "nusmv/core/utils/utils.h"
 
-
 /*!
   \brief HrcDumper class definition derived from
                class Object
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct HrcDumper_TAG
-{
+typedef struct HrcDumper_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
@@ -67,7 +62,7 @@ typedef struct HrcDumper_TAG
   /* -------------------------------------------------- */
 
   MasterPrinter_ptr printer;
-  FILE* fout;
+  FILE *fout;
   boolean use_indentation;
   int indent;
   size_t indent_size;
@@ -78,20 +73,15 @@ typedef struct HrcDumper_TAG
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
-  void (*dump_snippet)(HrcDumper_ptr self,
-                       HrcDumperSnippet snippet,
-                       const HrcDumperInfo* info);
+  void (*dump_snippet)(HrcDumper_ptr self, HrcDumperSnippet snippet,
+                       const HrcDumperInfo *info);
 
-  void (*dump_comment)(HrcDumper_ptr self,
-                       const char* msg);
+  void (*dump_comment)(HrcDumper_ptr self, const char *msg);
 
-  void (*dump_header)(HrcDumper_ptr self,
-                      const char* msg);
+  void (*dump_header)(HrcDumper_ptr self, const char *msg);
 
-  void (*dump_node)(HrcDumper_ptr self,
-                    node_ptr node);
+  void (*dump_node)(HrcDumper_ptr self, node_ptr node);
 } HrcDumper;
-
 
 /* ---------------------------------------------------------------------- */
 /* Macros                                                                 */
@@ -111,42 +101,33 @@ typedef struct HrcDumper_TAG
 */
 #define HRC_MODULE_SUFFIX "_hrc"
 
-
-#define _HRC_DUMP_STR(x)          \
-  {                               \
-    hrc_dumper_dump_indent(self); \
-    fprintf(self->fout, x);       \
+#define _HRC_DUMP_STR(x)                                                       \
+  {                                                                            \
+    hrc_dumper_dump_indent(self);                                              \
+    fprintf(self->fout, x);                                                    \
   }
 
-#define _HRC_DUMP_STR_NL(x)                                           \
-  {                                                                   \
-    hrc_dumper_dump_indent(self);                                     \
-    fprintf(self->fout, x);                                           \
-    hrc_dumper_nl(self);                                              \
+#define _HRC_DUMP_STR_NL(x)                                                    \
+  {                                                                            \
+    hrc_dumper_dump_indent(self);                                              \
+    fprintf(self->fout, x);                                                    \
+    hrc_dumper_nl(self);                                                       \
   }
 
-#define _HRC_DUMP_NL()                                                \
-  {                                                                   \
-    hrc_dumper_nl(self);                                              \
+#define _HRC_DUMP_NL()                                                         \
+  { hrc_dumper_nl(self); }
+
+#define _HRC_DUMP_NODE(x)                                                      \
+  {                                                                            \
+    hrc_dumper_dump_indent(self);                                              \
+    self->dump_node(self, x);                                                  \
   }
 
-#define _HRC_DUMP_NODE(x)                              \
-  {                                                    \
-    hrc_dumper_dump_indent(self);                      \
-    self->dump_node(self, x);                          \
-  }
+#define _HRC_DUMP_COMMENT(x)                                                   \
+  { self->dump_comment(self, x); }
 
-#define _HRC_DUMP_COMMENT(x)      \
-  {                               \
-    self->dump_comment(self, x);  \
-  }
-
-#define _HRC_DUMP_HEADER(x)       \
-  {                               \
-    self->dump_header(self, x);   \
-  }
-
-
+#define _HRC_DUMP_HEADER(x)                                                    \
+  { self->dump_header(self, x); }
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -160,9 +141,7 @@ typedef struct HrcDumper_TAG
 
   \sa HrcDumper_create
 */
-void hrc_dumper_init(HrcDumper_ptr self,
-                            const NuSMVEnv_ptr env,
-                            FILE* fout);
+void hrc_dumper_init(HrcDumper_ptr self, const NuSMVEnv_ptr env, FILE *fout);
 
 /*!
   \methodof HrcDumper
@@ -176,30 +155,28 @@ void hrc_dumper_deinit(HrcDumper_ptr self);
 
 /*!
   \methodof HrcDumper
-  \brief 
+  \brief
 
-  
+
 */
-void hrc_dumper_dump_snippet(HrcDumper_ptr self,
-                                    HrcDumperSnippet snippet,
-                                    const HrcDumperInfo* info);
+void hrc_dumper_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
+                             const HrcDumperInfo *info);
 
 /*!
   \methodof HrcDumper
   \brief Dumps a comment
 
-  
+
 */
-void hrc_dumper_dump_comment(HrcDumper_ptr self,
-                                    const char* msg);
+void hrc_dumper_dump_comment(HrcDumper_ptr self, const char *msg);
 
 /*!
   \methodof HrcDumper
-  \brief 
+  \brief
 
-  
+
 */
-void hrc_dumper_dump_header(HrcDumper_ptr self, const char* msg);
+void hrc_dumper_dump_header(HrcDumper_ptr self, const char *msg);
 
 /*!
   \methodof HrcDumper
@@ -211,9 +188,9 @@ void hrc_dumper_dump_node(HrcDumper_ptr self, node_ptr node);
 
 /*!
   \methodof HrcDumper
-  \brief 
+  \brief
 
-  
+
 */
 void hrc_dumper_dump_indent(HrcDumper_ptr self);
 
@@ -221,7 +198,7 @@ void hrc_dumper_dump_indent(HrcDumper_ptr self);
   \methodof HrcDumper
   \brief Implements indentation of a newline
 
-  
+
 */
 void hrc_dumper_nl(HrcDumper_ptr self);
 

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,43 +34,36 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ST_PRIVATE_H__
 #define __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ST_PRIVATE_H__
 
-
-#include "nusmv/core/node/anonymizers/NodeAnonymizerST.h" 
-#include "nusmv/core/node/anonymizers/NodeAnonymizerDot.h" 
-#include "nusmv/core/node/anonymizers/NodeAnonymizerDot_private.h" 
+#include "nusmv/core/node/anonymizers/NodeAnonymizerDot.h"
+#include "nusmv/core/node/anonymizers/NodeAnonymizerDot_private.h"
+#include "nusmv/core/node/anonymizers/NodeAnonymizerST.h"
 #include "nusmv/core/utils/defs.h"
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 #define NAST_COUNTERS_CARDINALITY 11
-
-
-
 
 /*!
   \brief NodeAnonymizerST class definition derived from
                class NodeAnonymizerDot
 
-  
+
   counters Used for building unique ids
            WORD = 0, INTEGER = 1, ENUMERATIVE = 2, BOOLEAN = 3,
            CONSTANT = 4, DEFINE = 5, ARRAY=6, ARRAY_DEFINES=7, WORDARRAY=8,
            FUNCTION = 9, INTARRAY=10
-          
+
 
   \sa Base class NodeAnonymizerDot
 */
 
-typedef struct NodeAnonymizerST_TAG
-{
+typedef struct NodeAnonymizerST_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(NodeAnonymizerDot);
 
@@ -86,8 +79,6 @@ typedef struct NodeAnonymizerST_TAG
 
 } NodeAnonymizerST;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -100,11 +91,10 @@ typedef struct NodeAnonymizerST_TAG
 
   \sa NodeAnonymizerST_create
 */
-void node_anonymizer_st_init(NodeAnonymizerST_ptr self,
-                                    NuSMVEnv_ptr env,
-                                    const char* default_prefix,
-                                    size_t memoization_threshold,
-                                    SymbTable_ptr symb_table);
+void node_anonymizer_st_init(NodeAnonymizerST_ptr self, NuSMVEnv_ptr env,
+                             const char *default_prefix,
+                             size_t memoization_threshold,
+                             SymbTable_ptr symb_table);
 
 /*!
   \methodof NodeAnonymizerST
@@ -122,9 +112,8 @@ void node_anonymizer_st_deinit(NodeAnonymizerST_ptr self);
 
   \todo Missing description
 */
-const char* node_anonymizer_st_build_anonymous(NodeAnonymizerBase_ptr self,
-                                                      node_ptr id,
-                                                      const char* prefix);
+const char *node_anonymizer_st_build_anonymous(NodeAnonymizerBase_ptr self,
+                                               node_ptr id, const char *prefix);
 
 /*!
   \methodof NodeAnonymizerST
@@ -133,12 +122,11 @@ const char* node_anonymizer_st_build_anonymous(NodeAnonymizerBase_ptr self,
                       there. Otherwise, it is computed, added to the map and
                       finally returned to the caller
 
-  
+
   @param id     an identifier
   @param prefix a prefix to be used instead of the default one
 */
-node_ptr node_anonymizer_st_translate(NodeAnonymizerBase_ptr self,
-                                             node_ptr id,
-                                             const char* prefix);
+node_ptr node_anonymizer_st_translate(NodeAnonymizerBase_ptr self, node_ptr id,
+                                      const char *prefix);
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ST_PRIVATE_H__ */

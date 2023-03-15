@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,30 +34,27 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/addons_core/compass/compile/ProbAssign.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/addons_core/compass/compass.h"
 #include "nusmv/addons_core/compass/compassInt.h"
 
 #include "nusmv/core/utils/error.h"
 
-
 /*!
   \brief Checks semantics of given probabilistic list
 
-  
+
 */
 
-void Compass_check_prob_list(TypeChecker_ptr tc, NodeList_ptr list)
-{
+void Compass_check_prob_list(TypeChecker_ptr tc, NodeList_ptr list) {
   ListIter_ptr iter;
   NODE_LIST_FOREACH(list, iter) {
     ProbAssign_ptr ta = PROB_ASSIGN(NodeList_get_elem_at(list, iter));
@@ -67,21 +64,19 @@ void Compass_check_prob_list(TypeChecker_ptr tc, NodeList_ptr list)
     if (!TypeChecker_is_expression_wellformed(tc, asgns, Nil)) {
       const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(tc));
       const ErrorMgr_ptr errmgr =
-        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+          ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
       ErrorMgr_rpterr(errmgr, "An error was found in probabilistic list\n");
     }
   }
 }
 
-
 /*!
   \brief Checks semantics of given atomic proposition list
 
-  
+
 */
 
-void Compass_check_ap_list(TypeChecker_ptr tc, NodeList_ptr list)
-{
+void Compass_check_ap_list(TypeChecker_ptr tc, NodeList_ptr list) {
   ListIter_ptr iter;
   SymbTable_ptr st = TypeChecker_get_symb_table(tc);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
@@ -92,52 +87,58 @@ void Compass_check_ap_list(TypeChecker_ptr tc, NodeList_ptr list)
 
     if (!TypeChecker_is_expression_wellformed(tc, ap, Nil)) {
       const MasterPrinter_ptr wffprint =
-        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+          MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
       const ErrorMgr_ptr errmgr =
-        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+          ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
       const StreamMgr_ptr streams =
-        STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+          STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
       StreamMgr_nprint_error(streams, wffprint, "This AP is wrong: %N\n", ap);
-      ErrorMgr_rpterr(errmgr, "An error was found in atomic proposition list\n");
+      ErrorMgr_rpterr(errmgr,
+                      "An error was found in atomic proposition list\n");
     }
   }
 }
 
-
 /* internal service of function Compass_process_prob_list */
-static node_ptr compass_add_mul(node_ptr n1, node_ptr n2, const NuSMVEnv_ptr env)
-{
+static node_ptr compass_add_mul(node_ptr n1, node_ptr n2,
+                                const NuSMVEnv_ptr env) {
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-  if (ExprMgr_is_number(exprs, n1, 1)) return n2;
-  if (ExprMgr_is_number(exprs, n1, 0)) return n1;
-  if (ExprMgr_is_number(exprs, n2, 1)) return n1;
-  if (ExprMgr_is_number(exprs, n2, 0)) return n2;
+  if (ExprMgr_is_number(exprs, n1, 1))
+    return n2;
+  if (ExprMgr_is_number(exprs, n1, 0))
+    return n1;
+  if (ExprMgr_is_number(exprs, n2, 1))
+    return n1;
+  if (ExprMgr_is_number(exprs, n2, 0))
+    return n2;
   error_unreachable_code(); /* no other possibilities here: one of the
                           two must be 1 or 0 */
 }
 
 /* internal service of function Compass_process_prob_list */
-static node_ptr compass_add_sum(node_ptr n1, node_ptr n2, const NuSMVEnv_ptr env)
-{
+static node_ptr compass_add_sum(node_ptr n1, node_ptr n2,
+                                const NuSMVEnv_ptr env) {
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-  if (ExprMgr_is_number(exprs, n1, 0)) return n2;
-  if (ExprMgr_is_number(exprs, n2, 0)) return n1;
+  if (ExprMgr_is_number(exprs, n1, 0))
+    return n2;
+  if (ExprMgr_is_number(exprs, n2, 0))
+    return n1;
   error_unreachable_code(); /* no other possibilities here: one of the
                           two must be 0 */
 }
 
 /*!
-  \brief 
+  \brief
 
   list is assumed to be already checked here. Returned add
   is referenced
 */
 
-add_ptr Compass_process_prob_list(BddEnc_ptr enc, NodeList_ptr list, add_ptr trans)
-{
+add_ptr Compass_process_prob_list(BddEnc_ptr enc, NodeList_ptr list,
+                                  add_ptr trans) {
   DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
   ListIter_ptr iter;
   add_ptr res_add = add_zero(dd);
@@ -148,13 +149,13 @@ add_ptr Compass_process_prob_list(BddEnc_ptr enc, NodeList_ptr list, add_ptr tra
   bdd_free(dd, ncube);
 /* #define DEBUG_PROB */
 #ifdef DEBUG_PROB
-    StreamMgr_print_output(streams, "========================================\n");
-    StreamMgr_print_output(streams, "TRANS\n");
-    StreamMgr_print_output(streams, "========================================\n");
-    dd_printminterm(dd, trans);
-    StreamMgr_print_output(streams, "========================================\n");
-    dd_printminterm(dd, BddEnc_get_input_vars_cube(enc));
-    StreamMgr_print_output(streams, "========================================\n");
+  StreamMgr_print_output(streams, "========================================\n");
+  StreamMgr_print_output(streams, "TRANS\n");
+  StreamMgr_print_output(streams, "========================================\n");
+  dd_printminterm(dd, trans);
+  StreamMgr_print_output(streams, "========================================\n");
+  dd_printminterm(dd, BddEnc_get_input_vars_cube(enc));
+  StreamMgr_print_output(streams, "========================================\n");
 #endif
 
   NODE_LIST_FOREACH(list, iter) {
@@ -165,7 +166,6 @@ add_ptr Compass_process_prob_list(BddEnc_ptr enc, NodeList_ptr list, add_ptr tra
     node_ptr val = ProbAssign_get_prob(pa);
     bdd_ptr asgns_bdd = BddEnc_expr_to_bdd(enc, asgns, Nil);
 
-
     tmp_bdd = bdd_and_abstract(dd, asgns_bdd, trans, cube);
     bdd_free(dd, asgns_bdd);
 
@@ -175,11 +175,14 @@ add_ptr Compass_process_prob_list(BddEnc_ptr enc, NodeList_ptr list, add_ptr tra
     bdd_free(dd, tmp_bdd);
 
 #ifdef DEBUG_PROB
-    StreamMgr_print_output(streams, "========================================\n");
+    StreamMgr_print_output(streams,
+                           "========================================\n");
     StreamMgr_print_output(streams, "ASSIGN\n");
-    StreamMgr_print_output(streams, "========================================\n");
+    StreamMgr_print_output(streams,
+                           "========================================\n");
     dd_printminterm(dd, asgns_bdd);
-    StreamMgr_print_output(streams, "========================================\n");
+    StreamMgr_print_output(streams,
+                           "========================================\n");
 
 #endif
 
@@ -187,8 +190,7 @@ add_ptr Compass_process_prob_list(BddEnc_ptr enc, NodeList_ptr list, add_ptr tra
     bdd_free(dd, asgns_bdd);
 
     val_add = add_leaf(dd, val);
-    asgns_prob_add = add_apply(dd, &compass_add_mul,
-                               asgns_add, val_add);
+    asgns_prob_add = add_apply(dd, &compass_add_mul, asgns_add, val_add);
     tmp_add = add_apply(dd, &compass_add_sum, res_add, asgns_prob_add);
 
     add_free(dd, res_add);
@@ -200,11 +202,11 @@ add_ptr Compass_process_prob_list(BddEnc_ptr enc, NodeList_ptr list, add_ptr tra
   } /* loop over prob list */
 
 #ifdef DEBUG_PROB
-    StreamMgr_print_output(streams, "========================================\n");
-    StreamMgr_print_output(streams, "PROB\n");
-    StreamMgr_print_output(streams, "========================================\n");
-    dd_printminterm(dd, res_add);
-    StreamMgr_print_output(streams, "========================================\n");
+  StreamMgr_print_output(streams, "========================================\n");
+  StreamMgr_print_output(streams, "PROB\n");
+  StreamMgr_print_output(streams, "========================================\n");
+  dd_printminterm(dd, res_add);
+  StreamMgr_print_output(streams, "========================================\n");
 #endif
 
   bdd_free(dd, ncube);

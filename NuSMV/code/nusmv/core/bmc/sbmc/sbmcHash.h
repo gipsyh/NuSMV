@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_HASH_H__
 
 /*!
@@ -45,7 +44,6 @@
 #define __NUSMV_CORE_BMC_SBMC_SBMC_HASH_H__
 
 #include "nusmv/core/node/node.h" /*For node_ptr*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -85,7 +83,7 @@ struct htable {
   /**Number of slots occupied*/
   unsigned occupied;
   /**The table*/
-  struct table_pair *table; 
+  struct table_pair *table;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -115,7 +113,7 @@ hashPtr Bmc_Hash_new_htable(const NuSMVEnv_ptr env);
   \brief Find a node in the table
 
   Find a node in the table. Return BMC_HASH_NOTFOUND if the
-  node is not present 
+  node is not present
 
   \se None
 */

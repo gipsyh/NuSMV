@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,22 +35,21 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/ltl/ltl2smv/ltl2smv.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/utils/assoc.h"
-#include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/node/node.h"
-#include "nusmv/core/wff/ExprMgr.h"
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/compile/symb_table/ResolveSymbol.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/ustring.h"
+#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/wff/ExprMgr.h"
 
 #include <stdarg.h>
 /*---------------------------------------------------------------------------*/
@@ -162,7 +161,6 @@
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
@@ -172,27 +170,24 @@ static void deinitialise_transformation(const NuSMVEnv_ptr env);
 
 static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t);
 static node_ptr perform_memory_sharing(const NuSMVEnv_ptr env, node_ptr t);
-static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
-                                         node_ptr t,
+static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env, node_ptr t,
                                          boolean polarity,
-                                         const Ltl2SmvPrefixes* prefixes);
-static node_ptr generate_smv_module(const NuSMVEnv_ptr env,
-                                    node_ptr t,
+                                         const Ltl2SmvPrefixes *prefixes);
+static node_ptr generate_smv_module(const NuSMVEnv_ptr env, node_ptr t,
                                     boolean single_justice,
-                                    const Ltl2SmvPrefixes* prefixes);
+                                    const Ltl2SmvPrefixes *prefixes);
 
-static node_ptr expr_to_name(const NuSMVEnv_ptr env,
-                             node_ptr node,
-                             boolean always,
-                             const Ltl2SmvPrefixes* prefixes);
+static node_ptr expr_to_name(const NuSMVEnv_ptr env, node_ptr node,
+                             boolean always, const Ltl2SmvPrefixes *prefixes);
 static void add_to_list(NodeList_ptr list, node_ptr node);
-static string_ptr generate_string(UStringMgr_ptr strings, const char *format, ...);
+static string_ptr generate_string(UStringMgr_ptr strings, const char *format,
+                                  ...);
 static node_ptr expand_case_body(const NuSMVEnv_ptr env, node_ptr);
-static node_ptr generate_expr_name(NuSMVEnv_ptr env,
-                                   const char * pre_prefix,
-                                   const char * prefix_name);
+static node_ptr generate_expr_name(NuSMVEnv_ptr env, const char *pre_prefix,
+                                   const char *prefix_name);
 #ifdef OUTPUT_DEBUGGING
-static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr module);
+static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE *ostream,
+                                 node_ptr module);
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -200,27 +195,22 @@ static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr modul
 /*---------------------------------------------------------------------------*/
 
 node_ptr ltl2smv(NuSMVEnv_ptr env, unsigned int uniqueId,
-                 node_ptr in_ltl_expr)
-{ 
+                 node_ptr in_ltl_expr) {
   return ltl2smv_core(env, uniqueId, in_ltl_expr, false, NULL);
 }
 
 node_ptr ltl2smv_single_justice(NuSMVEnv_ptr env, unsigned int uniqueId,
-                                node_ptr in_ltl_expr)
-{
+                                node_ptr in_ltl_expr) {
   return ltl2smv_core(env, uniqueId, in_ltl_expr, true, NULL);
 }
 
-node_ptr ltl2smv_core(NuSMVEnv_ptr env,
-                      unsigned int uniqueId,
-                      node_ptr in_ltl_expr,
-                      boolean single_justice,
-                      const Ltl2SmvPrefixes* prefixes)
-{
+node_ptr ltl2smv_core(NuSMVEnv_ptr env, unsigned int uniqueId,
+                      node_ptr in_ltl_expr, boolean single_justice,
+                      const Ltl2SmvPrefixes *prefixes) {
   MasterPrinter_ptr const wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   StreamMgr_ptr const streams =
-   STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   {
     /* the line number is set to LTL expression's line number.  */
     extern int nusmv_yylineno;
@@ -229,18 +219,18 @@ node_ptr ltl2smv_core(NuSMVEnv_ptr env,
 
   /* DEBUGGING */
 #ifdef OUTPUT_DEBUGGING
-  StreamMgr_print_output(streams,  "-- original LTL expression : ");
+  StreamMgr_print_output(streams, "-- original LTL expression : ");
   StreamMgr_nprint_output(streams, wffprint, "%N", in_ltl_expr);
-  StreamMgr_print_output(streams,  "\n");
+  StreamMgr_print_output(streams, "\n");
 #endif
 
   in_ltl_expr = normalise_formula(env, in_ltl_expr);
 
   /* DEBUGGING */
 #ifdef OUTPUT_DEBUGGING
-  StreamMgr_print_output(streams,  "-- normalised LTL expression : ");
+  StreamMgr_print_output(streams, "-- normalised LTL expression : ");
   StreamMgr_nprint_output(streams, wffprint, "%N", in_ltl_expr);
-  StreamMgr_print_output(streams,  "\n");
+  StreamMgr_print_output(streams, "\n");
 #endif
 
   initialise_transformation(env, uniqueId);
@@ -257,7 +247,6 @@ node_ptr ltl2smv_core(NuSMVEnv_ptr env,
   return in_ltl_expr;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -272,8 +261,7 @@ node_ptr ltl2smv_core(NuSMVEnv_ptr env,
   \sa ltl2smv
 */
 static void initialise_transformation(const NuSMVEnv_ptr env,
-                                      unsigned int specificationNumber)
-{
+                                      unsigned int specificationNumber) {
   /* the body of the module being created during transformation.
      See transform_ltl_expression for more info
   */
@@ -284,7 +272,6 @@ static void initialise_transformation(const NuSMVEnv_ptr env,
   NodeList_ptr init_declarations;
 
   hash_ptr expr_to_name_hash = NULL;
-
 
   expr_to_name_hash = new_assoc();
 
@@ -304,10 +291,10 @@ static void initialise_transformation(const NuSMVEnv_ptr env,
 
   /* Here 1 is added since 0 may clash with NULL value. */
   NuSMVEnv_set_or_replace_value(env, ENV_LTL2SMV_UNIQUE_POS_NUMBER,
-                                PTR_FROM_INT(void*, 1));
+                                PTR_FROM_INT(void *, 1));
 
   NuSMVEnv_set_or_replace_value(env, ENV_LTL2SMV_SPECIFICATION_NUMBER,
-                                PTR_FROM_INT(void*, specificationNumber + 2));
+                                PTR_FROM_INT(void *, specificationNumber + 2));
 }
 
 /*!
@@ -315,21 +302,20 @@ static void initialise_transformation(const NuSMVEnv_ptr env,
 
   The only required thing is to free the hash table: exp -> name
 */
-static void deinitialise_transformation(const NuSMVEnv_ptr env)
-{
+static void deinitialise_transformation(const NuSMVEnv_ptr env) {
   NodeList_ptr define_declarations =
-    NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_DEFINE_DECL));
+      NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_DEFINE_DECL));
   NodeList_ptr trans_declarations =
-    NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_TRANS_DECL));
+      NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_TRANS_DECL));
   NodeList_ptr var_declarations =
-    NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_VAR_DECL));
+      NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_VAR_DECL));
   NodeList_ptr justice_declarations =
-    NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_JUSTICE_DECL));
+      NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_JUSTICE_DECL));
   NodeList_ptr init_declarations =
-    NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_INIT_DECL));
+      NODE_LIST(NuSMVEnv_remove_value(env, ENV_LTL2SMV_INIT_DECL));
 
   hash_ptr expr_to_name_hash =
-    (hash_ptr)NuSMVEnv_remove_value(env, ENV_LTL2SMV_EXPR_TO_NAME);
+      (hash_ptr)NuSMVEnv_remove_value(env, ENV_LTL2SMV_EXPR_TO_NAME);
 
   NodeList_destroy(define_declarations);
   NodeList_destroy(trans_declarations);
@@ -363,16 +349,13 @@ static void deinitialise_transformation(const NuSMVEnv_ptr env)
    The expression is also memory-shared, i.e. find_atom
    of find_node is invoked on every(!) expressions, including
    on the leaf-nodes (i.e. nodes not participating in the conversion directly).
-   
+
 */
-static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  const ExprMgr_ptr exprs =
-    EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   SymbTable_ptr const symb_table =
-    SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
+      SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
 
   node_ptr left = Nil, right = Nil;
   node_ptr or, or1, or2, tmp;
@@ -381,22 +364,19 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
 #ifdef OUTPUT_DEBUGGING
   {
     StreamMgr_ptr const streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+        STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
     MasterPrinter_ptr const wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
     StreamMgr_inc_indent_size(streams);
-    StreamMgr_nprint_output(streams, wffprint,
-                            "%s: Input formula:\n%N\n",
-                            __func__,
-                            t);
+    StreamMgr_nprint_output(streams, wffprint, "%s: Input formula:\n%N\n",
+                            __func__, t);
   }
 #endif
 
   if (Nil == t) {
-    retval =  Nil;
-  }
-  else {
+    retval = Nil;
+  } else {
     /* proceed with every kind of expression separately*/
     switch (node_get_type(t)) {
     case NOT: /* ! */
@@ -426,7 +406,8 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
     case AND: /* & */
       left = normalise_formula(env, car(t));
       right = normalise_formula(env, cdr(t));
-      or  = ExprMgr_or(exprs, ExprMgr_not(exprs, left), ExprMgr_not(exprs, right));
+      or = ExprMgr_or(exprs, ExprMgr_not(exprs, left),
+                      ExprMgr_not(exprs, right));
       retval = ExprMgr_not(exprs, or);
       break;
 
@@ -436,14 +417,16 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
       retval = ExprMgr_or(exprs, ExprMgr_not(exprs, left), right);
       break;
 
-    case IFF: /* <-> */
+    case IFF:  /* <-> */
     case XNOR: /* xnor */
       /* a <-> b  =>  (!(!a | !b) | !(a | b)) */
       left = normalise_formula(env, car(t));
       right = normalise_formula(env, cdr(t));
-      or1 = ExprMgr_or(exprs, ExprMgr_not(exprs, left), ExprMgr_not(exprs, right));
+      or1 = ExprMgr_or(exprs, ExprMgr_not(exprs, left),
+                       ExprMgr_not(exprs, right));
       or2 = ExprMgr_or(exprs, left, right);
-      retval = ExprMgr_or(exprs, ExprMgr_not(exprs, or1), ExprMgr_not(exprs, or2));
+      retval =
+          ExprMgr_or(exprs, ExprMgr_not(exprs, or1), ExprMgr_not(exprs, or2));
       break;
 
     case XOR: /* xor */
@@ -452,7 +435,8 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
       right = normalise_formula(env, cdr(t));
       or1 = ExprMgr_or(exprs, ExprMgr_not(exprs, left), right);
       or2 = ExprMgr_or(exprs, left, ExprMgr_not(exprs, right));
-      retval = ExprMgr_or(exprs, ExprMgr_not(exprs, or1), ExprMgr_not(exprs, or2));
+      retval =
+          ExprMgr_or(exprs, ExprMgr_not(exprs, or1), ExprMgr_not(exprs, or2));
       break;
 
     case OP_NOTPRECNOT: /* Z  */
@@ -462,13 +446,14 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
       break;
 
     case OP_FUTURE: /* F */
-      left = normalise_formula(env,car(t));
+      left = normalise_formula(env, car(t));
       retval = find_node(nodemgr, UNTIL, ExprMgr_true(exprs), left);
       break;
 
     case OP_GLOBAL: /* G  */
       left = normalise_formula(env, car(t));
-      tmp = find_node(nodemgr, UNTIL, ExprMgr_true(exprs), ExprMgr_not(exprs, left));
+      tmp = find_node(nodemgr, UNTIL, ExprMgr_true(exprs),
+                      ExprMgr_not(exprs, left));
       retval = ExprMgr_not(exprs, tmp);
       break;
 
@@ -479,12 +464,13 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
 
     case OP_HISTORICAL: /* H */
       left = normalise_formula(env, car(t));
-      tmp = find_node(nodemgr, SINCE, ExprMgr_true(exprs), ExprMgr_not(exprs, left));
+      tmp = find_node(nodemgr, SINCE, ExprMgr_true(exprs),
+                      ExprMgr_not(exprs, left));
       retval = ExprMgr_not(exprs, tmp);
       break;
 
-    case TRIGGERED: /* T */
-    case RELEASES: /* V */
+    case TRIGGERED:             /* T */
+    case RELEASES:              /* V */
       error_unreachable_code(); /* T and V were transformed by the parser */
 
       /* Leafs, i.e. all the usual kinds of expressions.
@@ -501,40 +487,74 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
          anymore, we need to normalize, see issues 3681, 3694, 3907 */
     case IFTHENELSE:
     case CASE:
-    case UWCONST: case SWCONST:
-    case TWODOTS:   case SELF:
-    case BIT_SELECTION:  case CONCATENATION: case EXTEND:
-    case WSIZEOF: case WRESIZE:  case CAST_TOINT:
-    case CAST_BOOL:  case CAST_WORD1:  case CAST_SIGNED:  case CAST_UNSIGNED:
-    case TIMES: case DIVIDE: case PLUS :case MINUS: case MOD: case UMINUS:
-    case LSHIFT: case RSHIFT: case LROTATE: case RROTATE:
-    case UNION: case SETIN:
-    case EQUAL: case NOTEQUAL: case LT: case GT: case LE: case GE:
-    case FLOOR: case COUNT:
+    case UWCONST:
+    case SWCONST:
+    case TWODOTS:
+    case SELF:
+    case BIT_SELECTION:
+    case CONCATENATION:
+    case EXTEND:
+    case WSIZEOF:
+    case WRESIZE:
+    case CAST_TOINT:
+    case CAST_BOOL:
+    case CAST_WORD1:
+    case CAST_SIGNED:
+    case CAST_UNSIGNED:
+    case TIMES:
+    case DIVIDE:
+    case PLUS:
+    case MINUS:
+    case MOD:
+    case UMINUS:
+    case LSHIFT:
+    case RSHIFT:
+    case LROTATE:
+    case RROTATE:
+    case UNION:
+    case SETIN:
+    case EQUAL:
+    case NOTEQUAL:
+    case LT:
+    case GT:
+    case LE:
+    case GE:
+    case FLOOR:
+    case COUNT:
     case NFUNCTION:
-    case WAREAD: case WAWRITE:
-        retval =  perform_memory_sharing(env, t);
+    case WAREAD:
+    case WAWRITE:
+      retval = perform_memory_sharing(env, t);
 
-        if (retval != t) {
-          retval = normalise_formula(env, retval);
-        }
+      if (retval != t) {
+        retval = normalise_formula(env, retval);
+      }
 
       break;
 
       /* leaves... */
-    case NUMBER:  case NUMBER_UNSIGNED_WORD:  case NUMBER_SIGNED_WORD:
-    case FAILURE: case FALSEEXP:  case TRUEEXP:
-    case NUMBER_FRAC:  case NUMBER_REAL: case NUMBER_EXP:
+    case NUMBER:
+    case NUMBER_UNSIGNED_WORD:
+    case NUMBER_SIGNED_WORD:
+    case FAILURE:
+    case FALSEEXP:
+    case TRUEEXP:
+    case NUMBER_FRAC:
+    case NUMBER_REAL:
+    case NUMBER_EXP:
       /* ... and symbols */
-    case ATOM: case DOT:  case ARRAY:
+    case ATOM:
+    case DOT:
+    case ARRAY:
       /* array constants */
-    case CONST_ARRAY: case TYPEOF:
-      retval =  perform_memory_sharing(env, t);
+    case CONST_ARRAY:
+    case TYPEOF:
+      retval = perform_memory_sharing(env, t);
       break;
 
     default:
       error_unreachable_code(); /*  unknown operator */
-      retval =  Nil;
+      retval = Nil;
       break;
     }
   }
@@ -542,14 +562,12 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
 #ifdef OUTPUT_DEBUGGING
   {
     StreamMgr_ptr const streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+        STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
     MasterPrinter_ptr const wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-    StreamMgr_nprint_output(streams, wffprint,
-                            "%s: Output formula:\n%N\n",
-                            __func__,
-                            retval);
+    StreamMgr_nprint_output(streams, wffprint, "%s: Output formula:\n%N\n",
+                            __func__, retval);
     StreamMgr_dec_indent_size(streams);
   }
 #endif
@@ -562,24 +580,22 @@ static node_ptr normalise_formula(const NuSMVEnv_ptr env, node_ptr t)
   to share as much memory as possible, i.e. the same sub-expressions
   will have the same pointer.
 
-  
+
 */
-static node_ptr perform_memory_sharing(const NuSMVEnv_ptr env, node_ptr t)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  const ExprMgr_ptr exprs =
-    EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+static node_ptr perform_memory_sharing(const NuSMVEnv_ptr env, node_ptr t) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   const SymbTable_ptr st = SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
   Logger_ptr const logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
   MasterPrinter_ptr const wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   OptsHandler_ptr const opts =
-     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   node_ptr retval = Nil;
 
-  if (t == (node_ptr) NULL) return retval;
+  if (t == (node_ptr)NULL)
+    return retval;
 
 #ifdef OUTPUT_DEBUGGING
   Logger_inc_indent_size(logger);
@@ -588,12 +604,19 @@ static node_ptr perform_memory_sharing(const NuSMVEnv_ptr env, node_ptr t)
 
   switch (node_get_type(t)) {
     /* 0-arity */
-  case FAILURE: case FALSEEXP: case TRUEEXP:
-  case NUMBER: case NUMBER_UNSIGNED_WORD: case NUMBER_SIGNED_WORD:
-  case UWCONST: case SWCONST:
-  case NUMBER_FRAC: case NUMBER_REAL:
+  case FAILURE:
+  case FALSEEXP:
+  case TRUEEXP:
+  case NUMBER:
+  case NUMBER_UNSIGNED_WORD:
+  case NUMBER_SIGNED_WORD:
+  case UWCONST:
+  case SWCONST:
+  case NUMBER_FRAC:
+  case NUMBER_REAL:
   case NUMBER_EXP:
-  case ATOM: case SELF:
+  case ATOM:
+  case SELF:
     retval = find_atom(nodemgr, t);
     break;
     /* not, unary minus */
@@ -606,32 +629,59 @@ static node_ptr perform_memory_sharing(const NuSMVEnv_ptr env, node_ptr t)
     }
     /* else behave as a usual unary operator */
     /* 1-arity */
-  case CAST_BOOL:  case CAST_WORD1: case CAST_SIGNED: case CAST_UNSIGNED:
-  case FLOOR: case COUNT:
+  case CAST_BOOL:
+  case CAST_WORD1:
+  case CAST_SIGNED:
+  case CAST_UNSIGNED:
+  case FLOOR:
+  case COUNT:
     retval = ExprMgr_resolve(exprs, st, node_get_type(t),
                              perform_memory_sharing(env, car(t)), cdr(t));
     break;
     /* 1 or 2 arity */
   case DOT:
     if (Nil == car(t)) {
-      retval =  find_node(nodemgr, node_get_type(t),
-                          Nil,
-                          perform_memory_sharing(env, cdr(t)));
+      retval = find_node(nodemgr, node_get_type(t), Nil,
+                         perform_memory_sharing(env, cdr(t)));
       break;
+    } else { /* skip to 2-arity expressions */
     }
-    else { /* skip to 2-arity expressions */ }
     /* 2-arity */
-  case OR: case AND: case XOR: case XNOR: case IFF: case IMPLIES:
-  case TWODOTS: case ARRAY: case CONS:
-  case BIT_SELECTION:  case CONCATENATION: case EXTEND:
-  case WSIZEOF: case WRESIZE: case CAST_TOINT:
+  case OR:
+  case AND:
+  case XOR:
+  case XNOR:
+  case IFF:
+  case IMPLIES:
+  case TWODOTS:
+  case ARRAY:
+  case CONS:
+  case BIT_SELECTION:
+  case CONCATENATION:
+  case EXTEND:
+  case WSIZEOF:
+  case WRESIZE:
+  case CAST_TOINT:
   case CASE: /* CASE is no longer a part of LTL formula - just a usual exp */
   case IFTHENELSE:
   case COLON:
-  case TIMES: case DIVIDE: case PLUS :case MINUS: case MOD:
-  case LSHIFT: case RSHIFT: case LROTATE: case RROTATE:
-  case UNION: case SETIN:
-  case EQUAL: case NOTEQUAL: case LT: case GT: case LE: case GE:
+  case TIMES:
+  case DIVIDE:
+  case PLUS:
+  case MINUS:
+  case MOD:
+  case LSHIFT:
+  case RSHIFT:
+  case LROTATE:
+  case RROTATE:
+  case UNION:
+  case SETIN:
+  case EQUAL:
+  case NOTEQUAL:
+  case LT:
+  case GT:
+  case LE:
+  case GE:
     retval = ExprMgr_resolve(exprs, st, node_get_type(t),
                              perform_memory_sharing(env, car(t)),
                              perform_memory_sharing(env, cdr(t)));
@@ -643,27 +693,28 @@ static node_ptr perform_memory_sharing(const NuSMVEnv_ptr env, node_ptr t)
                              perform_memory_sharing(env, cdr(t)));
     break;
 
-  case WAREAD: case WAWRITE: case CONST_ARRAY: case TYPEOF:
+  case WAREAD:
+  case WAWRITE:
+  case CONST_ARRAY:
+  case TYPEOF:
     retval = ExprMgr_resolve(exprs, st, node_get_type(t),
                              perform_memory_sharing(env, car(t)),
                              perform_memory_sharing(env, cdr(t)));
     break;
 
-  default:
-    {
-      StreamMgr_ptr const streams =
+  default: {
+    StreamMgr_ptr const streams =
         STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-      MasterPrinter_ptr const wffprint =
+    MasterPrinter_ptr const wffprint =
         MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-      ErrorMgr_ptr const errmgr =
+    ErrorMgr_ptr const errmgr =
         ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-      StreamMgr_nprint_error(streams, wffprint,
+    StreamMgr_nprint_error(streams, wffprint,
                            "Unexpected expression found during %s:%N\n",
-                           __func__,
-                           t);
-      ErrorMgr_nusmv_exit(errmgr, 1);
-    }
+                           __func__, t);
+    ErrorMgr_nusmv_exit(errmgr, 1);
+  }
   }
 
 #ifdef OUTPUT_DEBUGGING
@@ -696,28 +747,24 @@ static node_ptr perform_memory_sharing(const NuSMVEnv_ptr env, node_ptr t)
 
   NB: The memory of expression is expected to be shared. Then the
   same name will be used for the same sub-expression.
-  
+
 */
-static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
-                                         node_ptr t,
+static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env, node_ptr t,
                                          boolean polarity,
-                                         const Ltl2SmvPrefixes* prefixes)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  const ExprMgr_ptr exprs =
-    EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+                                         const Ltl2SmvPrefixes *prefixes) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   NodeList_ptr define_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_DEFINE_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_DEFINE_DECL));
   NodeList_ptr trans_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_TRANS_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_TRANS_DECL));
   NodeList_ptr var_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_VAR_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_VAR_DECL));
   NodeList_ptr justice_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_JUSTICE_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_JUSTICE_DECL));
   NodeList_ptr init_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_INIT_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_INIT_DECL));
 
   node_ptr name;
   node_ptr nameLeft;
@@ -725,14 +772,15 @@ static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
   node_ptr result;
   node_ptr nameXY; /* an additional X or Y expression */
 
-  switch(node_get_type(t)) {
+  switch (node_get_type(t)) {
   case OR:
 #ifndef NO_DEFINE_FOR_OR_and_NOT_OPT
     name = expr_to_name(env, t, false, prefixes);
     nameLeft = transform_ltl_expression(env, car(t), polarity, prefixes);
     nameRight = transform_ltl_expression(env, cdr(t), polarity, prefixes);
     /* generate a new DEFINE */
-    result = find_node(nodemgr, EQDEF, name, ExprMgr_or(exprs, nameLeft, nameRight));
+    result =
+        find_node(nodemgr, EQDEF, name, ExprMgr_or(exprs, nameLeft, nameRight));
     add_to_list(define_declarations, result);
     return name;
 #else
@@ -754,7 +802,7 @@ static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
     return ExprMgr_not(exprs, nameLeft);
 #endif
 
-  case OP_NEXT:  /* X */
+  case OP_NEXT: /* X */
     name = expr_to_name(env, t, false, prefixes);
     /* add to VAR */
     add_to_list(var_declarations, name);
@@ -762,9 +810,9 @@ static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
     nameLeft = transform_ltl_expression(env, car(t), polarity, prefixes);
 
     /* generate a new TRANS */
-    result = ExprMgr_equal(exprs, ExprMgr_next(exprs, nameLeft, SYMB_TABLE(NULL)),
-                        name,
-                        SYMB_TABLE(NULL));
+    result =
+        ExprMgr_equal(exprs, ExprMgr_next(exprs, nameLeft, SYMB_TABLE(NULL)),
+                      name, SYMB_TABLE(NULL));
     add_to_list(trans_declarations, result);
     return name;
 
@@ -779,35 +827,34 @@ static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
     /* Note that the TRANS is similar to X's TRANS, but the NEXT operator
        is applied to a different term */
     result = ExprMgr_equal(exprs, nameLeft,
-                        ExprMgr_next(exprs, name, SYMB_TABLE(NULL)),
-                        SYMB_TABLE(NULL));
+                           ExprMgr_next(exprs, name, SYMB_TABLE(NULL)),
+                           SYMB_TABLE(NULL));
     add_to_list(trans_declarations, result);
 
     /* generate a new INIT */
     result = ExprMgr_equal(exprs, name, ExprMgr_false(exprs), SYMB_TABLE(NULL));
 
     add_to_list(init_declarations, result);
-    return name ;
+    return name;
 
   case UNTIL:
     name = expr_to_name(env, t, false, prefixes);
     /* generate X (expr) and add to VAR */
-    nameXY = expr_to_name(env, find_node(nodemgr, OP_NEXT, t, Nil), false,
-                          prefixes);
+    nameXY =
+        expr_to_name(env, find_node(nodemgr, OP_NEXT, t, Nil), false, prefixes);
     add_to_list(var_declarations, nameXY);
 
     nameLeft = transform_ltl_expression(env, car(t), polarity, prefixes);
     nameRight = transform_ltl_expression(env, cdr(t), polarity, prefixes);
 
-
     /* generate a new DEFINE */
-    result = find_node(nodemgr, EQDEF, name, ExprMgr_or(exprs, nameRight,
-                                            ExprMgr_and(exprs, nameLeft, nameXY)));
+    result = find_node(
+        nodemgr, EQDEF, name,
+        ExprMgr_or(exprs, nameRight, ExprMgr_and(exprs, nameLeft, nameXY)));
     add_to_list(define_declarations, result);
     /* generate a new TRANS */
     result = ExprMgr_equal(exprs, ExprMgr_next(exprs, name, SYMB_TABLE(NULL)),
-                        nameXY,
-                        SYMB_TABLE(NULL));
+                           nameXY, SYMB_TABLE(NULL));
     add_to_list(trans_declarations, result);
 
     /* if the occurrence of the formula is positive, generate a new JUSTICE */
@@ -820,47 +867,82 @@ static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
   case SINCE:
     name = expr_to_name(env, t, false, prefixes);
     /* generate Y (expr) and add to VAR */
-    nameXY = expr_to_name(env, find_node(nodemgr, OP_PREC, t, Nil), false, prefixes);
+    nameXY =
+        expr_to_name(env, find_node(nodemgr, OP_PREC, t, Nil), false, prefixes);
     add_to_list(var_declarations, nameXY);
 
     nameLeft = transform_ltl_expression(env, car(t), polarity, prefixes);
     nameRight = transform_ltl_expression(env, cdr(t), polarity, prefixes);
 
     /* generate a new DEFINE */
-    result = find_node(nodemgr, EQDEF, name, ExprMgr_or(exprs, nameRight,
-                                            ExprMgr_and(exprs, nameLeft, nameXY)));
+    result = find_node(
+        nodemgr, EQDEF, name,
+        ExprMgr_or(exprs, nameRight, ExprMgr_and(exprs, nameLeft, nameXY)));
     add_to_list(define_declarations, result);
     /* generate a new TRANS */
     result = ExprMgr_equal(exprs, name,
-                        ExprMgr_next(exprs, nameXY, SYMB_TABLE(NULL)),
-                        SYMB_TABLE(NULL));
+                           ExprMgr_next(exprs, nameXY, SYMB_TABLE(NULL)),
+                           SYMB_TABLE(NULL));
     add_to_list(trans_declarations, result);
     /* generate a new INIT */
-    result = ExprMgr_equal(exprs, nameXY, ExprMgr_false(exprs), SYMB_TABLE(NULL));
+    result =
+        ExprMgr_equal(exprs, nameXY, ExprMgr_false(exprs), SYMB_TABLE(NULL));
     add_to_list(init_declarations, result);
     return name;
 
     /* Leafs. Skip them */
-  case FAILURE: case FALSEEXP:  case TRUEEXP:
-  case NUMBER:  case NUMBER_UNSIGNED_WORD: case NUMBER_SIGNED_WORD:
-  case UWCONST: case SWCONST:
-  case NUMBER_FRAC:  case NUMBER_REAL:
+  case FAILURE:
+  case FALSEEXP:
+  case TRUEEXP:
+  case NUMBER:
+  case NUMBER_UNSIGNED_WORD:
+  case NUMBER_SIGNED_WORD:
+  case UWCONST:
+  case SWCONST:
+  case NUMBER_FRAC:
+  case NUMBER_REAL:
   case NUMBER_EXP:
-  case TWODOTS:  case ATOM:  case SELF: case DOT:  case ARRAY:
-  case BIT_SELECTION:  case CONCATENATION: case EXTEND:
-  case WSIZEOF: case WRESIZE: case CAST_TOINT:
+  case TWODOTS:
+  case ATOM:
+  case SELF:
+  case DOT:
+  case ARRAY:
+  case BIT_SELECTION:
+  case CONCATENATION:
+  case EXTEND:
+  case WSIZEOF:
+  case WRESIZE:
+  case CAST_TOINT:
   case CASE: /* CASE is no longer a part of LTL formula - just a usual exp */
-  case IFTHENELSE: case COUNT:
-  case CAST_BOOL:  case CAST_WORD1: case CAST_SIGNED: case CAST_UNSIGNED:
-  case TIMES: case DIVIDE: case PLUS :case MINUS: case MOD:
-  case LSHIFT: case RSHIFT: case LROTATE: case RROTATE:
-  case UNION: case SETIN:
-  case EQUAL: case NOTEQUAL: case LT: case GT: case LE: case GE:
+  case IFTHENELSE:
+  case COUNT:
+  case CAST_BOOL:
+  case CAST_WORD1:
+  case CAST_SIGNED:
+  case CAST_UNSIGNED:
+  case TIMES:
+  case DIVIDE:
+  case PLUS:
+  case MINUS:
+  case MOD:
+  case LSHIFT:
+  case RSHIFT:
+  case LROTATE:
+  case RROTATE:
+  case UNION:
+  case SETIN:
+  case EQUAL:
+  case NOTEQUAL:
+  case LT:
+  case GT:
+  case LE:
+  case GE:
     return t;
   case NFUNCTION:
     return t;
   default:
-    error_unreachable_code(); /* unknown expression. This is for debugging only */
+    error_unreachable_code(); /* unknown expression. This is for debugging only
+                               */
   }
   return Nil;
 }
@@ -879,69 +961,97 @@ static node_ptr transform_ltl_expression(const NuSMVEnv_ptr env,
   more efficient because the same name will be returned
   for the same subexpression
 */
-static node_ptr expr_to_name(const NuSMVEnv_ptr env,
-                             node_ptr node,
-                             boolean always,
-                             const Ltl2SmvPrefixes* prefixes)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+static node_ptr expr_to_name(const NuSMVEnv_ptr env, node_ptr node,
+                             boolean always, const Ltl2SmvPrefixes *prefixes) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   hash_ptr expr_to_name_hash =
-    (hash_ptr)NuSMVEnv_get_value(env, ENV_LTL2SMV_EXPR_TO_NAME);
+      (hash_ptr)NuSMVEnv_get_value(env, ENV_LTL2SMV_EXPR_TO_NAME);
 
   node_ptr result = find_assoc(expr_to_name_hash, node);
 
-  char* pre_prefix;
-  char* prefix_name;
+  char *pre_prefix;
+  char *prefix_name;
 
-  pre_prefix = ((NULL == prefixes || NULL == prefixes->pre_prefix)? 
-                PRE_PREFIX : prefixes->pre_prefix);
+  pre_prefix = ((NULL == prefixes || NULL == prefixes->pre_prefix)
+                    ? PRE_PREFIX
+                    : prefixes->pre_prefix);
 
-  prefix_name = ((NULL == prefixes || NULL == prefixes->prefix_name)? 
-                 PREFIXNAME : prefixes->prefix_name);
+  prefix_name = ((NULL == prefixes || NULL == prefixes->prefix_name)
+                     ? PREFIXNAME
+                     : prefixes->prefix_name);
 
-  if (Nil != result) 
-      return result; /* the association already exists */
+  if (Nil != result)
+    return result; /* the association already exists */
 
   /* no association has been created =>  create a new association */
   switch (node_get_type(node)) {
     /* operators participating in the conversion => create a name */
-  case NOT: /* ! */
-  case OR: /* | */
+  case NOT:     /* ! */
+  case OR:      /* | */
   case OP_NEXT: /* X */
   case OP_PREC: /* Y */
-  case UNTIL: /* U */
-  case SINCE: /* S */{
+  case UNTIL:   /* U */
+  case SINCE: /* S */ {
     result = generate_expr_name(env, pre_prefix, prefix_name);
     break;
   }
 
     /* Leafs. just return the input node  */
-  case FAILURE: case FALSEEXP:  case TRUEEXP:
-  case NUMBER:  case NUMBER_UNSIGNED_WORD:  case NUMBER_SIGNED_WORD:
-  case UWCONST: case SWCONST:
-  case NUMBER_FRAC:  case NUMBER_REAL:
+  case FAILURE:
+  case FALSEEXP:
+  case TRUEEXP:
+  case NUMBER:
+  case NUMBER_UNSIGNED_WORD:
+  case NUMBER_SIGNED_WORD:
+  case UWCONST:
+  case SWCONST:
+  case NUMBER_FRAC:
+  case NUMBER_REAL:
   case NUMBER_EXP:
-  case TWODOTS:  case ATOM: case SELF: case DOT:  case ARRAY:
-  case BIT_SELECTION:  case CONCATENATION: case EXTEND:
-  case WSIZEOF: case WRESIZE: case CAST_TOINT:
+  case TWODOTS:
+  case ATOM:
+  case SELF:
+  case DOT:
+  case ARRAY:
+  case BIT_SELECTION:
+  case CONCATENATION:
+  case EXTEND:
+  case WSIZEOF:
+  case WRESIZE:
+  case CAST_TOINT:
   case CASE: /* CASE is no longer a part of LTL formula - just a usual exp */
   case IFTHENELSE:
-  case CAST_BOOL:  case CAST_WORD1:  case CAST_SIGNED:  case CAST_UNSIGNED:
-  case TIMES: case DIVIDE: case PLUS :case MINUS: case MOD:
-  case LSHIFT: case RSHIFT: case LROTATE: case RROTATE:
-  case UNION: case SETIN:
-  case EQUAL: case NOTEQUAL: case LT: case GT: case LE: case GE:
+  case CAST_BOOL:
+  case CAST_WORD1:
+  case CAST_SIGNED:
+  case CAST_UNSIGNED:
+  case TIMES:
+  case DIVIDE:
+  case PLUS:
+  case MINUS:
+  case MOD:
+  case LSHIFT:
+  case RSHIFT:
+  case LROTATE:
+  case RROTATE:
+  case UNION:
+  case SETIN:
+  case EQUAL:
+  case NOTEQUAL:
+  case LT:
+  case GT:
+  case LE:
+  case GE:
   case NFUNCTION:
     if (always) {
       result = generate_expr_name(env, pre_prefix, prefix_name);
-    }
-    else {
+    } else {
       result = node;
     }
     break;
-  default: error_unreachable_code(); /* unknown expression: just for debugging */
+  default:
+    error_unreachable_code(); /* unknown expression: just for debugging */
   }
   /* remember the node and its name */
   insert_assoc(expr_to_name_hash, node, result);
@@ -954,8 +1064,7 @@ static node_ptr expr_to_name(const NuSMVEnv_ptr env,
   nothing happens
 
 */
-static void add_to_list(NodeList_ptr list, node_ptr node)
-{
+static void add_to_list(NodeList_ptr list, node_ptr node) {
 
   if (!NodeList_belongs_to(list, node)) {
     NodeList_append(list, node);
@@ -974,9 +1083,8 @@ static void add_to_list(NodeList_ptr list, node_ptr node)
   2. The limit of generated strings is set to 100 bytes. Do not try
   to generate a bigger string
 */
-static string_ptr generate_string(UStringMgr_ptr strings,
-                                  const char* format, ...)
-{
+static string_ptr generate_string(UStringMgr_ptr strings, const char *format,
+                                  ...) {
   char buffer[100]; /* 100 bytes should be enough */
 
   int len;
@@ -986,7 +1094,7 @@ static string_ptr generate_string(UStringMgr_ptr strings,
   len = vsnprintf(buffer, 100, format, ap); /* 100 - buffer length */
   va_end(ap);
 
-  nusmv_assert(len >= 0); /* an error in the vsnprintf */
+  nusmv_assert(len >= 0);  /* an error in the vsnprintf */
   nusmv_assert(len < 100); /* buffer overflow */
   return UStringMgr_find_string(strings, buffer);
 
@@ -1042,121 +1150,111 @@ static string_ptr generate_string(UStringMgr_ptr strings,
 static node_ptr generate_smv_module(const NuSMVEnv_ptr env,
                                     node_ptr whole_expression_name,
                                     boolean single_justice,
-                                    const Ltl2SmvPrefixes* prefixes)
-{
+                                    const Ltl2SmvPrefixes *prefixes) {
   const UStringMgr_ptr strings =
-    USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   NodeList_ptr define_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_DEFINE_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_DEFINE_DECL));
   NodeList_ptr trans_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_TRANS_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_TRANS_DECL));
   NodeList_ptr var_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_VAR_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_VAR_DECL));
   NodeList_ptr justice_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_JUSTICE_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_JUSTICE_DECL));
   NodeList_ptr init_declarations =
-    NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_INIT_DECL));
+      NODE_LIST(NuSMVEnv_get_value(env, ENV_LTL2SMV_INIT_DECL));
 
   /* We use an offset of 2 for avoiding clash with 0 and NULL */
   unsigned int specificationNumber =
-    (unsigned int)(nusmv_ptrint)NuSMVEnv_get_value(env, ENV_LTL2SMV_SPECIFICATION_NUMBER) - 2;
+      (unsigned int)(nusmv_ptrint)NuSMVEnv_get_value(
+          env, ENV_LTL2SMV_SPECIFICATION_NUMBER) -
+      2;
 
   node_ptr all_declr;
   ListIter_ptr iter;
   node_ptr tmp;
 
-  char* pre_prefix;
-  char* prefix_name;
-  char* ltl_module_base_name;
-  
-  pre_prefix = ((NULL == prefixes || NULL == prefixes->pre_prefix)?
-                PRE_PREFIX : prefixes->pre_prefix);
+  char *pre_prefix;
+  char *prefix_name;
+  char *ltl_module_base_name;
 
-  prefix_name = ((NULL == prefixes || NULL == prefixes->prefix_name)?
-                 PREFIXNAME : prefixes->prefix_name);
+  pre_prefix = ((NULL == prefixes || NULL == prefixes->pre_prefix)
+                    ? PRE_PREFIX
+                    : prefixes->pre_prefix);
 
-  ltl_module_base_name = 
-      ((NULL == prefixes || NULL == prefixes->ltl_module_base_name)?
-        LTL_MODULE_BASE_NAME : prefixes->ltl_module_base_name);
+  prefix_name = ((NULL == prefixes || NULL == prefixes->prefix_name)
+                     ? PREFIXNAME
+                     : prefixes->prefix_name);
+
+  ltl_module_base_name =
+      ((NULL == prefixes || NULL == prefixes->ltl_module_base_name)
+           ? LTL_MODULE_BASE_NAME
+           : prefixes->ltl_module_base_name);
 
   /* add the INIT with the name of the whole expression */
-  all_declr = cons(nodemgr, new_node(nodemgr, INIT, whole_expression_name, Nil), Nil);
+  all_declr =
+      cons(nodemgr, new_node(nodemgr, INIT, whole_expression_name, Nil), Nil);
 
   if (single_justice) {
     const ExprMgr_ptr exprs =
-      EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+        EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
     node_ptr one_fairness_expr = ExprMgr_true(exprs);
-    string_ptr name = generate_string(strings, "%s%u%s_one_fairness",
-                                      pre_prefix, specificationNumber,
-                                      prefix_name);
+    string_ptr name =
+        generate_string(strings, "%s%u%s_one_fairness", pre_prefix,
+                        specificationNumber, prefix_name);
     node_ptr one_fairness_name = find_node(nodemgr, ATOM, (node_ptr)name, Nil);
 
     NODE_LIST_FOREACH(justice_declarations, iter) {
       node_ptr val = NodeList_get_elem_at(justice_declarations, iter);
       node_ptr fairness_name = expr_to_name(env, val, true, prefixes);
       all_declr =
-        cons(nodemgr,
-             new_node(nodemgr, VAR,
-                      cons(nodemgr,
-                           new_node(nodemgr, COLON, fairness_name,
-                                    find_node(nodemgr, BOOLEAN, Nil, Nil)),
-                           Nil),
-                      Nil),
-             all_declr);
+          cons(nodemgr,
+               new_node(nodemgr, VAR,
+                        cons(nodemgr,
+                             new_node(nodemgr, COLON, fairness_name,
+                                      find_node(nodemgr, BOOLEAN, Nil, Nil)),
+                             Nil),
+                        Nil),
+               all_declr);
       all_declr =
-        cons(nodemgr,
-             new_node(nodemgr, INIT,
-                      new_node(nodemgr, NOT, fairness_name, Nil), Nil),
-             all_declr);
-      all_declr =
-        cons(nodemgr,
-             new_node(nodemgr, TRANS,
-                      ExprMgr_implies(exprs,
-                                      ExprMgr_not(exprs,
-                                                  one_fairness_name),
-                                      ExprMgr_iff(exprs,
-                                                  ExprMgr_or(exprs,
-                                                             fairness_name,
-                                                             val),
-                                                  find_node(nodemgr,
-                                                            NEXT,
-                                                            fairness_name,
-                                                            Nil))),
-                      Nil),
-             all_declr);
-      all_declr =
-        cons(nodemgr,
-             new_node(nodemgr, TRANS,
-                      ExprMgr_implies(exprs,
-                                      one_fairness_name,
-                                      ExprMgr_iff(exprs,
-                                                  val,
-                                                  find_node(nodemgr,
-                                                            NEXT,
-                                                            fairness_name,
-                                                            Nil))),
-                      Nil),
-             all_declr);
+          cons(nodemgr,
+               new_node(nodemgr, INIT,
+                        new_node(nodemgr, NOT, fairness_name, Nil), Nil),
+               all_declr);
+      all_declr = cons(
+          nodemgr,
+          new_node(
+              nodemgr, TRANS,
+              ExprMgr_implies(
+                  exprs, ExprMgr_not(exprs, one_fairness_name),
+                  ExprMgr_iff(exprs, ExprMgr_or(exprs, fairness_name, val),
+                              find_node(nodemgr, NEXT, fairness_name, Nil))),
+              Nil),
+          all_declr);
+      all_declr = cons(
+          nodemgr,
+          new_node(nodemgr, TRANS,
+                   ExprMgr_implies(exprs, one_fairness_name,
+                                   ExprMgr_iff(exprs, val,
+                                               find_node(nodemgr, NEXT,
+                                                         fairness_name, Nil))),
+                   Nil),
+          all_declr);
       one_fairness_expr = ExprMgr_and(exprs, one_fairness_expr, fairness_name);
     }
-    all_declr =
-      cons(nodemgr,
-           new_node(nodemgr, DEFINE, cons(nodemgr,
-                                          new_node(nodemgr,
-                                                   EQDEF,
-                                                   one_fairness_name,
-                                                   one_fairness_expr), Nil),
-                    Nil),
-           all_declr);
-    all_declr =
-      cons(nodemgr,
-           new_node(nodemgr, JUSTICE, one_fairness_name, Nil),
-           all_declr);
-  }
-  else {
+    all_declr = cons(nodemgr,
+                     new_node(nodemgr, DEFINE,
+                              cons(nodemgr,
+                                   new_node(nodemgr, EQDEF, one_fairness_name,
+                                            one_fairness_expr),
+                                   Nil),
+                              Nil),
+                     all_declr);
+    all_declr = cons(
+        nodemgr, new_node(nodemgr, JUSTICE, one_fairness_name, Nil), all_declr);
+  } else {
     /* add the JUSTICEs to the list of all declarations */
     tmp = Nil;
     NODE_LIST_FOREACH(justice_declarations, iter) {
@@ -1184,14 +1282,16 @@ static node_ptr generate_smv_module(const NuSMVEnv_ptr env,
 
   /* add the DEFINESs to the list of all declarations */
   {
-/*     node_ptr shared_defines = Nil; /\* defines with shared memory *\/ */
-/*     iter = define_declarations; */
-/*     while (Nil != iter) { */
-/*       shared_defines = find_node(nodemgr, CONS, car(iter), shared_defines); */
-/*       iter = cdr(iter); */
-/*     } */
-/*     all_declr = find_node(nodemgr, CONS, */
-/*                           find_node(nodemgr, DEFINE, shared_defines, Nil), all_declr); */
+    /*     node_ptr shared_defines = Nil; /\* defines with shared memory *\/ */
+    /*     iter = define_declarations; */
+    /*     while (Nil != iter) { */
+    /*       shared_defines = find_node(nodemgr, CONS, car(iter),
+     * shared_defines); */
+    /*       iter = cdr(iter); */
+    /*     } */
+    /*     all_declr = find_node(nodemgr, CONS, */
+    /*                           find_node(nodemgr, DEFINE, shared_defines,
+     * Nil), all_declr); */
     tmp = Nil;
     NODE_LIST_FOREACH(define_declarations, iter) {
       node_ptr val = NodeList_get_elem_at(define_declarations, iter);
@@ -1202,11 +1302,12 @@ static node_ptr generate_smv_module(const NuSMVEnv_ptr env,
 
   /* add the VARs to the list of all declarations */
   {
-    node_ptr new_vars = Nil;/* all the variable declaration */
+    node_ptr new_vars = Nil; /* all the variable declaration */
     node_ptr boolean_type = find_node(nodemgr, BOOLEAN, Nil, Nil);
     NODE_LIST_FOREACH(var_declarations, iter) {
       node_ptr val = NodeList_get_elem_at(var_declarations, iter);
-      new_vars = cons(nodemgr, new_node(nodemgr, COLON, val, boolean_type), new_vars);
+      new_vars =
+          cons(nodemgr, new_node(nodemgr, COLON, val, boolean_type), new_vars);
     }
     all_declr = cons(nodemgr, new_node(nodemgr, VAR, new_vars, Nil), all_declr);
   }
@@ -1218,7 +1319,8 @@ static node_ptr generate_smv_module(const NuSMVEnv_ptr env,
     tmp = find_node(nodemgr, ATOM, (node_ptr)name, Nil);
   }
 
-  return new_node(nodemgr, MODULE, new_node(nodemgr, MODTYPE, tmp, Nil), all_declr);
+  return new_node(nodemgr, MODULE, new_node(nodemgr, MODTYPE, tmp, Nil),
+                  all_declr);
 }
 
 /*!
@@ -1232,17 +1334,16 @@ static node_ptr generate_smv_module(const NuSMVEnv_ptr env,
      ...
   esac;
   </textarea>
-  it returns <tt> (c1 and e1) or (!c1 and ((c2 and e2) or (!c2 and (....)))) </tt>
+  it returns <tt> (c1 and e1) or (!c1 and ((c2 and e2) or (!c2 and (....))))
+  </tt>
 
 */
-static node_ptr expand_case_body(const NuSMVEnv_ptr env, node_ptr expr)
-{
+static node_ptr expand_case_body(const NuSMVEnv_ptr env, node_ptr expr) {
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   nusmv_assert(Nil != expr);
 
-  if ((CASE == node_get_type(expr)) ||
-      (IFTHENELSE == node_get_type(expr))) {
+  if ((CASE == node_get_type(expr)) || (IFTHENELSE == node_get_type(expr))) {
     node_ptr c, t, e;
 
     nusmv_assert((COLON == node_get_type(car(expr))));
@@ -1251,7 +1352,8 @@ static node_ptr expand_case_body(const NuSMVEnv_ptr env, node_ptr expr)
     t = cdr(car(expr));
     e = expand_case_body(env, cdr(expr));
 
-    return ExprMgr_or(exprs, ExprMgr_and(exprs, c, t), ExprMgr_and(exprs, ExprMgr_not(exprs, c), e));
+    return ExprMgr_or(exprs, ExprMgr_and(exprs, c, t),
+                      ExprMgr_and(exprs, ExprMgr_not(exprs, c), e));
   }
 
   return expr;
@@ -1266,35 +1368,36 @@ static node_ptr expand_case_body(const NuSMVEnv_ptr env, node_ptr expr)
   This function generates an unique name for that ATOM.
 
 */
-static node_ptr generate_expr_name(NuSMVEnv_ptr env,
-                                   const char * pre_prefix,
-                                   const char * prefix_name)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+static node_ptr generate_expr_name(NuSMVEnv_ptr env, const char *pre_prefix,
+                                   const char *prefix_name) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const UStringMgr_ptr strings =
-    USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
+      USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
   const SymbTable_ptr symb_table =
-    SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
+      SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
 
   /* Here 1 is removed since 0 may clash with NULL value. */
   unsigned int uniquePositiveNumber =
-    (unsigned int)(nusmv_ptrint)NuSMVEnv_get_value(env, ENV_LTL2SMV_UNIQUE_POS_NUMBER) - 1;
+      (unsigned int)(nusmv_ptrint)NuSMVEnv_get_value(
+          env, ENV_LTL2SMV_UNIQUE_POS_NUMBER) -
+      1;
 
   /* We use an offset of 2 for avoiding clash with 0 and NULL */
   unsigned int specificationNumber =
-    (unsigned int)(nusmv_ptrint)NuSMVEnv_get_value(env, ENV_LTL2SMV_SPECIFICATION_NUMBER) - 2;
+      (unsigned int)(nusmv_ptrint)NuSMVEnv_get_value(
+          env, ENV_LTL2SMV_SPECIFICATION_NUMBER) -
+      2;
 
   string_ptr str = NULL;
   node_ptr result = NULL;
   ResolveSymbol_ptr rs = NULL;
 
   str = generate_string(strings, "%s%u%s%d", pre_prefix, specificationNumber,
-                                     prefix_name, uniquePositiveNumber++);
+                        prefix_name, uniquePositiveNumber++);
   result = new_node(nodemgr, ATOM, (node_ptr)str, Nil);
   rs = SymbTable_resolve_symbol(symb_table, result, Nil);
 
-  while(ResolveSymbol_is_defined(rs)) {
+  while (ResolveSymbol_is_defined(rs)) {
     free_node(nodemgr, result);
     str = generate_string(strings, "%s%u%s%d", pre_prefix, specificationNumber,
                           prefix_name, uniquePositiveNumber++);
@@ -1303,7 +1406,7 @@ static node_ptr generate_expr_name(NuSMVEnv_ptr env,
   }
 
   NuSMVEnv_set_or_replace_value(env, ENV_LTL2SMV_UNIQUE_POS_NUMBER,
-                                PTR_FROM_INT(void*, uniquePositiveNumber + 1));
+                                PTR_FROM_INT(void *, uniquePositiveNumber + 1));
 
   return result;
 }
@@ -1317,10 +1420,10 @@ static node_ptr generate_expr_name(NuSMVEnv_ptr env,
 
   \se None
 */
-static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr module)
-{
+static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE *ostream,
+                                 node_ptr module) {
   MasterPrinter_ptr const wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   node_ptr iter;
 
   nusmv_assert(Nil != module);
@@ -1330,7 +1433,8 @@ static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr modul
   nusmv_assert(ATOM == node_get_type(car(car(module))));
   nusmv_assert(Nil == cdr(car(module)));
 
-  fprintf(ostream, "MODULE %s\n", UStringMgr_get_string_text((string_ptr)car(car(car(module)))));
+  fprintf(ostream, "MODULE %s\n",
+          UStringMgr_get_string_text((string_ptr)car(car(car(module)))));
 
   iter = cdr(module);
   while (Nil != iter) {
@@ -1340,7 +1444,7 @@ static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr modul
     case VAR: { /* variable declarations */
       node_ptr var;
       var = car(car(iter));
-      if ( Nil != var) {
+      if (Nil != var) {
         fprintf(ostream, "VAR\n");
         while (Nil != var) { /* iterate over variable declarations */
 
@@ -1350,7 +1454,7 @@ static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr modul
           nusmv_assert(BOOLEAN == node_get_type(cdr(car(var))));
 
           fprintf(ostream, "   %s : boolean;\n",
- UStringMgr_get_string_text((string_ptr)car(car(car(var)))));
+                  UStringMgr_get_string_text((string_ptr)car(car(car(var)))));
 
           var = cdr(var);
         }
@@ -1361,7 +1465,7 @@ static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr modul
     case DEFINE: { /* define declarations */
       node_ptr def;
       def = car(car(iter));
-      if ( Nil != def) {
+      if (Nil != def) {
         fprintf(ostream, "DEFINE\n");
         while (Nil != def) { /* iterate over define declarations */
 
@@ -1395,8 +1499,9 @@ static void ltl2smv_print_module(NuSMVEnv_ptr env, FILE* ostream, node_ptr modul
       print_node(wffprint, ostream, car(car(iter)));
       fprintf(ostream, "\n");
       break;
-    default: error_unreachable_code(); /* unexpected node */
-    } /*switch */
+    default:
+      error_unreachable_code(); /* unexpected node */
+    }                           /*switch */
 
     iter = cdr(iter);
   } /* while */

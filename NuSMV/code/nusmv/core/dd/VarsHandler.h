@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,8 +37,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_DD_VARS_HANDLER_H__
 #define __NUSMV_CORE_DD_VARS_HANDLER_H__
 
@@ -49,9 +47,9 @@
   \struct VarsHandler
   \brief Definition of the public accessor for class VarsHandler
 
-  
+
 */
-typedef struct VarsHandler_TAG*  VarsHandler_ptr;
+typedef struct VarsHandler_TAG *VarsHandler_ptr;
 
 /*!
   \struct GroupInfo
@@ -61,7 +59,7 @@ typedef struct VarsHandler_TAG*  VarsHandler_ptr;
   When manipulating variable groups, a pointer to a GroupInfo is
   returned and/or accepted by class VarsHandler.
 */
-typedef struct GroupInfo_TAG* GroupInfo_ptr;
+typedef struct GroupInfo_TAG *GroupInfo_ptr;
 
 /*!
   \brief To cast and check instances of class VarsHandler
@@ -69,18 +67,15 @@ typedef struct GroupInfo_TAG* GroupInfo_ptr;
   These macros must be used respectively to cast and to check
   instances of class VarsHandler
 */
-#define VARS_HANDLER(self) \
-         ((VarsHandler_ptr) self)
+#define VARS_HANDLER(self) ((VarsHandler_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define VARS_HANDLER_CHECK_INSTANCE(self) \
-         (nusmv_assert(VARS_HANDLER(self) != VARS_HANDLER(NULL)))
-
-
+#define VARS_HANDLER_CHECK_INSTANCE(self)                                      \
+  (nusmv_assert(VARS_HANDLER(self) != VARS_HANDLER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -112,7 +107,7 @@ void VarsHandler_destroy(VarsHandler_ptr self);
   \methodof VarsHandler
   \brief Returns the contained dd manager
 
-  
+
 */
 DDMgr_ptr VarsHandler_get_dd_manager(const VarsHandler_ptr self);
 
@@ -132,10 +127,9 @@ DDMgr_ptr VarsHandler_get_dd_manager(const VarsHandler_ptr self);
   \sa VarsHandler_release_group,
   VarsHandler_dissolve_group
 */
-GroupInfo_ptr
-VarsHandler_reserve_group(VarsHandler_ptr self,
-                          int from_lev, int size, int chunk,
-                          boolean can_share, int* lev_low);
+GroupInfo_ptr VarsHandler_reserve_group(VarsHandler_ptr self, int from_lev,
+                                        int size, int chunk, boolean can_share,
+                                        int *lev_low);
 
 /*!
   \methodof VarsHandler
@@ -145,8 +139,8 @@ VarsHandler_reserve_group(VarsHandler_ptr self,
   This method can be used to check if a group can be
   created at given level.
 */
-boolean VarsHandler_can_group(const VarsHandler_ptr self,
-                                     int from_lev, int size, int chunk);
+boolean VarsHandler_can_group(const VarsHandler_ptr self, int from_lev,
+                              int size, int chunk);
 
 /*!
   \methodof VarsHandler
@@ -160,8 +154,7 @@ boolean VarsHandler_can_group(const VarsHandler_ptr self,
 
   \sa VarsHandler_reserve_group
 */
-boolean
-VarsHandler_release_group(VarsHandler_ptr self, GroupInfo_ptr bid);
+boolean VarsHandler_release_group(VarsHandler_ptr self, GroupInfo_ptr bid);
 
 /*!
   \methodof VarsHandler
@@ -177,8 +170,7 @@ VarsHandler_release_group(VarsHandler_ptr self, GroupInfo_ptr bid);
 
   \sa VarsHandler_reserve_group
 */
-void
-VarsHandler_dissolve_group(VarsHandler_ptr self, GroupInfo_ptr bid);
+void VarsHandler_dissolve_group(VarsHandler_ptr self, GroupInfo_ptr bid);
 
 /*!
   \methodof VarsHandler
@@ -197,10 +189,8 @@ void VarsHandler_update_levels(VarsHandler_ptr self);
 
   This is used for debugging/verosity purposes
 */
-void VarsHandler_print(const VarsHandler_ptr self, FILE* _file);
+void VarsHandler_print(const VarsHandler_ptr self, FILE *_file);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_DD_VARS_HANDLER_H__ */

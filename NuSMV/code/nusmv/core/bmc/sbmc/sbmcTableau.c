@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,15 @@
 
 */
 
-
 #include "nusmv/core/bmc/sbmc/sbmcTableau.h"
 #include "nusmv/core/bmc/sbmc/sbmcTableauLTLformula.h"
 
-#include "nusmv/core/bmc/bmcInt.h"
-#include "nusmv/core/bmc/bmcUtils.h"
-#include "nusmv/core/bmc/bmcModel.h"
 #include "nusmv/core/bmc/bmcCheck.h"
-#include "nusmv/core/wff/wff.h"
+#include "nusmv/core/bmc/bmcInt.h"
+#include "nusmv/core/bmc/bmcModel.h"
+#include "nusmv/core/bmc/bmcUtils.h"
 #include "nusmv/core/wff/w2w/w2w.h"
+#include "nusmv/core/wff/wff.h"
 
 #include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/utils/error.h"
@@ -75,53 +74,43 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-be_ptr Bmc_SBMCTableau_GetNoLoop(const BeFsm_ptr be_fsm,
-                                 const node_ptr ltl_wff, const int k)
-{
-  return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm),
-                                      ltl_wff, 0, k,
-                                      Bmc_Utils_GetNoLoopback());
+be_ptr Bmc_SBMCTableau_GetNoLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
+                                 const int k) {
+  return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm), ltl_wff, 0,
+                                      k, Bmc_Utils_GetNoLoopback());
 }
 
 be_ptr Bmc_SBMCTableau_GetSingleLoop(const BeFsm_ptr be_fsm,
                                      const node_ptr ltl_wff, const int k,
-                                     const int l)
-{
+                                     const int l) {
   BeEnc_ptr be_enc = BeFsm_get_be_encoding(be_fsm);
   be_ptr loopback = Bmc_SBMCTableau_GetLoopCondition(be_enc, k, l);
-  
-  be_ptr tableau_k = BmcInt_SBMCTableau_GetAtTime(be_enc,
-                                                  ltl_wff,
-                                                  0, k, l);
-  
+
+  be_ptr tableau_k = BmcInt_SBMCTableau_GetAtTime(be_enc, ltl_wff, 0, k, l);
+
   return Be_And(BeEnc_get_be_manager(be_enc), loopback, tableau_k);
 }
 
 be_ptr Bmc_SBMCTableau_GetAllLoops(const BeFsm_ptr be_fsm,
                                    const node_ptr ltl_wff, const int k,
-                                   const int l)
-{
+                                   const int l) {
   /* asserts on l, k compatibility */
   nusmv_assert(!Bmc_Utils_IsNoLoopback(l));
   nusmv_assert(l < k);
 
-  return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm),
-                                      ltl_wff,
-                                      0, k, l);
+  return BmcInt_SBMCTableau_GetAtTime(BeFsm_get_be_encoding(be_fsm), ltl_wff, 0,
+                                      k, l);
 }
 
-be_ptr
-Bmc_SBMCTableau_GetLoopCondition(const BeEnc_ptr be_enc, const int k,
-                                 const int l)
-{
-  Be_Manager_ptr be_mgr; 
-  be_ptr tableau_iff_constraints; 
-  int iter; 
+be_ptr Bmc_SBMCTableau_GetLoopCondition(const BeEnc_ptr be_enc, const int k,
+                                        const int l) {
+  Be_Manager_ptr be_mgr;
+  be_ptr tableau_iff_constraints;
+  int iter;
 
   nusmv_assert(l < k);
 
@@ -132,18 +121,16 @@ Bmc_SBMCTableau_GetLoopCondition(const BeEnc_ptr be_enc, const int k,
   while (BeEnc_is_var_index_valid(be_enc, iter)) {
     /* Here we can consider removing the loop variable */
     tableau_iff_constraints =
-      Be_And(be_mgr, tableau_iff_constraints,
-             Be_Iff(be_mgr, 
-                    BeEnc_index_to_timed(be_enc, iter, l), 
-                    BeEnc_index_to_timed(be_enc, iter, k)));
+        Be_And(be_mgr, tableau_iff_constraints,
+               Be_Iff(be_mgr, BeEnc_index_to_timed(be_enc, iter, l),
+                      BeEnc_index_to_timed(be_enc, iter, k)));
 
     iter = BeEnc_get_next_var_index(be_enc, iter, BE_VAR_TYPE_CURR);
   }
 
- return tableau_iff_constraints;
+  return tableau_iff_constraints;
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-

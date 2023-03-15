@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,8 +37,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_MASTER_NODE_WALKER_H__
 #define __NUSMV_CORE_NODE_MASTER_NODE_WALKER_H__
 
@@ -50,9 +48,9 @@
   \struct MasterNodeWalker
   \brief Definition of the public accessor for class MasterNodeWalker
 
-  
+
 */
-typedef struct MasterNodeWalker_TAG*  MasterNodeWalker_ptr;
+typedef struct MasterNodeWalker_TAG *MasterNodeWalker_ptr;
 
 /*!
   \brief To cast and check instances of class MasterNodeWalker
@@ -60,17 +58,15 @@ typedef struct MasterNodeWalker_TAG*  MasterNodeWalker_ptr;
   These macros must be used respectively to cast and to check
   instances of class MasterNodeWalker
 */
-#define MASTER_NODE_WALKER(self) \
-         ((MasterNodeWalker_ptr) self)
+#define MASTER_NODE_WALKER(self) ((MasterNodeWalker_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MASTER_NODE_WALKER_CHECK_INSTANCE(self) \
-         (nusmv_assert(MASTER_NODE_WALKER(self) != MASTER_NODE_WALKER(NULL)))
-
+#define MASTER_NODE_WALKER_CHECK_INSTANCE(self)                                \
+  (nusmv_assert(MASTER_NODE_WALKER(self) != MASTER_NODE_WALKER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -109,13 +105,12 @@ void MasterNodeWalker_destroy(MasterNodeWalker_ptr self);
   Warning: If this method succeeds, the walker instance belongs to
   self, and its life cycle will be controlled by self as long as the
   walker is registered within self. The user must not destroy a
-  registered walker. 
+  registered walker.
 
   \sa unregister_walker
 */
-boolean
-MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
-                                 NodeWalker_ptr walker);
+boolean MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
+                                         NodeWalker_ptr walker);
 
 /*!
   \methodof MasterNodeWalker
@@ -124,13 +119,12 @@ MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
   If the walker was registered returns the walker instance.
   If not registered (not found among the currently registered walkers),
   returns NULL but no error occurs. After this method is called,
-  
+
 
   \sa register_walker
 */
-NodeWalker_ptr
-MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
-                                   const char* name);
+NodeWalker_ptr MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
+                                                  const char *name);
 
 /*!
   \methodof MasterNodeWalker
@@ -139,10 +133,9 @@ MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
   If the walker is not found among the registered walkers,
   NULL is returned and no error occurs
 */
-NodeWalker_ptr
-MasterNodeWalker_get_walker(MasterNodeWalker_ptr self, const char* name);
+NodeWalker_ptr MasterNodeWalker_get_walker(MasterNodeWalker_ptr self,
+                                           const char *name);
 
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_NODE_MASTER_NODE_WALKER_H__ */

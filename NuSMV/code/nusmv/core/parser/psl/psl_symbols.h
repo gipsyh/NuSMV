@@ -67,17 +67,17 @@ enum PSL_SYMBOLS_TAG {
   PSL_LBSPLAT,
   PSL_LBEQ,
   PSL_LBMINUSGT,
-  PSL_LBPLUSRB,  
+  PSL_LBPLUSRB,
 
-  PSL_TILDE, 
-  PSL_EQEQ, 
-  
-  PSL_RANGE, 
-  PSL_ITE, 
-  
+  PSL_TILDE,
+  PSL_EQEQ,
+
+  PSL_RANGE,
+  PSL_ITE,
+
   PSL_WSELECT, /* PSL bit selection */
-  /* ---------------------------------------------------------------------- */  
-  NUSMV_PSL_SYMBOL_LAST  /* Do not touch this */
+  /* ---------------------------------------------------------------------- */
+  NUSMV_PSL_SYMBOL_LAST /* Do not touch this */
 };
 
 #endif /* ___NUSMV_CORE_PARSER_PSL_PSL_SYMBOLS_H__ */

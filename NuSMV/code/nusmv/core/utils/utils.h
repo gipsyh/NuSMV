@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_UTILS_H__
 #define __NUSMV_CORE_UTILS_UTILS_H__
 
@@ -50,8 +49,8 @@
 #define NUSMV_FUNCATTR_NORETURN
 #endif
 
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/utils/list.h" /* MD: it should be better to remove this dependency */
 
 /* --------------------------------------------------------------------- */
@@ -83,7 +82,7 @@ void Utils_pkg_quit(const NuSMVEnv_ptr env);
 
   The string must be freed after use
 */
-char* Utils_int_to_str(const int an_int);
+char *Utils_int_to_str(const int an_int);
 
 /*!
   \brief Returns the size than an ant would need if represented as
@@ -102,7 +101,7 @@ size_t Utils_int_size_as_string(const int an_int);
 
   \se None
 */
-const char* Utils_StripPath(const char* pathfname);
+const char *Utils_StripPath(const char *pathfname);
 
 /*!
   \brief Returns filename without path and extension
@@ -113,8 +112,7 @@ const char* Utils_StripPath(const char* pathfname);
 
   \se the string pointed by 'filename' changes
 */
-void
-Utils_StripPathNoExtension(const char* fpathname, char* filename);
+void Utils_StripPathNoExtension(const char *fpathname, char *filename);
 
 /*!
   \brief Returns directory part of fpathname without filename and
@@ -127,16 +125,14 @@ Utils_StripPathNoExtension(const char* fpathname, char* filename);
 
   \sa Utils_StripPathNoExtension, Utils_StripPath
 */
-void Utils_StripPathNoFilenameNoExtension(const char* fpathname,
-                                          char* dirname);
+void Utils_StripPathNoFilenameNoExtension(const char *fpathname, char *dirname);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char* Utils_get_temp_filename_in_dir(const char* dir,
-                                     const char* templ);
+char *Utils_get_temp_filename_in_dir(const char *dir, const char *templ);
 
 /*!
   \brief Checks a list of directories for a given file.
@@ -152,9 +148,8 @@ char* Utils_get_temp_filename_in_dir(const char* dir,
 
   \sa Utils_file_exists_in_directory
 */
-int Utils_file_exists_in_paths(const char* filename,
-                               const char* paths,
-                               const char* delimiters);
+int Utils_file_exists_in_paths(const char *filename, const char *paths,
+                               const char *delimiters);
 
 /*!
   \brief Checks for the existence of a file within a directory.
@@ -168,8 +163,7 @@ int Utils_file_exists_in_paths(const char* filename,
 
   \sa Utils_file_exists_in_paths
 */
-int Utils_file_exists_in_directory(const char* filename,
-                                   char* directory);
+int Utils_file_exists_in_directory(const char *filename, char *directory);
 
 /*!
   \brief Checks if a file exists in file system
@@ -177,12 +171,12 @@ int Utils_file_exists_in_directory(const char* filename,
   filename is absolute or relative to the current
   working dir
 */
-boolean Utils_file_exists(const char* filename);
+boolean Utils_file_exists(const char *filename);
 
 /*!
   \brief check if given file names are referring the same file node
 */
-boolean Utils_files_are_the_same(const char* fname1, const char* fname3);
+boolean Utils_files_are_the_same(const char *fname1, const char *fname3);
 
 /*!
   \brief Checks if a file can be written in file system
@@ -190,7 +184,7 @@ boolean Utils_files_are_the_same(const char* fname1, const char* fname3);
   filename is absolute or relative to the current
   working dir
 */
-boolean Utils_file_can_be_written(const char* filename);
+boolean Utils_file_can_be_written(const char *filename);
 
 /*!
   \brief Checks if a file exists in file system and it has
@@ -199,8 +193,7 @@ boolean Utils_file_can_be_written(const char* filename);
   filename is absolute or relative to the current
   working dir
 */
-boolean Utils_exe_file_exists(const char* filename);
-
+boolean Utils_exe_file_exists(const char *filename);
 
 /* Miscellaneous **************************************************************/
 
@@ -210,7 +203,7 @@ boolean Utils_exe_file_exists(const char* filename);
   Compares the two strings s1 and s2,
   ignoring the case of the characters.
 */
-int Utils_strcasecmp(const char* s1, const char* s2);
+int Utils_strcasecmp(const char *s1, const char *s2);
 
 /*!
   \brief Computes the log2 of the given unsigned argument
@@ -231,7 +224,7 @@ int Utils_log2_round(unsigned long long int a);
 
   \sa optional
 */
-int Utils_ptr_compar(const void* a, const void* b);
+int Utils_ptr_compar(const void *a, const void *b);
 
 /*!
   \brief Escapes all characters in given string, and dumps them
@@ -239,7 +232,7 @@ int Utils_ptr_compar(const void* a, const void* b);
 
 
 */
-void Utils_str_escape_xml_file(const char* str, FILE* file);
+void Utils_str_escape_xml_file(const char *str, FILE *file);
 
 /*!
   \brief Destroys a list of list
@@ -254,7 +247,6 @@ void Utils_str_escape_xml_file(const char* str, FILE* file);
 */
 void Utils_FreeListOfLists(lsList list_of_lists);
 
-
 /* High-level support for timers used in benchmarking ************************/
 
 /*!
@@ -263,30 +255,29 @@ void Utils_FreeListOfLists(lsList list_of_lists);
   If the timer does not exist, it will be created and
   started. If already started an error occurs.
 */
-void Utils_start_timer(const NuSMVEnv_ptr env, const char* name);
+void Utils_start_timer(const NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief Stops a timer whose name is given
 
   The timer must be already existing and running.
 */
-void Utils_stop_timer(const NuSMVEnv_ptr env, const char* name);
+void Utils_stop_timer(const NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief Resets a timer whose name is given
 
   The timer must be already existing.
 */
-void Utils_reset_timer(const NuSMVEnv_ptr env, const char* name);
+void Utils_reset_timer(const NuSMVEnv_ptr env, const char *name);
 
 /*!
   \brief prints info about a timer whose name is given
 
   The timer must be already existing. msg can be NULL
 */
-void Utils_print_timer(const NuSMVEnv_ptr env,
-                       const char* name, const char* msg);
-
+void Utils_print_timer(const NuSMVEnv_ptr env, const char *name,
+                       const char *msg);
 
 /* Draft of an interface to cudd util subpackage ******************************/
 
@@ -296,7 +287,6 @@ void Utils_print_timer(const NuSMVEnv_ptr env,
   Returned string must be destroyed. Returned string is
   equal (but not it) to the input string if home could not be find
 */
-char* Utils_util_tilde_expand(char* fname);
-
+char *Utils_util_tilde_expand(char *fname);
 
 #endif /* __NUSMV_CORE_UTILS_UTILS_H__ */

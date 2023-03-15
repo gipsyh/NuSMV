@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -30,7 +30,7 @@
   \author Andrei Tchaltsev
   \brief Public interface for a predicate-normaliser class
 
-  
+
   The purpose of a predicate normaliser is to take a symbolic
   expression (node_ptr), normalise predicates and return a newly
   created expressions with normlised predicates.  A
@@ -51,11 +51,9 @@
   This is a stand-alone class. This class needs only a type checker
   -- to get the type of input expression and type check the generated
   (returned) expressions.
-  
+
 
 */
-
-
 
 #ifndef __NUSMV_CORE_COMPILE_PREDICATE_NORMALISER_H__
 #define __NUSMV_CORE_COMPILE_PREDICATE_NORMALISER_H__
@@ -63,7 +61,6 @@
 #include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/set/set.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -73,26 +70,24 @@
   \struct PredicateNormaliser
   \brief Preicate Normaliser class
 
-  
+
 */
-typedef struct PredicateNormaliser_TAG* PredicateNormaliser_ptr;
+typedef struct PredicateNormaliser_TAG *PredicateNormaliser_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PREDICATE_NORMALISER(x) \
-         ((PredicateNormaliser_ptr) x)
+#define PREDICATE_NORMALISER(x) ((PredicateNormaliser_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PREDICATE_NORMALISER_CHECK_INSTANCE(x) \
-         ( nusmv_assert(PREDICATE_NORMALISER(x) != PREDICATE_NORMALISER(NULL)) )
-
+#define PREDICATE_NORMALISER_CHECK_INSTANCE(x)                                 \
+  (nusmv_assert(PREDICATE_NORMALISER(x) != PREDICATE_NORMALISER(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -108,16 +103,15 @@ typedef struct PredicateNormaliser_TAG* PredicateNormaliser_ptr;
    generated expressions.
    NOTE that the type checker remember the type of checked expressions.
 */
-PredicateNormaliser_ptr
-PredicateNormaliser_create(SymbTable_ptr st);
+PredicateNormaliser_ptr PredicateNormaliser_create(SymbTable_ptr st);
 
 /*!
   \methodof PredicateNormaliser
   \brief Class PredicateNormaliser destructor
 
-  
+
 */
-void  PredicateNormaliser_destroy(PredicateNormaliser_ptr self);
+void PredicateNormaliser_destroy(PredicateNormaliser_ptr self);
 
 /*!
   \methodof PredicateNormaliser
@@ -153,11 +147,10 @@ void  PredicateNormaliser_destroy(PredicateNormaliser_ptr self);
 
    NOTE: if only predicates are required at the end and not the whole
    normalized expressions, then it is better to use PredicateExtractor
-   class.  
+   class.
 */
-node_ptr
-PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self,
-                                   node_ptr expr);
+node_ptr PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self,
+                                            node_ptr expr);
 
 /*!
   \methodof PredicateNormaliser
@@ -175,7 +168,7 @@ PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self,
 
    NOTE: if only predicates are required at the end and not the whole
    normalized expressions, then it is better to use PredicateExtractor
-   class.  
+   class.
 */
 node_ptr
 PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self,
@@ -189,7 +182,7 @@ PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self,
   This function does the same things as
    PredicateNormaliser_normalise_expr, except that the input expression
    must be a specification (such expression are returned by Prop_get_expr_core)
-   
+
 */
 node_ptr
 PredicateNormaliser_normalise_specification(PredicateNormaliser_ptr self,
@@ -210,11 +203,10 @@ PredicateNormaliser_normalise_specification(PredicateNormaliser_ptr self,
    This function just walks the exressions, tries to find
    a subexpression with not-boolean operands then adds it to the given set.
    Every predicate is added only once.
-   
+
 */
-void
-PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
-Set_t* preds, node_ptr expr);
+void PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
+                                             Set_t *preds, node_ptr expr);
 
 /*!
   \methodof PredicateNormaliser
@@ -228,13 +220,11 @@ Set_t* preds, node_ptr expr);
 
    This function just walks the exressions, tries to find
    a subexpression with not-boolean operands then print it.
-   
+
 
   \se PredicateNormaliser_get_predicates_only
 */
-void
-PredicateNormaliser_print_predicates_only(const PredicateNormaliser_ptr self,
-FILE* stream,
-node_ptr expr);
+void PredicateNormaliser_print_predicates_only(
+    const PredicateNormaliser_ptr self, FILE *stream, node_ptr expr);
 
 #endif /* __NUSMV_CORE_COMPILE_PREDICATE_NORMALISER_H__ */

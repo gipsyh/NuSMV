@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,41 +35,35 @@
 
 */
 
-
 #include "nusmv/core/compile/flattening/flatteningPkg.h"
-#include "nusmv/core/compile/flattening/MasterCompileFlattener.h"
 #include "nusmv/core/compile/flattening/FlattenerCore.h"
+#include "nusmv/core/compile/flattening/MasterCompileFlattener.h"
 
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/opt/opt.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -78,7 +72,6 @@
 /*---------------------------------------------------------------------------*/
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -92,26 +85,25 @@
   It associates a flattener to the global environment.
 */
 
-void FlatteningPkg_init(NuSMVEnv_ptr env)
-{
+void FlatteningPkg_init(NuSMVEnv_ptr env) {
   MasterCompileFlattener_ptr flattener;
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-               "Instantiating the Flattener instance "
-               "within the given environment...\n");
+    Logger_log(logger, "Instantiating the Flattener instance "
+                       "within the given environment...\n");
   }
 
   flattener = MasterCompileFlattener_create(env);
   {
     /* add core flatteners */
     FlattenerBase_ptr core_flattener;
-    core_flattener = FLATTENER_BASE(FlattenerCore_create(env, "Flattener core"));
+    core_flattener =
+        FLATTENER_BASE(FlattenerCore_create(env, "Flattener core"));
     MasterNodeWalker_register_walker(MASTER_NODE_WALKER(flattener),
                                      NODE_WALKER(core_flattener));
-
   }
 
   NuSMVEnv_set_value(env, ENV_FLATTENER, flattener);
@@ -120,35 +112,28 @@ void FlatteningPkg_init(NuSMVEnv_ptr env)
 /*!
   \brief Deinitialization of the flattening package
 
-  
+
 */
 
-void FlatteningPkg_quit(NuSMVEnv_ptr env)
-{
+void FlatteningPkg_quit(NuSMVEnv_ptr env) {
   MasterCompileFlattener_ptr flattener =
-    MASTER_COMPILE_FLATTENER(NuSMVEnv_remove_value(env, ENV_FLATTENER));
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      MASTER_COMPILE_FLATTENER(NuSMVEnv_remove_value(env, ENV_FLATTENER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-               "Clearing the Flattener instance in "
-               "the given environment...\n");
+    Logger_log(logger, "Clearing the Flattener instance in "
+                       "the given environment...\n");
   }
 
   MasterCompileFlattener_destroy(flattener);
 }
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
-

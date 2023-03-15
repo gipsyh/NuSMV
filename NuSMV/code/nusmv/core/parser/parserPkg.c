@@ -3,7 +3,7 @@
 
   This file is part of the ``parser'' package.
   %COPYRIGHT%
-  
+
 
 -----------------------------------------------------------------------------*/
 
@@ -15,33 +15,28 @@
 
 */
 
-#include "nusmv/core/parser/parserInt.h"
 #include "nusmv/core/parser/parser.h"
+#include "nusmv/core/parser/parserInt.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -51,27 +46,23 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Parser_Init(NuSMVEnv_ptr env)
-{
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+void Parser_Init(NuSMVEnv_ptr env) {
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   /* lib init */
   parser_free_parsed_syntax_errors(env);
 
   /* options */
-  (void)OptsHandler_register_bool_option(opts,
-                                   OPT_PARSER_IS_LAX,
-                                   false,
-                                   true /*public*/);
+  (void)OptsHandler_register_bool_option(opts, OPT_PARSER_IS_LAX, false,
+                                         true /*public*/);
 }
 
-void Parser_Quit(NuSMVEnv_ptr env)
-{
+void Parser_Quit(NuSMVEnv_ptr env) {
   /* lib quit */
   parser_free_parsed_syntax_errors(env);
 }
@@ -80,10 +71,6 @@ void Parser_Quit(NuSMVEnv_ptr env)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
-

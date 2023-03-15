@@ -34,63 +34,59 @@
 
 */
 
-
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/compile/PredicateExtractor.h"
 #include "nusmv/core/compile/compileInt.h"
+#include "nusmv/core/compile/symb_table/ResolveSymbol.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/utils/EnvObject_private.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/WordNumberMgr.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/error.h"
-#include "nusmv/core/compile/symb_table/ResolveSymbol.h"
-#include "nusmv/core/utils/EnvObject_private.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct PredicateExtractor_TAG
-{
+typedef struct PredicateExtractor_TAG {
   INHERITS_FROM(EnvObject);
 
-  Set_t all_preds;   /* all predicates : Set_t of node_ptr */
-  Set_t unclustered_preds;   /* subset of all_preds for which clusters
-                                were not computed : Set_t of node_ptr */
-  Set_t all_clusters;   /* all clusters : Set_t of Set_t of node_ptr.
-                           This is the actual owner of all clusters.*/
+  Set_t all_preds;         /* all predicates : Set_t of node_ptr */
+  Set_t unclustered_preds; /* subset of all_preds for which clusters
+                              were not computed : Set_t of node_ptr */
+  Set_t all_clusters;      /* all clusters : Set_t of Set_t of node_ptr.
+                              This is the actual owner of all clusters.*/
 
-  hash_ptr var2cluster; /* var -> cluster it belongs to. node_ptr -> Set_t */
-  hash_ptr cluster2preds;   /* cluster -> its predicates. Owner of preds sets.
-                               Set_t -> Set_t of node_ptr */
+  hash_ptr var2cluster;   /* var -> cluster it belongs to. node_ptr -> Set_t */
+  hash_ptr cluster2preds; /* cluster -> its predicates. Owner of preds sets.
+                             Set_t -> Set_t of node_ptr */
 
-  hash_ptr expr2preds; /* node_ptr -> Set_t of node_ptr.  For
-                          not-boolean expr the associated value is set
-                          of subparts of predicates in it.  For
-                          processed boolean expressions the associated
-                          value is one of PREDICATES_TRUE (if the
-                          expression can be simplified to constant
-                          true), PREDICATES_FALSE (if expression can
-                          be simplified to FALSE) or
-                          PREDICATES_ARBITRARY (for all other cases).
-                          This hash is the owner of preds sets.
-                       */
+  hash_ptr expr2preds;         /* node_ptr -> Set_t of node_ptr.  For
+                                  not-boolean expr the associated value is set
+                                  of subparts of predicates in it.  For
+                                  processed boolean expressions the associated
+                                  value is one of PREDICATES_TRUE (if the
+                                  expression can be simplified to constant
+                                  true), PREDICATES_FALSE (if expression can
+                                  be simplified to FALSE) or
+                                  PREDICATES_ARBITRARY (for all other cases).
+                                  This hash is the owner of preds sets.
+                               */
   Set_t special_word_preds[3]; /* array of 3 special predicates subparts:
                                   {0d1_0}, {0d1_1}, and {0d1_0,0d1_1} */
 
   TypeChecker_ptr checker; /* type-checker is used to get type info
                               of processed expressions and type check
                               generated expressions */
-  SymbTable_ptr st;  /* the symbol table */
-  boolean use_approx; /* if over-approximation has to be used when
-                         extracting predicates (see issue 1934) */
+  SymbTable_ptr st;        /* the symbol table */
+  boolean use_approx;      /* if over-approximation has to be used when
+                              extracting predicates (see issue 1934) */
 
 } PredicateExtractor;
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -107,8 +103,8 @@ typedef struct PredicateExtractor_TAG
    hash.
    For better optimizations simplifications 3 values are introduced:
    PREDICATES_TRUE -- represent a set of predicates, consisting of {TRUE} only.
-   PREDICATES_FALSE -- represent a set of predicates, consisting of {FALSE} only.
-   PREDICATES_ARBITRARY -- represent arbitrary set of predicates.
+   PREDICATES_FALSE -- represent a set of predicates, consisting of {FALSE}
+  only. PREDICATES_ARBITRARY -- represent arbitrary set of predicates.
 
    PREDICATES_OVERAPPROX -- represent approximanted value (to give
    up the extraction)
@@ -145,7 +141,6 @@ typedef struct PredicateExtractor_TAG
 */
 #define OVER_APPROX_THRESHOLD 600000
 
-
 /* below macro is TRUE iff the set is not an actually a Set_t,
    i.e. it is a valide predicate constant or the constant
    indicating the overapproximation.
@@ -156,8 +151,8 @@ typedef struct PredicateExtractor_TAG
 
   \todo Missing description
 */
-#define IS_FLAG_PREDICATES(set)                                 \
- (IS_FLAG_VALID_PREDICATES(set) || IS_OVER_APPROX(set))
+#define IS_FLAG_PREDICATES(set)                                                \
+  (IS_FLAG_VALID_PREDICATES(set) || IS_OVER_APPROX(set))
 
 /* below macro is TRUE iff the set is not an actually a Set_t,
    i.e. it is one of the constant values PREDICATES_TRUE,
@@ -169,10 +164,9 @@ typedef struct PredicateExtractor_TAG
 
   \todo Missing description
 */
-#define IS_FLAG_VALID_PREDICATES(set)                           \
- ((set)==PREDICATES_TRUE||(set)==PREDICATES_FALSE||(set)==PREDICATES_ARBITRARY)
-
-
+#define IS_FLAG_VALID_PREDICATES(set)                                          \
+  ((set) == PREDICATES_TRUE || (set) == PREDICATES_FALSE ||                    \
+   (set) == PREDICATES_ARBITRARY)
 
 /* below macro is TRUE iff the set is not an actually a Set_t, but it represents
    an over-approximation, i.e. it is PREDICATES_OVERAPPROX */
@@ -182,29 +176,25 @@ typedef struct PredicateExtractor_TAG
 
   \todo Missing description
 */
-#define IS_OVER_APPROX(set)                     \
-  ((set)==PREDICATES_OVERAPPROX)
+#define IS_OVER_APPROX(set) ((set) == PREDICATES_OVERAPPROX)
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-
-static void pred_extract_init(PredicateExtractor_ptr self,
-                              SymbTable_ptr st, boolean use_approx);
+static void pred_extract_init(PredicateExtractor_ptr self, SymbTable_ptr st,
+                              boolean use_approx);
 
 static void pred_extract_deinit(PredicateExtractor_ptr self);
 
-static void pred_extract_finalize(Object_ptr self, void* dummy);
+static void pred_extract_finalize(Object_ptr self, void *dummy);
 
 static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
-                                        node_ptr expr,
-                                        node_ptr context);
+                                        node_ptr expr, node_ptr context);
 
 static boolean pred_extract_is_bool_preds(PredicateExtractor_ptr self,
                                           Set_t result);
@@ -212,23 +202,18 @@ static boolean pred_extract_is_bool_preds(PredicateExtractor_ptr self,
 static Set_t pred_extract_fix_any_preds(PredicateExtractor_ptr self,
                                         Set_t result);
 
-static Set_t pred_extract_apply_unary(PredicateExtractor_ptr self,
-                                      int type,
+static Set_t pred_extract_apply_unary(PredicateExtractor_ptr self, int type,
                                       Set_t childResult);
 
-static Set_t pred_extract_apply_binary(PredicateExtractor_ptr self,
-                                       int type,
-                                       Set_t leftResult,
-                                       Set_t rightResult);
-
+static Set_t pred_extract_apply_binary(PredicateExtractor_ptr self, int type,
+                                       Set_t leftResult, Set_t rightResult);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 PredicateExtractor_ptr PredicateExtractor_create(SymbTable_ptr st,
-                                                 boolean use_approx)
-{
+                                                 boolean use_approx) {
   PredicateExtractor_ptr self = ALLOC(PredicateExtractor, 1);
 
   PREDICATE_EXTRACTOR_CHECK_INSTANCE(self);
@@ -237,22 +222,20 @@ PredicateExtractor_ptr PredicateExtractor_create(SymbTable_ptr st,
   return self;
 }
 
-void PredicateExtractor_destroy(PredicateExtractor_ptr self)
-{
+void PredicateExtractor_destroy(PredicateExtractor_ptr self) {
   PREDICATE_EXTRACTOR_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-void
-PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
-                                 node_ptr expr)
-{
+void PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
+                                      node_ptr expr) {
   int lineno_tmp;
 
   PREDICATE_EXTRACTOR_CHECK_INSTANCE(self);
 
-  if (Nil == expr) return;
+  if (Nil == expr)
+    return;
 
   /* new node will be created with for sure error line number */
   lineno_tmp = nusmv_yylineno;
@@ -276,8 +259,7 @@ PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
   if (AND == node_get_type(expr) || CONS == node_get_type(expr)) {
     PredicateExtractor_compute_preds(self, car(expr));
     PredicateExtractor_compute_preds(self, cdr(expr));
-  }
-  else {
+  } else {
     /* this is a usual expression */
     pred_extract_process_recur(self, expr, Nil);
   }
@@ -286,26 +268,25 @@ PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
   return;
 }
 
-void
-PredicateExtractor_compute_preds_from_hierarchy(PredicateExtractor_ptr self,
-                                                FlatHierarchy_ptr fh)
-{
+void PredicateExtractor_compute_preds_from_hierarchy(
+    PredicateExtractor_ptr self, FlatHierarchy_ptr fh) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   int i;
   node_ptr expr;
-  array_t * layers_name;
-  const char* a_layer_name;
+  array_t *layers_name;
+  const char *a_layer_name;
 
-  node_ptr (*fh_access[])(FlatHierarchy_ptr)  = {
-    FlatHierarchy_get_init, FlatHierarchy_get_invar,
-    FlatHierarchy_get_trans, FlatHierarchy_get_input,
-    FlatHierarchy_get_justice, FlatHierarchy_get_compassion,
-    NULL};
+  node_ptr (*fh_access[])(FlatHierarchy_ptr) = {FlatHierarchy_get_init,
+                                                FlatHierarchy_get_invar,
+                                                FlatHierarchy_get_trans,
+                                                FlatHierarchy_get_input,
+                                                FlatHierarchy_get_justice,
+                                                FlatHierarchy_get_compassion,
+                                                NULL};
 
-  for(i = 0; fh_access[i] != NULL; i++) {
+  for (i = 0; fh_access[i] != NULL; i++) {
     expr = (*fh_access[i])(fh);
     PredicateExtractor_compute_preds(self, expr);
   }
@@ -317,7 +298,8 @@ PredicateExtractor_compute_preds_from_hierarchy(PredicateExtractor_ptr self,
         because boolean vars are ignored by predicate extractor and
         assignment of a var to itself does not create new predicate
      Thus it is better to use FlatHierarchy_get_assign instead of
-     FlatHierarchy_lookup_assign (there will be no need to iterate over all vars).
+     FlatHierarchy_lookup_assign (there will be no need to iterate over all
+     vars).
   */
 
   /* Assignments require very special handling because
@@ -329,9 +311,9 @@ PredicateExtractor_compute_preds_from_hierarchy(PredicateExtractor_ptr self,
      NOTE: This code is terrible because API in FlatHierarchy does
      not provided the required function (to access actual assignments).
   */
-  layers_name = SymbTable_get_class_layer_names(self->st, (const char*) NULL);
+  layers_name = SymbTable_get_class_layer_names(self->st, (const char *)NULL);
 
-  arrayForEachItem(const char*, layers_name, i, a_layer_name) {
+  arrayForEachItem(const char *, layers_name, i, a_layer_name) {
     SymbLayer_ptr layer = SymbTable_get_layer(self->st, a_layer_name);
     SymbLayerIter iter;
 
@@ -361,17 +343,13 @@ PredicateExtractor_compute_preds_from_hierarchy(PredicateExtractor_ptr self,
   return;
 }
 
-Set_t
-PredicateExtractor_get_all_preds(const PredicateExtractor_ptr self)
-{
+Set_t PredicateExtractor_get_all_preds(const PredicateExtractor_ptr self) {
   PREDICATE_EXTRACTOR_CHECK_INSTANCE(self);
 
   return self->all_preds;
 }
 
-Set_t
-PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self)
-{
+Set_t PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self) {
   PREDICATE_EXTRACTOR_CHECK_INSTANCE(self);
 
   /* there are un-clustered predicates => process them at first */
@@ -403,7 +381,8 @@ PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self)
         if (NULL == cluster) {
           cluster = Set_MakeSingleton(var);
           insert_assoc(self->var2cluster, var, NODE_PTR(cluster));
-          self->all_clusters = Set_AddMember(self->all_clusters, NODE_PTR(cluster));
+          self->all_clusters =
+              Set_AddMember(self->all_clusters, NODE_PTR(cluster));
 
           /* create new cluster->predicates association and add the predicate */
           insert_assoc(self->cluster2preds, NODE_PTR(cluster),
@@ -412,7 +391,8 @@ PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self)
         /* cluster already exist => insert the predicate into existing
            cluster2preds associated */
         else {
-          Set_t cl_preds = (Set_t)find_assoc(self->cluster2preds, NODE_PTR(cluster));
+          Set_t cl_preds =
+              (Set_t)find_assoc(self->cluster2preds, NODE_PTR(cluster));
           Set_t tmp;
           nusmv_assert(NULL != cl_preds); /* every cluster has some predicate */
           tmp = Set_AddMember(cl_preds, predicate);
@@ -427,7 +407,7 @@ PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self)
              it = Set_GetNextIter(it)) {
           Set_t another_cluster;
           var = Set_GetMember(deps, it);
-          another_cluster = (Set_t) find_assoc(self->var2cluster, var);
+          another_cluster = (Set_t)find_assoc(self->var2cluster, var);
 
           /* var has no cluster => add the var to the cluster of previous var */
           if ((Set_t)NULL == another_cluster) {
@@ -457,27 +437,28 @@ PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self)
               insert_assoc(self->var2cluster, a_var, NODE_PTR(another_cluster));
             }
             /* merge the associated predicates */
-            cl_preds = (Set_t) find_assoc(self->cluster2preds,
-                                          NODE_PTR(cluster));
-            other_preds = (Set_t) find_assoc(self->cluster2preds,
-                                             NODE_PTR(another_cluster));
+            cl_preds =
+                (Set_t)find_assoc(self->cluster2preds, NODE_PTR(cluster));
+            other_preds = (Set_t)find_assoc(self->cluster2preds,
+                                            NODE_PTR(another_cluster));
             /* every cluster has at least 1 predicate */
             nusmv_assert(NULL != cl_preds && NULL != other_preds);
 
             tmp = Set_Union(other_preds, cl_preds);
-            nusmv_assert(tmp == other_preds); /* debug: other_preds is a union now */
+            nusmv_assert(tmp ==
+                         other_preds); /* debug: other_preds is a union now */
 
             Set_ReleaseSet(cl_preds);
             remove_assoc(self->cluster2preds, NODE_PTR(cluster));
 
-            self->all_clusters = Set_RemoveMember(self->all_clusters,
-                                                  NODE_PTR(cluster));
+            self->all_clusters =
+                Set_RemoveMember(self->all_clusters, NODE_PTR(cluster));
             Set_ReleaseSet(cluster);
 
             cluster = another_cluster;
           }
         } /* for */
-      } /* if predicate is not empty */
+      }   /* if predicate is not empty */
 
       Set_ReleaseSet(deps);
     }
@@ -490,18 +471,15 @@ PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self)
 }
 
 Set_t PredicateExtractor_get_var_cluster(const PredicateExtractor_ptr self,
-                                         node_ptr var)
-{
+                                         node_ptr var) {
   /* to trigger cluster computation */
   PredicateExtractor_get_all_clusters(self);
 
   return (Set_t)find_assoc(self->var2cluster, var);
 }
 
-Set_t
-PredicateExtractor_get_preds_of_a_cluster(const PredicateExtractor_ptr self,
-                                          Set_t cluster)
-{
+Set_t PredicateExtractor_get_preds_of_a_cluster(
+    const PredicateExtractor_ptr self, Set_t cluster) {
   Set_t preds;
 
   /* PredicateExtractor_compute_preds was called after
@@ -515,28 +493,25 @@ PredicateExtractor_get_preds_of_a_cluster(const PredicateExtractor_ptr self,
   return preds;
 }
 
-void
-PredicateExtractor_print(const PredicateExtractor_ptr self,
-                         FILE* stream,
-                         boolean printPredicates,
-                         boolean printClusters)
-{
+void PredicateExtractor_print(const PredicateExtractor_ptr self, FILE *stream,
+                              boolean printPredicates, boolean printClusters) {
   Set_t set;
   Set_Iterator_t iter;
   int clst_num = 0;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   if (!printPredicates && !printClusters) {
-    ErrorMgr_rpterr(errmgr, "Function PredicateExtractor_print needs at least one "
-           "of printPredicates and printClusters to be true.");
+    ErrorMgr_rpterr(errmgr,
+                    "Function PredicateExtractor_print needs at least one "
+                    "of printPredicates and printClusters to be true.");
   }
 
   /* ----------- print just predicates */
-  if (printPredicates && ! printClusters) {
+  if (printPredicates && !printClusters) {
     fprintf(stream, "\nPredicates are :\n-------------------------------\n");
     set = PredicateExtractor_get_all_preds(self);
     SET_FOREACH(set, iter) {
@@ -550,13 +525,14 @@ PredicateExtractor_print(const PredicateExtractor_ptr self,
   /* -------------  print clusters */
   set = PredicateExtractor_get_all_clusters(self);
   SET_FOREACH(set, iter) {
-    Set_t cluster = (Set_t) Set_GetMember(set, iter);
+    Set_t cluster = (Set_t)Set_GetMember(set, iter);
     Set_Iterator_t sit;
 
     /* output the clusters */
     fprintf(stream,
             "\n--------------------------------------------------\n"
-            "---- Cluster %d \n \t [\n", clst_num);
+            "---- Cluster %d \n \t [\n",
+            clst_num);
     /* Clusters */
     SET_FOREACH(cluster, sit) {
       node_ptr var = Set_GetMember(cluster, sit);
@@ -571,9 +547,9 @@ PredicateExtractor_print(const PredicateExtractor_ptr self,
     /* stream the predicates */
     if (printPredicates) {
       /* Preds */
-      Set_t preds = (Set_t)find_assoc(self->cluster2preds,
-                                      NODE_PTR(cluster));
-      nusmv_assert(NULL != preds); /* every cluster has at least one predicate */
+      Set_t preds = (Set_t)find_assoc(self->cluster2preds, NODE_PTR(cluster));
+      nusmv_assert(NULL !=
+                   preds); /* every cluster has at least one predicate */
 
       fprintf(stream, " \t Predicates for Cluster %d\n \t (\n", clst_num);
       SET_FOREACH(preds, sit) {
@@ -587,9 +563,7 @@ PredicateExtractor_print(const PredicateExtractor_ptr self,
 
     return;
   }
-
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Static function definitions                                               */
@@ -600,17 +574,15 @@ PredicateExtractor_print(const PredicateExtractor_ptr self,
 
 
 */
-static void pred_extract_init(PredicateExtractor_ptr self,
-                              SymbTable_ptr st, boolean use_approx)
-{
+static void pred_extract_init(PredicateExtractor_ptr self, SymbTable_ptr st,
+                              boolean use_approx) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const WordNumberMgr_ptr words =
-    WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-  node_ptr w0,w1;
+  node_ptr w0, w1;
 
   env_object_init(ENV_OBJECT(self), env);
 
@@ -622,9 +594,11 @@ static void pred_extract_init(PredicateExtractor_ptr self,
   self->expr2preds = new_assoc();
 
   w0 = find_node(nodemgr, NUMBER_UNSIGNED_WORD,
-                 NODE_PTR(WordNumberMgr_integer_to_word_number(words, 0, 1)), Nil);
+                 NODE_PTR(WordNumberMgr_integer_to_word_number(words, 0, 1)),
+                 Nil);
   w1 = find_node(nodemgr, NUMBER_UNSIGNED_WORD,
-                 NODE_PTR(WordNumberMgr_integer_to_word_number(words, 1, 1)), Nil);
+                 NODE_PTR(WordNumberMgr_integer_to_word_number(words, 1, 1)),
+                 Nil);
   self->special_word_preds[0] = Set_MakeSingleton(w0);
   self->special_word_preds[1] = Set_MakeSingleton(w1);
   self->special_word_preds[2] = Set_AddMember(Set_MakeSingleton(w0), w1);
@@ -640,8 +614,7 @@ static void pred_extract_init(PredicateExtractor_ptr self,
   \brief finalizer  of this class
 
 */
-static void pred_extract_finalize(Object_ptr object, void* dummy)
-{
+static void pred_extract_finalize(Object_ptr object, void *dummy) {
   PredicateExtractor_ptr self = PREDICATE_EXTRACTOR(object);
 
   pred_extract_deinit(self);
@@ -653,8 +626,7 @@ static void pred_extract_finalize(Object_ptr object, void* dummy)
   \brief de-initialiser of an object of this class
 
 */
-static void pred_extract_deinit(PredicateExtractor_ptr self)
-{
+static void pred_extract_deinit(PredicateExtractor_ptr self) {
   assoc_iter iter;
   Set_t cluster, preds, tmp;
   node_ptr expr;
@@ -674,8 +646,7 @@ static void pred_extract_deinit(PredicateExtractor_ptr self)
 
   ASSOC_FOREACH(self->expr2preds, iter, &expr, &preds) {
     /* preds must exist and should not be one of special predicates set */
-    nusmv_assert(preds != NULL &&
-                 preds != self->special_word_preds[0] &&
+    nusmv_assert(preds != NULL && preds != self->special_word_preds[0] &&
                  preds != self->special_word_preds[1] &&
                  preds != self->special_word_preds[2]);
 
@@ -702,7 +673,6 @@ static void pred_extract_deinit(PredicateExtractor_ptr self)
   /* predicate sets are just Set_t of node_ptr */
   Set_ReleaseSet(self->unclustered_preds);
   Set_ReleaseSet(self->all_preds);
-
 
   /* debugging code : setting to NULL */
   self->all_preds = (Set_t)NULL;
@@ -738,14 +708,10 @@ static void pred_extract_deinit(PredicateExtractor_ptr self)
    whole system).
 */
 static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
-                                        node_ptr expr,
-                                        node_ptr context)
-{
+                                        node_ptr expr, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  const ExprMgr_ptr exprs =
-    EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   SymbType_ptr type;
   Set_t result, left, right;
@@ -757,8 +723,9 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
   key = find_node(nodemgr, CONTEXT, context, expr);
 
   /* is already processed. */
-  result = (Set_t) find_assoc(self->expr2preds, key);
-  if (NULL != result) return result;
+  result = (Set_t)find_assoc(self->expr2preds, key);
+  if (NULL != result)
+    return result;
 
   type = TypeChecker_get_expression_type(self->checker, expr, context);
   nusmv_assert(!SymbType_is_error(type));
@@ -766,7 +733,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
   node_type = node_get_type(expr);
 
   /* for sure incorrect value for debugging */
-  result = left = right = (Set_t) -1;
+  result = left = right = (Set_t)-1;
 
   /* process every kind of an expression */
   switch (node_type) {
@@ -820,18 +787,17 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     while (Nil != list) {
       Set_t elem = pred_extract_process_recur(self, car(list), context);
 
-      if (IS_OVER_APPROX(elem)) break;
+      if (IS_OVER_APPROX(elem))
+        break;
       list = cdr(list);
     }
     if (Nil != list) {
       Set_ReleaseSet(result);
       result = PREDICATES_OVERAPPROX;
-    }
-    else {
+    } else {
       if (!SymbType_is_boolean(type)) {
         result = Set_AddMember(result, (Set_Element_t)expr);
-      }
-      else if (Set_IsEmpty(result)) {
+      } else if (Set_IsEmpty(result)) {
         Set_ReleaseSet(result);
         result = PREDICATES_ARBITRARY;
       }
@@ -857,8 +823,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
       nusmv_assert(tmp != expr); /* loop in recursion is impossible */
       result = pred_extract_process_recur(self, tmp, Nil);
       break;
-    }
-    else {
+    } else {
       /* array is actually identifier => process it with other identifiers */
     }
     /* NO BREAK HERE */
@@ -888,7 +853,8 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
       if (!SymbType_is_boolean(type)) {
         result = Set_MakeSingleton(resolvedName);
       } /* boolean vars make predicates have arbitrary values */
-      else result = PREDICATES_ARBITRARY;
+      else
+        result = PREDICATES_ARBITRARY;
     }
 
     /* check whether is a define */
@@ -903,10 +869,9 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
          higher) subtype and at the same time has a boolean element.
          In this case the boolean element has to be casted to integer.
       */
-      if (ARRAY == node_type &&
-          !SymbType_is_boolean(type) &&
-          SymbType_is_boolean(TypeChecker_get_expression_type(self->checker,
-                                                              def, ctx))) {
+      if (ARRAY == node_type && !SymbType_is_boolean(type) &&
+          SymbType_is_boolean(
+              TypeChecker_get_expression_type(self->checker, def, ctx))) {
         /* boolean can be casted to Int, Int-Symb or their Sets only
            thus conversion to integer is enough*/
         nusmv_assert(SymbType_is_integer(type) ||
@@ -917,8 +882,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     }
     /* check whether this symbol is a constant. The ResolveSymbol
        takes care of simple/complex constants */
-    else if (ResolveSymbol_is_constant(rs) ||
-             ResolveSymbol_is_function(rs)) {
+    else if (ResolveSymbol_is_constant(rs) || ResolveSymbol_is_function(rs)) {
       result = Set_MakeSingleton(resolvedName);
     }
     /* check whether this symbol is a parameter */
@@ -942,11 +906,25 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
 
     /* boolean unary expression or boolean binary expressions those
        right child can be ignored and which have not to be optimized */
-  case EX: case AX: case EF: case AF: case EG: case AG:
-  case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
-  case OP_HISTORICAL: case OP_FUTURE: case OP_ONCE:
-  case EBF: case ABF: case EBG: case ABG: /* ignore the number..number part */
-  case ABU: case EBU: /* ignore the number..number part */
+  case EX:
+  case AX:
+  case EF:
+  case AF:
+  case EG:
+  case AG:
+  case OP_NEXT:
+  case OP_PREC:
+  case OP_NOTPRECNOT:
+  case OP_GLOBAL:
+  case OP_HISTORICAL:
+  case OP_FUTURE:
+  case OP_ONCE:
+  case EBF:
+  case ABF:
+  case EBG:
+  case ABG: /* ignore the number..number part */
+  case ABU:
+  case EBU: /* ignore the number..number part */
     nusmv_assert(SymbType_is_boolean(type)); /* only boolean can be here */
     result = pred_extract_process_recur(self, car(expr), context);
     result = PREDICATES_ARBITRARY;
@@ -962,11 +940,13 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
        value */
     if (!IS_OVER_APPROX(left)) {
       if (SymbType_is_boolean(type)) {
-        if (left == PREDICATES_TRUE) result = PREDICATES_FALSE;
-        else if (left == PREDICATES_FALSE) result = PREDICATES_TRUE;
-        else result = PREDICATES_ARBITRARY;
-      }
-      else { /* otherwise apply the bitwise operator */
+        if (left == PREDICATES_TRUE)
+          result = PREDICATES_FALSE;
+        else if (left == PREDICATES_FALSE)
+          result = PREDICATES_TRUE;
+        else
+          result = PREDICATES_ARBITRARY;
+      } else { /* otherwise apply the bitwise operator */
         if (!IS_FLAG_VALID_PREDICATES(left)) {
           result = pred_extract_apply_unary(self, NOT, left);
         }
@@ -979,7 +959,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
   case FLOOR:
   /* [AI] adding typeof unary operator */
   case TYPEOF:
-    nusmv_assert(Nil == cdr(expr));    /* checking that indeed no right child */
+    nusmv_assert(Nil == cdr(expr)); /* checking that indeed no right child */
     result = PREDICATES_OVERAPPROX;
 
     left = pred_extract_process_recur(self, car(expr), context);
@@ -996,8 +976,10 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
        CONS is artificial expression, it is boolean and may have empty
        right child */
   case CONS:
-  case UNTIL: case SINCE:
-  case AU: case EU:
+  case UNTIL:
+  case SINCE:
+  case AU:
+  case EU:
     result = PREDICATES_OVERAPPROX;
 
     left = pred_extract_process_recur(self, car(expr), context);
@@ -1015,7 +997,12 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
        which can be optimized.
        note: children here always have the same type as the
        expression */
-  case AND: case OR: case XOR: case XNOR: case IFF: case IMPLIES:
+  case AND:
+  case OR:
+  case XOR:
+  case XNOR:
+  case IFF:
+  case IMPLIES:
 
     left = pred_extract_process_recur(self, car(expr), context);
     result = PREDICATES_OVERAPPROX;
@@ -1027,8 +1014,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
             (left == PREDICATES_TRUE && node_type == OR)) {
           result = left;
           break;
-        }
-        else if (left == PREDICATES_FALSE && node_type == IMPLIES) {
+        } else if (left == PREDICATES_FALSE && node_type == IMPLIES) {
           result = PREDICATES_TRUE;
           break;
         }
@@ -1044,50 +1030,50 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
         switch (node_type) {
         case AND:
           result = (right == PREDICATES_FALSE)
-            ? PREDICATES_FALSE
-            : ( (left == PREDICATES_TRUE && right == PREDICATES_TRUE)
-                ? PREDICATES_TRUE
-                : PREDICATES_ARBITRARY
-                );
+                       ? PREDICATES_FALSE
+                       : ((left == PREDICATES_TRUE && right == PREDICATES_TRUE)
+                              ? PREDICATES_TRUE
+                              : PREDICATES_ARBITRARY);
           break;
 
         case OR:
-          result = (right == PREDICATES_TRUE)
-            ? PREDICATES_TRUE
-            : ( (left == PREDICATES_FALSE && right == PREDICATES_FALSE)
-                ? PREDICATES_FALSE
-                : PREDICATES_ARBITRARY
-                );
+          result =
+              (right == PREDICATES_TRUE)
+                  ? PREDICATES_TRUE
+                  : ((left == PREDICATES_FALSE && right == PREDICATES_FALSE)
+                         ? PREDICATES_FALSE
+                         : PREDICATES_ARBITRARY);
           break;
 
         case XOR:
-          result = (left == PREDICATES_ARBITRARY || right == PREDICATES_ARBITRARY)
-            ? PREDICATES_ARBITRARY
-            : (left != right ? PREDICATES_TRUE : PREDICATES_FALSE);
+          result =
+              (left == PREDICATES_ARBITRARY || right == PREDICATES_ARBITRARY)
+                  ? PREDICATES_ARBITRARY
+                  : (left != right ? PREDICATES_TRUE : PREDICATES_FALSE);
           break;
 
         case XNOR:
         case IFF:
-          result = (left == PREDICATES_ARBITRARY || right == PREDICATES_ARBITRARY)
-            ? PREDICATES_ARBITRARY
-            : (left == right ? PREDICATES_TRUE : PREDICATES_FALSE);
+          result =
+              (left == PREDICATES_ARBITRARY || right == PREDICATES_ARBITRARY)
+                  ? PREDICATES_ARBITRARY
+                  : (left == right ? PREDICATES_TRUE : PREDICATES_FALSE);
           break;
 
         case IMPLIES:
           result = (right == PREDICATES_TRUE)
-            ? PREDICATES_TRUE
-            : ( (left == PREDICATES_TRUE && right == PREDICATES_FALSE)
-                ? PREDICATES_FALSE
-                : PREDICATES_ARBITRARY
-                );
+                       ? PREDICATES_TRUE
+                       : ((left == PREDICATES_TRUE && right == PREDICATES_FALSE)
+                              ? PREDICATES_FALSE
+                              : PREDICATES_ARBITRARY);
           break;
 
-        default: error_unreachable_code(); /* impossible code */
+        default:
+          error_unreachable_code(); /* impossible code */
         }
         /* debug: result was set up to a constant */
         nusmv_assert(IS_FLAG_PREDICATES(result));
-      }
-      else {
+      } else {
         /* this is not a boolean => it can be only word operations,
            i.e.  apply the binary operator to results. */
         result = PREDICATES_OVERAPPROX;
@@ -1097,8 +1083,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
           if (!IS_FLAG_VALID_PREDICATES(left) &&
               !IS_FLAG_VALID_PREDICATES(right)) {
             result = pred_extract_apply_binary(self, node_type, left, right);
-          }
-          else {
+          } else {
             result = Set_MakeSingleton(expr);
           }
         }
@@ -1109,14 +1094,13 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     /* not-boolean unary operators */
   case CAST_UNSIGNED:
   case CAST_SIGNED:
-    nusmv_assert(Nil == cdr(expr));    /* checking that indeed no right child */
+    nusmv_assert(Nil == cdr(expr)); /* checking that indeed no right child */
     result = PREDICATES_OVERAPPROX;
     left = pred_extract_process_recur(self, car(expr), context);
     if (!IS_OVER_APPROX(left)) {
       if (!IS_FLAG_VALID_PREDICATES(left)) {
         result = pred_extract_apply_unary(self, node_type, left);
-      }
-      else {
+      } else {
         result = Set_MakeSingleton(expr);
       }
     }
@@ -1139,19 +1123,24 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     if (!IS_FLAG_PREDICATES(result)) {
       /* this is not true boolean => apply the operator */
       result = pred_extract_apply_unary(self, node_type, result);
-    }
-    else {
+    } else {
       /* the true/false value is not changed by next/init => do nothing */
     }
     break;
 
     /* relational operators: they convert not-boolean to boolean  */
-  case EQDEF: case SETIN:
-  case EQUAL: case NOTEQUAL: case LT: case GT: case LE: case GE: {
+  case EQDEF:
+  case SETIN:
+  case EQUAL:
+  case NOTEQUAL:
+  case LT:
+  case GT:
+  case LE:
+  case GE: {
     SymbType_ptr type1 =
-      TypeChecker_get_expression_type(self->checker, car(expr), context);
+        TypeChecker_get_expression_type(self->checker, car(expr), context);
     SymbType_ptr type2 =
-      TypeChecker_get_expression_type(self->checker, cdr(expr), context);
+        TypeChecker_get_expression_type(self->checker, cdr(expr), context);
 
     nusmv_assert(!SymbType_is_error(type1));
     nusmv_assert(!SymbType_is_error(type2));
@@ -1160,10 +1149,12 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
 
     left = pred_extract_process_recur(self, car(expr), context);
 
-    if (IS_OVER_APPROX(left)) break;
+    if (IS_OVER_APPROX(left))
+      break;
 
     right = pred_extract_process_recur(self, cdr(expr), context);
-    if (IS_OVER_APPROX(right)) break;
+    if (IS_OVER_APPROX(right))
+      break;
 
     /* both operands are boolean (or bool-set for EQDEF and SETIN) */
     if ((SymbType_is_boolean(type1) ||
@@ -1176,50 +1167,56 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
       case SETIN:
       case EQUAL:
         result = (left == PREDICATES_ARBITRARY || right == PREDICATES_ARBITRARY)
-          ? PREDICATES_ARBITRARY
-          : (left == right ? PREDICATES_TRUE : PREDICATES_FALSE);
+                     ? PREDICATES_ARBITRARY
+                     : (left == right ? PREDICATES_TRUE : PREDICATES_FALSE);
         break;
 
       case NOTEQUAL:
         result = (left == PREDICATES_ARBITRARY || right == PREDICATES_ARBITRARY)
-          ? PREDICATES_ARBITRARY
-          : (left != right ? PREDICATES_TRUE : PREDICATES_FALSE);
+                     ? PREDICATES_ARBITRARY
+                     : (left != right ? PREDICATES_TRUE : PREDICATES_FALSE);
         break;
 
       case GT: /* exchange right and left and jump to LT */
-        {Set_t tmp = left; left = right; right = tmp;}
+      {
+        Set_t tmp = left;
+        left = right;
+        right = tmp;
+      }
         /* no break here! */
       case LT:
         result = (left == PREDICATES_TRUE || right == PREDICATES_FALSE)
-          ? PREDICATES_FALSE
-          : (left == PREDICATES_FALSE && right == PREDICATES_TRUE)
-          ? PREDICATES_TRUE
-          : PREDICATES_ARBITRARY;
+                     ? PREDICATES_FALSE
+                 : (left == PREDICATES_FALSE && right == PREDICATES_TRUE)
+                     ? PREDICATES_TRUE
+                     : PREDICATES_ARBITRARY;
         break;
 
       case GE: /* exchange right and left and jump to LE */
-        {Set_t tmp = left; left = right; right = tmp;}
+      {
+        Set_t tmp = left;
+        left = right;
+        right = tmp;
+      }
         /* no break here! */
       case LE:
         result = (left == PREDICATES_FALSE || right == PREDICATES_TRUE)
-          ? PREDICATES_TRUE
-          : (left == PREDICATES_TRUE && right == PREDICATES_FALSE)
-          ? PREDICATES_FALSE
-          : PREDICATES_ARBITRARY;
+                     ? PREDICATES_TRUE
+                 : (left == PREDICATES_TRUE && right == PREDICATES_FALSE)
+                     ? PREDICATES_FALSE
+                     : PREDICATES_ARBITRARY;
         break;
 
-      default: error_unreachable_code(); /* impossible code */
+      default:
+        error_unreachable_code(); /* impossible code */
       }
-    }
-    else {
+    } else {
       /* both operands are scalar => do bool2int to cast "true
          boolean" operand (if there is one) and apply the binary
          operator */
-      if (!IS_FLAG_VALID_PREDICATES(left) &&
-          !IS_FLAG_VALID_PREDICATES(right)) {
+      if (!IS_FLAG_VALID_PREDICATES(left) && !IS_FLAG_VALID_PREDICATES(right)) {
         result = pred_extract_apply_binary(self, node_type, left, right);
-      }
-      else {
+      } else {
         result = Set_MakeSingleton(expr);
       }
       /* remember the results */
@@ -1229,19 +1226,23 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
   }
 
     /* These exprs are always scalar. No optimizations are done here. */
-  case TIMES: case DIVIDE: case PLUS :case MINUS: case MOD:
-  case LSHIFT: case RSHIFT: /*case LROTATE: case RROTATE: */
-  case EXTEND: case WRESIZE:
+  case TIMES:
+  case DIVIDE:
+  case PLUS:
+  case MINUS:
+  case MOD:
+  case LSHIFT:
+  case RSHIFT: /*case LROTATE: case RROTATE: */
+  case EXTEND:
+  case WRESIZE:
   case CONST_ARRAY: {
     result = PREDICATES_OVERAPPROX;
     left = pred_extract_process_recur(self, car(expr), context);
     if (!IS_OVER_APPROX(left)) {
       right = pred_extract_process_recur(self, cdr(expr), context);
-      if (!IS_FLAG_VALID_PREDICATES(left) &&
-          !IS_FLAG_VALID_PREDICATES(right)) {
+      if (!IS_FLAG_VALID_PREDICATES(left) && !IS_FLAG_VALID_PREDICATES(right)) {
         result = pred_extract_apply_binary(self, node_type, left, right);
-      }
-      else {
+      } else {
         result = Set_MakeSingleton(expr);
       }
     }
@@ -1257,8 +1258,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
         if (!IS_FLAG_VALID_PREDICATES(left) &&
             !IS_FLAG_VALID_PREDICATES(right)) {
           result = pred_extract_apply_binary(self, node_type, left, right);
-        }
-        else {
+        } else {
           result = Set_MakeSingleton(expr);
         }
       }
@@ -1267,7 +1267,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
   }
 
   case WAWRITE: {
-    nusmv_assert(node_get_type(cdr(expr))==WAWRITE);
+    nusmv_assert(node_get_type(cdr(expr)) == WAWRITE);
 
     result = PREDICATES_OVERAPPROX;
     left = pred_extract_process_recur(self, car(expr), context);
@@ -1281,8 +1281,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
               !IS_FLAG_VALID_PREDICATES(value)) {
             right = pred_extract_apply_binary(self, node_type, index, value);
             result = pred_extract_apply_binary(self, node_type, left, right);
-          }
-          else {
+          } else {
             result = Set_MakeSingleton(expr);
           }
         }
@@ -1292,7 +1291,8 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
   }
 
     /* COLON cannot go as a independent operation */
-  case COLON: error_unreachable_code();
+  case COLON:
+    error_unreachable_code();
 
   case BIT_SELECTION: {
     /* just consistency check */
@@ -1301,14 +1301,12 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     left = pred_extract_process_recur(self, car(expr), context);
     if (!IS_OVER_APPROX(left)) {
       if (!IS_FLAG_VALID_PREDICATES(left)) {
-        right = Set_MakeSingleton(find_node(nodemgr,
-                                            COLON,
-                                            find_atom(nodemgr, car(cdr(expr))),
-                                            find_atom(nodemgr, cdr(cdr(expr)))));
+        right = Set_MakeSingleton(
+            find_node(nodemgr, COLON, find_atom(nodemgr, car(cdr(expr))),
+                      find_atom(nodemgr, cdr(cdr(expr)))));
         result = pred_extract_apply_binary(self, node_type, left, right);
         Set_ReleaseSet(right);
-      }
-      else {
+      } else {
         /* The expression is propagated up */
         result = Set_MakeSingleton(expr);
       }
@@ -1322,7 +1320,8 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     int width;
     nusmv_assert(SymbType_is_word(type));
     width = SymbType_get_word_width(type);
-    result = Set_MakeSingleton(find_node(nodemgr, NUMBER, NODE_FROM_INT(width), Nil));
+    result = Set_MakeSingleton(
+        find_node(nodemgr, NUMBER, NODE_FROM_INT(width), Nil));
     break;
   }
 
@@ -1333,8 +1332,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     if (!IS_OVER_APPROX(left)) {
       if (!IS_FLAG_VALID_PREDICATES(left)) {
         result = pred_extract_apply_unary(self, node_type, left);
-      }
-      else {
+      } else {
         node_ptr fexpr = Compile_FlattenSexp(self->st, expr, context);
         result = Set_MakeSingleton(fexpr);
       }
@@ -1349,7 +1347,8 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     while (Nil != list) {
       Set_t elem = pred_extract_process_recur(self, car(list), context);
 
-      if (IS_OVER_APPROX(elem)) break;
+      if (IS_OVER_APPROX(elem))
+        break;
       list = cdr(list);
     }
     if (Nil == list) {
@@ -1364,9 +1363,9 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     */
   case CONCATENATION: {
     SymbType_ptr type1 =
-      TypeChecker_get_expression_type(self->checker, car(expr), context);
+        TypeChecker_get_expression_type(self->checker, car(expr), context);
     SymbType_ptr type2 =
-      TypeChecker_get_expression_type(self->checker, cdr(expr), context);
+        TypeChecker_get_expression_type(self->checker, cdr(expr), context);
 
     nusmv_assert(!SymbType_is_error(type1));
     nusmv_assert(!SymbType_is_error(type2));
@@ -1377,10 +1376,10 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
       right = pred_extract_process_recur(self, cdr(expr), context);
 
       if (!IS_OVER_APPROX(right)) {
-        if (!IS_FLAG_VALID_PREDICATES(left) && !IS_FLAG_VALID_PREDICATES(right)) {
+        if (!IS_FLAG_VALID_PREDICATES(left) &&
+            !IS_FLAG_VALID_PREDICATES(right)) {
           result = pred_extract_apply_binary(self, node_type, left, right);
-        }
-        else {
+        } else {
           result = Set_MakeSingleton(expr);
         }
       }
@@ -1409,9 +1408,12 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     left = pred_extract_process_recur(self, car(expr), context);
     if (!IS_OVER_APPROX(left)) {
       /* create a word1 possible values */
-      if (left == PREDICATES_FALSE) result = self->special_word_preds[0];
-      else if (left == PREDICATES_TRUE) result = self->special_word_preds[1];
-      else result = self->special_word_preds[2];
+      if (left == PREDICATES_FALSE)
+        result = self->special_word_preds[0];
+      else if (left == PREDICATES_TRUE)
+        result = self->special_word_preds[1];
+      else
+        result = self->special_word_preds[2];
       result = Set_Copy(result); /* create a copy of special predicate set */
     }
     break;
@@ -1441,16 +1443,13 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
             (SYMB_TYPE_SET_BOOL == SymbType_get_tag(type))) {
           if (left == right) {
             result = right;
-          }
-          else {
+          } else {
             result = PREDICATES_ARBITRARY;
           }
-        }
-        else if (!IS_FLAG_VALID_PREDICATES(left) &&
-                 !IS_FLAG_VALID_PREDICATES(right)) {
+        } else if (!IS_FLAG_VALID_PREDICATES(left) &&
+                   !IS_FLAG_VALID_PREDICATES(right)) {
           result = Set_Union(Set_Copy(left), right);
-        }
-        else {
+        } else {
           result = Set_MakeSingleton(expr);
         }
       }
@@ -1480,17 +1479,16 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
     /* since simp_cond_expr is flattened, context becomes Nil here: */
     cond = pred_extract_process_recur(self, simp_cond_expr, Nil);
 
-    if (IS_OVER_APPROX(cond)) break;
+    if (IS_OVER_APPROX(cond))
+      break;
 
     /* if condition is a constant => process only one branch.
        also if tail is FAILURE => ignore it. */
     if (cond == PREDICATES_TRUE || FAILURE == node_get_type(e)) {
       result = pred_extract_process_recur(self, t, context);
-    }
-    else if (cond == PREDICATES_FALSE) {
+    } else if (cond == PREDICATES_FALSE) {
       result = pred_extract_process_recur(self, e, context);
-    }
-    else { /* process both branches */
+    } else { /* process both branches */
       /* the only remaining value */
       nusmv_assert(cond == PREDICATES_ARBITRARY);
 
@@ -1505,10 +1503,11 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
           if (SymbType_is_boolean(type)) {
             /* optimization : both branches return the same constant =>
                return it as the value of the whole expression */
-            if (then == tail) result = then;
-            else result = PREDICATES_ARBITRARY;
-          }
-          else {
+            if (then == tail)
+              result = then;
+            else
+              result = PREDICATES_ARBITRARY;
+          } else {
             /* make union of the results from then and tail */
             /*
               {T} Union S ---> S
@@ -1516,8 +1515,10 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
               Arbitrary Union S ---> S
               Overapprox Union S ---> Overapprox
             */
-            if (IS_FLAG_PREDICATES(then)) result = tail;
-            else if (IS_FLAG_PREDICATES(tail)) result = then;
+            if (IS_FLAG_PREDICATES(then))
+              result = tail;
+            else if (IS_FLAG_PREDICATES(tail))
+              result = then;
             else {
               result = Set_Union(Set_Copy(then), tail);
             }
@@ -1538,8 +1539,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
         right = Set_MakeSingleton(find_atom(nodemgr, cdr(expr)));
         result = pred_extract_apply_binary(self, node_type, left, right);
         Set_ReleaseSet(right);
-      }
-      else {
+      } else {
         result = Set_MakeSingleton(expr);
       }
     }
@@ -1555,8 +1555,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
         if (!IS_FLAG_VALID_PREDICATES(left) &&
             !IS_FLAG_VALID_PREDICATES(right)) {
           result = pred_extract_apply_binary(self, node_type, left, right);
-        }
-        else {
+        } else {
           result = Set_MakeSingleton(expr);
         }
       }
@@ -1576,29 +1575,28 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
         if (!IS_FLAG_VALID_PREDICATES(left) &&
             !IS_FLAG_VALID_PREDICATES(right)) {
           result = pred_extract_apply_binary(self, node_type, left, right);
-        }
-        else {
+        } else {
           result = Set_MakeSingleton(expr);
         }
       }
     }
     break;
 #else
-    {
-      const MasterPrinter_ptr sexpprinter =
+  {
+    const MasterPrinter_ptr sexpprinter =
         MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
-      const StreamMgr_ptr streams =
+    const StreamMgr_ptr streams =
         STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-      StreamMgr_nprint_error(streams, sexpprinter, "%N", expr);
-      StreamMgr_print_error(streams,  "unknown token = %d\n", node_type);
-      error_unreachable_code(); /* unknown kind of an expression */
-    }
+    StreamMgr_nprint_error(streams, sexpprinter, "%N", expr);
+    StreamMgr_print_error(streams, "unknown token = %d\n", node_type);
+    error_unreachable_code(); /* unknown kind of an expression */
+  }
 #endif
   } /* switch */
 
   /* debug that result was properly set up */
-  nusmv_assert(result != (Set_t) -1);
+  nusmv_assert(result != (Set_t)-1);
 
   /* preds returned should not be one of special predicates set
      which used only to construct other predicates */
@@ -1613,8 +1611,7 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
                pred_extract_is_bool_preds(self, result));
   nusmv_assert((SymbType_is_boolean(type) ||
                 SYMB_TYPE_SET_BOOL == SymbType_get_tag(type)) ||
-               !IS_FLAG_PREDICATES(result) ||
-               IS_OVER_APPROX(result));
+               !IS_FLAG_PREDICATES(result) || IS_OVER_APPROX(result));
 
   /* remember the processed expression */
   insert_assoc(self->expr2preds, key, NODE_PTR(result));
@@ -1634,21 +1631,23 @@ static Set_t pred_extract_process_recur(PredicateExtractor_ptr self,
 
   \se pred_extract_process_recur
 */
-static boolean pred_extract_is_bool_preds(PredicateExtractor_ptr self, Set_t result)
-{
+static boolean pred_extract_is_bool_preds(PredicateExtractor_ptr self,
+                                          Set_t result) {
   Set_Iterator_t iter;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   /* a flag that expressions is truly boolean => not predicate subparts */
-  if (IS_FLAG_PREDICATES(result)) return true;
+  if (IS_FLAG_PREDICATES(result))
+    return true;
 
   SET_FOREACH(result, iter) {
     node_ptr expr = Set_GetMember(result, iter);
     /* there may be "next" or "init" wrapping boolean predicates */
     node_ptr unnexted =
-      (node_get_type(expr) == NEXT || node_get_type(expr) == SMALLINIT)
-      ? car(expr) : expr;
+        (node_get_type(expr) == NEXT || node_get_type(expr) == SMALLINIT)
+            ? car(expr)
+            : expr;
 
     /* for 0 and 1 just do nothing. such predicates are useless. */
     if (!ExprMgr_is_true(exprs, unnexted) &&
@@ -1668,15 +1667,15 @@ static boolean pred_extract_is_bool_preds(PredicateExtractor_ptr self, Set_t res
   \se pred_extract_process_recur
 */
 static Set_t pred_extract_fix_any_preds(PredicateExtractor_ptr self,
-                                        Set_t result)
-{
+                                        Set_t result) {
   Set_Iterator_t iter;
   boolean there_is_0 = false;
   boolean there_is_1 = false;
   boolean there_is_arbit = false;
 
   /* overapproximation resolves to <T,F> */
-  if (IS_OVER_APPROX(result)) return PREDICATES_ARBITRARY;
+  if (IS_OVER_APPROX(result))
+    return PREDICATES_ARBITRARY;
 
   nusmv_assert(!IS_FLAG_PREDICATES(result)); /* only proper sets are expected */
 
@@ -1686,11 +1685,9 @@ static Set_t pred_extract_fix_any_preds(PredicateExtractor_ptr self,
     /* optimization: skip 0 and 1, TRUE and FALSE as useless predicates. */
     if (FALSEEXP == node_get_type(expr)) {
       there_is_0 = true;
-    }
-    else if (TRUEEXP == node_get_type(expr)) {
+    } else if (TRUEEXP == node_get_type(expr)) {
       there_is_1 = true;
-    }
-    else {
+    } else {
       there_is_arbit = true;
       /* remember the obtained predicates (only if it is new) */
       if (!Set_IsMember(self->all_preds, expr)) {
@@ -1702,8 +1699,10 @@ static Set_t pred_extract_fix_any_preds(PredicateExtractor_ptr self,
 
   Set_ReleaseSet(result);
 
-  if (there_is_0 && !there_is_1 && !there_is_arbit) return PREDICATES_FALSE;
-  if (!there_is_0 && there_is_1 && !there_is_arbit) return PREDICATES_TRUE;
+  if (there_is_0 && !there_is_1 && !there_is_arbit)
+    return PREDICATES_FALSE;
+  if (!there_is_0 && there_is_1 && !there_is_arbit)
+    return PREDICATES_TRUE;
 
   return PREDICATES_ARBITRARY;
 }
@@ -1719,10 +1718,8 @@ static Set_t pred_extract_fix_any_preds(PredicateExtractor_ptr self,
 
   \se pred_extract_process_recur
 */
-static Set_t pred_extract_apply_unary(PredicateExtractor_ptr self,
-                                      int type,
-                                      Set_t childResult)
-{
+static Set_t pred_extract_apply_unary(PredicateExtractor_ptr self, int type,
+                                      Set_t childResult) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   Set_t result;
@@ -1761,11 +1758,8 @@ static Set_t pred_extract_apply_unary(PredicateExtractor_ptr self,
 
   \se pred_extract_process_recur
 */
-static Set_t pred_extract_apply_binary(PredicateExtractor_ptr self,
-                                       int type,
-                                       Set_t leftResult,
-                                       Set_t rightResult)
-{
+static Set_t pred_extract_apply_binary(PredicateExtractor_ptr self, int type,
+                                       Set_t leftResult, Set_t rightResult) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   Set_t result;
@@ -1781,8 +1775,8 @@ static Set_t pred_extract_apply_binary(PredicateExtractor_ptr self,
                !IS_FLAG_PREDICATES(rightResult));
 
   if (self->use_approx &&
-      (((size_t) Set_GiveCardinality(leftResult) *
-        (size_t) Set_GiveCardinality(rightResult)) > OVER_APPROX_THRESHOLD)) {
+      (((size_t)Set_GiveCardinality(leftResult) *
+        (size_t)Set_GiveCardinality(rightResult)) > OVER_APPROX_THRESHOLD)) {
     /* too-big: gives up */
     return PREDICATES_OVERAPPROX;
   }
@@ -1800,9 +1794,8 @@ static Set_t pred_extract_apply_binary(PredicateExtractor_ptr self,
       node_ptr r_expr = Set_GetMember(rightResult, r_iter);
       nusmv_assert(Nil != r_expr); /* expression is well-formed */
 
-      result = Set_AddMember(result,
-                             ExprMgr_resolve(exprs, self->st,
-                                             type, l_expr, r_expr));
+      result = Set_AddMember(
+          result, ExprMgr_resolve(exprs, self->st, type, l_expr, r_expr));
     }
   }
   return result;

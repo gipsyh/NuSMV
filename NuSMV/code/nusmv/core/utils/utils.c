@@ -33,32 +33,31 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #if NUSMV_HAVE_DIRENT_H
-# if NUSMV_HAVE_SYS_TYPES_H
-#  include <sys/types.h>
-# endif
-# include <dirent.h>
+#if NUSMV_HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#include <dirent.h>
 #endif
 
 #if !NUSMV_HAVE_STRCASECMP
-# include <ctype.h>
+#include <ctype.h>
 #endif
 
 #if NUSMV_HAVE_UNISTD_H
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 
 #if NUSMV_HAVE_SYS_STAT_H
-# include <sys/stat.h>
+#include <sys/stat.h>
 #endif
 
 #if defined(_MSC_VER)
-#include <io.h>  /* for _access */
+#include <io.h> /* for _access */
 #endif
 
 #include <limits.h>
@@ -67,7 +66,7 @@
 
 #if defined(_MSC_VER)
 /* this is used to substitute stat */
-# include "nusmv/core/utils/utils_msvc.h"
+#include "nusmv/core/utils/utils_msvc.h"
 #endif
 
 #include "nusmv/core/utils/ErrorMgr.h"
@@ -101,17 +100,13 @@ typedef void (*hash_timers_DESTROY)(TimerBench_ptr);
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -122,44 +117,37 @@ static void freeListOfLists_aux(lsList list);
 
 static void hash_timers_init(const NuSMVEnv_ptr env);
 static void hash_timers_quit_fun(const NuSMVEnv_ptr env, hash_timers_DESTROY);
-static TimerBench_ptr
-hash_timers_lookup(const NuSMVEnv_ptr env, const char* key);
-static void
-hash_timers_insert(const NuSMVEnv_ptr env, const char* key,
-                   TimerBench_ptr val);
+static TimerBench_ptr hash_timers_lookup(const NuSMVEnv_ptr env,
+                                         const char *key);
+static void hash_timers_insert(const NuSMVEnv_ptr env, const char *key,
+                               TimerBench_ptr val);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Utils_pkg_init(const NuSMVEnv_ptr env)
-{
-  hash_timers_init(env);
-}
+void Utils_pkg_init(const NuSMVEnv_ptr env) { hash_timers_init(env); }
 
-void Utils_pkg_quit(const NuSMVEnv_ptr env)
-{
+void Utils_pkg_quit(const NuSMVEnv_ptr env) {
   hash_timers_quit_fun(env, TimerBench_destroy);
 }
 
-const char* Utils_StripPath(const char* pathfname)
-{
-  const char* old_pos = pathfname;
+const char *Utils_StripPath(const char *pathfname) {
+  const char *old_pos = pathfname;
 
   while ((*pathfname) != '\0') {
-    if ((*pathfname) == '/') old_pos = pathfname + 1;
+    if ((*pathfname) == '/')
+      old_pos = pathfname + 1;
     ++pathfname;
   }
   return old_pos;
 }
 
-void Utils_StripPathNoExtension(const char* fpathname, char* filename)
-{
-  char* szExt = NULL;
-  const char* szNoPath = Utils_StripPath(fpathname);
+void Utils_StripPathNoExtension(const char *fpathname, char *filename) {
+  char *szExt = NULL;
+  const char *szNoPath = Utils_StripPath(fpathname);
 
   /* We are going to use str(n)cpy, we need the two strings to not overlap */
   nusmv_assert(fpathname != filename);
@@ -167,24 +155,23 @@ void Utils_StripPathNoExtension(const char* fpathname, char* filename)
   szExt = strrchr(szNoPath, '.');
   if (szExt != NULL) {
     strncpy(filename, szNoPath, (size_t)(szExt - szNoPath));
-    *(filename+(size_t)(szExt - szNoPath)) = '\0'; /* terminates the string */
-  }
-  else {
+    *(filename + (size_t)(szExt - szNoPath)) = '\0'; /* terminates the string */
+  } else {
     strcpy(filename, szNoPath);
   }
 }
 
-void Utils_StripPathNoFilenameNoExtension(const char* fpathname, char* dirname)
-{
+void Utils_StripPathNoFilenameNoExtension(const char *fpathname,
+                                          char *dirname) {
   int pos = 0;
   int pos_last_sep = 0;
 
-  nusmv_assert(fpathname != (char *) NULL);
-  nusmv_assert(dirname != (char *) NULL);
+  nusmv_assert(fpathname != (char *)NULL);
+  nusmv_assert(dirname != (char *)NULL);
   /* We are going to use str(n)cpy, we need the two strings to not overlap */
   nusmv_assert(fpathname != dirname);
 
-  while(fpathname[pos] != '\0') {
+  while (fpathname[pos] != '\0') {
     if (fpathname[pos] == '/') {
       pos_last_sep = pos;
     }
@@ -195,13 +182,9 @@ void Utils_StripPathNoFilenameNoExtension(const char* fpathname, char* dirname)
   dirname[pos_last_sep] = '\0';
 }
 
-void Utils_FreeListOfLists(lsList list_of_lists)
-{
-  lsDestroy(list_of_lists, (void (*)(lsGeneric))&freeListOfLists_aux);
+void Utils_FreeListOfLists(lsList list_of_lists) {
+  lsDestroy(list_of_lists, (void (*)(lsGeneric)) & freeListOfLists_aux);
 }
-
-
-
 
 /*!
   \brief Return a string to be used as temporary file
@@ -216,47 +199,49 @@ void Utils_FreeListOfLists(lsList list_of_lists)
 */
 
 #define _TEMPDIR "/tmp"
-char* Utils_get_temp_filename_in_dir(const char* dir, const char* templ)
-{
-  char* dirname = (char*) NULL;
-  char* name = (char*) NULL;
-  char* var;
+char *Utils_get_temp_filename_in_dir(const char *dir, const char *templ) {
+  char *dirname = (char *)NULL;
+  char *name = (char *)NULL;
+  char *var;
   int len;
 
-# if NUSMV_HAVE_MKSTEMP
+#if NUSMV_HAVE_MKSTEMP
   int fn;
-# endif
+#endif
 
-# if defined(__MINGW32__)
+#if defined(__MINGW32__)
   char dir_separator = '\\';
-# else
+#else
   char dir_separator = '/';
-# endif
-
+#endif
 
   if (dir == NULL) {
     /* 1) Search for the directory */
-#   if defined(__MINGW32__)
-    var = (char*) NULL;
-#   if NUSMV_HAVE_GETENV
+#if defined(__MINGW32__)
+    var = (char *)NULL;
+#if NUSMV_HAVE_GETENV
     var = getenv("TEMP");
-    if (var == (char*) NULL) var = getenv("TMP");
-#   endif /* NUSMV_HAVE_GETENV */
+    if (var == (char *)NULL)
+      var = getenv("TMP");
+#endif /* NUSMV_HAVE_GETENV */
 
-    if (var != (char*) NULL) dirname = util_strsav(var);
-    else dirname = util_strsav(".");
+    if (var != (char *)NULL)
+      dirname = util_strsav(var);
+    else
+      dirname = util_strsav(".");
 
-#   else /* ! defined __MINGW32__ */
-    var = (char*) NULL;
-#   if NUSMV_HAVE_GETENV
+#else /* ! defined __MINGW32__ */
+    var = (char *)NULL;
+#if NUSMV_HAVE_GETENV
     var = getenv("TEMPDIR");
-#   endif /* NUSMV_HAVE_GETENV */
+#endif /* NUSMV_HAVE_GETENV */
 
-    if (var != (char*) NULL) dirname = util_strsav(var);
-    else dirname = util_strsav(_TEMPDIR);
-#   endif /* __MINGW32__ */
-  }
-  else {
+    if (var != (char *)NULL)
+      dirname = util_strsav(var);
+    else
+      dirname = util_strsav(_TEMPDIR);
+#endif /* __MINGW32__ */
+  } else {
     dirname = ALLOC(char, strlen(dir) + 1);
     strcpy(dirname, dir);
     if (dir[strlen(dir) - 1] == dir_separator) {
@@ -264,18 +249,17 @@ char* Utils_get_temp_filename_in_dir(const char* dir, const char* templ)
     }
   }
 
-  nusmv_assert(dirname != (char*) NULL);
-
+  nusmv_assert(dirname != (char *)NULL);
 
   /* 2) Tries to open the file: */
   len = strlen(dirname) + 1 + strlen(templ) + 1;
   name = ALLOC(char, len);
-  nusmv_assert(name != (char*) NULL);
+  nusmv_assert(name != (char *)NULL);
 
   snprintf(name, len, "%s%c%s", dirname, dir_separator, templ);
   FREE(dirname);
 
-# if NUSMV_HAVE_MKSTEMP
+#if NUSMV_HAVE_MKSTEMP
   fn = mkstemp(name);
   if (fn == -1) {
     /* tries with the current dir */
@@ -284,39 +268,39 @@ char* Utils_get_temp_filename_in_dir(const char* dir, const char* templ)
     if (fn == -1) {
       /* no way */
       FREE(name);
-      name = (char*) NULL;
+      name = (char *)NULL;
     }
   }
 
-  if (name != (char*) NULL) {
+  if (name != (char *)NULL) {
     nusmv_assert(fn != -1);
     close(fn);
     /* the file created needs to be removed */
     if (remove(name) == -1) {
       FREE(name);
-      name = (char*) NULL;
+      name = (char *)NULL;
     }
   }
 
 #elif NUSMV_HAVE_MKTEMP
-  if (mktemp(name) == (char*) NULL) {
+  if (mktemp(name) == (char *)NULL) {
     /* tries with the current dir */
     sprintf(name, "%s", templ);
-    if (mktemp(name) == (char*) NULL) {
+    if (mktemp(name) == (char *)NULL) {
       /* no way */
       FREE(name);
-      name = (char*) NULL;
+      name = (char *)NULL;
     }
   }
 #elif NUSMV_HAVE_TMPNAM
-  #include <stdio.h>
-  if (tmpnamp(name) == (char*) NULL) {
+#include <stdio.h>
+  if (tmpnamp(name) == (char *)NULL) {
     /* tries with the current dir */
     sprintf(name, "%s", templ);
-    if (mktemp(name) == (char*) NULL) {
+    if (mktemp(name) == (char *)NULL) {
       /* no way */
       FREE(name);
-      name = (char*) NULL;
+      name = (char *)NULL;
     }
   }
 #else /* no support from OS */
@@ -326,15 +310,13 @@ char* Utils_get_temp_filename_in_dir(const char* dir, const char* templ)
   return name;
 }
 
-int Utils_file_exists_in_paths(const char* filename,
-                               const char* paths,
-                               const char* delimiters)
-{
+int Utils_file_exists_in_paths(const char *filename, const char *paths,
+                               const char *delimiters) {
   int result = 0;
 
 #if NUSMV_HAVE_DIRENT_H
   char pathscopy[strlen(paths) + 1];
-  char* dir;
+  char *dir;
 
   strcpy(pathscopy, paths);
   dir = strtok(pathscopy, delimiters);
@@ -350,8 +332,7 @@ int Utils_file_exists_in_paths(const char* filename,
   return result;
 }
 
-boolean Utils_file_exists(const char* filename)
-{
+boolean Utils_file_exists(const char *filename) {
 #if NUSMV_HAVE_UNISTD_H
   return (access(filename, F_OK) == 0);
 #elif defined(_MSC_VER)
@@ -359,8 +340,8 @@ boolean Utils_file_exists(const char* filename)
 #else
   /* fallback to using fopen */
   boolean res = false;
-  FILE* fp = fopen(filename, "r");
-  if ((FILE*) NULL != fp) {
+  FILE *fp = fopen(filename, "r");
+  if ((FILE *)NULL != fp) {
     res = true;
     fclose(fp);
   }
@@ -368,22 +349,19 @@ boolean Utils_file_exists(const char* filename)
 #endif
 }
 
-boolean Utils_file_can_be_written(const char* filename)
-{
+boolean Utils_file_can_be_written(const char *filename) {
   boolean res = false;
 
   /* we open for appending to avoid truncating a previous file */
-  FILE* fp = fopen(filename, "a");
-  if ((FILE*) NULL != fp) {
+  FILE *fp = fopen(filename, "a");
+  if ((FILE *)NULL != fp) {
     res = true;
     fclose(fp);
   }
   return res;
 }
 
-
-boolean Utils_files_are_the_same(const char* fname1, const char* fname2)
-{
+boolean Utils_files_are_the_same(const char *fname1, const char *fname2) {
 #if defined(_MSC_VER)
   int res = Utils_msvc_files_are_the_same(fname1, fname2);
   /* one or both do not exist */
@@ -394,58 +372,55 @@ boolean Utils_files_are_the_same(const char* fname1, const char* fname2)
   int s1 = stat(fname1, &ss1);
   int s2 = stat(fname2, &ss2);
 
-  return (0 == s1 && 0 == s2 &&
-          ss1.st_ino == ss2.st_ino);
+  return (0 == s1 && 0 == s2 && ss1.st_ino == ss2.st_ino);
 
 #else
-# error "Did not find a way to compile Utils_files_are_the_same"
+#error "Did not find a way to compile Utils_files_are_the_same"
 #endif
 }
 
-boolean Utils_exe_file_exists(const char* filename)
-{
+boolean Utils_exe_file_exists(const char *filename) {
 #if NUSMV_HAVE_UNISTD_H
   return (access(filename, X_OK) == 0);
 #else
   /* fallback to using stat */
-# if NUSMV_HAVE_SYS_STAT_H && !defined(_MSC_VER)
+#if NUSMV_HAVE_SYS_STAT_H && !defined(_MSC_VER)
   /* it seems that it is not trivial to check if a file is
      executable under windows... */
   struct stat st_stat;
   int pmask;
   int r = stat(filename, &st_stat);
   if (r)
-      return false;
+    return false;
   pmask = (S_IXUSR | S_IXGRP | S_IXOTH);
   return (S_IFREG & st_stat.st_mode) & (pmask & st_stat.st_mode);
-#  else
+#else
   /* final fall back to file_exist, and see at runtime if execution
      fails... */
   return Utils_file_exists(filename);
-# endif
+#endif
 #endif
 }
 
-int Utils_file_exists_in_directory(const char* filename, char* directory)
-{
+int Utils_file_exists_in_directory(const char *filename, char *directory) {
   int fileexists = 0;
 
 #if NUSMV_HAVE_DIRENT_H
   struct dirent *dirfile;
   int l1 = strlen(filename);
 
-  DIR* dir = opendir(directory);
+  DIR *dir = opendir(directory);
 
-  if (dir != NULL){
+  if (dir != NULL) {
     while ((0 == fileexists) && (dirfile = readdir(dir))) {
       if (strlen(dirfile->d_name) == l1) {
         if (strcmp(filename, dirfile->d_name) == 0) {
           fileexists = 1;
-        }
-        else fileexists = 0;
+        } else
+          fileexists = 0;
       }
     }
-    (void) closedir(dir);
+    (void)closedir(dir);
   }
 #else
   fileexists = 2;
@@ -454,8 +429,7 @@ int Utils_file_exists_in_directory(const char* filename, char* directory)
   return fileexists;
 }
 
-int Utils_strcasecmp(const char* s1, const char* s2)
-{
+int Utils_strcasecmp(const char *s1, const char *s2) {
 #if NUSMV_HAVE_STRCASECMP
   return strcasecmp(s1, s2);
 #else
@@ -466,20 +440,22 @@ int Utils_strcasecmp(const char* s1, const char* s2)
     int c2 = tolower(*s2);
 
     if (c1 != c2) {
-      if (c1 < c2) return -1;
+      if (c1 < c2)
+        return -1;
       return 1;
     }
 
-    if (*s1 == '\0') break;
-    s1 += 1; s2 += 1;
+    if (*s1 == '\0')
+      break;
+    s1 += 1;
+    s2 += 1;
   }
 
   return 0;
 #endif
 }
 
-void Utils_start_timer(const NuSMVEnv_ptr env, const char* name)
-{
+void Utils_start_timer(const NuSMVEnv_ptr env, const char *name) {
   TimerBench_ptr timer = hash_timers_lookup(env, name);
 
   if (timer == TIMER_BENCH(NULL)) {
@@ -491,37 +467,33 @@ void Utils_start_timer(const NuSMVEnv_ptr env, const char* name)
   TimerBench_start(timer);
 }
 
-void Utils_stop_timer(const NuSMVEnv_ptr env, const char* name)
-{
+void Utils_stop_timer(const NuSMVEnv_ptr env, const char *name) {
   TimerBench_ptr timer = hash_timers_lookup(env, name);
   TIMER_BENCH_CHECK_INSTANCE(timer);
 
   TimerBench_stop(timer);
 }
 
-void Utils_reset_timer(const NuSMVEnv_ptr env, const char* name)
-{
+void Utils_reset_timer(const NuSMVEnv_ptr env, const char *name) {
   TimerBench_ptr timer = hash_timers_lookup(env, name);
   TIMER_BENCH_CHECK_INSTANCE(timer);
 
   TimerBench_reset(timer);
 }
 
-void Utils_print_timer(const NuSMVEnv_ptr env, const char* name,
-                       const char* msg)
-{
+void Utils_print_timer(const NuSMVEnv_ptr env, const char *name,
+                       const char *msg) {
   TimerBench_ptr timer = hash_timers_lookup(env, name);
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
   TIMER_BENCH_CHECK_INSTANCE(timer);
 
   TimerBench_print(timer, errstream, msg);
 }
 
-void Utils_str_escape_xml_file(const char* str, FILE* file)
-{
+void Utils_str_escape_xml_file(const char *str, FILE *file) {
   /* this table is used to associate a character to a string, for
      character escaping
 
@@ -530,83 +502,82 @@ void Utils_str_escape_xml_file(const char* str, FILE* file)
   */
   static char escape_table_begin = '\t';
   static char escape_table_end = '>';
-  static char* escape_table[] = {
-    "&#009;",  /* '\t' */
-    "&#010;",  /* '\n' */
-    "&#011;",  /* '\v' */
-    "&#012;",  /* '\f' */
-    "&#013;",  /* '\r' */
-    "&#014;",  /* SO   */
-    "&#015;",  /* SI   */
-    "&#016;",  /* DLE  */
-    "&#017;",  /* DC1  */
-    "&#018;",  /* DC2  */
-    "&#019;",  /* DC3  */
-    "&#020;",  /* DC4  */
-    "&#021;",  /* NAK  */
-    "&#022;",  /* SYN  */
-    "&#023;",  /* ETB  */
-    "&#024;",  /* CAN  */
-    "&#025;",  /* EM   */
-    "&#026;",  /* SUB  */
-    "&#027;",  /* ESC  */
-    "&#028;",  /* FS   */
-    "&#029;",  /* GS   */
-    "&#030;",  /* RS   */
-    "&#031;",  /* US   */
-    "&#032;",  /* ' '  */
-    "&#033;",  /* '!'  */
-    "&quot;",  /* '"'  */
-    "#",       /* '#'  */
-    "$",       /* '$'  */
-    "%",       /* '%'  */
-    "&amp;",   /* '&'  */
-    "&apos;",  /* '''  */
-    "(",       /* '('  */
-    ")",       /* ')'  */
-    "*",       /* '*'  */
-    "+",       /* '+'  */
-    ",",       /* ','  */
-    "-",       /* '-'  */
-    ".",       /* '.'  */
-    "/",       /* '/'  */
-    "0",       /* '0'  */
-    "1",       /* '1'  */
-    "2",       /* '2'  */
-    "3",       /* '3'  */
-    "4",       /* '4'  */
-    "5",       /* '5'  */
-    "6",       /* '6'  */
-    "7",       /* '7'  */
-    "8",       /* '8'  */
-    "9",       /* '9'  */
-    ":",       /* ':'  */
-    ";",       /* ';'  */
-    "&lt;",    /* '<'  */
-    "=",       /* '='  */
-    "&gt;",    /* '>'  */
+  static char *escape_table[] = {
+      "&#009;", /* '\t' */
+      "&#010;", /* '\n' */
+      "&#011;", /* '\v' */
+      "&#012;", /* '\f' */
+      "&#013;", /* '\r' */
+      "&#014;", /* SO   */
+      "&#015;", /* SI   */
+      "&#016;", /* DLE  */
+      "&#017;", /* DC1  */
+      "&#018;", /* DC2  */
+      "&#019;", /* DC3  */
+      "&#020;", /* DC4  */
+      "&#021;", /* NAK  */
+      "&#022;", /* SYN  */
+      "&#023;", /* ETB  */
+      "&#024;", /* CAN  */
+      "&#025;", /* EM   */
+      "&#026;", /* SUB  */
+      "&#027;", /* ESC  */
+      "&#028;", /* FS   */
+      "&#029;", /* GS   */
+      "&#030;", /* RS   */
+      "&#031;", /* US   */
+      "&#032;", /* ' '  */
+      "&#033;", /* '!'  */
+      "&quot;", /* '"'  */
+      "#",      /* '#'  */
+      "$",      /* '$'  */
+      "%",      /* '%'  */
+      "&amp;",  /* '&'  */
+      "&apos;", /* '''  */
+      "(",      /* '('  */
+      ")",      /* ')'  */
+      "*",      /* '*'  */
+      "+",      /* '+'  */
+      ",",      /* ','  */
+      "-",      /* '-'  */
+      ".",      /* '.'  */
+      "/",      /* '/'  */
+      "0",      /* '0'  */
+      "1",      /* '1'  */
+      "2",      /* '2'  */
+      "3",      /* '3'  */
+      "4",      /* '4'  */
+      "5",      /* '5'  */
+      "6",      /* '6'  */
+      "7",      /* '7'  */
+      "8",      /* '8'  */
+      "9",      /* '9'  */
+      ":",      /* ':'  */
+      ";",      /* ';'  */
+      "&lt;",   /* '<'  */
+      "=",      /* '='  */
+      "&gt;",   /* '>'  */
   };
 
-  if ((char*) NULL != str) {
-    const char* iter;
+  if ((char *)NULL != str) {
+    const char *iter;
     char c;
-    for (iter=str, c=*iter; c != '\0'; c=*(++iter)) {
+    for (iter = str, c = *iter; c != '\0'; c = *(++iter)) {
       if (escape_table_begin <= c && c <= escape_table_end) {
         /* in table */
-        fputs(escape_table[c-escape_table_begin], file);
-      }
-      else { /* not in table */
+        fputs(escape_table[c - escape_table_begin], file);
+      } else { /* not in table */
         fputc(c, file);
       }
     }
   }
 }
 
-int Utils_log2_round(unsigned long long int a)
-{
+int Utils_log2_round(unsigned long long int a) {
   int res;
 
-  if (0 == a) return 1; /* special case */
+  if (0 == a)
+    return 1; /* special case */
 
   res = 0;
   while (a != 0) {
@@ -616,17 +587,15 @@ int Utils_log2_round(unsigned long long int a)
   return res;
 }
 
-int Utils_ptr_compar(const void* a, const void* b)
-{
+int Utils_ptr_compar(const void *a, const void *b) {
   nusmv_assert(NULL != a);
   nusmv_assert(NULL != b);
 
-  return *(char**)a - *(char**)b;
+  return *(char **)a - *(char **)b;
 }
 
-char* Utils_int_to_str(const int an_int)
-{
-  char* str = NULL;
+char *Utils_int_to_str(const int an_int) {
+  char *str = NULL;
   size_t buffsize = 0;
   int c = -1;
 
@@ -638,17 +607,15 @@ char* Utils_int_to_str(const int an_int)
   return str;
 }
 
-size_t Utils_int_size_as_string(const int an_int)
-{
+size_t Utils_int_size_as_string(const int an_int) {
   size_t retval;
 
-  retval = (int)(ceil(log10((double)an_int))+2)*sizeof(char);
+  retval = (int)(ceil(log10((double)an_int)) + 2) * sizeof(char);
 
   return retval;
 }
 
-char* Utils_util_tilde_expand(char* fname)
-{
+char *Utils_util_tilde_expand(char *fname) {
   nusmv_assert(NULL != fname);
 
   return util_tilde_expand(fname);
@@ -657,8 +624,6 @@ char* Utils_util_tilde_expand(char* fname)
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -671,18 +636,14 @@ char* Utils_util_tilde_expand(char* fname)
 
   \sa Utils_FreeListOfLists
 */
-static void freeListOfLists_aux(lsList list)
-{
-  lsDestroy(list, NULL);
-}
+static void freeListOfLists_aux(lsList list) { lsDestroy(list, NULL); }
 
 /*!
   \brief Initializes the hash_timers hash
 
   Initializes the hash_timers hash
 */
-static void hash_timers_init(const NuSMVEnv_ptr env)
-{
+static void hash_timers_init(const NuSMVEnv_ptr env) {
   hash_ptr hash_timers = new_assoc();
   nusmv_assert((hash_ptr)NULL != hash_timers);
 
@@ -695,10 +656,9 @@ static void hash_timers_init(const NuSMVEnv_ptr env)
 
 */
 
-static enum st_retval hash_timers_quit_fun_aux(char*k, char* e, char* a)
-{
+static enum st_retval hash_timers_quit_fun_aux(char *k, char *e, char *a) {
   /* WARNING [MD] I think it should be (hash_timers_DESTROY)a */
-  hash_timers_DESTROY fun = *(hash_timers_DESTROY*)a;
+  hash_timers_DESTROY fun = *(hash_timers_DESTROY *)a;
   fun((TimerBench_ptr)e);
   return ASSOC_DELETE;
 }
@@ -709,13 +669,11 @@ static enum st_retval hash_timers_quit_fun_aux(char*k, char* e, char* a)
   Deinitializes the hash_timers hash
 */
 static void hash_timers_quit_fun(const NuSMVEnv_ptr env,
-                                 hash_timers_DESTROY fun)
-{
+                                 hash_timers_DESTROY fun) {
   hash_ptr hash_timers = (hash_ptr)NuSMVEnv_remove_value(env, ENV_HASH_TIMERS);
 
-  clear_assoc_and_free_entries_arg(hash_timers,
-                                   hash_timers_quit_fun_aux,
-                                   (char*)&fun);
+  clear_assoc_and_free_entries_arg(hash_timers, hash_timers_quit_fun_aux,
+                                   (char *)&fun);
   free_assoc(hash_timers);
 }
 
@@ -724,9 +682,8 @@ static void hash_timers_quit_fun(const NuSMVEnv_ptr env,
 
   Looks up in the hash_timers hash
 */
-static TimerBench_ptr
-hash_timers_lookup(const NuSMVEnv_ptr env, const char* key)
-{
+static TimerBench_ptr hash_timers_lookup(const NuSMVEnv_ptr env,
+                                         const char *key) {
   hash_ptr hash_timers = (hash_ptr)NuSMVEnv_get_value(env, ENV_HASH_TIMERS);
 
   return (TimerBench_ptr)find_assoc(hash_timers, (node_ptr)key);
@@ -737,9 +694,8 @@ hash_timers_lookup(const NuSMVEnv_ptr env, const char* key)
 
   Inserts into the hash_timers hash
 */
-static void hash_timers_insert(const NuSMVEnv_ptr env, const char* key,
-                               TimerBench_ptr val)
-{
+static void hash_timers_insert(const NuSMVEnv_ptr env, const char *key,
+                               TimerBench_ptr val) {
   hash_ptr hash_timers = (hash_ptr)NuSMVEnv_get_value(env, ENV_HASH_TIMERS);
 
   insert_assoc(hash_timers, (node_ptr)key, (node_ptr)val);

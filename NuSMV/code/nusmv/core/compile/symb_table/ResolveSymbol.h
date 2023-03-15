@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,21 +34,20 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_RESOLVE_SYMBOL_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_RESOLVE_SYMBOL_H__
 
-
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
 
 /*!
   \struct ResolveSymbol
   \brief Definition of the public accessor for class ResolveSymbol
 
-  
+
 */
-typedef struct ResolveSymbol_TAG*  ResolveSymbol_ptr;
+typedef struct ResolveSymbol_TAG *ResolveSymbol_ptr;
 
 /*!
   \brief To cast and check instances of class ResolveSymbol
@@ -56,21 +55,19 @@ typedef struct ResolveSymbol_TAG*  ResolveSymbol_ptr;
   These macros must be used respectively to cast and to check
   instances of class ResolveSymbol
 */
-#define RESOLVE_SYMBOL(self) \
-         ((ResolveSymbol_ptr) self)
+#define RESOLVE_SYMBOL(self) ((ResolveSymbol_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define RESOLVE_SYMBOL_CHECK_INSTANCE(self) \
-         (nusmv_assert(RESOLVE_SYMBOL(self) != RESOLVE_SYMBOL(NULL)))
+#define RESOLVE_SYMBOL_CHECK_INSTANCE(self)                                    \
+  (nusmv_assert(RESOLVE_SYMBOL(self) != RESOLVE_SYMBOL(NULL)))
 
 /* Forward declaration of the SymbTable structure, in order to avoid
    circular dependency  (ST needs RS, RS needs ST) */
 struct SymbTable_TAG;
-
 
 /**AutomaticStart*************************************************************/
 
@@ -207,19 +204,18 @@ boolean ResolveSymbol_is_error(ResolveSymbol_ptr self);
   Get the error message, if any error occurred.
                       The returned message has to be freed by the caller
 */
-char* ResolveSymbol_get_error_message(ResolveSymbol_ptr self,
-                                             MasterPrinter_ptr printer);
+char *ResolveSymbol_get_error_message(ResolveSymbol_ptr self,
+                                      MasterPrinter_ptr printer);
 
 /*!
   \methodof ResolveSymbol
   \brief Prints the error message, if any error occurred.
 
-  Prints the error message on the given stream, 
+  Prints the error message on the given stream,
                       if any error occurred.
 */
 void ResolveSymbol_print_error_message(ResolveSymbol_ptr self,
-                                              MasterPrinter_ptr printer,
-                                              FILE* stream);
+                                       MasterPrinter_ptr printer, FILE *stream);
 
 /*!
   \methodof ResolveSymbol
@@ -234,8 +230,7 @@ void ResolveSymbol_print_error_message(ResolveSymbol_ptr self,
 
   \sa ResolveSymbol_get_error_message ResolveSymbol_is_error
 */
-void ResolveSymbol_throw_error(ResolveSymbol_ptr self,
-                                      const NuSMVEnv_ptr env);
+void ResolveSymbol_throw_error(ResolveSymbol_ptr self, const NuSMVEnv_ptr env);
 
 /*!
   \methodof ResolveSymbol
@@ -247,7 +242,7 @@ node_ptr ResolveSymbol_get_resolved_name(ResolveSymbol_ptr self);
 
 /*!
   \methodof ResolveSymbol
-  \brief Resolves the given symbol in the given context, and 
+  \brief Resolves the given symbol in the given context, and
                       returns it.
 
   Resolves the given symbol in the given context, and
@@ -258,19 +253,15 @@ node_ptr ResolveSymbol_get_resolved_name(ResolveSymbol_ptr self);
                       structure. The internal structure is reset
                       before doing anything else.
 
-                      It is possible to get the resolved name later by calling 
+                      It is possible to get the resolved name later by calling
                       get_resolved_name.
-                      
+
 
   \sa ResolveSymbol_get_resolved_name
 */
-node_ptr ResolveSymbol_resolve(ResolveSymbol_ptr self,
-                                      struct SymbTable_TAG* st,
-                                      node_ptr name,
-                                      node_ptr context);
+node_ptr ResolveSymbol_resolve(ResolveSymbol_ptr self, struct SymbTable_TAG *st,
+                               node_ptr name, node_ptr context);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_RESOLVE_SYMBOL_H__ */

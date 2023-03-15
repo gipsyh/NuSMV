@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -30,17 +30,16 @@
   \author Roberto Cavada
   \brief  The header file of ClusterList class.
 
-   
+
 
 */
-
 
 #ifndef __NUSMV_CORE_TRANS_BDD_CLUSTER_LIST_H__
 #define __NUSMV_CORE_TRANS_BDD_CLUSTER_LIST_H__
 
-#include "nusmv/core/trans/bdd/Cluster.h"
 #include "nusmv/core/dd/dd.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/trans/bdd/Cluster.h"
 
 /*!
   \struct ClusterList
@@ -48,7 +47,7 @@
 
    This class forms a list of clusters.
 */
-typedef struct ClusterList_TAG* ClusterList_ptr;
+typedef struct ClusterList_TAG *ClusterList_ptr;
 
 /*!
   \brief \todo Missing synopsis
@@ -62,24 +61,22 @@ typedef node_ptr ClusterListIterator_ptr;
 
   \todo Missing description
 */
-#define CLUSTER_LIST(x)  \
-        ((ClusterList_ptr) x)
+#define CLUSTER_LIST(x) ((ClusterList_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CLUSTER_LIST_CHECK_INSTANCE(x)  \
-        (nusmv_assert(CLUSTER_LIST(x) != CLUSTER_LIST(NULL)))
+#define CLUSTER_LIST_CHECK_INSTANCE(x)                                         \
+  (nusmv_assert(CLUSTER_LIST(x) != CLUSTER_LIST(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CLUSTER_LIST_ITERATOR(x) \
-        ((ClusterListIterator_ptr) x)
+#define CLUSTER_LIST_ITERATOR(x) ((ClusterListIterator_ptr)x)
 
 /* ---------------------------------------------------------------------- */
 
@@ -111,7 +108,7 @@ typedef node_ptr ClusterListIterator_ptr;
 
 /*!
   \methodof ClusterList
-  \brief  Class ClusterList Constructor. 
+  \brief  Class ClusterList Constructor.
 
    The reference to DdManager passed here is internally
   stored but self does not become owner of it.
@@ -139,19 +136,17 @@ ClusterList_ptr ClusterList_copy(const ClusterList_ptr self);
   \methodof ClusterList
   \brief  Returns an Iterator to iterate the self.
 
-  
+
 */
-ClusterListIterator_ptr
-ClusterList_begin(const ClusterList_ptr self);
+ClusterListIterator_ptr ClusterList_begin(const ClusterList_ptr self);
 
 /*!
   \methodof ClusterList
   \brief  Returns an Iterator to iterate the self.
 
-  
+
 */
-DDMgr_ptr
-ClusterList_get_dd_manager(const ClusterList_ptr self);
+DDMgr_ptr ClusterList_get_dd_manager(const ClusterList_ptr self);
 
 /*!
   \methodof ClusterList
@@ -160,26 +155,25 @@ ClusterList_get_dd_manager(const ClusterList_ptr self);
 
   self keeps the ownership of the returned cluster
 */
-Cluster_ptr
-ClusterList_get_cluster(const ClusterList_ptr self,
-                        const ClusterListIterator_ptr iter);
+Cluster_ptr ClusterList_get_cluster(const ClusterList_ptr self,
+                                    const ClusterListIterator_ptr iter);
 
 /*!
   \methodof ClusterList
   \brief  Sets the cluster of the "self" at the position given by
   iterator "iter" to cluster "cluster".
 
-  
+
 */
 void ClusterList_set_cluster(ClusterList_ptr self,
-                                    const ClusterListIterator_ptr iter,
-                                    Cluster_ptr cluster);
+                             const ClusterListIterator_ptr iter,
+                             Cluster_ptr cluster);
 
 /*!
   \methodof ClusterList
   \brief  Returns the number of the clusters stored in "self".
 
-  
+
 */
 int ClusterList_length(const ClusterList_ptr self);
 
@@ -189,8 +183,7 @@ int ClusterList_length(const ClusterList_ptr self);
 
   List becomes the owner of the given cluster
 */
-void
-ClusterList_prepend_cluster(ClusterList_ptr self, Cluster_ptr cluster);
+void ClusterList_prepend_cluster(ClusterList_ptr self, Cluster_ptr cluster);
 
 /*!
   \methodof ClusterList
@@ -199,8 +192,7 @@ ClusterList_prepend_cluster(ClusterList_ptr self, Cluster_ptr cluster);
   List becomes the owner of the given cluster, if the user
   is going to call standard destructor
 */
-void
-ClusterList_append_cluster(ClusterList_ptr self, Cluster_ptr cluster);
+void ClusterList_append_cluster(ClusterList_ptr self, Cluster_ptr cluster);
 
 /*!
   \methodof ClusterListIterator
@@ -215,16 +207,15 @@ ClusterListIterator_next(const ClusterListIterator_ptr self);
   \methodof ClusterListIterator
   \brief Use to check if iterator is at the end of list
 
-  
+
 */
-boolean
-ClusterListIterator_is_end(const ClusterListIterator_ptr self);
+boolean ClusterListIterator_is_end(const ClusterListIterator_ptr self);
 
 /*!
   \methodof ClusterList
-  \brief  Reverses the list of clusters. 
+  \brief  Reverses the list of clusters.
 
-  
+
 */
 void ClusterList_reverse(ClusterList_ptr self);
 
@@ -236,18 +227,16 @@ void ClusterList_reverse(ClusterList_ptr self);
   Returns the number of removed occurrences. Clusters found
   won't be destroyed, simply their references will be removed from the list
 */
-int
-ClusterList_remove_cluster(ClusterList_ptr self, Cluster_ptr cluster);
+int ClusterList_remove_cluster(ClusterList_ptr self, Cluster_ptr cluster);
 
 /*!
   \methodof ClusterList
   \brief  It returns a monolithic transition cluster corresponding
   to the cluster list of the "self".
 
-  "self" remains unchanged. 
+  "self" remains unchanged.
 */
-ClusterList_ptr
-ClusterList_apply_monolithic(const ClusterList_ptr self);
+ClusterList_ptr ClusterList_apply_monolithic(const ClusterList_ptr self);
 
 /*!
   \methodof ClusterList
@@ -277,12 +266,10 @@ ClusterList_apply_threshold(const ClusterList_ptr self,
        heuristic described in IWLS95.</li>
   </ol>
 */
-ClusterList_ptr
-ClusterList_apply_iwls95_partition(const ClusterList_ptr self,
-                                   bdd_ptr state_vars_cube,
-                                   bdd_ptr input_vars_cube,
-                                   bdd_ptr next_state_vars_cube,
-                                   const ClusterOptions_ptr cl_options);
+ClusterList_ptr ClusterList_apply_iwls95_partition(
+    const ClusterList_ptr self, bdd_ptr state_vars_cube,
+    bdd_ptr input_vars_cube, bdd_ptr next_state_vars_cube,
+    const ClusterOptions_ptr cl_options);
 
 /*!
   \methodof ClusterList
@@ -295,9 +282,8 @@ ClusterList_apply_iwls95_partition(const ClusterList_ptr self,
 
   \se self will change
 */
-void
-ClusterList_apply_synchronous_product(ClusterList_ptr self,
-                                      const ClusterList_ptr other);
+void ClusterList_apply_synchronous_product(ClusterList_ptr self,
+                                           const ClusterList_ptr other);
 
 /*!
   \methodof ClusterList
@@ -305,8 +291,7 @@ ClusterList_apply_synchronous_product(ClusterList_ptr self,
 
   The returned bdd is referenced
 */
-bdd_ptr
-ClusterList_get_monolithic_bdd(const ClusterList_ptr self);
+bdd_ptr ClusterList_get_monolithic_bdd(const ClusterList_ptr self);
 
 /*!
   \methodof ClusterList
@@ -315,20 +300,17 @@ ClusterList_get_monolithic_bdd(const ClusterList_ptr self);
   Given a list of clusters, it computes their set of support.
   Returned bdd is referenced.
 */
-bdd_ptr
-ClusterList_get_clusters_cube(const ClusterList_ptr self);
+bdd_ptr ClusterList_get_clusters_cube(const ClusterList_ptr self);
 
 /*!
   \methodof ClusterList
   \brief It builds the quantification schedule of the variables
   inside the clusters of the "self".
 
-  
+
 */
-void
-ClusterList_build_schedule(ClusterList_ptr self,
-                           bdd_ptr state_vars_cube,
-                           bdd_ptr input_vars_cube);
+void ClusterList_build_schedule(ClusterList_ptr self, bdd_ptr state_vars_cube,
+                                bdd_ptr input_vars_cube);
 
 /*!
   \methodof ClusterList
@@ -337,8 +319,7 @@ ClusterList_build_schedule(ClusterList_ptr self,
 
   Returned bdd is referenced
 */
-bdd_ptr
-ClusterList_get_image_state(const ClusterList_ptr self, bdd_ptr s);
+bdd_ptr ClusterList_get_image_state(const ClusterList_ptr self, bdd_ptr s);
 
 /*!
   \methodof ClusterList
@@ -347,8 +328,8 @@ ClusterList_get_image_state(const ClusterList_ptr self, bdd_ptr s);
 
   Returned bdd is referenced
 */
-bdd_ptr
-ClusterList_get_image_state_input(const ClusterList_ptr self, bdd_ptr s);
+bdd_ptr ClusterList_get_image_state_input(const ClusterList_ptr self,
+                                          bdd_ptr s);
 
 /*!
   \methodof ClusterList
@@ -357,8 +338,8 @@ ClusterList_get_image_state_input(const ClusterList_ptr self, bdd_ptr s);
 
   Returned bdd is referenced
 */
-bdd_ptr
-ClusterList_get_k_image_state(const ClusterList_ptr self, bdd_ptr s, int k);
+bdd_ptr ClusterList_get_k_image_state(const ClusterList_ptr self, bdd_ptr s,
+                                      int k);
 
 /*!
   \methodof ClusterList
@@ -367,17 +348,16 @@ ClusterList_get_k_image_state(const ClusterList_ptr self, bdd_ptr s, int k);
 
   Returned bdd is referenced
 */
-bdd_ptr
-ClusterList_get_k_image_state_input(const ClusterList_ptr self, bdd_ptr s, int k);
+bdd_ptr ClusterList_get_k_image_state_input(const ClusterList_ptr self,
+                                            bdd_ptr s, int k);
 
 /*!
   \methodof ClusterList
   \brief Prints size of each cluster of the "self"
 
-  
+
 */
-void
-ClusterList_print_short_info(const ClusterList_ptr self, FILE* file);
+void ClusterList_print_short_info(const ClusterList_ptr self, FILE *file);
 
 /*!
   \methodof ClusterList
@@ -386,7 +366,7 @@ ClusterList_print_short_info(const ClusterList_ptr self, FILE* file);
   It compares BDDs not Clusters.
 */
 boolean ClusterList_check_equality(const ClusterList_ptr self,
-                                          const ClusterList_ptr other);
+                                   const ClusterList_ptr other);
 
 /*!
   \methodof ClusterList
@@ -408,6 +388,5 @@ boolean ClusterList_check_equality(const ClusterList_ptr self,
   This function returns true if schedule is correct, false otherwise.
 */
 boolean ClusterList_check_schedule(const ClusterList_ptr self);
-
 
 #endif /* __NUSMV_CORE_TRANS_BDD_CLUSTER_LIST_H__ */

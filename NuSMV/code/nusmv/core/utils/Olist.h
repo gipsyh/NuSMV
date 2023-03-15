@@ -34,13 +34,11 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_OLIST_H__
 #define __NUSMV_CORE_UTILS_OLIST_H__
 
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/defs.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -52,31 +50,29 @@
 
 
 */
-typedef struct Olist_TAG* Olist_ptr;
+typedef struct Olist_TAG *Olist_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OLIST(x) \
-         ((Olist_ptr) x)
+#define OLIST(x) ((Olist_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OLIST_CHECK_INSTANCE(x) \
-         ( nusmv_assert(OLIST(x) != OLIST(NULL)) )
+#define OLIST_CHECK_INSTANCE(x) (nusmv_assert(OLIST(x) != OLIST(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OLIST_FOREACH(list, iter) \
- for (iter = Olist_first(list); !Oiter_is_end(iter); iter = Oiter_next(iter))
+#define OLIST_FOREACH(list, iter)                                              \
+  for (iter = Olist_first(list); !Oiter_is_end(iter); iter = Oiter_next(iter))
 
 /* internal type. it cannot be used outside. */
 
@@ -86,10 +82,12 @@ typedef struct Olist_TAG* Olist_ptr;
 
 
 */
-typedef struct Onode_TAG* Onode_ptr;
+typedef struct Onode_TAG *Onode_ptr;
 /* here a struct definition is used only to create a new type. Thus
    C type checker will be able to catch incorrect use of iterators */
-typedef struct Oiter_TAG {Onode_ptr* node;} Oiter;
+typedef struct Oiter_TAG {
+  Onode_ptr *node;
+} Oiter;
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -144,8 +142,7 @@ Olist_ptr Olist_copy_reversed(Olist_ptr self);
 
   \sa Olist_copy
 */
-Olist_ptr Olist_copy_without_element(Olist_ptr self,
-                                            void* element);
+Olist_ptr Olist_copy_without_element(Olist_ptr self, void *element);
 
 /*!
   \methodof Olist
@@ -173,8 +170,7 @@ void Olist_reverse(Olist_ptr self);
 
   \sa Olist_copy_reversed
 */
-void Olist_move(Olist_ptr self, Olist_ptr to_list,
-                       Oiter iter_to);
+void Olist_move(Olist_ptr self, Olist_ptr to_list, Oiter iter_to);
 
 /*!
   \methodof Olist
@@ -220,7 +216,7 @@ void Olist_concat(Olist_ptr self, Olist_ptr other);
 
   \sa Olist_append
 */
-void Olist_prepend(Olist_ptr self, void* element);
+void Olist_prepend(Olist_ptr self, void *element);
 
 /*!
   \methodof Olist
@@ -228,7 +224,7 @@ void Olist_prepend(Olist_ptr self, void* element);
 
   \sa Olist_prepend
 */
-void Olist_append(Olist_ptr self, void* element);
+void Olist_append(Olist_ptr self, void *element);
 
 /*!
   \methodof Olist
@@ -245,7 +241,7 @@ void Olist_append(Olist_ptr self, void* element);
 
   \sa Olist_append, Olist_prepend
 */
-void* Olist_delete_first(Olist_ptr self);
+void *Olist_delete_first(Olist_ptr self);
 
 /*!
   \methodof Olist
@@ -361,7 +357,7 @@ Oiter Oiter_next(Oiter iter);
 
   \sa Olist_first, Oiter_is_end, Oiter_next
 */
-void* Oiter_element(Oiter iter);
+void *Oiter_element(Oiter iter);
 
 /*!
   \brief Sets a new value to the list element pointed by
@@ -372,7 +368,7 @@ void* Oiter_element(Oiter iter);
 
   \sa Olist_first, Oiter_is_end, Oiter_next, Oiter_element
 */
-void Oiter_set_element(Oiter iter, void* element);
+void Oiter_set_element(Oiter iter, void *element);
 
 /*!
   \methodof Olist
@@ -391,8 +387,7 @@ void Oiter_set_element(Oiter iter, void* element);
 
   Returns an iterator pointing to the newly inserted element.
 */
-Oiter Olist_insert_after(Olist_ptr self, Oiter iter,
-                               void* element);
+Oiter Olist_insert_after(Olist_ptr self, Oiter iter, void *element);
 
 /*!
   \methodof Olist
@@ -411,8 +406,7 @@ Oiter Olist_insert_after(Olist_ptr self, Oiter iter,
 
   Returns an iterator pointing to the newly inserted element.
 */
-Oiter Olist_insert_before(Olist_ptr self, Oiter iter,
-                          void* element);
+Oiter Olist_insert_before(Olist_ptr self, Oiter iter, void *element);
 
 /*!
   \methodof Olist
@@ -436,7 +430,7 @@ Oiter Olist_insert_before(Olist_ptr self, Oiter iter,
   element, but the next of it.
 
 */
-Oiter Olist_delete(Olist_ptr self, Oiter iter, void** element);
+Oiter Olist_delete(Olist_ptr self, Oiter iter, void **element);
 
 /*!
   \methodof Olist
@@ -444,7 +438,7 @@ Oiter Olist_delete(Olist_ptr self, Oiter iter, void** element);
 
 
 */
-boolean Olist_contains(const Olist_ptr self, const void* element);
+boolean Olist_contains(const Olist_ptr self, const void *element);
 
 /*!
   \methodof Olist
@@ -454,7 +448,7 @@ boolean Olist_contains(const Olist_ptr self, const void* element);
 
 
 */
-boolean Olist_remove(Olist_ptr self, const void* element);
+boolean Olist_remove(Olist_ptr self, const void *element);
 
 /*!
   \methodof Olist
@@ -466,9 +460,8 @@ boolean Olist_remove(Olist_ptr self, const void* element);
   cmp is comparison function returning value v, v < 0, v == 0 or v > 0,
   extra is a user parameter that is passed to every invocation of cmp
 */
-void Olist_sort(Olist_ptr self,
-                       int (*cmp)(void* el1, void* el2, void* extra),
-                       void* extra);
+void Olist_sort(Olist_ptr self, int (*cmp)(void *el1, void *el2, void *extra),
+                void *extra);
 
 /*!
   \methodof Olist
@@ -478,8 +471,7 @@ void Olist_sort(Olist_ptr self,
 
   Precondition: all elements of the list have to be node_ptr.
 */
-void Olist_print_node(Olist_ptr self,
-                             MasterPrinter_ptr printer, FILE* output);
+void Olist_print_node(Olist_ptr self, MasterPrinter_ptr printer, FILE *output);
 
 /*!
   \brief This is a test function
@@ -499,7 +491,6 @@ void olist_testing_function(const NuSMVEnv_ptr env);
   Call func over each element of the list. Very useful for
   example for freeing the elements
 */
-void
-Olist_map(Olist_ptr self, void (*func)(void* elem));
+void Olist_map(Olist_ptr self, void (*func)(void *elem));
 
 #endif /* __OLIST_H__ */

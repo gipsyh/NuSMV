@@ -22,41 +22,38 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
 /*!
   \author Marco Pensallorto
-  \brief Private and protected interface of class 'SATRestartPartialTraceExecutor'
+  \brief Private and protected interface of class
+  'SATRestartPartialTraceExecutor'
 
   This file can be included only by derived and friend classes
 
 */
-
-
 
 #ifndef __NUSMV_CORE_TRACE_EXEC_SATRESTART_PARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_SATRESTART_PARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 
 #include "nusmv/core/utils/utils.h"
 
-#include "nusmv/trace/exec/SATRestartPartialTraceExecutor.h"
 #include "nusmv/core/trace/exec/PartialTraceExecutor.h"
 #include "nusmv/core/trace/exec/PartialTraceExecutor_private.h"
-
+#include "nusmv/trace/exec/SATRestartPartialTraceExecutor.h"
 
 /*!
   \brief SATRestartPartialTraceExecutor class definition derived from
                class PartialTraceExecutor
 
-  
+
 
   \sa Base class PartialTraceExecutor
 */
 
-typedef struct SATRestartPartialTraceExecutor_TAG
-{
+typedef struct SATRestartPartialTraceExecutor_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(PartialTraceExecutor);
 
@@ -64,17 +61,15 @@ typedef struct SATRestartPartialTraceExecutor_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } SATRestartPartialTraceExecutor;
 
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
 
-
-#endif /* __NUSMV_CORE_TRACE_EXEC_SATRESTART_PARTIAL_TRACE_EXECUTOR_PRIVATE_H__ */
+#endif /* __NUSMV_CORE_TRACE_EXEC_SATRESTART_PARTIAL_TRACE_EXECUTOR_PRIVATE_H__ \
+        */

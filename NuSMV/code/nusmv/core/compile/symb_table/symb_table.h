@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -146,8 +146,7 @@ SymbType_ptr SymbTablePkg_continuous_type(const NuSMVEnv_ptr env);
   The memory is shared, so you can compare pointers to
   compare types. De-initialisation of the package destroys this type.
 */
-SymbType_ptr SymbTablePkg_unsigned_word_type(const NuSMVEnv_ptr env,
-                                                    int width);
+SymbType_ptr SymbTablePkg_unsigned_word_type(const NuSMVEnv_ptr env, int width);
 
 /*!
   \brief returns a signed Word type (with a given width)
@@ -155,18 +154,16 @@ SymbType_ptr SymbTablePkg_unsigned_word_type(const NuSMVEnv_ptr env,
   The memory is shared, so you can compare pointers to
   compare types. De-initialisation of the package destroys this type.
 */
-SymbType_ptr SymbTablePkg_signed_word_type(const NuSMVEnv_ptr env,
-                                                  int width);
+SymbType_ptr SymbTablePkg_signed_word_type(const NuSMVEnv_ptr env, int width);
 
 /*!
   \brief Returns a WordArray type (given array width and subtype)
 
   The memory is shared, so you can compare pointers to
-  compare types. The association is done based on the cons of awidth and subtype.
-  De-initialisation of the package destroys this type.
+  compare types. The association is done based on the cons of awidth and
+  subtype. De-initialisation of the package destroys this type.
 */
-SymbType_ptr SymbTablePkg_wordarray_type(const NuSMVEnv_ptr env,
-                                         int awidth, 
+SymbType_ptr SymbTablePkg_wordarray_type(const NuSMVEnv_ptr env, int awidth,
                                          SymbType_ptr subtype);
 
 /*!
@@ -177,9 +174,8 @@ SymbType_ptr SymbTablePkg_wordarray_type(const NuSMVEnv_ptr env,
   PRECONDITION: subtype has to be created with one of SymbTypePkg_.._type
   function.
 */
-SymbType_ptr SymbTablePkg_array_type(SymbType_ptr subtype,
-                                            int lower_bound,
-                                            int upper_bound);
+SymbType_ptr SymbTablePkg_array_type(SymbType_ptr subtype, int lower_bound,
+                                     int upper_bound);
 
 /*!
   \brief returns an unsigned Word type (with a given width)
@@ -189,7 +185,7 @@ SymbType_ptr SymbTablePkg_array_type(SymbType_ptr subtype,
 
 */
 SymbType_ptr SymbTablePkg_intarray_type(const NuSMVEnv_ptr env,
-                                                      SymbType_ptr subtype);
+                                        SymbType_ptr subtype);
 
 /*!
   \brief returns a boolean-set type.
@@ -230,6 +226,5 @@ SymbType_ptr SymbTablePkg_integer_symbolic_set_type(const NuSMVEnv_ptr env);
   compare types. De-initialisation of the package destroys this type.
 */
 SymbType_ptr SymbTablePkg_error_type(const NuSMVEnv_ptr env);
-
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_TABLE_H__ */

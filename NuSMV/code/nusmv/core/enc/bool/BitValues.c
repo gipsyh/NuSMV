@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,14 +35,13 @@
 
 */
 
-
 #include "nusmv/core/enc/bool/BitValues.h"
 
 #include "nusmv/core/enc/bool/BoolEnc.h"
 #include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/wff/ExprMgr.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/wff/ExprMgr.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -56,18 +55,15 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct BitValues_TAG
-{
+typedef struct BitValues_TAG {
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
   BoolEnc_ptr enc;
   node_ptr scalar_var;
-  BitValue* values;
+  BitValue *values;
   NodeList_ptr bits; /* name of bits */
 } BitValues;
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -77,25 +73,22 @@ typedef struct BitValues_TAG
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void bit_values_array_init(BitValues_ptr self,
-                                  BoolEnc_ptr enc, node_ptr var);
+static void bit_values_array_init(BitValues_ptr self, BoolEnc_ptr enc,
+                                  node_ptr var);
 
 static void bit_values_array_deinit(BitValues_ptr self);
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-BitValues_ptr BitValues_create(BoolEnc_ptr enc, node_ptr var)
-{
+BitValues_ptr BitValues_create(BoolEnc_ptr enc, node_ptr var) {
   BitValues_ptr self = ALLOC(BitValues, 1);
   BIT_VALUES_CHECK_INSTANCE(self);
 
@@ -103,64 +96,55 @@ BitValues_ptr BitValues_create(BoolEnc_ptr enc, node_ptr var)
   return self;
 }
 
-void BitValues_destroy(BitValues_ptr self)
-{
+void BitValues_destroy(BitValues_ptr self) {
   BIT_VALUES_CHECK_INSTANCE(self);
 
   bit_values_array_deinit(self);
   FREE(self);
 }
 
-size_t BitValues_get_size(const BitValues_ptr self)
-{
+size_t BitValues_get_size(const BitValues_ptr self) {
   BIT_VALUES_CHECK_INSTANCE(self);
   return NodeList_get_length(self->bits);
 }
 
-node_ptr BitValues_get_scalar_var(const BitValues_ptr self)
-{
+node_ptr BitValues_get_scalar_var(const BitValues_ptr self) {
   BIT_VALUES_CHECK_INSTANCE(self);
   return self->scalar_var;
 }
 
-NodeList_ptr BitValues_get_bits(const BitValues_ptr self)
-{
+NodeList_ptr BitValues_get_bits(const BitValues_ptr self) {
   BIT_VALUES_CHECK_INSTANCE(self);
   return self->bits;
 }
 
-void BitValues_reset(BitValues_ptr self)
-{
+void BitValues_reset(BitValues_ptr self) {
   unsigned int i;
   size_t size = BitValues_get_size(self);
   BIT_VALUES_CHECK_INSTANCE(self);
-  for (i=0; i<size; ++i) self->values[i] = BIT_VALUE_DONTCARE;
+  for (i = 0; i < size; ++i)
+    self->values[i] = BIT_VALUE_DONTCARE;
 }
 
-void BitValues_set(BitValues_ptr self, size_t index, BitValue val)
-{
+void BitValues_set(BitValues_ptr self, size_t index, BitValue val) {
   BIT_VALUES_CHECK_INSTANCE(self);
   nusmv_assert(index < BitValues_get_size(self));
   self->values[index] = val;
 }
 
-void BitValues_set_from_expr(BitValues_ptr self, size_t index, node_ptr expr)
-{
+void BitValues_set_from_expr(BitValues_ptr self, size_t index, node_ptr expr) {
   BIT_VALUES_CHECK_INSTANCE(self);
   BitValues_set(self, index, BitValues_get_value_from_expr(self, expr));
 }
 
-BitValue BitValues_get(const BitValues_ptr self, size_t index)
-{
+BitValue BitValues_get(const BitValues_ptr self, size_t index) {
   BIT_VALUES_CHECK_INSTANCE(self);
   nusmv_assert(index < BitValues_get_size(self));
   return self->values[index];
 }
 
-void BitValues_set_from_values_list(BitValues_ptr self,
-                                    const BoolEnc_ptr enc,
-                                    node_ptr vals)
-{
+void BitValues_set_from_values_list(BitValues_ptr self, const BoolEnc_ptr enc,
+                                    node_ptr vals) {
   SymbTable_ptr st;
   node_ptr iter;
 
@@ -172,7 +156,7 @@ void BitValues_set_from_values_list(BitValues_ptr self,
   st = BaseEnc_get_symb_table(BASE_ENC(enc));
   BitValues_reset(self); /* to set don't care for all unspecified bits */
 
-  for (iter=vals; iter != Nil; iter=cdr(iter)) {
+  for (iter = vals; iter != Nil; iter = cdr(iter)) {
     node_ptr assgn;
     node_ptr bit, val;
     nusmv_assert(node_get_type(iter) == CONS);
@@ -180,12 +164,13 @@ void BitValues_set_from_values_list(BitValues_ptr self,
     nusmv_assert(node_get_type(assgn) == IFF || node_get_type(assgn) == EQUAL);
 
     if (BoolEnc_is_var_bit(enc, car(assgn))) {
-      bit = car(assgn); val = cdr(assgn);
-    }
-    else if (BoolEnc_is_var_bit(enc, cdr(assgn))) {
-      bit = cdr(assgn); val = car(assgn);
-    }
-    else error_unreachable_code(); /* there is no assignment */
+      bit = car(assgn);
+      val = cdr(assgn);
+    } else if (BoolEnc_is_var_bit(enc, cdr(assgn))) {
+      bit = cdr(assgn);
+      val = car(assgn);
+    } else
+      error_unreachable_code(); /* there is no assignment */
 
     /* simplifies value */
     val = ExprMgr_simplify(exprs, st, val);
@@ -195,21 +180,21 @@ void BitValues_set_from_values_list(BitValues_ptr self,
   }
 }
 
-BitValue BitValues_get_value_from_expr(const BitValues_ptr self, node_ptr expr)
-{
+BitValue BitValues_get_value_from_expr(const BitValues_ptr self,
+                                       node_ptr expr) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->enc));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-  if (ExprMgr_is_true(exprs, expr)) return BIT_VALUE_TRUE;
-  if (ExprMgr_is_false(exprs, expr)) return BIT_VALUE_FALSE;
+  if (ExprMgr_is_true(exprs, expr))
+    return BIT_VALUE_TRUE;
+  if (ExprMgr_is_false(exprs, expr))
+    return BIT_VALUE_FALSE;
   error_unreachable_code(); /* no other possible values! */
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -222,14 +207,13 @@ BitValue BitValues_get_value_from_expr(const BitValues_ptr self, node_ptr expr)
 
   \sa BitValues_create
 */
-static void bit_values_array_init(BitValues_ptr self,
-                                  BoolEnc_ptr enc, node_ptr var)
-{ /* members initialization */
+static void bit_values_array_init(BitValues_ptr self, BoolEnc_ptr enc,
+                                  node_ptr var) { /* members initialization */
   self->enc = enc;
   self->bits = BoolEnc_get_var_bits(enc, var);
   self->scalar_var = var;
   self->values = ALLOC(BitValue, BitValues_get_size(self));
-  nusmv_assert(self->values != (BitValue*) NULL);
+  nusmv_assert(self->values != (BitValue *)NULL);
 
   BitValues_reset(self);
 }
@@ -241,15 +225,11 @@ static void bit_values_array_init(BitValues_ptr self,
 
   \sa BitValues_destroy
 */
-static void bit_values_array_deinit(BitValues_ptr self)
-{
+static void bit_values_array_deinit(BitValues_ptr self) {
   /* members deinitialization */
   FREE(self->values);
-  self->values = (BitValue*) NULL;
+  self->values = (BitValue *)NULL;
   NodeList_destroy(self->bits);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

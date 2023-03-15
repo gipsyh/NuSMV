@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_DAG_DAG_INT_H__
 #define __NUSMV_CORE_DAG_DAG_INT_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/dag/dag.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -54,20 +52,18 @@
 
   \todo Missing description
 */
-#define DAGMAX_WORDS  ((int) 10)
+#define DAGMAX_WORDS ((int)10)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DAGWORD_SIZE  ((int) (NUSMV_SIZEOF_VOID_P * 4))
-
+#define DAGWORD_SIZE ((int)(NUSMV_SIZEOF_VOID_P * 4))
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -86,25 +82,23 @@
 */
 
 struct DagManager {
-  st_table     * vTable;
-  int            hashFn[DAGMAX_WORDS];
-  lsList         gcList;
-  int            dfsCode;
+  st_table *vTable;
+  int hashFn[DAGMAX_WORDS];
+  lsList gcList;
+  int dfsCode;
 
-  int            stats[DAG_MAX_STAT];
+  int stats[DAG_MAX_STAT];
 
-  Dag_DfsFunctions_t* dag_DfsClean;
+  Dag_DfsFunctions_t *dag_DfsClean;
 };
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -121,14 +115,14 @@ struct DagManager {
                     marks
                <li> removes sons from the free list if their mark
                     is increased to one for the first time;
-               <li> clears the vertex mark and stores the vertex in the 
+               <li> clears the vertex mark and stores the vertex in the
                     free list;
                <li> clears other internal fields.
                </ul>
 
   \se none
 */
-void DagVertexInit(Dag_Manager_t * dagManager, Dag_Vertex_t * v);
+void DagVertexInit(Dag_Manager_t *dagManager, Dag_Vertex_t *v);
 
 /*!
   \brief Compare two vertices.
@@ -140,13 +134,13 @@ void DagVertexInit(Dag_Manager_t * dagManager, Dag_Vertex_t * v);
 
   \se None
 */
-int DagVertexComp(const char * v1, const char * v2);
+int DagVertexComp(const char *v1, const char *v2);
 
 /*!
   \brief Calculate the hash key of a vertex.
 
   Calculate a preliminary index as follows:
-                  v -> symbol                            + 
+                  v -> symbol                            +
                   8 low order bits of (int) (v -> data)  +
                  16 low order bits of each son up to MAXSON +
                   1 for each son whose edge is annotated
@@ -154,7 +148,7 @@ int DagVertexComp(const char * v1, const char * v2);
 
   \se None
 */
-int DagVertexHash(char * v, int modulus);
+int DagVertexHash(char *v, int modulus);
 
 /**AutomaticEnd***************************************************************/
 

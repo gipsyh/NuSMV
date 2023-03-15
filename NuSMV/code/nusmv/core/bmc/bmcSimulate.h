@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,46 +34,40 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_SIMULATE_H__
 #define __NUSMV_CORE_BMC_BMC_SIMULATE_H__
 
 #include "cudd/util.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/bmc/bmcConv.h"
 #include "nusmv/core/bmc/bmcInt.h"
 #include "nusmv/core/bmc/bmcUtils.h"
-#include "nusmv/core/bmc/bmcConv.h"
-#include "nusmv/core/trace/pkg_trace.h"
-#include "nusmv/core/trace/Trace.h"
-#include "nusmv/core/simulate/simulate.h"
 #include "nusmv/core/compile/compile.h"
 #include "nusmv/core/sat/sat.h"
+#include "nusmv/core/simulate/simulate.h"
+#include "nusmv/core/trace/Trace.h"
+#include "nusmv/core/trace/pkg_trace.h"
 #include "nusmv/core/utils/Olist.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -90,16 +84,10 @@
 
   \se None
 */
-int
-Bmc_Simulate(NuSMVEnv_ptr env,
-             const BeFsm_ptr be_fsm,
-             BddEnc_ptr bdd_enc,
-             be_ptr constraints,
-             boolean time_shift,
-             const int k,
-             const boolean print_trace,
-             const boolean changes_only,
-             Simulation_Mode mode);
+int Bmc_Simulate(NuSMVEnv_ptr env, const BeFsm_ptr be_fsm, BddEnc_ptr bdd_enc,
+                 be_ptr constraints, boolean time_shift, const int k,
+                 const boolean print_trace, const boolean changes_only,
+                 Simulation_Mode mode);
 
 /*!
   \brief SAT Based Incremental simulation
@@ -129,18 +117,12 @@ Bmc_Simulate(NuSMVEnv_ptr env,
 
   \sa optional
 */
-int
-Bmc_StepWiseSimulation(NuSMVEnv_ptr env,
-                       BeFsm_ptr be_fsm,
-                       BddEnc_ptr bdd_enc,
-                       TraceMgr_ptr trace_manager,
-                       int target_steps,
-                       be_ptr constraints,
-                       boolean time_shift,
-                       boolean printtrace,
-                       boolean changes_only,
-                       Simulation_Mode mode,
-                       boolean display_all);
+int Bmc_StepWiseSimulation(NuSMVEnv_ptr env, BeFsm_ptr be_fsm,
+                           BddEnc_ptr bdd_enc, TraceMgr_ptr trace_manager,
+                           int target_steps, be_ptr constraints,
+                           boolean time_shift, boolean printtrace,
+                           boolean changes_only, Simulation_Mode mode,
+                           boolean display_all);
 
 /*!
   \brief Checks the truth value of a list of constraints on the
@@ -160,12 +142,11 @@ Bmc_StepWiseSimulation(NuSMVEnv_ptr env,
 
   \se None
 */
-Olist_ptr
-Bmc_simulate_check_feasible_constraints(NuSMVEnv_ptr env,
-                                        BeFsm_ptr be_fsm,
-                                        BddEnc_ptr bdd_enc,
-                                        Olist_ptr constraints,
-                                        be_ptr from_state);
+Olist_ptr Bmc_simulate_check_feasible_constraints(NuSMVEnv_ptr env,
+                                                  BeFsm_ptr be_fsm,
+                                                  BddEnc_ptr bdd_enc,
+                                                  Olist_ptr constraints,
+                                                  be_ptr from_state);
 
 /*!
   \brief Picks a state from the initial state, creates a trace
@@ -177,25 +158,19 @@ Bmc_simulate_check_feasible_constraints(NuSMVEnv_ptr env,
 
   \se A new trace possibly created into the trace manager
 */
-int
-Bmc_pick_state_from_constr(NuSMVEnv_ptr env,
-                           BeFsm_ptr fsm, BddEnc_ptr bdd_enc,
-                           be_ptr constr, Simulation_Mode mode,
-                           boolean display_all);
+int Bmc_pick_state_from_constr(NuSMVEnv_ptr env, BeFsm_ptr fsm,
+                               BddEnc_ptr bdd_enc, be_ptr constr,
+                               Simulation_Mode mode, boolean display_all);
 
 /*!
   \brief Picks a state from the set of initial states
 
   Picks a state from the set of initial states
 */
-int
-Bmc_Simulate_bmc_pick_state(const NuSMVEnv_ptr env,
-                            TraceLabel label,
-                            be_ptr be_constr,
-                            int tr_number,
-                            const Simulation_Mode mode,
-                            const int display_all,
-                            const boolean verbose);
+int Bmc_Simulate_bmc_pick_state(const NuSMVEnv_ptr env, TraceLabel label,
+                                be_ptr be_constr, int tr_number,
+                                const Simulation_Mode mode,
+                                const int display_all, const boolean verbose);
 
 /*!
   \brief Checks feasibility of a list of constraints for the
@@ -204,12 +179,10 @@ Bmc_Simulate_bmc_pick_state(const NuSMVEnv_ptr env,
   Checks feasibility of a list of constraints for the
   simulation
 */
-int
-Bmc_Simulate_bmc_simulate_check_feasible_constraints(const NuSMVEnv_ptr env,
-                                                     const Olist_ptr str_constraints,
-                                                     const Olist_ptr be_constraints,
-                                                     const Olist_ptr expr_constraints,
-                                                     const boolean human_readable);
+int Bmc_Simulate_bmc_simulate_check_feasible_constraints(
+    const NuSMVEnv_ptr env, const Olist_ptr str_constraints,
+    const Olist_ptr be_constraints, const Olist_ptr expr_constraints,
+    const boolean human_readable);
 
 /**AutomaticEnd***************************************************************/
 

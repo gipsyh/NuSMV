@@ -1,28 +1,28 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``hrc'' package of NuSMV version 2. 
-  Copyright (C) 2009 by FBK-irst. 
+  This file is part of the ``hrc'' package of NuSMV version 2.
+  Copyright (C) 2009 by FBK-irst.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,21 +34,19 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_HRC_HRC_H__
 #define __NUSMV_CORE_HRC_HRC_H__
 
 #include "nusmv/core/hrc/HrcNode.h"
 #include "nusmv/core/hrc/dumpers/HrcDumper.h"
 
+#include "nusmv/core/cinit/NuSMVEnv.h"
 #include "nusmv/core/set/set.h"
 #include "nusmv/core/utils/utils.h"
-#include "nusmv/core/cinit/NuSMVEnv.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -56,7 +54,7 @@
 /*!
   \brief The possible type of printing of an hrc
 
-  
+
 */
 
 typedef enum HrcDumpFormat_TAG {
@@ -66,24 +64,21 @@ typedef enum HrcDumpFormat_TAG {
   HRC_DUMP_FORMAT_XML
 } HrcDumpFormat;
 
-HrcDumpFormat Hrc_dump_format_str_to_enum(char* format);
-char* Hrc_dump_format_enum_to_str(HrcDumpFormat format);
-char* Hrc_dump_format_get_available(void);
+HrcDumpFormat Hrc_dump_format_str_to_enum(char *format);
+char *Hrc_dump_format_enum_to_str(HrcDumpFormat format);
+char *Hrc_dump_format_get_available(void);
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -126,9 +121,7 @@ void Hrc_quit(NuSMVEnv_ptr env);
   names when the original model and the model generated from hrc are
   merged.
 */
-int Hrc_WriteModel(HrcNode_ptr self,
-                          FILE * ofile,
-                          boolean append_suffix);
+int Hrc_WriteModel(HrcNode_ptr self, FILE *ofile, boolean append_suffix);
 
 /*!
   \brief Prints the SMV module for the hrcNode.
@@ -152,12 +145,8 @@ void Hrc_DumpModel(HrcNode_ptr hrcNode, HrcDumper_ptr dumper);
   dump the hrc model.
   ownership of ofileid is taken (by the dumpers)
 */
-int
-Hrc_dump_model(const NuSMVEnv_ptr env,
-               HrcDumpFormat format,
-               FILE* ofileid,
-               const boolean append_suffix,
-               const boolean use_indent);
+int Hrc_dump_model(const NuSMVEnv_ptr env, HrcDumpFormat format, FILE *ofileid,
+                   const boolean append_suffix, const boolean use_indent);
 
 /**AutomaticEnd***************************************************************/
 

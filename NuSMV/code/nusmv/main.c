@@ -34,31 +34,29 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/cinit/cinit.h"
-#include "nusmv/core/opt/opt.h"
-#include "nusmv/shell/cinit/cinit.h"
-#include "nusmv/core/cinit/cinitInt.h"
 #include "nusmv/addons_core/addonsCore.h"
 #include "nusmv/addons_core/compass/compassCmd.h"
+#include "nusmv/core/cinit/cinit.h"
+#include "nusmv/core/cinit/cinitInt.h"
+#include "nusmv/core/opt/opt.h"
+#include "nusmv/shell/cinit/cinit.h"
 
 /*---------------------------------------------------------------------------*/
 /* Macro definitions                                                         */
 /*---------------------------------------------------------------------------*/
-#ifndef  NUSMV_PACKAGE_BUGREPORT
+#ifndef NUSMV_PACKAGE_BUGREPORT
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  NUSMV_PACKAGE_BUGREPORT "nusmv-users@list.fbk.eu"
+#define NUSMV_PACKAGE_BUGREPORT "nusmv-users@list.fbk.eu"
 #endif
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -75,7 +73,6 @@ static void main_init_custom_cmd_options(void);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
@@ -90,8 +87,7 @@ static void main_init_custom_cmd_options(void);
   \sa optional
 */
 
-int main(int  argc, char ** argv)
-{
+int main(int argc, char **argv) {
   int status;
   boolean requires_shutdown = true;
   NuSMVEnv_ptr env;
@@ -115,7 +111,7 @@ int main(int  argc, char ** argv)
   env = NuSMVEnv_create();
 
   /* Initializes all packages, having the list of init/quit mfunctions */
-  NuSMVCore_init(env, iq_fns, sizeof(iq_fns)/sizeof(iq_fns[0]));
+  NuSMVCore_init(env, iq_fns, sizeof(iq_fns) / sizeof(iq_fns[0]));
 
   /* Adds the command line options of NuSMV */
   NuSMVCore_init_cmd_options(env);
@@ -135,11 +131,9 @@ int main(int  argc, char ** argv)
   return status;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -150,8 +144,7 @@ int main(int  argc, char ** argv)
 
   \todo Missing description
 */
-static void main_init_custom_data(void)
-{
+static void main_init_custom_data(void) {
   /* Empty stub */
 
   /* Example: */
@@ -163,8 +156,7 @@ static void main_init_custom_data(void)
 
   \todo Missing description
 */
-static void main_init_custom_cmd_options(void)
-{
+static void main_init_custom_cmd_options(void) {
   /* Empty stub */
 
   /* Example: */

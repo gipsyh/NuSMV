@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,23 +34,20 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_H__
 #define __NUSMV_CORE_BMC_BMC_H__
-
 
 /* all BMC modules: */
 #include "nusmv/core/bmc/bmcBmc.h"
 #include "nusmv/core/bmc/bmcPkg.h"
 
-#include "nusmv/core/bmc/bmcGen.h"
-#include "nusmv/core/bmc/bmcDump.h"
-#include "nusmv/core/bmc/bmcTableau.h"
-#include "nusmv/core/bmc/bmcModel.h"
-#include "nusmv/core/bmc/bmcConv.h"
 #include "nusmv/core/bmc/bmcCheck.h"
+#include "nusmv/core/bmc/bmcConv.h"
+#include "nusmv/core/bmc/bmcDump.h"
+#include "nusmv/core/bmc/bmcGen.h"
+#include "nusmv/core/bmc/bmcModel.h"
+#include "nusmv/core/bmc/bmcTableau.h"
 #include "nusmv/core/bmc/bmcUtils.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -70,7 +67,7 @@
 
   \todo Missing description
 */
-#define BMC_MODE          "bmc_mode"
+#define BMC_MODE "bmc_mode"
 
 /*!
   \brief \todo Missing synopsis
@@ -91,21 +88,21 @@
 
   \todo Missing description
 */
-#define BMC_PB_LENGTH      "bmc_length"
+#define BMC_PB_LENGTH "bmc_length"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BMC_PB_LOOP        "bmc_loopback"
+#define BMC_PB_LOOP "bmc_loopback"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BMC_INVAR_ALG        "bmc_invar_alg"
+#define BMC_INVAR_ALG "bmc_invar_alg"
 
 #if NUSMV_HAVE_INCREMENTAL_SAT
 
@@ -114,7 +111,7 @@
 
   \todo Missing description
 */
-#define BMC_INC_INVAR_ALG        "bmc_inc_invar_alg"
+#define BMC_INC_INVAR_ALG "bmc_inc_invar_alg"
 #endif
 
 /*!
@@ -163,9 +160,9 @@
   \brief The names for INVAR solving algorithms (incremental and
   non-incremental).
 
-  
+
 */
-#define BMC_INVAR_ALG_CLASSIC       "classic"
+#define BMC_INVAR_ALG_CLASSIC "classic"
 
 /*!
   \brief \todo Missing synopsis
@@ -186,14 +183,14 @@
 
   \todo Missing description
 */
-#define BMC_INC_INVAR_ALG_DUAL      "dual"
+#define BMC_INC_INVAR_ALG_DUAL "dual"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BMC_INC_INVAR_ALG_ZIGZAG    "zigzag"
+#define BMC_INC_INVAR_ALG_ZIGZAG "zigzag"
 
 /*!
   \brief \todo Missing synopsis
@@ -260,7 +257,6 @@ typedef enum {
   ALG_INTERPOLANTS,
 } bmc_invar_algorithm;
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
@@ -273,14 +269,11 @@ typedef enum {
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
-
 
 /* BMC Options */
 
@@ -289,14 +282,14 @@ typedef enum {
 
   \todo Missing description
 */
-void    set_bmc_mode(OptsHandler_ptr);
+void set_bmc_mode(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_bmc_mode(OptsHandler_ptr);
+void unset_bmc_mode(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -310,7 +303,7 @@ boolean opt_bmc_mode(OptsHandler_ptr);
 
   \todo Missing description
 */
-char* get_bmc_dimacs_filename(OptsHandler_ptr);
+char *get_bmc_dimacs_filename(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -324,7 +317,7 @@ void set_bmc_dimacs_filename(OptsHandler_ptr, char *);
 
   \todo Missing description
 */
-char* get_bmc_invar_dimacs_filename(OptsHandler_ptr);
+char *get_bmc_invar_dimacs_filename(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -352,28 +345,28 @@ int get_bmc_pb_length(OptsHandler_ptr);
 
   \todo Missing description
 */
-void set_bmc_pb_loop(OptsHandler_ptr opt, const char* loop);
+void set_bmc_pb_loop(OptsHandler_ptr opt, const char *loop);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-const char* get_bmc_pb_loop(OptsHandler_ptr);
+const char *get_bmc_pb_loop(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void set_bmc_invar_alg(OptsHandler_ptr opt, const char* loop);
+void set_bmc_invar_alg(OptsHandler_ptr opt, const char *loop);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-const char* get_bmc_invar_alg(OptsHandler_ptr);
+const char *get_bmc_invar_alg(OptsHandler_ptr);
 #if NUSMV_HAVE_INCREMENTAL_SAT
 
 /*!
@@ -381,14 +374,14 @@ const char* get_bmc_invar_alg(OptsHandler_ptr);
 
   \todo Missing description
 */
-void set_bmc_inc_invar_alg(OptsHandler_ptr opt, const char* loop);
+void set_bmc_inc_invar_alg(OptsHandler_ptr opt, const char *loop);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-const char* get_bmc_inc_invar_alg(OptsHandler_ptr);
+const char *get_bmc_inc_invar_alg(OptsHandler_ptr);
 #endif
 
 /*!
@@ -417,14 +410,14 @@ boolean opt_bmc_optimized_tableau(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_bmc_force_pltl_tableau(OptsHandler_ptr);
+void set_bmc_force_pltl_tableau(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_bmc_force_pltl_tableau(OptsHandler_ptr);
+void unset_bmc_force_pltl_tableau(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -432,7 +425,6 @@ void    unset_bmc_force_pltl_tableau(OptsHandler_ptr);
   \todo Missing description
 */
 boolean opt_bmc_force_pltl_tableau(OptsHandler_ptr);
-
 
 /* SBMC Options */
 
@@ -498,7 +490,6 @@ void unset_bmc_sbmc_cache(OptsHandler_ptr opt);
   \todo Missing description
 */
 boolean opt_bmc_sbmc_cache(OptsHandler_ptr opt);
-
 
 /**AutomaticEnd***************************************************************/
 

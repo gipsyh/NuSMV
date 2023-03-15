@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,12 +34,10 @@
 
 */
 
-
-
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/node/MasterNodeWalker.h"
 #include "nusmv/core/node/MasterNodeWalker_private.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
 
 #include "nusmv/core/node/NodeWalker_private.h"
 #include "nusmv/core/node/nodeInt.h"
@@ -58,7 +56,6 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -67,21 +64,18 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void master_node_walker_finalize(Object_ptr object, void* dummy);
-
+static void master_node_walker_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-MasterNodeWalker_ptr MasterNodeWalker_create(const NuSMVEnv_ptr env)
-{
+MasterNodeWalker_ptr MasterNodeWalker_create(const NuSMVEnv_ptr env) {
   MasterNodeWalker_ptr self = ALLOC(MasterNodeWalker, 1);
   MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
@@ -89,50 +83,48 @@ MasterNodeWalker_ptr MasterNodeWalker_create(const NuSMVEnv_ptr env)
   return self;
 }
 
-void MasterNodeWalker_destroy(MasterNodeWalker_ptr self)
-{
+void MasterNodeWalker_destroy(MasterNodeWalker_ptr self) {
   MASTER_NODE_WALKER_CHECK_INSTANCE(self);
   Object_destroy(OBJECT(self), NULL);
 }
 
 boolean MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
-                                         NodeWalker_ptr walker)
-{
+                                         NodeWalker_ptr walker) {
   ListIter_ptr iter;
 
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
   if (opt_verbose_level_gt(opts, 3)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "MasterNodeWalker: registering walker '%s'...",
-      NodeWalker_get_name(walker));
+               NodeWalker_get_name(walker));
   }
 
   iter = NodeList_get_first_iter(self->walkers);
   while (!ListIter_is_end(iter)) {
-    NodeWalker_ptr pr =
-      NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
+    NodeWalker_ptr pr = NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
 
-    if (pr == walker) return false; /* already registered */
+    if (pr == walker)
+      return false; /* already registered */
 
     if (NodeWalker_collides(walker, pr)) {
-      ErrorMgr_rpterr(errmgr, "The walker '%s' partition collides with the " \
-       "registered walker '%s'\n",
-       NodeWalker_get_name(walker),
-       NodeWalker_get_name(pr));
+      ErrorMgr_rpterr(errmgr,
+                      "The walker '%s' partition collides with the "
+                      "registered walker '%s'\n",
+                      NodeWalker_get_name(walker), NodeWalker_get_name(pr));
     }
 
     iter = ListIter_get_next(iter);
   }
 
   /* ok, not found and valid partition: appends and sets it up */
-  NodeList_append(self->walkers, (node_ptr) walker);
+  NodeList_append(self->walkers, (node_ptr)walker);
   node_walker_set_master(walker, self);
 
   if (opt_verbose_level_gt(opts, 3)) {
@@ -143,16 +135,14 @@ boolean MasterNodeWalker_register_walker(MasterNodeWalker_ptr self,
 }
 
 NodeWalker_ptr MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
-                                                  const char* name)
-{
+                                                  const char *name) {
   ListIter_ptr iter;
 
   MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
   iter = NodeList_get_first_iter(self->walkers);
   while (!ListIter_is_end(iter)) {
-    NodeWalker_ptr pr = NODE_WALKER(
-          NodeList_get_elem_at(self->walkers, iter));
+    NodeWalker_ptr pr = NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
 
     if (strcmp(NodeWalker_get_name(pr), name) == 0) {
       NodeList_remove_elem_at(self->walkers, iter); /* unregistration */
@@ -165,32 +155,30 @@ NodeWalker_ptr MasterNodeWalker_unregister_walker(MasterNodeWalker_ptr self,
   return NODE_WALKER(NULL); /* not found */
 }
 
-NodeWalker_ptr
-MasterNodeWalker_get_walker(MasterNodeWalker_ptr self, const char* name)
-{
+NodeWalker_ptr MasterNodeWalker_get_walker(MasterNodeWalker_ptr self,
+                                           const char *name) {
   ListIter_ptr iter;
 
   MASTER_NODE_WALKER_CHECK_INSTANCE(self);
 
   iter = NodeList_get_first_iter(self->walkers);
   while (!ListIter_is_end(iter)) {
-    NodeWalker_ptr pr = NODE_WALKER(
-          NodeList_get_elem_at(self->walkers, iter));
+    NodeWalker_ptr pr = NODE_WALKER(NodeList_get_elem_at(self->walkers, iter));
 
-    if (strcmp(NodeWalker_get_name(pr), name) == 0) return pr;
+    if (strcmp(NodeWalker_get_name(pr), name) == 0)
+      return pr;
     iter = ListIter_get_next(iter);
   }
 
   return NODE_WALKER(NULL); /* not found */
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void master_node_walker_init(MasterNodeWalker_ptr self, const NuSMVEnv_ptr env)
-{
+void master_node_walker_init(MasterNodeWalker_ptr self,
+                             const NuSMVEnv_ptr env) {
   /* base class initialization */
   env_object_init(ENV_OBJECT(self), env);
 
@@ -201,8 +189,7 @@ void master_node_walker_init(MasterNodeWalker_ptr self, const NuSMVEnv_ptr env)
   OVERRIDE(Object, finalize) = master_node_walker_finalize;
 }
 
-void master_node_walker_deinit(MasterNodeWalker_ptr self)
-{
+void master_node_walker_deinit(MasterNodeWalker_ptr self) {
   /* members deinitialization */
   ListIter_ptr iter = NodeList_get_first_iter(self->walkers);
   while (!ListIter_is_end(iter)) {
@@ -223,7 +210,6 @@ void master_node_walker_deinit(MasterNodeWalker_ptr self)
   env_object_deinit(ENV_OBJECT(self));
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -233,14 +219,11 @@ void master_node_walker_deinit(MasterNodeWalker_ptr self)
 
   Called by the class destructor
 */
-static void master_node_walker_finalize(Object_ptr object, void* dummy)
-{
+static void master_node_walker_finalize(Object_ptr object, void *dummy) {
   MasterNodeWalker_ptr self = MASTER_NODE_WALKER(object);
 
   master_node_walker_deinit(self);
   FREE(self);
 }
 
-
 /**AutomaticEnd***************************************************************/
-

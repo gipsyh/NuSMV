@@ -1,28 +1,28 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``bmc.sbmc'' package of NuSMV version 2. 
+  This file is part of the ``bmc.sbmc'' package of NuSMV version 2.
   Copyright (C) 2006 by Tommi Junttila.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,35 +34,30 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_TABLEAU_INC_H__
 #define __NUSMV_CORE_BMC_SBMC_SBMC_TABLEAU_INC_H__
 
-#include "nusmv/core/enc/enc.h"
-#include "nusmv/core/enc/be/BeEnc.h"
-#include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/bmc/sbmc/sbmcStructs.h"
+#include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/enc/enc.h"
+#include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -82,7 +77,6 @@
 */
 #define sbmc_SNYI_text "%s:%d: Something not yet implemented\n"
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -96,10 +90,8 @@
 
   \se None
 */
-be_ptr sbmc_equal_vectors_formula(const BeEnc_ptr be_enc,
-                                         lsList vars,
-                                         const unsigned int i,
-                                         const unsigned int j);
+be_ptr sbmc_equal_vectors_formula(const BeEnc_ptr be_enc, lsList vars,
+                                  const unsigned int i, const unsigned int j);
 
 /*!
   \brief Associates each subformula node of ltlspec with
@@ -112,14 +104,12 @@ be_ptr sbmc_equal_vectors_formula(const BeEnc_ptr be_enc,
 
   \se None
 */
-hash_ptr sbmc_init_LTL_info(const NuSMVEnv_ptr env,
-                                   SymbLayer_ptr layer,
-                                   node_ptr ltlspec,
-                                   lsList state_vars_formula_pd0,
-                                   lsList state_vars_formula_pdx,
-                                   lsList state_vars_formula_aux,
-                                   const int opt_force_state_vars,
-                                   const int opt_do_virtual_unrolling);
+hash_ptr sbmc_init_LTL_info(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
+                            node_ptr ltlspec, lsList state_vars_formula_pd0,
+                            lsList state_vars_formula_pdx,
+                            lsList state_vars_formula_aux,
+                            const int opt_force_state_vars,
+                            const int opt_do_virtual_unrolling);
 
 /*!
   \brief Initialize trans_bes[i][d] for each sub-formula.
@@ -128,16 +118,14 @@ hash_ptr sbmc_init_LTL_info(const NuSMVEnv_ptr env,
   <ul>
     <li> the formula [[f]]_i^d for definitionally translated subformulae</li>
     <li> the [[f]]_i^d be variable for variable translated subformulae</li>
-  </ul> 
+  </ul>
 
   \se None
 */
-void sbmc_init_state_vector(const BeEnc_ptr be_enc,
-                                   const node_ptr ltlspec,
-                                   const hash_ptr info_map,
-                                   const unsigned int i_real,
-                                   const node_ptr LastState_var,
-                                   const be_ptr be_LoopExists);
+void sbmc_init_state_vector(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                            const hash_ptr info_map, const unsigned int i_real,
+                            const node_ptr LastState_var,
+                            const be_ptr be_LoopExists);
 
 /*!
   \brief Build InLoop_i
@@ -149,9 +137,8 @@ void sbmc_init_state_vector(const BeEnc_ptr be_enc,
   \se None
 */
 be_ptr sbmc_build_InLoop_i(const BeEnc_ptr be_enc,
-                                      const state_vars_struct * state_vars,
-                                      array_t *InLoop_array,
-                                      const unsigned int i_model);
+                           const state_vars_struct *state_vars,
+                           array_t *InLoop_array, const unsigned int i_model);
 
 /*!
   \brief Build SimplePath_{i,k} for each 0<=i<k
@@ -161,9 +148,8 @@ be_ptr sbmc_build_InLoop_i(const BeEnc_ptr be_enc,
   \se None
 */
 lsList sbmc_SimplePaths(const BeEnc_ptr be_enc,
-                                   const state_vars_struct *state_vars,
-                      array_t *InLoop_array,
-                                   const unsigned int k);
+                        const state_vars_struct *state_vars,
+                        array_t *InLoop_array, const unsigned int k);
 
 /**AutomaticEnd***************************************************************/
 

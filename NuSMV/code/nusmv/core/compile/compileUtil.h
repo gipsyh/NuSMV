@@ -15,40 +15,34 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_COMPILE_UTIL_H__
 #define __NUSMV_CORE_COMPILE_COMPILE_UTIL_H__
 
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/utils/NodeList.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/NodeList.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -81,9 +75,8 @@
    to achieve a similar result
 */
 node_ptr Compile_Util_symbol_from_expr(NuSMVEnv_ptr const env,
-                                              node_ptr const var,
-                                              const char* prefix,
-                                              const char* suffix);
+                                       node_ptr const var, const char *prefix,
+                                       const char *suffix);
 
 /*!
   \brief Builds an internal representation for a given string.
@@ -112,7 +105,7 @@ node_ptr Compile_Util_symbol_from_expr(NuSMVEnv_ptr const env,
 
   \sa find_atom
 */
-node_ptr sym_intern(const NuSMVEnv_ptr env, const char*);
+node_ptr sym_intern(const NuSMVEnv_ptr env, const char *);
 
 /*!
   \bref Like sym_intern, but taking a string_ptr instead of C string
@@ -130,9 +123,8 @@ node_ptr sym_intern_from_ustring(const NuSMVEnv_ptr env,
    ATOM, and work well with both find-noded and new-noded nodes,
    even independently on the NodeMgr the names were built with.
 */
-boolean
-sym_names_are_equal(const NuSMVEnv_ptr env,
-                    node_ptr name1, node_ptr name2);
+boolean sym_names_are_equal(const NuSMVEnv_ptr env, node_ptr name1,
+                            node_ptr name2);
 
 /*!
   \brief Simplifies the given property by exploiting
@@ -153,9 +145,7 @@ sym_names_are_equal(const NuSMVEnv_ptr env,
    Given property can be both flattened or unflattened.
 
 */
-node_ptr Compile_pop_distrib_ops(const NuSMVEnv_ptr env,
-                                        node_ptr prop);
-
+node_ptr Compile_pop_distrib_ops(const NuSMVEnv_ptr env, node_ptr prop);
 
 /*!
   \brief Remove bounded LTL temporal operators if any.
@@ -186,10 +176,9 @@ node_ptr Compile_remove_ltl_bop(const NuSMVEnv_ptr env, node_ptr prop);
    into the resulting list. The returned set must be destroyed by the
    caller.
 */
-Set_t
-Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
-const NodeList_ptr vars, const NodeList_ptr vars_order);
-
+Set_t Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
+                                               const NodeList_ptr vars,
+                                               const NodeList_ptr vars_order);
 
 /**AutomaticEnd***************************************************************/
 

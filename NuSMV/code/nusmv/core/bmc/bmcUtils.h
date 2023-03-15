@@ -34,16 +34,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_UTILS_H__
 #define __NUSMV_CORE_BMC_BMC_UTILS_H__
 
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/trace/TraceMgr.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/ucmd.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -54,35 +52,35 @@
 
   \todo Missing description
 */
-#define UNKNOWN_OP      -1
+#define UNKNOWN_OP -1
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CONSTANT_EXPR    0
+#define CONSTANT_EXPR 0
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LITERAL          1
+#define LITERAL 1
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PROP_CONNECTIVE  2
+#define PROP_CONNECTIVE 2
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TIME_OPERATOR    3
+#define TIME_OPERATOR 3
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -105,55 +103,48 @@
 
   \todo Missing description
 */
-#define isConstantExpr(op) ((op)==TRUEEXP)  || ((op)==FALSEEXP)
+#define isConstantExpr(op) ((op) == TRUEEXP) || ((op) == FALSEEXP)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define isVariable(op)     (((op)==DOT) || ((op) == BIT))
+#define isVariable(op) (((op) == DOT) || ((op) == BIT))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define isPastOp(op)       ((op)==OP_PREC)  || ((op)==OP_NOTPRECNOT) ||    \
-                           ((op)==OP_ONCE)  || ((op)==OP_HISTORICAL) ||    \
-                           ((op)==SINCE)    || ((op)==TRIGGERED)
+#define isPastOp(op)                                                           \
+  ((op) == OP_PREC) || ((op) == OP_NOTPRECNOT) || ((op) == OP_ONCE) ||         \
+      ((op) == OP_HISTORICAL) || ((op) == SINCE) || ((op) == TRIGGERED)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define isBinaryOp(op)     ((op)==AND)      || ((op)==OR)            ||    \
-                           ((op)==IFF)      || ((op)==UNTIL)         ||    \
-                           ((op)==SINCE)    || ((op)==RELEASES)      ||    \
-                           ((op)==TRIGGERED)
+#define isBinaryOp(op)                                                         \
+  ((op) == AND) || ((op) == OR) || ((op) == IFF) || ((op) == UNTIL) ||         \
+      ((op) == SINCE) || ((op) == RELEASES) || ((op) == TRIGGERED)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define getOpClass(op) \
-  ((op)==TRUEEXP)       || ((op)==FALSEEXP)      ? CONSTANT_EXPR           \
-  :                                                                        \
-  ((op)==DOT) || ((op) == BIT) || ((op)==NOT)    ? LITERAL                 \
-  :                                                                        \
-  ((op)==AND)           || ((op)==OR)        ||                            \
-  ((op)==IFF)                                    ? PROP_CONNECTIVE         \
-  :                                                                        \
-  ((op)==OP_PREC)       || ((op)==OP_NEXT)   ||                            \
-  ((op)==OP_NOTPRECNOT) ||                                                 \
-  ((op)==OP_ONCE)       || ((op)==OP_FUTURE) ||                            \
-  ((op)==OP_HISTORICAL) || ((op)==OP_GLOBAL) ||                            \
-  ((op)==SINCE)         || ((op)==UNTIL)     ||                            \
-  ((op)==TRIGGERED)     || ((op)==RELEASES)      ? TIME_OPERATOR           \
-  :                                                                        \
-                                                   UNKNOWN_OP
+#define getOpClass(op)                                                         \
+  ((op) == TRUEEXP) || ((op) == FALSEEXP)           ? CONSTANT_EXPR            \
+  : ((op) == DOT) || ((op) == BIT) || ((op) == NOT) ? LITERAL                  \
+  : ((op) == AND) || ((op) == OR) || ((op) == IFF)  ? PROP_CONNECTIVE          \
+  : ((op) == OP_PREC) || ((op) == OP_NEXT) || ((op) == OP_NOTPRECNOT) ||       \
+          ((op) == OP_ONCE) || ((op) == OP_FUTURE) ||                          \
+          ((op) == OP_HISTORICAL) || ((op) == OP_GLOBAL) || ((op) == SINCE) || \
+          ((op) == UNTIL) || ((op) == TRIGGERED) || ((op) == RELEASES)         \
+      ? TIME_OPERATOR                                                          \
+      : UNKNOWN_OP
 
 /**AutomaticStart*************************************************************/
 
@@ -174,14 +165,9 @@
 
   \sa Bmc_Utils_generate_cntexample Bmc_Utils_fill_cntexample
 */
-Trace_ptr
-Bmc_Utils_generate_and_print_cntexample(BeEnc_ptr be_enc,
-                                        TraceMgr_ptr tm,
-                                        SatSolver_ptr solver,
-                                        be_ptr be_prob,
-                                        const int k,
-                                        const char* trace_name,
-                                        NodeList_ptr symbols);
+Trace_ptr Bmc_Utils_generate_and_print_cntexample(
+    BeEnc_ptr be_enc, TraceMgr_ptr tm, SatSolver_ptr solver, be_ptr be_prob,
+    const int k, const char *trace_name, NodeList_ptr symbols);
 
 /*!
   \brief Given a problem, and a solver containing a model for that
@@ -194,13 +180,10 @@ Bmc_Utils_generate_and_print_cntexample(BeEnc_ptr be_enc,
 
   \sa Bmc_Utils_generate_and_print_cntexample
 */
-Trace_ptr
-Bmc_Utils_generate_cntexample(BeEnc_ptr be_enc,
-                              SatSolver_ptr solver,
-                              be_ptr be_prob,
-                              const int k,
-                              const char* trace_name,
-                              NodeList_ptr symbols);
+Trace_ptr Bmc_Utils_generate_cntexample(BeEnc_ptr be_enc, SatSolver_ptr solver,
+                                        be_ptr be_prob, const int k,
+                                        const char *trace_name,
+                                        NodeList_ptr symbols);
 
 /*!
   \brief Given a solver containing a model for a
@@ -210,10 +193,8 @@ Bmc_Utils_generate_cntexample(BeEnc_ptr be_enc,
 
   \sa Bmc_fill_trace_from_cnf_model Bmc_Utils_generate_cntexample
 */
-Trace_ptr
-Bmc_Utils_fill_cntexample(BeEnc_ptr be_enc,
-                          SatSolver_ptr solver,
-                          const int k, Trace_ptr trace);
+Trace_ptr Bmc_Utils_fill_cntexample(BeEnc_ptr be_enc, SatSolver_ptr solver,
+                                    const int k, Trace_ptr trace);
 
 /*!
   \brief Returns true if l has the internally encoded "no loop"
@@ -231,7 +212,7 @@ boolean Bmc_Utils_IsNoLoopback(const int l);
   This is supplied in order to hide the internal value of
                loopback which corresponds to the "no loop" semantic.
 */
-boolean Bmc_Utils_IsNoLoopbackString(const char* str);
+boolean Bmc_Utils_IsNoLoopbackString(const char *str);
 
 /*!
   \brief Returns true if the given loop value represents a single
@@ -261,7 +242,7 @@ boolean Bmc_Utils_IsAllLoopbacks(const int l);
                loopback which corresponds to the "all loops"
                semantic.
 */
-boolean Bmc_Utils_IsAllLoopbacksString(const char* str);
+boolean Bmc_Utils_IsAllLoopbacksString(const char *str);
 
 /*!
   \brief Returns the integer value which represents the "no loop"
@@ -285,7 +266,7 @@ int Bmc_Utils_GetAllLoopbacks(void);
 
 
 */
-const char* Bmc_Utils_GetAllLoopbacksString(void);
+const char *Bmc_Utils_GetAllLoopbacksString(void);
 
 /*!
   \brief Converts a relative loop value (wich can also be an
@@ -329,7 +310,7 @@ int Bmc_Utils_GetSuccTime(const int time, const int k, const int l);
 
   \se result will change if supplied
 */
-int Bmc_Utils_ConvertLoopFromString(const char* strValue, Outcome* result);
+int Bmc_Utils_ConvertLoopFromString(const char *strValue, Outcome *result);
 
 /*!
   \brief Given an integer containing the inner representation of
@@ -344,7 +325,8 @@ int Bmc_Utils_ConvertLoopFromString(const char* strValue, Outcome* result);
 
   \sa Bmc_Utils_ConvertLoopFromString
 */
-void Bmc_Utils_ConvertLoopFromInteger(const int iLoopback, char* szLoopback, const int _bufsize);
+void Bmc_Utils_ConvertLoopFromInteger(const int iLoopback, char *szLoopback,
+                                      const int _bufsize);
 
 /*!
   \brief Search into a given string any symbol which belongs to a
@@ -360,11 +342,10 @@ void Bmc_Utils_ConvertLoopFromInteger(const int iLoopback, char* szLoopback, con
 
   \se filename_expanded string data will change
 */
-void
-Bmc_Utils_ExpandMacrosInFilename(const char* filename_to_be_expanded,
-      const SubstString* table_ptr,
-      const size_t table_len,
-      char* filename_expanded, size_t buf_len);
+void Bmc_Utils_ExpandMacrosInFilename(const char *filename_to_be_expanded,
+                                      const SubstString *table_ptr,
+                                      const size_t table_len,
+                                      char *filename_expanded, size_t buf_len);
 
 /*!
   \brief Applies inlining taking into account of current user
@@ -372,8 +353,7 @@ Bmc_Utils_ExpandMacrosInFilename(const char* filename_to_be_expanded,
 
 
 */
-be_ptr
-Bmc_Utils_apply_inlining(Be_Manager_ptr be_mgr, be_ptr f);
+be_ptr Bmc_Utils_apply_inlining(Be_Manager_ptr be_mgr, be_ptr f);
 
 /*!
   \brief Applies inlining forcing inclusion of the conjunct
@@ -382,8 +362,7 @@ Bmc_Utils_apply_inlining(Be_Manager_ptr be_mgr, be_ptr f);
 
 
 */
-be_ptr
-Bmc_Utils_apply_inlining4inc(Be_Manager_ptr be_mgr, be_ptr f);
+be_ptr Bmc_Utils_apply_inlining4inc(Be_Manager_ptr be_mgr, be_ptr f);
 
 /*!
   \brief Reads a simple expression and builds the corresponding BE
@@ -397,11 +376,10 @@ Bmc_Utils_apply_inlining4inc(Be_Manager_ptr be_mgr, be_ptr f);
 
   \sa Bmc_Utils_next_costraint_from_string
 */
-be_ptr
-Bmc_Utils_simple_costraint_from_string(BeEnc_ptr be_enc,
-                                       BddEnc_ptr bdd_enc,
-                                       const char* str,
-                                       Expr_ptr* node_expr);
+be_ptr Bmc_Utils_simple_costraint_from_string(BeEnc_ptr be_enc,
+                                              BddEnc_ptr bdd_enc,
+                                              const char *str,
+                                              Expr_ptr *node_expr);
 
 /*!
   \brief Reads a next expression and builds the corresponding BE
@@ -416,11 +394,9 @@ Bmc_Utils_simple_costraint_from_string(BeEnc_ptr be_enc,
 
   \sa Bmc_Utils_simple_costraint_from_string
 */
-be_ptr
-Bmc_Utils_next_costraint_from_string(BeEnc_ptr be_enc,
-                                     BddEnc_ptr bdd_enc,
-                                     const char* str,
-                                     Expr_ptr* node_expr);
+be_ptr Bmc_Utils_next_costraint_from_string(BeEnc_ptr be_enc,
+                                            BddEnc_ptr bdd_enc, const char *str,
+                                            Expr_ptr *node_expr);
 
 /*!
   \brief Converts Be into CNF, and adds it into a group of a
@@ -430,12 +406,10 @@ Bmc_Utils_next_costraint_from_string(BeEnc_ptr be_enc,
   Outputs into outstream the total time of conversion,
                  adding, setting polarity and destroying BE.
 */
-void
-Bmc_Utils_add_be_into_inc_solver_positively(SatIncSolver_ptr solver,
-                                            SatSolverGroup group,
-                                            be_ptr prob,
-                                            BeEnc_ptr be_enc,
-                                            Be_CnfAlgorithm cnf_alg);
+void Bmc_Utils_add_be_into_inc_solver_positively(SatIncSolver_ptr solver,
+                                                 SatSolverGroup group,
+                                                 be_ptr prob, BeEnc_ptr be_enc,
+                                                 Be_CnfAlgorithm cnf_alg);
 
 /*!
   \brief Converts Be into CNF, and adds it into a group of a
@@ -445,11 +419,10 @@ Bmc_Utils_add_be_into_inc_solver_positively(SatIncSolver_ptr solver,
   Outputs into outstream the total time of conversion,
                  adding, setting polarity and destroying BE.
 */
-void
-Bmc_Utils_add_be_into_non_inc_solver_positively(SatSolver_ptr solver,
-                                                be_ptr prob,
-                                                BeEnc_ptr be_enc,
-                                                Be_CnfAlgorithm cnf_alg);
+void Bmc_Utils_add_be_into_non_inc_solver_positively(SatSolver_ptr solver,
+                                                     be_ptr prob,
+                                                     BeEnc_ptr be_enc,
+                                                     Be_CnfAlgorithm cnf_alg);
 
 /**AutomaticEnd***************************************************************/
 

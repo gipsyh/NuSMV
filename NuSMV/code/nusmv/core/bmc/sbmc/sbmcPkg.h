@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,7 +33,6 @@
   \todo: Missing description
 
 */
-
 
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_PKG_H__
 #define __NUSMV_CORE_BMC_SBMC_SBMC_PKG_H__
@@ -60,8 +59,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -85,4 +82,3 @@ void SBmc_Quit(NuSMVEnv_ptr env);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_BMC_SBMC_SBMC_PKG_H__ */
-

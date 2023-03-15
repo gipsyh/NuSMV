@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,7 +36,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_WORD_NUMBER_PRIVATE_H__
 #define __NUSMV_CORE_UTILS_WORD_NUMBER_PRIVATE_H__
 
@@ -48,39 +47,33 @@
 #error "This file is not expected to be included when big numbers are used"
 #endif
 
+#include "nusmv/core/cinit/NuSMVEnv.h"
 #include "nusmv/core/utils/WordNumber.h"
 #include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/cinit/NuSMVEnv.h"
-
 
 /*!
   \brief WordNumber struct.
 
-  
+
 */
 
-typedef struct WordNumber_TAG
-{
+typedef struct WordNumber_TAG {
   WordNumberValue value; /* Words are unsigned */
   int width;
   string_ptr parsedString;
 } WordNumber;
 
-
 /* ---------------------------------------------------------------------- */
 /*     Private methods                                                    */
 /* ---------------------------------------------------------------------- */
 
-
 /*!
   \methodof WordNumber
-  \brief 
+  \brief
 
-  
+
 */
 
-WordNumberValue
-word_number_to_signed_c_value(const WordNumber_ptr self);
-
+WordNumberValue word_number_to_signed_c_value(const WordNumber_ptr self);
 
 #endif /* __NUSMV_CORE_UTILS_WORD_NUMBER_PRIVATE_H__ */

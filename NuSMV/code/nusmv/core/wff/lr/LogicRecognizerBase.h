@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_BASE_H__
 #define __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_BASE_H__
-
 
 #include "nusmv/core/node/NodeWalker.h"
 #include "nusmv/core/utils/defs.h"
@@ -48,9 +45,9 @@
   \struct LogicRecognizerBase
   \brief Definition of the public accessor for class LogicRecognizerBase
 
-  
+
 */
-typedef struct LogicRecognizerBase_TAG*  LogicRecognizerBase_ptr;
+typedef struct LogicRecognizerBase_TAG *LogicRecognizerBase_ptr;
 
 /*!
   \brief To cast and check instances of class LogicRecognizerBase
@@ -58,18 +55,15 @@ typedef struct LogicRecognizerBase_TAG*  LogicRecognizerBase_ptr;
   These macros must be used respectively to cast and to check
   instances of class LogicRecognizerBase
 */
-#define LOGIC_RECOGNIZER_BASE(self) \
-         ((LogicRecognizerBase_ptr) self)
+#define LOGIC_RECOGNIZER_BASE(self) ((LogicRecognizerBase_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LOGIC_RECOGNIZER_BASE_CHECK_INSTANCE(self) \
-         (nusmv_assert(LOGIC_RECOGNIZER_BASE(self) != LOGIC_RECOGNIZER_BASE(NULL)))
-
-
+#define LOGIC_RECOGNIZER_BASE_CHECK_INSTANCE(self)                             \
+  (nusmv_assert(LOGIC_RECOGNIZER_BASE(self) != LOGIC_RECOGNIZER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,11 +79,8 @@ typedef struct LogicRecognizerBase_TAG*  LogicRecognizerBase_ptr;
   the expression type to which it belongs.
 */
 LogicType LogicRecognizerBase_recognize(LogicRecognizerBase_ptr self,
-                                                     node_ptr wff,
-                                                     node_ptr context);
+                                        node_ptr wff, node_ptr context);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_BASE_H__ */

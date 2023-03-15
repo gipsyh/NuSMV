@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -44,15 +44,14 @@
 #include "nusmv/core/hrc/dumpers/HrcDumperXml.h"
 
 #include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 #include "nusmv/core/cinit/NuSMVEnv.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -63,22 +62,19 @@
 
   \todo Missing description
 */
-typedef HrcDumper_ptr (*HrcDumperFactory)(const NuSMVEnv_ptr env, FILE* fout);
+typedef HrcDumper_ptr (*HrcDumperFactory)(const NuSMVEnv_ptr env, FILE *fout);
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -88,55 +84,49 @@ typedef HrcDumper_ptr (*HrcDumperFactory)(const NuSMVEnv_ptr env, FILE* fout);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Hrc_init(NuSMVEnv_ptr env)
-{
+void Hrc_init(NuSMVEnv_ptr env) {
   HrcNode_ptr node = HrcNode_create(env);
 
   NuSMVEnv_set_value(env, ENV_HRC_HIERARCHY, node);
 }
 
-void Hrc_quit(NuSMVEnv_ptr env)
-{
+void Hrc_quit(NuSMVEnv_ptr env) {
   if (NuSMVEnv_has_value(env, ENV_HRC_HIERARCHY)) {
     HrcNode_ptr node = HRC_NODE(NuSMVEnv_remove_value(env, ENV_HRC_HIERARCHY));
     HrcNode_destroy_recur(node);
   }
 }
 
-int Hrc_dump_model(const NuSMVEnv_ptr env,
-                   HrcDumpFormat dump_format,
-                   FILE* ofileid,
-                   const boolean append_suffix,
-                   const boolean use_indent)
-{
+int Hrc_dump_model(const NuSMVEnv_ptr env, HrcDumpFormat dump_format,
+                   FILE *ofileid, const boolean append_suffix,
+                   const boolean use_indent) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   HrcDumper_ptr dumper = NULL;
 
   int rv = 1;
 
-  switch(dump_format) {
+  switch (dump_format) {
   case HRC_DUMP_FORMAT_DEBUG:
     dumper = HRC_DUMPER(HrcDumperDebug_create(env, ofileid));
     break;
-      
+
   case HRC_DUMP_FORMAT_SMV:
     dumper = HRC_DUMPER(HrcDumperSmv_create(env, ofileid));
     break;
-      
+
   case HRC_DUMP_FORMAT_XML:
     dumper = HRC_DUMPER(HrcDumperXml_create(env, ofileid));
     break;
-      
+
   default:
     error_unreachable_code();
   }
@@ -155,11 +145,10 @@ int Hrc_dump_model(const NuSMVEnv_ptr env,
     }
     rv = 0;
   }
-  FAIL(errmgr) {
-    rv = 1;
-  }
+  FAIL(errmgr) { rv = 1; }
 
-  HrcDumper_destroy(dumper); dumper = NULL;
+  HrcDumper_destroy(dumper);
+  dumper = NULL;
 
   return rv;
 }
@@ -170,18 +159,15 @@ int Hrc_dump_model(const NuSMVEnv_ptr env,
   If the string is not recognized, an invalide value is set
 */
 
-HrcDumpFormat Hrc_dump_format_str_to_enum(char* format)
-{
+HrcDumpFormat Hrc_dump_format_str_to_enum(char *format) {
   if (0 == strcmp("debug", format)) {
     return HRC_DUMP_FORMAT_DEBUG;
-  }
-  else if (0 == strcmp("smv", format)) {
+  } else if (0 == strcmp("smv", format)) {
     return HRC_DUMP_FORMAT_SMV;
-  }
-  else if (0 == strcmp("xml", format)) {
+  } else if (0 == strcmp("xml", format)) {
     return HRC_DUMP_FORMAT_XML;
-  }
-  else return HRC_DUMP_FORMAT_INVALID;
+  } else
+    return HRC_DUMP_FORMAT_INVALID;
 }
 
 /*!
@@ -190,9 +176,8 @@ HrcDumpFormat Hrc_dump_format_str_to_enum(char* format)
   If the format is not recognized, NULL is returned
 */
 
-char* Hrc_dump_format_enum_to_str(HrcDumpFormat format)
-{
-  switch(format) {
+char *Hrc_dump_format_enum_to_str(HrcDumpFormat format) {
+  switch (format) {
   case HRC_DUMP_FORMAT_DEBUG:
     return "debug";
 
@@ -214,19 +199,12 @@ char* Hrc_dump_format_enum_to_str(HrcDumpFormat format)
   Useful for usage message
 */
 
-char* Hrc_dump_format_get_available(void)
-{
-  return "debug, smv, xml";
-}
+char *Hrc_dump_format_get_available(void) { return "debug, smv, xml"; }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
-

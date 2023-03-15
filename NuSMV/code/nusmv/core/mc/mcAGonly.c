@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -38,44 +38,40 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/mc/mc.h"
 #include "nusmv/core/mc/mcInt.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
+#include "nusmv/core/enc/enc.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/utils/error.h"
+#include "nusmv/core/prop/propPkg.h"
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/trace/TraceMgr.h"
-#include "nusmv/core/enc/enc.h"
-#include "nusmv/core/prop/propPkg.h"
+#include "nusmv/core/utils/error.h"
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 static boolean check_AG_only(BddFsm_ptr fsm, BddEnc_ptr enc, Prop_ptr prop,
                              Expr_ptr spec, node_ptr context,
-                             NodeList_ptr symbols,
-                             Trace_ptr* out_trace);
+                             NodeList_ptr symbols, Trace_ptr *out_trace);
 
 static boolean is_AG_only_formula(node_ptr n);
-static boolean is_AG_only_formula_recur(node_ptr n, int* ag_count);
-
+static boolean is_AG_only_formula_recur(node_ptr n, int *ag_count);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Mc_CheckAGOnlySpec(NuSMVEnv_ptr env, Prop_ptr prop)
-{
+void Mc_CheckAGOnlySpec(NuSMVEnv_ptr env, Prop_ptr prop) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   BddFsm_ptr fsm = BDD_FSM(NULL);
   Expr_ptr spec = Prop_get_expr_core(prop);
@@ -101,50 +97,47 @@ void Mc_CheckAGOnlySpec(NuSMVEnv_ptr env, Prop_ptr prop)
       SEXP_FSM_CHECK_INSTANCE(sexp_fsm);
     }
 
-    StreamMgr_print_output(streams,  "-- ");
-    print_spec(StreamMgr_get_output_ostream(streams),
-               prop, get_prop_print_method(opts));
+    StreamMgr_print_output(streams, "-- ");
+    print_spec(StreamMgr_get_output_ostream(streams), prop,
+               get_prop_print_method(opts));
 
     if (check_AG_only(fsm, enc, prop, spec, Nil,
                       SexpFsm_get_symbols_list(sexp_fsm), &trace)) {
 
       /* property is true */
-      StreamMgr_print_output(streams,  "is true\n");
+      StreamMgr_print_output(streams, "is true\n");
       Prop_set_status(prop, Prop_True);
-    }
-    else { /* property is false */
-      StreamMgr_print_output(streams,  "is false\n");
+    } else { /* property is false */
+      StreamMgr_print_output(streams, "is false\n");
       Prop_set_status(prop, Prop_False);
 
       if (TRACE(NULL) != trace) {
         /* Print the trace using default plugin */
-        StreamMgr_print_output(streams, 
+        StreamMgr_print_output(
+            streams,
             "-- as demonstrated by the following execution sequence\n");
 
-        TraceMgr_register_trace(TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)), trace);
-        TraceMgr_execute_plugin(TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)), TRACE_OPT(NULL),
-                                    TRACE_MGR_DEFAULT_PLUGIN,
-                                    TRACE_MGR_LAST_TRACE);
+        TraceMgr_register_trace(
+            TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)), trace);
+        TraceMgr_execute_plugin(
+            TRACE_MGR(NuSMVEnv_get_value(env, ENV_TRACE_MGR)), TRACE_OPT(NULL),
+            TRACE_MGR_DEFAULT_PLUGIN, TRACE_MGR_LAST_TRACE);
 
         Prop_set_trace(prop, Trace_get_id(trace));
-
       }
     }
-  }
-  else {
+  } else {
     ErrorMgr_warning_non_ag_only_spec(errmgr, prop);
     return;
   }
 
 } /* Mc_CheckAGOnlySpec */
 
-node_ptr make_AG_counterexample(BddFsm_ptr fsm, BddStates target_states)
-{
+node_ptr make_AG_counterexample(BddFsm_ptr fsm, BddStates target_states) {
   BddEnc_ptr enc = BddFsm_get_bdd_encoding(fsm);
   DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr counterexample = Nil;
   bdd_ptr state, dist;
@@ -155,7 +148,8 @@ node_ptr make_AG_counterexample(BddFsm_ptr fsm, BddStates target_states)
   distance = BddFsm_get_minimum_distance_of_states(fsm, target_states);
 
   /* returns an empty list if any of given target states is not reachable */
-  if (distance == -1) return Nil;
+  if (distance == -1)
+    return Nil;
 
   /* pushes the one state from target states (all reachable) at the end: */
   dist = BddFsm_get_reachable_states_at_distance(fsm, distance);
@@ -165,9 +159,9 @@ node_ptr make_AG_counterexample(BddFsm_ptr fsm, BddStates target_states)
   state = BddEnc_pick_one_state(enc, tgt);
   bdd_free(dd, tgt);
 
-  counterexample = cons(nodemgr, (node_ptr) state, counterexample);
+  counterexample = cons(nodemgr, (node_ptr)state, counterexample);
 
-  for (i = distance-1; i >= 0 ; --i) {
+  for (i = distance - 1; i >= 0; --i) {
     BddStates pre_image;
     BddStates reachables;
     BddInputs inputs;
@@ -184,17 +178,16 @@ node_ptr make_AG_counterexample(BddFsm_ptr fsm, BddStates target_states)
     input = BddEnc_pick_one_input(enc, inputs);
     nusmv_assert(!bdd_is_false(dd, input));
     bdd_free(dd, inputs);
-    counterexample = cons(nodemgr, (node_ptr) input, counterexample);
+    counterexample = cons(nodemgr, (node_ptr)input, counterexample);
 
     state = BddEnc_pick_one_state(enc, pre_image);
     bdd_free(dd, pre_image);
     nusmv_assert(!bdd_is_false(dd, state));
-    counterexample = cons(nodemgr, (node_ptr) state, counterexample);
+    counterexample = cons(nodemgr, (node_ptr)state, counterexample);
   }
 
   return counterexample;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -221,79 +214,76 @@ node_ptr make_AG_counterexample(BddFsm_ptr fsm, BddStates target_states)
 */
 static boolean check_AG_only(BddFsm_ptr fsm, BddEnc_ptr enc, Prop_ptr prop,
                              Expr_ptr spec, node_ptr context,
-                             NodeList_ptr symbols, Trace_ptr* out_trace)
-{
+                             NodeList_ptr symbols, Trace_ptr *out_trace) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   boolean res = false;
 
-  if (spec == Nil) return false;
+  if (spec == Nil)
+    return false;
 
   switch (node_get_type(spec)) {
 
   case CONTEXT:
-    res = check_AG_only(fsm, enc, prop, cdr(spec),
-                        car(spec), symbols, out_trace);
+    res =
+        check_AG_only(fsm, enc, prop, cdr(spec), car(spec), symbols, out_trace);
     break;
 
   case AND:
-    res = check_AG_only(fsm, enc, prop, car(spec),
-                        context, symbols, out_trace);
+    res = check_AG_only(fsm, enc, prop, car(spec), context, symbols, out_trace);
     if (res) { /* lazy mc */
-      res = check_AG_only(fsm, enc, prop, cdr(spec),
-                          context, symbols, out_trace);
+      res =
+          check_AG_only(fsm, enc, prop, cdr(spec), context, symbols, out_trace);
     }
     break;
 
-  case AG:
-    {
-      bdd_ptr tmp_1, tmp_2, acc;
-      bdd_ptr invar_bdd, reachable_bdd;
-      DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
-      bdd_ptr s0 = eval_ctl_spec(fsm, enc, car(spec), context);
+  case AG: {
+    bdd_ptr tmp_1, tmp_2, acc;
+    bdd_ptr invar_bdd, reachable_bdd;
+    DDMgr_ptr dd = BddEnc_get_dd_manager(enc);
+    bdd_ptr s0 = eval_ctl_spec(fsm, enc, car(spec), context);
 
-      invar_bdd = BddFsm_get_state_constraints(fsm);
-      reachable_bdd = BddFsm_get_reachable_states(fsm);
+    invar_bdd = BddFsm_get_state_constraints(fsm);
+    reachable_bdd = BddFsm_get_reachable_states(fsm);
 
-      tmp_1 = bdd_not(dd, s0);
-      tmp_2 = bdd_and(dd, invar_bdd, tmp_1);
-      acc = bdd_and(dd, reachable_bdd, tmp_2);
+    tmp_1 = bdd_not(dd, s0);
+    tmp_2 = bdd_and(dd, invar_bdd, tmp_1);
+    acc = bdd_and(dd, reachable_bdd, tmp_2);
 
-      bdd_free(dd, s0);
-      bdd_free(dd, tmp_2);
-      bdd_free(dd, reachable_bdd);
-      bdd_free(dd, tmp_1);
-      bdd_free(dd, invar_bdd);
+    bdd_free(dd, s0);
+    bdd_free(dd, tmp_2);
+    bdd_free(dd, reachable_bdd);
+    bdd_free(dd, tmp_1);
+    bdd_free(dd, invar_bdd);
 
-      if (bdd_is_false(dd, acc)) {
+    if (bdd_is_false(dd, acc)) {
+      bdd_free(dd, acc);
+      res = true;
+    } else {
+      res = false;
+
+      if (opt_counter_examples(opts)) {
+        /* build counter-example trace */
+        node_ptr path = make_AG_counterexample(fsm, acc);
+
+        nusmv_assert(NIL(Trace_ptr) != out_trace);
+        (*out_trace) = Mc_create_trace_from_bdd_state_input_list(
+            enc, symbols, "AG Only counterexample", TRACE_TYPE_CNTEXAMPLE,
+            path);
+
+        /* free the list "path" */
+        walk_dd(dd, bdd_free, path);
+        free_list(nodemgr, path);
+
         bdd_free(dd, acc);
-        res = true;
       }
-      else {
-        res = false;
+    }
 
-        if (opt_counter_examples(opts)) {
-          /* build counter-example trace */
-          node_ptr path = make_AG_counterexample(fsm, acc);
-
-          nusmv_assert(NIL(Trace_ptr) != out_trace);
-          (*out_trace) = Mc_create_trace_from_bdd_state_input_list(enc, symbols,
-                         "AG Only counterexample", TRACE_TYPE_CNTEXAMPLE, path);
-
-          /* free the list "path" */
-          walk_dd(dd, bdd_free, path);
-          free_list(nodemgr, path);
-
-          bdd_free(dd, acc);
-        }
-      }
-
-      break;
-    } /* case AG */
+    break;
+  } /* case AG */
 
   default:
     if (opt_verbose_level_gt(opts, 0)) {
@@ -315,8 +305,7 @@ static boolean check_AG_only(BddFsm_ptr fsm, BddEnc_ptr enc, Prop_ptr prop,
 
   \sa is_AG_only_formula_recur
 */
-static boolean is_AG_only_formula(node_ptr n)
-{
+static boolean is_AG_only_formula(node_ptr n) {
   int ag_count = 0;
   return is_AG_only_formula_recur(n, &ag_count);
 }
@@ -324,21 +313,21 @@ static boolean is_AG_only_formula(node_ptr n)
 /*!
   \brief Recursive function that helps is_AG_only_formula.
 
-  
+
 
   \sa is_AG_only_formula
 */
-static boolean is_AG_only_formula_recur(node_ptr n, int* ag_count)
-{
-  if (n == Nil) return true;
+static boolean is_AG_only_formula_recur(node_ptr n, int *ag_count) {
+  if (n == Nil)
+    return true;
 
   switch (node_get_type(n)) {
 
   case CONTEXT:
-      return is_AG_only_formula_recur(cdr(n), ag_count);
+    return is_AG_only_formula_recur(cdr(n), ag_count);
 
   case NOT:
-      return is_AG_only_formula_recur(car(n), ag_count);
+    return is_AG_only_formula_recur(car(n), ag_count);
 
   case AND:
   case OR:
@@ -349,7 +338,7 @@ static boolean is_AG_only_formula_recur(node_ptr n, int* ag_count)
     return ((is_AG_only_formula_recur(car(n), ag_count)) &&
             (is_AG_only_formula_recur(cdr(n), ag_count)));
 
-  case EX:   /* Non-AG formula */
+  case EX: /* Non-AG formula */
   case AX:
   case EF:
   case AF:
@@ -366,13 +355,13 @@ static boolean is_AG_only_formula_recur(node_ptr n, int* ag_count)
 
   case AG:
     *ag_count += 1;
-    if(*ag_count > 1) return false; /* More than one AG */
+    if (*ag_count > 1)
+      return false; /* More than one AG */
     return is_AG_only_formula_recur(car(n), ag_count);
 
-  default:
-    { /* for all the other cases, we can safely assume it to be AG Only formula. */
-      return true;
-    }
+  default: { /* for all the other cases, we can safely assume it to be AG Only
+                formula. */
+    return true;
+  }
   }
 }
-

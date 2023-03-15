@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,23 +33,23 @@
   Here we perform the reduction of LTL model checking to
   CTL model checking. The technique adopted has been taken from \[1\].
   <ol>
-    <li>O. Grumberg E. Clarke and K. Hamaguchi. "Another Look at LTL Model Checking".
-       <em>Formal Methods in System Design</em>, 10(1):57--71, February 1997.</li>
+    <li>O. Grumberg E. Clarke and K. Hamaguchi. "Another Look at LTL Model
+  Checking". <em>Formal Methods in System Design</em>, 10(1):57--71, February
+  1997.</li>
   </ol>
-  
+
 
 */
 
-
 #ifndef __NUSMV_CORE_LTL_LTL_H__
-#define  __NUSMV_CORE_LTL_LTL_H__
+#define __NUSMV_CORE_LTL_LTL_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/prop/Prop.h"
-#include "nusmv/core/wff/ExprMgr.h"
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/utils/OStream.h"
+#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/wff/ExprMgr.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -61,18 +61,16 @@
 
   \todo Missing description
 */
-typedef struct Ltl_StructCheckLtlSpec_TAG* Ltl_StructCheckLtlSpec_ptr;
+typedef struct Ltl_StructCheckLtlSpec_TAG *Ltl_StructCheckLtlSpec_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef node_ptr (*Ltl_StructCheckLtlSpec_oreg2smv)(NuSMVEnv_ptr,
-                                                    unsigned int,
+typedef node_ptr (*Ltl_StructCheckLtlSpec_oreg2smv)(NuSMVEnv_ptr, unsigned int,
                                                     node_ptr);
-typedef node_ptr (*Ltl_StructCheckLtlSpec_ltl2smv)(NuSMVEnv_ptr,
-                                                   unsigned int,
+typedef node_ptr (*Ltl_StructCheckLtlSpec_ltl2smv)(NuSMVEnv_ptr, unsigned int,
                                                    node_ptr);
 
 /*---------------------------------------------------------------------------*/
@@ -84,18 +82,15 @@ typedef node_ptr (*Ltl_StructCheckLtlSpec_ltl2smv)(NuSMVEnv_ptr,
 
   \todo Missing description
 */
-#define LTL_STRUCTCHECKLTLSPEC(self) \
-         ((Ltl_StructCheckLtlSpec_ptr) self)
+#define LTL_STRUCTCHECKLTLSPEC(self) ((Ltl_StructCheckLtlSpec_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LTL_STRUCTCHECKLTLSPEC_CHECK_INSTANCE(self) \
-         (nusmv_assert(LTL_STRUCTCHECKLTLSPEC(self) != \
-          LTL_STRUCTCHECKLTLSPEC(NULL)))
-
+#define LTL_STRUCTCHECKLTLSPEC_CHECK_INSTANCE(self)                            \
+  (nusmv_assert(LTL_STRUCTCHECKLTLSPEC(self) != LTL_STRUCTCHECKLTLSPEC(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -136,31 +131,27 @@ void Ltl_CheckLtlSpec(NuSMVEnv_ptr env, Prop_ptr prop);
 
   SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
-  
+
 
   \se layer and outfh are expected to get changed
 */
-void
-Ltl_spec_to_hierarchy(NuSMVEnv_ptr env,
-                      Expr_ptr spec, node_ptr context,
-                      node_ptr (*what2smv)(NuSMVEnv_ptr env,
-                                           unsigned int id,
-                                           node_ptr expr),
-                      SymbLayer_ptr layer,
-                      FlatHierarchy_ptr outfh);
+void Ltl_spec_to_hierarchy(NuSMVEnv_ptr env, Expr_ptr spec, node_ptr context,
+                           node_ptr (*what2smv)(NuSMVEnv_ptr env,
+                                                unsigned int id, node_ptr expr),
+                           SymbLayer_ptr layer, FlatHierarchy_ptr outfh);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-Expr_ptr
-Ltl_apply_input_vars_rewriting(Expr_ptr spec, SymbTable_ptr st,
-                               SymbLayer_ptr layer,
-                               FlatHierarchy_ptr outfh);
+Expr_ptr Ltl_apply_input_vars_rewriting(Expr_ptr spec, SymbTable_ptr st,
+                                        SymbLayer_ptr layer,
+                                        FlatHierarchy_ptr outfh);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -169,7 +160,7 @@ Ltl_apply_input_vars_rewriting(Expr_ptr spec, SymbTable_ptr st,
   Create an empty Ltl_StructCheckLtlSpec structure.
 */
 Ltl_StructCheckLtlSpec_ptr Ltl_StructCheckLtlSpec_create(NuSMVEnv_ptr env,
-                                                                Prop_ptr prop);
+                                                         Prop_ptr prop);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -185,8 +176,8 @@ void Ltl_StructCheckLtlSpec_destroy(Ltl_StructCheckLtlSpec_ptr self);
 
   Set the oreg2smv field of an Ltl_StructCheckLtlSpec structure
 */
-void Ltl_StructCheckLtlSpec_set_oreg2smv(Ltl_StructCheckLtlSpec_ptr self,
-                                                Ltl_StructCheckLtlSpec_oreg2smv oreg2smv);
+void Ltl_StructCheckLtlSpec_set_oreg2smv(
+    Ltl_StructCheckLtlSpec_ptr self, Ltl_StructCheckLtlSpec_oreg2smv oreg2smv);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -195,7 +186,7 @@ void Ltl_StructCheckLtlSpec_set_oreg2smv(Ltl_StructCheckLtlSpec_ptr self,
   Set the ltl2smv field of an Ltl_StructCheckLtlSpec structure
 */
 void Ltl_StructCheckLtlSpec_set_ltl2smv(Ltl_StructCheckLtlSpec_ptr self,
-                                               Ltl_StructCheckLtlSpec_ltl2smv ltl2smv);
+                                        Ltl_StructCheckLtlSpec_ltl2smv ltl2smv);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -204,7 +195,7 @@ void Ltl_StructCheckLtlSpec_set_ltl2smv(Ltl_StructCheckLtlSpec_ptr self,
   Set the negate_formula field of an Ltl_StructCheckLtlSpec structure
 */
 void Ltl_StructCheckLtlSpec_set_negate_formula(Ltl_StructCheckLtlSpec_ptr self,
-                                                      boolean negate_formula);
+                                               boolean negate_formula);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -215,7 +206,7 @@ void Ltl_StructCheckLtlSpec_set_negate_formula(Ltl_StructCheckLtlSpec_ptr self,
   structure
 */
 void Ltl_StructCheckLtlSpec_set_do_rewriting(Ltl_StructCheckLtlSpec_ptr self,
-                                                   boolean do_rewriting);
+                                             boolean do_rewriting);
 
 /*!
   \methodof Ltl_StructCheckLtlSpec
@@ -255,7 +246,7 @@ void Ltl_StructCheckLtlSpec_build(Ltl_StructCheckLtlSpec_ptr self);
 
   If compassion is present it calls the check method for compassion,
   otherwise the check method dedicated to the algorithm given by the
-  value of the oreg_justice_emptiness_bdd_algorithm option. 
+  value of the oreg_justice_emptiness_bdd_algorithm option.
 
   \sa ltl_stuctcheckltlspec_check_compassion,
   ltl_structcheckltlspec_check_el_bwd, ltl_structcheckltlspec_check_el_fwd
@@ -292,8 +283,7 @@ Ltl_StructCheckLtlSpec_build_counter_example(Ltl_StructCheckLtlSpec_ptr self,
   Ltl_StructCheckLtlSpec_build, and that Ltl_StructCheckLtlSpec_build has been
   invoked.
 */
-void
-Ltl_StructCheckLtlSpec_explain(Ltl_StructCheckLtlSpec_ptr self,
-                               NodeList_ptr symbols);
+void Ltl_StructCheckLtlSpec_explain(Ltl_StructCheckLtlSpec_ptr self,
+                                    NodeList_ptr symbols);
 
 #endif /*  __NUSMV_CORE_LTL_LTL_H__ */

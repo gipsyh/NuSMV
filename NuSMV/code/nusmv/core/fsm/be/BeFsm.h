@@ -2,7 +2,7 @@
 
 
   This file is part of the ``fsm.be'' package of NuSMV version 2.
-  Copyright (C) 2005 by FBK-irst. 
+  Copyright (C) 2005 by FBK-irst.
 
   NuSMV version 2 is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,16 +35,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_FSM_BE_BE_FSM_H__
 #define __NUSMV_CORE_FSM_BE_BE_FSM_H__
 
-
-#include "nusmv/core/fsm/sexp/BoolSexpFsm.h"
 #include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/fsm/sexp/BoolSexpFsm.h"
 
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/be/be.h"
+#include "nusmv/core/node/node.h"
 
 #include "nusmv/core/utils/utils.h"
 
@@ -60,10 +58,9 @@
   \struct BeFsm
   \brief This is the BeFsm accessor type
 
-  
-*/
-typedef struct BeFsm_TAG* BeFsm_ptr;
 
+*/
+typedef struct BeFsm_TAG *BeFsm_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -83,18 +80,14 @@ typedef struct BeFsm_TAG* BeFsm_ptr;
   These macros must be used respectively to cast and to check
   instances of class BeEnc
 */
-#define BE_FSM(self) \
-         ((BeFsm_ptr) self)
+#define BE_FSM(self) ((BeFsm_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BE_FSM_CHECK_INSTANCE(self) \
-         (nusmv_assert(BE_FSM(self) != BE_FSM(NULL)))
-
-
+#define BE_FSM_CHECK_INSTANCE(self) (nusmv_assert(BE_FSM(self) != BE_FSM(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -111,12 +104,8 @@ typedef struct BeFsm_TAG* BeFsm_ptr;
 
   \sa BeFsm_destroy
 */
-BeFsm_ptr 
-BeFsm_create(BeEnc_ptr be_enc, 
-              const be_ptr init, 
-              const be_ptr invar, 
-              const be_ptr trans, 
-              const node_ptr list_of_be_fairness); 
+BeFsm_ptr BeFsm_create(BeEnc_ptr be_enc, const be_ptr init, const be_ptr invar,
+                       const be_ptr trans, const node_ptr list_of_be_fairness);
 
 /* should not be in FsmBuilder? */
 
@@ -129,15 +118,14 @@ BeFsm_create(BeEnc_ptr be_enc,
 
   \sa BeFsm_create, BeFsm_destroy
 */
-BeFsm_ptr 
-BeFsm_create_from_sexp_fsm(BeEnc_ptr be_enc, 
-                           const BoolSexpFsm_ptr bfsm);
+BeFsm_ptr BeFsm_create_from_sexp_fsm(BeEnc_ptr be_enc,
+                                     const BoolSexpFsm_ptr bfsm);
 
 /*!
   \methodof BeFsm
   \brief Class BeFsm destructor
 
-  
+
 
   \se self will be invalidated
 
@@ -162,7 +150,7 @@ BeFsm_ptr BeFsm_copy(BeFsm_ptr self);
   \brief Returns the be encoding associated with the given fsm
    instance
 
-  
+
 */
 BeEnc_ptr BeFsm_get_be_encoding(const BeFsm_ptr self);
 
@@ -171,7 +159,7 @@ BeEnc_ptr BeFsm_get_be_encoding(const BeFsm_ptr self);
   \brief Returns the initial states stored in BE format into the
    given fsm instance
 
-  
+
 */
 be_ptr BeFsm_get_init(const BeFsm_ptr self);
 
@@ -180,7 +168,7 @@ be_ptr BeFsm_get_init(const BeFsm_ptr self);
   \brief Returns the invariants stored in BE format into the
    given fsm instance
 
-  
+
 */
 be_ptr BeFsm_get_invar(const BeFsm_ptr self);
 
@@ -189,7 +177,7 @@ be_ptr BeFsm_get_invar(const BeFsm_ptr self);
   \brief Returns the transition relation stored in BE format
    into the given fsm instance
 
-  
+
 */
 be_ptr BeFsm_get_trans(const BeFsm_ptr self);
 
@@ -198,7 +186,7 @@ be_ptr BeFsm_get_trans(const BeFsm_ptr self);
   \brief Returns the list of fairness stored in BE format
    into the given fsm instance
 
-  
+
 */
 node_ptr BeFsm_get_fairness_list(const BeFsm_ptr self);
 
@@ -207,11 +195,9 @@ node_ptr BeFsm_get_fairness_list(const BeFsm_ptr self);
   \brief Apply the synchronous product between self and other
    modifying self
 
-  
-*/
-void
-BeFsm_apply_synchronous_product(BeFsm_ptr self, const BeFsm_ptr other);
 
+*/
+void BeFsm_apply_synchronous_product(BeFsm_ptr self, const BeFsm_ptr other);
 
 /**AutomaticEnd***************************************************************/
 

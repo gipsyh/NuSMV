@@ -38,16 +38,16 @@
 #define __NUSMV_CORE_TRACE_TRACE_MGR_H__
 
 #include "nusmv/core/dd/dd.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/array.h"
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/trace/plugins/TracePlugin.h"
-#include "nusmv/core/trace/exec/PartialTraceExecutor.h"
-#include "nusmv/core/trace/exec/CompleteTraceExecutor.h"
-#include "nusmv/core/trace/eval/BaseEvaluator.h"
+#include "nusmv/core/node/node.h"
 #include "nusmv/core/trace/TraceLabel.h"
 #include "nusmv/core/trace/TraceOpt.h"
-#include "nusmv/core/node/node.h"
+#include "nusmv/core/trace/eval/BaseEvaluator.h"
+#include "nusmv/core/trace/exec/CompleteTraceExecutor.h"
+#include "nusmv/core/trace/exec/PartialTraceExecutor.h"
+#include "nusmv/core/trace/plugins/TracePlugin.h"
+#include "nusmv/core/utils/array.h"
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -137,7 +137,6 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
@@ -176,7 +175,7 @@
         <br>
 
 */
-typedef struct TraceMgr_TAG* TraceMgr_ptr;
+typedef struct TraceMgr_TAG *TraceMgr_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -191,16 +190,15 @@ typedef struct TraceMgr_TAG* TraceMgr_ptr;
 
   \todo Missing description
 */
-#define TRACE_MGR(x) \
-        ((TraceMgr_ptr) x)
+#define TRACE_MGR(x) ((TraceMgr_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_MGR_CHECK_INSTANCE(x) \
-        (nusmv_assert(TRACE_MGR(x) != TRACE_MGR(NULL)))
+#define TRACE_MGR_CHECK_INSTANCE(x)                                            \
+  (nusmv_assert(TRACE_MGR(x) != TRACE_MGR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -244,9 +242,7 @@ int TraceMgr_get_size(const TraceMgr_ptr self);
 
 
 */
-Trace_ptr
-TraceMgr_get_trace_at_index(const TraceMgr_ptr self,
-                            int index);
+Trace_ptr TraceMgr_get_trace_at_index(const TraceMgr_ptr self, int index);
 
 /* TraceMgr register functions */
 
@@ -260,8 +256,7 @@ TraceMgr_get_trace_at_index(const TraceMgr_ptr self,
 
   OWNERSHIP: "trace" is now owned by the TraceMgr
 */
-int TraceMgr_register_trace(TraceMgr_ptr self,
-                                   Trace_ptr trace);
+int TraceMgr_register_trace(TraceMgr_ptr self, Trace_ptr trace);
 
 /* Evaluators management */
 
@@ -271,8 +266,7 @@ int TraceMgr_register_trace(TraceMgr_ptr self,
 
 
 */
-BaseEvaluator_ptr
-TraceMgr_get_evaluator(TraceMgr_ptr self);
+BaseEvaluator_ptr TraceMgr_get_evaluator(TraceMgr_ptr self);
 
 /*!
   \methodof TraceMgr
@@ -281,9 +275,7 @@ TraceMgr_get_evaluator(TraceMgr_ptr self);
   Registers an evaluator. If some evaluator was already
   registered it is destroyed
 */
-void
-TraceMgr_register_evaluator(TraceMgr_ptr self,
-                            BaseEvaluator_ptr eval);
+void TraceMgr_register_evaluator(TraceMgr_ptr self, BaseEvaluator_ptr eval);
 
 /*!
   \methodof TraceMgr
@@ -308,10 +300,9 @@ void TraceMgr_unregister_evaluator(TraceMgr_ptr self);
 
   \sa TraceMgr_register_partial_trace_executor
 */
-void
-TraceMgr_register_complete_trace_executor(TraceMgr_ptr self,
-       const char* executor_name, const char* executor_desc,
-       const CompleteTraceExecutor_ptr executor);
+void TraceMgr_register_complete_trace_executor(
+    TraceMgr_ptr self, const char *executor_name, const char *executor_desc,
+    const CompleteTraceExecutor_ptr executor);
 
 /*!
   \methodof TraceMgr
@@ -326,8 +317,7 @@ TraceMgr_register_complete_trace_executor(TraceMgr_ptr self,
   \se none
 */
 CompleteTraceExecutor_ptr
-TraceMgr_get_complete_trace_executor(const TraceMgr_ptr self,
-                                         const char* name);
+TraceMgr_get_complete_trace_executor(const TraceMgr_ptr self, const char *name);
 
 /*!
   \methodof TraceMgr
@@ -338,8 +328,7 @@ TraceMgr_get_complete_trace_executor(const TraceMgr_ptr self,
 
   \sa TraceMgr_register_complete_trace_executor
 */
-array_t*
-TraceMgr_get_complete_trace_executor_ids(const TraceMgr_ptr self);
+array_t *TraceMgr_get_complete_trace_executor_ids(const TraceMgr_ptr self);
 
 /*!
   \methodof TraceMgr
@@ -354,9 +343,8 @@ TraceMgr_get_complete_trace_executor_ids(const TraceMgr_ptr self);
 
   \se none
 */
-const char*
-TraceMgr_get_complete_trace_executor_desc(const TraceMgr_ptr self,
-                                          const char* name);
+const char *TraceMgr_get_complete_trace_executor_desc(const TraceMgr_ptr self,
+                                                      const char *name);
 
 /*!
   \brief Returns default registered complete trace executor
@@ -371,9 +359,8 @@ TraceMgr_get_complete_trace_executor_desc(const TraceMgr_ptr self,
 
   \sa TraceMgr_register_complete_trace_executor
 */
-CompleteTraceExecutor_ptr
-TraceMgr_get_default_complete_trace_executor(
-      const TraceMgr_ptr global_trace_manager);
+CompleteTraceExecutor_ptr TraceMgr_get_default_complete_trace_executor(
+    const TraceMgr_ptr global_trace_manager);
 
 /* Partial trace executors management functions */
 
@@ -384,10 +371,9 @@ TraceMgr_get_default_complete_trace_executor(
   It registers a partial trace executor with the
   TraceMgr and returns the corresponding index.
 */
-void
-TraceMgr_register_partial_trace_executor(TraceMgr_ptr self,
-       const char* executor_name, const char* executor_desc,
-       const PartialTraceExecutor_ptr executor);
+void TraceMgr_register_partial_trace_executor(
+    TraceMgr_ptr self, const char *executor_name, const char *executor_desc,
+    const PartialTraceExecutor_ptr executor);
 
 /*!
   \methodof TraceMgr
@@ -398,8 +384,7 @@ TraceMgr_register_partial_trace_executor(TraceMgr_ptr self,
 
   \sa TraceMgr_register_complete_trace_executor
 */
-array_t*
-TraceMgr_get_partial_trace_executor_ids(const TraceMgr_ptr self);
+array_t *TraceMgr_get_partial_trace_executor_ids(const TraceMgr_ptr self);
 
 /*!
   \methodof TraceMgr
@@ -415,8 +400,7 @@ TraceMgr_get_partial_trace_executor_ids(const TraceMgr_ptr self);
   \se none
 */
 PartialTraceExecutor_ptr
-TraceMgr_get_partial_trace_executor(const TraceMgr_ptr self,
-                                    const char* name);
+TraceMgr_get_partial_trace_executor(const TraceMgr_ptr self, const char *name);
 
 /*!
   \methodof TraceMgr
@@ -427,9 +411,8 @@ TraceMgr_get_partial_trace_executor(const TraceMgr_ptr self,
 
   \se none
 */
-const char*
-TraceMgr_get_partial_trace_executor_desc(const TraceMgr_ptr self,
-                                         const char* name);
+const char *TraceMgr_get_partial_trace_executor_desc(const TraceMgr_ptr self,
+                                                     const char *name);
 
 /*!
   \brief Returns default registered partial trace executor
@@ -443,8 +426,8 @@ TraceMgr_get_partial_trace_executor_desc(const TraceMgr_ptr self,
 
   \sa TraceMgr_register_partial_trace_executor
 */
-PartialTraceExecutor_ptr
-TraceMgr_get_default_partial_trace_executor(const TraceMgr_ptr global_trace_manager);
+PartialTraceExecutor_ptr TraceMgr_get_default_partial_trace_executor(
+    const TraceMgr_ptr global_trace_manager);
 
 /* Registration of layers */
 
@@ -462,9 +445,7 @@ TraceMgr_get_default_partial_trace_executor(const TraceMgr_ptr global_trace_mana
 
   \sa unregister_layer
 */
-void
-TraceMgr_register_layer(TraceMgr_ptr self,
-                        const char* layer_name);
+void TraceMgr_register_layer(TraceMgr_ptr self, const char *layer_name);
 
 /*!
   \methodof TraceMgr
@@ -475,9 +456,7 @@ TraceMgr_register_layer(TraceMgr_ptr self,
 
   \sa register_layer
 */
-void
-TraceMgr_unregister_layer(TraceMgr_ptr self,
-                          const char* layer_name);
+void TraceMgr_unregister_layer(TraceMgr_ptr self, const char *layer_name);
 
 /*!
   \methodof TraceMgr
@@ -488,9 +467,8 @@ TraceMgr_unregister_layer(TraceMgr_ptr self,
 
   \sa unregister_layer
 */
-boolean
-TraceMgr_is_layer_registered(const TraceMgr_ptr self,
-                             const char* layer_name);
+boolean TraceMgr_is_layer_registered(const TraceMgr_ptr self,
+                                     const char *layer_name);
 
 /*!
   \methodof TraceMgr
@@ -498,9 +476,7 @@ TraceMgr_is_layer_registered(const TraceMgr_ptr self,
 
   Returned array belongs to self, do not change or delete it
 */
-array_t*
-TraceMgr_get_registered_layers(const TraceMgr_ptr self);
-
+array_t *TraceMgr_get_registered_layers(const TraceMgr_ptr self);
 
 /* Other Functions */
 
@@ -510,9 +486,7 @@ TraceMgr_get_registered_layers(const TraceMgr_ptr self);
 
 
 */
-void
-TraceMgr_set_current_trace_number(TraceMgr_ptr self,
-                                      int trace_id);
+void TraceMgr_set_current_trace_number(TraceMgr_ptr self, int trace_id);
 
 /*!
   \methodof TraceMgr
@@ -520,8 +494,7 @@ TraceMgr_set_current_trace_number(TraceMgr_ptr self,
 
 
 */
-int
-TraceMgr_get_current_trace_number(TraceMgr_ptr self);
+int TraceMgr_get_current_trace_number(TraceMgr_ptr self);
 
 /*!
   \methodof TraceMgr
@@ -539,44 +512,36 @@ TraceMgr_get_current_trace_number(TraceMgr_ptr self);
 
   \se none
 */
-boolean
-TraceMgr_is_visible_symbol(TraceMgr_ptr self, node_ptr symbol);
+boolean TraceMgr_is_visible_symbol(TraceMgr_ptr self, node_ptr symbol);
 
 /*!
   \brief Shows the traces generated in a NuSMV session
 
   Shows the traces generated in a NuSMV session
 */
-int TraceMgr_show_traces(TraceMgr_ptr const self,
-                                const int plugin_index,
-                                const boolean is_all,
-                                const int trace,
-                                TraceOpt_ptr const trace_opt,
-                                const int traceno,
-                                int from_state,
-                                int to_state);
+int TraceMgr_show_traces(TraceMgr_ptr const self, const int plugin_index,
+                         const boolean is_all, const int trace,
+                         TraceOpt_ptr const trace_opt, const int traceno,
+                         int from_state, int to_state);
 
 /*!
   \brief Executes complete traces on the model FSM
 
   Execute the traces between first trace and last trace
 */
-int
-TraceMgr_execute_traces(TraceMgr_ptr const self,
-                        CompleteTraceExecutor_ptr const executor,
-                        const int first_trace,
-                        const int last_trace);
+int TraceMgr_execute_traces(TraceMgr_ptr const self,
+                            CompleteTraceExecutor_ptr const executor,
+                            const int first_trace, const int last_trace);
 
 /*!
   \brief Executes partial traces on the model FSM
 
   Execute the traces between first trace and last trace
 */
-int
-TraceMgr_execute_partial_traces(TraceMgr_ptr const self,
-                                PartialTraceExecutor_ptr const executor,
-                                const int first_trace,
-                                const int last_trace);
+int TraceMgr_execute_partial_traces(TraceMgr_ptr const self,
+                                    PartialTraceExecutor_ptr const executor,
+                                    const int first_trace,
+                                    const int last_trace);
 
 /* Functions related to Labels */
 
@@ -589,8 +554,7 @@ TraceMgr_execute_partial_traces(TraceMgr_ptr const self,
   raise no errors (exceptions, assertions) and should be used before
   any other label-related function to avoid any subsequent failure.
 */
-boolean
-TraceMgr_is_label_valid(TraceMgr_ptr self, TraceLabel label);
+boolean TraceMgr_is_label_valid(TraceMgr_ptr self, TraceLabel label);
 
 /*!
   \methodof TraceMgr
@@ -599,9 +563,7 @@ TraceMgr_is_label_valid(TraceMgr_ptr self, TraceLabel label);
 
 
 */
-TraceIter
-TraceMgr_get_iterator_from_label(TraceMgr_ptr self,
-                                     TraceLabel label);
+TraceIter TraceMgr_get_iterator_from_label(TraceMgr_ptr self, TraceLabel label);
 
 /*!
   \methodof TraceMgr
@@ -609,9 +571,7 @@ TraceMgr_get_iterator_from_label(TraceMgr_ptr self,
 
 
 */
-int
-TraceMgr_get_abs_index_from_label(TraceMgr_ptr self,
-                                      TraceLabel label);
+int TraceMgr_get_abs_index_from_label(TraceMgr_ptr self, TraceLabel label);
 
 /* Interaction with trace plugins *********************************************/
 
@@ -633,8 +593,7 @@ int TraceMgr_get_plugin_size(const TraceMgr_ptr self);
   This function returns the number of internal plugins
   registered with traceManager
 */
-int
-TraceMgr_get_internal_plugin_size(const TraceMgr_ptr self);
+int TraceMgr_get_internal_plugin_size(const TraceMgr_ptr self);
 
 /*!
   \methodof TraceMgr
@@ -642,9 +601,8 @@ TraceMgr_get_internal_plugin_size(const TraceMgr_ptr self);
 
 
 */
-TracePlugin_ptr
-TraceMgr_get_plugin_at_index(const TraceMgr_ptr self,
-                                 int index);
+TracePlugin_ptr TraceMgr_get_plugin_at_index(const TraceMgr_ptr self,
+                                             int index);
 
 /*!
   \methodof TraceMgr
@@ -661,8 +619,7 @@ void TraceMgr_init_plugins(TraceMgr_ptr self);
   It registers a plugin with the TraceMgr and returns the
   corresponding index.
 */
-int TraceMgr_register_plugin(TraceMgr_ptr self,
-                                        TracePlugin_ptr plugin);
+int TraceMgr_register_plugin(TraceMgr_ptr self, TracePlugin_ptr plugin);
 
 /*!
   \methodof TraceMgr
@@ -687,10 +644,8 @@ int TraceMgr_register_plugin(TraceMgr_ptr self,
 
   \sa TRACE_MGR_DEFAULT_PLUGIN, TRACE_MGR_LAST_TRACE
 */
-int TraceMgr_execute_plugin(const TraceMgr_ptr self,
-                                       const TraceOpt_ptr opt,
-                                       int plugin_index,
-                                       int trace_index);
+int TraceMgr_execute_plugin(const TraceMgr_ptr self, const TraceOpt_ptr opt,
+                            int plugin_index, int trace_index);
 
 /*!
   \methodof TraceMgr
@@ -699,9 +654,7 @@ int TraceMgr_execute_plugin(const TraceMgr_ptr self,
    Default plugin is the plugin to be used to print a trace by
   default.
 */
-void
-TraceMgr_set_default_plugin(TraceMgr_ptr self,
-                                int plugin_id);
+void TraceMgr_set_default_plugin(TraceMgr_ptr self, int plugin_id);
 
 /*!
   \methodof TraceMgr
@@ -709,17 +662,15 @@ TraceMgr_set_default_plugin(TraceMgr_ptr self,
 
 
 */
-int
-TraceMgr_get_default_plugin(TraceMgr_ptr self);
+int TraceMgr_get_default_plugin(TraceMgr_ptr self);
 
 /*!
   \brief Lists out all the available plugins inside the system.
 
   Lists out all the available plugins inside the system.
 */
-int TraceMgr_show_plugins(TraceMgr_ptr const self,
-                                 const boolean is_show_all,
-                                 const int dp);
+int TraceMgr_show_plugins(TraceMgr_ptr const self, const boolean is_show_all,
+                          const int dp);
 
 /*!
   \methodof TraceMgr
@@ -729,13 +680,10 @@ int TraceMgr_show_plugins(TraceMgr_ptr const self,
 
 
 */
-boolean
-TraceMgr_is_plugin_internal(const TraceMgr_ptr self, int index);
+boolean TraceMgr_is_plugin_internal(const TraceMgr_ptr self, int index);
 
 /******************************************************************************/
 
-
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_TRACE_TRACE_MGR_H__ */

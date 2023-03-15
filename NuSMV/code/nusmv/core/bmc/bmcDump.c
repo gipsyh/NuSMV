@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,11 +35,10 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include <errno.h>
 
 #include "nusmv/core/bmc/bmcDump.h"
@@ -48,8 +47,8 @@
 
 #include "nusmv/core/cinit/cinit.h"
 #include "nusmv/core/prop/Prop.h"
-#include "nusmv/core/utils/ucmd.h" /* for SubstString */
 #include "nusmv/core/utils/defs.h" /* for PRIuPTR */
+#include "nusmv/core/utils/ucmd.h" /* for SubstString */
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -76,50 +75,42 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void
-bmc_dump_expandFilename(const NuSMVEnv_ptr env,
-                        const int k, const int l,
-                        const int prop_idx,
-                        const char* filename_to_be_expanded,
-                        char* filename_expanded,
-                        const size_t filename_expanded_maxlen);
+static void bmc_dump_expandFilename(const NuSMVEnv_ptr env, const int k,
+                                    const int l, const int prop_idx,
+                                    const char *filename_to_be_expanded,
+                                    char *filename_expanded,
+                                    const size_t filename_expanded_maxlen);
 
-static int
-bmc_dump_openDimacsFile(const NuSMVEnv_ptr env,
-                        const char* filename, FILE** file_ref);
-
+static int bmc_dump_openDimacsFile(const NuSMVEnv_ptr env, const char *filename,
+                                   FILE **file_ref);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Bmc_Dump_WriteProblem(const BeEnc_ptr be_enc,
-                           const Be_Cnf_ptr cnf,
-                           Prop_ptr prop,
-                           const int k, const int loop,
+void Bmc_Dump_WriteProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                           Prop_ptr prop, const int k, const int loop,
                            const Bmc_DumpType dump_type,
-                           const char* dump_fname_template)
-{
+                           const char *dump_fname_template) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   char dumpFilenameExpanded[BMC_DUMP_FILENAME_MAXLEN];
 
-  if (dump_type == BMC_DUMP_NONE) return;
+  if (dump_type == BMC_DUMP_NONE)
+    return;
 
-  nusmv_assert(dump_fname_template != (char*) NULL);
+  nusmv_assert(dump_fname_template != (char *)NULL);
 
   /* 10 here is the maximum length of extension */
-  bmc_dump_expandFilename(env, k, loop,
-                          Prop_get_index(prop),
-                          dump_fname_template,
-                          dumpFilenameExpanded,
-                          sizeof(dumpFilenameExpanded)-10);
+  bmc_dump_expandFilename(env, k, loop, Prop_get_index(prop),
+                          dump_fname_template, dumpFilenameExpanded,
+                          sizeof(dumpFilenameExpanded) - 10);
 
   switch (dump_type) {
 
@@ -129,98 +120,94 @@ void Bmc_Dump_WriteProblem(const BeEnc_ptr be_enc,
 
     if (Prop_get_type(prop) == Prop_Invar) {
       Bmc_Dump_DimacsInvarProblemFilename(be_enc, cnf, dumpFilenameExpanded);
-    }
-    else {
+    } else {
       Bmc_Dump_DimacsProblemFilename(be_enc, cnf, dumpFilenameExpanded, k);
     }
     break;
 
-  case BMC_DUMP_DA_VINCI:
-    {
-      FILE* davinci_file = NULL;
+  case BMC_DUMP_DA_VINCI: {
+    FILE *davinci_file = NULL;
 
-      strcat(dumpFilenameExpanded, ".davinci");
+    strcat(dumpFilenameExpanded, ".davinci");
 
-      if (opt_verbose_level_gt(opts, 1)) {
-        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger, "\nOpening file '%s' for writing...\n",
-                dumpFilenameExpanded);
-      }
-      davinci_file = fopen(dumpFilenameExpanded, "w");
-      if (davinci_file == (FILE*) NULL) {
-        int errsv = errno;
-        StreamMgr_print_output(streams, 
-                "\n*************    WARNING    *************"
-                "\n An error has occurred when writing the file \"%s\"."
-                "\n (error was '%s')"
-                "\n DA VINCI dumping aborted."
-                "\n*************  END WARNING  *************\n\n",
-                dumpFilenameExpanded, strerror(errsv));
-        break;
-      }
-
-      Be_DumpDavinci(BeEnc_get_be_manager(be_enc),
-                     Be_Cnf_GetOriginalProblem(cnf),
-                     davinci_file);
-
-      if (opt_verbose_level_gt(opts, 1)) {
-        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger,
-               dumpFilenameExpanded);
-      }
-
-      fclose(davinci_file);
+    if (opt_verbose_level_gt(opts, 1)) {
+      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+      Logger_log(logger, "\nOpening file '%s' for writing...\n",
+                 dumpFilenameExpanded);
+    }
+    davinci_file = fopen(dumpFilenameExpanded, "w");
+    if (davinci_file == (FILE *)NULL) {
+      int errsv = errno;
+      StreamMgr_print_output(
+          streams,
+          "\n*************    WARNING    *************"
+          "\n An error has occurred when writing the file \"%s\"."
+          "\n (error was '%s')"
+          "\n DA VINCI dumping aborted."
+          "\n*************  END WARNING  *************\n\n",
+          dumpFilenameExpanded, strerror(errsv));
       break;
     }
 
-  case BMC_DUMP_GDL:
-    {
-      FILE* gdl_file = NULL;
+    Be_DumpDavinci(BeEnc_get_be_manager(be_enc), Be_Cnf_GetOriginalProblem(cnf),
+                   davinci_file);
 
-      strcat(dumpFilenameExpanded, ".gdl");
+    if (opt_verbose_level_gt(opts, 1)) {
+      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+      Logger_log(logger, dumpFilenameExpanded);
+    }
 
-      if (opt_verbose_level_gt(opts, 1)) {
-        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger, "\nOpening file '%s' for writing...\n",
-                dumpFilenameExpanded);
-      }
-      gdl_file = fopen(dumpFilenameExpanded, "w");
-      if (gdl_file == (FILE*) NULL) {
-        int errsv = errno;
-        StreamMgr_print_output(streams, 
-                "\n*************    WARNING    *************"
-                "\n An error has occurred when writing the file \"%s\"."
-                "\n (error was '%s')"
-                "\n GDL dumping aborted."
-                "\n*************  END WARNING  *************\n\n",
-                dumpFilenameExpanded, strerror(errsv));
-        break;
-      }
+    fclose(davinci_file);
+    break;
+  }
 
-      Be_DumpGdl(BeEnc_get_be_manager(be_enc),
-                 Be_Cnf_GetOriginalProblem(cnf),
-                 gdl_file);
-      if (opt_verbose_level_gt(opts, 1)) {
-        Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_log(logger, dumpFilenameExpanded);
-      }
+  case BMC_DUMP_GDL: {
+    FILE *gdl_file = NULL;
 
-      fclose(gdl_file);
+    strcat(dumpFilenameExpanded, ".gdl");
+
+    if (opt_verbose_level_gt(opts, 1)) {
+      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+      Logger_log(logger, "\nOpening file '%s' for writing...\n",
+                 dumpFilenameExpanded);
+    }
+    gdl_file = fopen(dumpFilenameExpanded, "w");
+    if (gdl_file == (FILE *)NULL) {
+      int errsv = errno;
+      StreamMgr_print_output(
+          streams,
+          "\n*************    WARNING    *************"
+          "\n An error has occurred when writing the file \"%s\"."
+          "\n (error was '%s')"
+          "\n GDL dumping aborted."
+          "\n*************  END WARNING  *************\n\n",
+          dumpFilenameExpanded, strerror(errsv));
       break;
     }
+
+    Be_DumpGdl(BeEnc_get_be_manager(be_enc), Be_Cnf_GetOriginalProblem(cnf),
+               gdl_file);
+    if (opt_verbose_level_gt(opts, 1)) {
+      Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
+      Logger_log(logger, dumpFilenameExpanded);
+    }
+
+    fclose(gdl_file);
+    break;
+  }
 
   default:
-    ErrorMgr_internal_error(errmgr, "Bmc_DumpProblem: Unexpected value in dump_type");
+    ErrorMgr_internal_error(errmgr,
+                            "Bmc_DumpProblem: Unexpected value in dump_type");
   }
 }
 
 int Bmc_Dump_DimacsInvarProblemFilename(const BeEnc_ptr be_enc,
                                         const Be_Cnf_ptr cnf,
-                                        const char* filename)
-{
+                                        const char *filename) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
 
-  FILE* file;
+  FILE *file;
   int ret = bmc_dump_openDimacsFile(env, filename, &file);
 
   if (ret == 0) {
@@ -230,14 +217,11 @@ int Bmc_Dump_DimacsInvarProblemFilename(const BeEnc_ptr be_enc,
   return ret;
 }
 
-int Bmc_Dump_DimacsProblemFilename(const BeEnc_ptr be_enc,
-                                   const Be_Cnf_ptr cnf,
-                                   const char* filename,
-                                   const int k)
-{
+int Bmc_Dump_DimacsProblemFilename(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                                   const char *filename, const int k) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
 
-  FILE* file;
+  FILE *file;
   int ret = bmc_dump_openDimacsFile(env, filename, &file);
 
   if (ret == 0) {
@@ -247,23 +231,18 @@ int Bmc_Dump_DimacsProblemFilename(const BeEnc_ptr be_enc,
   return ret;
 }
 
-void Bmc_Dump_DimacsInvarProblem(const BeEnc_ptr be_enc,
-                                 const Be_Cnf_ptr cnf,
-                                 FILE* dimacsfile)
-{
+void Bmc_Dump_DimacsInvarProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                                 FILE *dimacsfile) {
   Bmc_Dump_DimacsProblem(be_enc, cnf, 1, dimacsfile);
 }
 
-void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
-                            const Be_Cnf_ptr cnf,
-                            const int k,
-                            FILE* dimacsfile)
-{
+void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                            const int k, FILE *dimacsfile) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   int time;
   Be_Manager_ptr be_mgr;
@@ -275,7 +254,7 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger,
-            "Dumping problem to Dimacs file (problem length is %d)\n", k);
+               "Dumping problem to Dimacs file (problem length is %d)\n", k);
   }
 
   /* Writes the readable mapping table as a comment: */
@@ -284,10 +263,8 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
   fprintf(dimacsfile,
           "c Time steps from 0 to %d, %d State Variables,"
           " %d Frozen Variables and %d Input Variables\n",
-          k,
-          BeEnc_get_state_vars_num(be_enc),
-          BeEnc_get_frozen_vars_num(be_enc),
-          BeEnc_get_input_vars_num(be_enc));
+          k, BeEnc_get_state_vars_num(be_enc),
+          BeEnc_get_frozen_vars_num(be_enc), BeEnc_get_input_vars_num(be_enc));
 
   fprintf(dimacsfile, "c Model to Dimacs Conversion Table\n");
 
@@ -295,20 +272,18 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
     int iter;
     fprintf(dimacsfile, "c \nc @@@@@ Time %d\n", time);
 
-    iter = BeEnc_get_first_untimed_var_index(be_enc,
-                                             BE_VAR_TYPE_CURR |
-                                             BE_VAR_TYPE_FROZEN |
-                                             BE_VAR_TYPE_INPUT);
+    iter = BeEnc_get_first_untimed_var_index(
+        be_enc, BE_VAR_TYPE_CURR | BE_VAR_TYPE_FROZEN | BE_VAR_TYPE_INPUT);
     while (BeEnc_is_var_index_valid(be_enc, iter)) {
       /* to avoid dumping of input variables at time k and
          frozen variable at time > 0 (since such variables do not exist) */
-      if (! ( (BeEnc_is_index_input_var(be_enc, iter) && time == k)
-            ||(BeEnc_is_index_frozen_var(be_enc, iter) && time > 0))) {
+      if (!((BeEnc_is_index_input_var(be_enc, iter) && time == k) ||
+            (BeEnc_is_index_frozen_var(be_enc, iter) && time > 0))) {
         int cnf_index;
 
-        cnf_index = Be_BeIndex2CnfLiteral(be_mgr,
-                BeEnc_var_to_index(be_enc,
-                                   BeEnc_index_to_timed(be_enc, iter, time)));
+        cnf_index = Be_BeIndex2CnfLiteral(
+            be_mgr, BeEnc_var_to_index(
+                        be_enc, BeEnc_index_to_timed(be_enc, iter, time)));
 
         if (cnf_index != 0) {
           /* it is a cnf index of a real variable */
@@ -320,15 +295,16 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
       }
 
       iter = BeEnc_get_next_var_index(be_enc, iter,
-                      BE_VAR_TYPE_CURR | BE_VAR_TYPE_FROZEN | BE_VAR_TYPE_INPUT);
+                                      BE_VAR_TYPE_CURR | BE_VAR_TYPE_FROZEN |
+                                          BE_VAR_TYPE_INPUT);
     }
   } /* time cycle */
   fprintf(dimacsfile, "c \n");
 
   /* Actually writes the dimacs data: */
   {
-    int * cl = (int *)NULL;
-    Siter  genCl, genLit;
+    int *cl = (int *)NULL;
+    Siter genCl, genLit;
     nusmv_ptrint lit = 0;
 
     fprintf(dimacsfile, "c Beginning of the DIMACS dumping\n");
@@ -337,7 +313,7 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
     fprintf(dimacsfile, "c ");
 
     SLIST_FOREACH(Be_Cnf_GetVarsList(cnf), genLit) {
-      lit = (nusmv_ptrint) Siter_element(genLit);
+      lit = (nusmv_ptrint)Siter_element(genLit);
       fprintf(dimacsfile, "%" PRIdPTR " ", lit);
     }
     fprintf(dimacsfile, "0\n");
@@ -351,19 +327,16 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
         fprintf(dimacsfile, "p cnf %d 0\n", Be_Cnf_GetMaxVarIndex(cnf));
         /* the constand is true => just output a comment */
         fprintf(dimacsfile, "c Warning: the true constant is printed out\n");
-      }
-      else {
+      } else {
         /* the constant is false => output a comment and a false formula */
         fprintf(dimacsfile, "p cnf %d 2\n", Be_Cnf_GetMaxVarIndex(cnf));
         fprintf(dimacsfile, "c Warning: the false constant is printed out\n");
-        fprintf(dimacsfile,"1 0\n-1 0\n"); /* this is always false */
+        fprintf(dimacsfile, "1 0\n-1 0\n"); /* this is always false */
       }
-    }
-    else { /* the formula is a usual formula, output its formula literal */
+    } else { /* the formula is a usual formula, output its formula literal */
       /* Prints the problem header. */
-      fprintf(dimacsfile, "p cnf %d %" PRIuPTR "\n",
-              Be_Cnf_GetMaxVarIndex(cnf),
-              Be_Cnf_GetClausesNumber(cnf)+1); /* 1 is the formula literal */
+      fprintf(dimacsfile, "p cnf %d %" PRIuPTR "\n", Be_Cnf_GetMaxVarIndex(cnf),
+              Be_Cnf_GetClausesNumber(cnf) + 1); /* 1 is the formula literal */
 
       fprintf(dimacsfile, "%d 0\n", Be_Cnf_GetFormulaLiteral(cnf));
 
@@ -371,7 +344,7 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
       SLIST_FOREACH(Be_Cnf_GetClausesList(cnf), genCl) {
         int i = 0;
 
-        cl = (int*) Siter_element(genCl);
+        cl = (int *)Siter_element(genCl);
         while (cl[i] != 0) {
           lit = (nusmv_ptrint)cl[i];
           fprintf(dimacsfile, "%" PRIdPTR " ", lit);
@@ -388,7 +361,6 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
     Logger_log(logger, "End of dump.\n");
   }
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
@@ -408,13 +380,12 @@ void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc,
 
   \se file_ref will change
 */
-static int bmc_dump_openDimacsFile(const NuSMVEnv_ptr env,
-                                   const char* filename, FILE** file_ref)
-{
+static int bmc_dump_openDimacsFile(const NuSMVEnv_ptr env, const char *filename,
+                                   FILE **file_ref) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   int ret = 0;
   if (opt_verbose_level_gt(opts, 1)) {
@@ -423,15 +394,16 @@ static int bmc_dump_openDimacsFile(const NuSMVEnv_ptr env,
   }
 
   *file_ref = fopen(filename, "w");
-  if ((*file_ref) == NULL)  {
+  if ((*file_ref) == NULL) {
     int errsv = errno;
-    StreamMgr_print_output(streams, 
-            "\n*************    WARNING    *************"
-            "\n An error has occurred when writing the file \"%s\"."
-            "\n (error was '%s')"
-            "\n DIMACS dumping aborted."
-            "\n*************  END WARNING  *************\n\n",
-            filename, strerror(errsv));
+    StreamMgr_print_output(
+        streams,
+        "\n*************    WARNING    *************"
+        "\n An error has occurred when writing the file \"%s\"."
+        "\n (error was '%s')"
+        "\n DIMACS dumping aborted."
+        "\n*************  END WARNING  *************\n\n",
+        filename, strerror(errsv));
     ret = 1;
   }
 
@@ -442,33 +414,30 @@ static int bmc_dump_openDimacsFile(const NuSMVEnv_ptr env,
   \brief This is only a useful wrapper for easily call
   Bmc_Utils_ExpandMacrosInFilename
 
-  
+
 
   \se None
 */
-static void
-bmc_dump_expandFilename(const NuSMVEnv_ptr env,
-                        const int k, const int l,
-                        const int prop_idx,
-                        const char* filename_to_be_expanded,
-                        char* filename_expanded,
-                        const size_t filename_expanded_maxlen)
-{
+static void bmc_dump_expandFilename(const NuSMVEnv_ptr env, const int k,
+                                    const int l, const int prop_idx,
+                                    const char *filename_to_be_expanded,
+                                    char *filename_expanded,
+                                    const size_t filename_expanded_maxlen) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   char szBuffer[1024];
   char szLoopback[16];
 
   /* Prepares the structure for macro-expansion: */
-  SubstString aSubstTable[] =  {
-    SYMBOL_CREATE(), /* 0 */
-    SYMBOL_CREATE(), /* 1 */
-    SYMBOL_CREATE(), /* 2 */
-    SYMBOL_CREATE(), /* 3 */
-    SYMBOL_CREATE(), /* 4 */
-    SYMBOL_CREATE(), /* 5 */
-    SYMBOL_CREATE()  /* 6 */
+  SubstString aSubstTable[] = {
+      SYMBOL_CREATE(), /* 0 */
+      SYMBOL_CREATE(), /* 1 */
+      SYMBOL_CREATE(), /* 2 */
+      SYMBOL_CREATE(), /* 3 */
+      SYMBOL_CREATE(), /* 4 */
+      SYMBOL_CREATE(), /* 5 */
+      SYMBOL_CREATE()  /* 6 */
   };
 
   /* customizes the table with runtime values: */
@@ -476,25 +445,22 @@ bmc_dump_expandFilename(const NuSMVEnv_ptr env,
   Bmc_Utils_ConvertLoopFromInteger(l, szLoopback, sizeof(szLoopback));
 
   /* this to protect @@ (see last rule) */
-  SYMBOL_ASSIGN(aSubstTable[0], "@@", string,  "%s", "\1");
+  SYMBOL_ASSIGN(aSubstTable[0], "@@", string, "%s", "\1");
 
-  SYMBOL_ASSIGN(aSubstTable[1], "@F", string,  "%s", get_input_file(opts));
-  SYMBOL_ASSIGN(aSubstTable[2], "@f", string,  "%s", szBuffer);
+  SYMBOL_ASSIGN(aSubstTable[1], "@F", string, "%s", get_input_file(opts));
+  SYMBOL_ASSIGN(aSubstTable[2], "@f", string, "%s", szBuffer);
   SYMBOL_ASSIGN(aSubstTable[3], "@k", integer, "%d", k);
   SYMBOL_ASSIGN(aSubstTable[4], "@l", string, "%s", szLoopback);
   if (prop_idx != BMC_NO_PROPERTY_INDEX) {
     SYMBOL_ASSIGN(aSubstTable[5], "@n", integer, "%d", prop_idx);
-  }
-  else {
+  } else {
     SYMBOL_ASSIGN(aSubstTable[5], "@n", string, "%s", "undef");
   }
 
   /* this to restore @@ as @ */
-  SYMBOL_ASSIGN(aSubstTable[6], "\1", string,  "%s", "@");
+  SYMBOL_ASSIGN(aSubstTable[6], "\1", string, "%s", "@");
 
-  Bmc_Utils_ExpandMacrosInFilename(filename_to_be_expanded,
-                                   aSubstTable,
-                                   sizeof(aSubstTable)/sizeof(aSubstTable[0]),
-                                   filename_expanded,
-                                   filename_expanded_maxlen);
+  Bmc_Utils_ExpandMacrosInFilename(filename_to_be_expanded, aSubstTable,
+                                   sizeof(aSubstTable) / sizeof(aSubstTable[0]),
+                                   filename_expanded, filename_expanded_maxlen);
 }

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,8 +33,6 @@
   This file can be included only by derived and friend classes
 
 */
-
-
 
 #ifndef __NUSMV_CORE_SIMULATE_SIMULATE_STATE_PRIVATE_H__
 #define __NUSMV_CORE_SIMULATE_SIMULATE_STATE_PRIVATE_H__
@@ -48,18 +46,16 @@
 #include "nusmv/core/dd/dd.h"
 #include "nusmv/core/trace/TraceLabel.h"
 
-
 /*!
   \brief SimulateState class definition derived from
                class Object
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct SimulateState_TAG
-{
+typedef struct SimulateState_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(Object);
 
@@ -76,8 +72,6 @@ typedef struct SimulateState_TAG
 
 } SimulateState;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -89,10 +83,8 @@ typedef struct SimulateState_TAG
 
   \sa SimulateState_create
 */
-void simulate_state_init(SimulateState_ptr const self,
-                                DDMgr_ptr const dd_mgr,
-                                bdd_ptr const bdd,
-                                TraceLabel const trace_label);
+void simulate_state_init(SimulateState_ptr const self, DDMgr_ptr const dd_mgr,
+                         bdd_ptr const bdd, TraceLabel const trace_label);
 
 /*!
   \methodof SimulateState
@@ -103,7 +95,5 @@ void simulate_state_init(SimulateState_ptr const self,
   \sa SimulateState_destroy
 */
 void simulate_state_deinit(SimulateState_ptr self);
-
-
 
 #endif /* __NUSMV_CORE_SIMULATE_SIMULATE_STATE_PRIVATE_H__ */

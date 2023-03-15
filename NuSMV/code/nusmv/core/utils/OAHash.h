@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_OAHASH_H__
 #define __NUSMV_CORE_UTILS_OAHASH_H__
-
 
 #include "nusmv/core/utils/utils.h"
 
@@ -48,7 +45,7 @@
 
 
 */
-typedef struct OAHash_TAG*  OAHash_ptr;
+typedef struct OAHash_TAG *OAHash_ptr;
 
 /*!
   \brief \todo Missing synopsis
@@ -62,16 +59,16 @@ typedef size_t OAHashIter;
 
   \todo Missing description
 */
-typedef boolean (*OA_HASH_EQ_FUN)(const void*, const void*, void*);
+typedef boolean (*OA_HASH_EQ_FUN)(const void *, const void *, void *);
 
-typedef size_t (*OA_HASH_HASH_FUN)(const void*, void*);
+typedef size_t (*OA_HASH_HASH_FUN)(const void *, void *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef void (*OA_HASH_FREE_FUN)(void* key, void* value, void* arg);
+typedef void (*OA_HASH_FREE_FUN)(void *key, void *value, void *arg);
 
 /*!
   \brief To cast and check instances of class OAHash
@@ -79,15 +76,14 @@ typedef void (*OA_HASH_FREE_FUN)(void* key, void* value, void* arg);
   These macros must be used respectively to cast and to check
    instances of class OAHash
 */
-#define OA_HASH(self)                           \
-  ((OAHash_ptr) self)
+#define OA_HASH(self) ((OAHash_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OA_HASH_CHECK_INSTANCE(self)                    \
+#define OA_HASH_CHECK_INSTANCE(self)                                           \
   (nusmv_assert(OA_HASH(self) != OA_HASH(NULL)))
 
 /*!
@@ -95,9 +91,8 @@ typedef void (*OA_HASH_FREE_FUN)(void* key, void* value, void* arg);
 
   \todo Missing description
 */
-#define OA_HASH_FOREACH(self, iter)             \
-  for (iter = OAHash_get_first_iter(self);      \
-       !OAHash_iter_is_end(self, iter);         \
+#define OA_HASH_FOREACH(self, iter)                                            \
+  for (iter = OAHash_get_first_iter(self); !OAHash_iter_is_end(self, iter);    \
        iter = OAHash_iter_next(self, iter))
 
 /*!
@@ -105,13 +100,11 @@ typedef void (*OA_HASH_FREE_FUN)(void* key, void* value, void* arg);
 
   \todo Missing description
 */
-#define OA_HASH_FOREACH_ENTRY(self, iter, key, value)                   \
-  for (iter = OAHash_get_first_iter(self);                              \
-       !OAHash_iter_is_end(self, iter) &&                               \
-         (OAHash_iter_values(self, iter, (void**)key, (void**)value), true); \
+#define OA_HASH_FOREACH_ENTRY(self, iter, key, value)                          \
+  for (iter = OAHash_get_first_iter(self);                                     \
+       !OAHash_iter_is_end(self, iter) &&                                      \
+       (OAHash_iter_values(self, iter, (void **)key, (void **)value), true);   \
        iter = OAHash_iter_next(self, iter))
-
-
 
 /**AutomaticStart*************************************************************/
 
@@ -135,8 +128,7 @@ typedef void (*OA_HASH_FREE_FUN)(void* key, void* value, void* arg);
 */
 OAHash_ptr OAHash_create(OA_HASH_EQ_FUN key_eq_fun,
                          OA_HASH_HASH_FUN key_hash_fun,
-                         OA_HASH_FREE_FUN free_entry_fun,
-                         void* custom_arg);
+                         OA_HASH_FREE_FUN free_entry_fun, void *custom_arg);
 
 /*!
   \methodof OAHash
@@ -167,9 +159,7 @@ void OAHash_destroy(OAHash_ptr self);
   If the key already exists, it is replaced and the old value is
   returned. Returns true if the key has been replaced
 */
-boolean OAHash_insert(OAHash_ptr self,
-                      const void* key,
-                      const void* value);
+boolean OAHash_insert(OAHash_ptr self, const void *key, const void *value);
 
 /*!
   \methodof OAHash
@@ -182,8 +172,7 @@ boolean OAHash_insert(OAHash_ptr self,
   the hash, OAHash_lookup(k) will return NULL. Use OAHash_has_key for
   a correct interpretation of the return value
 */
-void* OAHash_lookup(OAHash_ptr self,
-                    const void* key);
+void *OAHash_lookup(OAHash_ptr self, const void *key);
 
 /*!
   \methodof OAHash
@@ -191,8 +180,7 @@ void* OAHash_lookup(OAHash_ptr self,
 
   Checks if the given key is in the OAHash
 */
-boolean OAHash_has_key(OAHash_ptr self,
-                       const void* key);
+boolean OAHash_has_key(OAHash_ptr self, const void *key);
 
 /*!
   \methodof OAHash
@@ -203,8 +191,7 @@ boolean OAHash_has_key(OAHash_ptr self,
   Returns true if the key has been actually removed (i.e. the key was
   in the hash
 */
-boolean OAHash_remove(OAHash_ptr self,
-                      const void* key);
+boolean OAHash_remove(OAHash_ptr self, const void *key);
 
 /*!
   \methodof OAHash
@@ -257,9 +244,7 @@ boolean OAHash_iter_is_end(const OAHash_ptr self, const OAHashIter iter);
   iterator. Both key and value can be NULL
 */
 void OAHash_iter_values(const OAHash_ptr self, const OAHashIter iter,
-                        void** key, void** value);
-
-
+                        void **key, void **value);
 
 /* Functions for key_eq_fun and key_hash_fun */
 
@@ -272,7 +257,7 @@ void OAHash_iter_values(const OAHash_ptr self, const OAHashIter iter,
 
   \sa OAHash_create
 */
-boolean OAHash_pointer_eq_fun(const void* k1, const void* k2, void* arg);
+boolean OAHash_pointer_eq_fun(const void *k1, const void *k2, void *arg);
 
 /*!
   \brief The OAHash pointer hash function
@@ -281,7 +266,7 @@ boolean OAHash_pointer_eq_fun(const void* k1, const void* k2, void* arg);
 
   \sa OAHash_create
 */
-size_t OAHash_pointer_hash_fun(const void* key, void* arg);
+size_t OAHash_pointer_hash_fun(const void *key, void *arg);
 
 /*!
   \brief The OAHash string equality function
@@ -290,7 +275,7 @@ size_t OAHash_pointer_hash_fun(const void* key, void* arg);
 
   \sa OAHash_create
 */
-boolean OAHash_string_eq_fun(const void* k1, const void* k2, void* arg);
+boolean OAHash_string_eq_fun(const void *k1, const void *k2, void *arg);
 
 /*!
   \brief The OAHash string hash function
@@ -299,12 +284,8 @@ boolean OAHash_string_eq_fun(const void* k1, const void* k2, void* arg);
 
   \sa OAHash_create
 */
-size_t OAHash_string_hash_fun(const void* key, void* arg);
-
-
+size_t OAHash_string_hash_fun(const void *key, void *arg);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_OAHASH_H__ */

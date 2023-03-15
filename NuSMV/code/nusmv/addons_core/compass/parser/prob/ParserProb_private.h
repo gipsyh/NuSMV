@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,13 +34,12 @@
 
 */
 
-
 #ifndef __NUSMV_ADDONS_CORE_COMPASS_PARSER_PROB_PARSER_PROB_PRIVATE_H__
 #define __NUSMV_ADDONS_CORE_COMPASS_PARSER_PROB_PARSER_PROB_PRIVATE_H__
 
 #include "nusmv/addons_core/compass/parser/prob/ParserProb.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \methodof ParserProb
@@ -51,43 +50,41 @@ void parser_prob_add(ParserProb_ptr self, node_ptr prob);
   \methodof ParserProb
   \todo
 */
-node_ptr parser_prob_mk_prob(ParserProb_ptr self,
-                             node_ptr assigns, node_ptr prob);
+node_ptr parser_prob_mk_prob(ParserProb_ptr self, node_ptr assigns,
+                             node_ptr prob);
 
 /*!
   \methodof ParserProb
   \todo
 */
-node_ptr parser_prob_mk_var_assign(ParserProb_ptr self,
-                                  node_ptr var, node_ptr val);
+node_ptr parser_prob_mk_var_assign(ParserProb_ptr self, node_ptr var,
+                                   node_ptr val);
 
 /*!
   \methodof ParserProb
   \todo
 */
-node_ptr
-parser_prob_mk_var_assigns(ParserProb_ptr self,
-                           node_ptr left, node_ptr right);
+node_ptr parser_prob_mk_var_assigns(ParserProb_ptr self, node_ptr left,
+                                    node_ptr right);
 
 /*!
   \methodof ParserProb
   \todo
 */
-node_ptr
-parser_prob_mk_dot(ParserProb_ptr self, node_ptr left, node_ptr right);
+node_ptr parser_prob_mk_dot(ParserProb_ptr self, node_ptr left, node_ptr right);
 
 /*!
   \methodof ParserProb
   \todo
 */
-node_ptr
-parser_prob_mk_array(ParserProb_ptr self, node_ptr left, node_ptr right);
+node_ptr parser_prob_mk_array(ParserProb_ptr self, node_ptr left,
+                              node_ptr right);
 
 /*!
   \methodof ParserProb
   \todo
 */
-node_ptr parser_prob_mk_atom(ParserProb_ptr self, const char* name);
+node_ptr parser_prob_mk_atom(ParserProb_ptr self, const char *name);
 
 /*!
   \methodof ParserProb
@@ -99,7 +96,7 @@ node_ptr parser_prob_mk_num(ParserProb_ptr self, const int num);
   \methodof ParserProb
   \todo
 */
-node_ptr parser_prob_mk_real(ParserProb_ptr self, const char* real_text);
+node_ptr parser_prob_mk_real(ParserProb_ptr self, const char *real_text);
 
 /*!
   \methodof ParserProb
@@ -111,6 +108,5 @@ node_ptr parser_prob_mk_true(ParserProb_ptr self);
   \todo
 */
 node_ptr parser_prob_mk_false(ParserProb_ptr self);
-
 
 #endif /* __NUSMV_ADDONS_CORE_COMPASS_PARSER_PROB_PARSER_PROB_PRIVATE_H__ */

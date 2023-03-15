@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,23 +34,20 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_OSTREAM_H__
 #define __NUSMV_CORE_UTILS_OSTREAM_H__
 
-
-#include <stdarg.h>
 #include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/utils/utils.h"
+#include <stdarg.h>
 
 /*!
   \struct OStream
   \brief Definition of the public accessor for class OStream
 
-  
+
 */
-typedef struct OStream_TAG*  OStream_ptr;
+typedef struct OStream_TAG *OStream_ptr;
 
 /*!
   \brief To cast and check instances of class OStream
@@ -58,18 +55,15 @@ typedef struct OStream_TAG*  OStream_ptr;
   These macros must be used respectively to cast and to check
   instances of class OStream
 */
-#define OSTREAM(self) \
-         ((OStream_ptr) self)
+#define OSTREAM(self) ((OStream_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OSTREAM_CHECK_INSTANCE(self) \
-         (nusmv_assert(OSTREAM(self) != OSTREAM(NULL)))
-
-
+#define OSTREAM_CHECK_INSTANCE(self)                                           \
+  (nusmv_assert(OSTREAM(self) != OSTREAM(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -87,7 +81,7 @@ typedef struct OStream_TAG*  OStream_ptr;
 
   \sa OStream_destroy
 */
-OStream_ptr OStream_create(FILE* stream);
+OStream_ptr OStream_create(FILE *stream);
 
 /*!
   \methodof OStream
@@ -99,7 +93,7 @@ OStream_ptr OStream_create(FILE* stream);
 
   \sa OStream_destroy
 */
-OStream_ptr OStream_create_file(const char* fname, boolean append);
+OStream_ptr OStream_create_file(const char *fname, boolean append);
 
 /*!
   \methodof OStream
@@ -134,7 +128,6 @@ void OStream_destroy(OStream_ptr self);
 */
 void OStream_destroy_safe(OStream_ptr self);
 
-
 /* Getters and Setters ********************************************************/
 
 /*!
@@ -145,7 +138,7 @@ void OStream_destroy_safe(OStream_ptr self);
 
   \sa OStream_set_stream
 */
-FILE* OStream_get_stream(const OStream_ptr self);
+FILE *OStream_get_stream(const OStream_ptr self);
 
 /*!
   \methodof OStream
@@ -155,8 +148,7 @@ FILE* OStream_get_stream(const OStream_ptr self);
 
   \sa OStream_nprintf
 */
-void OStream_printf(const OStream_ptr self,
-                           const char* format, ...);
+void OStream_printf(const OStream_ptr self, const char *format, ...);
 
 /*!
   \methodof OStream
@@ -166,8 +158,8 @@ void OStream_printf(const OStream_ptr self,
                       Supports node printing (using '%N')
 */
 void OStream_nprintf(const OStream_ptr self,
-                            const MasterPrinter_ptr node_printer,
-                            const char* format, ...);
+                     const MasterPrinter_ptr node_printer, const char *format,
+                     ...);
 
 /*!
   \methodof OStream
@@ -177,8 +169,7 @@ void OStream_nprintf(const OStream_ptr self,
 
   \sa OStream_nprintf
 */
-void OStream_vprintf(const OStream_ptr self,
-                            const char* format, va_list args);
+void OStream_vprintf(const OStream_ptr self, const char *format, va_list args);
 
 /*!
   \methodof OStream
@@ -188,8 +179,8 @@ void OStream_vprintf(const OStream_ptr self,
                       Supports node printing (using '%N')
 */
 void OStream_nvprintf(const OStream_ptr self,
-                             const MasterPrinter_ptr node_printer,
-                             const char* format, va_list args);
+                      const MasterPrinter_ptr node_printer, const char *format,
+                      va_list args);
 
 /*!
   \methodof OStream
@@ -256,7 +247,7 @@ void OStream_set_split_newline(OStream_ptr self, boolean enabled);
   \se Flushes the current stream. Closes it if
                       it is not stdout or stderr
 */
-void OStream_set_stream(OStream_ptr self, FILE* stream);
+void OStream_set_stream(OStream_ptr self, FILE *stream);
 
 /*!
   \methodof OStream
@@ -265,10 +256,8 @@ void OStream_set_stream(OStream_ptr self, FILE* stream);
   Useful for avoiding OStream_set_stream to close the
   stream. The old stream is returned.
 */
-FILE* OStream_reset_stream(OStream_ptr self);
+FILE *OStream_reset_stream(OStream_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_OSTREAM_H__ */

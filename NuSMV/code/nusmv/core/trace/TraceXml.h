@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -46,13 +46,12 @@
   \brief Numeric values for all possible tags that can occur in the xml
                representation
 
-  
+
 */
 
-typedef enum TraceXmlTag_TAG
-{
+typedef enum TraceXmlTag_TAG {
   TRACE_XML_INVALID_TAG = -1,
-  TRACE_XML_CNTX_TAG    =  0,
+  TRACE_XML_CNTX_TAG = 0,
   TRACE_XML_NODE_TAG,
   TRACE_XML_STATE_TAG,
   TRACE_XML_COMB_TAG,
@@ -70,50 +69,49 @@ typedef enum TraceXmlTag_TAG
 
   \todo Missing description
 */
-#define TRACE_XML_CNTX_TAG_STRING   "counter-example"
+#define TRACE_XML_CNTX_TAG_STRING "counter-example"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_NODE_TAG_STRING   "node"
+#define TRACE_XML_NODE_TAG_STRING "node"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_STATE_TAG_STRING  "state"
+#define TRACE_XML_STATE_TAG_STRING "state"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_COMB_TAG_STRING   "combinatorial"
+#define TRACE_XML_COMB_TAG_STRING "combinatorial"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_INPUT_TAG_STRING  "input"
+#define TRACE_XML_INPUT_TAG_STRING "input"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_VALUE_TAG_STRING  "value"
+#define TRACE_XML_VALUE_TAG_STRING "value"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_XML_LOOPS_TAG_STRING  "loops"
-
+#define TRACE_XML_LOOPS_TAG_STRING "loops"
 
 /**AutomaticStart*************************************************************/
 
@@ -123,7 +121,7 @@ typedef enum TraceXmlTag_TAG
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
 
-TraceXmlTag TraceXmlTag_from_string(const char* tag); 
-const char* TraceXmlTag_to_string(TraceXmlTag tag);
+TraceXmlTag TraceXmlTag_from_string(const char *tag);
+const char *TraceXmlTag_to_string(TraceXmlTag tag);
 
 #endif /* __NUSMV_CORE_TRACE_TRACE_XML_H__ */

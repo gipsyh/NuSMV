@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,12 +34,10 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_FSM_BDD_BDD_H__
 #define __NUSMV_CORE_FSM_BDD_BDD_H__
 
 #include "nusmv/core/dd/dd.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -78,10 +76,9 @@
 
   \todo Missing description
 */
-#define BDD_ELFWD_OPT_ALL (BDD_ELFWD_OPT_FORWARD_SEARCH | \
-                           BDD_ELFWD_OPT_LTL_TABLEAU_FORWARD_SEARCH | \
-                           BDD_ELFWD_OPT_USE_REACHABLE_STATES | \
-                           BDD_ELFWD_OPT_COUNTER_EXAMPLES)
+#define BDD_ELFWD_OPT_ALL                                                      \
+  (BDD_ELFWD_OPT_FORWARD_SEARCH | BDD_ELFWD_OPT_LTL_TABLEAU_FORWARD_SEARCH |   \
+   BDD_ELFWD_OPT_USE_REACHABLE_STATES | BDD_ELFWD_OPT_COUNTER_EXAMPLES)
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -99,8 +96,7 @@ typedef bdd_ptr BddStates;
 
   \todo Missing description
 */
-#define BDD_STATES(x) \
-          ((BddStates) x)
+#define BDD_STATES(x) ((BddStates)x)
 
 typedef bdd_ptr BddInputs;
 
@@ -109,8 +105,7 @@ typedef bdd_ptr BddInputs;
 
   \todo Missing description
 */
-#define BDD_INPUTS(x) \
-          ((BddInputs) x)
+#define BDD_INPUTS(x) ((BddInputs)x)
 
 typedef bdd_ptr BddStatesInputs;
 
@@ -119,8 +114,7 @@ typedef bdd_ptr BddStatesInputs;
 
   \todo Missing description
 */
-#define BDD_STATES_INPUTS(x) \
-          ((BddStatesInputs) x)
+#define BDD_STATES_INPUTS(x) ((BddStatesInputs)x)
 
 typedef bdd_ptr BddStatesInputsNexts;
 
@@ -129,8 +123,7 @@ typedef bdd_ptr BddStatesInputsNexts;
 
   \todo Missing description
 */
-#define BDD_STATES_INPUTS_NEXTS(x) \
-          ((BddStatesInputsNexts) x)
+#define BDD_STATES_INPUTS_NEXTS(x) ((BddStatesInputsNexts)x)
 
 typedef bdd_ptr BddInvarStates;
 
@@ -139,8 +132,7 @@ typedef bdd_ptr BddInvarStates;
 
   \todo Missing description
 */
-#define BDD_INVAR_STATES(x) \
-          ((BddInvarStates) x)
+#define BDD_INVAR_STATES(x) ((BddInvarStates)x)
 
 typedef bdd_ptr BddInvarInputs;
 
@@ -149,22 +141,21 @@ typedef bdd_ptr BddInvarInputs;
 
   \todo Missing description
 */
-#define BDD_INVAR_INPUTS(x) \
-          ((BddInvarInputs) x)
+#define BDD_INVAR_INPUTS(x) ((BddInvarInputs)x)
 
 /*!
   \struct BddELFwdSavedOptions
   \brief Holds the values of those options that might have been
                       overridden to allow execution of forward Emerson-Lei.
 
-  
+
 
   \se n/a
 
   \sa Bdd_elfwd_check_set_and_save_options,
                       Bdd_elfwd_restore_options
 */
-typedef struct BddELFwdSavedOptions_TAG* BddELFwdSavedOptions_ptr;
+typedef struct BddELFwdSavedOptions_TAG *BddELFwdSavedOptions_ptr;
 
 /*!
   \brief Enumeration of algorithms for determining language
@@ -180,19 +171,18 @@ typedef struct BddELFwdSavedOptions_TAG* BddELFwdSavedOptions_ptr;
                 algorithms are added.
 */
 
-
 enum BddOregJusticeEmptinessBddAlgorithmType_TAG {
   BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_INVALID = -1,
-  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD  =  0,
+  BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD = 0,
   BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD,
 
   BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_MIN_VALID =
-    BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD,
+      BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD,
   BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_MAX_VALID =
-    BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD
+      BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_FWD
 };
 typedef enum BddOregJusticeEmptinessBddAlgorithmType_TAG
-  BddOregJusticeEmptinessBddAlgorithmType;
+    BddOregJusticeEmptinessBddAlgorithmType;
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -223,7 +213,7 @@ typedef enum BddOregJusticeEmptinessBddAlgorithmType_TAG
   \sa BddOregJusticeEmptinessBddAlgorithmType_to_string
 */
 BddOregJusticeEmptinessBddAlgorithmType
-Bdd_BddOregJusticeEmptinessBddAlgorithmType_from_string(const char* name);
+Bdd_BddOregJusticeEmptinessBddAlgorithmType_from_string(const char *name);
 
 /*!
   \brief BddOregJusticeEmptinessBddAlgorithmType to const char*
@@ -237,22 +227,22 @@ Bdd_BddOregJusticeEmptinessBddAlgorithmType_from_string(const char* name);
 
   \sa Bdd_BddOregJusticeEmptinessBddAlgorithmType_from_string
 */
-const char* Bdd_BddOregJusticeEmptinessBddAlgorithmType_to_string(const BddOregJusticeEmptinessBddAlgorithmType self);
+const char *Bdd_BddOregJusticeEmptinessBddAlgorithmType_to_string(
+    const BddOregJusticeEmptinessBddAlgorithmType self);
 
 /*!
   \brief Prints the BDD-based algorithms to check language
                       emptiness for omega-regular properties the system
                       currently supplies
 
-  
+
 
   \se None.
 
   \sa BddOregJusticeEmptinessBddAlgorithmType,
                       Bdd_BddOregJusticeEmptinessBddAlgorithmType_to_string
 */
-void
-  Bdd_print_available_BddOregJusticeEmptinessBddAlgorithms(FILE *file);
+void Bdd_print_available_BddOregJusticeEmptinessBddAlgorithms(FILE *file);
 
 /*!
   \brief Checks options for forward Emerson-Lei algorithm
@@ -266,9 +256,8 @@ void
 
   \se None.
 */
-boolean Bdd_elfwd_check_options(NuSMVEnv_ptr env,
-                                       unsigned int which_options,
-                                       boolean on_fail_print);
+boolean Bdd_elfwd_check_options(NuSMVEnv_ptr env, unsigned int which_options,
+                                boolean on_fail_print);
 
 /*!
   \brief Checks, sets and saves previous values of options for
@@ -307,12 +296,9 @@ Bdd_elfwd_check_set_and_save_options(NuSMVEnv_ptr env,
 
   \sa Bdd_elfwd_check_set_and_save_options
 */
-void
-Bdd_elfwd_restore_options(NuSMVEnv_ptr env,
-                          unsigned int which_options,
-                          BddELFwdSavedOptions_ptr saved_options);
+void Bdd_elfwd_restore_options(NuSMVEnv_ptr env, unsigned int which_options,
+                               BddELFwdSavedOptions_ptr saved_options);
 
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_FSM_BDD_BDD_H__ */

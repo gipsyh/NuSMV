@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -40,7 +40,7 @@
   6th International Conference VMCAI 2005, Paris, France, Volume 3385
   of LNCS, pp. 380-395, Springer, 2005.  Copyright (C)
   Springer-Verlag.
-  
+
 
 */
 
@@ -48,8 +48,8 @@
 #define __NUSMV_CORE_BMC_SBMC_SBMC_BMC_H__
 
 #include "nusmv/core/bmc/bmcDump.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/prop/Prop.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -59,11 +59,9 @@
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -78,19 +76,13 @@
   if loopback is '*' (BMC_ALL_LOOPS). <BR>
   Also see the Bmc_GenSolve_Action possible values
 
-  
+
 
   \sa Bmc_GenSolve_Action
 */
-int
-Bmc_SBMCGenSolveLtl(NuSMVEnv_ptr env,
-                    Prop_ptr ltlprop,
-                    const int k,
-                    const int relative_loop,
-                    const boolean must_inc_length,
-                    const boolean must_solve,
-                    const Bmc_DumpType dump_type,
-                    const char* dump_fname_template);
+int Bmc_SBMCGenSolveLtl(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int k,
+                        const int relative_loop, const boolean must_inc_length,
+                        const boolean must_solve, const Bmc_DumpType dump_type,
+                        const char *dump_fname_template);
 
 #endif /* __NUSMV_CORE_BMC_SBMC_SBMC_BMC_H__ */
-

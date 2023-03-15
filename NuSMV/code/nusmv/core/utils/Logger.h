@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,24 +34,22 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_LOGGER_H__
 #define __NUSMV_CORE_UTILS_LOGGER_H__
 
 #include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
-#include "nusmv/core/utils/OStream.h"
 #include "nusmv/core/opt/OptsHandler.h"
+#include "nusmv/core/utils/OStream.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct Logger
   \brief Definition of the public accessor for class Logger
 
-  
+
 */
-typedef struct Logger_TAG*  Logger_ptr;
+typedef struct Logger_TAG *Logger_ptr;
 
 /*!
   \brief To cast and check instances of class Logger
@@ -59,16 +57,14 @@ typedef struct Logger_TAG*  Logger_ptr;
   These macros must be used respectively to cast and to check
   instances of class Logger
 */
-#define LOGGER(self) \
-         ((Logger_ptr) self)
+#define LOGGER(self) ((Logger_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LOGGER_CHECK_INSTANCE(self) \
-         (nusmv_assert(LOGGER(self) != LOGGER(NULL)))
+#define LOGGER_CHECK_INSTANCE(self) (nusmv_assert(LOGGER(self) != LOGGER(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -105,7 +101,6 @@ typedef struct Logger_TAG*  Logger_ptr;
 */
 #define LOGGER_TRACE_VL 100
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -134,7 +129,7 @@ void Logger_quit(NuSMVEnv_ptr env);
 
   \sa Logger_destroy
 */
-Logger_ptr Logger_create(FILE* stream);
+Logger_ptr Logger_create(FILE *stream);
 
 /*!
   \methodof Logger
@@ -154,8 +149,7 @@ void Logger_destroy(Logger_ptr self);
 
   \sa Logger_nlog
 */
-void Logger_log(const Logger_ptr self,
-                       const char* format, ...);
+void Logger_log(const Logger_ptr self, const char *format, ...);
 
 /*!
   \methodof Logger
@@ -166,17 +160,15 @@ void Logger_log(const Logger_ptr self,
 
   \sa Logger_nlog
 */
-void Logger_vlog(const Logger_ptr self,
-                        OptsHandler_ptr opts,
-                        const int verbose_level,
-                        const char* format, ...);
+void Logger_vlog(const Logger_ptr self, OptsHandler_ptr opts,
+                 const int verbose_level, const char *format, ...);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define Logger_vlog_error(self, opts, format, ...) \
+#define Logger_vlog_error(self, opts, format, ...)                             \
   Logger_vlog(self, opts, LOGGER_ERROR_VL, format, __VA_ARGS__)
 
 /*!
@@ -184,7 +176,7 @@ void Logger_vlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vlog_warn(self, opts, format, ...) \
+#define Logger_vlog_warn(self, opts, format, ...)                              \
   Logger_vlog(self, opts, LOGGER_WARN_VL, format, __VA_ARGS__)
 
 /*!
@@ -192,7 +184,7 @@ void Logger_vlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vlog_info(self, opts, format, ...) \
+#define Logger_vlog_info(self, opts, format, ...)                              \
   Logger_vlog(self, opts, LOGGER_INFO_VL, format, __VA_ARGS__)
 
 /*!
@@ -200,7 +192,7 @@ void Logger_vlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vlog_debug(self, opts, format, ...) \
+#define Logger_vlog_debug(self, opts, format, ...)                             \
   Logger_vlog(self, opts, LOGGER_DEBUG_VL, format, __VA_ARGS__)
 
 /*!
@@ -208,7 +200,7 @@ void Logger_vlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vlog_trace(self, opts, format, ...) \
+#define Logger_vlog_trace(self, opts, format, ...)                             \
   Logger_vlog(self, opts, LOGGER_TRACE_VL, format, __VA_ARGS__)
 
 /*!
@@ -220,9 +212,8 @@ void Logger_vlog(const Logger_ptr self,
 
   \sa Logger_log, UtilsIO_node_vfprintf
 */
-void Logger_nlog(const Logger_ptr self,
-                        const MasterPrinter_ptr node_printer,
-                        const char* format, ...);
+void Logger_nlog(const Logger_ptr self, const MasterPrinter_ptr node_printer,
+                 const char *format, ...);
 
 /*!
   \methodof Logger
@@ -234,19 +225,17 @@ void Logger_nlog(const Logger_ptr self,
 
   \sa Logger_log, UtilsIO_node_vfprintf
 */
-void Logger_vnlog(const Logger_ptr self,
-                        const MasterPrinter_ptr node_printer,
-                         OptsHandler_ptr opts,
-                         const int verbose_level,
-                         const char* format, ...);
+void Logger_vnlog(const Logger_ptr self, const MasterPrinter_ptr node_printer,
+                  OptsHandler_ptr opts, const int verbose_level,
+                  const char *format, ...);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define Logger_vnlog_error(self, wffprint, opts, format, ...) \
-  Logger_vlog(self, opts, LOGGER_ERROR_VL, "%s: ", __func__);               \
+#define Logger_vnlog_error(self, wffprint, opts, format, ...)                  \
+  Logger_vlog(self, opts, LOGGER_ERROR_VL, "%s: ", __func__);                  \
   Logger_vnlog(self, wffprint, opts, LOGGER_ERROR_VL, format, __VA_ARGS__)
 
 /*!
@@ -254,8 +243,8 @@ void Logger_vnlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vnlog_warn(self, wffprint, opts, format, ...) \
-  Logger_vlog(self, opts, LOGGER_WARN_VL, "%s: ", __func__);               \
+#define Logger_vnlog_warn(self, wffprint, opts, format, ...)                   \
+  Logger_vlog(self, opts, LOGGER_WARN_VL, "%s: ", __func__);                   \
   Logger_vnlog(self, wffprint, opts, LOGGER_WARN_VL, format, __VA_ARGS__)
 
 /*!
@@ -263,8 +252,8 @@ void Logger_vnlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vnlog_info(self, wffprint, opts, format, ...) \
-  Logger_vlog(self, opts, LOGGER_INFO_VL, "%s: ", __func__);               \
+#define Logger_vnlog_info(self, wffprint, opts, format, ...)                   \
+  Logger_vlog(self, opts, LOGGER_INFO_VL, "%s: ", __func__);                   \
   Logger_vnlog(self, wffprint, opts, LOGGER_INFO_VL, format, __VA_ARGS__)
 
 /*!
@@ -272,8 +261,8 @@ void Logger_vnlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vnlog_debug(self, wffprint, opts, format, ...) \
-  Logger_vlog(self, opts, LOGGER_DEBUG_VL, "%s: ", __func__);               \
+#define Logger_vnlog_debug(self, wffprint, opts, format, ...)                  \
+  Logger_vlog(self, opts, LOGGER_DEBUG_VL, "%s: ", __func__);                  \
   Logger_vnlog(self, wffprint, opts, LOGGER_DEBUG_VL, format, __VA_ARGS__)
 
 /*!
@@ -281,8 +270,8 @@ void Logger_vnlog(const Logger_ptr self,
 
   \todo Missing description
 */
-#define Logger_vnlog_trace(self, wffprint, opts, format, ...) \
-  Logger_vlog(self, opts, LOGGER_TRACE_VL, "%s: ", __func__);               \
+#define Logger_vnlog_trace(self, wffprint, opts, format, ...)                  \
+  Logger_vlog(self, opts, LOGGER_TRACE_VL, "%s: ", __func__);                  \
   Logger_vnlog(self, wffprint, opts, LOGGER_TRACE_VL, format, __VA_ARGS__)
 
 /*!
@@ -293,7 +282,7 @@ void Logger_vnlog(const Logger_ptr self,
 
   \sa Logger_log, Logger_nlog
 */
-FILE* Logger_get_stream(const Logger_ptr self);
+FILE *Logger_get_stream(const Logger_ptr self);
 
 /*!
   \methodof Logger
@@ -345,7 +334,5 @@ void Logger_reset_indent_size(Logger_ptr self);
 void Logger_set_indent_size(Logger_ptr self, int n);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_LOGGER_H__ */

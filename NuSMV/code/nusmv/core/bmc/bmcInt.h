@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,20 +34,17 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_INT_H__
 #define __NUSMV_CORE_BMC_BMC_INT_H__
 
-
-#include <time.h>
 #include <limits.h>
 #include <stdio.h>
-
+#include <time.h>
 
 #include "nusmv/core/enc/be/BeEnc.h"
 
-#include "nusmv/core/fsm/FsmBuilder.h"
 #include "nusmv/core/compile/compile.h"
+#include "nusmv/core/fsm/FsmBuilder.h"
 
 #include "nusmv/core/be/be.h"
 
@@ -55,13 +52,12 @@
 #include "nusmv/core/trace/TraceMgr.h"
 
 #include "nusmv/core/dd/dd.h"
-#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/opt/opt.h"
 #include "nusmv/core/utils/utils.h"
 
 /* Uncomment the following line to print out benchmarking info */
 /* #define BENCHMARKING */
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -102,42 +98,42 @@
 
   \todo Missing description
 */
-#define DEFAULT_DIMACS_FILENAME        "@f_k@k_l@l_n@n"
+#define DEFAULT_DIMACS_FILENAME "@f_k@k_l@l_n@n"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_INVAR_DIMACS_FILENAME  "@f_invar_n@n"
+#define DEFAULT_INVAR_DIMACS_FILENAME "@f_invar_n@n"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_BMC_PB_LENGTH     10
+#define DEFAULT_BMC_PB_LENGTH 10
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_BMC_PB_LOOP         Bmc_Utils_GetAllLoopbacksString()
+#define DEFAULT_BMC_PB_LOOP Bmc_Utils_GetAllLoopbacksString()
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_BMC_INVAR_ALG       "classic"
+#define DEFAULT_BMC_INVAR_ALG "classic"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_BMC_INC_INVAR_ALG   "dual"
+#define DEFAULT_BMC_INC_INVAR_ALG "dual"
 
 /*!
   \brief \todo Missing synopsis
@@ -157,11 +153,9 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -185,15 +179,11 @@ extern cmp_struct_ptr cmps;
 extern FsmBuilder_ptr global_fsm_builder;
 extern TraceMgr_ptr global_trace_manager;
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -202,23 +192,22 @@ extern TraceMgr_ptr global_trace_manager;
 /*!
   \brief Creates the key for ltl_tableau_hash
 
-  
+
 */
-node_ptr
-bmc_tableau_memoization_get_key(NodeMgr_ptr nodemgr,
-                                node_ptr wff, int time, int k, int l);
+node_ptr bmc_tableau_memoization_get_key(NodeMgr_ptr nodemgr, node_ptr wff,
+                                         int time, int k, int l);
 
 /*!
   \brief Insertion function for ltl_tableau_hash
 
-  
+
 */
 void bmc_tableau_memoization_insert(hash_ptr, node_ptr key, be_ptr be);
 
 /*!
   \brief Lookup function for ltl_tableau_hash
 
-  
+
 */
 be_ptr bmc_tableau_memoization_lookup(hash_ptr, node_ptr key);
 
@@ -226,16 +215,16 @@ be_ptr bmc_tableau_memoization_lookup(hash_ptr, node_ptr key);
   \brief Call SymbTable_get_handled_hash_ptr with proper
                        arguments
 
-  
+
 */
-hash_ptr Bmc_Tableau_get_handled_hash(SymbTable_ptr symb_table,
-                                             char* hash_str);
+hash_ptr Bmc_Tableau_get_handled_hash(SymbTable_ptr symb_table, char *hash_str);
 
 /*!
   \command{_bmc_test_tableau} Generates a random formula to logically test the
   equivalent tableau
 
-  \command_args{[-h] | [-n property_index] | [[ -d max_depth] [-c max_conns] [-o operator]]
+  \command_args{[-h] | [-n property_index] | [[ -d max_depth] [-c max_conns] [-o
+  operator]]
   }
 
   Use this hidden command to generate random formulae and
@@ -247,37 +236,33 @@ hash_ptr Bmc_Tableau_get_handled_hash(SymbTable_ptr symb_table,
   the currently model loaded into NuSMV contains. <BR>
   You cannot call this command if the bmc_loopback is set to '*' (all loops).
 
-  The test is possibly broken if the model contains frozen variables 
-  
+  The test is possibly broken if the model contains frozen variables
+
 */
-int
-Bmc_TestTableau(NuSMVEnv_ptr env, int argc, char ** argv);
+int Bmc_TestTableau(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \brief Call this function to reset the test sub-package (into
   the reset command for example)
 
-  
+
 */
 void Bmc_TestReset(void);
 
 /*!
-  \brief  Checks wether a formula contains only future operators 
+  \brief  Checks wether a formula contains only future operators
 
-  
+
 */
-boolean
-isPureFuture(const node_ptr pltl_wff);
+boolean isPureFuture(const node_ptr pltl_wff);
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
-be_ptr
-Bmc_GetTestTableau(const BeEnc_ptr be_enc,
-                   const node_ptr ltl_wff,
-                   const int k, const int l);
+be_ptr Bmc_GetTestTableau(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
+                          const int k, const int l);
 
 /*!
   \brief Given a wff expressed in ltl builds the model-independent
@@ -292,10 +277,8 @@ Bmc_GetTestTableau(const BeEnc_ptr be_enc,
   bmc_tableauGetGloballyAtTime, bmc_tableauGetEventuallyAtTime,
   bmc_tableauGetUntilAtTime, bmc_tableauGetReleasesAtTime
 */
-be_ptr
-BmcInt_Tableau_GetAtTime(const BeEnc_ptr be_enc,
-                         const node_ptr ltl_wff,
-                         const int time, const int k, const int l);
+be_ptr BmcInt_Tableau_GetAtTime(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
+                                const int time, const int k, const int l);
 
 /* ================================================== */
 /* Tableaux for an LTL formula:                       */
@@ -307,10 +290,8 @@ BmcInt_Tableau_GetAtTime(const BeEnc_ptr be_enc,
   Returns a falsity constants if the next operator leads
   out of [l, k] and there is no loop
 */
-be_ptr
-bmc_tableauGetNextAtTime(const BeEnc_ptr be_enc,
-                         const node_ptr ltl_wff,
-                         const int time, const int k, const int l);
+be_ptr bmc_tableauGetNextAtTime(const BeEnc_ptr be_enc, const node_ptr ltl_wff,
+                                const int time, const int k, const int l);
 
 /*!
   \brief Resolves the future operator, and builds a conjunctive
@@ -321,11 +302,9 @@ bmc_tableauGetNextAtTime(const BeEnc_ptr be_enc,
   If intime<=k is out of [l, k] or if there is no loop,
   iterates from intime to k, otherwise iterates from l to k
 */
-be_ptr
-bmc_tableauGetEventuallyAtTime(const BeEnc_ptr be_enc,
-                               const node_ptr ltl_wff,
-                               const int intime, const int k,
-                               const int l);
+be_ptr bmc_tableauGetEventuallyAtTime(const BeEnc_ptr be_enc,
+                                      const node_ptr ltl_wff, const int intime,
+                                      const int k, const int l);
 
 /*!
   \brief As bmc_tableauGetEventuallyAtTime, but builds a
@@ -335,11 +314,9 @@ bmc_tableauGetEventuallyAtTime(const BeEnc_ptr be_enc,
 
   \sa bmc_tableauGetEventuallyAtTime
 */
-be_ptr
-bmc_tableauGetGloballyAtTime(const BeEnc_ptr be_enc,
-                             const node_ptr ltl_wff,
-                             const int intime, const int k,
-                             const int l);
+be_ptr bmc_tableauGetGloballyAtTime(const BeEnc_ptr be_enc,
+                                    const node_ptr ltl_wff, const int intime,
+                                    const int k, const int l);
 
 /*!
   \brief Builds an expression which evaluates the until operator
@@ -349,10 +326,9 @@ bmc_tableauGetGloballyAtTime(const BeEnc_ptr be_enc,
 
   \sa bmc_tableauGetUntilAtTime_aux
 */
-be_ptr
-bmc_tableauGetUntilAtTime(const BeEnc_ptr be_enc,
-                          const node_ptr p, const node_ptr q,
-                          const int time, const int k, const int l);
+be_ptr bmc_tableauGetUntilAtTime(const BeEnc_ptr be_enc, const node_ptr p,
+                                 const node_ptr q, const int time, const int k,
+                                 const int l);
 
 /*!
   \brief Builds an expression which evaluates the release
@@ -363,12 +339,10 @@ bmc_tableauGetUntilAtTime(const BeEnc_ptr be_enc,
 
   \sa bmc_tableauGetReleasesAtTime_aux
 */
-be_ptr
-bmc_tableauGetReleasesAtTime(const BeEnc_ptr be_enc,
-                             const node_ptr p, const node_ptr q,
-                             const int time, const int k, const int l);
+be_ptr bmc_tableauGetReleasesAtTime(const BeEnc_ptr be_enc, const node_ptr p,
+                                    const node_ptr q, const int time,
+                                    const int k, const int l);
 /* ================================================== */
-
 
 /* ================================================== */
 /* Tableaux for a PLTL formula:                       */
@@ -382,10 +356,9 @@ bmc_tableauGetReleasesAtTime(const BeEnc_ptr be_enc,
 
   \sa getTableauAtTime
 */
-be_ptr
-Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
-                           const node_ptr pltl_wff,
-                           const int k, const int l);
+be_ptr Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
+                                  const node_ptr pltl_wff, const int k,
+                                  const int l);
 
 /*!
   \brief Builds the conjunction of the tableaux for a PLTL formula
@@ -399,12 +372,9 @@ Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
 
   \sa evaluateOn
 */
-be_ptr
-Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
-                                  const node_ptr pltl_wff,
-                                  const int k);
+be_ptr Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
+                                         const node_ptr pltl_wff, const int k);
 /* ================================================== */
-
 
 /* ================================================== */
 /* Utils module:                                      */
@@ -424,9 +394,8 @@ Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
 
                Returned list must be destroyed by the called.
 */
-lsList
-Bmc_Utils_get_vars_list_for_uniqueness(BeEnc_ptr be_enc,
-                                       Prop_ptr invarprop);
+lsList Bmc_Utils_get_vars_list_for_uniqueness(BeEnc_ptr be_enc,
+                                              Prop_ptr invarprop);
 
 /*!
   \brief Creates a list of BE variables that are intended to be
@@ -443,13 +412,13 @@ Bmc_Utils_get_vars_list_for_uniqueness(BeEnc_ptr be_enc,
 
                Returned list must be destroyed by the called.
 */
-lsList
-Bmc_Utils_get_vars_list_for_uniqueness_fsm(BeEnc_ptr be_enc,
-                                           SexpFsm_ptr bool_fsm);
+lsList Bmc_Utils_get_vars_list_for_uniqueness_fsm(BeEnc_ptr be_enc,
+                                                  SexpFsm_ptr bool_fsm);
 
 /* ================================================== */
 /* Simulation                                         */
-void bmc_simulate_set_curr_sim_trace(const NuSMVEnv_ptr env, Trace_ptr trace, int idx);
+void bmc_simulate_set_curr_sim_trace(const NuSMVEnv_ptr env, Trace_ptr trace,
+                                     int idx);
 Trace_ptr bmc_simulate_get_curr_sim_trace(const NuSMVEnv_ptr env);
 int bmc_simulate_get_curr_sim_trace_index(const NuSMVEnv_ptr env);
 /* ================================================== */
@@ -469,13 +438,11 @@ int bmc_simulate_get_curr_sim_trace_index(const NuSMVEnv_ptr env);
   \sa Trace_create, Mc_create_trace_from_bdd_input_list,
                Bmc_fill_trace_from_cnf_model
 */
-Trace_ptr
-Bmc_create_trace_from_cnf_model(const BeEnc_ptr be_enc,
-                                const NodeList_ptr symbols,
-                                const char* desc,
-                                const TraceType type,
-                                const Slist_ptr cnf_model,
-                                int k);
+Trace_ptr Bmc_create_trace_from_cnf_model(const BeEnc_ptr be_enc,
+                                          const NodeList_ptr symbols,
+                                          const char *desc,
+                                          const TraceType type,
+                                          const Slist_ptr cnf_model, int k);
 
 /*!
   \brief Fills the given trace out of a cnf model
@@ -488,10 +455,9 @@ Bmc_create_trace_from_cnf_model(const BeEnc_ptr be_enc,
 
   \sa Trace_create, Mc_fill_trace_from_bdd_input_list
 */
-Trace_ptr
-Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
-                              const Slist_ptr cnf_model,
-                              int k, Trace_ptr trace);
+Trace_ptr Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
+                                        const Slist_ptr cnf_model, int k,
+                                        Trace_ptr trace);
 
 /* internal bmc/trace utils */
 
@@ -506,18 +472,16 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
 
   \se Trace is populated with default values
 */
-void
-bmc_trace_utils_complete_trace(Trace_ptr trace,
-                               const BoolEnc_ptr bool_enc);
+void bmc_trace_utils_complete_trace(Trace_ptr trace,
+                                    const BoolEnc_ptr bool_enc);
 
 /*!
   \brief Appends a _complete_ (i,S') pair to existing trace
 
   This is a private service of BmcStepWise_Simulation
 */
-void
-bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
-                                   const Slist_ptr cnf_model);
+void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
+                                        const Slist_ptr cnf_model);
 
 /**AutomaticEnd***************************************************************/
 

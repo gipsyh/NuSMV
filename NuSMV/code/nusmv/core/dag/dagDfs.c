@@ -2,7 +2,7 @@
 
 
   This file is part of the ``dag'' package of NuSMV version 2.
-  Copyright (C) 2000-2001 by University of Genova. 
+  Copyright (C) 2000-2001 by University of Genova.
   Copyright (C) 2011 by FBK.
 
   NuSMV version 2 is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -67,7 +67,7 @@
 
   Check if a vertex is a leaf
 */
-#define IS_LEAF(vertex) ((Dag_Vertex_t**)NULL == vertex->outList)
+#define IS_LEAF(vertex) ((Dag_Vertex_t **)NULL == vertex->outList)
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/
@@ -75,11 +75,8 @@
 /*---------------------------------------------------------------------------*/
 
 #ifdef DAG_DFS_RECURSION
-static void
-DFS(Dag_Vertex_t* v,
-    Dag_DfsFunctions_t* dfsFun,
-    char* dfsData,
-    nusmv_ptrint vBit);
+static void DFS(Dag_Vertex_t *v, Dag_DfsFunctions_t *dfsFun, char *dfsData,
+                nusmv_ptrint vBit);
 #endif
 
 /**AutomaticEnd***************************************************************/
@@ -110,21 +107,20 @@ DFS(Dag_Vertex_t* v,
 */
 
 #ifndef DAG_DFS_RECURSION
-void Dag_Dfs(Dag_Vertex_t* current,
-             Dag_DfsFunctions_t* dfs_fun,
-             char* dfs_data)
-{
+void Dag_Dfs(Dag_Vertex_t *current, Dag_DfsFunctions_t *dfs_fun,
+             char *dfs_data) {
   int set;
   int dfsCode;
   Stack_ptr parent_stack;
-  Dag_Vertex_t* current_ref;
+  Dag_Vertex_t *current_ref;
   nusmv_ptrint current_bit;
-  Dag_Vertex_t* parent;
-  Dag_Vertex_t* parent_ref;
+  Dag_Vertex_t *parent;
+  Dag_Vertex_t *parent_ref;
   nusmv_ptrint parent_bit;
-  Dag_Vertex_t* processed;
+  Dag_Vertex_t *processed;
 
-  if ((Dag_Vertex_t*)NULL == current) return;
+  if ((Dag_Vertex_t *)NULL == current)
+    return;
 
   current_bit = Dag_VertexIsSet(current);
   current_ref = Dag_VertexGetRef(current);
@@ -134,7 +130,8 @@ void Dag_Dfs(Dag_Vertex_t* current,
   /* Process the root */
   set = dfs_fun->Set(current_ref, dfs_data, current_bit);
 
-  if (1 == set) return;
+  if (1 == set)
+    return;
 
   current_ref->visit = dfsCode;
 
@@ -146,8 +143,7 @@ void Dag_Dfs(Dag_Vertex_t* current,
     current = current_ref->outList[0];
     current_bit = Dag_VertexIsSet(current);
     current_ref = Dag_VertexGetRef(current);
-  }
-  else {
+  } else {
     dfs_fun->LastVisit(current_ref, dfs_data, current_bit);
     return;
   }
@@ -156,8 +152,7 @@ void Dag_Dfs(Dag_Vertex_t* current,
     /* Is it to be processed? */
     set = dfs_fun->Set(current_ref, dfs_data, current_bit);
 
-    if ((-1 == set) ||
-        ((0 == set) && (current_ref->visit != dfsCode))) {
+    if ((-1 == set) || ((0 == set) && (current_ref->visit != dfsCode))) {
 
       current_ref->visit = dfsCode;
 
@@ -169,8 +164,7 @@ void Dag_Dfs(Dag_Vertex_t* current,
         current_bit = Dag_VertexIsSet(current);
         current_ref = Dag_VertexGetRef(current);
         continue;
-      }
-      else {
+      } else {
         dfs_fun->LastVisit(current_ref, dfs_data, current_bit);
       }
     }
@@ -179,7 +173,7 @@ void Dag_Dfs(Dag_Vertex_t* current,
     processed = DagId(current_ref, current_bit);
 
     while (true) {
-      parent = (Dag_Vertex_t*)STACK_TOP(parent_stack);
+      parent = (Dag_Vertex_t *)STACK_TOP(parent_stack);
       parent_bit = Dag_VertexIsSet(parent);
       parent_ref = Dag_VertexGetRef(parent);
 
@@ -189,19 +183,18 @@ void Dag_Dfs(Dag_Vertex_t* current,
       if (processed == parent_ref->outList[parent_ref->numSons - 1]) {
         /* Subtree processed. Back on the parent, if any. */
         dfs_fun->LastVisit(parent_ref, dfs_data, parent_bit);
-        processed = (Dag_Vertex_t*)Stack_pop(parent_stack);
+        processed = (Dag_Vertex_t *)Stack_pop(parent_stack);
 
         if (STACK_IS_EMPTY(parent_stack)) {
           Stack_destroy(parent_stack);
           return;
         }
-      }
-      else {
+      } else {
         /* Check needed for ITE. What is the next child of parent? */
         if (processed == parent_ref->outList[0]) {
           current = parent_ref->outList[1];
-        }
-        else current = parent_ref->outList[2];
+        } else
+          current = parent_ref->outList[2];
 
         current_bit = Dag_VertexIsSet(current);
         current_ref = Dag_VertexGetRef(current);
@@ -231,23 +224,20 @@ void Dag_Dfs(Dag_Vertex_t* current,
   \se none
 */
 
-void Dag_Dfs(Dag_Vertex_t* dfsRoot, Dag_DfsFunctions_t* dfsFun,
-             char* dfsData)
-{
+void Dag_Dfs(Dag_Vertex_t *dfsRoot, Dag_DfsFunctions_t *dfsFun, char *dfsData) {
   /* DFS cannot start from a NULL vertex. */
   if (dfsRoot == NIL(Dag_Vertex_t)) {
     return;
   }
 
   /* Increment the current DFS code for the dag manager. */
-  ++(Dag_VertexGetRef(dfsRoot) -> dag -> dfsCode);
+  ++(Dag_VertexGetRef(dfsRoot)->dag->dfsCode);
 
   /* Start the real thing. */
-   DFS(Dag_VertexGetRef(dfsRoot), dfsFun, dfsData, Dag_VertexIsSet(dfsRoot));
+  DFS(Dag_VertexGetRef(dfsRoot), dfsFun, dfsData, Dag_VertexIsSet(dfsRoot));
 
-   return;
+  return;
 } /* End of Dag_Dfs. */
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -266,41 +256,36 @@ void Dag_Dfs(Dag_Vertex_t* dfsRoot, Dag_DfsFunctions_t* dfsFun,
   \se none
 */
 
-static void
-DFS(
-  Dag_Vertex_t       * v,
-  Dag_DfsFunctions_t * dfsFun,
-  char               * dfsData,
-  nusmv_ptrint                  vBit)
-{
+static void DFS(Dag_Vertex_t *v, Dag_DfsFunctions_t *dfsFun, char *dfsData,
+                nusmv_ptrint vBit) {
   unsigned gen;
-  Dag_Vertex_t* vSon;
+  Dag_Vertex_t *vSon;
   int set;
 
   /* dfsFun -> Set() is -1 if the node is to be visited and 1 if the node
      is not to be visited; 0 means that the DFS should decide what to do. */
-  set = dfsFun -> Set(v, dfsData, vBit);
-  if ((set == 1) || ((set == 0) && (v -> visit == v -> dag -> dfsCode))) {
+  set = dfsFun->Set(v, dfsData, vBit);
+  if ((set == 1) || ((set == 0) && (v->visit == v->dag->dfsCode))) {
     return;
   } else {
-    v -> visit = v -> dag -> dfsCode;
+    v->visit = v->dag->dfsCode;
   }
 
   /* Do the first visit. */
-  (dfsFun -> FirstVisit)(v, dfsData, vBit);
+  (dfsFun->FirstVisit)(v, dfsData, vBit);
 
   /* Visit each son (if any). */
-  if (v -> outList != (Dag_Vertex_t **) NULL) {
+  if (v->outList != (Dag_Vertex_t **)NULL) {
     for (gen = 0; gen < v->numSons; gen++) {
       vSon = v->outList[gen];
 
       DFS(Dag_VertexGetRef(vSon), dfsFun, dfsData, Dag_VertexIsSet(vSon));
       /* Do the back visit. */
-      (dfsFun -> BackVisit)(v, dfsData, vBit);
+      (dfsFun->BackVisit)(v, dfsData, vBit);
     }
   }
   /* Do the last visit and return . */
-  (dfsFun -> LastVisit)(v, dfsData, vBit);
+  (dfsFun->LastVisit)(v, dfsData, vBit);
 
   return;
 

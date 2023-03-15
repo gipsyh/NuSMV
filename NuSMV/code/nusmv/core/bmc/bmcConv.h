@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,15 +36,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_CONV_H__
 #define __NUSMV_CORE_BMC_BMC_CONV_H__
 
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/enc/be/BeEnc.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
 /**AutomaticStart*************************************************************/
 
@@ -78,18 +77,17 @@ be_ptr Bmc_Conv_Bexp2Be(BeEnc_ptr be_enc, node_ptr bexp);
   \brief <b>Converts</b> given <b>boolean expressions list </b>
   into correspondent <b>reduced boolean circuits list</b>
 
-  
+
 
   \se be hash may change
 */
-node_ptr
-Bmc_Conv_BexpList2BeList(BeEnc_ptr be_enc, node_ptr bexp_list);
+node_ptr Bmc_Conv_BexpList2BeList(BeEnc_ptr be_enc, node_ptr bexp_list);
 
 /*!
   \brief This function converts a BE model (i.e. a list of BE
   literals) to symbolic expressions.
 
-  
+
 
   be_model is the model which will be transformed, i.e llList of
   BE literal.
@@ -129,15 +127,11 @@ Bmc_Conv_BexpList2BeList(BeEnc_ptr be_enc, node_ptr bexp_list);
   TODO[AT] a parameter may be added to make the returned assignments complete
 */
 void Bmc_Conv_get_BeModel2SymbModel(const BeEnc_ptr be_enc,
-                                    const Slist_ptr be_model,
-                                    int k,
+                                    const Slist_ptr be_model, int k,
                                     boolean convert_to_scalars,
-                                    node_ptr* frozen,
-                                    array_t** states,
-                                    array_t** inputs);
-
+                                    node_ptr *frozen, array_t **states,
+                                    array_t **inputs);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_BMC_BMC_CONV_H__ */
-

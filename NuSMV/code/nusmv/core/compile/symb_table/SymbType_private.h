@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,12 +34,10 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_TYPE_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_TYPE_PRIVATE_H__
 
 #include "nusmv/core/compile/symb_table/SymbType.h"
-
 
 /* ---------------------------------------------------------------------- */
 /*     Private methods                                                    */
@@ -55,15 +53,15 @@
    result the public constructor will not be able to destroy memory
    sharing instance of a type. Use the private constructor
    SymbType_destroy_memory_sharing_type to destroy such instances.
-   
+
 
   \se allocate memory
 
   \sa SymbType_create, SymbType_destroy_memory_sharing_type
 */
-SymbType_ptr
-SymbType_create_memory_sharing_type(const NuSMVEnv_ptr env,
-                                    SymbTypeTag tag, node_ptr body);
+SymbType_ptr SymbType_create_memory_sharing_type(const NuSMVEnv_ptr env,
+                                                 SymbTypeTag tag,
+                                                 node_ptr body);
 
 /*!
   \methodof SymbType
@@ -78,10 +76,9 @@ SymbType_create_memory_sharing_type(const NuSMVEnv_ptr env,
 
   \sa SymbType_create, SymbType_destroy_memory_sharing_type
 */
-SymbType_ptr
-SymbType_create_memory_sharing_array_type(SymbType_ptr subtype,
-                                          int lower_bound,
-                                          int higher_bound);
+SymbType_ptr SymbType_create_memory_sharing_array_type(SymbType_ptr subtype,
+                                                       int lower_bound,
+                                                       int higher_bound);
 
 /*!
   \methodof SymbType

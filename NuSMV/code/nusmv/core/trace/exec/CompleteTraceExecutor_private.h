@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,29 +37,27 @@
 #ifndef __NUSMV_CORE_TRACE_EXEC_COMPLETE_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_COMPLETE_TRACE_EXECUTOR_PRIVATE_H__
 
-#include "nusmv/core/trace/exec/CompleteTraceExecutor.h"
 #include "nusmv/core/trace/exec/BaseTraceExecutor.h"
 #include "nusmv/core/trace/exec/BaseTraceExecutor_private.h"
+#include "nusmv/core/trace/exec/CompleteTraceExecutor.h"
 #include "nusmv/core/utils/utils.h"
 
 /*!
   \brief CompleteTraceExecutor class definition derived from
                class TraceExecutor
 
-  
+
 
   \sa Base class TraceExecutor
 */
 
-typedef struct CompleteTraceExecutor_TAG
-{
+typedef struct CompleteTraceExecutor_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(BaseTraceExecutor);
 
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-
 
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
@@ -68,9 +66,8 @@ typedef struct CompleteTraceExecutor_TAG
   /* executes the given trace, returns true iff the whole trace was
      succesfully executed. Number of succesful transitions if returned
      in *n_steps, if a non-NULL pointer is given. */
-  VIRTUAL boolean
-  (*execute)(const CompleteTraceExecutor_ptr self,
-             const Trace_ptr trace, int* n_steps);
+  VIRTUAL boolean (*execute)(const CompleteTraceExecutor_ptr self,
+                             const Trace_ptr trace, int *n_steps);
 
 } CompleteTraceExecutor;
 
@@ -87,7 +84,7 @@ typedef struct CompleteTraceExecutor_TAG
   \sa CompleteTraceExecutor_create
 */
 void complete_trace_executor_init(CompleteTraceExecutor_ptr self,
-                                         const NuSMVEnv_ptr env);
+                                  const NuSMVEnv_ptr env);
 
 /*!
   \methodof CompleteTraceExecutor

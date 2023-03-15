@@ -34,8 +34,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_RBC_INLINE_RESULT_H__
 #define __NUSMV_CORE_RBC_INLINE_RESULT_H__
 
@@ -48,7 +46,7 @@
 
 
 */
-typedef struct InlineResult_TAG*  InlineResult_ptr;
+typedef struct InlineResult_TAG *InlineResult_ptr;
 
 /*!
   \brief To cast and check instances of class InlineResult
@@ -56,18 +54,15 @@ typedef struct InlineResult_TAG*  InlineResult_ptr;
   These macros must be used respectively to cast and to check
   instances of class InlineResult
 */
-#define INLINE_RESULT(self) \
-         ((InlineResult_ptr) self)
+#define INLINE_RESULT(self) ((InlineResult_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define INLINE_RESULT_CHECK_INSTANCE(self) \
-         (nusmv_assert(INLINE_RESULT(self) != INLINE_RESULT(NULL)))
-
-
+#define INLINE_RESULT_CHECK_INSTANCE(self)                                     \
+  (nusmv_assert(INLINE_RESULT(self) != INLINE_RESULT(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -83,8 +78,7 @@ typedef struct InlineResult_TAG*  InlineResult_ptr;
 
   \sa InlineResult_destroy
 */
-InlineResult_ptr
-InlineResult_create(Rbc_Manager_t* mgr, Rbc_t* f);
+InlineResult_ptr InlineResult_create(Rbc_Manager_t *mgr, Rbc_t *f);
 
 /*!
   \methodof InlineResult
@@ -104,8 +98,7 @@ void InlineResult_destroy(InlineResult_ptr self);
 
   \sa InlineResult_destroy
 */
-InlineResult_ptr
-InlineResult_copy(const InlineResult_ptr self);
+InlineResult_ptr InlineResult_copy(const InlineResult_ptr self);
 
 /*!
   Use when you need to store self in a cache.
@@ -128,8 +121,7 @@ InlineResult_ptr InlineResult_ref(InlineResult_ptr self);
   \brief Returns the original formula f that was submitted to
                       the constructor
 */
-Rbc_t*
-InlineResult_get_original_f(InlineResult_ptr self);
+Rbc_t *InlineResult_get_original_f(InlineResult_ptr self);
 
 /*!
   \methodof InlineResult
@@ -141,8 +133,7 @@ InlineResult_get_original_f(InlineResult_ptr self);
   counterexample must be shown though, inlined f must be conjuct
   with the conjuction set.
 */
-Rbc_t*
-InlineResult_get_inlined_f(InlineResult_ptr self);
+Rbc_t *InlineResult_get_inlined_f(InlineResult_ptr self);
 
 /*!
   \methodof InlineResult
@@ -156,8 +147,7 @@ InlineResult_get_inlined_f(InlineResult_ptr self);
 
   \sa ConjSet
 */
-Rbc_t*
-InlineResult_get_c(InlineResult_ptr self);
+Rbc_t *InlineResult_get_c(InlineResult_ptr self);
 
 /*!
   \methodof InlineResult
@@ -165,12 +155,8 @@ InlineResult_get_c(InlineResult_ptr self);
 
 
 */
-Rbc_t*
-InlineResult_get_inlined_f_and_c(InlineResult_ptr self);
-
+Rbc_t *InlineResult_get_inlined_f_and_c(InlineResult_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_RBC_INLINE_RESULT_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,18 +34,17 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_LTL_LTL_INT_H__
 #define __NUSMV_CORE_LTL_LTL_INT_H__
 
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/dd/dd.h"
+#include "nusmv/core/node/node.h"
 #include "nusmv/core/opt/opt.h"
+#include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/compile/compile.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/compile/symb_table/SymbLayer.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/compile/symb_table/SymbType.h"
 
 #include "nusmv/core/fsm/FsmBuilder.h"
@@ -93,8 +92,7 @@ extern TraceMgr_ptr global_trace_manager;
   Computes fair path from one of the states
   passed as parameter.
 */
-node_ptr
-witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasible);
+node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasible);
 
 /*!
   \brief Check for feasability
@@ -109,10 +107,8 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc);
 
   \todo Missing description
 */
-node_ptr
-Ltl_RewriteInput(SymbTable_ptr symb_table, node_ptr expr,
-                 SymbLayer_ptr layer,
-                 node_ptr* init, node_ptr* invar, node_ptr* trans,
-                 LtlRewriteType rewrite_type);
+node_ptr Ltl_RewriteInput(SymbTable_ptr symb_table, node_ptr expr,
+                          SymbLayer_ptr layer, node_ptr *init, node_ptr *invar,
+                          node_ptr *trans, LtlRewriteType rewrite_type);
 
 #endif /* __NUSMV_CORE_LTL_LTL_INT_H__ */

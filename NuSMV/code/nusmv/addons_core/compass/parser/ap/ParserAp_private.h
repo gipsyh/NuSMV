@@ -32,13 +32,12 @@
 
 */
 
-
 #ifndef __NUSMV_ADDONS_CORE_COMPASS_PARSER_AP_PARSER_AP_PRIVATE_H__
 #define __NUSMV_ADDONS_CORE_COMPASS_PARSER_AP_PARSER_AP_PRIVATE_H__
 
 #include "nusmv/addons_core/compass/parser/ap/ParserAp.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \methodof ParserAp
@@ -49,7 +48,6 @@ void parser_ap_add(ParserAp_ptr self, node_ptr ap);
   \methodof ParserAp
   \todo
 */
-node_ptr parser_ap_mk_ap(ParserAp_ptr self,
-                         node_ptr label, node_ptr ap);
+node_ptr parser_ap_mk_ap(ParserAp_ptr self, node_ptr label, node_ptr ap);
 
 #endif /* __NUSMV_ADDONS_CORE_COMPASS_PARSER_AP_PARSER_AP_PRIVATE_H__ */

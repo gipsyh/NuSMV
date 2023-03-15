@@ -43,10 +43,8 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_WORD_NUMBER_H__
 #define __NUSMV_CORE_UTILS_WORD_NUMBER_H__
-
 
 #include "nusmv/core/utils/utils.h"
 
@@ -56,15 +54,14 @@
 
 
 */
-typedef struct WordNumber_TAG* WordNumber_ptr;
+typedef struct WordNumber_TAG *WordNumber_ptr;
 
 /*!
   \brief WordNumber integer value
 
 
 */
-typedef unsigned long long  WordNumberValue;
-
+typedef unsigned long long WordNumberValue;
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -75,16 +72,15 @@ typedef unsigned long long  WordNumberValue;
 
   \todo Missing description
 */
-#define WORD_NUMBER(x)  \
-        ((WordNumber_ptr) (x))
+#define WORD_NUMBER(x) ((WordNumber_ptr)(x))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define WORD_NUMBER_CHECK_INSTANCE(x)  \
-        (nusmv_assert(WORD_NUMBER(x) != WORD_NUMBER(NULL)))
+#define WORD_NUMBER_CHECK_INSTANCE(x)                                          \
+  (nusmv_assert(WORD_NUMBER(x) != WORD_NUMBER(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -107,7 +103,6 @@ void WordNumber_init(NuSMVEnv_ptr env);
 */
 void WordNumber_quit(NuSMVEnv_ptr env);
 
-
 /* implementation limit */
 
 /*!
@@ -129,7 +124,8 @@ unsigned /*!
   \methodof WordNumber
   \todo
 */
-long long WordNumber_get_unsigned_value(WordNumber_ptr self);
+    long long
+    WordNumber_get_unsigned_value(WordNumber_ptr self);
 
 /*!
   \brief returns the value of a WordNumber, interpreted as a signed
@@ -141,7 +137,8 @@ signed /*!
   \methodof WordNumber
   \todo
 */
-long long WordNumber_get_signed_value(WordNumber_ptr self);
+    long long
+    WordNumber_get_signed_value(WordNumber_ptr self);
 
 /*!
   \methodof WordNumber
@@ -175,7 +172,7 @@ boolean WordNumber_get_sign(WordNumber_ptr self);
 
 
 */
-const char* WordNumber_get_parsed_string(WordNumber_ptr self);
+const char *WordNumber_get_parsed_string(WordNumber_ptr self);
 
 /* output functions */
 
@@ -189,10 +186,8 @@ const char* WordNumber_get_parsed_string(WordNumber_ptr self);
 
   \sa WordNumber_print
 */
-int WordNumber_based_print(FILE* output_stream,
-                                  WordNumber_ptr self,
-                                  int base,
-                                  boolean isSigned);
+int WordNumber_based_print(FILE *output_stream, WordNumber_ptr self, int base,
+                           boolean isSigned);
 
 /*!
   \methodof WordNumber
@@ -212,9 +207,8 @@ int WordNumber_based_print(FILE* output_stream,
 
   \sa WordNumber_based_print, WordNumber_to_string
 */
-char* WordNumber_to_based_string(WordNumber_ptr self, int base,
-                                        boolean isSigned);
-
+char *WordNumber_to_based_string(WordNumber_ptr self, int base,
+                                 boolean isSigned);
 
 /* relational operations */
 
@@ -238,8 +232,7 @@ boolean WordNumber_equal(WordNumber_ptr v1, WordNumber_ptr v2);
 
   the width of operands should be equal
 */
-boolean WordNumber_not_equal(WordNumber_ptr v1,
-                                    WordNumber_ptr v2);
+boolean WordNumber_not_equal(WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is less than
@@ -247,8 +240,7 @@ boolean WordNumber_not_equal(WordNumber_ptr v1,
 
   the width of operands should be equal
 */
-boolean WordNumber_unsigned_less(WordNumber_ptr v1,
-                                        WordNumber_ptr v2);
+boolean WordNumber_unsigned_less(WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is less than, or equal to,
@@ -256,8 +248,7 @@ boolean WordNumber_unsigned_less(WordNumber_ptr v1,
 
   the width of operands should be equal
 */
-boolean WordNumber_unsigned_less_or_equal(WordNumber_ptr v1,
-                                                 WordNumber_ptr v2);
+boolean WordNumber_unsigned_less_or_equal(WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is greater than
@@ -265,8 +256,7 @@ boolean WordNumber_unsigned_less_or_equal(WordNumber_ptr v1,
 
   the width of operands should be equal
 */
-boolean WordNumber_unsigned_greater(WordNumber_ptr v1,
-                                           WordNumber_ptr v2);
+boolean WordNumber_unsigned_greater(WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is greate than, or eqaul to,
@@ -275,7 +265,7 @@ boolean WordNumber_unsigned_greater(WordNumber_ptr v1,
   the width of operands should be equal
 */
 boolean WordNumber_unsigned_greater_or_equal(WordNumber_ptr v1,
-                                                    WordNumber_ptr v2);
+                                             WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is signed less than
@@ -283,8 +273,7 @@ boolean WordNumber_unsigned_greater_or_equal(WordNumber_ptr v1,
 
   the width of operands should be equal
 */
-boolean WordNumber_signed_less(WordNumber_ptr v1,
-                                      WordNumber_ptr v2);
+boolean WordNumber_signed_less(WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is signed less than,
@@ -292,8 +281,7 @@ boolean WordNumber_signed_less(WordNumber_ptr v1,
 
   the width of operands should be equal
 */
-boolean WordNumber_signed_less_or_equal(WordNumber_ptr v1,
-                                               WordNumber_ptr v2);
+boolean WordNumber_signed_less_or_equal(WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is signed greater than
@@ -301,8 +289,7 @@ boolean WordNumber_signed_less_or_equal(WordNumber_ptr v1,
 
   the width of operands should be equal
 */
-boolean WordNumber_signed_greater(WordNumber_ptr v1,
-                                         WordNumber_ptr v2);
+boolean WordNumber_signed_greater(WordNumber_ptr v1, WordNumber_ptr v2);
 
 /*!
   \brief returns TRUE if left operand is signed greate than,
@@ -318,17 +305,15 @@ boolean WordNumber_signed_greater_or_equal(WordNumber_ptr v1,
 
 
 */
-WordNumber_ptr WordNumber_max(WordNumber_ptr v1,
-                                     WordNumber_ptr v2,
-                                     boolean isSigned);
+WordNumber_ptr WordNumber_max(WordNumber_ptr v1, WordNumber_ptr v2,
+                              boolean isSigned);
 
 /*!
   \brief
 
 
 */
-WordNumber_ptr WordNumber_min(WordNumber_ptr v1,
-                                     WordNumber_ptr v2,
-                                     boolean isSigned);
+WordNumber_ptr WordNumber_min(WordNumber_ptr v1, WordNumber_ptr v2,
+                              boolean isSigned);
 
 #endif /* __NUSMV_CORE_UTILS_WORD_NUMBER_H__ */

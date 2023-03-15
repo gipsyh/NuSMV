@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_CORE_H__
 #define __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_CORE_H__
-
 
 #include "nusmv/core/compile/flattening/FlattenerBase.h"
 #include "nusmv/core/utils/defs.h"
@@ -48,7 +45,7 @@
   \brief Definition of the public accessor for class FlattenerCore
 
 */
-typedef struct FlattenerCore_TAG*  FlattenerCore_ptr;
+typedef struct FlattenerCore_TAG *FlattenerCore_ptr;
 
 /*!
   \brief To cast and check instances of class FlattenerCore
@@ -56,18 +53,15 @@ typedef struct FlattenerCore_TAG*  FlattenerCore_ptr;
   These macros must be used respectively to cast and to check
   instances of class FlattenerCore
 */
-#define FLATTENER_CORE(self) \
-         ((FlattenerCore_ptr) self)
+#define FLATTENER_CORE(self) ((FlattenerCore_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FLATTENER_CORE_CHECK_INSTANCE(self) \
-         (nusmv_assert(FLATTENER_CORE(self) != FLATTENER_CORE(NULL)))
-
-
+#define FLATTENER_CORE_CHECK_INSTANCE(self)                                    \
+  (nusmv_assert(FLATTENER_CORE(self) != FLATTENER_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -81,12 +75,9 @@ typedef struct FlattenerCore_TAG*  FlattenerCore_ptr;
 
   The FlattenerCore class constructor
 */
-FlattenerCore_ptr
-FlattenerCore_create(const NuSMVEnv_ptr env, const char* name);
-
+FlattenerCore_ptr FlattenerCore_create(const NuSMVEnv_ptr env,
+                                       const char *name);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_CORE_H__ */

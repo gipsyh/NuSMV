@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -44,13 +44,12 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_FLAT_HIERARCHY_H__
 #define __NUSMV_CORE_COMPILE_FLAT_HIERARCHY_H__
 
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/set/set.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/utils/assoc.h"
 
 /*---------------------------------------------------------------------------*/
@@ -63,7 +62,7 @@
 
   The struct store info of flattened modules
 */
-typedef struct FlatHierarchy* FlatHierarchy_ptr;
+typedef struct FlatHierarchy *FlatHierarchy_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -74,16 +73,15 @@ typedef struct FlatHierarchy* FlatHierarchy_ptr;
 
   \todo Missing description
 */
-#define FLAT_HIERARCHY(x) ((FlatHierarchy_ptr) x)
+#define FLAT_HIERARCHY(x) ((FlatHierarchy_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FLAT_HIERARCHY_CHECK_INSTANCE(x) \
-         ( nusmv_assert(FLAT_HIERARCHY(x) != FLAT_HIERARCHY(NULL)) )
-
+#define FLAT_HIERARCHY_CHECK_INSTANCE(x)                                       \
+  (nusmv_assert(FLAT_HIERARCHY(x) != FLAT_HIERARCHY(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -133,14 +131,9 @@ FlatHierarchy_ptr FlatHierarchy_create(SymbTable_ptr st);
 
   \se FlatHierarchy_create
 */
-FlatHierarchy_ptr
-FlatHierarchy_create_from_members(SymbTable_ptr st,
-                                  node_ptr init,
-                                  node_ptr invar,
-                                  node_ptr trans,
-                                  node_ptr input,
-                                  node_ptr justice,
-                                  node_ptr compassion);
+FlatHierarchy_ptr FlatHierarchy_create_from_members(
+    SymbTable_ptr st, node_ptr init, node_ptr invar, node_ptr trans,
+    node_ptr input, node_ptr justice, node_ptr compassion);
 
 /*!
   \methodof FlatHierarchy
@@ -151,15 +144,14 @@ given to it with access functions.
 
   \se FlatHierarchy_create
 */
-void  FlatHierarchy_destroy(FlatHierarchy_ptr self);
+void FlatHierarchy_destroy(FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
   \brief Returns a newly created instance that is a copy of self
 
 */
-FlatHierarchy_ptr
-FlatHierarchy_copy(const FlatHierarchy_ptr self);
+FlatHierarchy_ptr FlatHierarchy_copy(const FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
@@ -170,9 +162,7 @@ intact)
 SexpFsm_apply_synchronous_product
 */
 void FlatHierarchy_mergeinto(FlatHierarchy_ptr self,
-                                    const FlatHierarchy_ptr other);
-
-
+                             const FlatHierarchy_ptr other);
 
 /* Getters and Setters ********************************************************/
 
@@ -182,34 +172,31 @@ void FlatHierarchy_mergeinto(FlatHierarchy_ptr self,
 
   Returns the Flat Hierarchy SymbolTable's environment
 */
-NuSMVEnv_ptr
-FlatHierarchy_get_environment(const FlatHierarchy_ptr self);
+NuSMVEnv_ptr FlatHierarchy_get_environment(const FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
   \brief Returns the associated symbol table
 
-  
+
 */
-SymbTable_ptr
-FlatHierarchy_get_symb_table(const FlatHierarchy_ptr self);
+SymbTable_ptr FlatHierarchy_get_symb_table(const FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
   \brief Returns the associated symbol table
 
-  
+
 */
-void
-FlatHierarchy_set_symb_table(const FlatHierarchy_ptr self,
-                             SymbTable_ptr symb_table);
+void FlatHierarchy_set_symb_table(const FlatHierarchy_ptr self,
+                                  SymbTable_ptr symb_table);
 
 /* Access function to the class's fields : constrains and specifications ******/
 
 /*!
   \brief A set of functions accessing the fields of the class
 
-  
+
 */
 node_ptr FlatHierarchy_get_init(FlatHierarchy_ptr cmp);
 
@@ -295,14 +282,12 @@ node_ptr FlatHierarchy_get_assign(FlatHierarchy_ptr cmp);
 
   \todo Missing description
 */
-void
-FlatHierarchy_set_assign(FlatHierarchy_ptr cmp, node_ptr n);
-
+void FlatHierarchy_set_assign(FlatHierarchy_ptr cmp, node_ptr n);
 
 /* properties *****************************************************************/
 
 /*!
-  \brief 
+  \brief
 
   It is a cons list of constraints
 */
@@ -313,8 +298,7 @@ node_ptr FlatHierarchy_get_justice(FlatHierarchy_ptr cmp);
 
   \todo Missing description
 */
-void
-FlatHierarchy_set_justice(FlatHierarchy_ptr cmp, node_ptr n);
+void FlatHierarchy_set_justice(FlatHierarchy_ptr cmp, node_ptr n);
 
 /*!
   \brief \todo Missing synopsis
@@ -328,16 +312,14 @@ node_ptr FlatHierarchy_get_compassion(FlatHierarchy_ptr cmp);
 
   \todo Missing description
 */
-void FlatHierarchy_set_compassion(FlatHierarchy_ptr cmp,
-                                         node_ptr n);
+void FlatHierarchy_set_compassion(FlatHierarchy_ptr cmp, node_ptr n);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-boolean FlatHierarchy_add_property_name(FlatHierarchy_ptr cmp,
-                                            node_ptr name);
+boolean FlatHierarchy_add_property_name(FlatHierarchy_ptr cmp, node_ptr name);
 
 /*!
   \brief \todo Missing synopsis
@@ -365,8 +347,7 @@ node_ptr FlatHierarchy_get_ltlspec(FlatHierarchy_ptr cmp);
 
   Input is a cons list, with elements LTLSPEC nodes
 */
-void
-FlatHierarchy_set_ltlspec(FlatHierarchy_ptr cmp, node_ptr n);
+void FlatHierarchy_set_ltlspec(FlatHierarchy_ptr cmp, node_ptr n);
 
 /*!
   \brief \todo Missing synopsis
@@ -380,8 +361,7 @@ node_ptr FlatHierarchy_get_invarspec(FlatHierarchy_ptr cmp);
 
   \todo Missing description
 */
-void FlatHierarchy_set_invarspec(FlatHierarchy_ptr cmp,
-                                        node_ptr n);
+void FlatHierarchy_set_invarspec(FlatHierarchy_ptr cmp, node_ptr n);
 
 /*!
   \brief \todo Missing synopsis
@@ -395,8 +375,7 @@ node_ptr FlatHierarchy_get_pslspec(FlatHierarchy_ptr cmp);
 
   \todo Missing description
 */
-void
-FlatHierarchy_set_pslspec(FlatHierarchy_ptr cmp, node_ptr n);
+void FlatHierarchy_set_pslspec(FlatHierarchy_ptr cmp, node_ptr n);
 
 /*!
   \brief \todo Missing synopsis
@@ -410,9 +389,7 @@ node_ptr FlatHierarchy_get_compute(FlatHierarchy_ptr cmp);
 
   \todo Missing description
 */
-void
-FlatHierarchy_set_compute(FlatHierarchy_ptr cmp, node_ptr n);
-
+void FlatHierarchy_set_compute(FlatHierarchy_ptr cmp, node_ptr n);
 
 /* -- access functions to the variable sets -- ********************************/
 
@@ -429,7 +406,7 @@ Set_t FlatHierarchy_get_vars(FlatHierarchy_ptr cmp);
   \brief Add a variable name to the list of variables
 declared in the given hierarchy
 
-  
+
 
   \sa FlatHierarchy_get_vars
 */
@@ -440,7 +417,7 @@ void FlatHierarchy_add_var(FlatHierarchy_ptr cmp, node_ptr n);
   \brief Remove a variable name to the list of variables
                     declared in the given hierarchy
 
-  
+
 
   \sa FlatHierarchy_get_vars
 */
@@ -457,9 +434,8 @@ void FlatHierarchy_remove_var(FlatHierarchy_ptr self, node_ptr n);
                     If not NULL, outbound_edges will contain a map between vars
                     and their respective outgoing edges to other variables
 */
-NodeList_ptr
-FlatHierarchy_get_ordered_vars(const FlatHierarchy_ptr self,
-                               hash_ptr* outbound_edges);
+NodeList_ptr FlatHierarchy_get_ordered_vars(const FlatHierarchy_ptr self,
+                                            hash_ptr *outbound_edges);
 
 /*!
   \brief \todo Missing synopsis
@@ -503,7 +479,6 @@ void FlatHierarchy_add_mirror(FlatHierarchy_ptr cmp, node_ptr n);
 */
 void FlatHierarchy_set_mirror(FlatHierarchy_ptr cmp, node_ptr n);
 
-
 /*!
   \brief \todo Missing synopsis
 
@@ -524,7 +499,6 @@ void FlatHierarchy_add_property_pattern(FlatHierarchy_ptr cmp, node_ptr n);
   \todo Missing description
 */
 void FlatHierarchy_set_property_patterns(FlatHierarchy_ptr cmp, node_ptr n);
-
 
 /* Access function to the hash.
    Given a var name these functions can return right handside of
@@ -548,8 +522,7 @@ given hierarchy.
 
   \sa FlatHierarchy_insert_assign
 */
-node_ptr FlatHierarchy_lookup_assign(FlatHierarchy_ptr self,
-                                            node_ptr name);
+node_ptr FlatHierarchy_lookup_assign(FlatHierarchy_ptr self, node_ptr name);
 
 /*!
   \methodof FlatHierarchy
@@ -564,16 +537,15 @@ NB: All given assignments should have been declared in the given hierarchy.
 
   \sa FlatHierarchy_lookup_assign
 */
-void FlatHierarchy_insert_assign(FlatHierarchy_ptr self,
-                                        node_ptr name,
-                                        node_ptr assign);
+void FlatHierarchy_insert_assign(FlatHierarchy_ptr self, node_ptr name,
+                                 node_ptr assign);
 
 /*!
   \methodof FlatHierarchy
   \brief Returns  a list of constrains which contain
 a variable of the given name.
 
-  
+
 If the parameter "name" is a usual variable name then
 the INVAR expressions are returned.
 If the parameter "name" has a form init(var-name) then
@@ -588,15 +560,14 @@ given hierarchy.
 
   \sa FlatHierarchy_add_constrains
 */
-node_ptr FlatHierarchy_lookup_constrains(FlatHierarchy_ptr self,
-                                                node_ptr name);
+node_ptr FlatHierarchy_lookup_constrains(FlatHierarchy_ptr self, node_ptr name);
 
 /*!
   \methodof FlatHierarchy
   \brief Adds the given expressions to the list
 of constrains associated to the given variable
 
-  
+
 The parameter "name" can be a usual variable name then
 an expression is expected to be INVAR body.
 The parameter "name" can have a form init(var-name) then
@@ -611,9 +582,8 @@ NB: All given expressions should have been declared in the given hierarchy.
 
   \sa FlatHierarchy_lookup_constrains
 */
-void FlatHierarchy_add_constrains(FlatHierarchy_ptr self,
-                                         node_ptr name,
-                                         node_ptr expr);
+void FlatHierarchy_add_constrains(FlatHierarchy_ptr self, node_ptr name,
+                                  node_ptr expr);
 
 /*!
   \methodof FlatHierarchy
@@ -625,9 +595,8 @@ void FlatHierarchy_add_constrains(FlatHierarchy_ptr self,
 
   \sa FlatHierarchy_add_constant_constrains
 */
-node_ptr
-FlatHierarchy_lookup_constant_constrains(FlatHierarchy_ptr self,
-                                         int type);
+node_ptr FlatHierarchy_lookup_constant_constrains(FlatHierarchy_ptr self,
+                                                  int type);
 
 /*!
   \methodof FlatHierarchy
@@ -641,8 +610,7 @@ FlatHierarchy_lookup_constant_constrains(FlatHierarchy_ptr self,
   \sa FlatHierarchy_lookup_constant_constrains
 */
 void FlatHierarchy_add_constant_constrains(FlatHierarchy_ptr self,
-                                                  node_ptr expr,
-                                                  int type);
+                                           node_ptr expr, int type);
 
 /*!
   \methodof FlatHierarchy
@@ -660,8 +628,7 @@ The function compileFlattenProcess works similarly but with assignments.
 
   \sa compileFlattenProcess
 */
-void
-FlatHierarchy_calculate_vars_constrains(FlatHierarchy_ptr self);
+void FlatHierarchy_calculate_vars_constrains(FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
@@ -674,8 +641,7 @@ Note: you should know what you are doing when performing modifications
 on the table.
 
 */
-hash_ptr
-FlatHierarchy_get_var_expr_associations(FlatHierarchy_ptr self);
+hash_ptr FlatHierarchy_get_var_expr_associations(FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
@@ -690,16 +656,15 @@ fully responsible that the contents of h make sense - no checks are performed
 whatsoever.
 
 */
-void
-FlatHierarchy_set_var_expr_associations(FlatHierarchy_ptr self,
-                                        hash_ptr h);
+void FlatHierarchy_set_var_expr_associations(FlatHierarchy_ptr self,
+                                             hash_ptr h);
 
 /*!
   \methodof FlatHierarchy
   \brief This function cleans the association between a variable name
 and expressions the variable is used in.
 
-  
+
 Practically, this function cleans association created by
 FlatHierarchy_insert_assign and FlatHierarchy_add_constrains such that
 functions FlatHierarchy_lookup_assign and FlatHierarchy_lookup_constrains
@@ -709,8 +674,7 @@ Note: you should know what you are doing when invoke this function since
 it makes COI and various checks of FSM incorrect.
 
 */
-void
-FlatHierarchy_clear_var_expr_associations(FlatHierarchy_ptr self);
+void FlatHierarchy_clear_var_expr_associations(FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
@@ -720,10 +684,9 @@ FlatHierarchy_clear_var_expr_associations(FlatHierarchy_ptr self);
 
   self retains ownership of returned value.
                     Note: you should know what you are doing when
-                    performing modifications on the table.  
+                    performing modifications on the table.
 */
-hash_ptr
-FlatHierarchy_get_constants_associations(FlatHierarchy_ptr self);
+hash_ptr FlatHierarchy_get_constants_associations(FlatHierarchy_ptr self);
 
 /*!
   \methodof FlatHierarchy
@@ -733,11 +696,10 @@ FlatHierarchy_get_constants_associations(FlatHierarchy_ptr self);
 
   self retains ownership of h.
                     Note: you should know what you are doing when
-                    performing modifications on the table.  
+                    performing modifications on the table.
 */
-void
-FlatHierarchy_set_constants_associations(FlatHierarchy_ptr self,
-                                         hash_ptr h);
+void FlatHierarchy_set_constants_associations(FlatHierarchy_ptr self,
+                                              hash_ptr h);
 
 /*!
   \methodof FlatHierarchy
@@ -747,9 +709,7 @@ FlatHierarchy_set_constants_associations(FlatHierarchy_ptr self,
   Clears the association between hierarchy sections
                     and constant expressions
 */
-void
-FlatHierarchy_clear_constants_associations(FlatHierarchy_ptr self);
-
+void FlatHierarchy_clear_constants_associations(FlatHierarchy_ptr self);
 
 /* Miscellaneous **************************************************************/
 
@@ -758,7 +718,7 @@ FlatHierarchy_clear_constants_associations(FlatHierarchy_ptr self);
   \brief Performs a self check of the instance content wrt the
                     set of language self was declared to contain
 
-  
+
 */
 void FlatHierarchy_self_check(const FlatHierarchy_ptr self);
 
@@ -769,6 +729,5 @@ void FlatHierarchy_self_check(const FlatHierarchy_ptr self);
   \todo Missing description
 */
 void FlatHierarchy_type_check(FlatHierarchy_ptr self);
-
 
 #endif /* __NUSMV_CORE_COMPILE_FLAT_HIERARCHY_H__ */

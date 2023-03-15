@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,15 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_LAYER_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_LAYER_H__
 
-#include "nusmv/core/compile/symb_table/SymbType.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/NodeList.h"
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/compile/symb_table/NFunction.h"
+#include "nusmv/core/compile/symb_table/SymbType.h"
+#include "nusmv/core/node/node.h"
 #include "nusmv/core/set/set.h"
+#include "nusmv/core/utils/NodeList.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct SymbLayer
@@ -52,24 +51,22 @@
   See the description of class SymbLayer for further
   information.
 */
-typedef struct SymbLayer_TAG* SymbLayer_ptr;
+typedef struct SymbLayer_TAG *SymbLayer_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_LAYER(x)  \
-        ((SymbLayer_ptr) x)
+#define SYMB_LAYER(x) ((SymbLayer_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_LAYER_CHECK_INSTANCE(x)  \
-        (nusmv_assert(SYMB_LAYER(x) != SYMB_LAYER(NULL)))
-
+#define SYMB_LAYER_CHECK_INSTANCE(x)                                           \
+  (nusmv_assert(SYMB_LAYER(x) != SYMB_LAYER(NULL)))
 
 /*!
   \brief To be used as a policy when a layer is pushed in the
@@ -84,14 +81,14 @@ typedef struct SymbLayer_TAG* SymbLayer_ptr;
   at that position. Only one layer can be added to a symbol table with
   the same forced postion at a given time, i.e. two or more layers are not
   allowed to have the same forced position into the same symbol table.
-  
+
 */
 
 typedef enum LayerInsertPolicy_TAG {
-  SYMB_LAYER_POS_DEFAULT,   /* default is equal to SYMB_LAYER_POS_TOP */
-  SYMB_LAYER_POS_FORCE_TOP, /* layer is forced to be always at the top */
-  SYMB_LAYER_POS_TOP,       /* Inserted before other top */
-  SYMB_LAYER_POS_BOTTOM,    /* inserted after other bottom */
+  SYMB_LAYER_POS_DEFAULT,     /* default is equal to SYMB_LAYER_POS_TOP */
+  SYMB_LAYER_POS_FORCE_TOP,   /* layer is forced to be always at the top */
+  SYMB_LAYER_POS_TOP,         /* Inserted before other top */
+  SYMB_LAYER_POS_BOTTOM,      /* inserted after other bottom */
   SYMB_LAYER_POS_FORCE_BOTTOM /* layer is forced to be always at the bottom */
 } LayerInsertPolicy;
 
@@ -101,14 +98,13 @@ typedef enum LayerInsertPolicy_TAG {
   \todo Missing description
 */
 typedef boolean (*SymbLayerIterFilterFun)(const SymbLayer_ptr layer,
-                                          const node_ptr sym,
-                                          void* arg);
+                                          const node_ptr sym, void *arg);
 
 typedef struct SymbLayerIter_TAG {
   unsigned int index;
   unsigned int mask;
   SymbLayerIterFilterFun filter;
-  void* arg;
+  void *arg;
 } SymbLayerIter;
 
 /*!
@@ -116,27 +112,23 @@ typedef struct SymbLayerIter_TAG {
 
   \todo Missing description
 */
-#define SYMB_LAYER_FOREACH(self, iter, mask)             \
-  for (SymbLayer_gen_iter(self, &iter, mask);            \
-       !SymbLayer_iter_is_end(self, &iter);              \
-       SymbLayer_iter_next(self, &iter))
+#define SYMB_LAYER_FOREACH(self, iter, mask)                                   \
+  for (SymbLayer_gen_iter(self, &iter, mask);                                  \
+       !SymbLayer_iter_is_end(self, &iter); SymbLayer_iter_next(self, &iter))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_LAYER_FOREACH_FILTER(self, iter, mask, filter, arg)        \
-  for (SymbLayer_gen_iter(self, &iter, mask),                           \
-         SymbLayer_iter_set_filter(self, &iter, filter, arg);           \
-       !SymbLayer_iter_is_end(self, &iter);                             \
-       SymbLayer_iter_next(self, &iter))
-
+#define SYMB_LAYER_FOREACH_FILTER(self, iter, mask, filter, arg)               \
+  for (SymbLayer_gen_iter(self, &iter, mask),                                  \
+       SymbLayer_iter_set_filter(self, &iter, filter, arg);                    \
+       !SymbLayer_iter_is_end(self, &iter); SymbLayer_iter_next(self, &iter))
 
 /* ---------------------------------------------------------------------- */
 /*     Public methods                                                     */
 /* ---------------------------------------------------------------------- */
-
 
 /* Iterators */
 
@@ -148,9 +140,8 @@ typedef struct SymbLayerIter_TAG {
    The iterator will ignore all symbols that do not
    satisfy the mask
 */
-void SymbLayer_gen_iter(const SymbLayer_ptr self,
-                               SymbLayerIter* iter,
-                               unsigned int mask);
+void SymbLayer_gen_iter(const SymbLayer_ptr self, SymbLayerIter *iter,
+                        unsigned int mask);
 
 /*!
   \methodof SymbLayer
@@ -160,8 +151,7 @@ void SymbLayer_gen_iter(const SymbLayer_ptr self,
    regarding to the mask given when built using
    SymbCache_gen_iter
 */
-void SymbLayer_iter_next(const SymbLayer_ptr self,
-                                SymbLayerIter* iter);
+void SymbLayer_iter_next(const SymbLayer_ptr self, SymbLayerIter *iter);
 
 /*!
   \methodof SymbLayer
@@ -170,7 +160,7 @@ void SymbLayer_iter_next(const SymbLayer_ptr self,
   Checks if the iterator is at it's end
 */
 boolean SymbLayer_iter_is_end(const SymbLayer_ptr self,
-                                     const SymbLayerIter* iter);
+                              const SymbLayerIter *iter);
 
 /*!
   \methodof SymbLayer
@@ -179,7 +169,7 @@ boolean SymbLayer_iter_is_end(const SymbLayer_ptr self,
   Get the symbol pointed by the iterator
 */
 node_ptr SymbLayer_iter_get_symbol(const SymbLayer_ptr self,
-                                          const SymbLayerIter* iter);
+                                   const SymbLayerIter *iter);
 
 /*!
   \brief Sets the filter for an interator over the
@@ -190,11 +180,8 @@ node_ptr SymbLayer_iter_get_symbol(const SymbLayer_ptr self,
    in order to point to a symbol that satisfies
    both the mask and the filter
 */
-void
-SymbLayer_iter_set_filter(const SymbLayer_ptr layer,
-                          SymbLayerIter* iter,
-                          SymbLayerIterFilterFun fun,
-                          void* arg);
+void SymbLayer_iter_set_filter(const SymbLayer_ptr layer, SymbLayerIter *iter,
+                               SymbLayerIterFilterFun fun, void *arg);
 
 /*!
   \methodof SymbLayer
@@ -203,10 +190,8 @@ SymbLayer_iter_set_filter(const SymbLayer_ptr layer,
   SymbLayer built-in filter: Returns true iff the symbol
    is a boolean variable
 */
-boolean
-SymbLayer_iter_filter_bool_vars(const SymbLayer_ptr self,
-                                const node_ptr sym,
-                                void* arg);
+boolean SymbLayer_iter_filter_bool_vars(const SymbLayer_ptr self,
+                                        const node_ptr sym, void *arg);
 
 /*!
   \methodof SymbLayer
@@ -216,8 +201,7 @@ SymbLayer_iter_filter_bool_vars(const SymbLayer_ptr self,
    The iter will not be consumed (since passed as
    copy)
 */
-Set_t
-SymbLayer_iter_to_set(const SymbLayer_ptr self, SymbLayerIter iter);
+Set_t SymbLayer_iter_to_set(const SymbLayer_ptr self, SymbLayerIter iter);
 
 /*!
   \methodof SymbLayer
@@ -227,8 +211,8 @@ SymbLayer_iter_to_set(const SymbLayer_ptr self, SymbLayerIter iter);
    The iter will not be consumed (since passed as
    copy)
 */
-NodeList_ptr
-SymbLayer_iter_to_list(const SymbLayer_ptr self, SymbLayerIter iter);
+NodeList_ptr SymbLayer_iter_to_list(const SymbLayer_ptr self,
+                                    SymbLayerIter iter);
 
 /*!
   \methodof SymbLayer
@@ -238,8 +222,7 @@ SymbLayer_iter_to_list(const SymbLayer_ptr self, SymbLayerIter iter);
    The iter will not be consumed (since passed as
    copy)
 */
-unsigned int
-SymbLayer_iter_count(const SymbLayer_ptr self, SymbLayerIter iter);
+unsigned int SymbLayer_iter_count(const SymbLayer_ptr self, SymbLayerIter iter);
 
 /*!
   \methodof SymbLayer
@@ -247,8 +230,7 @@ SymbLayer_iter_count(const SymbLayer_ptr self, SymbLayerIter iter);
 
   Returned string must not be freed, it belongs to self
 */
-const char*
-SymbLayer_get_name(const SymbLayer_ptr self);
+const char *SymbLayer_get_name(const SymbLayer_ptr self);
 
 /*!
   \methodof SymbLayer
@@ -258,11 +240,10 @@ SymbLayer_get_name(const SymbLayer_ptr self);
   Since more than one layer can declare the same constants,
    this method might return true even if another layer already contain the
    given constant. If the constant had already been declared within self,
-   false is returned. 
+   false is returned.
 */
-boolean
-SymbLayer_can_declare_constant(const SymbLayer_ptr self,
-                               const node_ptr name);
+boolean SymbLayer_can_declare_constant(const SymbLayer_ptr self,
+                                       const node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -272,8 +253,7 @@ SymbLayer_can_declare_constant(const SymbLayer_ptr self,
 
   \sa SymbLayer_can_declare_constant
 */
-void
-SymbLayer_declare_constant(SymbLayer_ptr self, node_ptr name);
+void SymbLayer_declare_constant(SymbLayer_ptr self, node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -282,11 +262,10 @@ SymbLayer_declare_constant(SymbLayer_ptr self, node_ptr name);
 
   Returns true if the given symbol does not exist
    within the symbol table which self belongs to. Returns
-   false if the symbol was already declared. 
+   false if the symbol was already declared.
 */
-boolean
-SymbLayer_can_declare_var(const SymbLayer_ptr self,
-                          const node_ptr name);
+boolean SymbLayer_can_declare_var(const SymbLayer_ptr self,
+                                  const node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -297,9 +276,8 @@ SymbLayer_can_declare_var(const SymbLayer_ptr self,
    funtions SymbTablePkg_..._type.
    The layer is responsible for destroying the variable's type.
 */
-void
-SymbLayer_declare_input_var(SymbLayer_ptr self, node_ptr var,
-                            SymbType_ptr type);
+void SymbLayer_declare_input_var(SymbLayer_ptr self, node_ptr var,
+                                 SymbType_ptr type);
 
 /*!
   \methodof SymbLayer
@@ -310,9 +288,8 @@ SymbLayer_declare_input_var(SymbLayer_ptr self, node_ptr var,
    funtions SymbTablePkg_..._type.
    The layer is responsible for destroying the variable's type.
 */
-void
-SymbLayer_declare_state_var(SymbLayer_ptr self, node_ptr var,
-                            SymbType_ptr type);
+void SymbLayer_declare_state_var(SymbLayer_ptr self, node_ptr var,
+                                 SymbType_ptr type);
 
 /*!
   \methodof SymbLayer
@@ -323,9 +300,8 @@ SymbLayer_declare_state_var(SymbLayer_ptr self, node_ptr var,
    funtions SymbTablePkg_..._type.
    The layer is responsible for destroying the variable's type.
 */
-void
-SymbLayer_declare_frozen_var(SymbLayer_ptr self, node_ptr var,
-                            SymbType_ptr type);
+void SymbLayer_declare_frozen_var(SymbLayer_ptr self, node_ptr var,
+                                  SymbType_ptr type);
 
 /*!
   \methodof SymbLayer
@@ -335,8 +311,7 @@ SymbLayer_declare_frozen_var(SymbLayer_ptr self, node_ptr var,
    cannot change in transitions.
    'var' must be a state variable already defined and not redeclared as frozen.
 */
-void
-SymbLayer_redeclare_state_as_frozen_var(SymbLayer_ptr self, node_ptr var);
+void SymbLayer_redeclare_state_as_frozen_var(SymbLayer_ptr self, node_ptr var);
 
 /*!
   \methodof SymbLayer
@@ -345,11 +320,10 @@ SymbLayer_redeclare_state_as_frozen_var(SymbLayer_ptr self, node_ptr var);
 
   Returns true if the given symbol does not exist within
    the symbol table which self belongs to. Returns false if the symbol
-   was already declared. 
+   was already declared.
 */
-boolean
-SymbLayer_can_declare_define(const SymbLayer_ptr self,
-                             const node_ptr name);
+boolean SymbLayer_can_declare_define(const SymbLayer_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -358,11 +332,10 @@ SymbLayer_can_declare_define(const SymbLayer_ptr self,
 
   Returns true if the given symbol does not exist
    within the symbol table which self belongs to. Returns
-   false if the symbol was already declared. 
+   false if the symbol was already declared.
 */
-boolean
-SymbLayer_can_declare_function(const SymbLayer_ptr self,
-                                 const node_ptr name);
+boolean SymbLayer_can_declare_function(const SymbLayer_ptr self,
+                                       const node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -371,11 +344,10 @@ SymbLayer_can_declare_function(const SymbLayer_ptr self,
 
   Returns true if the given symbol does not exist within
    the symbol table which self belongs to. Returns false if the symbol
-   was already declared. 
+   was already declared.
 */
-boolean
-SymbLayer_can_declare_parameter(const SymbLayer_ptr self,
-                                const node_ptr name);
+boolean SymbLayer_can_declare_parameter(const SymbLayer_ptr self,
+                                        const node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -384,11 +356,10 @@ SymbLayer_can_declare_parameter(const SymbLayer_ptr self,
 
   Returns true if the given symbol does not exist within
    the symbol table which self belongs to. Returns false if the symbol
-   was already declared. 
+   was already declared.
 */
-boolean
-SymbLayer_can_declare_array_define(const SymbLayer_ptr self,
-                             const node_ptr name);
+boolean SymbLayer_can_declare_array_define(const SymbLayer_ptr self,
+                                           const node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -397,11 +368,10 @@ SymbLayer_can_declare_array_define(const SymbLayer_ptr self,
 
   Returns true if the given symbol does not exist within
    the symbol table which self belongs to. Returns false if the symbol
-   was already declared. 
+   was already declared.
 */
-boolean
-SymbLayer_can_declare_variable_array(const SymbLayer_ptr self,
-                                  const node_ptr name);
+boolean SymbLayer_can_declare_variable_array(const SymbLayer_ptr self,
+                                             const node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -410,9 +380,8 @@ SymbLayer_can_declare_variable_array(const SymbLayer_ptr self,
   A new DEFINE of a given value is created. name must be
    contestualized, context is provided as a separated information
 */
-void
-SymbLayer_declare_define(SymbLayer_ptr self, node_ptr name,
-                         node_ptr ctx, node_ptr definition);
+void SymbLayer_declare_define(SymbLayer_ptr self, node_ptr name, node_ptr ctx,
+                              node_ptr definition);
 
 /*!
   \methodof SymbLayer
@@ -424,9 +393,8 @@ SymbLayer_declare_define(SymbLayer_ptr self, node_ptr name,
 
   \sa SymbLayer_can_declare_function
 */
-void
-SymbLayer_declare_function(SymbLayer_ptr self, node_ptr name,
-                           node_ptr ctx, SymbType_ptr type);
+void SymbLayer_declare_function(SymbLayer_ptr self, node_ptr name, node_ptr ctx,
+                                SymbType_ptr type);
 
 /*!
   \methodof SymbLayer
@@ -435,9 +403,8 @@ SymbLayer_declare_function(SymbLayer_ptr self, node_ptr name,
   A new parameter of a given value is created. name must be
    contestualized, context is provided as a separated information
 */
-void
-SymbLayer_declare_parameter(SymbLayer_ptr self, node_ptr formal,
-                            node_ptr ctx, node_ptr actual);
+void SymbLayer_declare_parameter(SymbLayer_ptr self, node_ptr formal,
+                                 node_ptr ctx, node_ptr actual);
 
 /*!
   \methodof SymbLayer
@@ -446,20 +413,18 @@ SymbLayer_declare_parameter(SymbLayer_ptr self, node_ptr formal,
   A new define array of a given value is created. name must be
    contestualized, context is provided as a separated information
 */
-void
-SymbLayer_declare_array_define(SymbLayer_ptr self, node_ptr name,
-                                node_ptr ctx, node_ptr definition);
+void SymbLayer_declare_array_define(SymbLayer_ptr self, node_ptr name,
+                                    node_ptr ctx, node_ptr definition);
 
 /*!
   \methodof SymbLayer
-  \brief Insert a new symbol-type association, i.e. array var 
+  \brief Insert a new symbol-type association, i.e. array var
 
   The specified name will be associated to the give array type
    in the symbols collection
 */
-void
-SymbLayer_declare_variable_array(SymbLayer_ptr self, node_ptr var,
-                              SymbType_ptr type);
+void SymbLayer_declare_variable_array(SymbLayer_ptr self, node_ptr var,
+                                      SymbType_ptr type);
 
 /*!
   \methodof SymbLayer
@@ -523,12 +488,11 @@ void SymbLayer_remove_function(SymbLayer_ptr self, node_ptr name);
 */
 void SymbLayer_remove_variable_array(SymbLayer_ptr self, node_ptr name);
 
-
 /*!
   \methodof SymbLayer
   \brief Returns the number of declared symbols
 
-  
+
 */
 int SymbLayer_get_symbols_num(const SymbLayer_ptr self);
 
@@ -536,7 +500,7 @@ int SymbLayer_get_symbols_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared contants
 
-  
+
 */
 int SymbLayer_get_constants_num(const SymbLayer_ptr self);
 
@@ -544,7 +508,7 @@ int SymbLayer_get_constants_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared state variables.
 
-  
+
 */
 int SymbLayer_get_state_vars_num(const SymbLayer_ptr self);
 
@@ -552,7 +516,7 @@ int SymbLayer_get_state_vars_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared boolean state variables
 
-  
+
 */
 int SymbLayer_get_bool_state_vars_num(const SymbLayer_ptr self);
 
@@ -560,7 +524,7 @@ int SymbLayer_get_bool_state_vars_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared frozen variables.
 
-  
+
 */
 int SymbLayer_get_frozen_vars_num(const SymbLayer_ptr self);
 
@@ -568,7 +532,7 @@ int SymbLayer_get_frozen_vars_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared boolean frozen variables
 
-  
+
 */
 int SymbLayer_get_bool_frozen_vars_num(const SymbLayer_ptr self);
 
@@ -576,7 +540,7 @@ int SymbLayer_get_bool_frozen_vars_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared input variables
 
-  
+
 */
 int SymbLayer_get_input_vars_num(const SymbLayer_ptr self);
 
@@ -584,7 +548,7 @@ int SymbLayer_get_input_vars_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared variables
 
-  
+
 */
 int SymbLayer_get_vars_num(const SymbLayer_ptr self);
 
@@ -592,7 +556,7 @@ int SymbLayer_get_vars_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of declared boolean input variables
 
-  
+
 */
 int SymbLayer_get_bool_input_vars_num(const SymbLayer_ptr self);
 
@@ -600,7 +564,7 @@ int SymbLayer_get_bool_input_vars_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of DEFINEs.
 
-  
+
 */
 int SymbLayer_get_defines_num(const SymbLayer_ptr self);
 
@@ -608,7 +572,7 @@ int SymbLayer_get_defines_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of NFunctions.
 
-  
+
 */
 int SymbLayer_get_functions_num(const SymbLayer_ptr self);
 
@@ -616,7 +580,7 @@ int SymbLayer_get_functions_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of parameters.
 
-  
+
 */
 int SymbLayer_get_parameters_num(const SymbLayer_ptr self);
 
@@ -624,7 +588,7 @@ int SymbLayer_get_parameters_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of define arrays.
 
-  
+
 */
 int SymbLayer_get_array_defines_num(const SymbLayer_ptr self);
 
@@ -632,7 +596,7 @@ int SymbLayer_get_array_defines_num(const SymbLayer_ptr self);
   \methodof SymbLayer
   \brief Returns the number of Symbol Types.
 
-  
+
 */
 int SymbLayer_get_variable_arrays_num(const SymbLayer_ptr self);
 
@@ -644,9 +608,8 @@ int SymbLayer_get_variable_arrays_num(const SymbLayer_ptr self);
   Compares the insertion policies of self and other, and
    returns true if self must be inserted *before* other.
 */
-boolean
-SymbLayer_must_insert_before(const SymbLayer_ptr self,
-                             const SymbLayer_ptr other);
+boolean SymbLayer_must_insert_before(const SymbLayer_ptr self,
+                                     const SymbLayer_ptr other);
 
 /*!
   \methodof SymbLayer
@@ -654,9 +617,7 @@ SymbLayer_must_insert_before(const SymbLayer_ptr self,
 
   Returns true if the variable is defined in the layer.
 */
-boolean
-SymbLayer_is_variable_in_layer(SymbLayer_ptr self,
-                               node_ptr name);
+boolean SymbLayer_is_variable_in_layer(SymbLayer_ptr self, node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -664,8 +625,7 @@ SymbLayer_is_variable_in_layer(SymbLayer_ptr self,
 
   Returns true if the symbol is defined in the layer.
 */
-boolean
-SymbLayer_is_symbol_in_layer(SymbLayer_ptr self, node_ptr name);
+boolean SymbLayer_is_symbol_in_layer(SymbLayer_ptr self, node_ptr name);
 
 /*!
   \methodof SymbLayer
@@ -675,8 +635,7 @@ SymbLayer_is_symbol_in_layer(SymbLayer_ptr self, node_ptr name);
   This method is thought to be used exclusively by class
    SymbTable
 */
-LayerInsertPolicy
-SymbLayer_get_insert_policy(const SymbLayer_ptr self);
+LayerInsertPolicy SymbLayer_get_insert_policy(const SymbLayer_ptr self);
 
 /*!
   \methodof SymbLayer

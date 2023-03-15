@@ -35,26 +35,22 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/utils/Olist.h"
 #include "nusmv/core/node/node.h" /* for print_node */
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include <stddef.h> /* for offsetof */
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -62,8 +58,8 @@
 
 struct Olist_TAG {
   Onode_ptr first; /* first node of the list */
-  Onode_ptr last; /* last node of the list */
-  int size; /* the size of the list */
+  Onode_ptr last;  /* last node of the list */
+  int size;        /* the size of the list */
 };
 
 /*!
@@ -74,17 +70,15 @@ struct Olist_TAG {
 typedef struct Olist_TAG Olist;
 
 struct Onode_TAG {
-  void* element; /* an element stored in this node */
+  void *element;  /* an element stored in this node */
   Onode_ptr next; /* next node of a list */
 };
 
 typedef struct Onode_TAG Onode;
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -97,7 +91,7 @@ typedef struct Onode_TAG Onode;
 
   \todo Missing description
 */
-#define DEBUG(a)  a
+#define DEBUG(a) a
 #else
 #define DEBUG(a)
 #endif
@@ -112,29 +106,25 @@ static void olist_deinit(Olist_ptr self);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Olist_ptr Olist_create(void)
-{
+Olist_ptr Olist_create(void) {
   Olist_ptr self = ALLOC(Olist, 1);
   olist_init(self);
   return self;
 }
 
-void Olist_destroy (Olist_ptr self)
-{
+void Olist_destroy(Olist_ptr self) {
   olist_deinit(self);
   FREE(self);
 }
 
-Olist_ptr Olist_copy(Olist_ptr self)
-{
+Olist_ptr Olist_copy(Olist_ptr self) {
   Olist_ptr new_list = Olist_create();
 
-  Onode_ptr* new = &(new_list->first);
+  Onode_ptr *new = &(new_list->first);
   Onode_ptr tmp = NULL;
   Onode_ptr old;
 
@@ -143,7 +133,7 @@ Olist_ptr Olist_copy(Olist_ptr self)
     tmp->element = old->element;
     *new = tmp;
     new = &(tmp->next);
-   }
+  }
   (*new) = NULL;
   new_list->last = tmp;
   new_list->size = self->size;
@@ -151,8 +141,7 @@ Olist_ptr Olist_copy(Olist_ptr self)
   return new_list;
 }
 
-Olist_ptr Olist_copy_reversed(Olist_ptr self)
-{
+Olist_ptr Olist_copy_reversed(Olist_ptr self) {
   Olist_ptr new_list = Olist_create();
   Onode_ptr new;
   Onode_ptr old;
@@ -160,7 +149,8 @@ Olist_ptr Olist_copy_reversed(Olist_ptr self)
   if (Olist_is_empty(self))
     return new_list;
 
-  old = self->first;;
+  old = self->first;
+  ;
 
   /* process the first element separately */
   new = ALLOC(Onode, 1);
@@ -180,11 +170,10 @@ Olist_ptr Olist_copy_reversed(Olist_ptr self)
   return new_list;
 }
 
-Olist_ptr Olist_copy_without_element(Olist_ptr self, void* element)
-{
+Olist_ptr Olist_copy_without_element(Olist_ptr self, void *element) {
   Olist_ptr new_list = Olist_create();
 
-  Onode_ptr* new = &(new_list->first);
+  Onode_ptr *new = &(new_list->first);
   Onode_ptr tmp = NULL;
   Onode_ptr old;
   int num = 0;
@@ -197,7 +186,7 @@ Olist_ptr Olist_copy_without_element(Olist_ptr self, void* element)
       new = &(tmp->next);
       num += 1;
     }
-   }
+  }
   (*new) = NULL;
   new_list->last = tmp;
   new_list->size = num;
@@ -205,8 +194,7 @@ Olist_ptr Olist_copy_without_element(Olist_ptr self, void* element)
   return new_list;
 }
 
-void Olist_reverse(Olist_ptr self)
-{
+void Olist_reverse(Olist_ptr self) {
   Onode_ptr new = NULL;
   Onode_ptr old = self->first;
   self->first = self->last;
@@ -220,20 +208,18 @@ void Olist_reverse(Olist_ptr self)
   }
 }
 
-void Olist_move(Olist_ptr self, Olist_ptr to_list, Oiter iter_to)
-{
-  if (self->first == NULL) return; /* nothing to move */
+void Olist_move(Olist_ptr self, Olist_ptr to_list, Oiter iter_to) {
+  if (self->first == NULL)
+    return; /* nothing to move */
 
   if (to_list->first == NULL) { /* to_list is empty */
-    *to_list = *self; /* simply copy all the fields */
-  }
-  else {
+    *to_list = *self;           /* simply copy all the fields */
+  } else {
     if (Oiter_is_end(iter_to)) {
       /* to the tail */
       to_list->last->next = self->first;
       to_list->last = self->last;
-    }
-    else {
+    } else {
       self->last->next = (*iter_to.node);
       *iter_to.node = self->first;
     }
@@ -245,31 +231,25 @@ void Olist_move(Olist_ptr self, Olist_ptr to_list, Oiter iter_to)
   self->size = 0;
 }
 
-void Olist_move_all(Olist_ptr self, Olist_ptr to_list)
-{
+void Olist_move_all(Olist_ptr self, Olist_ptr to_list) {
   Oiter it = Olist_end(to_list);
   Olist_move(self, to_list, it);
 }
 
-void Olist_clean(Olist_ptr self)
-{
+void Olist_clean(Olist_ptr self) {
   olist_deinit(self);
   self->first = NULL;
   self->last = NULL;
   self->size = 0;
 }
 
-void Olist_concat(Olist_ptr self, Olist_ptr other)
-{
+void Olist_concat(Olist_ptr self, Olist_ptr other) {
   Oiter oiter;
 
-  OLIST_FOREACH(other, oiter) {
-    Olist_append(self, Oiter_element(oiter));
-  }
+  OLIST_FOREACH(other, oiter) { Olist_append(self, Oiter_element(oiter)); }
 }
 
-void Olist_prepend(Olist_ptr self, void* element)
-{
+void Olist_prepend(Olist_ptr self, void *element) {
   /* create and initialize a new node */
   Onode_ptr node = ALLOC(Onode, 1);
   node->element = element;
@@ -286,8 +266,7 @@ void Olist_prepend(Olist_ptr self, void* element)
   self->size += 1;
 }
 
-void Olist_append(Olist_ptr self, void* element)
-{
+void Olist_append(Olist_ptr self, void *element) {
   /* create and initialize a new node */
   Onode_ptr node = ALLOC(Onode, 1);
   node->element = element;
@@ -299,8 +278,7 @@ void Olist_append(Olist_ptr self, void* element)
     nusmv_assert(NULL == self->last);
     nusmv_assert(0 == self->size);
     self->first = node;
-  }
-  else {
+  } else {
     self->last->next = node;
   }
 
@@ -308,10 +286,9 @@ void Olist_append(Olist_ptr self, void* element)
   self->size += 1;
 }
 
-void* Olist_delete_first(Olist_ptr self)
-{
+void *Olist_delete_first(Olist_ptr self) {
   Onode_ptr node;
-  void* element;
+  void *element;
 
   nusmv_assert(self->first != NULL); /* list must not be empty */
 
@@ -331,19 +308,14 @@ void* Olist_delete_first(Olist_ptr self)
   return element;
 }
 
-int Olist_get_size(const Olist_ptr self)
-{
+int Olist_get_size(const Olist_ptr self) {
   nusmv_assert(self->size >= 0); /* the size cannot be negative */
   return self->size;
 }
 
-boolean Olist_is_empty(Olist_ptr self)
-{
-  return NULL == self->first;
-}
+boolean Olist_is_empty(Olist_ptr self) { return NULL == self->first; }
 
-boolean Olist_contains(const Olist_ptr self, const void* element)
-{
+boolean Olist_contains(const Olist_ptr self, const void *element) {
   Oiter iter;
 
   OLIST_FOREACH(self, iter) {
@@ -355,19 +327,17 @@ boolean Olist_contains(const Olist_ptr self, const void* element)
   return false;
 }
 
-boolean Olist_remove(Olist_ptr self, const void* element)
-{
+boolean Olist_remove(Olist_ptr self, const void *element) {
   Oiter iter;
   boolean result;
 
   result = false;
   iter = Olist_first(self);
-  while(!Oiter_is_end(iter)) {
+  while (!Oiter_is_end(iter)) {
     if (Oiter_element(iter) == element) {
-      iter = Olist_delete(self, iter, (void**)NULL);
+      iter = Olist_delete(self, iter, (void **)NULL);
       result = true;
-    }
-    else {
+    } else {
       iter = Oiter_next(iter);
     }
   }
@@ -375,8 +345,7 @@ boolean Olist_remove(Olist_ptr self, const void* element)
   return result;
 }
 
-Oiter Olist_first(Olist_ptr self)
-{
+Oiter Olist_first(Olist_ptr self) {
   Oiter iter;
   /* actually the iterator points to a "next" pointer of previous
      element or to self->first. Such a way we have access to the part
@@ -387,53 +356,45 @@ Oiter Olist_first(Olist_ptr self)
   return iter;
 }
 
-Oiter Olist_last(Olist_ptr self)
-{
+Oiter Olist_last(Olist_ptr self) {
   Oiter iter;
   /* actually the iterator points to a "next" pointer of previous
      element or to self->first. Such a way we have access to the part
      of the list which points to a given node, i.e. we can modify the
      structure of the list (e.g. remove a given node).
   */
-  iter.node = (self->first == NULL)
-    ? &(self->first) /* the list is empty */
-    : &(self->last);
+  iter.node = (self->first == NULL) ? &(self->first) /* the list is empty */
+                                    : &(self->last);
   return iter;
 }
 
-Oiter Olist_end(Olist_ptr self)
-{
+Oiter Olist_end(Olist_ptr self) {
   Oiter iter;
   /* actually the iterator points to a "next" pointer of previous
      element or to self->first. Such a way we have access to the part
      of the list which points to a given node, i.e. we can modify the
      structure of the list (e.g. remove a given node).
   */
-  iter.node = (self->first == NULL)
-    ? &(self->first) /* the list is empty */
-    : &(self->last->next);
+  iter.node = (self->first == NULL) ? &(self->first) /* the list is empty */
+                                    : &(self->last->next);
   return iter;
 }
 
-boolean Olist_iter_is_first(Olist_ptr self, Oiter iter)
-{
-  return ( *(iter.node) == self->first);
+boolean Olist_iter_is_first(Olist_ptr self, Oiter iter) {
+  return (*(iter.node) == self->first);
 }
 
-boolean Olist_iter_is_last(Olist_ptr self, Oiter iter)
-{
+boolean Olist_iter_is_last(Olist_ptr self, Oiter iter) {
   /* Use Oiter_is_end instead */
-  return ( *(iter.node) == self->last);
+  return (*(iter.node) == self->last);
 }
 
-boolean Oiter_is_end(Oiter iter)
-{
+boolean Oiter_is_end(Oiter iter) {
   /* iter.node ==NULL if iter has not been initialized */
   return NULL == *(iter.node);
 }
 
-Oiter Oiter_next(Oiter iter)
-{
+Oiter Oiter_next(Oiter iter) {
   Oiter new;
   nusmv_assert(*iter.node != NULL); /* iterator is past the last element */
 
@@ -441,23 +402,19 @@ Oiter Oiter_next(Oiter iter)
   return new;
 }
 
-void* Oiter_element(Oiter iter)
-{
+void *Oiter_element(Oiter iter) {
   nusmv_assert(*iter.node != NULL); /* iterator is past the last element */
   return (*iter.node)->element;
 }
 
-void Oiter_set_element(Oiter iter, void* element)
-{
+void Oiter_set_element(Oiter iter, void *element) {
   nusmv_assert(*iter.node != NULL); /* iterator is past the last element */
   (*iter.node)->element = element;
 }
 
-Oiter Olist_insert_after(Olist_ptr self, Oiter iter, void* element)
-{
+Oiter Olist_insert_after(Olist_ptr self, Oiter iter, void *element) {
   Onode_ptr node;
   nusmv_assert(NULL != *iter.node); /* points past the last element */
-
 
   node = ALLOC(Onode, 1);
   node->element = element;
@@ -475,8 +432,7 @@ Oiter Olist_insert_after(Olist_ptr self, Oiter iter, void* element)
   return iter;
 }
 
-Oiter Olist_insert_before(Olist_ptr self, Oiter iter, void* element)
-{
+Oiter Olist_insert_before(Olist_ptr self, Oiter iter, void *element) {
   Onode_ptr node = ALLOC(Onode, 1);
   node->element = element;
   node->next = *iter.node;
@@ -490,8 +446,7 @@ Oiter Olist_insert_before(Olist_ptr self, Oiter iter, void* element)
   return iter;
 }
 
-Oiter Olist_delete(Olist_ptr self, Oiter iter, void** element)
-{
+Oiter Olist_delete(Olist_ptr self, Oiter iter, void **element) {
   Onode_ptr node;
   nusmv_assert(*iter.node != NULL); /* should not point past the last element */
 
@@ -505,15 +460,14 @@ Oiter Olist_delete(Olist_ptr self, Oiter iter, void** element)
     nusmv_assert(NULL == node->next);
     if (NULL == self->first) { /* this means the list is empty */
       self->last = NULL;
-    }
-    else {
+    } else {
       /* below expression find the address of the last element */
-      self->last = (Onode_ptr)((char*)(iter.node) - offsetof(Onode, next));
+      self->last = (Onode_ptr)((char *)(iter.node) - offsetof(Onode, next));
     }
   }
 
   node->element = NULL; /* for debugging */
-  node->next = NULL; /* for debugging */
+  node->next = NULL;    /* for debugging */
   FREE(node);
 
   self->size -= 1;
@@ -522,15 +476,14 @@ Oiter Olist_delete(Olist_ptr self, Oiter iter, void** element)
   return iter;
 }
 
-void Olist_sort(Olist_ptr self,
-                int (*cmp)(void* el1, void* el2, void* extra),
-                void* extra)
-{
+void Olist_sort(Olist_ptr self, int (*cmp)(void *el1, void *el2, void *extra),
+                void *extra) {
   Onode_ptr list = self->first;
   Onode_ptr tail;
   int insize;
 
-  if (NULL == list) return; /* no change */
+  if (NULL == list)
+    return; /* no change */
 
   insize = 1;
 
@@ -543,14 +496,15 @@ void Olist_sort(Olist_ptr self,
       Onode_ptr q = p;
       int psize, qsize, i;
 
-      merges += 1;  /* there exists a merge to be done */
+      merges += 1; /* there exists a merge to be done */
 
       psize = 0;
       /* step `insize' places along from p */
       for (i = 0; i < insize; ++i) {
         psize += 1;
         q = q->next;
-        if (NULL == q) break;
+        if (NULL == q)
+          break;
       }
 
       /* if q hasn't fallen off end, we have two lists to merge */
@@ -563,22 +517,32 @@ void Olist_sort(Olist_ptr self,
         /* decide whether next element of merge comes from p or q */
         if (psize == 0) {
           /* p is empty; e must come from q. */
-          e = q; q = q->next; qsize--;
+          e = q;
+          q = q->next;
+          qsize--;
         } else if (qsize == 0 || NULL == q) {
           /* q is empty; e must come from p. */
-          e = p; p = p->next; psize--;
+          e = p;
+          p = p->next;
+          psize--;
         } else if (cmp(p->element, q->element, extra) <= 0) {
           /* First element of p is lower (or same);
            * e must come from p. */
-          e = p; p = p->next; psize--;
+          e = p;
+          p = p->next;
+          psize--;
         } else {
           /* First element of q is lower; e must come from q. */
-          e = q; q = q->next; qsize--;
+          e = q;
+          q = q->next;
+          qsize--;
         }
 
         /* add the next element to the merged list */
-        if (NULL != tail) tail->next = e;
-        else list = e;
+        if (NULL != tail)
+          tail->next = e;
+        else
+          list = e;
         tail = e;
       }
 
@@ -588,7 +552,8 @@ void Olist_sort(Olist_ptr self,
     tail->next = NULL;
 
     /* If we have done only one merge, we're finished. */
-    if (merges <= 1) break;
+    if (merges <= 1)
+      break;
 
     /* keep going merging twice the size */
     insize <<= 1;
@@ -598,46 +563,41 @@ void Olist_sort(Olist_ptr self,
   self->last = tail;
 }
 
-void Olist_print_node(Olist_ptr self, MasterPrinter_ptr printer,
-                      FILE* output)
-{
+void Olist_print_node(Olist_ptr self, MasterPrinter_ptr printer, FILE *output) {
   Oiter it;
   OLIST_FOREACH(self, it) {
     print_node(printer, output, Oiter_element(it));
-    if (!Oiter_is_end(it)) fprintf(output, ", ");
+    if (!Oiter_is_end(it))
+      fprintf(output, ", ");
   }
 }
 
-void Olist_map(Olist_ptr self, void (*func)(void* elem))
-{
+void Olist_map(Olist_ptr self, void (*func)(void *elem)) {
   Oiter iter;
 
-  OLIST_FOREACH(self, iter) {
-    func(Oiter_element(iter));
- }
+  OLIST_FOREACH(self, iter) { func(Oiter_element(iter)); }
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void olist_testing_function(const NuSMVEnv_ptr env)
-{
+void olist_testing_function(const NuSMVEnv_ptr env) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
   /* Olist_ptr keeper; */
   Olist_ptr list1, list2;
   Oiter iter1;
-  void* v1 = (void*)1;
-  void* v2 = (void*)2;
-  void* v3 = (void*)3;
-  void* v4 = (void*)4;
-  void* elem;
+  void *v1 = (void *)1;
+  void *v2 = (void *)2;
+  void *v3 = (void *)3;
+  void *v4 = (void *)4;
+  void *elem;
 
   StreamMgr_print_output(streams, "TESTING Olist class : in process ....\n");
 
-  list1 = Olist_create();                  /* keeper = list1; */
+  list1 = Olist_create(); /* keeper = list1; */
   Olist_destroy(list1);
 
   list1 = Olist_create();
@@ -836,13 +796,12 @@ void olist_testing_function(const NuSMVEnv_ptr env)
      function is freed this allocation should be exactly the same as
      the first allocation of a list.
   */
-  list1 = Olist_create();                  //nusmv_assert(keeper == list1);
+  list1 = Olist_create(); // nusmv_assert(keeper == list1);
   Olist_destroy(list1);
 
   StreamMgr_print_output(streams, "TESTING Olist class : DONE\n");
   return;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -853,8 +812,7 @@ void olist_testing_function(const NuSMVEnv_ptr env)
 
 
 */
-static void olist_init(Olist_ptr self)
-{
+static void olist_init(Olist_ptr self) {
   OLIST_CHECK_INSTANCE(self);
 
   self->first = NULL;
@@ -867,8 +825,7 @@ static void olist_init(Olist_ptr self)
 
 
 */
-static void olist_deinit(Olist_ptr self)
-{
+static void olist_deinit(Olist_ptr self) {
   Onode_ptr node;
   Onode_ptr tmp;
 
@@ -891,8 +848,8 @@ static void olist_deinit(Olist_ptr self)
     FREE(tmp);
   };
 
-  DEBUG(nusmv_assert(0 == self->size));/* there is a problem with size */
-  self->first = NULL; /* for debugging */
-  self->last = NULL; /* for debugging */
-  self->size = -1; /* for debugging */
+  DEBUG(nusmv_assert(0 == self->size)); /* there is a problem with size */
+  self->first = NULL;                   /* for debugging */
+  self->last = NULL;                    /* for debugging */
+  self->size = -1;                      /* for debugging */
 }

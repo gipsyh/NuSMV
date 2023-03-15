@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,17 +34,13 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_CORE_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_CORE_PRIVATE_H__
 
-
-#include "nusmv/core/compile/flattening/FlattenerCore.h"
 #include "nusmv/core/compile/flattening/FlattenerBase.h"
 #include "nusmv/core/compile/flattening/FlattenerBase_private.h"
+#include "nusmv/core/compile/flattening/FlattenerCore.h"
 #include "nusmv/core/utils/defs.h"
-
 
 /*!
   \brief FlattenerCore class definition derived from
@@ -53,8 +49,7 @@
   \sa Base class FlattenerBase
 */
 
-typedef struct FlattenerCore_TAG
-{
+typedef struct FlattenerCore_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(FlattenerBase);
 
@@ -62,14 +57,11 @@ typedef struct FlattenerCore_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } FlattenerCore;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -84,7 +76,7 @@ typedef struct FlattenerCore_TAG
   \sa FlattenerCore_create
 */
 void flattener_core_init(FlattenerCore_ptr self, const NuSMVEnv_ptr env,
-                                const char* name, int low, size_t num);
+                         const char *name, int low, size_t num);
 
 /*!
   \methodof FlattenerCore
@@ -99,13 +91,9 @@ void flattener_core_deinit(FlattenerCore_ptr self);
   \brief Do the actual flattening
 
 */
-node_ptr
-flattener_core_flatten(FlattenerBase_ptr self,
-                       SymbTable_ptr symb_table,
-                       hash_ptr def_hash,
-                       node_ptr sexp,
-                       node_ptr context,
-                       MasterCompileFlattener_def_mode mode);
-
+node_ptr flattener_core_flatten(FlattenerBase_ptr self,
+                                SymbTable_ptr symb_table, hash_ptr def_hash,
+                                node_ptr sexp, node_ptr context,
+                                MasterCompileFlattener_def_mode mode);
 
 #endif /* __NUSMV_CORE_COMPILE_FLATTENING_FLATTENER_CORE_PRIVATE_H__ */

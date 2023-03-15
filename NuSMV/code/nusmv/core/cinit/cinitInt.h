@@ -34,13 +34,12 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_CINIT_CINIT_INT_H__
 #define __NUSMV_CORE_CINIT_CINIT_INT_H__
 
 #include "nusmv/core/cinit/cinit.h"
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/compile/compile.h"
+#include "nusmv/core/node/node.h"
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -86,7 +85,6 @@ void CInit_reset_first(NuSMVEnv_ptr env);
   \sa CInit_reset_first
 */
 void CInit_reset_last(NuSMVEnv_ptr env);
-
 
 /*!
   \brief The batch main.

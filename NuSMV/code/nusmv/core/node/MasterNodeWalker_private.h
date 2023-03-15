@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,8 +35,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_MASTER_NODE_WALKER_PRIVATE_H__
 #define __NUSMV_CORE_NODE_MASTER_NODE_WALKER_PRIVATE_H__
 
@@ -44,9 +42,8 @@
 
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/NodeList.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -55,11 +52,10 @@
 /*!
   \brief MasterNodeWalker class definition
 
-  
+
 */
 
-typedef struct MasterNodeWalker_TAG
-{
+typedef struct MasterNodeWalker_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
@@ -69,7 +65,6 @@ typedef struct MasterNodeWalker_TAG
   NodeList_ptr walkers;
 
 } MasterNodeWalker;
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -83,8 +78,7 @@ typedef struct MasterNodeWalker_TAG
 
   \sa MasterNodeWalker_create
 */
-void master_node_walker_init(MasterNodeWalker_ptr self,
-                                    const NuSMVEnv_ptr env);
+void master_node_walker_init(MasterNodeWalker_ptr self, const NuSMVEnv_ptr env);
 
 /*!
   \methodof MasterNodeWalker
@@ -96,9 +90,6 @@ void master_node_walker_init(MasterNodeWalker_ptr self,
 */
 void master_node_walker_deinit(MasterNodeWalker_ptr self);
 
-
-
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_NODE_MASTER_NODE_WALKER_PRIVATE_H__ */

@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,44 +35,37 @@
 
 */
 
-
 #include "nusmv/core/compile/dependency/dependencyPkg.h"
-#include "nusmv/core/compile/dependency/FormulaDependency.h"
 #include "nusmv/core/compile/dependency/DependencyBase.h"
 #include "nusmv/core/compile/dependency/DependencyCore.h"
 #include "nusmv/core/compile/dependency/DependencyPsl.h"
+#include "nusmv/core/compile/dependency/FormulaDependency.h"
 
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/opt/opt.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
-
 
 /**AutomaticStart*************************************************************/
 
@@ -81,7 +74,6 @@
 /*---------------------------------------------------------------------------*/
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -96,16 +88,15 @@
   the global environment.
 */
 
-void DependencyPkg_init(NuSMVEnv_ptr env)
-{
+void DependencyPkg_init(NuSMVEnv_ptr env) {
   FormulaDependency_ptr dependency;
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-               "Instantiating the FormulaDependency instance "
-               "within the given environment...\n");
+    Logger_log(logger, "Instantiating the FormulaDependency instance "
+                       "within the given environment...\n");
   }
 
   dependency = FormulaDependency_create(env);
@@ -120,7 +111,6 @@ void DependencyPkg_init(NuSMVEnv_ptr env)
     psl_dep = DEPENDENCY_BASE(DependencyPsl_create(env, "Dependency psl"));
     MasterNodeWalker_register_walker(MASTER_NODE_WALKER(dependency),
                                      NODE_WALKER(psl_dep));
-
   }
 
   NuSMVEnv_set_value(env, ENV_DEPENDENCY, dependency);
@@ -129,35 +119,28 @@ void DependencyPkg_init(NuSMVEnv_ptr env)
 /*!
   \brief Deinitialization of the dependency package
 
-  
+
 */
 
-void DependencyPkg_quit(NuSMVEnv_ptr env)
-{
+void DependencyPkg_quit(NuSMVEnv_ptr env) {
   FormulaDependency_ptr dependency =
-    FORMULA_DEPENDENCY(NuSMVEnv_remove_value(env, ENV_DEPENDENCY));
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      FORMULA_DEPENDENCY(NuSMVEnv_remove_value(env, ENV_DEPENDENCY));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger,
-               "Clearing the formula dependency instance in "
-               "the given environment...\n");
+    Logger_log(logger, "Clearing the formula dependency instance in "
+                       "the given environment...\n");
   }
 
   MasterNodeWalker_destroy(MASTER_NODE_WALKER(dependency));
 }
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
-

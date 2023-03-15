@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,9 +35,8 @@
 
 */
 
-
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/normalizers/MasterNormalizer.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/normalizers/MasterNormalizer_private.h"
 
 #include "nusmv/core/node/MasterNodeWalker_private.h"
@@ -45,9 +44,8 @@
 #include "nusmv/core/node/normalizers/NormalizerBase.h"
 #include "nusmv/core/node/normalizers/NormalizerBase_private.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -61,8 +59,7 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct MasterNormalizer_TAG
-{
+typedef struct MasterNormalizer_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(MasterNodeWalker);
 
@@ -91,14 +88,13 @@ typedef struct MasterNormalizer_TAG
 static void master_normalizer_init(MasterNormalizer_ptr self,
                                    const NuSMVEnv_ptr env);
 static void master_normalizer_deinit(MasterNormalizer_ptr self);
-static void master_normalizer_finalize(Object_ptr object, void* dummy);
+static void master_normalizer_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-MasterNormalizer_ptr MasterNormalizer_create(const NuSMVEnv_ptr env)
-{
+MasterNormalizer_ptr MasterNormalizer_create(const NuSMVEnv_ptr env) {
   MasterNormalizer_ptr self = ALLOC(MasterNormalizer, 1);
   MASTER_NORMALIZER_CHECK_INSTANCE(self);
 
@@ -106,8 +102,8 @@ MasterNormalizer_ptr MasterNormalizer_create(const NuSMVEnv_ptr env)
   return self;
 }
 
-node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n)
-{
+node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self,
+                                         node_ptr n) {
   node_ptr res;
   MASTER_NORMALIZER_CHECK_INSTANCE(self);
   res = master_normalizer_normalize_node(self, n);
@@ -118,16 +114,16 @@ node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n)
 
        - A node n is created with new_node.
 
-       - MasterNormalizer_normalize_node(normalizer, n) is called and memoization is updated with
-         the pointer to n
+       - MasterNormalizer_normalize_node(normalizer, n) is called and
+     memoization is updated with the pointer to n
 
        - n is released with free_node
 
        - a new node n' is created with new_node and n' has the same
          address of n, even if it is different.
 
-       - MasterNormalizer_normalize_node(normalizer, n') is called, but using the memoization we
-         obtain a wrong result.
+       - MasterNormalizer_normalize_node(normalizer, n') is called, but using
+     the memoization we obtain a wrong result.
   */
 
   clear_assoc(self->cache);
@@ -135,33 +131,28 @@ node_ptr MasterNormalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n)
   return res;
 }
 
-node_ptr MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n)
-{
+node_ptr MasterNormalizer_lookup_cache(MasterNormalizer_ptr self, node_ptr n) {
   MASTER_NORMALIZER_CHECK_INSTANCE(self);
   return find_assoc(self->cache, n);
 }
 
 void MasterNormalizer_insert_cache(MasterNormalizer_ptr self, node_ptr n,
-                                   node_ptr norm)
-{
+                                   node_ptr norm) {
   MASTER_NORMALIZER_CHECK_INSTANCE(self);
   insert_assoc(self->cache, n, norm);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
 node_ptr master_normalizer_normalize_node(MasterNormalizer_ptr self,
-                                          node_ptr n)
-{
+                                          node_ptr n) {
   ListIter_ptr iter;
   iter = NodeList_get_first_iter(MASTER_NODE_WALKER(self)->walkers);
   while (!ListIter_is_end(iter)) {
-    NormalizerBase_ptr pr =
-      NORMALIZER_BASE(NodeList_get_elem_at(MASTER_NODE_WALKER(self)->walkers,
-                                           iter));
+    NormalizerBase_ptr pr = NORMALIZER_BASE(
+        NodeList_get_elem_at(MASTER_NODE_WALKER(self)->walkers, iter));
 
     if (NodeWalker_can_handle(NODE_WALKER(pr), n)) {
 
@@ -186,8 +177,7 @@ node_ptr master_normalizer_normalize_node(MasterNormalizer_ptr self,
   \sa MasterNormalizer_create
 */
 static void master_normalizer_init(MasterNormalizer_ptr self,
-                                   const NuSMVEnv_ptr env)
-{
+                                   const NuSMVEnv_ptr env) {
   /* base class initialization */
   master_node_walker_init(MASTER_NODE_WALKER(self), env);
 
@@ -204,8 +194,7 @@ static void master_normalizer_init(MasterNormalizer_ptr self,
 
   \sa Object_destroy
 */
-static void master_normalizer_deinit(MasterNormalizer_ptr self)
-{
+static void master_normalizer_deinit(MasterNormalizer_ptr self) {
   /* base class deinitialization */
   master_node_walker_deinit(MASTER_NODE_WALKER(self));
 
@@ -217,8 +206,7 @@ static void master_normalizer_deinit(MasterNormalizer_ptr self)
 
   Called by the class destructor
 */
-static void master_normalizer_finalize(Object_ptr object, void* dummy)
-{
+static void master_normalizer_finalize(Object_ptr object, void *dummy) {
   MasterNormalizer_ptr self = MASTER_NORMALIZER(object);
 
   master_normalizer_deinit(self);

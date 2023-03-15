@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,15 +34,14 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/bmc/bmc.h"
 #include "nusmv/core/bmc/bmcInt.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
-#include "nusmv/core/trace/pkg_trace.h"
 #include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/trace/pkg_trace.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -58,39 +57,32 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static enum st_retval trace_utils_release_bv(char* key, char* data,
-                                             char* arg);
+static enum st_retval trace_utils_release_bv(char *key, char *data, char *arg);
 
 static void bmc_model_trace_step_print(const NuSMVEnv_ptr env,
                                        const Trace_ptr trace,
                                        const TraceIter step,
                                        TraceIteratorType it_type,
-                                       const char* prefix,
-                                       int count);
+                                       const char *prefix, int count);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -98,30 +90,25 @@ static void bmc_model_trace_step_print(const NuSMVEnv_ptr env,
 
 Trace_ptr Bmc_create_trace_from_cnf_model(const BeEnc_ptr be_enc,
                                           const NodeList_ptr symbols,
-                                          const char* desc,
+                                          const char *desc,
                                           const TraceType type,
-                                          const Slist_ptr cnf_model,
-                                          int k)
-{
-  Trace_ptr trace = Trace_create(BaseEnc_get_symb_table(BASE_ENC(be_enc)),
-                                 desc, type, symbols, false);
+                                          const Slist_ptr cnf_model, int k) {
+  Trace_ptr trace = Trace_create(BaseEnc_get_symb_table(BASE_ENC(be_enc)), desc,
+                                 type, symbols, false);
 
   return Bmc_fill_trace_from_cnf_model(be_enc, cnf_model, k, trace);
 }
 
-Trace_ptr
-Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
-                              const Slist_ptr cnf_model,
-                              int k, Trace_ptr trace)
-{
+Trace_ptr Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
+                                        const Slist_ptr cnf_model, int k,
+                                        Trace_ptr trace) {
   TraceIter first;
   /* local refs */
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  const BoolEnc_ptr bool_enc = \
-    BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(be_enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const BoolEnc_ptr bool_enc =
+      BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(be_enc));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   const Be_Manager_ptr be_mgr = BeEnc_get_be_manager(be_enc);
   const SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(be_enc));
@@ -142,7 +129,7 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
 
   /* phase 0: setup trace iterators for all times */
   insert_assoc(time_2_step, NODE_FROM_INT(0), (node_ptr)(first));
-  for (i = 1; i <= k; ++ i) {
+  for (i = 1; i <= k; ++i) {
     TraceIter step = Trace_append_step(trace);
     insert_assoc(time_2_step, NODE_FROM_INT(i), (node_ptr)(step));
   }
@@ -159,11 +146,12 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
     int var_idx, ut_index, vtime;
     node_ptr var, key;
 
-    cnfLiteral = (nusmv_ptrint) Siter_element(genLiteral);
-    beLiteral = (nusmv_ptrint) Be_CnfLiteral2BeLiteral(be_mgr, cnfLiteral);
+    cnfLiteral = (nusmv_ptrint)Siter_element(genLiteral);
+    beLiteral = (nusmv_ptrint)Be_CnfLiteral2BeLiteral(be_mgr, cnfLiteral);
 
     /* if there is no corresponding rbc variable skip this */
-    if (0 == beLiteral) continue;
+    if (0 == beLiteral)
+      continue;
 
     /* get timed var */
     var_idx = Be_BeLiteral2BeIndex(be_mgr, beLiteral);
@@ -173,9 +161,12 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
 
     /* needed to adapt to new trace timing format, input is stored
      in the next step */
-    if (SymbTable_is_symbol_input_var(st, var)) { ++ vtime; }
+    if (SymbTable_is_symbol_input_var(st, var)) {
+      ++vtime;
+    }
 
-    if (vtime > k) continue;
+    if (vtime > k)
+      continue;
 
     /* if it's a bit get/create a BitValues structure for
        the scalar variable which this bit belongs */
@@ -194,16 +185,17 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
       BitValues_set(bv, BoolEnc_get_index_from_bit(bool_enc, var),
                     (beLiteral >= 0) ? BIT_VALUE_TRUE : BIT_VALUE_FALSE);
 
-    }
-    else { /* boolean variables do not require any further processing */
+    } else { /* boolean variables do not require any further processing */
 
-      TraceIter timed_step = (-1 != vtime) /* frozenvars */
-        ? TRACE_ITER(find_assoc(time_2_step, NODE_FROM_INT(vtime)))
-        : first ;
+      TraceIter timed_step =
+          (-1 != vtime) /* frozenvars */
+              ? TRACE_ITER(find_assoc(time_2_step, NODE_FROM_INT(vtime)))
+              : first;
 
       nusmv_assert(TRACE_END_ITER != timed_step);
-      Trace_step_put_value(trace, timed_step, var, beLiteral >= 0
-                           ? ExprMgr_true(exprs) : ExprMgr_false(exprs));
+      Trace_step_put_value(trace, timed_step, var,
+                           beLiteral >= 0 ? ExprMgr_true(exprs)
+                                          : ExprMgr_false(exprs));
     }
 
   } /* SLIST_FOREACH (phase 1) */
@@ -219,9 +211,10 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
       int vtime = NODE_TO_INT(cdr(ts_var)); /* its time */
       node_ptr value = BoolEnc_get_value_from_var_bits(bool_enc, bitValues);
 
-      TraceIter timed_step = (-1 != vtime) /* frozenvars */
-        ? TRACE_ITER(find_assoc(time_2_step, NODE_FROM_INT(vtime)))
-        : first ;
+      TraceIter timed_step =
+          (-1 != vtime) /* frozenvars */
+              ? TRACE_ITER(find_assoc(time_2_step, NODE_FROM_INT(vtime)))
+              : first;
 
       nusmv_assert(TRACE_END_ITER != timed_step);
       Trace_step_put_value(trace, timed_step, car(ts_var), value);
@@ -236,21 +229,22 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
 #if BMC_MODEL_DEBUG
   {
     TraceIter step;
-    int i=0;
+    int i = 0;
 
-    StreamMgr_print_error(streams,  "\n--- BMC Model extraction ---\n");
+    StreamMgr_print_error(streams, "\n--- BMC Model extraction ---\n");
     TRACE_FOREACH(trace, step) {
-      ++ i;
+      ++i;
 
       if (1 != i) {
-        bmc_model_trace_step_print(env, trace, step, TRACE_ITER_I_VARS,"I", i);
+        bmc_model_trace_step_print(env, trace, step, TRACE_ITER_I_VARS, "I", i);
       }
 
-      bmc_model_trace_step_print(env, trace, step, (1 == i) ? TRACE_ITER_SF_VARS
-                                 : TRACE_ITER_S_VARS, "S", i);
+      bmc_model_trace_step_print(
+          env, trace, step, (1 == i) ? TRACE_ITER_SF_VARS : TRACE_ITER_S_VARS,
+          "S", i);
     }
   }
-  StreamMgr_print_error(streams,  "\n\n");
+  StreamMgr_print_error(streams, "\n\n");
 #endif
 
   /* cleanup */
@@ -264,8 +258,8 @@ Bmc_fill_trace_from_cnf_model(const BeEnc_ptr be_enc,
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void bmc_trace_utils_complete_trace(Trace_ptr trace, const BoolEnc_ptr bool_enc)
-{
+void bmc_trace_utils_complete_trace(Trace_ptr trace,
+                                    const BoolEnc_ptr bool_enc) {
   hash_ptr defaults;
   TraceIter step;
 
@@ -282,12 +276,13 @@ void bmc_trace_utils_complete_trace(Trace_ptr trace, const BoolEnc_ptr bool_enc)
 
     NODE_LIST_FOREACH(symbols, lst_iter) {
       node_ptr symb = NodeList_get_elem_at(symbols, lst_iter);
-      if (!SymbTable_is_symbol_var(st, symb) ||  \
+      if (!SymbTable_is_symbol_var(st, symb) ||
           SymbType_is_boolean(SymbTable_get_var_type(st, symb))) {
-        continue ; /* ignore non-vars and pure-booleans */
+        continue; /* ignore non-vars and pure-booleans */
       }
 
-      insert_assoc(defaults, symb, (node_ptr)(BitValues_create(bool_enc, symb)));
+      insert_assoc(defaults, symb,
+                   (node_ptr)(BitValues_create(bool_enc, symb)));
     }
   }
 
@@ -301,16 +296,18 @@ void bmc_trace_utils_complete_trace(Trace_ptr trace, const BoolEnc_ptr bool_enc)
       if (Nil == val) { /* not assigned */
 
         /* no inputs on first step */
-        if (SymbTable_is_symbol_input_var(st, var) && \
-            (Trace_first_iter(trace) == step)) { continue; }
+        if (SymbTable_is_symbol_input_var(st, var) &&
+            (Trace_first_iter(trace) == step)) {
+          continue;
+        }
 
         if (!SymbType_is_boolean(SymbTable_get_var_type(st, var))) {
           /* default scalar value */
-          Trace_step_put_value(trace, step, var,
-                               BoolEnc_get_value_from_var_bits(bool_enc,
-                                         BIT_VALUES(find_assoc(defaults, var))));
-        }
-        else {
+          Trace_step_put_value(
+              trace, step, var,
+              BoolEnc_get_value_from_var_bits(
+                  bool_enc, BIT_VALUES(find_assoc(defaults, var))));
+        } else {
           /* default boolean value (false) */
           Trace_step_put_value(trace, step, var, ExprMgr_false(exprs));
         }
@@ -326,13 +323,12 @@ void bmc_trace_utils_complete_trace(Trace_ptr trace, const BoolEnc_ptr bool_enc)
 } /* bmc_trace_utils_complete_trace */
 
 void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
-                                        const Slist_ptr cnf_model)
-{
+                                        const Slist_ptr cnf_model) {
   TraceIter step = Trace_append_step(trace);
 
   /* local refs */
-  const BoolEnc_ptr bool_enc = \
-    BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(be_enc));
+  const BoolEnc_ptr bool_enc =
+      BoolEncClient_get_bool_enc(BOOL_ENC_CLIENT(be_enc));
 
   const Be_Manager_ptr be_mgr = BeEnc_get_be_manager(be_enc);
   const SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(be_enc));
@@ -360,7 +356,9 @@ void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
       }
 
       /* if it's a boolean, default is false */
-      else { insert_assoc(values, symb, ExprMgr_false(exprs)); }
+      else {
+        insert_assoc(values, symb, ExprMgr_false(exprs));
+      }
     }
     symbols = Trace_get_i_vars(trace);
     NODE_LIST_FOREACH(symbols, lst_iter) {
@@ -373,7 +371,9 @@ void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
       }
 
       /* if it's a boolean, default is false */
-      else { insert_assoc(values, symb, ExprMgr_false(exprs)); }
+      else {
+        insert_assoc(values, symb, ExprMgr_false(exprs));
+      }
     }
   } /* 0 */
 
@@ -389,11 +389,12 @@ void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
     int var_idx, ut_index, vtime;
     node_ptr var;
 
-    cnfLiteral = (nusmv_ptrint) Siter_element(genLiteral);
-    beLiteral = (nusmv_ptrint) Be_CnfLiteral2BeLiteral(be_mgr, cnfLiteral);
+    cnfLiteral = (nusmv_ptrint)Siter_element(genLiteral);
+    beLiteral = (nusmv_ptrint)Be_CnfLiteral2BeLiteral(be_mgr, cnfLiteral);
 
     /* if there is no corresponding rbc variable skip this */
-    if (0 == beLiteral) continue;
+    if (0 == beLiteral)
+      continue;
 
     /* get timed var */
     var_idx = Be_BeLiteral2BeIndex(be_mgr, beLiteral);
@@ -403,11 +404,14 @@ void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
 
     /* needed to adapt to new trace timing format, input is stored
      in the next step */
-    if (SymbTable_is_symbol_input_var(st, var)) { ++ vtime; }
+    if (SymbTable_is_symbol_input_var(st, var)) {
+      ++vtime;
+    }
 
     /* we're interested only in (input, next) both have time 1,
        skip anything else */
-    if (1 != vtime) continue;
+    if (1 != vtime)
+      continue;
 
     /* if it's a bit get/create a BitValues structure for
        the scalar variable which this bit belongs to */
@@ -419,10 +423,10 @@ void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
       BitValues_set(bv, BoolEnc_get_index_from_bit(bool_enc, var),
                     (beLiteral >= 0) ? BIT_VALUE_TRUE : BIT_VALUE_FALSE);
 
-    }
-    else { /* boolean variables do not require any further processing */
+    } else { /* boolean variables do not require any further processing */
       insert_assoc(values, var,
-                   (beLiteral >= 0) ? ExprMgr_true(exprs) : ExprMgr_false(exprs));
+                   (beLiteral >= 0) ? ExprMgr_true(exprs)
+                                    : ExprMgr_false(exprs));
     }
   } /* SLIST_FOREACH (phase 1) */
 
@@ -430,17 +434,17 @@ void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
        populate the trace accordingly. */
     assoc_iter aiter;
     node_ptr var;
-    void* val;
+    void *val;
 
     ASSOC_FOREACH(values, aiter, &var, &val) {
-      boolean is_scalar = \
-        (!SymbType_is_boolean(SymbTable_get_var_type(st, var)));
+      boolean is_scalar =
+          (!SymbType_is_boolean(SymbTable_get_var_type(st, var)));
 
       /* get value from values assoc */
-      node_ptr value = (is_scalar)
-        ? BoolEnc_get_value_from_var_bits(bool_enc,
-                                          BIT_VALUES(val))
-        : (node_ptr)val;
+      node_ptr value =
+          (is_scalar)
+              ? BoolEnc_get_value_from_var_bits(bool_enc, BIT_VALUES(val))
+              : (node_ptr)val;
 
       /* write into trace */
       Trace_step_put_value(trace, step, var, value);
@@ -455,7 +459,6 @@ void bmc_trace_utils_append_input_state(Trace_ptr trace, BeEnc_ptr be_enc,
   free_assoc(values);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -469,36 +472,34 @@ static void bmc_model_trace_step_print(const NuSMVEnv_ptr env,
                                        const Trace_ptr trace,
                                        const TraceIter step,
                                        TraceIteratorType it_type,
-                                       const char* prefix,
-                                       int count)
-{
+                                       const char *prefix, int count) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   TraceStepIter iter;
   node_ptr symb, val;
 
-  if (0 < count) { StreamMgr_print_error(streams,  "%s%d:", prefix, count); }
-  else { StreamMgr_print_error(streams,  "%s:", prefix); }
-
-  TRACE_STEP_FOREACH(trace, step, it_type, iter, symb, val) {
-    StreamMgr_nprint_error(streams, wffprint, "%N", symb); StreamMgr_print_error(streams,  "=");
-    StreamMgr_nprint_error(streams, wffprint, "%N", val); StreamMgr_print_error(streams,  " ");
+  if (0 < count) {
+    StreamMgr_print_error(streams, "%s%d:", prefix, count);
+  } else {
+    StreamMgr_print_error(streams, "%s:", prefix);
   }
 
-  StreamMgr_print_error(streams,  "\n");
+  TRACE_STEP_FOREACH(trace, step, it_type, iter, symb, val) {
+    StreamMgr_nprint_error(streams, wffprint, "%N", symb);
+    StreamMgr_print_error(streams, "=");
+    StreamMgr_nprint_error(streams, wffprint, "%N", val);
+    StreamMgr_print_error(streams, " ");
+  }
+
+  StreamMgr_print_error(streams, "\n");
 } /* bmc_model_trace_step_print */
 
-
-static enum st_retval
-trace_utils_release_bv (char* key, char* data, char* arg)
-{
+static enum st_retval trace_utils_release_bv(char *key, char *data, char *arg) {
   BitValues_ptr bv = BIT_VALUES(data);
   BitValues_destroy(bv);
 
   return ST_DELETE;
 }
-
-

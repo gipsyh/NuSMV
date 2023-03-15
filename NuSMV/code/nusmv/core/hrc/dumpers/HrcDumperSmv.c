@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,14 +34,12 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/hrc/dumpers/HrcDumperSmv.h"
 #include "nusmv/core/hrc/dumpers/HrcDumperSmv_private.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -52,14 +50,14 @@
 
   \todo Missing description
 */
-#define HRC_DUMPER_SMV_COMMENT_PREFIX         "-- "
+#define HRC_DUMPER_SMV_COMMENT_PREFIX "-- "
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define HRC_DUMPER_SMV_COMMENT_PREFIX_LEN     3
+#define HRC_DUMPER_SMV_COMMENT_PREFIX_LEN 3
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -78,23 +76,19 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void hrc_dumper_smv_finalize(Object_ptr object, void* dummy);
-
+static void hrc_dumper_smv_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-HrcDumperSmv_ptr HrcDumperSmv_create(const NuSMVEnv_ptr env,
-                                     FILE* fout)
-{
+HrcDumperSmv_ptr HrcDumperSmv_create(const NuSMVEnv_ptr env, FILE *fout) {
   HrcDumperSmv_ptr self = ALLOC(HrcDumperSmv, 1);
   HRC_DUMPER_SMV_CHECK_INSTANCE(self);
 
@@ -102,14 +96,12 @@ HrcDumperSmv_ptr HrcDumperSmv_create(const NuSMVEnv_ptr env,
   return self;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
 void hrc_dumper_smv_init(HrcDumperSmv_ptr self, const NuSMVEnv_ptr env,
-                         FILE* fout)
-{
+                         FILE *fout) {
   /* base class initialization */
   hrc_dumper_init(HRC_DUMPER(self), env, fout);
 
@@ -122,24 +114,21 @@ void hrc_dumper_smv_init(HrcDumperSmv_ptr self, const NuSMVEnv_ptr env,
   OVERRIDE(HrcDumper, dump_header) = hrc_dumper_smv_dump_header;
 }
 
-void hrc_dumper_smv_deinit(HrcDumperSmv_ptr self)
-{
+void hrc_dumper_smv_deinit(HrcDumperSmv_ptr self) {
   /* members deinitialization */
 
   /* base class deinitialization */
   hrc_dumper_deinit(HRC_DUMPER(self));
 }
 
-void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
-                                 HrcDumperSnippet snippet,
-                                 const HrcDumperInfo* info)
-{
+void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
+                                 const HrcDumperInfo *info) {
   HRC_DUMPER_CHECK_INSTANCE(self);
 
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
     switch (snippet) {
     case HDS_HRC_TOP:
@@ -155,7 +144,7 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
       }
       if (info->stage & HRC_STAGE_END) {
         _HRC_DUMP_HEADER("End of module")
-          }
+      }
       break;
 
     case HDS_MOD_NAME:
@@ -170,7 +159,7 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_MOD_FORMAL_PARAMS:
-      if (! info->list_is_empty) {
+      if (!info->list_is_empty) {
         if (info->stage & HRC_STAGE_BEGIN) {
           _HRC_DUMP_STR("(");
         }
@@ -188,18 +177,29 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
         _HRC_DUMP_NODE(info->n1.name);
         nusmv_assert(Nil == info->n2.type); /* type not supported yet! */
 
-        if (! info->last_in_list) { _HRC_DUMP_STR(", "); }
+        if (!info->last_in_list) {
+          _HRC_DUMP_STR(", ");
+        }
       }
       break;
 
     case HDS_LIST_MOD_INSTANCES:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       if (info->stage & HRC_STAGE_BEGIN) {
         switch (info->symb_cat) {
-        case SYMBOL_STATE_VAR: _HRC_DUMP_STR_NL("VAR"); break;
-        case SYMBOL_INPUT_VAR: _HRC_DUMP_STR_NL("IVAR"); break;
-        case SYMBOL_FROZEN_VAR: _HRC_DUMP_STR_NL("FROZENVAR"); break;
-        default: ErrorMgr_internal_error(errmgr, "Unexpected type of list of mod instances");
+        case SYMBOL_STATE_VAR:
+          _HRC_DUMP_STR_NL("VAR");
+          break;
+        case SYMBOL_INPUT_VAR:
+          _HRC_DUMP_STR_NL("IVAR");
+          break;
+        case SYMBOL_FROZEN_VAR:
+          _HRC_DUMP_STR_NL("FROZENVAR");
+          break;
+        default:
+          ErrorMgr_internal_error(errmgr,
+                                  "Unexpected type of list of mod instances");
         }
       }
       break;
@@ -237,28 +237,47 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
     case HDS_MOD_INSTANCE_ACTUAL_PARAM:
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_NODE(info->n1.value);
-        if (!info->last_in_list) { _HRC_DUMP_STR(", "); }
+        if (!info->last_in_list) {
+          _HRC_DUMP_STR(", ");
+        }
       }
       break;
 
     case HDS_LIST_SYMBOLS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
 
       if (info->stage & HRC_STAGE_BEGIN) {
         switch (info->symb_cat) {
-        case SYMBOL_STATE_VAR: _HRC_DUMP_STR_NL("VAR"); break;
-        case SYMBOL_INPUT_VAR: _HRC_DUMP_STR_NL("IVAR"); break;
-        case SYMBOL_FROZEN_VAR: _HRC_DUMP_STR_NL("FROZENVAR"); break;
-        case SYMBOL_FUNCTION: _HRC_DUMP_STR_NL("FUN"); break;
-        case SYMBOL_CONSTANT: _HRC_DUMP_STR("CONSTANTS "); break;
-        case SYMBOL_DEFINE: _HRC_DUMP_STR_NL("DEFINE"); break;
-        default: ErrorMgr_internal_error(errmgr, "Unexpected type of list of symbols");
+        case SYMBOL_STATE_VAR:
+          _HRC_DUMP_STR_NL("VAR");
+          break;
+        case SYMBOL_INPUT_VAR:
+          _HRC_DUMP_STR_NL("IVAR");
+          break;
+        case SYMBOL_FROZEN_VAR:
+          _HRC_DUMP_STR_NL("FROZENVAR");
+          break;
+        case SYMBOL_FUNCTION:
+          _HRC_DUMP_STR_NL("FUN");
+          break;
+        case SYMBOL_CONSTANT:
+          _HRC_DUMP_STR("CONSTANTS ");
+          break;
+        case SYMBOL_DEFINE:
+          _HRC_DUMP_STR_NL("DEFINE");
+          break;
+        default:
+          ErrorMgr_internal_error(errmgr, "Unexpected type of list of symbols");
         }
       }
       if (info->stage & HRC_STAGE_END) {
         switch (info->symb_cat) {
-        case SYMBOL_CONSTANT: _HRC_DUMP_STR_NL(";"); break;
-        default: break;
+        case SYMBOL_CONSTANT:
+          _HRC_DUMP_STR_NL(";");
+          break;
+        default:
+          break;
         }
         _HRC_DUMP_NL();
       }
@@ -286,7 +305,8 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
           _HRC_DUMP_NODE(info->n2.body);
           break;
 
-        default: ErrorMgr_internal_error(errmgr, "Unexpected symbol type");
+        default:
+          ErrorMgr_internal_error(errmgr, "Unexpected symbol type");
         }
       }
       if (info->stage & HRC_STAGE_END) {
@@ -294,15 +314,15 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
           if (!info->last_in_list) {
             _HRC_DUMP_STR(", ");
           }
-        }
-        else {
+        } else {
           _HRC_DUMP_STR_NL(";");
         }
       }
       break; /* end of case HDS_SYMBOL */
 
     case HDS_LIST_ASSIGNS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_STR_NL("ASSIGN");
       }
@@ -343,7 +363,6 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
         _HRC_DUMP_NL();
       }
       break;
-
 
     case HDS_LIST_CONSTRAINTS:
       /* nothing to do for smv */
@@ -457,13 +476,14 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_SYNTAX_ERRORS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_HEADER("Syntactic Errors")
-          }
+      }
       if (info->stage & HRC_STAGE_END) {
         _HRC_DUMP_HEADER("End of Syntactic Errors")
-          }
+      }
       break;
 
     case HDS_ERROR:
@@ -473,10 +493,9 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
 
         _HRC_DUMP_COMMENT("");
         _HRC_DUMP_STR("File ");
-        if ((const char*) NULL != info->error.filename) {
+        if ((const char *)NULL != info->error.filename) {
           _HRC_DUMP_STR(info->error.filename);
-        }
-        else {
+        } else {
           _HRC_DUMP_STR("stdin");
         }
         c = snprintf(buf, 12, "%d", info->error.lineno);
@@ -485,7 +504,7 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
         _HRC_DUMP_STR(": line ");
         _HRC_DUMP_STR(buf);
         _HRC_DUMP_STR(": ");
-        if ((const char*) NULL != info->error.token) {
+        if ((const char *)NULL != info->error.token) {
           _HRC_DUMP_STR("at token \"");
           _HRC_DUMP_STR(info->error.token);
           _HRC_DUMP_STR("\"");
@@ -502,32 +521,31 @@ void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
   }
 }
 
-void hrc_dumper_smv_dump_comment(HrcDumper_ptr self, const char* msg)
-{
+void hrc_dumper_smv_dump_comment(HrcDumper_ptr self, const char *msg) {
   _HRC_DUMP_STR(HRC_DUMPER_SMV_COMMENT_PREFIX);
   _HRC_DUMP_STR(msg);
 }
 
-void hrc_dumper_smv_dump_header(HrcDumper_ptr self, const char* msg)
-{
-  const int len = self->columns - (strlen(msg) +
-                                   HRC_DUMPER_SMV_COMMENT_PREFIX_LEN);
+void hrc_dumper_smv_dump_header(HrcDumper_ptr self, const char *msg) {
+  const int len =
+      self->columns - (strlen(msg) + HRC_DUMPER_SMV_COMMENT_PREFIX_LEN);
   unsigned int i;
 
   _HRC_DUMP_NL();
 
   /* dumps -- =============== ... */
   _HRC_DUMP_COMMENT("");
-  for (i=0; i < self->columns; ++i) {
+  for (i = 0; i < self->columns; ++i) {
     _HRC_DUMP_STR("=");
   }
   _HRC_DUMP_NL();
 
-  if (strlen(msg) == 0) return;
+  if (strlen(msg) == 0)
+    return;
 
   /* dumps the message centered */
   _HRC_DUMP_COMMENT("");
-  for (i=0; i < len/2 - 1; ++i) {
+  for (i = 0; i < len / 2 - 1; ++i) {
     _HRC_DUMP_STR(" ");
   }
   _HRC_DUMP_STR(msg);
@@ -535,7 +553,7 @@ void hrc_dumper_smv_dump_header(HrcDumper_ptr self, const char* msg)
 
   /* dumps -- =============== ... */
   _HRC_DUMP_COMMENT("");
-  for (i=0; i < self->columns; ++i) {
+  for (i = 0; i < self->columns; ++i) {
     _HRC_DUMP_STR("=");
   }
   _HRC_DUMP_NL();
@@ -550,15 +568,11 @@ void hrc_dumper_smv_dump_header(HrcDumper_ptr self, const char* msg)
 
   Called by the class destructor
 */
-static void hrc_dumper_smv_finalize(Object_ptr object, void* dummy)
-{
+static void hrc_dumper_smv_finalize(Object_ptr object, void *dummy) {
   HrcDumperSmv_ptr self = HRC_DUMPER_SMV(object);
 
   hrc_dumper_smv_deinit(self);
   FREE(self);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

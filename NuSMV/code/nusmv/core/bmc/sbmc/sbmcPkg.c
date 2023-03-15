@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,34 +34,30 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
+#include "nusmv/core/bmc/bmcInt.h" /* for 'options' */
+#include "nusmv/core/bmc/bmcPkg.h"
 #include "nusmv/core/bmc/sbmc/sbmcPkg.h"
 #include "nusmv/core/bmc/sbmc/sbmcUtils.h"
-#include "nusmv/core/bmc/bmcPkg.h"
-#include "nusmv/core/bmc/bmcInt.h" /* for 'options' */
 
-#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/sat/sat.h"
+#include "nusmv/core/utils/Logger.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -71,7 +67,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -80,16 +75,13 @@
 
 /**AutomaticEnd***************************************************************/
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void SBmc_Init(NuSMVEnv_ptr env)
-{
+void SBmc_Init(NuSMVEnv_ptr env) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 1)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
@@ -102,10 +94,9 @@ void SBmc_Init(NuSMVEnv_ptr env)
   }
 }
 
-void SBmc_Quit(NuSMVEnv_ptr env)
-{
+void SBmc_Quit(NuSMVEnv_ptr env) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 1)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
@@ -118,15 +109,10 @@ void SBmc_Quit(NuSMVEnv_ptr env)
   }
 }
 
-
-
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-

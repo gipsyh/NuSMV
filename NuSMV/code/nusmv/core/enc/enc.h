@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,17 +35,15 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_ENC_ENC_H__
 #define __NUSMV_CORE_ENC_ENC_H__
 
 #include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/enc/bool/BoolEnc.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
 #include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/enc/bool/BoolEnc.h"
 #include "nusmv/core/utils/StreamMgr.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -59,7 +57,7 @@
 /* Structure definitions                                                     */
 /*---------------------------------------------------------------------------*/
 /* possible Variable Ordering Types */
-typedef enum  {
+typedef enum {
   VARS_ORD_INPUTS_BEFORE,
   VARS_ORD_INPUTS_AFTER,
   VARS_ORD_TOPOLOGICAL,
@@ -107,7 +105,7 @@ void Enc_init_encodings(NuSMVEnv_ptr env);
                       flattening phase. After the flattening, you must
                       initialize the bdd encoding as well. Don't
                       forget to call Enc_quit_encodings when the
-                      session ends. 
+                      session ends.
 
   \sa Enc_init_bdd_encoding, Enc_quit_encodings
 */
@@ -116,15 +114,14 @@ void Enc_init_bool_encoding(NuSMVEnv_ptr env);
 /*!
   \brief Initializes the bdd enc for the given environment
 
-  
+
 */
-void Enc_init_bdd_encoding(NuSMVEnv_ptr env,
-                                  const char* input_order_file_name);
+void Enc_init_bdd_encoding(NuSMVEnv_ptr env, const char *input_order_file_name);
 
 /*!
   \brief Initializes the be enc for this session
 
-  
+
 */
 void Enc_init_be_encoding(NuSMVEnv_ptr env);
 
@@ -141,7 +138,7 @@ void Enc_quit_encodings(NuSMVEnv_ptr env);
 
   Returned string does not have to be freed
 */
-const char* Enc_vars_ord_to_string(VarsOrdType);
+const char *Enc_vars_ord_to_string(VarsOrdType);
 
 /*!
   \brief Converts a string to the corresponding var order type.
@@ -151,7 +148,7 @@ const char* Enc_vars_ord_to_string(VarsOrdType);
                       is not NULL, and VARS_ORD_STR_LEXICOGRAPHIC is
                       given as str argument, a warning will be printed
 */
-VarsOrdType Enc_string_to_vars_ord(const char*, StreamMgr_ptr);
+VarsOrdType Enc_string_to_vars_ord(const char *, StreamMgr_ptr);
 
 /*!
   \brief Returns a string of all possible values for
@@ -159,14 +156,14 @@ VarsOrdType Enc_string_to_vars_ord(const char*, StreamMgr_ptr);
 
   Returned string does not have to be freed
 */
-const char* Enc_get_valid_vars_ord_types(void);
+const char *Enc_get_valid_vars_ord_types(void);
 
 /*!
   \brief Returns the string corresponding to give parameter
 
   Returned string does not have to be freed
 */
-const char* Enc_bdd_static_order_heuristics_to_string(BddSohEnum);
+const char *Enc_bdd_static_order_heuristics_to_string(BddSohEnum);
 
 /*!
   \brief Converts a string to the corresponding BDD Static Order Heuristics.
@@ -174,7 +171,7 @@ const char* Enc_bdd_static_order_heuristics_to_string(BddSohEnum);
   BDD_STATIC_ORDER_HEURISTICS_ERROR is returned when the
   string does not match the given string
 */
-BddSohEnum Enc_string_to_bdd_static_order_heuristics(const char*);
+BddSohEnum Enc_string_to_bdd_static_order_heuristics(const char *);
 
 /*!
   \brief Returns a string of all possible values for
@@ -182,15 +179,14 @@ BddSohEnum Enc_string_to_bdd_static_order_heuristics(const char*);
 
   Returned string does not have to be freed
 */
-const char* Enc_get_valid_bdd_static_order_heuristics(void);
+const char *Enc_get_valid_bdd_static_order_heuristics(void);
 
 /*!
   \brief Top level function for resetting the evaluation self of
   the bdd encoder
 
-  
+
 */
-int Enc_clean_evaluation_cache(NuSMVEnv_ptr env,
-                                      BddEnc_ptr enc);
+int Enc_clean_evaluation_cache(NuSMVEnv_ptr env, BddEnc_ptr enc);
 
 #endif /* __NUSMV_CORE_ENC_ENC_H__ */

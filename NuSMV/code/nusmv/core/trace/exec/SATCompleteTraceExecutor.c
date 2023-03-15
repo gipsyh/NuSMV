@@ -34,14 +34,14 @@
 
 */
 
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/trace/exec/PartialTraceExecutor.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
 #include "nusmv/core/trace/exec/SATCompleteTraceExecutor.h"
 #include "nusmv/core/trace/exec/SATCompleteTraceExecutor_private.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/opt/opt.h"
+#include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/trace/Trace_private.h"
@@ -60,7 +60,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'SATCompleteTraceExecutor_private.h' for class 'SATCompleteTraceExecutor' definition. */
+/* See 'SATCompleteTraceExecutor_private.h' for class 'SATCompleteTraceExecutor'
+ * definition. */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -70,7 +71,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -78,11 +78,11 @@
 /*---------------------------------------------------------------------------*/
 
 static void sat_complete_trace_executor_finalize(Object_ptr object,
-                                                 void* dummy);
+                                                 void *dummy);
 
 static boolean
 sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr self,
-                                    const Trace_ptr trace, int* n_steps);
+                                    const Trace_ptr trace, int *n_steps);
 
 static inline be_ptr
 sat_complete_trace_executor_get_initial_state(BeFsm_ptr be_fsm);
@@ -90,11 +90,11 @@ sat_complete_trace_executor_get_initial_state(BeFsm_ptr be_fsm);
 static inline be_ptr
 sat_complete_trace_executor_get_transition_relation(BeFsm_ptr be_fsm);
 
-static inline void
-bmc_add_be_into_solver_positively(SatSolver_ptr solver,
-                                  SatSolverGroup group, be_ptr prob,
-                                  BeEnc_ptr be_enc,
-                                  Be_CnfAlgorithm alg);
+static inline void bmc_add_be_into_solver_positively(SatSolver_ptr solver,
+                                                     SatSolverGroup group,
+                                                     be_ptr prob,
+                                                     BeEnc_ptr be_enc,
+                                                     Be_CnfAlgorithm alg);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
@@ -102,8 +102,7 @@ bmc_add_be_into_solver_positively(SatSolver_ptr solver,
 
 SATCompleteTraceExecutor_ptr
 SATCompleteTraceExecutor_create(const BeFsm_ptr fsm, const BeEnc_ptr enc,
-                                const BddEnc_ptr bdd_enc)
-{
+                                const BddEnc_ptr bdd_enc) {
   SATCompleteTraceExecutor_ptr self = ALLOC(SATCompleteTraceExecutor, 1);
   SAT_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
@@ -111,13 +110,11 @@ SATCompleteTraceExecutor_create(const BeFsm_ptr fsm, const BeEnc_ptr enc,
   return self;
 }
 
-void SATCompleteTraceExecutor_destroy(SATCompleteTraceExecutor_ptr self)
-{
+void SATCompleteTraceExecutor_destroy(SATCompleteTraceExecutor_ptr self) {
   SAT_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
@@ -125,8 +122,7 @@ void SATCompleteTraceExecutor_destroy(SATCompleteTraceExecutor_ptr self)
 
 void sat_complete_trace_executor_init(SATCompleteTraceExecutor_ptr self,
                                       const BeFsm_ptr fsm, const BeEnc_ptr enc,
-                                      const BddEnc_ptr bdd_enc)
-{
+                                      const BddEnc_ptr bdd_enc) {
   /* base class initialization */
   complete_trace_executor_init(COMPLETE_TRACE_EXECUTOR(self),
                                EnvObject_get_environment(ENV_OBJECT(enc)));
@@ -139,17 +135,16 @@ void sat_complete_trace_executor_init(SATCompleteTraceExecutor_ptr self,
   /* virtual methods settings */
   OVERRIDE(Object, finalize) = sat_complete_trace_executor_finalize;
 
-  OVERRIDE(CompleteTraceExecutor, execute) = sat_complete_trace_executor_execute;
+  OVERRIDE(CompleteTraceExecutor, execute) =
+      sat_complete_trace_executor_execute;
 }
 
-void sat_complete_trace_executor_deinit(SATCompleteTraceExecutor_ptr self)
-{
+void sat_complete_trace_executor_deinit(SATCompleteTraceExecutor_ptr self) {
   /* members deinitialization */
 
   /* base class deinitialization */
   complete_trace_executor_deinit(COMPLETE_TRACE_EXECUTOR(self));
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -160,8 +155,8 @@ void sat_complete_trace_executor_deinit(SATCompleteTraceExecutor_ptr self)
 
   Called by the class destructor
 */
-static void sat_complete_trace_executor_finalize(Object_ptr object, void* dummy)
-{
+static void sat_complete_trace_executor_finalize(Object_ptr object,
+                                                 void *dummy) {
   SATCompleteTraceExecutor_ptr self = SAT_COMPLETE_TRACE_EXECUTOR(object);
 
   sat_complete_trace_executor_deinit(self);
@@ -179,20 +174,18 @@ static void sat_complete_trace_executor_finalize(Object_ptr object, void* dummy)
   The number of performed steps (transitions) is returned. If the
   initial state is not compatible -1 is returned.
 */
-static boolean
-sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_executor,
-                                    const Trace_ptr trace, int* n_steps)
-{
+static boolean sat_complete_trace_executor_execute(
+    const CompleteTraceExecutor_ptr complete_executor, const Trace_ptr trace,
+    int *n_steps) {
   /* local references to self */
-  const SATCompleteTraceExecutor_ptr self = \
-    SAT_COMPLETE_TRACE_EXECUTOR(complete_executor);
+  const SATCompleteTraceExecutor_ptr self =
+      SAT_COMPLETE_TRACE_EXECUTOR(complete_executor);
 
-  const BaseTraceExecutor_ptr executor = \
-    BASE_TRACE_EXECUTOR(complete_executor);
+  const BaseTraceExecutor_ptr executor = BASE_TRACE_EXECUTOR(complete_executor);
 
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   int count = -1; /* failure */
   TraceIter step;
@@ -207,7 +200,7 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
   be_ptr be_problem;
 
   /* 0- Check prerequisites */
-  solver  = Sat_CreateIncSolver(env, get_sat_solver(opts));
+  solver = Sat_CreateIncSolver(env, get_sat_solver(opts));
   SAT_INC_SOLVER_CHECK_INSTANCE(solver);
 
   SAT_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self);
@@ -221,9 +214,10 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
   if (!Trace_is_complete(trace, Trace_get_sf_vars(trace), false) ||
       !Trace_is_complete(trace, Trace_get_i_vars(trace), false)) {
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-    ErrorMgr_internal_error(errmgr, "%s:%d:%s: This executor does not support partial traces.",
-                   __FILE__, __LINE__, __func__);
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+    ErrorMgr_internal_error(
+        errmgr, "%s:%d:%s: This executor does not support partial traces.",
+        __FILE__, __LINE__, __func__);
   }
 
   step = trace_first_iter(trace);
@@ -235,17 +229,16 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
     satGroup = SatIncSolver_create_group(solver);
 
     /* pick the initial state from the trace */
-    be_current = \
-      TraceUtils_fetch_as_be(trace, step, TRACE_ITER_SF_SYMBOLS,
-                             self->enc, self->bdd_enc);
+    be_current = TraceUtils_fetch_as_be(trace, step, TRACE_ITER_SF_SYMBOLS,
+                                        self->enc, self->bdd_enc);
 
-    be_problem = Be_And(be_mgr,  be_current,
-                    sat_complete_trace_executor_get_initial_state(self->fsm));
+    be_problem =
+        Be_And(be_mgr, be_current,
+               sat_complete_trace_executor_get_initial_state(self->fsm));
 
     /* push the problem into the SAT solver */
-    bmc_add_be_into_solver_positively(SAT_SOLVER(solver), satGroup,
-                                      be_problem, self->enc,
-                                      get_rbc2cnf_algorithm(opts));
+    bmc_add_be_into_solver_positively(SAT_SOLVER(solver), satGroup, be_problem,
+                                      self->enc, get_rbc2cnf_algorithm(opts));
 
     satResult = SatSolver_solve_all_groups(SAT_SOLVER(solver));
     SatIncSolver_destroy_group(solver, satGroup);
@@ -254,19 +247,17 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
   if (SAT_SOLVER_UNSATISFIABLE_PROBLEM == satResult) {
     fprintf(BaseTraceExecutor_get_error_stream(executor),
             "Error: starting state is not initial state\n");
-  }
-  else {
+  } else {
     boolean terminate = false;
     nusmv_assert(SAT_SOLVER_SATISFIABLE_PROBLEM == satResult);
 
-    ++ count;
+    ++count;
 
     /* in SAT/SMT approach it is possibile to factorize the trans. relation */
-    bmc_add_be_into_solver_positively(SAT_SOLVER(solver),
-              SatSolver_get_permanent_group(SAT_SOLVER(solver)),
-              sat_complete_trace_executor_get_transition_relation(self->fsm),
-                                      self->enc,
-                                      get_rbc2cnf_algorithm(opts));
+    bmc_add_be_into_solver_positively(
+        SAT_SOLVER(solver), SatSolver_get_permanent_group(SAT_SOLVER(solver)),
+        sat_complete_trace_executor_get_transition_relation(self->fsm),
+        self->enc, get_rbc2cnf_algorithm(opts));
 
     /* 2- Check Consecutive States are related by transition relation */
     do {
@@ -276,21 +267,18 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
         /* create problem and push into the SAT solver current state,
            next input, next transitional, next state.  SAT problem for
            complete trace re-execution (untimed) */
-        be_ptr be_input = \
-          TraceUtils_fetch_as_be(trace, step, TRACE_ITER_I_SYMBOLS,
-                                 self->enc, self->bdd_enc);
-        be_ptr be_comb = \
-          TraceUtils_fetch_as_be(trace, step, TRACE_ITER_COMBINATORIAL,
-                                 self->enc, self->bdd_enc);
-        be_ptr be_next = \
-          TraceUtils_fetch_as_be(trace, step, TRACE_ITER_SF_SYMBOLS,
-                                 self->enc, self->bdd_enc);
+        be_ptr be_input = TraceUtils_fetch_as_be(
+            trace, step, TRACE_ITER_I_SYMBOLS, self->enc, self->bdd_enc);
+        be_ptr be_comb = TraceUtils_fetch_as_be(
+            trace, step, TRACE_ITER_COMBINATORIAL, self->enc, self->bdd_enc);
+        be_ptr be_next = TraceUtils_fetch_as_be(
+            trace, step, TRACE_ITER_SF_SYMBOLS, self->enc, self->bdd_enc);
 
-        be_problem = \
-          Be_And(be_mgr, be_current,
-                 Be_And(be_mgr, be_comb,
-                      Be_And(be_mgr, be_input,
-                             BeEnc_shift_curr_to_next(self->enc, be_next))));
+        be_problem = Be_And(
+            be_mgr, be_current,
+            Be_And(be_mgr, be_comb,
+                   Be_And(be_mgr, be_input,
+                          BeEnc_shift_curr_to_next(self->enc, be_next))));
 
         if (BaseTraceExecutor_get_verbosity(executor)) {
           fprintf(BaseTraceExecutor_get_output_stream(executor),
@@ -317,7 +305,7 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
           if (BaseTraceExecutor_get_verbosity(executor)) {
             fprintf(BaseTraceExecutor_get_output_stream(executor), "ok\n");
           }
-          ++ count;
+          ++count;
 
           nusmv_assert(SAT_SOLVER_SATISFIABLE_PROBLEM == satResult);
           be_current = be_next;
@@ -345,19 +333,19 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
         fprintf(BaseTraceExecutor_get_output_stream(executor),
                 "Trace %d execution completed successfully.\n"
                 "%d steps performed.\n",
-                Trace_get_id(trace),
-                count );
+                Trace_get_id(trace), count);
 
         res = true;
       }
-    }
-    else {
+    } else {
       fprintf(BaseTraceExecutor_get_output_stream(executor),
               "Trace execution failed!\n"
               /* "(%d steps performed).\n", count */);
     }
 
-    if (NIL(int) != n_steps) { *n_steps = count; }
+    if (NIL(int) != n_steps) {
+      *n_steps = count;
+    }
     return res;
   }
 }
@@ -370,11 +358,9 @@ sat_complete_trace_executor_execute(const CompleteTraceExecutor_ptr complete_exe
   \se None
 */
 static inline be_ptr
-sat_complete_trace_executor_get_initial_state(BeFsm_ptr be_fsm)
-{
+sat_complete_trace_executor_get_initial_state(BeFsm_ptr be_fsm) {
   BeEnc_ptr be_enc = BeFsm_get_be_encoding(be_fsm);
-  be_ptr init = Be_And(BeEnc_get_be_manager(be_enc),
-                       BeFsm_get_init(be_fsm),
+  be_ptr init = Be_And(BeEnc_get_be_manager(be_enc), BeFsm_get_init(be_fsm),
                        BeFsm_get_invar(be_fsm));
   return init;
 }
@@ -388,8 +374,7 @@ sat_complete_trace_executor_get_initial_state(BeFsm_ptr be_fsm)
 */
 
 static inline be_ptr
-sat_complete_trace_executor_get_transition_relation (BeFsm_ptr be_fsm)
-{
+sat_complete_trace_executor_get_transition_relation(BeFsm_ptr be_fsm) {
   BeEnc_ptr be_enc = BeFsm_get_be_encoding(be_fsm);
   Be_Manager_ptr mgr = BeEnc_get_be_manager(be_enc);
 
@@ -409,22 +394,21 @@ sat_complete_trace_executor_get_transition_relation (BeFsm_ptr be_fsm)
   \se Outputs into outstream the total time of conversion,
   adding, setting polarity and destroying BE.
 */
-static inline void
-bmc_add_be_into_solver_positively(SatSolver_ptr solver, SatSolverGroup group,
-                                  be_ptr prob, BeEnc_ptr be_enc,
-                                  Be_CnfAlgorithm cnf_alg)
-{
+static inline void bmc_add_be_into_solver_positively(SatSolver_ptr solver,
+                                                     SatSolverGroup group,
+                                                     be_ptr prob,
+                                                     BeEnc_ptr be_enc,
+                                                     Be_CnfAlgorithm cnf_alg) {
   Be_Manager_ptr be_mgr = BeEnc_get_be_manager(be_enc);
   Be_Cnf_ptr cnf;
 
   /* We force inclusion of the conjunct set to guarantee soundness */
-  cnf = Be_ConvertToCnf(be_mgr, Bmc_Utils_apply_inlining4inc(be_mgr, prob),
-                        1, cnf_alg);
+  cnf = Be_ConvertToCnf(be_mgr, Bmc_Utils_apply_inlining4inc(be_mgr, prob), 1,
+                        cnf_alg);
   SatSolver_add(solver, cnf, group);
   SatSolver_set_polarity(solver, cnf, 1, group);
 
   Be_Cnf_Delete(cnf);
 }
-
 
 /**AutomaticEnd***************************************************************/

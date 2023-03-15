@@ -34,18 +34,16 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_ENV_OBJECT_H__
 #define __NUSMV_CORE_UTILS_ENV_OBJECT_H__
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
+#include "nusmv/core/cinit/NuSMVEnv.h"
 #include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/utils.h"
-#include "nusmv/core/cinit/NuSMVEnv.h"
 
 /*!
   \struct EnvObject
@@ -53,7 +51,7 @@
 
 
 */
-typedef struct EnvObject_TAG*  EnvObject_ptr;
+typedef struct EnvObject_TAG *EnvObject_ptr;
 
 /*!
   \brief To cast and check instances of class EnvObject
@@ -61,16 +59,15 @@ typedef struct EnvObject_TAG*  EnvObject_ptr;
   These macros must be used respectively to cast and to check
   instances of class EnvObject
 */
-#define ENV_OBJECT(self) \
-         ((EnvObject_ptr) self)
+#define ENV_OBJECT(self) ((EnvObject_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_OBJECT_CHECK_INSTANCE(self) \
-         (nusmv_assert(ENV_OBJECT(self) != ENV_OBJECT(NULL)))
+#define ENV_OBJECT_CHECK_INSTANCE(self)                                        \
+  (nusmv_assert(ENV_OBJECT(self) != ENV_OBJECT(NULL)))
 
 /*!
   \brief Macro that returns the environment from an env object
@@ -79,16 +76,13 @@ typedef struct EnvObject_TAG*  EnvObject_ptr;
 
   \se none
 */
-#define ENV_OBJECT_GET_ENV(self) \
-        EnvObject_get_environment(ENV_OBJECT(self))
+#define ENV_OBJECT_GET_ENV(self) EnvObject_get_environment(ENV_OBJECT(self))
 
 /*!
   \brief Handy shortcut for EnvObject_get_environment
   \sa EnvObject_get_environment
 */
-#define EnvObject_env \
-  EnvObject_get_environment
-
+#define EnvObject_env EnvObject_get_environment
 
 /**AutomaticStart*************************************************************/
 
@@ -126,9 +120,6 @@ void EnvObject_destroy(EnvObject_ptr self);
 */
 NuSMVEnv_ptr EnvObject_get_environment(const EnvObject_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_ENV_OBJECT_H__ */

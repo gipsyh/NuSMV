@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_CORE_H__
 #define __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_CORE_H__
-
 
 #include "nusmv/core/compile/dependency/DependencyBase.h"
 #include "nusmv/core/utils/defs.h"
@@ -47,9 +44,9 @@
   \struct DependencyCore
   \brief Definition of the public accessor for class DependencyCore
 
-  
+
 */
-typedef struct DependencyCore_TAG*  DependencyCore_ptr;
+typedef struct DependencyCore_TAG *DependencyCore_ptr;
 
 /*!
   \brief To cast and check instances of class DependencyCore
@@ -57,18 +54,15 @@ typedef struct DependencyCore_TAG*  DependencyCore_ptr;
   These macros must be used respectively to cast and to check
   instances of class DependencyCore
 */
-#define DEPENDENCY_CORE(self) \
-         ((DependencyCore_ptr) self)
+#define DEPENDENCY_CORE(self) ((DependencyCore_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEPENDENCY_CORE_CHECK_INSTANCE(self) \
-         (nusmv_assert(DEPENDENCY_CORE(self) != DEPENDENCY_CORE(NULL)))
-
-
+#define DEPENDENCY_CORE_CHECK_INSTANCE(self)                                   \
+  (nusmv_assert(DEPENDENCY_CORE(self) != DEPENDENCY_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,11 +79,8 @@ typedef struct DependencyCore_TAG*  DependencyCore_ptr;
   \sa DependencyCore_destroy
 */
 DependencyCore_ptr DependencyCore_create(const NuSMVEnv_ptr env,
-                                                const char* name);
-
+                                         const char *name);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_CORE_H__ */

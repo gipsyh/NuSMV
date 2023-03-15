@@ -31,8 +31,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_FSM_BDD_BDD_FSM_PRIVATE_H__
 #define __NUSMV_CORE_FSM_BDD_BDD_FSM_PRIVATE_H__
 
@@ -42,25 +40,23 @@
 /*!
   \struct BddFsm
 */
-typedef struct BddFsm_TAG
-{
+typedef struct BddFsm_TAG {
   /* private members */
   DDMgr_ptr dd;
   SymbTable_ptr symb_table;
-  BddEnc_ptr  enc;
+  BddEnc_ptr enc;
 
-  BddStates      init;
+  BddStates init;
 
   BddInvarStates invar_states;
   BddInvarInputs invar_inputs;
 
   BddTrans_ptr trans;
 
-  JusticeList_ptr    justice;
+  JusticeList_ptr justice;
   CompassionList_ptr compassion;
 
   BddFsmCache_ptr cache;
 } BddFsm;
-
 
 #endif /* __NUSMV_CORE_FSM_BDD_BDD_FSM_PRIVATE_H__ */

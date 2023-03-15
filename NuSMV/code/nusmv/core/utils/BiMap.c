@@ -13,7 +13,6 @@
 
 */
 
-
 #include "nusmv/core/utils/BiMap.h"
 #include "nusmv/core/utils/assoc.h"
 
@@ -29,14 +28,13 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct BiMap_TAG
-{
+typedef struct BiMap_TAG {
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-  hash_ptr d2c; /* domain to codomain hash map */
-  hash_ptr c2d; /* codomain to domain hash map */
+  hash_ptr d2c;        /* domain to codomain hash map */
+  hash_ptr c2d;        /* codomain to domain hash map */
   NodeList_ptr d_list; /* domain as list for fast iteration */
   NodeList_ptr c_list; /* codomain as list for fast iteration */
   node_ptr d_cache;
@@ -58,13 +56,11 @@ typedef struct BiMap_TAG
 static void bi_map_init(BiMap_ptr self);
 static void bi_map_deinit(BiMap_ptr self);
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-BiMap_ptr BiMap_create(void)
-{
+BiMap_ptr BiMap_create(void) {
   BiMap_ptr self = ALLOC(BiMap, 1);
   BI_MAP_CHECK_INSTANCE(self);
 
@@ -72,23 +68,19 @@ BiMap_ptr BiMap_create(void)
   return self;
 }
 
-void BiMap_destroy(BiMap_ptr self)
-{
+void BiMap_destroy(BiMap_ptr self) {
   BI_MAP_CHECK_INSTANCE(self);
 
   bi_map_deinit(self);
   FREE(self);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void BiMap_put(BiMap_ptr self, 
-               node_ptr domain_element, 
-               node_ptr codomain_element)
-{
+void BiMap_put(BiMap_ptr self, node_ptr domain_element,
+               node_ptr codomain_element) {
   BI_MAP_CHECK_INSTANCE(self);
   nusmv_assert(find_assoc(self->d2c, domain_element) == Nil);
   nusmv_assert(find_assoc(self->c2d, codomain_element) == Nil);
@@ -103,20 +95,18 @@ void BiMap_put(BiMap_ptr self,
   self->c_cache = codomain_element;
 }
 
-node_ptr BiMap_get(BiMap_ptr self, node_ptr domain_element)
-{
+node_ptr BiMap_get(BiMap_ptr self, node_ptr domain_element) {
   BI_MAP_CHECK_INSTANCE(self);
   nusmv_assert(find_assoc(self->d2c, domain_element) != Nil);
 
-  if (domain_element != self->d_cache){
+  if (domain_element != self->d_cache) {
     self->d_cache = domain_element;
     self->c_cache = find_assoc(self->d2c, domain_element);
   }
   return self->c_cache;
 }
 
-node_ptr BiMap_inverse_get(BiMap_ptr self, node_ptr codomain_element)
-{
+node_ptr BiMap_inverse_get(BiMap_ptr self, node_ptr codomain_element) {
   BI_MAP_CHECK_INSTANCE(self);
   nusmv_assert(find_assoc(self->c2d, codomain_element) != Nil);
 
@@ -127,8 +117,7 @@ node_ptr BiMap_inverse_get(BiMap_ptr self, node_ptr codomain_element)
   return self->d_cache;
 }
 
-boolean BiMap_domain_contains(BiMap_ptr self, node_ptr domain_element)
-{
+boolean BiMap_domain_contains(BiMap_ptr self, node_ptr domain_element) {
   BI_MAP_CHECK_INSTANCE(self);
 
   if (domain_element != self->d_cache) {
@@ -138,8 +127,7 @@ boolean BiMap_domain_contains(BiMap_ptr self, node_ptr domain_element)
   return self->c_cache != Nil;
 }
 
-boolean BiMap_codomain_contains(BiMap_ptr self, node_ptr codomain_element)
-{
+boolean BiMap_codomain_contains(BiMap_ptr self, node_ptr codomain_element) {
   BI_MAP_CHECK_INSTANCE(self);
 
   if (codomain_element != self->c_cache) {
@@ -149,29 +137,25 @@ boolean BiMap_codomain_contains(BiMap_ptr self, node_ptr codomain_element)
   return self->d_cache != Nil;
 }
 
-unsigned BiMap_size(BiMap_ptr self)
-{
+unsigned BiMap_size(BiMap_ptr self) {
   BI_MAP_CHECK_INSTANCE(self);
   nusmv_assert(assoc_get_size(self->c2d) == assoc_get_size(self->d2c));
-  return (unsigned) assoc_get_size(self->c2d);
+  return (unsigned)assoc_get_size(self->c2d);
 }
 
-boolean BiMap_is_empty(BiMap_ptr self)
-{
+boolean BiMap_is_empty(BiMap_ptr self) {
   BI_MAP_CHECK_INSTANCE(self);
   return BiMap_size(self) == 0;
 }
 
-void BiMap_clear(BiMap_ptr self)
-{
+void BiMap_clear(BiMap_ptr self) {
   BI_MAP_CHECK_INSTANCE(self);
 
   bi_map_deinit(self);
   bi_map_init(self);
 }
 
-void BiMap_gen_iter(BiMap_ptr self, BiMapIter* iter)
-{
+void BiMap_gen_iter(BiMap_ptr self, BiMapIter *iter) {
 #ifndef BI_MAP_FAST_ITERATOR
   iter->gen.table = self->d2c;
   iter->gen.entry = NIL(st_table_entry);
@@ -183,8 +167,7 @@ void BiMap_gen_iter(BiMap_ptr self, BiMapIter* iter)
 #endif
 }
 
-boolean BiMap_iter_is_end(BiMap_ptr self, BiMapIter* iter)
-{
+boolean BiMap_iter_is_end(BiMap_ptr self, BiMapIter *iter) {
 #ifndef BI_MAP_FAST_ITERATOR
   return iter->end == 0;
 #else
@@ -192,8 +175,7 @@ boolean BiMap_iter_is_end(BiMap_ptr self, BiMapIter* iter)
 #endif
 }
 
-void BiMap_iter_next(BiMap_ptr self, BiMapIter* iter)
-{
+void BiMap_iter_next(BiMap_ptr self, BiMapIter *iter) {
 #ifndef BI_MAP_FAST_ITERATOR
   iter->end = st_gen(&(iter->gen), &(iter->key_p), &(iter->value_p));
 #else
@@ -202,8 +184,7 @@ void BiMap_iter_next(BiMap_ptr self, BiMapIter* iter)
 #endif
 }
 
-node_ptr BiMap_iter_get_domain_element(BiMap_ptr self, BiMapIter* iter)
-{
+node_ptr BiMap_iter_get_domain_element(BiMap_ptr self, BiMapIter *iter) {
 #ifndef BI_MAP_FAST_ITERATOR
   return NODE_PTR(iter->key_p);
 #else
@@ -211,8 +192,7 @@ node_ptr BiMap_iter_get_domain_element(BiMap_ptr self, BiMapIter* iter)
 #endif
 }
 
-node_ptr BiMap_iter_get_codomain_element(BiMap_ptr self, BiMapIter* iter)
-{
+node_ptr BiMap_iter_get_codomain_element(BiMap_ptr self, BiMapIter *iter) {
 #ifndef BI_MAP_FAST_ITERATOR
   return NODE_PTR(iter->value_p);
 #else
@@ -220,25 +200,13 @@ node_ptr BiMap_iter_get_codomain_element(BiMap_ptr self, BiMapIter* iter)
 #endif
 }
 
-NodeList_ptr BiMap_domain(BiMap_ptr self)
-{
-  return self->d_list;
-}
+NodeList_ptr BiMap_domain(BiMap_ptr self) { return self->d_list; }
 
-NodeList_ptr BiMap_codomain(BiMap_ptr self)
-{
-  return self->c_list;
-}
+NodeList_ptr BiMap_codomain(BiMap_ptr self) { return self->c_list; }
 
-hash_ptr BiMap_map(BiMap_ptr self)
-{
-  return self->d2c;
-}
+hash_ptr BiMap_map(BiMap_ptr self) { return self->d2c; }
 
-hash_ptr BiMap_inverse_map(BiMap_ptr self)
-{
-  return self->c2d;
-}
+hash_ptr BiMap_inverse_map(BiMap_ptr self) { return self->c2d; }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -251,8 +219,7 @@ hash_ptr BiMap_inverse_map(BiMap_ptr self)
 
   \sa BiMap_create
 */
-static void bi_map_init(BiMap_ptr self)
-{
+static void bi_map_init(BiMap_ptr self) {
   self->d2c = new_assoc();
   self->c2d = new_assoc();
 
@@ -270,8 +237,7 @@ static void bi_map_init(BiMap_ptr self)
 
   \sa BiMap_destroy
 */
-static void bi_map_deinit(BiMap_ptr self)
-{
+static void bi_map_deinit(BiMap_ptr self) {
   free_assoc(self->d2c);
   free_assoc(self->c2d);
 

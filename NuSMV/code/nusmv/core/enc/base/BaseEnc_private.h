@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_ENC_BASE_BASE_ENC_PRIVATE_H__
 #define __NUSMV_CORE_ENC_BASE_BASE_ENC_PRIVATE_H__
-
 
 #include "nusmv/core/enc/base/BaseEnc.h"
 
@@ -51,18 +48,16 @@
 /* Class BaseEnc is friend of SymbLayer */
 #include "nusmv/core/compile/symb_table/SymbLayer_private.h"
 
-
 /*!
   \brief BaseEnc class definition derived from
                class Object
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct BaseEnc_TAG
-{
+typedef struct BaseEnc_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
@@ -71,17 +66,15 @@ typedef struct BaseEnc_TAG
   /* -------------------------------------------------- */
   SymbTable_ptr symb_table;
   NodeList_ptr committed_layers;
-  array_t* layer_names;
+  array_t *layer_names;
 
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
-  void (*commit_layer)(BaseEnc_ptr self, const char* layer_name);
-  void (*remove_layer)(BaseEnc_ptr self, const char* layer_name);
+  void (*commit_layer)(BaseEnc_ptr self, const char *layer_name);
+  void (*remove_layer)(BaseEnc_ptr self, const char *layer_name);
 
 } BaseEnc;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
@@ -102,12 +95,12 @@ void base_enc_deinit(BaseEnc_ptr self);
   \methodof BaseEnc
   \todo
 */
-void base_enc_commit_layer(BaseEnc_ptr self, const char* layer_name);
+void base_enc_commit_layer(BaseEnc_ptr self, const char *layer_name);
 
 /*!
   \methodof BaseEnc
   \todo
 */
-void base_enc_remove_layer(BaseEnc_ptr self, const char* layer_name);
+void base_enc_remove_layer(BaseEnc_ptr self, const char *layer_name);
 
 #endif /* __NUSMV_CORE_ENC_BASE_BASE_ENC_PRIVATE_H__ */

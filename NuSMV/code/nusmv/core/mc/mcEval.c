@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,14 +35,13 @@
 
 */
 
-
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/mc/mc.h"
 #include "nusmv/core/mc/mcInt.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/error.h"
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/wff/wff.h"
 
 /*---------------------------------------------------------------------------*/
@@ -54,94 +53,92 @@
 
   \todo Missing description
 */
-typedef bdd_ptr (*BDDPFDB)(DDMgr_ptr , bdd_ptr);
+typedef bdd_ptr (*BDDPFDB)(DDMgr_ptr, bdd_ptr);
 typedef bdd_ptr (*BDDPFFB)(BddFsm_ptr, bdd_ptr);
-typedef bdd_ptr (*BDDPFDBB)(DDMgr_ptr , bdd_ptr, bdd_ptr);
+typedef bdd_ptr (*BDDPFDBB)(DDMgr_ptr, bdd_ptr, bdd_ptr);
 typedef bdd_ptr (*BDDPFFBB)(BddFsm_ptr, bdd_ptr, bdd_ptr);
-typedef bdd_ptr (*BDDPFDBII)(DDMgr_ptr , bdd_ptr, int, int);
+typedef bdd_ptr (*BDDPFDBII)(DDMgr_ptr, bdd_ptr, int, int);
 typedef bdd_ptr (*BDDPFFBII)(BddFsm_ptr, bdd_ptr, int, int);
-typedef bdd_ptr (*BDDPFDBBII)(DDMgr_ptr , bdd_ptr, bdd_ptr, int, int);
+typedef bdd_ptr (*BDDPFDBBII)(DDMgr_ptr, bdd_ptr, bdd_ptr, int, int);
 typedef bdd_ptr (*BDDPFFBBII)(BddFsm_ptr, bdd_ptr, bdd_ptr, int, int);
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr, BddEnc_ptr enc,
-                                   node_ptr, node_ptr);
+static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr, BddEnc_ptr enc, node_ptr,
+                                   node_ptr);
 
-static int eval_compute_recur(BddFsm_ptr, BddEnc_ptr enc,
-                              node_ptr, node_ptr);
+static int eval_compute_recur(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
 
-static bdd_ptr unary_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFDB, node_ptr,
-                            int, int, node_ptr);
-static bdd_ptr binary_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFDBB, node_ptr,
-                             int, int, int, node_ptr);
+static bdd_ptr unary_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFDB, node_ptr, int, int,
+                            node_ptr);
+static bdd_ptr binary_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFDBB, node_ptr, int,
+                             int, int, node_ptr);
 
-static bdd_ptr unary_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFB,
-                                node_ptr, int, int, node_ptr);
-static bdd_ptr binary_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBB,
-                                 node_ptr, int, int, int, node_ptr);
-static bdd_ptr binary_mod_bdd_op_ns(BddFsm_ptr, BddEnc_ptr, BDDPFFBB,
-                                    node_ptr, int, int, int, node_ptr);
-static bdd_ptr ternary_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBII,
-                                  node_ptr, int, int, node_ptr);
-static bdd_ptr quad_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBBII,
-                               node_ptr, int, int, int, node_ptr);
-
+static bdd_ptr unary_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFB, node_ptr, int,
+                                int, node_ptr);
+static bdd_ptr binary_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBB, node_ptr,
+                                 int, int, int, node_ptr);
+static bdd_ptr binary_mod_bdd_op_ns(BddFsm_ptr, BddEnc_ptr, BDDPFFBB, node_ptr,
+                                    int, int, int, node_ptr);
+static bdd_ptr ternary_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBII, node_ptr,
+                                  int, int, node_ptr);
+static bdd_ptr quad_mod_bdd_op(BddFsm_ptr, BddEnc_ptr, BDDPFFBBII, node_ptr,
+                               int, int, int, node_ptr);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-bdd_ptr eval_ctl_spec(BddFsm_ptr fsm, BddEnc_ptr enc,
-                      node_ptr n, node_ptr context)
-{
+bdd_ptr eval_ctl_spec(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
+                      node_ptr context) {
   bdd_ptr res;
   int temp = nusmv_yylineno;
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
 
-  if (n == Nil) return(bdd_true(dd_manager));
+  if (n == Nil)
+    return (bdd_true(dd_manager));
   nusmv_yylineno = node_get_lineno(n);
   res = eval_ctl_spec_recur(fsm, enc, n, context);
   nusmv_yylineno = temp;
-  return(res);
+  return (res);
 }
 
-node_ptr eval_formula_list(BddFsm_ptr fsm, BddEnc_ptr enc,
-                           node_ptr nodes, node_ptr context)
-{
+node_ptr eval_formula_list(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr nodes,
+                           node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  if (nodes == Nil) return(Nil);
+  if (nodes == Nil)
+    return (Nil);
   if (node_get_type(nodes) == CONS) {
-    return(find_node(nodemgr, CONS, eval_formula_list(fsm, enc, car(nodes), context),
-                           eval_formula_list(fsm, enc, cdr(nodes), context)));
+    return (find_node(nodemgr, CONS,
+                      eval_formula_list(fsm, enc, car(nodes), context),
+                      eval_formula_list(fsm, enc, cdr(nodes), context)));
   }
-  return(find_node(nodemgr, BDD, (node_ptr) eval_ctl_spec(fsm, enc, nodes, context),
-                   Nil));
+  return (find_node(nodemgr, BDD,
+                    (node_ptr)eval_ctl_spec(fsm, enc, nodes, context), Nil));
 }
 
-int eval_compute(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n, node_ptr context)
-{
+int eval_compute(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   int res;
   int temp = nusmv_yylineno;
 
-  if (n == Nil) ErrorMgr_internal_error(errmgr, "eval_compute: n = NIL\n");
+  if (n == Nil)
+    ErrorMgr_internal_error(errmgr, "eval_compute: n = NIL\n");
   nusmv_yylineno = node_get_lineno(n);
   res = eval_compute_recur(fsm, enc, n, context);
   nusmv_yylineno = temp;
-  return(res);
+  return (res);
 }
 
-void free_formula_list(DDMgr_ptr dd, node_ptr formula_list){
+void free_formula_list(DDMgr_ptr dd, node_ptr formula_list) {
   node_ptr fl = formula_list;
 
-  while(fl != Nil) {
+  while (fl != Nil) {
     node_ptr s = car(fl);
 
     fl = cdr(fl);
@@ -162,13 +159,14 @@ void free_formula_list(DDMgr_ptr dd, node_ptr formula_list){
   \sa eval_ctl_spec
 */
 static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
-                                   node_ptr context)
-{
+                                   node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  if (n == Nil) { return bdd_true(BddEnc_get_dd_manager(enc)); }
+  if (n == Nil) {
+    return bdd_true(BddEnc_get_dd_manager(enc));
+  }
 
   {
     SymbTable_ptr st = BaseEnc_get_symb_table(BASE_ENC(enc));
@@ -176,7 +174,8 @@ static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
       bdd_ptr res_bdd = BddEnc_expr_to_bdd(enc, n, context);
 
       if (res_bdd == NULL) {
-        ErrorMgr_rpterr(errmgr, "eval_ctl_spec: res = NULL after a call to \"eval\".");
+        ErrorMgr_rpterr(errmgr,
+                        "eval_ctl_spec: res = NULL after a call to \"eval\".");
         ErrorMgr_nusmv_exit(errmgr, 1);
       }
       return res_bdd;
@@ -184,39 +183,61 @@ static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
   }
 
   switch (node_get_type(n)) {
-  case CONTEXT: return(eval_ctl_spec(fsm, enc, cdr(n),car(n)));
-  case AND:     return(binary_bdd_op(fsm, enc, bdd_and, n, 1, 1, 1, context));
-  case OR:      return(binary_bdd_op(fsm, enc, bdd_or, n, 1, 1, 1, context));
-  case XOR:     return(binary_bdd_op(fsm, enc, bdd_xor, n, 1, 1, 1, context));
-  case XNOR:    return(binary_bdd_op(fsm, enc, bdd_xor, n, 1, 1, -1, context));
-  case NOT:     return(unary_bdd_op(fsm, enc, bdd_not, n, 1, 1, context));
-  case IMPLIES: return(binary_bdd_op(fsm, enc, bdd_or, n, 1, -1, 1, context));
-  case IFF:     return(binary_bdd_op(fsm, enc, bdd_xor, n, -1, 1, 1, context));
+  case CONTEXT:
+    return (eval_ctl_spec(fsm, enc, cdr(n), car(n)));
+  case AND:
+    return (binary_bdd_op(fsm, enc, bdd_and, n, 1, 1, 1, context));
+  case OR:
+    return (binary_bdd_op(fsm, enc, bdd_or, n, 1, 1, 1, context));
+  case XOR:
+    return (binary_bdd_op(fsm, enc, bdd_xor, n, 1, 1, 1, context));
+  case XNOR:
+    return (binary_bdd_op(fsm, enc, bdd_xor, n, 1, 1, -1, context));
+  case NOT:
+    return (unary_bdd_op(fsm, enc, bdd_not, n, 1, 1, context));
+  case IMPLIES:
+    return (binary_bdd_op(fsm, enc, bdd_or, n, 1, -1, 1, context));
+  case IFF:
+    return (binary_bdd_op(fsm, enc, bdd_xor, n, -1, 1, 1, context));
 
-  case EX:      return(unary_mod_bdd_op(fsm, enc, ex, n,  1,  1, context));
-  case AX:      return(unary_mod_bdd_op(fsm, enc, ex, n, -1, -1, context));
-  case EF:      return(unary_mod_bdd_op(fsm, enc, ef, n,  1,  1, context));
-  case AG:      return(unary_mod_bdd_op(fsm, enc, ef, n, -1, -1, context));
-  case AF:      return(unary_mod_bdd_op(fsm, enc, eg, n, -1, -1, context));
-  case EG:      return(unary_mod_bdd_op(fsm, enc, eg, n,  1,  1, context));
-  case EU:      return(binary_mod_bdd_op(fsm, enc, eu, n, 1, 1, 1, context));
-  case AU:      return(binary_mod_bdd_op(fsm, enc, au, n, 1, 1, 1, context));
-  case EBU:     return(quad_mod_bdd_op(fsm, enc, ebu, n, 1, 1, 1, context));
-  case ABU:     return(quad_mod_bdd_op(fsm, enc, abu, n, 1, 1, 1, context));
-  case EBF:     return(ternary_mod_bdd_op(fsm, enc, ebf, n, 1, 1, context));
-  case ABF:     return(ternary_mod_bdd_op(fsm, enc, ebg, n, -1, -1, context));
-  case EBG:     return(ternary_mod_bdd_op(fsm, enc, ebg, n, 1, 1, context));
-  case ABG:     return(ternary_mod_bdd_op(fsm, enc, ebf, n, -1, -1, context));
-  default:
-    {
-      bdd_ptr res_bdd = BddEnc_expr_to_bdd(enc, n, context);
+  case EX:
+    return (unary_mod_bdd_op(fsm, enc, ex, n, 1, 1, context));
+  case AX:
+    return (unary_mod_bdd_op(fsm, enc, ex, n, -1, -1, context));
+  case EF:
+    return (unary_mod_bdd_op(fsm, enc, ef, n, 1, 1, context));
+  case AG:
+    return (unary_mod_bdd_op(fsm, enc, ef, n, -1, -1, context));
+  case AF:
+    return (unary_mod_bdd_op(fsm, enc, eg, n, -1, -1, context));
+  case EG:
+    return (unary_mod_bdd_op(fsm, enc, eg, n, 1, 1, context));
+  case EU:
+    return (binary_mod_bdd_op(fsm, enc, eu, n, 1, 1, 1, context));
+  case AU:
+    return (binary_mod_bdd_op(fsm, enc, au, n, 1, 1, 1, context));
+  case EBU:
+    return (quad_mod_bdd_op(fsm, enc, ebu, n, 1, 1, 1, context));
+  case ABU:
+    return (quad_mod_bdd_op(fsm, enc, abu, n, 1, 1, 1, context));
+  case EBF:
+    return (ternary_mod_bdd_op(fsm, enc, ebf, n, 1, 1, context));
+  case ABF:
+    return (ternary_mod_bdd_op(fsm, enc, ebg, n, -1, -1, context));
+  case EBG:
+    return (ternary_mod_bdd_op(fsm, enc, ebg, n, 1, 1, context));
+  case ABG:
+    return (ternary_mod_bdd_op(fsm, enc, ebf, n, -1, -1, context));
+  default: {
+    bdd_ptr res_bdd = BddEnc_expr_to_bdd(enc, n, context);
 
-      if (res_bdd == NULL) {
-        ErrorMgr_rpterr(errmgr, "eval_ctl_spec: res = NULL after a call to \"eval\".");
-        ErrorMgr_nusmv_exit(errmgr, 1);
-      }
-      return res_bdd;
+    if (res_bdd == NULL) {
+      ErrorMgr_rpterr(errmgr,
+                      "eval_ctl_spec: res = NULL after a call to \"eval\".");
+      ErrorMgr_nusmv_exit(errmgr, 1);
     }
+    return res_bdd;
+  }
   } /* switch */
 }
 
@@ -227,34 +248,36 @@ static bdd_ptr eval_ctl_spec_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
 
   \sa eval_compute
 */
-static int eval_compute_recur(BddFsm_ptr fsm, BddEnc_ptr enc,
-                              node_ptr n, node_ptr context)
-{
+static int eval_compute_recur(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr n,
+                              node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   int res;
 
-  if (n == Nil) ErrorMgr_internal_error(errmgr, "eval_compute_recur: n = NIL\n");
+  if (n == Nil)
+    ErrorMgr_internal_error(errmgr, "eval_compute_recur: n = NIL\n");
 
   switch (node_get_type(n)) {
   case CONTEXT:
-    res = eval_compute_recur(fsm, enc, cdr(n),car(n)); break;
+    res = eval_compute_recur(fsm, enc, cdr(n), car(n));
+    break;
 
   case MINU:
-    res = PTR_TO_INT(binary_mod_bdd_op_ns(fsm, enc,
-                          (BDDPFFBB)minu, n, 1, 1, 1, context));
+    res = PTR_TO_INT(
+        binary_mod_bdd_op_ns(fsm, enc, (BDDPFFBB)minu, n, 1, 1, 1, context));
     break;
 
   case MAXU:
-    res = PTR_TO_INT(binary_mod_bdd_op_ns(fsm, enc,
-                          (BDDPFFBB)maxu, n, 1, 1, 1, context));
+    res = PTR_TO_INT(
+        binary_mod_bdd_op_ns(fsm, enc, (BDDPFFBB)maxu, n, 1, 1, 1, context));
     break;
 
   default:
     res = 0;
-    ErrorMgr_internal_error(errmgr, "eval_compute: type = %d\n", node_get_type(n));
+    ErrorMgr_internal_error(errmgr, "eval_compute: type = %d\n",
+                            node_get_type(n));
   }
 
   return res;
@@ -273,11 +296,10 @@ static int eval_compute_recur(BddFsm_ptr fsm, BddEnc_ptr enc,
 */
 static bdd_ptr unary_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFDB op,
                             node_ptr n, int resflag, int argflag,
-                            node_ptr context)
-{
+                            node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   bdd_ptr tmp_1, tmp_2, res;
   bdd_ptr arg = eval_ctl_spec(fsm, enc, car(n), context);
@@ -316,11 +338,10 @@ static bdd_ptr unary_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFDB op,
 */
 static bdd_ptr binary_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFDBB op,
                              node_ptr n, int resflag, int argflag1,
-                             int argflag2, node_ptr context)
-{
+                             int argflag2, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   bdd_ptr tmp_1, tmp_2, tmp_3, res;
   bdd_ptr arg1 = eval_ctl_spec(fsm, enc, car(n), context);
@@ -356,11 +377,10 @@ static bdd_ptr binary_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFDBB op,
 */
 static bdd_ptr unary_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFB op,
                                 node_ptr n, int resflag, int argflag,
-                                node_ptr context)
-{
+                                node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   bdd_ptr tmp_1, tmp_2, res;
   bdd_ptr arg;
@@ -403,11 +423,10 @@ static bdd_ptr unary_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFB op,
 */
 static bdd_ptr binary_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBB op,
                                  node_ptr n, int resflag, int argflag1,
-                                 int argflag2, node_ptr context)
-{
+                                 int argflag2, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   bdd_ptr tmp_1, tmp_2, tmp_3, res;
   bdd_ptr arg1;
@@ -433,7 +452,7 @@ static bdd_ptr binary_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBB op,
   bdd_free(dd, arg1);
   bdd_free(dd, arg2);
 
-  return(res);
+  return (res);
 }
 
 /*!
@@ -453,11 +472,10 @@ static bdd_ptr binary_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBB op,
 */
 static bdd_ptr binary_mod_bdd_op_ns(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBB op,
                                     node_ptr n, int resflag, int argflag1,
-                                    int argflag2, node_ptr context)
-{
+                                    int argflag2, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   bdd_ptr tmp_1, tmp_2, res;
   bdd_ptr arg1;
@@ -499,11 +517,10 @@ static bdd_ptr binary_mod_bdd_op_ns(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBB op,
 */
 static bdd_ptr ternary_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBII op,
                                   node_ptr n, int resflag, int argflag,
-                                  node_ptr context)
-{
+                                  node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   bdd_ptr tmp_1, tmp_2, res;
   bdd_ptr arg1;
@@ -547,11 +564,10 @@ static bdd_ptr ternary_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBII op,
 */
 static bdd_ptr quad_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBBII op,
                                node_ptr n, int resflag, int argflag1,
-                               int argflag2, node_ptr context)
-{
+                               int argflag2, node_ptr context) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   bdd_ptr tmp_1, tmp_2, tmp_3, res;
   bdd_ptr arg1;
@@ -583,5 +599,3 @@ static bdd_ptr quad_mod_bdd_op(BddFsm_ptr fsm, BddEnc_ptr enc, BDDPFFBBII op,
 
   return res;
 }
-
-

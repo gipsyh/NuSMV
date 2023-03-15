@@ -2,28 +2,28 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``fsm.sexp'' package of NuSMV version 2. 
-  Copyright (C) 2009 by FBK-irst. 
+  This file is part of the ``fsm.sexp'' package of NuSMV version 2.
+  Copyright (C) 2009 by FBK-irst.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,22 +35,19 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_FSM_SEXP_BOOL_SEXP_FSM_H__
 #define __NUSMV_CORE_FSM_SEXP_BOOL_SEXP_FSM_H__
 
-
-#include "nusmv/core/fsm/sexp/SexpFsm.h" 
+#include "nusmv/core/fsm/sexp/SexpFsm.h"
 #include "nusmv/core/utils/utils.h"
 
 /*!
   \struct BoolSexpFsm
   \brief Definition of the public accessor for class BoolSexpFsm
 
-  
+
 */
-typedef struct BoolSexpFsm_TAG*  BoolSexpFsm_ptr;
+typedef struct BoolSexpFsm_TAG *BoolSexpFsm_ptr;
 
 /*!
   \brief To cast and check instances of class BoolSexpFsm
@@ -58,18 +55,15 @@ typedef struct BoolSexpFsm_TAG*  BoolSexpFsm_ptr;
   These macros must be used respectively to cast and to check
   instances of class BoolSexpFsm
 */
-#define BOOL_SEXP_FSM(self) \
-         ((BoolSexpFsm_ptr) self)
+#define BOOL_SEXP_FSM(self) ((BoolSexpFsm_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BOOL_SEXP_FSM_CHECK_INSTANCE(self) \
-         (nusmv_assert(BOOL_SEXP_FSM(self) != BOOL_SEXP_FSM(NULL)))
-
-
+#define BOOL_SEXP_FSM_CHECK_INSTANCE(self)                                     \
+  (nusmv_assert(BOOL_SEXP_FSM(self) != BOOL_SEXP_FSM(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,10 +79,9 @@ typedef struct BoolSexpFsm_TAG*  BoolSexpFsm_ptr;
 
   \sa BoolSexpFsm_destroy
 */
-BoolSexpFsm_ptr 
-BoolSexpFsm_create(const FlatHierarchy_ptr hierarchy, 
-                   const Set_t vars_set,
-                   BddEnc_ptr benc, SymbLayer_ptr det_layer);
+BoolSexpFsm_ptr BoolSexpFsm_create(const FlatHierarchy_ptr hierarchy,
+                                   const Set_t vars_set, BddEnc_ptr benc,
+                                   SymbLayer_ptr det_layer);
 
 /*!
   \methodof BoolSexpFsm
@@ -101,10 +94,9 @@ BoolSexpFsm_create(const FlatHierarchy_ptr hierarchy,
 
   \sa BoolSexpFsm_destroy
 */
-BoolSexpFsm_ptr 
-BoolSexpFsm_create_from_scalar_fsm(const SexpFsm_ptr scalar_fsm, 
-                                   BddEnc_ptr benc, 
-                                   SymbLayer_ptr det_layer);
+BoolSexpFsm_ptr BoolSexpFsm_create_from_scalar_fsm(const SexpFsm_ptr scalar_fsm,
+                                                   BddEnc_ptr benc,
+                                                   SymbLayer_ptr det_layer);
 
 /*!
   \methodof BoolSexpFsm
@@ -136,9 +128,6 @@ BoolEnc_ptr BoolSexpFsm_get_bool_enc(const BoolSexpFsm_ptr self);
 */
 BoolSexpFsm_ptr BoolSexpFsm_copy(BoolSexpFsm_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_FSM_SEXP_BOOL_SEXP_FSM_H__ */

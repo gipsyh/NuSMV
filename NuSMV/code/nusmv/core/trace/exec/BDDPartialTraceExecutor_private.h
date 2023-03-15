@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,24 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_BDDPARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_BDDPARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 
-
 #include "nusmv/core/trace/exec/BDDPartialTraceExecutor.h"
-#include "nusmv/core/trace/exec/PartialTraceExecutor.h" /* fix this */
+#include "nusmv/core/trace/exec/PartialTraceExecutor.h"         /* fix this */
 #include "nusmv/core/trace/exec/PartialTraceExecutor_private.h" /* fix this */
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief BDDPartialTraceExecutor class definition derived from
                class PartialTraceExecutor
 
-  
+
 
   \sa Base class PartialTraceExecutor
 */
 
-typedef struct BDDPartialTraceExecutor_TAG
-{
+typedef struct BDDPartialTraceExecutor_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(PartialTraceExecutor);
 
@@ -72,8 +67,6 @@ typedef struct BDDPartialTraceExecutor_TAG
 
 } BDDPartialTraceExecutor;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -86,7 +79,8 @@ typedef struct BDDPartialTraceExecutor_TAG
 
   \sa BDDPartialTraceExecutor_create
 */
-void bdd_partial_trace_executor_init(BDDPartialTraceExecutor_ptr self, const BddFsm_ptr fsm, BddEnc_ptr enc);
+void bdd_partial_trace_executor_init(BDDPartialTraceExecutor_ptr self,
+                                     const BddFsm_ptr fsm, BddEnc_ptr enc);
 
 /*!
   \methodof BDDPartialTraceExecutor
@@ -97,7 +91,5 @@ void bdd_partial_trace_executor_init(BDDPartialTraceExecutor_ptr self, const Bdd
   \sa BDDPartialTraceExecutor_destroy
 */
 void bdd_partial_trace_executor_deinit(BDDPartialTraceExecutor_ptr self);
-
-
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_BDDPARTIAL_TRACE_EXECUTOR_PRIVATE_H__ */

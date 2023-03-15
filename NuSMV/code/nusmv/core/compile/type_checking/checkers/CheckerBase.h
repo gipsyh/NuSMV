@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,13 +34,11 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_H__
 #define __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_H__
 
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/node/NodeWalker.h"
+#include "nusmv/core/node/node.h"
 
 #include "nusmv/core/compile/symb_table/SymbType.h"
 #include "nusmv/core/utils/object.h"
@@ -50,9 +48,9 @@
   \struct CheckerBase
   \brief Definition of the public accessor for class CheckerBase
 
-  
+
 */
-typedef struct CheckerBase_TAG*  CheckerBase_ptr;
+typedef struct CheckerBase_TAG *CheckerBase_ptr;
 
 /*!
   \brief To cast and check instances of class CheckerBase
@@ -60,18 +58,15 @@ typedef struct CheckerBase_TAG*  CheckerBase_ptr;
   These macros must be used respectively to cast and to check
   instances of class CheckerBase
 */
-#define CHECKER_BASE(self) \
-         ((CheckerBase_ptr) self)
+#define CHECKER_BASE(self) ((CheckerBase_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CHECKER_BASE_CHECK_INSTANCE(self) \
-         (nusmv_assert(CHECKER_BASE(self) != CHECKER_BASE(NULL)))
-
-
+#define CHECKER_BASE_CHECK_INSTANCE(self)                                      \
+  (nusmv_assert(CHECKER_BASE(self) != CHECKER_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -91,13 +86,9 @@ typedef struct CheckerBase_TAG*  CheckerBase_ptr;
 
   \sa CheckerBase_can_handle
 */
-VIRTUAL SymbType_ptr
-CheckerBase_check_expr(CheckerBase_ptr self,
-                       node_ptr expr, node_ptr context);
-
-
+VIRTUAL SymbType_ptr CheckerBase_check_expr(CheckerBase_ptr self, node_ptr expr,
+                                            node_ptr context);
 
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_H__ */

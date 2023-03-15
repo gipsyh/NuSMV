@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,8 +37,8 @@
 #ifndef __NUSMV_CORE_TRACE_PLUGINS_TRACE_COMPACT_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_PLUGINS_TRACE_COMPACT_PRIVATE_H__
 
-#include "nusmv/core/trace/plugins/TracePlugin_private.h"
 #include "nusmv/core/trace/plugins/TraceCompact.h"
+#include "nusmv/core/trace/plugins/TracePlugin_private.h"
 
 #include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
@@ -62,11 +62,10 @@
   </dl>
   <br>
   This Class inherits from TracePlugin class.
-  
+
 */
 
-typedef struct TraceCompact_TAG
-{
+typedef struct TraceCompact_TAG {
   INHERITS_FROM(TracePlugin);
 } TraceCompact;
 
@@ -101,4 +100,3 @@ int trace_compact_action(const TracePlugin_ptr plugin);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_TRACE_PLUGINS_TRACE_COMPACT_PRIVATE_H__ */
-

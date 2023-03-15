@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,17 +34,14 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_MODEL_H__
 #define __NUSMV_CORE_BMC_BMC_MODEL_H__
 
-
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/fsm/be/BeFsm.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -104,8 +101,7 @@ be_ptr Bmc_Model_GetInitI(const BeFsm_ptr be_fsm, const int i);
 
   \sa Bmc_Model_GetInit0
 */
-be_ptr Bmc_Model_GetInvarAtTime(const BeFsm_ptr be_fsm,
-                                       const int time);
+be_ptr Bmc_Model_GetInvarAtTime(const BeFsm_ptr be_fsm, const int time);
 
 /*!
   \brief Retrieves the trans from the given fsm, and compiles
@@ -117,8 +113,7 @@ be_ptr Bmc_Model_GetInvarAtTime(const BeFsm_ptr be_fsm,
 
   \se None
 */
-be_ptr Bmc_Model_GetTransAtTime(const BeFsm_ptr be_fsm,
-                                       const int time);
+be_ptr Bmc_Model_GetTransAtTime(const BeFsm_ptr be_fsm, const int time);
 
 /*!
   \brief Unrolls the transition relation from j to k, taking
@@ -129,31 +124,27 @@ be_ptr Bmc_Model_GetTransAtTime(const BeFsm_ptr be_fsm,
 
   \sa Bmc_Model_GetPathWithInit, Bmc_Model_GetPathNoInit
 */
-be_ptr
-Bmc_Model_GetUnrolling(const BeFsm_ptr be_fsm,
-                       const int j, const int k);
+be_ptr Bmc_Model_GetUnrolling(const BeFsm_ptr be_fsm, const int j, const int k);
 
 /*!
   \brief Returns the path for the model from 0 to k,
   taking into account the invariants (and no init)
 
-  
+
 
   \sa Bmc_Model_GetPathWithInit
 */
-be_ptr
-Bmc_Model_GetPathNoInit(const BeFsm_ptr be_fsm, const int k);
+be_ptr Bmc_Model_GetPathNoInit(const BeFsm_ptr be_fsm, const int k);
 
 /*!
   \brief Returns the path for the model from 0 to k,
   taking into account initial conditions and invariants
 
-  
+
 
   \sa Bmc_Model_GetPathNoInit
 */
-be_ptr
-Bmc_Model_GetPathWithInit(const BeFsm_ptr be_fsm, const int k);
+be_ptr Bmc_Model_GetPathWithInit(const BeFsm_ptr be_fsm, const int k);
 
 /*!
   \brief Generates and returns an expression representing
@@ -170,9 +161,7 @@ Bmc_Model_GetPathWithInit(const BeFsm_ptr be_fsm, const int k);
 
   \sa bmc_model_getFairness_aux, bmc_model_getSingleFairness
 */
-be_ptr
-Bmc_Model_GetFairness(const BeFsm_ptr be_fsm,
-                      const int k, const int l);
+be_ptr Bmc_Model_GetFairness(const BeFsm_ptr be_fsm, const int k, const int l);
 
 /*!
   \brief Unrolls the transition relation from j to k, taking
@@ -181,10 +170,8 @@ Bmc_Model_GetFairness(const BeFsm_ptr be_fsm,
   Using of invars over previous variables instead of the
                       next variables is a specific implementation aspect
 */
-be_ptr 
-Bmc_Model_Invar_Dual_forward_unrolling(const BeFsm_ptr be_fsm,
-                                       const be_ptr invarspec, 
-                                       int i);
+be_ptr Bmc_Model_Invar_Dual_forward_unrolling(const BeFsm_ptr be_fsm,
+                                              const be_ptr invarspec, int i);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_BMC_BMC_MODEL_H__ */

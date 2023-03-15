@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,7 +33,6 @@
   A non-incremental SAT solver interface
 
 */
-
 
 #ifndef __NUSMV_CORE_SAT_SAT_SOLVER_H__
 #define __NUSMV_CORE_SAT_SAT_SOLVER_H__
@@ -61,8 +60,8 @@
 #define TermFactoryCallbacksUserData_ptr void *
 
 /* a flag returned by the 'solve' methods */
-typedef enum SatSolverResult_TAG
-{ SAT_SOLVER_INTERNAL_ERROR=-1,
+typedef enum SatSolverResult_TAG {
+  SAT_SOLVER_INTERNAL_ERROR = -1,
   SAT_SOLVER_TIMEOUT,
   SAT_SOLVER_MEMOUT,
   SAT_SOLVER_SATISFIABLE_PROBLEM,
@@ -80,7 +79,7 @@ typedef enum SatSolverResult_TAG
 
   \todo Missing description
 */
-typedef struct SatSolver_TAG* SatSolver_ptr;
+typedef struct SatSolver_TAG *SatSolver_ptr;
 
 /*!
   \brief \todo Missing synopsis
@@ -94,7 +93,8 @@ typedef struct TermFactoryCallbacks_TAG {
   Term (*make_false)(TermFactoryCallbacksUserData_ptr user_data);
   Term (*make_true)(TermFactoryCallbacksUserData_ptr user_data);
 
-  Term (*make_and)(Term t1, Term t2, TermFactoryCallbacksUserData_ptr user_data);
+  Term (*make_and)(Term t1, Term t2,
+                   TermFactoryCallbacksUserData_ptr user_data);
   Term (*make_or)(Term t1, Term t2, TermFactoryCallbacksUserData_ptr user_data);
   Term (*make_not)(Term t, TermFactoryCallbacksUserData_ptr user_data);
 
@@ -106,7 +106,7 @@ typedef struct TermFactoryCallbacks_TAG {
 
   \todo Missing description
 */
-typedef TermFactoryCallbacks* TermFactoryCallbacks_ptr;
+typedef TermFactoryCallbacks *TermFactoryCallbacks_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -121,16 +121,15 @@ typedef TermFactoryCallbacks* TermFactoryCallbacks_ptr;
 
   \todo Missing description
 */
-#define SAT_SOLVER(x) \
-         ((SatSolver_ptr) x)
+#define SAT_SOLVER(x) ((SatSolver_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SAT_SOLVER_CHECK_INSTANCE(x) \
-         (nusmv_assert(SAT_SOLVER(x) != SAT_SOLVER(NULL)))
+#define SAT_SOLVER_CHECK_INSTANCE(x)                                           \
+  (nusmv_assert(SAT_SOLVER(x) != SAT_SOLVER(NULL)))
 
 /**AutomaticStart*************************************************************/
 /*---------------------------------------------------------------------------*/
@@ -143,7 +142,7 @@ typedef TermFactoryCallbacks* TermFactoryCallbacks_ptr;
   \methodof SatSolver
   \brief Destoys an instance of a  SAT solver
 
-  
+
 */
 void SatSolver_destroy(SatSolver_ptr self);
 
@@ -156,14 +155,13 @@ void SatSolver_destroy(SatSolver_ptr self);
   of any 'solve' functions, the permanent group will always be
   included into the groups to be solved.
 */
-SatSolverGroup
-SatSolver_get_permanent_group(const SatSolver_ptr self);
+SatSolverGroup SatSolver_get_permanent_group(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
-  \brief Adds a CNF formula to a group 
+  \brief Adds a CNF formula to a group
 
-  
+
   The function does not specify the polarity of the formula.
   This should be done by SatSolver_set_polarity.
   In general, if polarity is not set any value can be assigned to the formula
@@ -176,10 +174,8 @@ SatSolver_get_permanent_group(const SatSolver_ptr self);
 
   \sa SatSolver_set_polarity
 */
-VIRTUAL void
-SatSolver_add(const SatSolver_ptr self,
-              const Be_Cnf_ptr cnfProb,
-              SatSolverGroup group);
+VIRTUAL void SatSolver_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
+                           SatSolverGroup group);
 
 /*!
   \methodof SatSolver
@@ -194,11 +190,9 @@ SatSolver_add(const SatSolver_ptr self,
 
   \sa SatSolver_add
 */
-VIRTUAL void
-SatSolver_set_polarity(const SatSolver_ptr self,
-                       const Be_Cnf_ptr cnfProb,
-                       int polarity,
-                       SatSolverGroup group);
+VIRTUAL void SatSolver_set_polarity(const SatSolver_ptr self,
+                                    const Be_Cnf_ptr cnfProb, int polarity,
+                                    SatSolverGroup group);
 
 /*!
   \methodof SatSolver
@@ -208,21 +202,19 @@ SatSolver_set_polarity(const SatSolver_ptr self,
 
   \sa SatSolver_clear_preferred_variables
 */
-VIRTUAL void
-SatSolver_set_preferred_variables(const SatSolver_ptr self,
-                                  const Slist_ptr cnfVars);
+VIRTUAL void SatSolver_set_preferred_variables(const SatSolver_ptr self,
+                                               const Slist_ptr cnfVars);
 
 /*!
   \methodof SatSolver
   \brief Returns the conflicts resulting from a previous call
   to solving under assumptions
 
-  
+
 
   \sa SatSolverResult
 */
-VIRTUAL Slist_ptr
-SatSolver_get_conflicts(const SatSolver_ptr self);
+VIRTUAL Slist_ptr SatSolver_get_conflicts(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
@@ -232,31 +224,29 @@ SatSolver_get_conflicts(const SatSolver_ptr self);
 
   \sa SatSolver_set_preferred_variables
 */
-VIRTUAL void
-SatSolver_clear_preferred_variables(const SatSolver_ptr self);
+VIRTUAL void SatSolver_clear_preferred_variables(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
   \brief Solves all groups belonging to the solver and returns the flag
 
-  
+
 
   \sa SatSolverResult
 */
-VIRTUAL SatSolverResult
-SatSolver_solve_all_groups(const SatSolver_ptr self);
+VIRTUAL SatSolverResult SatSolver_solve_all_groups(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
   \brief Solves all groups belonging to the solver assuming the cnf
   assumptions, and returns the flag
 
-  
+
 
   \sa SatSolverResult
 */
-VIRTUAL SatSolverResult
-SatSolver_solve_all_groups_assume(const SatSolver_ptr self, Slist_ptr assumptions);
+VIRTUAL SatSolverResult SatSolver_solve_all_groups_assume(
+    const SatSolver_ptr self, Slist_ptr assumptions);
 
 /*!
   \methodof SatSolver
@@ -269,17 +259,15 @@ SatSolver_solve_all_groups_assume(const SatSolver_ptr self, Slist_ptr assumption
 
   Returned list belongs to self and must be not destroyed or changed.
 */
-VIRTUAL Slist_ptr
-SatSolver_get_model(const SatSolver_ptr self);
+VIRTUAL Slist_ptr SatSolver_get_model(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
-  \brief 
+  \brief
 
-  
+
 */
-VIRTUAL int
-SatSolver_get_cnf_var(const SatSolver_ptr self, int var);
+VIRTUAL int SatSolver_get_cnf_var(const SatSolver_ptr self, int var);
 
 /*!
   \methodof SatSolver
@@ -288,74 +276,66 @@ SatSolver_get_cnf_var(const SatSolver_ptr self, int var);
   If given seed is != 0, then random polarity mode is enabled
   with given seed, otherwise random mode is disabled
 */
-VIRTUAL void
-SatSolver_set_random_mode(SatSolver_ptr self, double seed);
+VIRTUAL void SatSolver_set_random_mode(SatSolver_ptr self, double seed);
 
 /*!
   \methodof SatSolver
   \brief Sets the current polarity mode
 
-  
+
 */
-VIRTUAL void
-SatSolver_set_polarity_mode(SatSolver_ptr self, int mode);
+VIRTUAL void SatSolver_set_polarity_mode(SatSolver_ptr self, int mode);
 
 /*!
   \methodof SatSolver
   \brief Gets the current polarity mode
 
-  
+
 */
-VIRTUAL int
-SatSolver_get_polarity_mode(const SatSolver_ptr self);
+VIRTUAL int SatSolver_get_polarity_mode(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
   \brief Returns the name of the solver
 
-  
+
 */
-const char*
-SatSolver_get_name(const SatSolver_ptr self);
+const char *SatSolver_get_name(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
   \brief Returns the time of last solving
 
-  
+
 */
-long
-SatSolver_get_last_solving_time(const SatSolver_ptr self);
+long SatSolver_get_last_solving_time(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
   \brief Returns current itp group
 
-  
+
 */
-SatSolverItpGroup
-SatSolver_curr_itp_group(const SatSolver_ptr self);
+SatSolverItpGroup SatSolver_curr_itp_group(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
   \brief Returns the time of last solving
 
-  
+
 */
-SatSolverItpGroup
-SatSolver_new_itp_group(const SatSolver_ptr self);
+SatSolverItpGroup SatSolver_new_itp_group(const SatSolver_ptr self);
 
 /*!
   \methodof SatSolver
   \brief Returns the time of last solving
 
-  
+
 */
-Term
-SatSolver_extract_interpolant(const SatSolver_ptr self, int nof_ga_groups,
-                              SatSolverItpGroup* ga_groups,
-                              TermFactoryCallbacks_ptr callbacks,
-                              TermFactoryCallbacksUserData_ptr user_data);
+Term SatSolver_extract_interpolant(const SatSolver_ptr self, int nof_ga_groups,
+                                   SatSolverItpGroup *ga_groups,
+                                   TermFactoryCallbacks_ptr callbacks,
+                                   TermFactoryCallbacksUserData_ptr user_data);
 
 /**AutomaticEnd***************************************************************/
 

@@ -42,11 +42,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_NODE_WALKER_H__
 #define __NUSMV_CORE_NODE_NODE_WALKER_H__
-
 
 #include "nusmv/core/node/node.h"
 
@@ -59,7 +56,7 @@
 
 
 */
-typedef struct NodeWalker_TAG*  NodeWalker_ptr;
+typedef struct NodeWalker_TAG *NodeWalker_ptr;
 
 /*!
   \brief To cast and check instances of class NodeWalker
@@ -67,18 +64,15 @@ typedef struct NodeWalker_TAG*  NodeWalker_ptr;
   These macros must be used respectively to cast and to check
   instances of class NodeWalker
 */
-#define NODE_WALKER(self) \
-         ((NodeWalker_ptr) self)
+#define NODE_WALKER(self) ((NodeWalker_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_WALKER_CHECK_INSTANCE(self) \
-         (nusmv_assert(NODE_WALKER(self) != NODE_WALKER(NULL)))
-
-
+#define NODE_WALKER_CHECK_INSTANCE(self)                                       \
+  (nusmv_assert(NODE_WALKER(self) != NODE_WALKER(NULL)))
 
 /*! This structure is used when calling add_node_transformation
   E.g a printer will call all transformation functions which has been
@@ -89,11 +83,9 @@ typedef struct NodeWalker_TAG*  NodeWalker_ptr;
   \sa PrinterBase_print_node
  */
 typedef struct NodeTransformation_TAG {
-  node_ptr (*func)(const NodeWalker_ptr walker,
-                   node_ptr node, void* arg);
-  void* arg;  /* the argument to be passed */
+  node_ptr (*func)(const NodeWalker_ptr walker, node_ptr node, void *arg);
+  void *arg; /* the argument to be passed */
 } NodeTransformation;
-
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -119,8 +111,7 @@ void NodeWalker_destroy(NodeWalker_ptr self);
   associated to this walker. If n is Nil then the specific walker will be
   asked
 */
-boolean
-NodeWalker_can_handle(const NodeWalker_ptr self, node_ptr n);
+boolean NodeWalker_can_handle(const NodeWalker_ptr self, node_ptr n);
 
 /*!
   \methodof NodeWalker
@@ -129,7 +120,7 @@ NodeWalker_can_handle(const NodeWalker_ptr self, node_ptr n);
   The returned string belongs to self, do not deallocate
   or change it.
 */
-const char* NodeWalker_get_name(const NodeWalker_ptr self);
+const char *NodeWalker_get_name(const NodeWalker_ptr self);
 
 /*!
   \methodof NodeWalker
@@ -142,7 +133,6 @@ const char* NodeWalker_get_name(const NodeWalker_ptr self);
 boolean NodeWalker_collides(const NodeWalker_ptr self,
                             const NodeWalker_ptr other);
 
-
 /*!
   \methodof NodeWalker
   \brief Adds a node tranformation function that will be called at each
@@ -154,8 +144,7 @@ boolean NodeWalker_collides(const NodeWalker_ptr self,
   \sa NodeWalker_remove_node_transformation
 */
 int NodeWalker_add_node_transformation(NodeWalker_ptr self,
-                                       const NodeTransformation* nt);
-
+                                       const NodeTransformation *nt);
 
 /*!
   \methodof NodeWalker
@@ -164,6 +153,5 @@ int NodeWalker_add_node_transformation(NodeWalker_ptr self,
 */
 void NodeWalker_remove_node_transformation(NodeWalker_ptr self,
                                            int tranf_handle);
-
 
 #endif /* __NUSMV_CORE_NODE_NODE_WALKER_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,23 +34,20 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ST___
 #define __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ST___
 
-
-#include "nusmv/core/node/anonymizers/NodeAnonymizerDot.h" 
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/node/anonymizers/NodeAnonymizerDot.h"
+#include "nusmv/core/utils/defs.h"
 
 /*!
   \struct NodeAnonymizerST
   \brief Definition of the public accessor for class NodeAnonymizerST
 
-  
+
 */
-typedef struct NodeAnonymizerST_TAG*  NodeAnonymizerST_ptr;
+typedef struct NodeAnonymizerST_TAG *NodeAnonymizerST_ptr;
 
 /*!
   \brief To cast and check instances of class NodeAnonymizerST
@@ -58,18 +55,15 @@ typedef struct NodeAnonymizerST_TAG*  NodeAnonymizerST_ptr;
   These macros must be used respectively to cast and to check
   instances of class NodeAnonymizerST
 */
-#define NODE_ANONYMIZER_ST(self) \
-         ((NodeAnonymizerST_ptr) self)
+#define NODE_ANONYMIZER_ST(self) ((NodeAnonymizerST_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_ANONYMIZER_ST_CHECK_INSTANCE(self) \
-         (nusmv_assert(NODE_ANONYMIZER_ST(self) != NODE_ANONYMIZER_ST(NULL)))
-
-
+#define NODE_ANONYMIZER_ST_CHECK_INSTANCE(self)                                \
+  (nusmv_assert(NODE_ANONYMIZER_ST(self) != NODE_ANONYMIZER_ST(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -87,9 +81,9 @@ typedef struct NodeAnonymizerST_TAG*  NodeAnonymizerST_ptr;
   \sa NodeAnonymizerST_destroy
 */
 NodeAnonymizerST_ptr NodeAnonymizerST_create(NuSMVEnv_ptr env,
-                                                    const char* default_prefix,
-                                                    size_t memoization_threshold,
-                                                    SymbTable_ptr symb_table);
+                                             const char *default_prefix,
+                                             size_t memoization_threshold,
+                                             SymbTable_ptr symb_table);
 
 /*!
   \methodof NodeAnonymizerST
@@ -101,9 +95,6 @@ NodeAnonymizerST_ptr NodeAnonymizerST_create(NuSMVEnv_ptr env,
 */
 void NodeAnonymizerST_destroy(NodeAnonymizerST_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_ST___ */

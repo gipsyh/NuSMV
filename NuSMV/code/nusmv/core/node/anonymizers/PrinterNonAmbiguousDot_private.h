@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,24 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_PRIVATE_H__
 #define __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_PRIVATE_H__
-
 
 #include "nusmv/core/node/anonymizers/PrinterNonAmbiguousDot.h"
 #include "nusmv/core/node/printers/PrinterBase.h"
 #include "nusmv/core/node/printers/PrinterBase_private.h"
 #include "nusmv/core/utils/defs.h"
 
-
 /*!
   \brief PrinterNonAmbiguousDot class definition derived from
                class PrinterBase
 
-  
+
 
   \sa Base class PrinterBase
 */
 
-typedef struct PrinterNonAmbiguousDot_TAG
-{
+typedef struct PrinterNonAmbiguousDot_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(PrinterBase);
 
@@ -64,14 +59,11 @@ typedef struct PrinterNonAmbiguousDot_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } PrinterNonAmbiguousDot;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -86,10 +78,8 @@ typedef struct PrinterNonAmbiguousDot_TAG
   \sa PrinterNonAmbiguousDot_create
 */
 void printer_anon_map_entry_init(PrinterNonAmbiguousDot_ptr self,
-                                        const NuSMVEnv_ptr env,
-                                        const char* name,
-                                        int low,
-                                        size_t num);
+                                 const NuSMVEnv_ptr env, const char *name,
+                                 int low, size_t num);
 
 /*!
   \methodof PrinterNonAmbiguousDot
@@ -105,11 +95,10 @@ void printer_anon_map_entry_deinit(PrinterNonAmbiguousDot_ptr self);
   \methodof PrinterNonAmbiguousDot
   \brief Virtual menthod that prints the given node
 
-  
+
 */
-int printer_anon_map_entry_print_node(PrinterBase_ptr self,
-                                             node_ptr n,
-                                             int priority);
+int printer_anon_map_entry_print_node(PrinterBase_ptr self, node_ptr n,
+                                      int priority);
 
-
-#endif /* __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_PRIVATE_H__ */
+#endif /* __NUSMV_CORE_NODE_ANONYMIZERS_PRINTER_NON_AMBIGUOUS_DOT_PRIVATE_H__  \
+        */

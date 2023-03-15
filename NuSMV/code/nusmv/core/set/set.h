@@ -39,18 +39,16 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_SET_SET_H__
 #define __NUSMV_CORE_SET_SET_H__
 
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/NodeList.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/NodeList.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -150,7 +148,7 @@
 
 
 */
-typedef struct Set_TAG* Set_t;
+typedef struct Set_TAG *Set_t;
 
 /*!
   \brief \todo Missing synopsis
@@ -174,7 +172,6 @@ typedef ListIter_ptr Set_Iterator_t;
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
@@ -184,26 +181,23 @@ typedef ListIter_ptr Set_Iterator_t;
 
 
 */
-#define SET_FOREACH(set, iter)                               \
-   for (iter=Set_GetFirstIter(set); !Set_IsEndIter(iter);    \
-        iter=Set_GetNextIter(iter))
+#define SET_FOREACH(set, iter)                                                 \
+  for (iter = Set_GetFirstIter(set); !Set_IsEndIter(iter);                     \
+       iter = Set_GetNextIter(iter))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SET_T(self) \
-  ((Set_t)self)
+#define SET_T(self) ((Set_t)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SET_ELEMENT_T(self) \
-  ((Set_Element_t)self)
-
+#define SET_ELEMENT_T(self) ((Set_Element_t)self)
 
 /**AutomaticStart*************************************************************/
 
@@ -273,7 +267,6 @@ void Set_ReleaseSet(Set_t set);
 */
 void Set_ReleaseSetOfSet(Set_t set);
 
-
 /* Getters and Setters ********************************************************/
 
 /*!
@@ -304,7 +297,6 @@ Set_t Set_AddMember(Set_t set, Set_Element_t el);
   after removal set is empty, it is also released.
 */
 Set_t Set_RemoveMember(Set_t set, Set_Element_t el);
-
 
 /* Queries ********************************************************************/
 
@@ -362,7 +354,6 @@ boolean Set_IsFrozen(Set_t const set);
 */
 boolean Set_IsSingleton(Set_t const set);
 
-
 /* Package handling ***********************************************************/
 
 /*!
@@ -379,7 +370,6 @@ void set_pkg_init(void);
   De-Initializes the set package. Use after Set_init()
 */
 void set_pkg_quit(void);
-
 
 /* Converters *****************************************************************/
 
@@ -409,7 +399,6 @@ node_ptr Set_Set2Union(const Set_t set, NodeMgr_ptr nodemgr);
 */
 node_ptr Set_Set2Node(const Set_t set, NodeMgr_ptr nodemgr);
 
-
 /* Printers *******************************************************************/
 
 /*!
@@ -421,12 +410,9 @@ node_ptr Set_Set2Node(const Set_t set, NodeMgr_ptr nodemgr);
   print_node is called. printer_arg is an optional argument to be
   passed to the printer (can be NULL)
 */
-void Set_PrintSet(MasterPrinter_ptr mprinter,
-                         FILE *, const Set_t set,
-                         void (*printer)(FILE* file,
-                                         Set_Element_t el, void* arg),
-                         void* printer_arg);
-
+void Set_PrintSet(MasterPrinter_ptr mprinter, FILE *, const Set_t set,
+                  void (*printer)(FILE *file, Set_Element_t el, void *arg),
+                  void *printer_arg);
 
 /* SubInterface: Set_Iterator_t ***********************************************/
 
@@ -461,7 +447,6 @@ boolean Set_IsEndIter(Set_Iterator_t iter);
 */
 Set_Iterator_t Set_GetFirstIter(Set_t set1);
 
-
 /* Methods using both Set and Set_Iterator_t **********************************/
 
 /*!
@@ -483,7 +468,6 @@ Set_Element_t Set_GetMember(const Set_t set, Set_Iterator_t iter);
   backward compatibility and should be no longer used in new code.
 */
 Set_t Set_GetRest(const Set_t set, Set_Iterator_t from);
-
 
 /* Miscellaneous **************************************************************/
 
@@ -560,7 +544,6 @@ Set_t Set_Intersection(Set_t set1, const Set_t set2);
   set is returned.
 */
 Set_t Set_Difference(Set_t set1, const Set_t set2);
-
 
 /**AutomaticEnd***************************************************************/
 

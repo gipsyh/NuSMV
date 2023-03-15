@@ -22,19 +22,18 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
 /*!
   \author Roberto Cavada
-  \brief Private interface of class 'MasterNormalizer', to be used by normalizers
+  \brief Private interface of class 'MasterNormalizer', to be used by
+  normalizers
 
   \todo: Missing description
 
 */
-
-
 
 #ifndef __NUSMV_CORE_NODE_NORMALIZERS_MASTER_NORMALIZER_PRIVATE_H__
 #define __NUSMV_CORE_NODE_NORMALIZERS_MASTER_NORMALIZER_PRIVATE_H__
@@ -51,10 +50,10 @@
   \brief Internal version of the method normalize_node, callable
   internally and by normalizers
 
-  
+
 */
-node_ptr
-master_normalizer_normalize_node(MasterNormalizer_ptr self, node_ptr n);
+node_ptr master_normalizer_normalize_node(MasterNormalizer_ptr self,
+                                          node_ptr n);
 
 /**AutomaticEnd***************************************************************/
 

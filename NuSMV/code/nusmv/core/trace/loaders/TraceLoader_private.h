@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,12 +37,12 @@
 #ifndef __NUSMV_CORE_TRACE_LOADERS_TRACE_LOADER_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_LOADERS_TRACE_LOADER_PRIVATE_H__
 
-#include "nusmv/core/trace/loaders/TraceLoader.h"
 #include "nusmv/core/compile/compile.h"
+#include "nusmv/core/trace/loaders/TraceLoader.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/object_private.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -56,11 +56,10 @@
                specialized.
 */
 
-typedef struct TraceLoader_TAG
-{
+typedef struct TraceLoader_TAG {
   INHERITS_FROM(Object);
 
-  char* desc; /* Short description of the loader */
+  char *desc; /* Short description of the loader */
 
   /* ---------------------------------------------------------------------- */
   /*     Virtual Methods                                                    */
@@ -82,15 +81,15 @@ typedef struct TraceLoader_TAG
   \methodof TraceLoader
   \brief This function initializes the loader class.
 
-  
+
 */
-void trace_loader_init(TraceLoader_ptr self, char* desc);
+void trace_loader_init(TraceLoader_ptr self, char *desc);
 
 /*!
   \methodof TraceLoader
   \brief This function de-initializes the loader class.
 
-  
+
 */
 void trace_loader_deinit(TraceLoader_ptr self);
 
@@ -102,9 +101,8 @@ void trace_loader_deinit(TraceLoader_ptr self);
   base class. Every derived class must ovewrwrite this function. It returns 1
   if operation is successful, 0 otherwise.
 */
-Trace_ptr trace_loader_load(TraceLoader_ptr self,
-                                   const SymbTable_ptr st,
-                                   const NodeList_ptr symbols);
+Trace_ptr trace_loader_load(TraceLoader_ptr self, const SymbTable_ptr st,
+                            const NodeList_ptr symbols);
 
 /**AutomaticEnd***************************************************************/
 

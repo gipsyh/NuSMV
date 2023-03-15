@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,11 +35,9 @@
 
 */
 
-
-
 #include "nusmv/core/utils/object.h"
-#include "nusmv/core/utils/object_private.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/object_private.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -60,48 +58,40 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void object_finalize(Object_ptr self, void* arg);
+static void object_finalize(Object_ptr self, void *arg);
 static Object_ptr object_copy(const Object_ptr self);
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-VIRTUAL void Object_destroy(Object_ptr self, void* arg)
-{
+VIRTUAL void Object_destroy(Object_ptr self, void *arg) {
   OBJECT_CHECK_INSTANCE(self);
   self->finalize(self, arg);
 }
 
-VIRTUAL Object_ptr Object_copy(const Object_ptr self)
-{
+VIRTUAL Object_ptr Object_copy(const Object_ptr self) {
   return self->copy(self);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of private functions                                           */
 /*---------------------------------------------------------------------------*/
 
-void object_init(Object_ptr self)
-{
+void object_init(Object_ptr self) {
   OVERRIDE(Object, finalize) = object_finalize;
-  OVERRIDE(Object, copy)     = object_copy;
+  OVERRIDE(Object, copy) = object_copy;
 }
 
-void object_deinit(Object_ptr self)
-{
+void object_deinit(Object_ptr self) {
   OVERRIDE(Object, finalize) = NULL;
-  OVERRIDE(Object, copy)     = NULL;
+  OVERRIDE(Object, copy) = NULL;
 }
 
-void object_copy_aux(const Object_ptr self, Object_ptr copy)
-{
+void object_copy_aux(const Object_ptr self, Object_ptr copy) {
   copy->finalize = self->finalize;
-  copy->copy     = self->copy;
+  copy->copy = self->copy;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -118,12 +108,11 @@ void object_copy_aux(const Object_ptr self, Object_ptr copy)
   If the derived class does not override the object's copy constructor,
   and the user tries to copy the derived class instance by calling the
   Object_copy method, then an assertion is fired since Object is a class
-  that cannot be instantiated. 
+  that cannot be instantiated.
 
   \sa object_copy_aux
 */
-static Object_ptr object_copy(const Object_ptr self)
-{
+static Object_ptr object_copy(const Object_ptr self) {
   error_unreachable_code(); /* this is a virtual class, no real instances
                           are allowed */
   return OBJECT(NULL);
@@ -137,8 +126,7 @@ static Object_ptr object_copy(const Object_ptr self)
   class does not override the finalizer, then an assertion is fired when
   the virtual destroyer Object_destroy is called.
 */
-static void object_finalize(Object_ptr self, void* arg)
-{
+static void object_finalize(Object_ptr self, void *arg) {
   object_deinit(self);
 
   error_unreachable_code(); /* this is a virtual class, no real instances

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -42,8 +42,8 @@
 #include "nusmv/core/compile/type_checking/checkers/checkersInt.h"
 
 #include "nusmv/core/compile/compile.h"
-#include "nusmv/core/opt/opt.h" /* for options type_checking_... */
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/opt/opt.h" /* for options type_checking_... */
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -61,9 +61,7 @@
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 extern int nusmv_yylineno;
-
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */

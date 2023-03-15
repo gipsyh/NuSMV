@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,17 +34,16 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_ENC_ENC_INT_H__
 #define __NUSMV_CORE_ENC_ENC_INT_H__
 
-#include "nusmv/core/enc/utils/OrdGroups.h"
 #include "nusmv/core/enc/bool/BoolEnc.h"
+#include "nusmv/core/enc/utils/OrdGroups.h"
 
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/dd/dd.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/opt/opt.h"
-#include "nusmv/core/dd/dd.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -61,8 +60,6 @@
 extern int nusmv_yylineno;
 extern node_ptr boolean_range;
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Functions declarations                                                    */
 /*---------------------------------------------------------------------------*/
@@ -74,16 +71,15 @@ extern node_ptr boolean_range;
   The returned instance belongs to the caller. It is a
   caller's responsability to destroy it. order_filename can be NULL
 */
-OrdGroups_ptr
-enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
-                              const char* order_filename,
-                              const BoolEnc_ptr bool_enc);
+OrdGroups_ptr enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
+                                            const char *order_filename,
+                                            const BoolEnc_ptr bool_enc);
 
 /*!
   \brief Given a boolean variable or a bit the function inserts it
    into the sorted list at proper position
 
-  
+
    The higher bits are added to the beginning of the
    list and lower bits are added at the end. The boolean variables
    are added at the beginning of the list before the bits.
@@ -100,12 +96,11 @@ enc_utils_parse_ordering_file(const NuSMVEnv_ptr env,
    after last invoking Enc_append_bit_to_sorted_list (the same
    sorting_cache and sorted_list can be used for several runs of this
    function).
-   
+
 */
 void Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
-                                          NodeList_ptr sorted_list,
-                                          node_ptr var,
-                                          node_ptr* sorting_cache);
+                                   NodeList_ptr sorted_list, node_ptr var,
+                                   node_ptr *sorting_cache);
 
 /*!
   \brief Given a list of variables representing a new variable ordering,
@@ -114,8 +109,7 @@ void Enc_append_bit_to_sorted_list(SymbTable_ptr symb_table,
   The returned instance belongs to the caller. It is a
   caller's responsability to destroy it.
 */
-OrdGroups_ptr
-enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
-                                 NodeList_ptr vars);
+OrdGroups_ptr enc_utils_create_vars_ord_groups(BoolEnc_ptr bool_enc,
+                                               NodeList_ptr vars);
 
 #endif /* __NUSMV_CORE_ENC_ENC_INT_H__ */

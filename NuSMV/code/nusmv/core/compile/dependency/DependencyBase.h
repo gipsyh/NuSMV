@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_BASE_H__
 #define __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_BASE_H__
-
 
 #include "nusmv/core/compile/dependency/FormulaDependency.h"
 #include "nusmv/core/node/NodeWalker.h"
@@ -48,9 +45,9 @@
   \struct DependencyBase
   \brief Definition of the public accessor for class DependencyBase
 
-  
+
 */
-typedef struct DependencyBase_TAG*  DependencyBase_ptr;
+typedef struct DependencyBase_TAG *DependencyBase_ptr;
 
 /*!
   \brief To cast and check instances of class DependencyBase
@@ -58,18 +55,15 @@ typedef struct DependencyBase_TAG*  DependencyBase_ptr;
   These macros must be used respectively to cast and to check
   instances of class DependencyBase
 */
-#define DEPENDENCY_BASE(self) \
-         ((DependencyBase_ptr) self)
+#define DEPENDENCY_BASE(self) ((DependencyBase_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEPENDENCY_BASE_CHECK_INSTANCE(self) \
-         (nusmv_assert(DEPENDENCY_BASE(self) != DEPENDENCY_BASE(NULL)))
-
-
+#define DEPENDENCY_BASE_CHECK_INSTANCE(self)                                   \
+  (nusmv_assert(DEPENDENCY_BASE(self) != DEPENDENCY_BASE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,16 +80,11 @@ typedef struct DependencyBase_TAG*  DependencyBase_ptr;
   The caller (the master) has to check if the current dependency may
   handle the expression.
 */
-VIRTUAL Set_t
-DependencyBase_get_dependencies(DependencyBase_ptr self,
-                                SymbTable_ptr symb_table,
-                                node_ptr formula, node_ptr context,
-                                SymbFilterType filter,
-                                boolean preserve_time, int time,
-                                hash_ptr dependencies_hash);
+VIRTUAL Set_t DependencyBase_get_dependencies(
+    DependencyBase_ptr self, SymbTable_ptr symb_table, node_ptr formula,
+    node_ptr context, SymbFilterType filter, boolean preserve_time, int time,
+    hash_ptr dependencies_hash);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_BASE_H__ */

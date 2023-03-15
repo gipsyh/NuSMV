@@ -34,22 +34,20 @@
 
 */
 
-
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/compile/PredicateNormaliser.h"
 #include "nusmv/core/compile/compileInt.h"
 #include "nusmv/core/compile/symb_table/ResolveSymbol.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/utils/WordNumberMgr.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/utils/EnvObject_private.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/utils/WordNumberMgr.h"
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/error.h"
-#include "nusmv/core/utils/EnvObject_private.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 
@@ -57,18 +55,16 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct PredicateNormaliser_TAG
-{
+typedef struct PredicateNormaliser_TAG {
   INHERITS_FROM(EnvObject);
 
   hash_ptr expr2normalisedPredicate; /* hash of
                                         expr -> predicate-normalised expr */
-  TypeChecker_ptr checker; /* type-checker is used to get type info
-                              of processed expressions and type check
-                              generated expressions */
-  SymbTable_ptr st;  /* the symbol table */
+  TypeChecker_ptr checker;           /* type-checker is used to get type info
+                                        of processed expressions and type check
+                                        generated expressions */
+  SymbTable_ptr st;                  /* the symbol table */
 } PredicateNormaliser;
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -106,59 +102,53 @@ typedef struct PredicateNormaliser_TAG
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void pred_norm_init(PredicateNormaliser_ptr self,
-                           SymbTable_ptr st);
+static void pred_norm_init(PredicateNormaliser_ptr self, SymbTable_ptr st);
 static void pred_norm_deinit(PredicateNormaliser_ptr self);
 
-static void pred_norm_finalize(Object_ptr object, void* dummy);
+static void pred_norm_finalize(Object_ptr object, void *dummy);
 
-static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
-                                    node_ptr expr,
-                                    node_ptr context,
-                                    boolean expand_defines);
-static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self,
-                                    int kind, node_ptr op1, node_ptr op2);
+static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self, node_ptr expr,
+                                    node_ptr context, boolean expand_defines);
+static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self, int kind,
+                                    node_ptr op1, node_ptr op2);
 static boolean pred_norm_is_true_bool_exp(PredicateNormaliser_ptr self,
                                           node_ptr expr, node_ptr context);
 
 static node_ptr pred_norm_bool2int(PredicateNormaliser_ptr self, node_ptr expr);
-static node_ptr pred_norm_bool2word1(PredicateNormaliser_ptr self, node_ptr expr);
+static node_ptr pred_norm_bool2word1(PredicateNormaliser_ptr self,
+                                     node_ptr expr);
 
-static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self,
-                                      int op, node_ptr op1, node_ptr op2);
+static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self, int op,
+                                      node_ptr op1, node_ptr op2);
 static node_ptr pred_norm_push_ite_up_conditioned(PredicateNormaliser_ptr self,
                                                   node_ptr condition, int op,
                                                   node_ptr exp1, node_ptr exp2,
                                                   node_ptr tail);
 static node_ptr pred_norm_normalise_ite(PredicateNormaliser_ptr self,
-                                        node_ptr cond,
-                                        node_ptr then,
+                                        node_ptr cond, node_ptr then,
                                         node_ptr tail);
-static void
-pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
-                              Set_t* preds, node_ptr expr,
-                              hash_ptr already_processed);
+static void pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
+                                          Set_t *preds, node_ptr expr,
+                                          hash_ptr already_processed);
 
 static hash_ptr
 predicate_normalizer_get_handled_hash(PredicateNormaliser_ptr self);
 
-static assoc_retval
-predicate_normalizer_hash_free(char *key, char *data, char * arg);
+static assoc_retval predicate_normalizer_hash_free(char *key, char *data,
+                                                   char *arg);
 
-static node_ptr
-pred_normalizer_make_key(const NodeMgr_ptr nodemgr, boolean expand_define,
-                         node_ptr context, node_ptr expr);
+static node_ptr pred_normalizer_make_key(const NodeMgr_ptr nodemgr,
+                                         boolean expand_define,
+                                         node_ptr context, node_ptr expr);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-PredicateNormaliser_ptr PredicateNormaliser_create(SymbTable_ptr st)
-{
+PredicateNormaliser_ptr PredicateNormaliser_create(SymbTable_ptr st) {
   PredicateNormaliser_ptr self = ALLOC(PredicateNormaliser, 1);
 
   PREDICATE_NORMALISER_CHECK_INSTANCE(self);
@@ -167,15 +157,13 @@ PredicateNormaliser_ptr PredicateNormaliser_create(SymbTable_ptr st)
   return self;
 }
 
-void PredicateNormaliser_destroy(PredicateNormaliser_ptr self)
-{
+void PredicateNormaliser_destroy(PredicateNormaliser_ptr self) {
   PREDICATE_NORMALISER_CHECK_INSTANCE(self);
   Object_destroy(OBJECT(self), NULL);
 }
 
-node_ptr
-PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self, node_ptr expr)
-{
+node_ptr PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self,
+                                            node_ptr expr) {
   int lineno_tmp;
   node_ptr result;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
@@ -184,7 +172,8 @@ PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self, node_ptr expr)
   PREDICATE_NORMALISER_CHECK_INSTANCE(self);
 
   /* Nil returned as it is. Probably, only CONS-exprs may have Nil inside */
-  if (Nil == expr) return Nil;
+  if (Nil == expr)
+    return Nil;
 
   /* new node will be created with for sure error line number */
   lineno_tmp = nusmv_yylineno;
@@ -209,8 +198,7 @@ PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self, node_ptr expr)
     node_ptr left = PredicateNormaliser_normalise_expr(self, car(expr));
     node_ptr right = PredicateNormaliser_normalise_expr(self, cdr(expr));
     result = ExprMgr_resolve(exprs, self->st, node_get_type(expr), left, right);
-  }
-  else {
+  } else {
     /* this is a usual expression */
     result = pred_norm_normalise(self, expr, Nil, true);
   }
@@ -220,8 +208,8 @@ PredicateNormaliser_normalise_expr(PredicateNormaliser_ptr self, node_ptr expr)
 }
 
 node_ptr
-PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self, node_ptr expr)
-{
+PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self,
+                                             node_ptr expr) {
   int lineno_tmp;
   node_ptr result;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
@@ -230,7 +218,8 @@ PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self, node_
   PREDICATE_NORMALISER_CHECK_INSTANCE(self);
 
   /* Nil returned as it is. Probably, only CONS-exprs may have Nil inside */
-  if (Nil == expr) return Nil;
+  if (Nil == expr)
+    return Nil;
 
   /* new node will be created with for sure error line number */
   lineno_tmp = nusmv_yylineno;
@@ -252,11 +241,12 @@ PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self, node_
      for high level expressions, not generic AND or CONS.
   */
   if (AND == node_get_type(expr) || CONS == node_get_type(expr)) {
-    node_ptr left = PredicateNormaliser_normalise_expr_no_expand(self, car(expr));
-    node_ptr right = PredicateNormaliser_normalise_expr_no_expand(self, cdr(expr));
+    node_ptr left =
+        PredicateNormaliser_normalise_expr_no_expand(self, car(expr));
+    node_ptr right =
+        PredicateNormaliser_normalise_expr_no_expand(self, cdr(expr));
     result = ExprMgr_resolve(exprs, self->st, node_get_type(expr), left, right);
-  }
-  else {
+  } else {
     /* this is a usual expression */
     result = pred_norm_normalise(self, expr, Nil, false);
   }
@@ -267,8 +257,7 @@ PredicateNormaliser_normalise_expr_no_expand(PredicateNormaliser_ptr self, node_
 
 node_ptr
 PredicateNormaliser_normalise_specification(PredicateNormaliser_ptr self,
-                                            node_ptr expr)
-{
+                                            node_ptr expr) {
   node_ptr result;
   int lineno_tmp;
   boolean isTypeOK;
@@ -290,26 +279,23 @@ PredicateNormaliser_normalise_specification(PredicateNormaliser_ptr self,
   */
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-    isTypeOK = TypeChecker_is_specification_wellformed(self->checker,
-                                                       find_node(nodemgr, SPEC, result, Nil));
+    isTypeOK = TypeChecker_is_specification_wellformed(
+        self->checker, find_node(nodemgr, SPEC, result, Nil));
   }
-  nusmv_assert(isTypeOK);/* the type should be always OK */
+  nusmv_assert(isTypeOK); /* the type should be always OK */
 
   nusmv_yylineno = lineno_tmp; /* restore line number */
   return result;
 }
 
-void
-PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
-                                        Set_t* preds, node_ptr expr)
-{
+void PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
+                                             Set_t *preds, node_ptr expr) {
   PREDICATE_NORMALISER_CHECK_INSTANCE(self);
 
-
-  if (Nil == expr) return;
+  if (Nil == expr)
+    return;
 
   /* Process the high level expressions.
      See comment inside PredicateNormaliser_normalise_expr about AND and CONS
@@ -327,11 +313,12 @@ PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
   if (CONS == node_get_type(expr) || AND == node_get_type(expr)) {
     PredicateNormaliser_get_predicates_only(self, preds, car(expr));
     PredicateNormaliser_get_predicates_only(self, preds, cdr(expr));
-  }
-  else {
+  } else {
     hash_ptr a_hash;
-    { /* debugging code : only boolean (or statement) expressions can be met here */
-      SymbType_ptr type = TypeChecker_get_expression_type(self->checker, expr, Nil);
+    { /* debugging code : only boolean (or statement) expressions can be met
+         here */
+      SymbType_ptr type =
+          TypeChecker_get_expression_type(self->checker, expr, Nil);
       nusmv_assert(SymbType_is_boolean(type) ||
                    SYMB_TYPE_STATEMENT == SymbType_get_tag(type));
     }
@@ -345,10 +332,8 @@ PredicateNormaliser_get_predicates_only(const PredicateNormaliser_ptr self,
   return;
 }
 
-void
-PredicateNormaliser_print_predicates_only(const PredicateNormaliser_ptr self,
-                                          FILE* stream, node_ptr expr)
-{
+void PredicateNormaliser_print_predicates_only(
+    const PredicateNormaliser_ptr self, FILE *stream, node_ptr expr) {
   Set_t preds;
   Set_Iterator_t iter;
 
@@ -359,7 +344,7 @@ PredicateNormaliser_print_predicates_only(const PredicateNormaliser_ptr self,
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const MasterPrinter_ptr wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
     SET_FOREACH(preds, iter) {
       node_ptr pred = Set_GetMember(preds, iter);
@@ -372,7 +357,6 @@ PredicateNormaliser_print_predicates_only(const PredicateNormaliser_ptr self,
   return;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Static function definitions                                               */
 /*---------------------------------------------------------------------------*/
@@ -382,9 +366,7 @@ PredicateNormaliser_print_predicates_only(const PredicateNormaliser_ptr self,
 
 
 */
-static void pred_norm_init(PredicateNormaliser_ptr self,
-                           SymbTable_ptr st)
-{
+static void pred_norm_init(PredicateNormaliser_ptr self, SymbTable_ptr st) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
 
   env_object_init(ENV_OBJECT(self), env);
@@ -408,8 +390,7 @@ static void pred_norm_init(PredicateNormaliser_ptr self,
 
 
 */
-static void pred_norm_finalize(Object_ptr object, void* dummy)
-{
+static void pred_norm_finalize(Object_ptr object, void *dummy) {
   PredicateNormaliser_ptr self = PREDICATE_NORMALISER(object);
 
   pred_norm_deinit(self);
@@ -422,8 +403,7 @@ static void pred_norm_finalize(Object_ptr object, void* dummy)
 
 
 */
-static void pred_norm_deinit(PredicateNormaliser_ptr self)
-{
+static void pred_norm_deinit(PredicateNormaliser_ptr self) {
   nusmv_assert(TYPE_CHECKER(NULL) != self->checker);
   /* check this is initialised object */
   nusmv_assert((hash_ptr)NULL != self->expr2normalisedPredicate);
@@ -443,7 +423,6 @@ static void pred_norm_deinit(PredicateNormaliser_ptr self)
 
   env_object_deinit(ENV_OBJECT(self));
 }
-
 
 /*!
   \brief Performs the predicate-normalisation of an expression
@@ -469,24 +448,20 @@ static void pred_norm_deinit(PredicateNormaliser_ptr self)
   \sa PredicateNormaliser_normalise_expr
 */
 
-static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
-                                    node_ptr expr,
-                                    node_ptr context,
-                                    boolean expand_defines)
-{
+static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self, node_ptr expr,
+                                    node_ptr context, boolean expand_defines) {
   SymbType_ptr type;
   node_ptr key, result;
   int node_type;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   OptsHandler_ptr const opts =
-     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
 #ifndef NDEBUG
   Logger_ptr const logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
@@ -497,11 +472,11 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
   /* already processed */
   key = pred_normalizer_make_key(nodemgr, expand_defines, context, expr);
   result = find_assoc(self->expr2normalisedPredicate, key);
-  if (Nil != result) return result;
+  if (Nil != result)
+    return result;
 
 #ifndef NDEBUG
-  Logger_vnlog_trace(logger, wffprint, opts, "\nINPUT\n%N",
-                     expr);
+  Logger_vnlog_trace(logger, wffprint, opts, "\nINPUT\n%N", expr);
 #endif
 
   node_type = node_get_type(expr);
@@ -509,12 +484,10 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
 
   /* process every kind of an expression */
   switch (node_type) {
-  case CONTEXT:
-    {
-      node_ptr new_ctx = CompileFlatten_concat_contexts(env, context, car(expr));
-      result = pred_norm_normalise(self, cdr(expr), new_ctx, expand_defines);
-    }
-    break;
+  case CONTEXT: {
+    node_ptr new_ctx = CompileFlatten_concat_contexts(env, context, car(expr));
+    result = pred_norm_normalise(self, cdr(expr), new_ctx, expand_defines);
+  } break;
 
     /* list of simple constants that do not need normaliasation */
   case FAILURE:
@@ -532,9 +505,10 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
 
   case UWCONST:
   case SWCONST:
-    result = ExprMgr_resolve(exprs, self->st, node_type,
-               pred_norm_normalise(self, car(expr), context, expand_defines),
-               pred_norm_normalise(self, cdr(expr), context, expand_defines));
+    result = ExprMgr_resolve(
+        exprs, self->st, node_type,
+        pred_norm_normalise(self, car(expr), context, expand_defines),
+        pred_norm_normalise(self, cdr(expr), context, expand_defines));
     break;
 
   case ARRAY: {
@@ -553,8 +527,7 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
       nusmv_assert(tmp != expr); /* loop in recursion is impossible */
       result = pred_norm_normalise(self, tmp, Nil, expand_defines);
       break;
-    }
-    else {
+    } else {
       /* array is actually identifier => process it with other identifiers */
     }
     /* NO BREAK HERE */
@@ -579,27 +552,26 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     rs = SymbTable_resolve_symbol(self->st, expr, context);
     resolvedName = ResolveSymbol_get_resolved_name(rs);
 
-     /* Check whether this is a variable */
+    /* Check whether this is a variable */
     if (ResolveSymbol_is_var(rs)) {
       result = resolvedName;
     }
 
     /* check whether is a define */
     else if (ResolveSymbol_is_define(rs)) {
-      boolean body_is_boolean =  SymbType_is_boolean(type);
+      boolean body_is_boolean = SymbType_is_boolean(type);
 
       result = resolvedName;
       if (expand_defines) {
-        node_ptr def = SymbTable_get_define_flatten_body(self->st,
-                                                         resolvedName);
+        node_ptr def =
+            SymbTable_get_define_flatten_body(self->st, resolvedName);
 
         /* Whether we expand or not the defines, we return the flattened
            symbol or the recursion on the body of the define */
         /* the context is Nil because expr is already flattened */
         result = pred_norm_normalise(self, def, Nil, expand_defines);
-        body_is_boolean =
-          SymbType_is_boolean(TypeChecker_get_expression_type(self->checker,
-                                                              def, Nil));
+        body_is_boolean = SymbType_is_boolean(
+            TypeChecker_get_expression_type(self->checker, def, Nil));
       }
 
       /* Special case: array define may be declared with Integer (or
@@ -622,8 +594,7 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
        takes care of simple/complex constants */
     else if (ResolveSymbol_is_constant(rs)) {
       result = resolvedName;
-    }
-    else if (ResolveSymbol_is_function(rs)) {
+    } else if (ResolveSymbol_is_function(rs)) {
       result = resolvedName;
     }
     /* check whether this symbol is a parameter */
@@ -636,13 +607,11 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
            type-checked, but being a parameter is the last
            possibility */
         ErrorMgr_internal_error(errmgr, "Symbol is unexpectedly undefined: %s",
-                       sprint_node(wffprint, resolvedName));
+                                sprint_node(wffprint, resolvedName));
       }
-      param = SymbTable_get_actual_parameter(self->st,
-                                             resolvedName);
+      param = SymbTable_get_actual_parameter(self->st, resolvedName);
 
-      new_ctx = SymbTable_get_actual_parameter_context(self->st,
-                                                       resolvedName);
+      new_ctx = SymbTable_get_actual_parameter_context(self->st, resolvedName);
 
       result = pred_norm_normalise(self, param, new_ctx, expand_defines);
     }
@@ -652,12 +621,26 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
 
     /* unary expression
        or binary expressions those right child has not to be normalized */
-  case EX: case AX: case EF: case AF: case EG: case AG:
-  case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
-  case OP_HISTORICAL: case OP_FUTURE: case OP_ONCE:
+  case EX:
+  case AX:
+  case EF:
+  case AF:
+  case EG:
+  case AG:
+  case OP_NEXT:
+  case OP_PREC:
+  case OP_NOTPRECNOT:
+  case OP_GLOBAL:
+  case OP_HISTORICAL:
+  case OP_FUTURE:
+  case OP_ONCE:
 
-  case EBF: case ABF: case EBG: case ABG: /* ignore the number..number part */
-  case ABU: case EBU: /* ignore the number..number part */
+  case EBF:
+  case ABF:
+  case EBG:
+  case ABG: /* ignore the number..number part */
+  case ABU:
+  case EBU: /* ignore the number..number part */
 
     nusmv_assert(SymbType_is_boolean(type)); /* only boolean can be here */
     /* [MRAT]: here the code does fall through going to the remaining part
@@ -676,15 +659,16 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     /* [AI] adding unary operator typeof*/
   case TYPEOF: {
     /* note that NOT and UMINUS may be boolean and/or words */
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
     /* do not normalise right operand if any */
     node_ptr op2 = find_atom(nodemgr, cdr(expr));
 
     if (SymbType_is_boolean(type)) { /* this is boolean => just return */
       result = ExprMgr_resolve(exprs, self->st, node_type, op1, op2);
-    }
-    else { /* this is not a boolean => push all ITE up.
-              note that temporal operators cannot be here as they are boolean */
+    } else { /* this is not a boolean => push all ITE up.
+                note that temporal operators cannot be here as they are boolean
+              */
       /* if operand of UMINUS is boolean => convert it into integer */
       if (UMINUS == node_type &&
           pred_norm_is_true_bool_exp(self, op1, context)) {
@@ -700,35 +684,43 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     /* CONS is like AND */
   case CONS: {
     node_ptr op1 =
-      pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = Nil == cdr(expr)
-      ? ExprMgr_true(exprs)
-      : pred_norm_normalise(self, cdr(expr), context, expand_defines);
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        Nil == cdr(expr)
+            ? ExprMgr_true(exprs)
+            : pred_norm_normalise(self, cdr(expr), context, expand_defines);
 
     if (SymbType_is_boolean(type)) { /* this is boolean => just return */
       result = pred_norm_find_node(self, AND, op1, op2);
-    }
-    else { /* this is not a boolean => push all ITE up */
+    } else { /* this is not a boolean => push all ITE up */
       result = pred_norm_push_ite_up(self, AND, op1, op2);
     }
     break;
   }
 
     /* binary expression */
-  case AND: case OR: case XOR: case XNOR: case IFF: case IMPLIES:
-  case AU: case EU:
-  case UNTIL: case SINCE: {
+  case AND:
+  case OR:
+  case XOR:
+  case XNOR:
+  case IFF:
+  case IMPLIES:
+  case AU:
+  case EU:
+  case UNTIL:
+  case SINCE: {
     node_ptr op1 =
-      pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = Nil == cdr(expr)
-      ? Nil
-      : pred_norm_normalise(self, cdr(expr), context, expand_defines);
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        Nil == cdr(expr)
+            ? Nil
+            : pred_norm_normalise(self, cdr(expr), context, expand_defines);
 
     if (SymbType_is_boolean(type)) { /* this is boolean => just return */
       result = pred_norm_find_node(self, node_type, op1, op2);
-    }
-    else { /* this is not a boolean => push all ITE up.
-            note that temporal operators cannot be here as they are boolean. */
+    } else { /* this is not a boolean => push all ITE up.
+              note that temporal operators cannot be here as they are boolean.
+            */
       result = pred_norm_push_ite_up(self, node_type, op1, op2);
     }
 
@@ -736,14 +728,22 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
   }
 
     /* relational operators */
-  case EQDEF: case SETIN:
-  case EQUAL: case NOTEQUAL: case LT: case GT: case LE: case GE: {
-    SymbType_ptr type1 = TypeChecker_get_expression_type(self->checker,
-                                                         car(expr), context);
-    SymbType_ptr type2 = TypeChecker_get_expression_type(self->checker,
-                                                         cdr(expr), context);
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = pred_norm_normalise(self, cdr(expr), context, expand_defines);
+  case EQDEF:
+  case SETIN:
+  case EQUAL:
+  case NOTEQUAL:
+  case LT:
+  case GT:
+  case LE:
+  case GE: {
+    SymbType_ptr type1 =
+        TypeChecker_get_expression_type(self->checker, car(expr), context);
+    SymbType_ptr type2 =
+        TypeChecker_get_expression_type(self->checker, cdr(expr), context);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        pred_norm_normalise(self, cdr(expr), context, expand_defines);
 
     /* some type conversion may be required */
     /* both operands are boolean (or bool set for EQDEF and SETIN) */
@@ -761,14 +761,15 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     }
     /* left is boolean and the right is word[1] => convert word1 to bool */
     else if (SymbType_is_boolean(type1) && SymbType_is_word_1(type2)) {
-      result = pred_norm_find_node(self, node_type, op1,
-                                   ExprMgr_resolve(exprs, self->st, CAST_BOOL, op2, Nil));
+      result = pred_norm_find_node(
+          self, node_type, op1,
+          ExprMgr_resolve(exprs, self->st, CAST_BOOL, op2, Nil));
     }
     /* left is word[1] and the right is boolean => convert word1 to bool */
     else if (SymbType_is_word_1(type1) && SymbType_is_boolean(type2)) {
-      result = pred_norm_find_node(self, node_type,
-                                   ExprMgr_resolve(exprs, self->st, CAST_BOOL, op1, Nil),
-                                   op2);
+      result = pred_norm_find_node(
+          self, node_type,
+          ExprMgr_resolve(exprs, self->st, CAST_BOOL, op1, Nil), op2);
     }
     /* both operands are scalar => convert "true boolean" operand (if
        there is one) to 1, and then push all ITE up from operands.
@@ -782,10 +783,9 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
          The assignment has to be changed to "in".
          Otherwise, at the end we will get, e.g., 1 := exp which
          is illegal as LHS is not var */
-      if (EQDEF == node_type  &&
-          SymbType_is_boolean(type1) &&
-          (SymbType_is_integer(type2)
-           || SYMB_TYPE_SET_INT == SymbType_get_tag(type2))) {
+      if (EQDEF == node_type && SymbType_is_boolean(type1) &&
+          (SymbType_is_integer(type2) ||
+           SYMB_TYPE_SET_INT == SymbType_get_tag(type2))) {
         node_type = SETIN;
       }
 
@@ -808,8 +808,13 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
        (even though "exp mod 2" is a boolean expression,
        there is no need to deal with it as with boolean).
     */
-  case TIMES: case DIVIDE: case PLUS :case MINUS: case MOD:
-  case LSHIFT: case RSHIFT: /*case LROTATE: case RROTATE: */
+  case TIMES:
+  case DIVIDE:
+  case PLUS:
+  case MINUS:
+  case MOD:
+  case LSHIFT:
+  case RSHIFT: /*case LROTATE: case RROTATE: */
   case CAST_UNSIGNED:
   case CAST_SIGNED:
   case EXTEND:
@@ -823,10 +828,12 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
                                   WAWRITE has actually three-operands
                                   but the second and third are dealt recursively
                                */
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = Nil == cdr(expr)
-      ? Nil
-      : pred_norm_normalise(self, cdr(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        Nil == cdr(expr)
+            ? Nil
+            : pred_norm_normalise(self, cdr(expr), context, expand_defines);
 
     /* below code is required to change, e.g "(a!=b)+5=6"
        into "((a!=b)?1:0) +5 = 6" and then obtain "(a!=b) ? 1+5=6 : 0+5=0" */
@@ -843,9 +850,12 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
   }
 
   case WAWRITE: {
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = pred_norm_normalise(self, car(cdr(expr)), context, expand_defines);
-    node_ptr op3 = pred_norm_normalise(self, cdr(cdr(expr)), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        pred_norm_normalise(self, car(cdr(expr)), context, expand_defines);
+    node_ptr op3 =
+        pred_norm_normalise(self, cdr(cdr(expr)), context, expand_defines);
 
     /* below code is required to change, e.g "(a!=b)+5=6"
        into "((a!=b)?1:0) +5 = 6" and then obtain "(a!=b) ? 1+5=6 : 0+5=0" */
@@ -860,8 +870,8 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     if (pred_norm_is_true_bool_exp(self, op3, context)) {
       op3 = pred_norm_bool2int(self, op3);
     }
-    result = pred_norm_push_ite_up(self, node_type, op1,
-                                   pred_norm_push_ite_up(self, node_type, op2, op3));
+    result = pred_norm_push_ite_up(
+        self, node_type, op1, pred_norm_push_ite_up(self, node_type, op2, op3));
     break;
   }
 
@@ -881,7 +891,8 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     error_unreachable_code();
 
   case BIT_SELECTION: {
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
     node_ptr op2;
 
     /* We must expand the bits to ensure they resolve to numbers */
@@ -908,15 +919,18 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
   }
 
   case WRESIZE: {
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = pred_norm_normalise(self, cdr(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        pred_norm_normalise(self, cdr(expr), context, expand_defines);
 
     result = pred_norm_push_ite_up(self, node_type, op1, op2);
     break;
   }
 
   case CAST_TOINT: {
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
     nusmv_assert(Nil == cdr(expr)); /* indeed no right child */
 
     result = pred_norm_push_ite_up(self, node_type, op1, Nil);
@@ -928,7 +942,8 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
     node_ptr new_list = Nil, find_list = Nil;
 
     while (Nil != list) {
-      node_ptr elem = pred_norm_normalise(self, car(list), context, expand_defines);
+      node_ptr elem =
+          pred_norm_normalise(self, car(list), context, expand_defines);
       new_list = cons(nodemgr, elem, new_list);
       list = cdr(list);
     }
@@ -952,13 +967,15 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
        it is a true boolean or one of 0, 1, mod2.
     */
   case CONCATENATION: {
-    SymbType_ptr type1 = TypeChecker_get_expression_type(self->checker,
-                                                         car(expr), context);
-    SymbType_ptr type2 = TypeChecker_get_expression_type(self->checker,
-                                                         cdr(expr), context);
+    SymbType_ptr type1 =
+        TypeChecker_get_expression_type(self->checker, car(expr), context);
+    SymbType_ptr type2 =
+        TypeChecker_get_expression_type(self->checker, cdr(expr), context);
 
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = pred_norm_normalise(self, cdr(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        pred_norm_normalise(self, cdr(expr), context, expand_defines);
 
     if (SymbType_is_boolean(type1)) {
       op1 = pred_norm_bool2word1(self, op1);
@@ -973,7 +990,8 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
   }
     /* pushes down bool cast if operand is a case */
   case CAST_BOOL: {
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
     nusmv_assert(cdr(expr) == Nil);
 
     result = pred_norm_push_ite_up(self, node_type, op1, Nil);
@@ -1004,10 +1022,12 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
        part in PredicateExtractor.c.
     */
   case UNION: {
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
-    node_ptr op2 = pred_norm_normalise(self, cdr(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op2 =
+        pred_norm_normalise(self, cdr(expr), context, expand_defines);
 
-     /* see comment above */
+    /* see comment above */
     if (pred_norm_is_true_bool_exp(self, op1, context)) {
       op1 = pred_norm_bool2int(self, op1);
     }
@@ -1029,77 +1049,77 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
 
     if (SymbType_is_boolean(type)) {
       /* this is boolean ITE  => do nothing */
-      result = ExprMgr_resolve(exprs, self->st, CASE,
-                            ExprMgr_resolve(exprs, self->st, COLON, cond, then), tail);
-    }
-    else result = pred_norm_normalise_ite(self, cond, then, tail);
+      result = ExprMgr_resolve(
+          exprs, self->st, CASE,
+          ExprMgr_resolve(exprs, self->st, COLON, cond, then), tail);
+    } else
+      result = pred_norm_normalise_ite(self, cond, then, tail);
 
     break;
   }
 
   case ATTIME: {
-    node_ptr op1 = pred_norm_normalise(self, car(expr), context, expand_defines);
+    node_ptr op1 =
+        pred_norm_normalise(self, car(expr), context, expand_defines);
     /* do not normalise right operand if any */
     node_ptr op2 = find_atom(nodemgr, cdr(expr));
 
     if (SymbType_is_boolean(type)) { /* this is boolean => just return */
       result = ExprMgr_resolve(exprs, self->st, node_type, op1, op2);
-    }
-    else { /* this is not a boolean => push all ITE up */
+    } else { /* this is not a boolean => push all ITE up */
       result = pred_norm_push_ite_up(self, node_type, op1, op2);
     }
 
     break;
   }
 
-  case NFUNCTION:
-    {
-      /* For functions, we normalise actual parameters */
-      node_ptr params = cdr(expr);
-      node_ptr new_params = Nil;
-      node_ptr tmp = Nil;
-      node_ptr p;
+  case NFUNCTION: {
+    /* For functions, we normalise actual parameters */
+    node_ptr params = cdr(expr);
+    node_ptr new_params = Nil;
+    node_ptr tmp = Nil;
+    node_ptr p;
 
-      while (Nil != params) {
-        p = pred_norm_normalise(self, car(params), context, expand_defines);
-        tmp = cons(nodemgr, p, tmp);
-        params = cdr(params);
-      }
-
-      /* Reverse the new parameter list, and create nodes using find_node */
-      while (Nil != tmp) {
-        node_ptr _tmp;
-
-        new_params = find_node(nodemgr, CONS, car(tmp), new_params);
-
-        _tmp = tmp;
-        tmp = cdr(tmp);
-        free_node(nodemgr, _tmp);
-      }
-
-      result = ExprMgr_function(exprs, car(expr), new_params);
+    while (Nil != params) {
+      p = pred_norm_normalise(self, car(params), context, expand_defines);
+      tmp = cons(nodemgr, p, tmp);
+      params = cdr(params);
     }
-    break;
+
+    /* Reverse the new parameter list, and create nodes using find_node */
+    while (Nil != tmp) {
+      node_ptr _tmp;
+
+      new_params = find_node(nodemgr, CONS, car(tmp), new_params);
+
+      _tmp = tmp;
+      tmp = cdr(tmp);
+      free_node(nodemgr, _tmp);
+    }
+
+    result = ExprMgr_function(exprs, car(expr), new_params);
+  } break;
 
   default:
     /* TODO[MD] This is wrong. Should be ifdef. See issue 3009. Two other cases
        around. */
 #ifndef NDEBUG
-    result = ExprMgr_resolve(exprs, self->st, node_type,
-                          pred_norm_normalise(self, car(expr), context, expand_defines),
-                          pred_norm_normalise(self, cdr(expr), context, expand_defines));
+    result = ExprMgr_resolve(
+        exprs, self->st, node_type,
+        pred_norm_normalise(self, car(expr), context, expand_defines),
+        pred_norm_normalise(self, cdr(expr), context, expand_defines));
     break;
 #else
-    {
-      const MasterPrinter_ptr sexpprinter =
+  {
+    const MasterPrinter_ptr sexpprinter =
         MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
-      const StreamMgr_ptr streams =
+    const StreamMgr_ptr streams =
         STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-      StreamMgr_nprint_error(streams, sexpprinter, "%N", expr);
-      StreamMgr_print_error(streams,  "unknown token = %d\n", node_type);
-      error_unreachable_code(); /* unknown kind of an expression */
-    }
+    StreamMgr_nprint_error(streams, sexpprinter, "%N", expr);
+    StreamMgr_print_error(streams, "unknown token = %d\n", node_type);
+    error_unreachable_code(); /* unknown kind of an expression */
+  }
 #endif
   } /* switch */
 
@@ -1109,13 +1129,11 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
   insert_assoc(self->expr2normalisedPredicate, key, result);
 
 #ifndef NDEBUG
-  Logger_vnlog_trace(logger, wffprint, opts, "\nOUTPUT\n%N",
-                     result);
+  Logger_vnlog_trace(logger, wffprint, opts, "\nOUTPUT\n%N", result);
 #endif
 
   return result;
 }
-
 
 /*!
   \brief Create a new node with the help of find_node function
@@ -1133,16 +1151,22 @@ static node_ptr pred_norm_normalise(PredicateNormaliser_ptr self,
    will be the same).
 */
 
-static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self,
-                                    int kind, node_ptr op1, node_ptr op2)
-{
+static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self, int kind,
+                                    node_ptr op1, node_ptr op2) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   switch (kind) {
     /* commutative operations */
-  case AND: case OR: case XOR: case XNOR: case IFF:
-  case EQUAL: case NOTEQUAL:  case TIMES: case PLUS:
+  case AND:
+  case OR:
+  case XOR:
+  case XNOR:
+  case IFF:
+  case EQUAL:
+  case NOTEQUAL:
+  case TIMES:
+  case PLUS:
   case UNION:
     /* order the operands (somehow) */
     if (op1 > op2) {
@@ -1153,30 +1177,80 @@ static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self,
     break;
 
     /* noncommutative operations */
-  case FALSEEXP: case TRUEEXP: case FAILURE:
-  case DOT:  case ATOM:  case SELF:  case ARRAY:  case BIT_SELECTION:
-  case NEXT: case SMALLINIT: case NOT: case UMINUS: case IMPLIES:
-  case COLON: case CASE:  case CAST_WORD1:  case CAST_BOOL:
-  case EQDEF:  /* I think, EQDEF is not commutative */
-  case LT: case GT: case LE: case GE:
-  case DIVIDE: case MINUS: case LSHIFT: case RSHIFT: case MOD:
-  case NUMBER: case NUMBER_UNSIGNED_WORD: case NUMBER_SIGNED_WORD:
-  case UWCONST: case SWCONST:
-  case NUMBER_FRAC: case NUMBER_REAL:
+  case FALSEEXP:
+  case TRUEEXP:
+  case FAILURE:
+  case DOT:
+  case ATOM:
+  case SELF:
+  case ARRAY:
+  case BIT_SELECTION:
+  case NEXT:
+  case SMALLINIT:
+  case NOT:
+  case UMINUS:
+  case IMPLIES:
+  case COLON:
+  case CASE:
+  case CAST_WORD1:
+  case CAST_BOOL:
+  case EQDEF: /* I think, EQDEF is not commutative */
+  case LT:
+  case GT:
+  case LE:
+  case GE:
+  case DIVIDE:
+  case MINUS:
+  case LSHIFT:
+  case RSHIFT:
+  case MOD:
+  case NUMBER:
+  case NUMBER_UNSIGNED_WORD:
+  case NUMBER_SIGNED_WORD:
+  case UWCONST:
+  case SWCONST:
+  case NUMBER_FRAC:
+  case NUMBER_REAL:
   case NUMBER_EXP:
-  case TWODOTS:  case CONCATENATION:
-  case EX: case AX: case EF: case AF: case EG: case AG:
-  case ABU: case EBU: case EBF: case ABF: case EBG: case ABG:
-  case AU: case EU:
-  case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
-  case OP_HISTORICAL: case OP_FUTURE: case OP_ONCE:
-  case UNTIL: case SINCE: case CONTEXT:
-  case WAREAD: case WAWRITE: case ATTIME:
+  case TWODOTS:
+  case CONCATENATION:
+  case EX:
+  case AX:
+  case EF:
+  case AF:
+  case EG:
+  case AG:
+  case ABU:
+  case EBU:
+  case EBF:
+  case ABF:
+  case EBG:
+  case ABG:
+  case AU:
+  case EU:
+  case OP_NEXT:
+  case OP_PREC:
+  case OP_NOTPRECNOT:
+  case OP_GLOBAL:
+  case OP_HISTORICAL:
+  case OP_FUTURE:
+  case OP_ONCE:
+  case UNTIL:
+  case SINCE:
+  case CONTEXT:
+  case WAREAD:
+  case WAWRITE:
+  case ATTIME:
   case SETIN: /* AG */
-  case EXTEND: case WRESIZE:
-  case FLOOR: case COUNT:
-  case CAST_UNSIGNED: case CAST_SIGNED: case CAST_TOINT:
-  case WSIZEOF: case NFUNCTION:
+  case EXTEND:
+  case WRESIZE:
+  case FLOOR:
+  case COUNT:
+  case CAST_UNSIGNED:
+  case CAST_SIGNED:
+  case CAST_TOINT:
+  case WSIZEOF:
+  case NFUNCTION:
   case CONST_ARRAY: /* AI */
   case TYPEOF:
   case CAST_TO_UNSIGNED_WORD:
@@ -1186,17 +1260,17 @@ static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self,
 #if 0 /* def NDEBUG */
     break;
 #else
-    {
-      const MasterPrinter_ptr sexpprinter =
+  {
+    const MasterPrinter_ptr sexpprinter =
         MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
-      const StreamMgr_ptr streams =
+    const StreamMgr_ptr streams =
         STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-      const NodeMgr_ptr nodemgr =
-        NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-      StreamMgr_nprint_error(streams, sexpprinter, "%N", new_node(nodemgr, kind, op1, op2));
-      error_unreachable_code(); /* unknown kind of an expression */
-    }
+    StreamMgr_nprint_error(streams, sexpprinter, "%N",
+                           new_node(nodemgr, kind, op1, op2));
+    error_unreachable_code(); /* unknown kind of an expression */
+  }
 #endif
   } /* switch */
 
@@ -1218,25 +1292,21 @@ static node_ptr pred_norm_find_node(PredicateNormaliser_ptr self,
 */
 
 static boolean pred_norm_is_true_bool_exp(PredicateNormaliser_ptr self,
-                                          node_ptr expr,
-                                          node_ptr context)
-{
+                                          node_ptr expr, node_ptr context) {
   /* application of "next" or "init" does not influence on whether
      the expressions is truly boolean or not */
-  node_ptr unnexted
-    = (node_get_type(expr) == NEXT || node_get_type(expr) == INIT)
-    ? car(expr) : expr;
+  node_ptr unnexted =
+      (node_get_type(expr) == NEXT || node_get_type(expr) == INIT) ? car(expr)
+                                                                   : expr;
 
-  SymbType_ptr type = TypeChecker_get_expression_type(self->checker, expr,
-                                                      context);
+  SymbType_ptr type =
+      TypeChecker_get_expression_type(self->checker, expr, context);
 
-  return SymbType_is_boolean(type)
-    && NUMBER != node_get_type(unnexted)
-    && MOD != node_get_type(unnexted);
+  return SymbType_is_boolean(type) && NUMBER != node_get_type(unnexted) &&
+         MOD != node_get_type(unnexted);
   /* note that check for number being 0/1 or mod's second operand being 2
      is not done as check for boolean type is enough */
 }
-
 
 /*!
   \brief Casts a boolean expression to an integer expression
@@ -1248,21 +1318,21 @@ static boolean pred_norm_is_true_bool_exp(PredicateNormaliser_ptr self,
 */
 
 static node_ptr pred_norm_bool2int(PredicateNormaliser_ptr self,
-                                   node_ptr expr)
-{
+                                   node_ptr expr) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   return
-    /* optimization: TRUE becomes 1 and FALSE become 0 */
-    (TRUEEXP == node_get_type(expr)) ? ExprMgr_true(exprs) :
-    ((FALSEEXP == node_get_type(expr)) ? ExprMgr_false(exprs) :
-     /* normal conversion */
-     ExprMgr_resolve(exprs, self->st, CASE,
-                  ExprMgr_resolve(exprs, self->st, COLON, expr, ExprMgr_true(exprs)), ExprMgr_false(exprs))
-    );
+      /* optimization: TRUE becomes 1 and FALSE become 0 */
+      (TRUEEXP == node_get_type(expr))
+          ? ExprMgr_true(exprs)
+          : ((FALSEEXP == node_get_type(expr)) ? ExprMgr_false(exprs) :
+                                               /* normal conversion */
+                 ExprMgr_resolve(exprs, self->st, CASE,
+                                 ExprMgr_resolve(exprs, self->st, COLON, expr,
+                                                 ExprMgr_true(exprs)),
+                                 ExprMgr_false(exprs)));
 }
-
 
 /*!
   \brief Cast a boolean expression to a Word[1] expression
@@ -1275,35 +1345,37 @@ static node_ptr pred_norm_bool2int(PredicateNormaliser_ptr self,
 */
 
 static node_ptr pred_norm_bool2word1(PredicateNormaliser_ptr self,
-                                     node_ptr expr)
-{
+                                     node_ptr expr) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
 
   const WordNumberMgr_ptr words =
-    WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
   if (ExprMgr_is_true(exprs, expr) || ExprMgr_is_number(exprs, expr, 1)) {
-    return ExprMgr_resolve(exprs, self->st, NUMBER_UNSIGNED_WORD,
-                        (node_ptr) WordNumberMgr_integer_to_word_number(words, 1,1), Nil);
+    return ExprMgr_resolve(
+        exprs, self->st, NUMBER_UNSIGNED_WORD,
+        (node_ptr)WordNumberMgr_integer_to_word_number(words, 1, 1), Nil);
   }
   if (ExprMgr_is_false(exprs, expr) || ExprMgr_is_number(exprs, expr, 0)) {
-    return ExprMgr_resolve(exprs, self->st, NUMBER_UNSIGNED_WORD,
-                        (node_ptr) WordNumberMgr_integer_to_word_number(words, 0,1), Nil);
+    return ExprMgr_resolve(
+        exprs, self->st, NUMBER_UNSIGNED_WORD,
+        (node_ptr)WordNumberMgr_integer_to_word_number(words, 0, 1), Nil);
   }
 
-  return ExprMgr_resolve(exprs, self->st, CASE,
-                      ExprMgr_resolve(exprs, self->st, COLON, expr,
-                                   ExprMgr_resolve(exprs, self->st, NUMBER_UNSIGNED_WORD,
-                                                (node_ptr)WordNumberMgr_integer_to_word_number(words, 1,1),
-                                                Nil)),
-                      ExprMgr_resolve(exprs, self->st, NUMBER_UNSIGNED_WORD,
-                                   (node_ptr)WordNumberMgr_integer_to_word_number(words, 0,1),
-                                   Nil));
+  return ExprMgr_resolve(
+      exprs, self->st, CASE,
+      ExprMgr_resolve(
+          exprs, self->st, COLON, expr,
+          ExprMgr_resolve(
+              exprs, self->st, NUMBER_UNSIGNED_WORD,
+              (node_ptr)WordNumberMgr_integer_to_word_number(words, 1, 1),
+              Nil)),
+      ExprMgr_resolve(
+          exprs, self->st, NUMBER_UNSIGNED_WORD,
+          (node_ptr)WordNumberMgr_integer_to_word_number(words, 0, 1), Nil));
 }
-
-
 
 /*!
   \brief Applies an operators to two (or one) not-boolean operands
@@ -1357,9 +1429,8 @@ static node_ptr pred_norm_bool2word1(PredicateNormaliser_ptr self,
 
 */
 
-static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self,
-                                      int op, node_ptr op1, node_ptr op2)
-{
+static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self, int op,
+                                      node_ptr op1, node_ptr op2) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
@@ -1378,8 +1449,9 @@ static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self,
     /* apply the operation on op2 and op1's tail (without first CASE).
        Of op1's tail is FAILURE simply return this tail
     */
-    node_ptr tail = (FAILURE == node_get_type(cdr(op1))) ? cdr(op1)
-      : pred_norm_push_ite_up(self, op, cdr(op1), op2);
+    node_ptr tail = (FAILURE == node_get_type(cdr(op1)))
+                        ? cdr(op1)
+                        : pred_norm_push_ite_up(self, op, cdr(op1), op2);
 
     /* RC: This code adds an hard to track down implicit requirement
 
@@ -1399,11 +1471,9 @@ static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self,
        CASEs may not be nestable, it may be necessary to push all CASE form
        op2 to the CASE list of op1
     */
-    return pred_norm_push_ite_up_conditioned(self, cond,
-                                             op, cdr(car(op1)), op2,
+    return pred_norm_push_ite_up_conditioned(self, cond, op, cdr(car(op1)), op2,
                                              tail);
-  }
-  else if (Nil != op2 && CASE == node_get_type(op2)) {
+  } else if (Nil != op2 && CASE == node_get_type(op2)) {
     /* push_ite_up(op1 + ITE(c, t, e)) =
        ITE(c, op1 + t, push_ite_up(op1 + e))
 
@@ -1413,13 +1483,14 @@ static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self,
        NB: If op2's tail is FAILURE then keep it as it is.
     */
     node_ptr cond = car(car(op2));
-    node_ptr first_expr = pred_norm_push_ite_up(self, op, op1,
-                                                cdr(car(op2)));
-    node_ptr second_expr
-      = FAILURE == node_get_type(cdr(op2)) ? cdr(op2)
-      : pred_norm_push_ite_up(self, op, op1, cdr(op2));
+    node_ptr first_expr = pred_norm_push_ite_up(self, op, op1, cdr(car(op2)));
+    node_ptr second_expr = FAILURE == node_get_type(cdr(op2))
+                               ? cdr(op2)
+                               : pred_norm_push_ite_up(self, op, op1, cdr(op2));
 
-    return ExprMgr_resolve(exprs, self->st, CASE, ExprMgr_resolve(exprs, self->st, COLON, cond, first_expr),  second_expr);
+    return ExprMgr_resolve(
+        exprs, self->st, CASE,
+        ExprMgr_resolve(exprs, self->st, COLON, cond, first_expr), second_expr);
   }
   /* both operands are not ITE */
   else {
@@ -1455,18 +1526,14 @@ static node_ptr pred_norm_push_ite_up(PredicateNormaliser_ptr self,
    If the given operator is unary then the op2 is Nil.
 */
 
-static node_ptr
-pred_norm_push_ite_up_conditioned(PredicateNormaliser_ptr self,
-                                  node_ptr condition,
-                                  int op,
-                                  node_ptr exp1,
-                                  node_ptr exp2,
-                                  node_ptr tail)
-{
+static node_ptr pred_norm_push_ite_up_conditioned(PredicateNormaliser_ptr self,
+                                                  node_ptr condition, int op,
+                                                  node_ptr exp1, node_ptr exp2,
+                                                  node_ptr tail) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-#if 0 == ALLOW_NESTED_CASES  /* nested ITE are NOT allowed! */
+#if 0 == ALLOW_NESTED_CASES /* nested ITE are NOT allowed! */
 
   nusmv_assert(CASE != node_get_type(exp1));
   nusmv_assert(FAILURE != node_get_type(exp1));
@@ -1492,22 +1559,24 @@ pred_norm_push_ite_up_conditioned(PredicateNormaliser_ptr self,
     return pred_norm_find_node(self, CASE, tmp, tail);
   }
 
-#elif 1 == ALLOW_NESTED_CASES   /* nested ITE are allowed */
+#elif 1 == ALLOW_NESTED_CASES /* nested ITE are allowed */
   /* [AT] Optimization to be implemented:
-     let b be a boolean var, define d1 := b + b, d2 := d1 + d1; d3 := d2 + d2; d4 := d3+d3;
-     Having now INIT d4; cannot be simplified because the size of CASE is huge.
+     let b be a boolean var, define d1 := b + b, d2 := d1 + d1; d3 := d2 + d2;
+     d4 := d3+d3; Having now INIT d4; cannot be simplified because the size of
+     CASE is huge.
 
      Solution is to detect if conditions in left case-exp and right
      case-exp are the same and not build full expression in that case.
    */
   node_ptr tmp = pred_norm_push_ite_up(self, op, exp1, exp2);
-  return ExprMgr_resolve(exprs, self->st, CASE, ExprMgr_resolve(exprs, self->st, COLON, condition, tmp), tail);
+  return ExprMgr_resolve(
+      exprs, self->st, CASE,
+      ExprMgr_resolve(exprs, self->st, COLON, condition, tmp), tail);
 
 #else
 #error ALLOW_NESTED_CASES is incorrectly defined!
 #endif
 }
-
 
 /*!
   \brief The function take three expressions (cond, e1, e2) and
@@ -1529,13 +1598,12 @@ pred_norm_push_ite_up_conditioned(PredicateNormaliser_ptr self,
    normalised)).
 */
 
-static node_ptr
-pred_norm_normalise_ite(PredicateNormaliser_ptr self,
-                        node_ptr cond, node_ptr then, node_ptr tail)
-{
+static node_ptr pred_norm_normalise_ite(PredicateNormaliser_ptr self,
+                                        node_ptr cond, node_ptr then,
+                                        node_ptr tail) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-#if 0 == ALLOW_NESTED_CASES  /* nested ITE are NOT allowed */
+#if 0 == ALLOW_NESTED_CASES /* nested ITE are NOT allowed */
 
   if (CASE == node_get_type(then)) {
     /* 'then' is ITE expression => modify it.*/
@@ -1550,7 +1618,6 @@ pred_norm_normalise_ite(PredicateNormaliser_ptr self,
   }
   /* 'then' is not ITE expression => just create the expression*/
   else return ExprMgr_resolve(exprs, self->st, CASE, ExprMgr_resolve(exprs, self->st, COLON, cond, then), tail);
-
 
 #elif 1 == ALLOW_NESTED_CASES /* nested ITE are allowed */
   /* just create the expression */
@@ -1569,21 +1636,19 @@ pred_norm_normalise_ite(PredicateNormaliser_ptr self,
    expressions. Since every predicate has to be collected only once
    there is no need to process the same exp twice.
 */
-static void
-pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
-                              Set_t* preds, node_ptr expr,
-                              hash_ptr already_processed)
-{
+static void pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
+                                          Set_t *preds, node_ptr expr,
+                                          hash_ptr already_processed) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
-  if (find_assoc(already_processed, expr)) return;
+  if (find_assoc(already_processed, expr))
+    return;
 
   /* process every kind of an expression */
   switch (node_get_type(expr)) {
@@ -1601,34 +1666,59 @@ pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
   case DOT:
   case ATOM:
   case ARRAY: {
-    SymbType_ptr type = TypeChecker_get_expression_type(self->checker, expr, Nil);
+    SymbType_ptr type =
+        TypeChecker_get_expression_type(self->checker, expr, Nil);
     nusmv_assert(SymbType_is_boolean(type)); /* only bool var can be met */
     break;
   }
 
     /* unary expressions whose operands are boolean */
-  case NEXT: case SMALLINIT:
+  case NEXT:
+  case SMALLINIT:
   case NOT:
-  case EX: case AX: case EF: case AF: case EG:  case AG:
-  case EBF: case ABF: case EBG: case ABG: /* ignore the number..number part */
-  case ABU: case EBU: /* ignore the number..number part */
-  case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_GLOBAL:
-  case OP_HISTORICAL: case OP_FUTURE: case OP_ONCE:
+  case EX:
+  case AX:
+  case EF:
+  case AF:
+  case EG:
+  case AG:
+  case EBF:
+  case ABF:
+  case EBG:
+  case ABG: /* ignore the number..number part */
+  case ABU:
+  case EBU: /* ignore the number..number part */
+  case OP_NEXT:
+  case OP_PREC:
+  case OP_NOTPRECNOT:
+  case OP_GLOBAL:
+  case OP_HISTORICAL:
+  case OP_FUTURE:
+  case OP_ONCE:
     pred_norm_get_predicates_only(self, preds, car(expr), already_processed);
     break;
 
     /* binary expressions whose operands are boolean */
-  case AND: case OR: case XOR: case XNOR: case IFF: case IMPLIES:
-  case AU: case EU: case UNTIL: case SINCE: case CONS:
+  case AND:
+  case OR:
+  case XOR:
+  case XNOR:
+  case IFF:
+  case IMPLIES:
+  case AU:
+  case EU:
+  case UNTIL:
+  case SINCE:
+  case CONS:
     pred_norm_get_predicates_only(self, preds, car(expr), already_processed);
     pred_norm_get_predicates_only(self, preds, cdr(expr), already_processed);
     break;
 
     /* operand of bool-cast is always word[1] => add it */
-  case CAST_BOOL:  {
+  case CAST_BOOL: {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const WordNumberMgr_ptr words =
-      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+        WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
     SymbType_ptr type;
 
     /* here the expression word[1] is casted to boolean.
@@ -1637,46 +1727,56 @@ pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
     type = TypeChecker_get_expression_type(self->checker, expr, Nil);
     nusmv_assert(SymbType_is_word_1(type));
 
-    expr = ExprMgr_resolve(exprs, self->st, EQUAL, expr,
-                        find_node(nodemgr, NUMBER_UNSIGNED_WORD,
-                                  (node_ptr)WordNumberMgr_integer_to_word_number(words, 1,1), Nil));
-    *preds = Set_AddMember(*preds, (Set_Element_t) expr);
+    expr = ExprMgr_resolve(
+        exprs, self->st, EQUAL, expr,
+        find_node(nodemgr, NUMBER_UNSIGNED_WORD,
+                  (node_ptr)WordNumberMgr_integer_to_word_number(words, 1, 1),
+                  Nil));
+    *preds = Set_AddMember(*preds, (Set_Element_t)expr);
     break;
   }
 
     /* three operands expression which do not change the type */
   case CASE:
-    pred_norm_get_predicates_only(self, preds, car(car(expr)), already_processed);
-    pred_norm_get_predicates_only(self, preds, cdr(car(expr)), already_processed);
+    pred_norm_get_predicates_only(self, preds, car(car(expr)),
+                                  already_processed);
+    pred_norm_get_predicates_only(self, preds, cdr(car(expr)),
+                                  already_processed);
     if (FAILURE != node_get_type(cdr(expr))) {
       pred_norm_get_predicates_only(self, preds, cdr(expr), already_processed);
     }
     break;
 
     /* binary expression whose operands may not be boolean */
-  case EQDEF: case SETIN:
-  case EQUAL: case NOTEQUAL: case LT: case GT: case LE: case GE: {
-    SymbType_ptr type1 = TypeChecker_get_expression_type(self->checker,
-                                                         car(expr), Nil);
-    SymbType_ptr type2 = TypeChecker_get_expression_type(self->checker,
-                                                         cdr(expr), Nil);
+  case EQDEF:
+  case SETIN:
+  case EQUAL:
+  case NOTEQUAL:
+  case LT:
+  case GT:
+  case LE:
+  case GE: {
+    SymbType_ptr type1 =
+        TypeChecker_get_expression_type(self->checker, car(expr), Nil);
+    SymbType_ptr type2 =
+        TypeChecker_get_expression_type(self->checker, cdr(expr), Nil);
 
     if (SymbType_is_boolean(type1) &&
         (SymbType_is_boolean(type2) ||
          SYMB_TYPE_SET_BOOL == SymbType_get_tag(type2))) {
       pred_norm_get_predicates_only(self, preds, car(expr), already_processed);
       pred_norm_get_predicates_only(self, preds, cdr(expr), already_processed);
-    }
-    else {
+    } else {
       /* the expression is not boolean.
-         after normalisation both operands must be boolean or not boolean only together.
-         Let's check it here. */
+         after normalisation both operands must be boolean or not boolean only
+         together. Let's check it here. */
       nusmv_assert(!pred_norm_is_true_bool_exp(self, car(expr), Nil) &&
                    !pred_norm_is_true_bool_exp(self, cdr(expr), Nil));
 
-      /* here the expression is added to the set of predicates (if it was not added before) */
+      /* here the expression is added to the set of predicates (if it was not
+       * added before) */
       if (!Set_IsMember(*preds, (Set_Element_t)expr)) {
-        *preds = Set_AddMember(*preds, (Set_Element_t) expr);
+        *preds = Set_AddMember(*preds, (Set_Element_t)expr);
       }
     }
     break;
@@ -1691,48 +1791,60 @@ pred_norm_get_predicates_only(const PredicateNormaliser_ptr self,
     pred_norm_get_predicates_only(self, preds, cdr(expr), already_processed);
     break;
 
-   /* Below are expressions which can never be met at this point
-      because only boolean one can be here and only expanded expressions. */
-  case CONTEXT:  /* after normalisation the expr should be expanded */
+    /* Below are expressions which can never be met at this point
+       because only boolean one can be here and only expanded expressions. */
+  case CONTEXT: /* after normalisation the expr should be expanded */
     /* these exps should have beem met earlier*/
-  case NUMBER_UNSIGNED_WORD: case NUMBER_SIGNED_WORD:
-  case NUMBER_FRAC:  case NUMBER_REAL:  case NUMBER_EXP:
-  case UWCONST: case SWCONST:
+  case NUMBER_UNSIGNED_WORD:
+  case NUMBER_SIGNED_WORD:
+  case NUMBER_FRAC:
+  case NUMBER_REAL:
+  case NUMBER_EXP:
+  case UWCONST:
+  case SWCONST:
   case TWODOTS:
   case COUNT:
 
-  case WSIZEOF: case WRESIZE: case CAST_TOINT:
+  case WSIZEOF:
+  case WRESIZE:
+  case CAST_TOINT:
     /* not- boolean expression cannot be met here */
-  case TIMES: case DIVIDE: case PLUS: case MINUS: case MOD:
-  case LSHIFT: case RSHIFT: /*case LROTATE: case RROTATE: */
+  case TIMES:
+  case DIVIDE:
+  case PLUS:
+  case MINUS:
+  case MOD:
+  case LSHIFT:
+  case RSHIFT: /*case LROTATE: case RROTATE: */
   case BIT_SELECTION:
-  case WAREAD: case WAWRITE:
+  case WAREAD:
+  case WAWRITE:
   case CONST_ARRAY:
   case TYPEOF:
   case CONCATENATION:
   case COLON:
   case CAST_WORD1: /* normalisation have already converted CAST_WORD1 to ITE*/
-  case CAST_SIGNED:   case CAST_UNSIGNED:   case EXTEND:
+  case CAST_SIGNED:
+  case CAST_UNSIGNED:
+  case EXTEND:
   case CAST_TO_UNSIGNED_WORD:
     error_unreachable_code();
     break;
 
-  default:
-    {
-      const MasterPrinter_ptr sexpprint =
+  default: {
+    const MasterPrinter_ptr sexpprint =
         MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
 
-      StreamMgr_nprint_error(streams, sexpprint, "%N", expr);
+    StreamMgr_nprint_error(streams, sexpprint, "%N", expr);
 
-      ErrorMgr_internal_error(errmgr, "unknown kind of an expression (see above)");
-    }
+    ErrorMgr_internal_error(errmgr,
+                            "unknown kind of an expression (see above)");
+  }
   } /* switch */
-
 
   insert_assoc(already_processed, expr, NODE_PTR(1));
   return;
 }
-
 
 static hash_ptr
 predicate_normalizer_get_handled_hash(PredicateNormaliser_ptr self) {
@@ -1740,27 +1852,20 @@ predicate_normalizer_get_handled_hash(PredicateNormaliser_ptr self) {
 
   PREDICATE_NORMALISER_CHECK_INSTANCE(self);
 
-  result =
-    SymbTable_get_handled_hash_ptr(self->st,
-                                   PREDICATE_NORMALIZER_HASH,
-                                   (ST_PFICPCP)NULL,
-                                   (ST_PFICPI)NULL,
-                                   predicate_normalizer_hash_free,
-                                   (SymbTableTriggerFun)NULL,
-                                   SymbTable_clear_handled_remove_action_hash,
-                                   (SymbTableTriggerFun)NULL
-                                   );
+  result = SymbTable_get_handled_hash_ptr(
+      self->st, PREDICATE_NORMALIZER_HASH, (ST_PFICPCP)NULL, (ST_PFICPI)NULL,
+      predicate_normalizer_hash_free, (SymbTableTriggerFun)NULL,
+      SymbTable_clear_handled_remove_action_hash, (SymbTableTriggerFun)NULL);
   return result;
 }
 
-static assoc_retval predicate_normalizer_hash_free(char *key, char *data, char * arg)
-{
+static assoc_retval predicate_normalizer_hash_free(char *key, char *data,
+                                                   char *arg) {
   return ASSOC_DELETE;
 }
 
-static node_ptr
-pred_normalizer_make_key(const NodeMgr_ptr nodemgr, boolean expand_define,
-                         node_ptr context, node_ptr expr)
-{
+static node_ptr pred_normalizer_make_key(const NodeMgr_ptr nodemgr,
+                                         boolean expand_define,
+                                         node_ptr context, node_ptr expr) {
   return find_node(nodemgr, CONTEXT + (expand_define ? 1 : 0), context, expr);
 }

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -45,43 +45,36 @@
 
 */
 
-
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/ltl/ltl.h"
-#include "nusmv/core/ltl/ltlInt.h"
 #include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/fsm/bdd/FairnessList.h"
+#include "nusmv/core/ltl/ltl.h"
+#include "nusmv/core/ltl/ltlInt.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/utils/Logger.h"
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static bdd_ptr
-successor(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
+static bdd_ptr successor(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
 
-static bdd_ptr
-successors(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
+static bdd_ptr successors(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
 
-static bdd_ptr
-predecessor(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
+static bdd_ptr predecessor(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
 
-static bdd_ptr
-predecessors(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
+static bdd_ptr predecessors(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation);
 
-static node_ptr
-path(BddEnc_ptr enc, bdd_ptr source, bdd_ptr dest, bdd_ptr R);
+static node_ptr path(BddEnc_ptr enc, bdd_ptr source, bdd_ptr dest, bdd_ptr R);
 
-static node_ptr
-fill_path_with_inputs(BddFsm_ptr fsm, BddEnc_ptr enc, node_ptr path);
+static node_ptr fill_path_with_inputs(BddFsm_ptr fsm, BddEnc_ptr enc,
+                                      node_ptr path);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc)
-{
+bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc) {
   NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   bdd_ptr new, old, R, init_bdd, trans_bdd;
   bdd_ptr invar_bdd, next_invar_bdd;
@@ -95,7 +88,7 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc)
     Logger_log(logger, "\n");
   }
 
-  init_bdd  = BddFsm_get_init(fsm);
+  init_bdd = BddFsm_get_init(fsm);
   trans_bdd = BddFsm_get_monolithic_trans_bdd(fsm);
   invar_bdd = BddFsm_get_state_constraints(fsm);
 
@@ -121,9 +114,9 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc)
     old = bdd_dup(new);
     {
       FairnessListIterator_ptr iter =
-        FairnessList_begin(FAIRNESS_LIST(justice));
+          FairnessList_begin(FAIRNESS_LIST(justice));
 
-      while( ! FairnessListIterator_is_end(iter)) {
+      while (!FairnessListIterator_is_end(iter)) {
         /* Loop over specifications */
         bdd_ptr spec = JusticeList_get_p(justice, iter);
 
@@ -155,9 +148,9 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc)
     }
     {
       FairnessListIterator_ptr iter =
-        FairnessList_begin(FAIRNESS_LIST(compassion));
+          FairnessList_begin(FAIRNESS_LIST(compassion));
 
-      while( ! FairnessListIterator_is_end(iter)) {
+      while (!FairnessListIterator_is_end(iter)) {
         /* Loop over specifications */
         bdd_ptr p_spec = CompassionList_get_p(compassion, iter);
         bdd_ptr q_spec = CompassionList_get_q(compassion, iter);
@@ -170,9 +163,9 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc)
         {
           bdd_ptr result1, result2, temp;
 
-          temp=bdd_not(dd_manager, p_spec);
-          result1= bdd_and(dd_manager, new, temp);
-          bdd_free(dd_manager,temp);
+          temp = bdd_not(dd_manager, p_spec);
+          result1 = bdd_and(dd_manager, new, temp);
+          bdd_free(dd_manager, temp);
           bdd_and_accumulate(dd_manager, &q_spec, new);
           result2 = successors(enc, q_spec, R);
           bdd_free(dd_manager, p_spec);
@@ -196,7 +189,7 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc)
 
       succ = successor(enc, new, R);
       temp = bdd_and(dd_manager, new, succ);
-      while (new != temp){
+      while (new != temp) {
         bdd_free(dd_manager, new);
         new = bdd_dup(temp);
         bdd_free(dd_manager, temp);
@@ -207,13 +200,12 @@ bdd_ptr feasible(BddFsm_ptr fsm, BddEnc_ptr enc)
       bdd_free(dd_manager, temp);
       bdd_free(dd_manager, succ);
     }
- }
+  }
 
- return new;
+  return new;
 }
 
-node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
-{
+node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib) {
   bdd_ptr final, R, state;
   bdd_ptr init_bdd, trans_bdd, invar_bdd, next_invar_bdd;
   node_ptr period, prefix, result;
@@ -222,13 +214,12 @@ node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
   NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(dd_manager));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   prefix = Nil;
 
-  init_bdd  = BddFsm_get_init(fsm);
+  init_bdd = BddFsm_get_init(fsm);
   trans_bdd = BddFsm_get_monolithic_trans_bdd(fsm);
   invar_bdd = BddFsm_get_state_constraints(fsm);
 
@@ -251,24 +242,24 @@ node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
     succ = successors(enc, state, R);
     prec = predecessors(enc, R, state);
     not = bdd_not(dd_manager, succ);
-    diff = bdd_and(dd_manager, prec, not);
-    while (bdd_isnot_false(dd_manager, diff)){
+    diff = bdd_and(dd_manager, prec, not );
+    while (bdd_isnot_false(dd_manager, diff)) {
       bdd_free(dd_manager, state);
       state = BddEnc_pick_one_state(enc, diff);
       bdd_free(dd_manager, succ);
       bdd_free(dd_manager, prec);
       bdd_free(dd_manager, diff);
-      bdd_free(dd_manager, not);
-      succ  = successors(enc, state, R);
-      prec  = predecessors(enc, R, state);
+      bdd_free(dd_manager, not );
+      succ = successors(enc, state, R);
+      prec = predecessors(enc, R, state);
       not = bdd_not(dd_manager, succ);
-      diff = bdd_and(dd_manager, prec, not);
+      diff = bdd_and(dd_manager, prec, not );
     }
 
     bdd_free(dd_manager, diff);
     bdd_free(dd_manager, final);
     final = bdd_and(dd_manager, succ, prec);
-    bdd_free(dd_manager, not);
+    bdd_free(dd_manager, not );
     bdd_free(dd_manager, succ);
     bdd_free(dd_manager, prec);
     bdd_and_accumulate(dd_manager, &R, final);
@@ -286,10 +277,9 @@ node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
   period = cons(nodemgr, last(prefix), Nil);
 
   {
-   FairnessListIterator_ptr iter =
-        FairnessList_begin(FAIRNESS_LIST(justice));
+    FairnessListIterator_ptr iter = FairnessList_begin(FAIRNESS_LIST(justice));
 
-    while( ! FairnessListIterator_is_end(iter) ) {
+    while (!FairnessListIterator_is_end(iter)) {
       /* Loop over specifications */
       bdd_ptr spec = JusticeList_get_p(justice, iter);
 
@@ -303,33 +293,32 @@ node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
         int found = 0;
 
         curr_period = period;
-        while (! found) {
+        while (!found) {
           bdd_ptr tmp = bdd_and(dd_manager, spec, (bdd_ptr)car(curr_period));
 
           found = bdd_isnot_false(dd_manager, tmp);
           curr_period = cdr(curr_period);
           bdd_free(dd_manager, tmp);
-          if (curr_period == Nil) break;
+          if (curr_period == Nil)
+            break;
         }
-        if (!found){
+        if (!found) {
           bdd_ptr tmp = bdd_and(dd_manager, final, spec);
 
-          period = append(period,
-                          reverse(path(enc, (bdd_ptr)last(period),
-                                       tmp, R)));
+          period =
+              append(period, reverse(path(enc, (bdd_ptr)last(period), tmp, R)));
           bdd_free(dd_manager, tmp);
         }
-
       }
       bdd_free(dd_manager, spec);
       iter = FairnessListIterator_next(iter);
     }
   }
   {
-   FairnessListIterator_ptr iter =
+    FairnessListIterator_ptr iter =
         FairnessList_begin(FAIRNESS_LIST(compassion));
 
-    while( ! FairnessListIterator_is_end(iter) ) {
+    while (!FairnessListIterator_is_end(iter)) {
       /* Loop over specifications */
       bdd_ptr p_spec = CompassionList_get_p(compassion, iter);
       bdd_ptr q_spec = CompassionList_get_q(compassion, iter);
@@ -340,15 +329,15 @@ node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
 
         curr_period = period;
 
-        while (! found) {
-          bdd_ptr tmp = bdd_and(dd_manager, q_spec,
-                                (bdd_ptr)car(curr_period));
+        while (!found) {
+          bdd_ptr tmp = bdd_and(dd_manager, q_spec, (bdd_ptr)car(curr_period));
           found = bdd_isnot_false(dd_manager, tmp);
           curr_period = cdr(curr_period);
           bdd_free(dd_manager, tmp);
-          if (curr_period == Nil) break;
+          if (curr_period == Nil)
+            break;
         }
-        if (!found){
+        if (!found) {
           bdd_ptr tmp = bdd_and(dd_manager, final, p_spec);
 
           if (bdd_isnot_false(dd_manager, tmp)) {
@@ -381,7 +370,7 @@ node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
   { /* We release the prefix list and its contents */
     node_ptr p = prefix;
 
-    while(p != Nil) {
+    while (p != Nil) {
       node_ptr m = p;
 
       p = cdr(p);
@@ -402,8 +391,7 @@ node_ptr witness(BddFsm_ptr fsm, BddEnc_ptr enc, bdd_ptr feasib)
   Given a state from and transition relation, compute the
   direct successor state.
 */
-static bdd_ptr successor(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation)
-{
+static bdd_ptr successor(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation) {
   bdd_ptr result, next_result, vars;
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
 
@@ -423,14 +411,13 @@ static bdd_ptr successor(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation)
   direct and indirect successor states (transitive closure of
   successor).
 */
-static bdd_ptr successors(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation)
-{
+static bdd_ptr successors(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation) {
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
   bdd_ptr old, new;
 
   old = bdd_false(dd_manager);
   new = bdd_dup(from);
-  while (old != new){
+  while (old != new) {
     bdd_ptr image;
 
     bdd_free(dd_manager, old);
@@ -450,8 +437,7 @@ static bdd_ptr successors(BddEnc_ptr enc, bdd_ptr from, bdd_ptr relation)
   Given a state to and a transition relation, compute the
   direct predecessor state.
 */
-static bdd_ptr predecessor(BddEnc_ptr enc, bdd_ptr relation, bdd_ptr to)
-{
+static bdd_ptr predecessor(BddEnc_ptr enc, bdd_ptr relation, bdd_ptr to) {
   bdd_ptr result, next_to, vars;
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
 
@@ -471,21 +457,20 @@ static bdd_ptr predecessor(BddEnc_ptr enc, bdd_ptr relation, bdd_ptr to)
   direct and indirect predecessor states (transitive closure of
   predecessor).
 */
-static bdd_ptr predecessors(BddEnc_ptr enc, bdd_ptr relation, bdd_ptr to)
-{
+static bdd_ptr predecessors(BddEnc_ptr enc, bdd_ptr relation, bdd_ptr to) {
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
   bdd_ptr old, new;
 
   old = bdd_false(dd_manager);
   new = bdd_dup(to);
-  while (old != new){
+  while (old != new) {
     bdd_ptr bwdimage;
 
-    bdd_free(dd_manager,old);
+    bdd_free(dd_manager, old);
     old = bdd_dup(new);
-    bwdimage = predecessor(enc, relation,old);
+    bwdimage = predecessor(enc, relation, old);
     bdd_or_accumulate(dd_manager, &new, bwdimage);
-    bdd_free(dd_manager,bwdimage);
+    bdd_free(dd_manager, bwdimage);
   }
   bdd_free(dd_manager, old);
   return new;
@@ -497,21 +482,19 @@ static bdd_ptr predecessors(BddEnc_ptr enc, bdd_ptr relation, bdd_ptr to)
   Computes a path given the bdds representind the source
   states, the target states, and the transition relation.
 */
-static node_ptr path(BddEnc_ptr enc, bdd_ptr source,
-                     bdd_ptr dest, bdd_ptr R) {
+static node_ptr path(BddEnc_ptr enc, bdd_ptr source, bdd_ptr dest, bdd_ptr R) {
   node_ptr L;
   bdd_ptr start, test, f, s, tmp;
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   L = Nil;
   start = bdd_dup(source);
   f = predecessor(enc, R, dest);
 
   tmp = bdd_and(dd_manager, start, f);
-  while (bdd_is_false(dd_manager, tmp)){
+  while (bdd_is_false(dd_manager, tmp)) {
     bdd_ptr fold;
 
     fold = f;
@@ -535,20 +518,20 @@ static node_ptr path(BddEnc_ptr enc, bdd_ptr source,
   test = bdd_and(dd_manager, start, dest);
   bdd_free(dd_manager, f);
   test = bdd_and(dd_manager, start, dest);
-  while (bdd_is_false(dd_manager, test)){
+  while (bdd_is_false(dd_manager, test)) {
     bdd_ptr tmp;
 
     f = predecessor(enc, R, dest);
 
     tmp = bdd_and(dd_manager, start, f);
-    while (bdd_is_false(dd_manager, tmp)){
+    while (bdd_is_false(dd_manager, tmp)) {
       bdd_ptr fold;
 
       fold = f;
       f = predecessor(enc, R, fold);
       bdd_free(dd_manager, fold);
       bdd_free(dd_manager, tmp);
-      tmp =  bdd_and(dd_manager, start, f);
+      tmp = bdd_and(dd_manager, start, f);
     }
     bdd_free(dd_manager, tmp);
     {
@@ -582,15 +565,12 @@ static node_ptr path(BddEnc_ptr enc, bdd_ptr source,
 
   Fills a path with inputs.
 */
-static node_ptr fill_path_with_inputs(BddFsm_ptr fsm,
-                                      BddEnc_ptr enc,
-                                      node_ptr path)
-{
+static node_ptr fill_path_with_inputs(BddFsm_ptr fsm, BddEnc_ptr enc,
+                                      node_ptr path) {
   node_ptr p;
   node_ptr result = Nil;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   DDMgr_ptr dd_manager = BddEnc_get_dd_manager(enc);
 
   for (p = path; (p != Nil) && (cdr(p) != Nil); p = cdr(p)) {
@@ -602,7 +582,10 @@ static node_ptr fill_path_with_inputs(BddFsm_ptr fsm,
     inputs = BddFsm_states_to_states_get_inputs(fsm, start, next);
     input = BddEnc_pick_one_input(enc, inputs);
 
-    result = cons(nodemgr, cons(nodemgr, (node_ptr)bdd_dup(input), (node_ptr)bdd_dup(start)), result);
+    result =
+        cons(nodemgr,
+             cons(nodemgr, (node_ptr)bdd_dup(input), (node_ptr)bdd_dup(start)),
+             result);
     bdd_free(dd_manager, input);
     bdd_free(dd_manager, inputs);
     bdd_free(dd_manager, next);
@@ -616,4 +599,3 @@ static node_ptr fill_path_with_inputs(BddFsm_ptr fsm,
   /* We reverse the list since it was built reversed */
   return reverse(result);
 }
-

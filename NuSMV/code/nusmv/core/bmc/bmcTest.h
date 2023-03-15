@@ -3,7 +3,7 @@
 
   This file is part of the ``required'' package.
   %COPYRIGHT%
-  
+
 
 -----------------------------------------------------------------------------*/
 
@@ -15,7 +15,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_TEST_H__
 #define __NUSMV_CORE_BMC_BMC_TEST_H__
 
@@ -25,31 +24,33 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 /* user can generate a random wff based on a specified operator: */
 typedef enum GenWffOperator_TAG {
-  GWO_None, GWO_Globally, GWO_Future, GWO_Until, GWO_Releases,
-  GWO_Historically, GWO_Once, GWO_Since, GWO_Triggered
+  GWO_None,
+  GWO_Globally,
+  GWO_Future,
+  GWO_Until,
+  GWO_Releases,
+  GWO_Historically,
+  GWO_Once,
+  GWO_Since,
+  GWO_Triggered
 } GenWffOperator;
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -65,15 +66,10 @@ typedef enum GenWffOperator_TAG {
 
   BMC_ALL_LOOPS is not supported
 */
-int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
-                                 node_ptr wff,
-                                 GenWffOperator wff_operator,
-                                 int max_depth,
-                                 int max_conns,
-                                 boolean usePastOperators,
-                                 boolean crossComparison,
-                                 int k,
-                                 int l);
+int Bmc_Test_test_tableau(NuSMVEnv_ptr env, node_ptr wff,
+                          GenWffOperator wff_operator, int max_depth,
+                          int max_conns, boolean usePastOperators,
+                          boolean crossComparison, int k, int l);
 
 /**AutomaticEnd***************************************************************/
 

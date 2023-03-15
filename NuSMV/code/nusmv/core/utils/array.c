@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,27 +34,24 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include <stdio.h>
-#include "cudd/util.h"
 #include "nusmv/core/utils/array.h"
+#include "cudd/util.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/error.h"
+#include <stdio.h>
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define INIT_SIZE       3
+#define INIT_SIZE 3
 
 unsigned int array_global_index;
 int array_global_insert;
 
-
 /* Allocate an array of 'number' elements,each of which require 'size' bytes */
-array_t* array_do_alloc(int size, int number)
-{
+array_t *array_do_alloc(int size, int number) {
   array_t *array;
 
   array = ALLOC(array_t, 1);
@@ -73,22 +70,20 @@ array_t* array_do_alloc(int size, int number)
     FREE(array);
     return NIL(array_t);
   }
-  (void) memset(array->space, 0, array->n_size * array->obj_size);
+  (void)memset(array->space, 0, array->n_size * array->obj_size);
   return array;
 }
 
-
-void array_free(array_t *array)
-{
-  if (array == NIL(array_t)) return;
-  if (array->index >= 0) array_abort(array,4);
+void array_free(array_t *array) {
+  if (array == NIL(array_t))
+    return;
+  if (array->index >= 0)
+    array_abort(array, 4);
   FREE(array->space);
   FREE(array);
 }
 
-
-array_t* array_dup(array_t *old)
-{
+array_t *array_dup(array_t *old) {
   array_t *new;
 
   new = ALLOC(array_t, 1);
@@ -101,25 +96,24 @@ array_t* array_dup(array_t *old)
   new->index = -new->obj_size;
   new->e_index = 0;
   new->e_insert = 0;
-  new->space = ALLOC(char, new->n_size * new->obj_size);
+  new->space = ALLOC(char, new->n_size *new->obj_size);
 
   if (new->space == NIL(char)) {
     FREE(new);
     return NIL(array_t);
   }
-  (void) memcpy(new->space, old->space, old->num * old->obj_size);
+  (void)memcpy(new->space, old->space, old->num * old->obj_size);
   return new;
 }
 
-
 /* append the elements of array2 to the end of array1 */
-int array_append(array_t* array1, array_t* array2)
-{
+int array_append(array_t *array1, array_t *array2) {
   char *pos;
 
-  if (array1->index >= 0) array_abort(array1,4);
+  if (array1->index >= 0)
+    array_abort(array1, 4);
   if (array1->obj_size != array2->obj_size) {
-    array_abort(array1,2);
+    array_abort(array1, 2);
     /* NOTREACHED */
   }
 
@@ -130,21 +124,19 @@ int array_append(array_t* array1, array_t* array2)
     }
   }
   pos = array1->space + array1->num * array1->obj_size;
-  (void) memcpy(pos, array2->space, array2->num * array2->obj_size);
+  (void)memcpy(pos, array2->space, array2->num * array2->obj_size);
   array1->num += array2->num;
 
   return 1;
 }
 
-
 /* join array1 and array2, returning a new array */
-array_t* array_join(array_t* array1, array_t* array2)
-{
+array_t *array_join(array_t *array1, array_t *array2) {
   array_t *array;
   char *pos;
 
   if (array1->obj_size != array2->obj_size) {
-    array_abort(array1,3);
+    array_abort(array1, 3);
     fail("array: join not defined for arrays of different sizes\n");
     /* NOTREACHED */
   }
@@ -163,28 +155,24 @@ array_t* array_join(array_t* array1, array_t* array2)
     FREE(array);
     return NIL(array_t);
   }
-  (void) memcpy(array->space, array1->space, array1->num * array1->obj_size);
+  (void)memcpy(array->space, array1->space, array1->num * array1->obj_size);
   pos = array->space + array1->num * array1->obj_size;
-  (void) memcpy(pos, array2->space, array2->num * array2->obj_size);
+  (void)memcpy(pos, array2->space, array2->num * array2->obj_size);
   return array;
 }
 
-
-char* array_do_data(array_t *array)
-{
+char *array_do_data(array_t *array) {
   char *data;
 
   data = ALLOC(char, array->num * array->obj_size);
   if (data == NIL(char)) {
     return NIL(char);
   }
-  (void) memcpy(data, array->space, array->num * array->obj_size);
+  (void)memcpy(data, array->space, array->num * array->obj_size);
   return data;
 }
 
-
-int array_resize(array_t* array, int new_size)
-{
+int array_resize(array_t *array, int new_size) {
   int old_size;
   char *pos, *newspace;
 
@@ -200,19 +188,16 @@ int array_resize(array_t* array, int new_size)
     array->space = newspace;
   }
   pos = array->space + old_size * array->obj_size;
-  (void) memset(pos, 0, (array->n_size - old_size)*array->obj_size);
+  (void)memset(pos, 0, (array->n_size - old_size) * array->obj_size);
   return 1;
 }
 
-void array_sort(array_t* array, int (*compare)(const void*, const void*))
-{
+void array_sort(array_t *array, int (*compare)(const void *, const void *)) {
   qsort((void *)array->space, array->num, array->obj_size, compare);
 }
 
-void array_uniq(array_t* array,
-                int (*compare)(char**, char**),
-                void (*free_func)(char*))
-{
+void array_uniq(array_t *array, int (*compare)(char **, char **),
+                void (*free_func)(char *)) {
   int i, last;
   char *dest, *obj1, *obj2;
 
@@ -221,53 +206,55 @@ void array_uniq(array_t* array,
   obj2 = array->space + array->obj_size;
   last = array->num;
 
-  for(i = 1; i < last; i++) {
-    if ((*compare)((char **) obj1, (char **) obj2) != 0) {
+  for (i = 1; i < last; i++) {
+    if ((*compare)((char **)obj1, (char **)obj2) != 0) {
       if (dest != obj1) {
-        (void) memcpy(dest, obj1, array->obj_size);
+        (void)memcpy(dest, obj1, array->obj_size);
       }
       dest += array->obj_size;
     } else {
-      if (free_func != 0) (*free_func)(obj1);
+      if (free_func != 0)
+        (*free_func)(obj1);
       array->num--;
     }
     obj1 += array->obj_size;
     obj2 += array->obj_size;
   }
   if (dest != obj1) {
-    (void) memcpy(dest, obj1, array->obj_size);
+    (void)memcpy(dest, obj1, array->obj_size);
   }
 }
 
-int array_abort(const array_t* a, int i)
-{
+int array_abort(const array_t *a, int i) {
   switch (i) {
 
-  case 0:           /* index error on insert */
+  case 0: /* index error on insert */
     error_unreachable_code_msg("array_t: insert of %d\n", a->index);
     break;
 
-  case 1:           /* index error on fetch */
+  case 1: /* index error on fetch */
     error_unreachable_code_msg("array_t: fetch index %d not in [0,%d]\n",
-                               a->e_index, a->num-1);
+                               a->e_index, a->num - 1);
     break;
 
-  case 2:           /* append with different element sizes */
-    error_unreachable_code_msg("array_t: append undefined for arrays of different sizes\n");
+  case 2: /* append with different element sizes */
+    error_unreachable_code_msg(
+        "array_t: append undefined for arrays of different sizes\n");
     break;
 
-  case 3:           /* join with different element sizes */
-    error_unreachable_code_msg("array_t: join not defined for arrays of different sizes\n");
+  case 3: /* join with different element sizes */
+    error_unreachable_code_msg(
+        "array_t: join not defined for arrays of different sizes\n");
     break;
 
-  case 4:           /* size error or locked error */
+  case 4: /* size error or locked error */
     if (a->index >= 0) {
       /* Since array_insert is a macro, it is not allowed to nest a
          call to any routine which might move the array space through
          a realloc or free inside an array_insert call. */
-      error_unreachable_code_msg("array_t: nested insert, append, or free operations\n");
-    }
-    else {
+      error_unreachable_code_msg(
+          "array_t: nested insert, append, or free operations\n");
+    } else {
       error_unreachable_code_msg("array_t: object size mismatch\n");
     }
     break;

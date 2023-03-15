@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -39,7 +39,6 @@
   the RBC layer. Look at them as a possible template and example.
 
 */
-
 
 #ifndef __NUSMV_CORE_BE_BE_MANAGER_INT_H__
 #define __NUSMV_CORE_BE_BE_MANAGER_INT_H__
@@ -61,25 +60,22 @@
 typedef struct Be_Manager_TAG {
   NuSMVEnv_ptr environment;
 
-  void* spec_manager; /* the low-level manager */
-  void* support_data; /* any support structure can be stored here */
+  void *spec_manager; /* the low-level manager */
+  void *support_data; /* any support structure can be stored here */
 
   /* Gateway: */
-  Be_Spec2Be_fun       spec2be_converter;
-  Be_Be2Spec_fun       be2spec_converter;
+  Be_Spec2Be_fun spec2be_converter;
+  Be_Be2Spec_fun be2spec_converter;
 
 } Be_Manager;
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -105,11 +101,9 @@ typedef struct Be_Manager_TAG {
 
   \sa Be_RbcManager_Create, Be_Manager_Delete
 */
-Be_Manager_ptr
-Be_Manager_Create(const NuSMVEnv_ptr env,
-                  void* spec_manager,
-                  Be_Spec2Be_fun      spec2be_converter,
-                  Be_Be2Spec_fun      be2spec_converter);
+Be_Manager_ptr Be_Manager_Create(const NuSMVEnv_ptr env, void *spec_manager,
+                                 Be_Spec2Be_fun spec2be_converter,
+                                 Be_Be2Spec_fun be2spec_converter);
 
 /*!
   \methodof Be_Manager
@@ -138,7 +132,7 @@ void Be_Manager_Delete(Be_Manager_ptr self);
 
   \sa Be_Manager_SetData
 */
-void* Be_Manager_GetData(const Be_Manager_ptr self);
+void *Be_Manager_GetData(const Be_Manager_ptr self);
 
 /*!
   \methodof Be_Manager
@@ -152,11 +146,8 @@ void* Be_Manager_GetData(const Be_Manager_ptr self);
 
   \sa Be_Manager_GetData
 */
-void  Be_Manager_SetData(Be_Manager_ptr self, void* data);
-
+void Be_Manager_SetData(Be_Manager_ptr self, void *data);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_BE_BE_MANAGER_INT_H__ */
-
-

@@ -34,17 +34,14 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_PROP_PROP_REWRITER_H__
 #define __NUSMV_CORE_PROP_PROP_REWRITER_H__
 
-
-#include "nusmv/core/utils/object.h"
-#include "nusmv/core/utils/defs.h"
-#include "nusmv/core/prop/Prop.h"
-#include "nusmv/core/wff/wffRewrite.h"
 #include "nusmv/core/fsm/fsm.h"
+#include "nusmv/core/prop/Prop.h"
+#include "nusmv/core/utils/defs.h"
+#include "nusmv/core/utils/object.h"
+#include "nusmv/core/wff/wffRewrite.h"
 
 /*!
   \struct Prop_Rewriter
@@ -52,7 +49,7 @@
 
 
 */
-typedef struct Prop_Rewriter_TAG*  Prop_Rewriter_ptr;
+typedef struct Prop_Rewriter_TAG *Prop_Rewriter_ptr;
 
 /*!
   \brief To cast and check instances of class Prop_Rewriter
@@ -60,18 +57,15 @@ typedef struct Prop_Rewriter_TAG*  Prop_Rewriter_ptr;
   These macros must be used respectively to cast and to check
   instances of class Prop_Rewriter
 */
-#define PROP_REWRITER(self) \
-         ((Prop_Rewriter_ptr) self)
+#define PROP_REWRITER(self) ((Prop_Rewriter_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PROP_REWRITER_CHECK_INSTANCE(self) \
-         (nusmv_assert(PROP_REWRITER(self) != PROP_REWRITER(NULL)))
-
-
+#define PROP_REWRITER_CHECK_INSTANCE(self)                                     \
+  (nusmv_assert(PROP_REWRITER(self) != PROP_REWRITER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -91,12 +85,10 @@ typedef struct Prop_Rewriter_TAG*  Prop_Rewriter_ptr;
 
   \sa Prop_Rewriter_destroy
 */
-Prop_Rewriter_ptr Prop_Rewriter_create(NuSMVEnv_ptr env,
-                                       Prop_ptr prop,
+Prop_Rewriter_ptr Prop_Rewriter_create(NuSMVEnv_ptr env, Prop_ptr prop,
                                        WffRewriteMethod method,
                                        WffRewriterExpectedProperty expprop,
-                                       FsmType fsm_type,
-                                       BddEnc_ptr bddenc);
+                                       FsmType fsm_type, BddEnc_ptr bddenc);
 
 /*!
   \methodof Prop_Rewriter
@@ -108,7 +100,6 @@ Prop_Rewriter_ptr Prop_Rewriter_create(NuSMVEnv_ptr env,
 */
 void Prop_Rewriter_destroy(Prop_Rewriter_ptr self);
 
-
 /* Getters and Setters ********************************************************/
 
 /*!
@@ -118,7 +109,6 @@ void Prop_Rewriter_destroy(Prop_Rewriter_ptr self);
   Getter for original property
 */
 Prop_ptr Prop_Rewriter_get_original_property(Prop_Rewriter_ptr self);
-
 
 /* Miscellaneous **************************************************************/
 
@@ -192,7 +182,5 @@ void Prop_Rewriter_ltl2invar_negate_property_to_true(Prop_Rewriter_ptr self);
 void Prop_Rewriter_ltl2invar_negate_property_to_false(Prop_Rewriter_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_PROP_PROP_REWRITER_H__ */

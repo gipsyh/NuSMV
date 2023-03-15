@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,8 +37,8 @@
 #ifndef __NUSMV_CORE_TRACE_TRACE_LABEL_H__
 #define __NUSMV_CORE_TRACE_TRACE_LABEL_H__
 
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/fsm/bdd/BddFsm.h"
+#include "nusmv/core/node/node.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -68,16 +68,15 @@ typedef node_ptr TraceLabel;
 
   \todo Missing description
 */
-#define TRACE_LABEL(x) \
-          ((node_ptr) x)
+#define TRACE_LABEL(x) ((node_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_LABEL_CHECK_INSTANCE(x) \
-          (nusmv_assert(TRACE_LABEL(x) != TRACE_LABEL(NULL)))
+#define TRACE_LABEL_CHECK_INSTANCE(x)                                          \
+  (nusmv_assert(TRACE_LABEL(x) != TRACE_LABEL(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -99,8 +98,7 @@ typedef node_ptr TraceLabel;
 
   \sa TraceLabel_create_from_string
 */
-TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr,
-                                    int trace_id, int state_id);
+TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr, int trace_id, int state_id);
 
 /*!
   \brief TraceLabel Constructor
@@ -113,19 +111,19 @@ TraceLabel TraceLabel_create(NodeMgr_ptr nodemgr,
   number.
 
   TODO[AMi] This function can be merged to similar code in traceCmd.c
-  
+
 
   \sa TraceLabel_create
 */
 TraceLabel TraceLabel_create_from_string(NodeMgr_ptr nodemgr,
-                                                const char* label_str);
+                                         const char *label_str);
 
 /* TraceLabel Getters */
 
 /*!
   \brief Returns the state index associated with the TraceLabel.
 
-  
+
 
   \sa TraceLabel_get_trace
 */
@@ -134,7 +132,7 @@ int TraceLabel_get_state(TraceLabel self);
 /*!
   \brief Returns the trace index associated with the TraceLabel.
 
-  
+
 
   \sa TraceLabel_get_state
 */

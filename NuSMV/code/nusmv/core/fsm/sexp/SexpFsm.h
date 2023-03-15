@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,42 +34,39 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_FSM_SEXP_SEXP_FSM_H__
 #define __NUSMV_CORE_FSM_SEXP_SEXP_FSM_H__
 
 #include "nusmv/core/fsm/sexp/sexp.h"
 #include "nusmv/core/wff/ExprMgr.h"
 
-#include "nusmv/core/set/set.h"
 #include "nusmv/core/compile/FlatHierarchy.h"
-#include "nusmv/core/compile/symb_table/SymbLayer.h"
 #include "nusmv/core/compile/PredicateNormaliser.h"
+#include "nusmv/core/compile/symb_table/SymbLayer.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
+#include "nusmv/core/set/set.h"
 
 /*!
   \struct SexpFsm
-  \brief The SexpFsm type 
+  \brief The SexpFsm type
 
-  The SexpFsm type 
+  The SexpFsm type
 */
-typedef struct SexpFsm_TAG* SexpFsm_ptr;
+typedef struct SexpFsm_TAG *SexpFsm_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SEXP_FSM(x) \
-         ((SexpFsm_ptr) x)
+#define SEXP_FSM(x) ((SexpFsm_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SEXP_FSM_CHECK_INSTANCE(x) \
-         (nusmv_assert(SEXP_FSM(x) != SEXP_FSM(NULL)))
+#define SEXP_FSM_CHECK_INSTANCE(x) (nusmv_assert(SEXP_FSM(x) != SEXP_FSM(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Public Function Interface                                                 */
@@ -85,15 +82,14 @@ typedef struct SexpFsm_TAG* SexpFsm_ptr;
   responsible for its destruction. Vars set is also copied, so the
   caller is responsible for its destruction (best if frozen)
 */
-SexpFsm_ptr
-SexpFsm_create(const FlatHierarchy_ptr hierarchy,
-               const Set_t vars_set);
+SexpFsm_ptr SexpFsm_create(const FlatHierarchy_ptr hierarchy,
+                           const Set_t vars_set);
 
 /*!
   \methodof SexpFsm
   \brief Copy costructor
 
-  
+
 */
 SexpFsm_ptr SexpFsm_copy(const SexpFsm_ptr self);
 
@@ -115,12 +111,13 @@ SexpFsm_ptr SexpFsm_copy(const SexpFsm_ptr self);
   Constrain: the given Sexp FSM has to be NOT boolean. Otherwise,
   it is meaningless to apply normalisation functions, since all the exporessions
   are already boolean.
-  
+
 
   \se SexpFsm_copy
 */
-SexpFsm_ptr SexpFsm_create_predicate_normalised_copy(const SexpFsm_ptr self,
-PredicateNormaliser_ptr normaliser);
+SexpFsm_ptr
+SexpFsm_create_predicate_normalised_copy(const SexpFsm_ptr self,
+                                         PredicateNormaliser_ptr normaliser);
 
 /* deconstructors */
 
@@ -128,7 +125,7 @@ PredicateNormaliser_ptr normaliser);
   \methodof SexpFsm
   \brief Destructor
 
-  
+
 */
 void SexpFsm_destroy(SexpFsm_ptr self);
 
@@ -150,7 +147,7 @@ SymbTable_ptr SexpFsm_get_symb_table(const SexpFsm_ptr self);
   Since a BoolSexpFsm derives from SexpFsm, a SexpFsm
                       is not necessarily a scalar fsm. Use this
                       method to distinguish scalar from boolean fsm
-                      when dealing with generic SexpFsm pointers. 
+                      when dealing with generic SexpFsm pointers.
 */
 boolean SexpFsm_is_boolean(const SexpFsm_ptr self);
 
@@ -166,15 +163,14 @@ boolean SexpFsm_is_boolean(const SexpFsm_ptr self);
   change self.  Also, notice that the SexpFsm constructor copies
   the passed hierarchy.
 */
-FlatHierarchy_ptr
-SexpFsm_get_hierarchy(const SexpFsm_ptr self);
+FlatHierarchy_ptr SexpFsm_get_hierarchy(const SexpFsm_ptr self);
 
 /*!
   \methodof SexpFsm
   \brief Returns an Expr that collects init states for all
   variables handled by self
 
-  
+
 */
 Expr_ptr SexpFsm_get_init(const SexpFsm_ptr self);
 
@@ -183,7 +179,7 @@ Expr_ptr SexpFsm_get_init(const SexpFsm_ptr self);
   \brief Returns an Expr that collects invar states for all
   variables handled by self
 
-  
+
 */
 Expr_ptr SexpFsm_get_invar(const SexpFsm_ptr self);
 
@@ -192,7 +188,7 @@ Expr_ptr SexpFsm_get_invar(const SexpFsm_ptr self);
   \brief Returns an Expr that collects all next states for all
   variables handled by self
 
-  
+
 */
 Expr_ptr SexpFsm_get_trans(const SexpFsm_ptr self);
 
@@ -201,27 +197,27 @@ Expr_ptr SexpFsm_get_trans(const SexpFsm_ptr self);
   \brief Returns an Expr that collects all input states for all
   variables handled by self
 
-  
+
 */
 Expr_ptr SexpFsm_get_input(const SexpFsm_ptr self);
 
 /*!
   \methodof SexpFsm
   \brief  Gets the list of sexp expressions defining the set of justice
-                  constraints for this machine. 
+                  constraints for this machine.
 
    Gets the list of sexp expressions defining the set of justice
-                  constraints for this machine. 
+                  constraints for this machine.
 */
 node_ptr SexpFsm_get_justice(const SexpFsm_ptr self);
 
 /*!
   \methodof SexpFsm
   \brief  Gets the list of sexp expressions defining the set of
-                  compassion constraints for this machine. 
+                  compassion constraints for this machine.
 
    Gets the list of sexp expressions defining the set of
-                  compassion constraints for this machine. 
+                  compassion constraints for this machine.
 */
 node_ptr SexpFsm_get_compassion(const SexpFsm_ptr self);
 
@@ -257,9 +253,7 @@ Set_t SexpFsm_get_vars(const SexpFsm_ptr self);
 
   \se self will change
 */
-void
-SexpFsm_apply_synchronous_product(SexpFsm_ptr self,
-                                  SexpFsm_ptr other);
+void SexpFsm_apply_synchronous_product(SexpFsm_ptr self, SexpFsm_ptr other);
 
 /*!
   \methodof SexpFsm
@@ -270,59 +264,53 @@ SexpFsm_apply_synchronous_product(SexpFsm_ptr self,
                        COMPASSION to be empty (ie: True Expr). In this
                        case returns true, false otherwise
 */
-boolean
-SexpFsm_is_syntactically_universal(SexpFsm_ptr self);
+boolean SexpFsm_is_syntactically_universal(SexpFsm_ptr self);
 
 /*!
   \methodof SexpFsm
   \brief  Gets the sexp expression defining the initial state for
-                  the variable "v". 
+                  the variable "v".
 
    Gets the sexp expression defining the initial state for
-                  the variable "v". 
+                  the variable "v".
 */
-Expr_ptr
-SexpFsm_get_var_init(const SexpFsm_ptr self, node_ptr v);
+Expr_ptr SexpFsm_get_var_init(const SexpFsm_ptr self, node_ptr v);
 
 /*!
   \methodof SexpFsm
   \brief  Gets the sexp expression defining the state constraints
-                  for the variable "v". 
+                  for the variable "v".
 
    Gets the sexp expression defining the state constraints
-                  for the variable "v". 
+                  for the variable "v".
 */
-Expr_ptr
-SexpFsm_get_var_invar(const SexpFsm_ptr self, node_ptr v);
+Expr_ptr SexpFsm_get_var_invar(const SexpFsm_ptr self, node_ptr v);
 
 /*!
   \methodof SexpFsm
   \brief  Gets the sexp expression defining the transition relation
-                  for the variable "v". 
+                  for the variable "v".
 
    Gets the sexp expression defining the transition relation
-                  for the variable "v". 
+                  for the variable "v".
 */
-Expr_ptr
-SexpFsm_get_var_trans(const SexpFsm_ptr self, node_ptr v);
+Expr_ptr SexpFsm_get_var_trans(const SexpFsm_ptr self, node_ptr v);
 
 /*!
   \methodof SexpFsm
   \brief  Gets the sexp expression defining the input relation
-                  for the variable "v". 
+                  for the variable "v".
 
-  
+
 */
-Expr_ptr
-SexpFsm_get_var_input(const SexpFsm_ptr self, node_ptr v);
+Expr_ptr SexpFsm_get_var_input(const SexpFsm_ptr self, node_ptr v);
 
 /*!
   \methodof SexpFsm
   \brief Self-check for the instance
 
-  
+
 */
 void SexpFsm_self_check(const SexpFsm_ptr self);
-
 
 #endif /* __NUSMV_CORE_FSM_SEXP_SEXP_FSM_H__ */

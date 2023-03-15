@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,18 +35,17 @@
 
 */
 
-
 #ifndef __NUSMV_SHELL_BMC_BMC_CMD_H__
 #define __NUSMV_SHELL_BMC_BMC_CMD_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/prop/Prop.h" /* for Prop_type type */
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/sat/sat.h"
 #include "nusmv/core/utils/bmc_profiler.h"
+#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/watchdog_util.h"
 
 /*!
@@ -79,7 +78,7 @@
 /*!
   \brief Adds all bmc-related commands to the interactive shell
 
-  
+
 
   \sa CInit_Init
 */
@@ -99,10 +98,8 @@ void Bmc_Cmd_quit(NuSMVEnv_ptr env);
 
   \se l is changed
 */
-Outcome Bmc_Cmd_compute_rel_loop(NuSMVEnv_ptr const env,
-                                        int* const rel_loop,
-                                        const char* str_loop,
-                                        const int k);
+Outcome Bmc_Cmd_compute_rel_loop(NuSMVEnv_ptr const env, int *const rel_loop,
+                                 const char *str_loop, const int k);
 
 /*!
   \command{bmc_setup} Builds the model in a Boolean Epression format.
@@ -118,7 +115,7 @@ Outcome Bmc_Cmd_compute_rel_loop(NuSMVEnv_ptr const env,
   </dl>
 
 */
-int Bmc_CommandBmcSetup(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandBmcSetup(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{bmc_simulate} Generates a trace of the model from 0 (zero) to k
@@ -171,7 +168,7 @@ int Bmc_CommandBmcSetup(NuSMVEnv_ptr env, int argc, char** argv);
     </dl>
 
 */
-int Bmc_CommandBmcSimulate(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandBmcSimulate(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{bmc_inc_simulate} Incrementally generates a trace of the model
@@ -230,15 +227,14 @@ int Bmc_CommandBmcSimulate(NuSMVEnv_ptr env, int argc, char** argv);
     </dl>
 
 */
-int
-Bmc_CommandBmcIncSimulate(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandBmcIncSimulate(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{bmc_pick_state} Picks a state from the set of initial states
 
   \command_args{[-h] [-v] \}
 
-  
+
 
   Chooses an element from the set of initial states, and makes it the
   <tt>current state</tt> (replacing the old one). The chosen state is
@@ -267,15 +263,15 @@ Bmc_CommandBmcIncSimulate(NuSMVEnv_ptr env, int argc, char** argv);
     <dt> <tt>-s trace.state</tt>
        <dd> Picks state from trace.state label. A new simulation trace will
        be created by copying prefix of the source trace up to specified state.
-  </dl> 
+  </dl>
 
 */
-int Bmc_CommandBmcPickState(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandBmcPickState(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
-  \command{bmc_simulate_check_feasible_constraints} Performs a feasibility check on the list of given
-  constraints. Constraints that are found to be feasible can be safely
-  assumed not to cause deadlocks if used in the following step of
+  \command{bmc_simulate_check_feasible_constraints} Performs a feasibility check
+  on the list of given constraints. Constraints that are found to be feasible
+  can be safely assumed not to cause deadlocks if used in the following step of
   incremental simulation.
 
   \command_args{[-h | -q] [-c "formula"]* }
@@ -300,8 +296,8 @@ int Bmc_CommandBmcPickState(NuSMVEnv_ptr env, int argc, char** argv);
   </dl>
 
 */
-int
-Bmc_CommandBmcSimulateCheckFeasibleConstraints(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandBmcSimulateCheckFeasibleConstraints(NuSMVEnv_ptr env, int argc,
+                                                   char **argv);
 
 /*!
   \command{gen_ltlspec_bmc} Dumps into one or more dimacs files the given LTL
@@ -378,16 +374,16 @@ Bmc_CommandBmcSimulateCheckFeasibleConstraints(NuSMVEnv_ptr env, int argc, char*
 
   \sa Bmc_CommandGenLtlSpecBmcOnePb, Bmc_GenSolveLtl
 */
-int Bmc_CommandGenLtlSpecBmc(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandGenLtlSpecBmc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
-  \command{gen_ltlspec_bmc_onepb} Dumps into one dimacs file the problem generated for
-  the given LTL specification, or for all LTL specifications if no formula
-  is explicitly given.
-  Generation and dumping parameters are the problem bound and the loopback
-  values
+  \command{gen_ltlspec_bmc_onepb} Dumps into one dimacs file the problem
+  generated for the given LTL specification, or for all LTL specifications if no
+  formula is explicitly given. Generation and dumping parameters are the problem
+  bound and the loopback values
 
-  \command_args{[-h | -n idx | -p "formula" [IN context] | -P "name"] [-k length]
+  \command_args{[-h | -n idx | -p "formula" [IN context] | -P "name"] [-k
+  length]
   [-l loopback] [-o filename]}
 
    As the <i>gen_ltlspec_bmc</i> command, but it generates
@@ -442,8 +438,7 @@ int Bmc_CommandGenLtlSpecBmc(NuSMVEnv_ptr env, int argc, char** argv);
 
   \sa Bmc_CommandGenLtlSpecBmc, Bmc_GenSolveLtl
 */
-int
-Bmc_CommandGenLtlSpecBmcOnePb(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandGenLtlSpecBmcOnePb(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{check_ltlspec_bmc} Checks the given LTL specification, or all LTL
@@ -453,7 +448,7 @@ Bmc_CommandGenLtlSpecBmcOnePb(NuSMVEnv_ptr env, int argc, char** argv);
   \command_args{[-h | -n idx | -p "formula" [IN context] | -P "name"]
   [-k max_length] [-l loopback] [-o filename]}
 
-  
+
   This command generates one or more problems, and calls
   SAT solver for each one. Each problem is related to a specific problem
   bound, which increases from zero (0) to the given maximum problem
@@ -515,12 +510,11 @@ Bmc_CommandGenLtlSpecBmcOnePb(NuSMVEnv_ptr env, int argc, char** argv);
 
   \sa Bmc_CommandCheckLtlSpecBmcOnePb, Bmc_GenSolveLtl
 */
-int
-Bmc_CommandCheckLtlSpecBmc(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandCheckLtlSpecBmc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
-  \command{check_ltlspec_bmc_onepb} Checks the given LTL specification, or all LTL
-  specifications if no formula is given. Checking parameters are the single
+  \command{check_ltlspec_bmc_onepb} Checks the given LTL specification, or all
+  LTL specifications if no formula is given. Checking parameters are the single
   problem bound and the loopback values
 
   \command_args{[-h | -n idx | -p "formula" [IN context] | -P "name"]
@@ -576,8 +570,7 @@ Bmc_CommandCheckLtlSpecBmc(NuSMVEnv_ptr env, int argc, char** argv);
 
   \sa Bmc_CommandCheckLtlSpecBmc, Bmc_GenSolveLtl
 */
-int
-Bmc_CommandCheckLtlSpecBmcOnePb(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandCheckLtlSpecBmcOnePb(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{gen_invar_bmc} Generates the given invariant, or all
@@ -617,7 +610,7 @@ Bmc_CommandCheckLtlSpecBmcOnePb(NuSMVEnv_ptr env, int argc, char** argv);
 
   \sa Bmc_GenSolveInvar
 */
-int Bmc_CommandGenInvarBmc(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandGenInvarBmc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{check_invar_bmc} Generates and solve the given invariant, or all
@@ -638,23 +631,18 @@ int Bmc_CommandGenInvarBmc(NuSMVEnv_ptr env, int argc, char** argv);
             <tt>context</tt> is the module instance name which the variables
             in <tt>formula</tt> must be evaluated in.
     <dt> <tt>-P name</tt>
-       <dd> Checks the INVARSPEC property with name <tt>name</tt> in the property
-            database.
-    <dt> <tt>-k <i>max_length</i></tt>
-       <dd> (Use only when selected algorithm is een-sorensson).
-            Use to specify the maximal deepth to be reached by the een-sorensson
-            invariant checking algorithm. If not specified, the value assigned
-            to the system variable <i>bmc_length</i> is taken.
-    <dt> <tt>-a <i>algorithm</i></tt>
-       <dd> Uses the specified algorithm to solve the invariant. If used, this
-            option will override system variable <i>bmc_invar_alg</i>.
-            At the moment, possible values are: "classic", "een-sorensson".
-    <dt> <tt>-e</i></tt>
-       <dd> Uses an additional step clause for algorithm "een-sorensson".</tt>
-       <dd> <i>filename</i> is the name of the dumped dimacs file, without
-       extension. <BR>
-       It may contain special symbols which will be macro-expanded to form
-       the real file name. Possible symbols are: <BR>
+       <dd> Checks the INVARSPEC property with name <tt>name</tt> in the
+  property database. <dt> <tt>-k <i>max_length</i></tt> <dd> (Use only when
+  selected algorithm is een-sorensson). Use to specify the maximal deepth to be
+  reached by the een-sorensson invariant checking algorithm. If not specified,
+  the value assigned to the system variable <i>bmc_length</i> is taken. <dt>
+  <tt>-a <i>algorithm</i></tt> <dd> Uses the specified algorithm to solve the
+  invariant. If used, this option will override system variable
+  <i>bmc_invar_alg</i>. At the moment, possible values are: "classic",
+  "een-sorensson". <dt> <tt>-e</i></tt> <dd> Uses an additional step clause for
+  algorithm "een-sorensson".</tt> <dd> <i>filename</i> is the name of the dumped
+  dimacs file, without extension. <BR> It may contain special symbols which will
+  be macro-expanded to form the real file name. Possible symbols are: <BR>
        - @F: model name with path part <BR>
        - @f: model name without path part <BR>
        - @n: index of the currently processed formula in the properties
@@ -664,7 +652,7 @@ int Bmc_CommandGenInvarBmc(NuSMVEnv_ptr env, int argc, char** argv);
 
   \sa Bmc_GenSolveInvar
 */
-int Bmc_CommandCheckInvarBmc(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandCheckInvarBmc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \brief Bmc commands options handling for commands (optionally)
@@ -696,22 +684,15 @@ int Bmc_CommandCheckInvarBmc(NuSMVEnv_ptr env, int argc, char** argv);
   Returns OUTCOME_GENERIC_ERROR if an error has occurred;
   Returns OUTCOME_SUCCESS_REQUIRED_HELP if -h options had been specified;
   Returns OUTCOME_SUCCESS in all other cases.
-  
+
 
   \se Result parameters might change
 */
-Outcome
-Bmc_cmd_options_handling(NuSMVEnv_ptr env, int argc, char** argv,
-                         Prop_Type prop_type,
-                         Prop_ptr* res_prop,
-                         int* res_k,
-                         int* res_l,
-                         char** res_a,
-                         char** res_s,
-                         char** res_o,
-                         boolean* res_e,
-                         int *res_step_k);
-
+Outcome Bmc_cmd_options_handling(NuSMVEnv_ptr env, int argc, char **argv,
+                                 Prop_Type prop_type, Prop_ptr *res_prop,
+                                 int *res_k, int *res_l, char **res_a,
+                                 char **res_s, char **res_o, boolean *res_e,
+                                 int *res_step_k);
 
 #if NUSMV_HAVE_INCREMENTAL_SAT
 
@@ -723,7 +704,7 @@ Bmc_cmd_options_handling(NuSMVEnv_ptr env, int argc, char** argv,
   \command_args{[-h | -n idx | -p "formula" [IN context] | -P "name"]
   [-k max_length] [-l loopback] }
 
-  
+
   This command generates one or more problems, and calls (incremental)
   SAT solver for each one. Each problem is related to a specific problem
   bound, which increases from zero (0) to the given maximum problem
@@ -771,8 +752,7 @@ Bmc_cmd_options_handling(NuSMVEnv_ptr env, int argc, char** argv,
 
   \sa Bmc_CommandCheckLtlSpecBmcOnePb, Bmc_CommandCheckLtlSpecBmc
 */
-int
-Bmc_CommandCheckLtlSpecBmcInc(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandCheckLtlSpecBmcInc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{check_invar_bmc_inc} Generates and solve the given invariant, or all
@@ -793,35 +773,28 @@ Bmc_CommandCheckLtlSpecBmcInc(NuSMVEnv_ptr env, int argc, char** argv);
             <tt>context</tt> is the module instance name which the variables
             in <tt>formula</tt> must be evaluated in.
     <dt> <tt>-P name</tt>
-       <dd> Checks the INVARSPEC property with name <tt>name</tt> in the property
-            database.
-    <dt> <tt>-k <i>max_length</i></tt>
-       <dd> Use to specify the maximal depth to be reached by the incremental
-            invariant checking algorithm. If not specified, the value assigned
-            to the system variable <i>bmc_length</i> is taken.
-    <dt> <tt>-a <i>algorithm</i></tt>
-       <dd> Use to specify incremental invariant checking algorithm. Currently
-            this can be one of the following values: dual, zigzag,
-            falsification.
-    <dt> <tt>-s <i>strategy</i></tt>
-       <dd> Use to specify closure strategy (this currenly applies to dual
-       algorithm only). This can be one of the following values: backward,
-       forward.
+       <dd> Checks the INVARSPEC property with name <tt>name</tt> in the
+  property database. <dt> <tt>-k <i>max_length</i></tt> <dd> Use to specify the
+  maximal depth to be reached by the incremental invariant checking algorithm.
+  If not specified, the value assigned to the system variable <i>bmc_length</i>
+  is taken. <dt> <tt>-a <i>algorithm</i></tt> <dd> Use to specify incremental
+  invariant checking algorithm. Currently this can be one of the following
+  values: dual, zigzag, falsification. <dt> <tt>-s <i>strategy</i></tt> <dd> Use
+  to specify closure strategy (this currenly applies to dual algorithm only).
+  This can be one of the following values: backward, forward.
   </dl>
 
   \sa Bmc_CommandCheckInvarBmc
 */
-int
-Bmc_CommandCheckInvarBmcInc(NuSMVEnv_ptr env, int argc, char** argv);
+int Bmc_CommandCheckInvarBmcInc(NuSMVEnv_ptr env, int argc, char **argv);
 #endif
 
-
 #if NUSMV_HAVE_BMC_PROFILER_LIBRARY
-int Bmc_CommandProfile(NuSMVEnv_ptr env, int argc, char ** argv);
+int Bmc_CommandProfile(NuSMVEnv_ptr env, int argc, char **argv);
 #endif
 
 #if NUSMV_HAVE_WATCHDOG_LIBRARY
-int Bmc_CommandWatchdog(NuSMVEnv_ptr env, int argc, char ** argv);
+int Bmc_CommandWatchdog(NuSMVEnv_ptr env, int argc, char **argv);
 #endif
 
 /**AutomaticEnd***************************************************************/

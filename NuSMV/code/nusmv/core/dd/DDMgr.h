@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_DD_DDMGR_H__
 #define __NUSMV_CORE_DD_DDMGR_H__
-
 
 #include "cudd/cudd.h"
 #include "nusmv/core/utils/EnvObject.h"
@@ -48,9 +45,9 @@
   \struct DDMgr
   \brief Definition of the public accessor for class DDMgr
 
-  
+
 */
-typedef struct DDMgr_TAG*  DDMgr_ptr;
+typedef struct DDMgr_TAG *DDMgr_ptr;
 
 /*!
   \brief To cast and check instances of class DDMgr
@@ -58,18 +55,14 @@ typedef struct DDMgr_TAG*  DDMgr_ptr;
   These macros must be used respectively to cast and to check
   instances of class DDMgr
 */
-#define DD_MGR(self) \
-         ((DDMgr_ptr) self)
+#define DD_MGR(self) ((DDMgr_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DD_MGR_CHECK_INSTANCE(self) \
-         (nusmv_assert(DD_MGR(self) != DD_MGR(NULL)))
-
-
+#define DD_MGR_CHECK_INSTANCE(self) (nusmv_assert(DD_MGR(self) != DD_MGR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -106,10 +99,8 @@ void DDMgr_destroy(DDMgr_ptr self);
 
   \sa DDMgr_create
 */
-DdManager* DDMgr_get_dd_manager(const DDMgr_ptr self);
+DdManager *DDMgr_get_dd_manager(const DDMgr_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_DD_DDMGR_H__ */

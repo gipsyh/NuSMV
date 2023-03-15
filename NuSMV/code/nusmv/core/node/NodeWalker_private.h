@@ -34,20 +34,16 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_NODE_WALKER_PRIVATE_H__
 #define __NUSMV_CORE_NODE_NODE_WALKER_PRIVATE_H__
 
-
-#include "nusmv/core/node/NodeWalker.h"
 #include "nusmv/core/node/MasterNodeWalker.h"
+#include "nusmv/core/node/NodeWalker.h"
 
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/array.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \brief NodeWalker class definition derived from
@@ -58,26 +54,23 @@
   \sa Base class Object
 */
 
-typedef struct NodeWalker_TAG
-{
+typedef struct NodeWalker_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-  char* name;
+  char *name;
   int low;
   size_t num;
   boolean can_handle_null;
 
   MasterNodeWalker_ptr master;
 
-  array_t* node_transformations;
+  array_t *node_transformations;
 
 } NodeWalker;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
@@ -102,10 +95,8 @@ typedef struct NodeWalker_TAG
 
   \sa NodeWalker_destroy
 */
-NodeWalker_ptr NodeWalker_create(const NuSMVEnv_ptr env,
-                                        const char* name,
-                                        int low, size_t num,
-                                        boolean can_handle_null);
+NodeWalker_ptr NodeWalker_create(const NuSMVEnv_ptr env, const char *name,
+                                 int low, size_t num, boolean can_handle_null);
 
 /*!
   \methodof NodeWalker
@@ -115,10 +106,9 @@ NodeWalker_ptr NodeWalker_create(const NuSMVEnv_ptr env,
 
   \sa NodeWalker_create
 */
-void
-node_walker_init(NodeWalker_ptr self, const NuSMVEnv_ptr env,
-                 const char* name, int low, size_t num,
-                 boolean can_handle_null);
+void node_walker_init(NodeWalker_ptr self, const NuSMVEnv_ptr env,
+                      const char *name, int low, size_t num,
+                      boolean can_handle_null);
 
 /*!
   \methodof NodeWalker
@@ -138,9 +128,7 @@ void node_walker_deinit(NodeWalker_ptr self);
   If already assigned to a master, it unregisters itself
   from the old master before setting the new master
 */
-void
-node_walker_set_master(NodeWalker_ptr self,
-                       MasterNodeWalker_ptr master);
+void node_walker_set_master(NodeWalker_ptr self, MasterNodeWalker_ptr master);
 
 /*!
   \methodof NodeWalker
@@ -150,9 +138,7 @@ node_walker_set_master(NodeWalker_ptr self,
   only the first registered walker that can handle null case will be
   called to handle the null node.
 */
-boolean
-node_walker_can_handle_null_node(const NodeWalker_ptr self);
-
+boolean node_walker_can_handle_null_node(const NodeWalker_ptr self);
 
 /*! \methodof NodeWalker
 

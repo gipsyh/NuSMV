@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
   classes to store and maipulate transition relation in bdd form
 
 */
-
 
 #ifndef __NUSMV_CORE_TRANS_BDD_BDD_TRANS_H__
 #define __NUSMV_CORE_TRANS_BDD_BDD_TRANS_H__
@@ -54,26 +53,24 @@
   \struct BddTrans
   \brief The structure used to represent the transition relation.
 
-  
+
 */
-typedef struct BddTrans_TAG* BddTrans_ptr;
+typedef struct BddTrans_TAG *BddTrans_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_TRANS(x)  \
-        ((BddTrans_ptr) x)
+#define BDD_TRANS(x) ((BddTrans_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_TRANS_CHECK_INSTANCE(x)  \
-        (nusmv_assert(BDD_TRANS(x) != BDD_TRANS(NULL)))
-
+#define BDD_TRANS_CHECK_INSTANCE(x)                                            \
+  (nusmv_assert(BDD_TRANS(x) != BDD_TRANS(NULL)))
 
 /*!
   \brief This is enumeration of possible kinds of image computations
@@ -95,8 +92,6 @@ typedef enum TransImageKind_TAG {
   TRANS_IMAGE_BACKWARD_STATE_INPUT = 3
 } TransImageKind;
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
@@ -116,12 +111,12 @@ typedef enum TransImageKind_TAG {
   Thus 0 is returned iff the image is to return
   both state and input vars
 */
-#define TRANS_IMAGE_IS_STATE_ONLY(kind) (!((kind) & 1))
+#define TRANS_IMAGE_IS_STATE_ONLY(kind) (!((kind)&1))
 
 /* ---------------------------------------------------------------------- */
 /* Enable this to auto-check trans after creation                         */
 #if 0
-# define TRANS_DEBUG_THRESHOLD
+#define TRANS_DEBUG_THRESHOLD
 #endif
 /* ---------------------------------------------------------------------- */
 
@@ -141,14 +136,12 @@ typedef enum TransImageKind_TAG {
 
   \sa BddTrans_generic_create
 */
-BddTrans_ptr
-BddTrans_create(DDMgr_ptr dd_manager,
-                const ClusterList_ptr clusters_bdd,
-                bdd_ptr state_vars_cube,
-                bdd_ptr input_vars_cube,
-                bdd_ptr next_state_vars_cube,
-                const TransType trans_type,
-                const ClusterOptions_ptr cl_options);
+BddTrans_ptr BddTrans_create(DDMgr_ptr dd_manager,
+                             const ClusterList_ptr clusters_bdd,
+                             bdd_ptr state_vars_cube, bdd_ptr input_vars_cube,
+                             bdd_ptr next_state_vars_cube,
+                             const TransType trans_type,
+                             const ClusterOptions_ptr cl_options);
 
 /*!
   \brief Builds the transition relation
@@ -160,38 +153,31 @@ BddTrans_create(DDMgr_ptr dd_manager,
 
   All the parameters are used just to set up struct BddTrans_TAG.
   See it for the description of, and constraints on, the parameters.
-  
+
 */
-BddTrans_ptr
-BddTrans_generic_create(
-                        const NuSMVEnv_ptr env,
-                        const TransType trans_type,
-                        void* transition,
-                        void* (*copy)(void* tranistion),
-                        void  (*destroy)(void* tranistion),
-                        bdd_ptr (*compute_image)(void* tranistion,
-                                                 bdd_ptr bdd, TransImageKind kind),
-                        bdd_ptr (*compute_k_image)(void* tranistion,
-                                                   bdd_ptr bdd, int k,
-                                                   TransImageKind kind),
-                        bdd_ptr (*get_monolithic_bdd)(void* tranistion),
-                        void (*synchronous_product)(void* tranistion1,
-                                                    void* const transition2),
-                        void (*print_short_info)(void* tranistion, FILE* file),
-                        ClusterList_ptr (*trans_get_clusterlist)(void* transition));
+BddTrans_ptr BddTrans_generic_create(
+    const NuSMVEnv_ptr env, const TransType trans_type, void *transition,
+    void *(*copy)(void *tranistion), void (*destroy)(void *tranistion),
+    bdd_ptr (*compute_image)(void *tranistion, bdd_ptr bdd,
+                             TransImageKind kind),
+    bdd_ptr (*compute_k_image)(void *tranistion, bdd_ptr bdd, int k,
+                               TransImageKind kind),
+    bdd_ptr (*get_monolithic_bdd)(void *tranistion),
+    void (*synchronous_product)(void *tranistion1, void *const transition2),
+    void (*print_short_info)(void *tranistion, FILE *file),
+    ClusterList_ptr (*trans_get_clusterlist)(void *transition));
 
 /*!
   \methodof BddTrans
   \brief Performs the synchronous product between two trans
 
   The result goes into self and contained forward and backward
-  cluster lists would be rescheduled. Other will remain unchanged. 
+  cluster lists would be rescheduled. Other will remain unchanged.
 
   \se self will change
 */
-void
-BddTrans_apply_synchronous_product(BddTrans_ptr self,
-                                   const BddTrans_ptr other);
+void BddTrans_apply_synchronous_product(BddTrans_ptr self,
+                                        const BddTrans_ptr other);
 
 /*!
   \methodof BddTrans
@@ -205,8 +191,7 @@ BddTrans_apply_synchronous_product(BddTrans_ptr self,
 
   \se self will change
 */
-bdd_ptr
-BddTrans_get_monolithic_bdd(const BddTrans_ptr self);
+bdd_ptr BddTrans_get_monolithic_bdd(const BddTrans_ptr self);
 
 /*!
   \methodof BddTrans
@@ -215,8 +200,7 @@ BddTrans_get_monolithic_bdd(const BddTrans_ptr self);
 
   Invoker has to free the returned clusterlist
 */
-ClusterList_ptr
-BddTrans_get_clusterlist(const BddTrans_ptr self);
+ClusterList_ptr BddTrans_get_clusterlist(const BddTrans_ptr self);
 
 /*!
   \methodof BddTrans
@@ -227,8 +211,7 @@ BddTrans_get_clusterlist(const BddTrans_ptr self);
 
   \se self keeps the ownership of the returned instance.
 */
-bdd_ptr
-BddTrans_get_forward_image_state(const BddTrans_ptr self, bdd_ptr s);
+bdd_ptr BddTrans_get_forward_image_state(const BddTrans_ptr self, bdd_ptr s);
 
 /*!
   \methodof BddTrans
@@ -237,9 +220,8 @@ BddTrans_get_forward_image_state(const BddTrans_ptr self, bdd_ptr s);
 
   Returned bdd is referenced
 */
-bdd_ptr
-BddTrans_get_forward_image_state_input(const BddTrans_ptr self,
-                                       bdd_ptr s);
+bdd_ptr BddTrans_get_forward_image_state_input(const BddTrans_ptr self,
+                                               bdd_ptr s);
 
 /*!
   \methodof BddTrans
@@ -248,8 +230,7 @@ BddTrans_get_forward_image_state_input(const BddTrans_ptr self,
 
   Returned bdd is referenced
 */
-bdd_ptr
-BddTrans_get_backward_image_state(const BddTrans_ptr self, bdd_ptr s);
+bdd_ptr BddTrans_get_backward_image_state(const BddTrans_ptr self, bdd_ptr s);
 
 /*!
   \methodof BddTrans
@@ -258,9 +239,8 @@ BddTrans_get_backward_image_state(const BddTrans_ptr self, bdd_ptr s);
 
   Returned bdd is referenced
 */
-bdd_ptr
-BddTrans_get_backward_image_state_input(const BddTrans_ptr self,
-                                        bdd_ptr s);
+bdd_ptr BddTrans_get_backward_image_state_input(const BddTrans_ptr self,
+                                                bdd_ptr s);
 
 /*!
   \methodof BddTrans
@@ -271,9 +251,8 @@ BddTrans_get_backward_image_state_input(const BddTrans_ptr self,
 
   \se self keeps the ownership of the returned instance.
 */
-bdd_ptr
-BddTrans_get_k_forward_image_state(const BddTrans_ptr self,
-                                   bdd_ptr s, int k);
+bdd_ptr BddTrans_get_k_forward_image_state(const BddTrans_ptr self, bdd_ptr s,
+                                           int k);
 
 /*!
   \methodof BddTrans
@@ -282,9 +261,8 @@ BddTrans_get_k_forward_image_state(const BddTrans_ptr self,
 
   Returned bdd is referenced
 */
-bdd_ptr
-BddTrans_get_k_forward_image_state_input(const BddTrans_ptr self,
-                                         bdd_ptr s, int k);
+bdd_ptr BddTrans_get_k_forward_image_state_input(const BddTrans_ptr self,
+                                                 bdd_ptr s, int k);
 
 /*!
   \methodof BddTrans
@@ -293,9 +271,8 @@ BddTrans_get_k_forward_image_state_input(const BddTrans_ptr self,
 
   Returned bdd is referenced
 */
-bdd_ptr
-BddTrans_get_k_backward_image_state(const BddTrans_ptr self,
-                                    bdd_ptr s, int k);
+bdd_ptr BddTrans_get_k_backward_image_state(const BddTrans_ptr self, bdd_ptr s,
+                                            int k);
 
 /*!
   \methodof BddTrans
@@ -304,9 +281,8 @@ BddTrans_get_k_backward_image_state(const BddTrans_ptr self,
 
   Returned bdd is referenced
 */
-bdd_ptr
-BddTrans_get_k_backward_image_state_input(const BddTrans_ptr self,
-                                            bdd_ptr s, int k);
+bdd_ptr BddTrans_get_k_backward_image_state_input(const BddTrans_ptr self,
+                                                  bdd_ptr s, int k);
 
 /*!
   \methodof BddTrans
@@ -315,9 +291,6 @@ BddTrans_get_k_backward_image_state_input(const BddTrans_ptr self,
   Prints info about the size of each cluster in
   forward/backward transition relations
 */
-void BddTrans_print_short_info(const BddTrans_ptr self,
-                                      FILE* file);
-
-
+void BddTrans_print_short_info(const BddTrans_ptr self, FILE *file);
 
 #endif /* __NUSMV_CORE_TRANS_BDD_BDD_TRANS_H__ */

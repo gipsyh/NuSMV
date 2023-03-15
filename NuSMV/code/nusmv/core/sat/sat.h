@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -30,28 +30,26 @@
   \author Andrei Tchaltsev, Roberto Cavada
   \brief The public interface for the <tt>sat</tt> package
 
-  This package contains the generic interface to access 
-  to sat solvers. A set of specific Sat solvers implementation are internally 
+  This package contains the generic interface to access
+  to sat solvers. A set of specific Sat solvers implementation are internally
   kept, and are not accessible
 
 */
-
-
 
 #ifndef __NUSMV_CORE_SAT_SAT_H__
 #define __NUSMV_CORE_SAT_SAT_H__
 
 /* ====================================================================== */
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/sat/SatSolver.h"
 #include "nusmv/core/sat/SatIncSolver.h"
+#include "nusmv/core/sat/SatSolver.h"
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
@@ -59,7 +57,6 @@
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -69,7 +66,7 @@
   \brief A flag indicating that there is at least one incremental
   SAT solver
 
-  
+
 */
 
 #ifdef NUSMV_HAVE_INCREMENTAL_SAT
@@ -88,7 +85,6 @@
 #define NUSMV_HAVE_INCREMENTAL_SAT 0
 #endif
 
-
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
@@ -100,7 +96,7 @@
   if requested sat solver is not available.
 */
 SatSolver_ptr Sat_CreateNonIncSolver(const NuSMVEnv_ptr env,
-                                            const char* satSolver);
+                                     const char *satSolver);
 
 /*!
   \brief Creates a SAT solver (non-incremental) of a given
@@ -111,7 +107,7 @@ SatSolver_ptr Sat_CreateNonIncSolver(const NuSMVEnv_ptr env,
   available only with MiniSat.
 */
 SatSolver_ptr Sat_CreateNonIncProofSolver(const NuSMVEnv_ptr env,
-                                                 const char* satSolver);
+                                          const char *satSolver);
 
 /*!
   \brief Creates an incremental SAT solver instance of a given
@@ -121,7 +117,7 @@ SatSolver_ptr Sat_CreateNonIncProofSolver(const NuSMVEnv_ptr env,
   if requested sat solver is not available.
 */
 SatIncSolver_ptr Sat_CreateIncSolver(const NuSMVEnv_ptr env,
-                                            const char* satSolver);
+                                     const char *satSolver);
 
 /*!
   \brief Creates an incremental proof logging SAT solver instance
@@ -131,28 +127,28 @@ SatIncSolver_ptr Sat_CreateIncSolver(const NuSMVEnv_ptr env,
   if requested sat solver is not available.
 */
 SatIncSolver_ptr Sat_CreateIncProofSolver(const NuSMVEnv_ptr env,
-                                                 const char* satSolver);
+                                          const char *satSolver);
 
 /*!
   \brief Given a string representing the name of a sat solver,
   returns a normalized solver name -- just potential changes in character cases
-  
+
 
   In case of an error, if an input string does not
   represented any solver, returns (const char*) NULL. Returned string
   must not be freed.
 */
-const char* Sat_NormalizeSatSolverName(const char* solverName);
+const char *Sat_NormalizeSatSolverName(const char *solverName);
 
 /*!
   \brief Prints out the sat solvers names the system currently
   supplies
 
-  
+
 
   \sa Sat_GetAvailableSolversString
 */
-void Sat_PrintAvailableSolvers(FILE* file);
+void Sat_PrintAvailableSolvers(FILE *file);
 
 /*!
   \brief Retrieves a string with the sat solvers names the
@@ -162,8 +158,7 @@ void Sat_PrintAvailableSolvers(FILE* file);
 
   \sa Sat_PrintAvailableSolvers
 */
-char* Sat_GetAvailableSolversString(void);
-
+char *Sat_GetAvailableSolversString(void);
 
 /* ====================================================================== */
 

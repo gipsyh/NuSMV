@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``nusmv.core.hrc.dumpers'' package of NuSMV version 2.
-  Copyright (C) 2014 by FBK-irst.
+  This file is part of the ``nusmv.core.hrc.dumpers'' package of NuSMV
+version 2. Copyright (C) 2014 by FBK-irst.
 
   NuSMV version 2 is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,23 +34,20 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_ANONYMIZER_H__
 #define __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_ANONYMIZER_H__
 
-
 #include "nusmv/core/hrc/dumpers/HrcDumperSmv.h"
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
+#include "nusmv/core/utils/defs.h"
 
 /*!
   \struct HrcDumperAnonymizer
   \brief Definition of the public accessor for class HrcDumperAnonymizer
 
-  
+
 */
-typedef struct HrcDumperAnonymizer_TAG*  HrcDumperAnonymizer_ptr;
+typedef struct HrcDumperAnonymizer_TAG *HrcDumperAnonymizer_ptr;
 
 /*!
   \brief To cast and check instances of class HrcDumperAnonymizer
@@ -58,18 +55,15 @@ typedef struct HrcDumperAnonymizer_TAG*  HrcDumperAnonymizer_ptr;
   These macros must be used respectively to cast and to check
   instances of class HrcDumperAnonymizer
 */
-#define HRC_DUMPER_ANONYMIZER(self) \
-         ((HrcDumperAnonymizer_ptr) self)
+#define HRC_DUMPER_ANONYMIZER(self) ((HrcDumperAnonymizer_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define HRC_DUMPER_ANONYMIZER_CHECK_INSTANCE(self) \
-         (nusmv_assert(HRC_DUMPER_ANONYMIZER(self) != HRC_DUMPER_ANONYMIZER(NULL)))
-
-
+#define HRC_DUMPER_ANONYMIZER_CHECK_INSTANCE(self)                             \
+  (nusmv_assert(HRC_DUMPER_ANONYMIZER(self) != HRC_DUMPER_ANONYMIZER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,8 +80,7 @@ typedef struct HrcDumperAnonymizer_TAG*  HrcDumperAnonymizer_ptr;
   \sa HrcDumperAnonymizer_destroy
 */
 HrcDumperAnonymizer_ptr
-HrcDumperAnonymizer_create(const NuSMVEnv_ptr env,
-                           FILE* fout,
+HrcDumperAnonymizer_create(const NuSMVEnv_ptr env, FILE *fout,
                            NodeAnonymizerBase_ptr anonymizer);
 
 /*!
@@ -100,9 +93,6 @@ HrcDumperAnonymizer_create(const NuSMVEnv_ptr env,
 */
 void HrcDumperAnonymizer_destroy(HrcDumperAnonymizer_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_ANONYMIZER_H__ */

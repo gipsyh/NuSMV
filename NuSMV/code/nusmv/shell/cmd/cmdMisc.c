@@ -35,17 +35,16 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/shell/cmd/cmdInt.h"
 
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/utils/error.h"
 #include "nusmv/core/cinit/cinit.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/utils/error.h"
 
 #include <stdio.h>
 
@@ -53,7 +52,7 @@
 #include <string.h> /* for strdup */
 #else
 #ifndef strdup
-char* strdup(const char*); /* forward declaration */
+char *strdup(const char *); /* forward declaration */
 #endif
 #endif
 /*---------------------------------------------------------------------------*/
@@ -103,31 +102,27 @@ extern rl_completion_func_t *rl_attempted_completion_function;
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-
-
 static void FlushBuffers(int sigtype);
 
 #if NUSMV_HAVE_LIBREADLINE
-static char ** command_completion(const char *text, int start, int end);
+static char **command_completion(const char *text, int start, int end);
 static char *command_completion_generator(const char *text, int state);
 char **rl_completion_matches(const char *, rl_compentry_func_t *);
 #endif
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Cmd_Init(NuSMVEnv_ptr env)
-{
+void Cmd_Init(NuSMVEnv_ptr env) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  avl_tree* cmdTable = avl_init_table((int (*)(char*, char*))strcmp);
-  avl_tree* aliasTable = avl_init_table((int (*)(char*, char*))strcmp);
-  array_t* cmdHistoryArray = array_alloc(char *, 0);
+  avl_tree *cmdTable = avl_init_table((int (*)(char *, char *))strcmp);
+  avl_tree *aliasTable = avl_init_table((int (*)(char *, char *))strcmp);
+  array_t *cmdHistoryArray = array_alloc(char *, 0);
   int start_time;
 
   NuSMVEnv_set_value(env, ENV_CMD_COMMAND_TABLE, cmdTable);
@@ -139,7 +134,7 @@ void Cmd_Init(NuSMVEnv_ptr env)
   /* Program the signal of type USR1 to flush outstream and errstream */
 #ifdef SIGUSR1
   __flush_buffers_streams__ = streams;
-  (void) signal(SIGUSR1, FlushBuffers);
+  (void)signal(SIGUSR1, FlushBuffers);
 #endif
 
   /* Initialize libreadline's completion machinery */
@@ -159,29 +154,27 @@ void Cmd_Init(NuSMVEnv_ptr env)
   start_time = util_cpu_time();
   /* we use the usual offset.. */
   NuSMVEnv_set_or_replace_value(env, ENV_START_TIME,
-                                PTR_FROM_INT(void*, start_time + 1));
+                                PTR_FROM_INT(void *, start_time + 1));
 }
 
-void
-Cmd_End(NuSMVEnv_ptr env)
-{
+void Cmd_End(NuSMVEnv_ptr env) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  avl_tree* cmdTable = (avl_tree*)
-      NuSMVEnv_remove_value(env, ENV_CMD_COMMAND_TABLE);
-  avl_tree* aliasTable = (avl_tree*)
-      NuSMVEnv_remove_value(env, ENV_CMD_ALIAS_TABLE);
-  array_t* cmdHistoryArray = (array_t*)
-      NuSMVEnv_remove_value(env, ENV_CMD_COMMAND_HISTORY);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  avl_tree *cmdTable =
+      (avl_tree *)NuSMVEnv_remove_value(env, ENV_CMD_COMMAND_TABLE);
+  avl_tree *aliasTable =
+      (avl_tree *)NuSMVEnv_remove_value(env, ENV_CMD_ALIAS_TABLE);
+  array_t *cmdHistoryArray =
+      (array_t *)NuSMVEnv_remove_value(env, ENV_CMD_COMMAND_HISTORY);
 
-  avl_free_table(cmdTable, (void (*)()) 0, CmdCommandFree);
-  avl_free_table(aliasTable, (void (*)()) 0, CmdAliasFree);
+  avl_free_table(cmdTable, (void (*)())0, CmdCommandFree);
+  avl_free_table(aliasTable, (void (*)())0, CmdAliasFree);
 
   {
     int c;
     char *dummy;
 
-    for (c = array_n(cmdHistoryArray); c-- > 0; ){
+    for (c = array_n(cmdHistoryArray); c-- > 0;) {
       dummy = array_fetch(char *, cmdHistoryArray, c);
       FREE(dummy);
     }
@@ -190,124 +183,111 @@ Cmd_End(NuSMVEnv_ptr env)
   array_free(cmdHistoryArray);
 
   if (NuSMVEnv_get_flag(env, ENV_PURIFY_FILE_CREATED)) {
-    StreamMgr_print_output(
-        streams,  "Purify has created a temporary file. The file");
-    StreamMgr_print_output(streams,  " must be deleted.\n");
+    StreamMgr_print_output(streams,
+                           "Purify has created a temporary file. The file");
+    StreamMgr_print_output(streams, " must be deleted.\n");
   }
 }
 
-FILE* CmdOpenPipe(const NuSMVEnv_ptr env, int useMore)
-{
+FILE *CmdOpenPipe(const NuSMVEnv_ptr env, int useMore) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
 #if NUSMV_HAVE_POPEN
-  FILE* rf = NIL(FILE);
-  char* pager = NIL(char);
+  FILE *rf = NIL(FILE);
+  char *pager = NIL(char);
 
 #if NUSMV_HAVE_GETENV
   pager = getenv("PAGER");
-  if (pager == (char*) NULL) {
+  if (pager == (char *)NULL) {
     rf = popen("more", "w");
-    if (rf == (FILE*)NULL) {
+    if (rf == (FILE *)NULL) {
       StreamMgr_print_error(streams, "Unable to open pipe with \"more\".\n");
     }
-  }
-  else {
+  } else {
     rf = popen(pager, "w");
     if (rf == NULL) {
-      StreamMgr_print_error(streams,
-                            "Unable to open pipe with \"%s\".\n", pager);
+      StreamMgr_print_error(streams, "Unable to open pipe with \"%s\".\n",
+                            pager);
     }
   }
 #else
   rf = popen("more", "w");
-  if (rf == (FILE*) NULL) {
+  if (rf == (FILE *)NULL) {
     StreamMgr_print_error(streams, "Unable to open pipe with \"more\".\n");
   }
 #endif
   return rf;
 
 #else /* NUSMV_HAVE_POPEN */
-  return (FILE*) NULL;
+  return (FILE *)NULL;
 #endif
 }
 
-void CmdClosePipe(FILE* file)
-{
+void CmdClosePipe(FILE *file) {
 #if NUSMV_HAVE_POPEN
   pclose(file);
 #endif
 }
 
-FILE* CmdOpenFile(const NuSMVEnv_ptr env, const char* filename)
-{
+FILE *CmdOpenFile(const NuSMVEnv_ptr env, const char *filename) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  FILE* rf = NIL(FILE);
+  FILE *rf = NIL(FILE);
 
   if (filename != NIL(char)) {
     rf = fopen(filename, "w");
-    if (rf == (FILE*) NULL) {
-      StreamMgr_print_error(streams, "Unable to open file \"%s\".\n",
-                            filename);
+    if (rf == (FILE *)NULL) {
+      StreamMgr_print_error(streams, "Unable to open file \"%s\".\n", filename);
     }
   } else {
     StreamMgr_print_error(streams, "CmdOpenFile: file name is NULL\n");
   }
-  return(rf);
+  return (rf);
 }
 
-void CmdCloseFile(FILE* file)
-{
+void CmdCloseFile(FILE *file) {
   fflush(file);
   fclose(file);
 }
 
 Outcome Cmd_Misc_open_pipe_or_file(NuSMVEnv_ptr const env,
-                                   const char* dbgFileName,
-                                   FILE** outstream)
-{
+                                   const char *dbgFileName, FILE **outstream) {
   StreamMgr_ptr const streams =
-   STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  if ((const char*)NULL == dbgFileName) {
+  if ((const char *)NULL == dbgFileName) {
     *outstream = CmdOpenPipe(env, true);
 
-    if (*outstream != (FILE*)NULL) {
+    if (*outstream != (FILE *)NULL) {
       StreamMgr_set_output_stream(streams, *outstream);
-    }
-    else return OUTCOME_GENERIC_ERROR;
-  }
-  else if (dbgFileName != NIL(char)) {
+    } else
+      return OUTCOME_GENERIC_ERROR;
+  } else if (dbgFileName != NIL(char)) {
     *outstream = CmdOpenFile(env, dbgFileName);
 
-    if (*outstream != (FILE*) NULL) {
+    if (*outstream != (FILE *)NULL) {
       StreamMgr_set_output_stream(streams, *outstream);
-    }
-    else return OUTCOME_GENERIC_ERROR;
+    } else
+      return OUTCOME_GENERIC_ERROR;
   }
 
   return OUTCOME_SUCCESS;
 }
 
-int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env,
-                                   char* filename,
-                                   boolean use_a_pipe,
-                                   FILE** prev_outstream)
-{
-  FILE* stream = NULL;
+int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env, char *filename,
+                                   boolean use_a_pipe, FILE **prev_outstream) {
+  FILE *stream = NULL;
   /* Caller asks either for streaming on file or on pipe */
-  nusmv_assert(! (NULL == filename && ! use_a_pipe));
+  nusmv_assert(!(NULL == filename && !use_a_pipe));
 
   /* Caller cannot asks both */
   nusmv_assert(NULL != filename || use_a_pipe);
 
   if (NULL != filename) {
     stream = CmdOpenFile(env, filename);
-  }
-  else {
+  } else {
     nusmv_assert(use_a_pipe);
     stream = CmdOpenPipe(env, true);
   }
@@ -315,28 +295,26 @@ int Cmd_Misc_set_global_out_stream(NuSMVEnv_ptr env,
   if (NULL == stream) {
     *prev_outstream = NULL;
     return 1;
-  }
-  else {
+  } else {
     StreamMgr_ptr const streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+        STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
     *prev_outstream = StreamMgr_reset_output_stream(streams);
     StreamMgr_set_output_stream(streams, stream);
     return 0;
   }
 }
 
-void Cmd_Misc_restore_global_out_stream(NuSMVEnv_ptr env,
-                                        char* filename,
+void Cmd_Misc_restore_global_out_stream(NuSMVEnv_ptr env, char *filename,
                                         boolean use_a_pipe,
-                                        FILE* prev_outstream)
-{
+                                        FILE *prev_outstream) {
   StreamMgr_ptr const streams =
-   STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* stream = StreamMgr_reset_output_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *stream = StreamMgr_reset_output_stream(streams);
 
   nusmv_assert(NULL != prev_outstream);
 
-  if (filename != NIL(char)) CmdCloseFile(stream);
+  if (filename != NIL(char))
+    CmdCloseFile(stream);
   else {
     nusmv_assert(use_a_pipe);
     CmdClosePipe(stream);
@@ -348,31 +326,24 @@ void Cmd_Misc_restore_global_out_stream(NuSMVEnv_ptr env,
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void
-CmdFreeArgv(int  argc,  char ** argv)
-{
+void CmdFreeArgv(int argc, char **argv) {
   int i;
 
-  for(i = 0; i < argc; i++) {
+  for (i = 0; i < argc; i++) {
     FREE(argv[i]);
   }
   FREE(argv);
 }
 
-void
-CmdAliasFree(
-  char * value)
-{
-  CmdAliasDescr_t *alias = (CmdAliasDescr_t *) value;
+void CmdAliasFree(char *value) {
+  CmdAliasDescr_t *alias = (CmdAliasDescr_t *)value;
 
   CmdFreeArgv(alias->argc, alias->argv);
-  FREE(alias->name);            /* same as key */
+  FREE(alias->name); /* same as key */
   FREE(alias);
 }
 
-
-int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env)
-{
+int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env) {
   char *commandLine;
   char *libraryName;
   char *rcFileName;
@@ -382,9 +353,9 @@ int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env)
   int status0;
   int status1 = TRUE;
   int status2 = TRUE;
-  const char* cmd_pattern = "source -s %s/master%s";
-  const char* rc_tilde_pattern = "~/%s";
-  const char* source_pattern = "source -s %s";
+  const char *cmd_pattern = "source -s %s/master%s";
+  const char *rc_tilde_pattern = "~/%s";
+  const char *source_pattern = "source -s %s";
   boolean home_exists, cur_exists;
 
   /*
@@ -393,7 +364,7 @@ int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env)
   libraryName = CInit_NuSMVObtainLibrary();
   rcFileName = NuSMVCore_get_tool_rc_file_name();
   commandLine = ALLOC(char, strlen(cmd_pattern) + strlen(libraryName) +
-                      strlen(rcFileName)+1);
+                                strlen(rcFileName) + 1);
   sprintf(commandLine, cmd_pattern, libraryName, rcFileName);
   FREE(libraryName);
   status0 = Cmd_CommandExecute(env, commandLine);
@@ -403,8 +374,7 @@ int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env)
    * Look in home directory and current directory for .nusmvrc.
    */
   /* ~/.nusmvrc */
-  tmpRcTilde = ALLOC(char,
-                     strlen(rcFileName) + strlen(rc_tilde_pattern) + 1);
+  tmpRcTilde = ALLOC(char, strlen(rcFileName) + strlen(rc_tilde_pattern) + 1);
   sprintf(tmpRcTilde, rc_tilde_pattern, rcFileName);
 
   /* .nusmvrc */
@@ -424,8 +394,7 @@ int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env)
     sprintf(tmpCmd, source_pattern, tmpRcTilde);
     status1 = Cmd_CommandExecute(env, tmpCmd);
     FREE(tmpCmd);
-  }
-  else {
+  } else {
     if (home_exists) {
       tmpCmd = ALLOC(char, strlen(tmpRcTilde) + strlen(source_pattern) + 1);
       sprintf(tmpCmd, source_pattern, tmpRcTilde);
@@ -445,12 +414,9 @@ int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env)
   return (status0 && status1 && status2);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
 
 #if NUSMV_HAVE_LIBREADLINE
 
@@ -464,12 +430,11 @@ int Cmd_Misc_NusmvrcSource(NuSMVEnv_ptr env)
 
   \sa Cmd_Completion
 */
-static char *command_completion_generator(const char *text, int state)
-{
-  extern avl_tree* __rl_cmd_table__;
+static char *command_completion_generator(const char *text, int state) {
+  extern avl_tree *__rl_cmd_table__;
   static int list_index, len;
-  char* key;
-  avl_generator* gen;
+  char *key;
+  avl_generator *gen;
   int cnt;
 
   if (!state) {
@@ -479,7 +444,7 @@ static char *command_completion_generator(const char *text, int state)
 
   cnt = 0;
 
-  avl_foreach_item(__rl_cmd_table__, gen, AVL_FORWARD, &key, NIL(char *)){
+  avl_foreach_item(__rl_cmd_table__, gen, AVL_FORWARD, &key, NIL(char *)) {
     if (strncmp(text, key, len) == 0) { // possible match
       if (cnt++ == list_index) {
         list_index++;
@@ -501,10 +466,11 @@ static char *command_completion_generator(const char *text, int state)
 
   \sa CmdCompletion_Generator
 */
-static char ** command_completion(const char *text, int start, int end)
-{
-  if (start) return NULL; /* not on line beginning: filename */
-  else return rl_completion_matches(text, command_completion_generator);
+static char **command_completion(const char *text, int start, int end) {
+  if (start)
+    return NULL; /* not on line beginning: filename */
+  else
+    return rl_completion_matches(text, command_completion_generator);
 }
 #endif
 
@@ -517,14 +483,11 @@ static char ** command_completion(const char *text, int start, int end)
 
   \sa Cmd_Init
 */
-static void
-FlushBuffers(
-  int sigtype)
-{
+static void FlushBuffers(int sigtype) {
   StreamMgr_flush_streams(__flush_buffers_streams__);
 
   /* Reprogram again the handler */
 #ifdef SIGUSR1
-  (void) signal(SIGUSR1, FlushBuffers);
+  (void)signal(SIGUSR1, FlushBuffers);
 #endif
 } /* End of FlushBuffers */

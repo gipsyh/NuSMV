@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,27 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_ENC_BOOL_BOOL_ENC_H__
 #define __NUSMV_CORE_ENC_BOOL_BOOL_ENC_H__
 
-#include "nusmv/core/enc/bool/BitValues.h"
 #include "nusmv/core/enc/base/BaseEnc.h"
+#include "nusmv/core/enc/bool/BitValues.h"
 
 #include "nusmv/core/compile/symb_table/SymbTable.h"
-#include "nusmv/core/utils/NodeList.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/set/set.h"
+#include "nusmv/core/utils/NodeList.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/object.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct BoolEnc
   \brief Definition of the public accessor for class BoolEnc
 
-  
+
 */
-typedef struct BoolEnc_TAG*  BoolEnc_ptr;
+typedef struct BoolEnc_TAG *BoolEnc_ptr;
 
 /*!
   \brief To cast and check instances of class BoolEnc
@@ -64,18 +62,15 @@ typedef struct BoolEnc_TAG*  BoolEnc_ptr;
   These macros must be used respectively to cast and to check
   instances of class BoolEnc
 */
-#define BOOL_ENC(self) \
-         ((BoolEnc_ptr) self)
+#define BOOL_ENC(self) ((BoolEnc_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BOOL_ENC_CHECK_INSTANCE(self) \
-         (nusmv_assert(BOOL_ENC(self) != BOOL_ENC(NULL)))
-
-
+#define BOOL_ENC_CHECK_INSTANCE(self)                                          \
+  (nusmv_assert(BOOL_ENC(self) != BOOL_ENC(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -108,22 +103,20 @@ VIRTUAL void BoolEnc_destroy(BoolEnc_ptr self);
   \brief Returns true if the given symbol is the name of
   a bit variable that is part of a scalar var
 
-  
+
 
   \sa BoolEnc_get_scalar_var_of_bit
 */
-boolean
-BoolEnc_is_var_bit(const BoolEnc_ptr self, node_ptr name);
+boolean BoolEnc_is_var_bit(const BoolEnc_ptr self, node_ptr name);
 
 /*!
   \methodof BoolEnc
   \brief Returns true if the given symbol is the name of
   a scalar (non-boolean) variable
 
-  
+
 */
-boolean
-BoolEnc_is_var_scalar(const BoolEnc_ptr self, node_ptr name);
+boolean BoolEnc_is_var_scalar(const BoolEnc_ptr self, node_ptr name);
 
 /*!
   \methodof BoolEnc
@@ -135,8 +128,7 @@ BoolEnc_is_var_scalar(const BoolEnc_ptr self, node_ptr name);
 
   \sa BoolEnc_is_var_bit, BoolEnc_get_index_from_bit
 */
-node_ptr
-BoolEnc_get_scalar_var_from_bit(const BoolEnc_ptr self, node_ptr name);
+node_ptr BoolEnc_get_scalar_var_from_bit(const BoolEnc_ptr self, node_ptr name);
 
 /*!
   \methodof BoolEnc
@@ -148,8 +140,7 @@ BoolEnc_get_scalar_var_from_bit(const BoolEnc_ptr self, node_ptr name);
 
   \sa BoolEnc_is_var_bit, BoolEnc_get_index_from_bit
 */
-node_ptr
-BoolEnc_make_var_bit(const BoolEnc_ptr self, node_ptr name, int index);
+node_ptr BoolEnc_make_var_bit(const BoolEnc_ptr self, node_ptr name, int index);
 
 /*!
   \methodof BoolEnc
@@ -159,8 +150,7 @@ BoolEnc_make_var_bit(const BoolEnc_ptr self, node_ptr name, int index);
 
   \sa BoolEnc_is_var_bit, BoolEnc_get_scalar_var_from_bit
 */
-int
-BoolEnc_get_index_from_bit(const BoolEnc_ptr self, node_ptr name);
+int BoolEnc_get_index_from_bit(const BoolEnc_ptr self, node_ptr name);
 
 /*!
   \methodof BoolEnc
@@ -169,8 +159,7 @@ BoolEnc_get_index_from_bit(const BoolEnc_ptr self, node_ptr name);
 
   Returned list must be destroyed by the caller
 */
-NodeList_ptr
-BoolEnc_get_var_bits(const BoolEnc_ptr self, node_ptr name);
+NodeList_ptr BoolEnc_get_var_bits(const BoolEnc_ptr self, node_ptr name);
 
 /*!
   \methodof BoolEnc
@@ -178,8 +167,7 @@ BoolEnc_get_var_bits(const BoolEnc_ptr self, node_ptr name);
 
   Given variable must have been encoded by self
 */
-node_ptr
-BoolEnc_get_var_encoding(const BoolEnc_ptr self, node_ptr name);
+node_ptr BoolEnc_get_var_encoding(const BoolEnc_ptr self, node_ptr name);
 
 /*!
   \methodof BoolEnc
@@ -215,10 +203,8 @@ BoolEnc_get_var_encoding(const BoolEnc_ptr self, node_ptr name);
 
   \sa BoolEnc_get_var_encoding
 */
-node_ptr
-BoolEnc_get_values_bool_encoding(const BoolEnc_ptr self,
-                                 node_ptr values,
-                                 Set_t* bits);
+node_ptr BoolEnc_get_values_bool_encoding(const BoolEnc_ptr self,
+                                          node_ptr values, Set_t *bits);
 
 /*!
   \methodof BoolEnc
@@ -227,9 +213,8 @@ BoolEnc_get_values_bool_encoding(const BoolEnc_ptr self,
 
   Returned string should NOT be modified or freed.
 */
-const char*
-BoolEnc_scalar_layer_to_bool_layer(const BoolEnc_ptr self,
-                                   const char* layer_name);
+const char *BoolEnc_scalar_layer_to_bool_layer(const BoolEnc_ptr self,
+                                               const char *layer_name);
 
 /*!
   \brief Determines if a layer name corresponds to a bool layer
@@ -241,8 +226,7 @@ BoolEnc_scalar_layer_to_bool_layer(const BoolEnc_ptr self,
 
   \sa BoolEnc_scalar_layer_to_bool_layer
 */
-boolean
-BoolEnc_is_bool_layer(const char* layer_name);
+boolean BoolEnc_is_bool_layer(const char *layer_name);
 
 /*!
   \methodof BoolEnc
@@ -252,11 +236,10 @@ BoolEnc_is_bool_layer(const char* layer_name);
   BitValues instance
 
   Returns an ATOM, a NUMBER, an NUMBER_UNSIGNED_WORD,
-  etc. depending on the kind of variable. 
+  etc. depending on the kind of variable.
 */
-node_ptr
-BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
-                                const BitValues_ptr bit_values);
+node_ptr BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
+                                         const BitValues_ptr bit_values);
 
 /*!
   \methodof BoolEnc
@@ -287,11 +270,8 @@ BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
 
   Result is memoized. See issue 0925 for further details.
 */
-node_ptr
-BoolEnc_get_var_mask(const BoolEnc_ptr self, node_ptr name);
+node_ptr BoolEnc_get_var_mask(const BoolEnc_ptr self, node_ptr name);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_ENC_BOOL_BOOL_ENC_H__ */

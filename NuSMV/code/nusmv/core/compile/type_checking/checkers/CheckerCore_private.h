@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``compile.type_checking.checkers'' package of NuSMV version 2.
-  Copyright (C) 2006 by FBK-irst.
+  This file is part of the ``compile.type_checking.checkers'' package of NuSMV
+version 2. Copyright (C) 2006 by FBK-irst.
 
   NuSMV version 2 is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,8 +34,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_CORE_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_CORE_PRIVATE_H__
 
@@ -46,8 +44,6 @@
 
 #include "nusmv/core/utils/utils.h"
 
-
-
 /*!
   \brief Short way of calling tc_set_expression_type
 
@@ -56,9 +52,8 @@
   can be used when expressions that are node_ptr
 */
 
-#define _SET_TYPE(expr, type) \
-   tc_set_expression_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr, type)
-
+#define _SET_TYPE(expr, type)                                                  \
+  tc_set_expression_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr, type)
 
 /*!
   \brief Short way of calling tc_lookup_expr_type
@@ -68,9 +63,8 @@
   can be used when expressions that are node_ptr
 */
 
-#define _GET_TYPE(expr) \
-   tc_lookup_expr_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr)
-
+#define _GET_TYPE(expr)                                                        \
+  tc_lookup_expr_type(TYPE_CHECKER(NODE_WALKER(self)->master), expr)
 
 /*!
   \brief Short way of calling checker_base_manage_violation
@@ -80,10 +74,8 @@
   can be used when expressions that are node_ptr
 */
 
-#define _VIOLATION(viol_id, expr) \
-   checker_base_manage_violation(CHECKER_BASE(self), viol_id, expr)
-
-
+#define _VIOLATION(viol_id, expr)                                              \
+  checker_base_manage_violation(CHECKER_BASE(self), viol_id, expr)
 
 /*!
   \brief Short way of calling type_checker_print_error_message
@@ -93,24 +85,20 @@
   can be used when expressions that are node_ptr
 */
 
-#define _PRINT_ERROR_MSG(exp, is_error)                                      \
-   type_checker_print_error_message(TYPE_CHECKER(NODE_WALKER(self)->master), \
-                                 exp, is_error)
-
-
-
+#define _PRINT_ERROR_MSG(exp, is_error)                                        \
+  type_checker_print_error_message(TYPE_CHECKER(NODE_WALKER(self)->master),    \
+                                   exp, is_error)
 
 /*!
   \brief CheckerCore class definition derived from
                class CheckerBase
 
-  
+
 
   \sa Base class CheckerBase
 */
 
-typedef struct CheckerCore_TAG
-{
+typedef struct CheckerCore_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(CheckerBase);
 
@@ -118,14 +106,11 @@ typedef struct CheckerCore_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } CheckerCore;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -139,9 +124,8 @@ typedef struct CheckerCore_TAG
 
   \sa CheckerCore_create
 */
-void
-checker_core_init(CheckerCore_ptr self, const NuSMVEnv_ptr env,
-                  const char* name, int low, size_t num);
+void checker_core_init(CheckerCore_ptr self, const NuSMVEnv_ptr env,
+                       const char *name, int low, size_t num);
 
 /*!
   \methodof CheckerCore
@@ -151,6 +135,5 @@ checker_core_init(CheckerCore_ptr self, const NuSMVEnv_ptr env,
 */
 void checker_core_deinit(CheckerCore_ptr self);
 
-
-
-#endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_CORE_PRIVATE_H__ */
+#endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_CORE_PRIVATE_H__ \
+        */

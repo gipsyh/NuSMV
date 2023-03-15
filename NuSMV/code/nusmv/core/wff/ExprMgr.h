@@ -34,20 +34,17 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_WFF_EXPR_MGR_H__
 #define __NUSMV_CORE_WFF_EXPR_MGR_H__
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
-
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
 /* Don't change these values (used to handle NEXT untimed case and FROZEN) */
 
@@ -87,12 +84,7 @@
 
   \sa EXP_KIND in grammar.y; ExprMgr_is_syntax_correct
 */
-typedef enum {
-  EXPR_SIMPLE,
-  EXPR_NEXT,
-  EXPR_LTL,
-  EXPR_CTL
-} ExprKind;
+typedef enum { EXPR_SIMPLE, EXPR_NEXT, EXPR_LTL, EXPR_CTL } ExprKind;
 
 /*!
   \brief The Expr type
@@ -106,16 +98,14 @@ typedef node_ptr Expr_ptr;
 
   \todo Missing description
 */
-#define EXPR(x)                                 \
-  ((Expr_ptr) x)
+#define EXPR(x) ((Expr_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define EXPR_CHECK_INSTANCE(x)                  \
-  (nusmv_assert(EXPR(x) != EXPR(NULL)))
+#define EXPR_CHECK_INSTANCE(x) (nusmv_assert(EXPR(x) != EXPR(NULL)))
 
 /*!
   \struct ExprMgr
@@ -123,7 +113,7 @@ typedef node_ptr Expr_ptr;
 
 
 */
-typedef struct ExprMgr_TAG*  ExprMgr_ptr;
+typedef struct ExprMgr_TAG *ExprMgr_ptr;
 
 /*!
   \brief To cast and check instances of class ExprMgr
@@ -131,15 +121,14 @@ typedef struct ExprMgr_TAG*  ExprMgr_ptr;
   These macros must be used respectively to cast and to check
    instances of class ExprMgr
 */
-#define EXPR_MGR(self)                          \
-  ((ExprMgr_ptr) self)
+#define EXPR_MGR(self) ((ExprMgr_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define EXPR_MGR_CHECK_INSTANCE(self)                   \
+#define EXPR_MGR_CHECK_INSTANCE(self)                                          \
   (nusmv_assert(EXPR_MGR(self) != EXPR_MGR(NULL)))
 
 /*!
@@ -147,9 +136,7 @@ typedef struct ExprMgr_TAG*  ExprMgr_ptr;
 
   \todo Missing description
 */
-#define Expr_get_type(t)                        \
-  node_get_type(t)
-
+#define Expr_get_type(t) node_get_type(t)
 
 /**AutomaticStart*************************************************************/
 
@@ -178,7 +165,6 @@ ExprMgr_ptr ExprMgr_create(const NuSMVEnv_ptr env);
 */
 void ExprMgr_destroy(ExprMgr_ptr self);
 
-
 /*!
   \methodof ExprMgr
   \brief Returns the internal NodeMgr
@@ -186,7 +172,6 @@ void ExprMgr_destroy(ExprMgr_ptr self);
   Do not destroy the returned object, it belongs to self.
 */
 NodeMgr_ptr ExprMgr_get_node_manager(const ExprMgr_ptr self);
-
 
 /* Top level functions ********************************************************/
 
@@ -215,7 +200,8 @@ NodeMgr_ptr ExprMgr_get_node_manager(const ExprMgr_ptr self);
 
   \se None
 */
-Expr_ptr ExprMgr_simplify(const ExprMgr_ptr self, SymbTable_ptr st, Expr_ptr expr);
+Expr_ptr ExprMgr_simplify(const ExprMgr_ptr self, SymbTable_ptr st,
+                          Expr_ptr expr);
 
 /*!
   \methodof ExprMgr
@@ -227,8 +213,8 @@ Expr_ptr ExprMgr_simplify(const ExprMgr_ptr self, SymbTable_ptr st, Expr_ptr exp
    simplifier-level) the simplifier call this function in post order
    after having simplified car(E) and cdr(E). It calls it by passing
    node_get_type(E) as type, and simplified sub expressions for left and right.
-   The function Expr_resolve does not traverses further the structures, it simply
-   combine given operation encoded in type with given already simplified
+   The function Expr_resolve does not traverses further the structures, it
+  simply combine given operation encoded in type with given already simplified
    operands left and right.
 
    For example, suppose E is AND(exp1, exp2). The simplifier:
@@ -239,15 +225,15 @@ Expr_ptr ExprMgr_simplify(const ExprMgr_ptr self, SymbTable_ptr st, Expr_ptr exp
 
    2. Calls in postorder ExprMgr_resolve(self, AND, exp1', exp2')
 
-   ExprMgr_resolve will simplify sintactically the conjunction of (self, exp1', exp2')
+   ExprMgr_resolve will simplify sintactically the conjunction of (self, exp1',
+  exp2')
 
   \se None
 
   \sa Expr_simplify
 */
-Expr_ptr ExprMgr_resolve(const ExprMgr_ptr self, SymbTable_ptr st,
-                                int type, Expr_ptr left, Expr_ptr right);
-
+Expr_ptr ExprMgr_resolve(const ExprMgr_ptr self, SymbTable_ptr st, int type,
+                         Expr_ptr left, Expr_ptr right);
 
 /* Queries ********************************************************************/
 
@@ -267,9 +253,8 @@ boolean ExprMgr_is_equal_to_zero(const ExprMgr_ptr self, const Expr_ptr input);
 
   Compares a NUMBER to a constant number
 */
-boolean
-ExprMgr_is_ge_to_number(const ExprMgr_ptr self, const Expr_ptr input,
-                        const Expr_ptr number);
+boolean ExprMgr_is_ge_to_number(const ExprMgr_ptr self, const Expr_ptr input,
+                                const Expr_ptr number);
 
 /*!
   \methodof ExprMgr
@@ -310,7 +295,8 @@ boolean ExprMgr_is_boolean_range(const ExprMgr_ptr self, Expr_ptr expr);
 
   \se None
 */
-boolean ExprMgr_is_number(const ExprMgr_ptr self, const Expr_ptr expr, const int value);
+boolean ExprMgr_is_number(const ExprMgr_ptr self, const Expr_ptr expr,
+                          const int value);
 
 /*!
   \methodof ExprMgr
@@ -392,8 +378,8 @@ Expr_ptr ExprMgr_number(const ExprMgr_ptr self, int value);
 
   \se None
 */
-Expr_ptr ExprMgr_word_max_value(const ExprMgr_ptr self,
-                                const int size, const int type);
+Expr_ptr ExprMgr_word_max_value(const ExprMgr_ptr self, const int size,
+                                const int type);
 
 /*!
   \methodof ExprMgr
@@ -403,7 +389,8 @@ Expr_ptr ExprMgr_word_max_value(const ExprMgr_ptr self,
 
   \se None
 */
-Expr_ptr ExprMgr_next(const ExprMgr_ptr self, const Expr_ptr a, const SymbTable_ptr st);
+Expr_ptr ExprMgr_next(const ExprMgr_ptr self, const Expr_ptr a,
+                      const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -416,9 +403,8 @@ Expr_ptr ExprMgr_next(const ExprMgr_ptr self, const Expr_ptr a, const SymbTable_
   \se None
 */
 Expr_ptr ExprMgr_ite(const ExprMgr_ptr self, const Expr_ptr cond,
-                            const Expr_ptr t,
-                            const Expr_ptr e,
-                            const SymbTable_ptr st);
+                     const Expr_ptr t, const Expr_ptr e,
+                     const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -430,8 +416,7 @@ Expr_ptr ExprMgr_ite(const ExprMgr_ptr self, const Expr_ptr cond,
   \se None
 */
 Expr_ptr ExprMgr_equal(const ExprMgr_ptr self, const Expr_ptr a,
-                              const Expr_ptr b,
-                              const SymbTable_ptr st);
+                       const Expr_ptr b, const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -443,8 +428,7 @@ Expr_ptr ExprMgr_equal(const ExprMgr_ptr self, const Expr_ptr a,
   \se None
 */
 Expr_ptr ExprMgr_notequal(const ExprMgr_ptr self, const Expr_ptr a,
-                                 const Expr_ptr b,
-                                 const SymbTable_ptr st);
+                          const Expr_ptr b, const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -456,9 +440,8 @@ Expr_ptr ExprMgr_notequal(const ExprMgr_ptr self, const Expr_ptr a,
 
   \se None
 */
-Expr_ptr ExprMgr_le(const ExprMgr_ptr self, const Expr_ptr a,
-                           const Expr_ptr b,
-                           const SymbTable_ptr st);
+Expr_ptr ExprMgr_le(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b,
+                    const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -470,9 +453,8 @@ Expr_ptr ExprMgr_le(const ExprMgr_ptr self, const Expr_ptr a,
 
   \se None
 */
-Expr_ptr ExprMgr_ge(const ExprMgr_ptr self, const Expr_ptr a,
-                           const Expr_ptr b,
-                           const SymbTable_ptr st);
+Expr_ptr ExprMgr_ge(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b,
+                    const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -483,8 +465,9 @@ Expr_ptr ExprMgr_ge(const ExprMgr_ptr self, const Expr_ptr a,
 
   \se None
 */
-Expr_ptr ExprMgr_simplify_word_extend(const ExprMgr_ptr self, const SymbTable_ptr st,
-                                             Expr_ptr w, Expr_ptr i);
+Expr_ptr ExprMgr_simplify_word_extend(const ExprMgr_ptr self,
+                                      const SymbTable_ptr st, Expr_ptr w,
+                                      Expr_ptr i);
 
 /*!
   \methodof ExprMgr
@@ -495,7 +478,7 @@ Expr_ptr ExprMgr_simplify_word_extend(const ExprMgr_ptr self, const SymbTable_pt
   \se None
 */
 Expr_ptr ExprMgr_attime(const ExprMgr_ptr self, Expr_ptr e, int time,
-                               const SymbTable_ptr st);
+                        const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -509,9 +492,7 @@ Expr_ptr ExprMgr_attime(const ExprMgr_ptr self, Expr_ptr e, int time,
   \sa ExprMgr_resolve
 */
 Expr_ptr ExprMgr_word_constant(const ExprMgr_ptr self, const SymbTable_ptr st,
-                                      int type,
-                                      Expr_ptr w,
-                                      Expr_ptr i);
+                               int type, Expr_ptr w, Expr_ptr i);
 
 /*!
   \methodof ExprMgr
@@ -527,7 +508,7 @@ Expr_ptr ExprMgr_word_constant(const ExprMgr_ptr self, const SymbTable_ptr st,
   \se None
 */
 Expr_ptr ExprMgr_and_from_list(const ExprMgr_ptr self, node_ptr list,
-                                      const SymbTable_ptr st);
+                               const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -537,7 +518,8 @@ Expr_ptr ExprMgr_and_from_list(const ExprMgr_ptr self, node_ptr list,
 
   \se None
 */
-Expr_ptr ExprMgr_and(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_and(const ExprMgr_ptr self, const Expr_ptr a,
+                     const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -548,7 +530,8 @@ Expr_ptr ExprMgr_and(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b)
 
   \se None
 */
-Expr_ptr ExprMgr_and_nil(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_and_nil(const ExprMgr_ptr self, const Expr_ptr a,
+                         const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -578,7 +561,8 @@ Expr_ptr ExprMgr_or(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
 
   \se None
 */
-Expr_ptr ExprMgr_xor(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_xor(const ExprMgr_ptr self, const Expr_ptr a,
+                     const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -588,7 +572,8 @@ Expr_ptr ExprMgr_xor(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b)
 
   \se None
 */
-Expr_ptr ExprMgr_xnor(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_xnor(const ExprMgr_ptr self, const Expr_ptr a,
+                      const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -598,7 +583,8 @@ Expr_ptr ExprMgr_xnor(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b
 
   \se None
 */
-Expr_ptr ExprMgr_iff(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_iff(const ExprMgr_ptr self, const Expr_ptr a,
+                     const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -608,7 +594,8 @@ Expr_ptr ExprMgr_iff(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b)
 
   \se None
 */
-Expr_ptr ExprMgr_implies(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_implies(const ExprMgr_ptr self, const Expr_ptr a,
+                         const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -631,8 +618,7 @@ Expr_ptr ExprMgr_lt(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
   \se None
 */
 Expr_ptr ExprMgr_simplify_lt(const ExprMgr_ptr self, const SymbTable_ptr st,
-                                    const Expr_ptr a,
-                                    const Expr_ptr b);
+                             const Expr_ptr a, const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -657,8 +643,7 @@ Expr_ptr ExprMgr_gt(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
   \se None
 */
 Expr_ptr ExprMgr_simplify_gt(const ExprMgr_ptr self, const SymbTable_ptr st,
-                                    const Expr_ptr a,
-                                    const Expr_ptr b);
+                             const Expr_ptr a, const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -669,7 +654,8 @@ Expr_ptr ExprMgr_simplify_gt(const ExprMgr_ptr self, const SymbTable_ptr st,
 
   \se None
 */
-Expr_ptr ExprMgr_plus(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_plus(const ExprMgr_ptr self, const Expr_ptr a,
+                      const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -680,7 +666,8 @@ Expr_ptr ExprMgr_plus(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b
 
   \se None
 */
-Expr_ptr ExprMgr_minus(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_minus(const ExprMgr_ptr self, const Expr_ptr a,
+                       const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -691,7 +678,8 @@ Expr_ptr ExprMgr_minus(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr 
 
   \se None
 */
-Expr_ptr ExprMgr_times(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_times(const ExprMgr_ptr self, const Expr_ptr a,
+                       const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -702,7 +690,8 @@ Expr_ptr ExprMgr_times(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr 
 
   \se None
 */
-Expr_ptr ExprMgr_divide(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_divide(const ExprMgr_ptr self, const Expr_ptr a,
+                        const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -713,7 +702,8 @@ Expr_ptr ExprMgr_divide(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr
 
   \se None
 */
-Expr_ptr ExprMgr_mod(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_mod(const ExprMgr_ptr self, const Expr_ptr a,
+                     const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -736,8 +726,8 @@ Expr_ptr ExprMgr_unary_minus(const ExprMgr_ptr self, const Expr_ptr a);
 
   \se None
 */
-Expr_ptr ExprMgr_array_read(const ExprMgr_ptr self,
-                            const Expr_ptr a, const Expr_ptr i);
+Expr_ptr ExprMgr_array_read(const ExprMgr_ptr self, const Expr_ptr a,
+                            const Expr_ptr i);
 
 /*!
   \methodof ExprMgr
@@ -748,9 +738,8 @@ Expr_ptr ExprMgr_array_read(const ExprMgr_ptr self,
 
   \se None
 */
-Expr_ptr ExprMgr_array_write(const ExprMgr_ptr self,
-                             const Expr_ptr a, const Expr_ptr i, 
-                             const Expr_ptr v);
+Expr_ptr ExprMgr_array_write(const ExprMgr_ptr self, const Expr_ptr a,
+                             const Expr_ptr i, const Expr_ptr v);
 
 /*!
   \methodof ExprMgr
@@ -761,8 +750,8 @@ Expr_ptr ExprMgr_array_write(const ExprMgr_ptr self,
 
   \se None
 */
-Expr_ptr ExprMgr_array_const(const ExprMgr_ptr self,
-                             const Expr_ptr a, const Expr_ptr v);
+Expr_ptr ExprMgr_array_const(const ExprMgr_ptr self, const Expr_ptr a,
+                             const Expr_ptr v);
 
 /*!
   \methodof ExprMgr
@@ -775,7 +764,8 @@ Expr_ptr ExprMgr_array_const(const ExprMgr_ptr self,
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words.
@@ -784,7 +774,7 @@ Expr_ptr ExprMgr_array_const(const ExprMgr_ptr self,
   \se None
 */
 Expr_ptr ExprMgr_word_left_shift(const ExprMgr_ptr self, const Expr_ptr a,
-                                        const Expr_ptr b);
+                                 const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -797,7 +787,8 @@ Expr_ptr ExprMgr_word_left_shift(const ExprMgr_ptr self, const Expr_ptr a,
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words.
@@ -806,7 +797,7 @@ Expr_ptr ExprMgr_word_left_shift(const ExprMgr_ptr self, const Expr_ptr a,
   \se None
 */
 Expr_ptr ExprMgr_word_right_shift(const ExprMgr_ptr self, const Expr_ptr a,
-                                         const Expr_ptr b);
+                                  const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -819,7 +810,8 @@ Expr_ptr ExprMgr_word_right_shift(const ExprMgr_ptr self, const Expr_ptr a,
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words.
@@ -828,7 +820,7 @@ Expr_ptr ExprMgr_word_right_shift(const ExprMgr_ptr self, const Expr_ptr a,
   \se None
 */
 Expr_ptr ExprMgr_word_left_rotate(const ExprMgr_ptr self, const Expr_ptr a,
-                                         const Expr_ptr b);
+                                  const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -841,7 +833,8 @@ Expr_ptr ExprMgr_word_left_rotate(const ExprMgr_ptr self, const Expr_ptr a,
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words.
@@ -850,7 +843,7 @@ Expr_ptr ExprMgr_word_left_rotate(const ExprMgr_ptr self, const Expr_ptr a,
   \se None
 */
 Expr_ptr ExprMgr_word_right_rotate(const ExprMgr_ptr self, const Expr_ptr a,
-                                          const Expr_ptr b);
+                                   const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -863,7 +856,8 @@ Expr_ptr ExprMgr_word_right_rotate(const ExprMgr_ptr self, const Expr_ptr a,
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words. Performs local syntactic
@@ -872,7 +866,7 @@ Expr_ptr ExprMgr_word_right_rotate(const ExprMgr_ptr self, const Expr_ptr a,
   \se None
 */
 Expr_ptr ExprMgr_word_bit_select(const ExprMgr_ptr self, const Expr_ptr w,
-                                        const Expr_ptr r);
+                                 const Expr_ptr r);
 
 /*!
   \methodof ExprMgr
@@ -885,7 +879,8 @@ Expr_ptr ExprMgr_word_bit_select(const ExprMgr_ptr self, const Expr_ptr w,
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words. Performs local semantic and syntactic
@@ -893,9 +888,9 @@ Expr_ptr ExprMgr_word_bit_select(const ExprMgr_ptr self, const Expr_ptr w,
 
   \se None
 */
-Expr_ptr ExprMgr_simplify_word_bit_select(const ExprMgr_ptr self, const SymbTable_ptr st,
-                                                 const Expr_ptr w,
-                                                 const Expr_ptr r);
+Expr_ptr ExprMgr_simplify_word_bit_select(const ExprMgr_ptr self,
+                                          const SymbTable_ptr st,
+                                          const Expr_ptr w, const Expr_ptr r);
 
 /*!
   \methodof ExprMgr
@@ -908,7 +903,8 @@ Expr_ptr ExprMgr_simplify_word_bit_select(const ExprMgr_ptr self, const SymbTabl
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words.
@@ -917,7 +913,7 @@ Expr_ptr ExprMgr_simplify_word_bit_select(const ExprMgr_ptr self, const SymbTabl
   \se None
 */
 Expr_ptr ExprMgr_word_concatenate(const ExprMgr_ptr self, const Expr_ptr a,
-                                         const Expr_ptr b);
+                                  const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -930,7 +926,8 @@ Expr_ptr ExprMgr_word_concatenate(const ExprMgr_ptr self, const Expr_ptr a,
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words with width 1.
@@ -951,7 +948,8 @@ Expr_ptr ExprMgr_word1_to_bool(const ExprMgr_ptr self, Expr_ptr w);
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with booleans.
@@ -973,7 +971,8 @@ Expr_ptr ExprMgr_bool_to_word1(const ExprMgr_ptr self, Expr_ptr a);
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words.
@@ -994,7 +993,8 @@ Expr_ptr ExprMgr_signed_word_to_unsigned(const ExprMgr_ptr self, Expr_ptr w);
 
    SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Works with words.
@@ -1013,9 +1013,8 @@ Expr_ptr ExprMgr_unsigned_word_to_signed(const ExprMgr_ptr self, Expr_ptr w);
 
   \se None
 */
-Expr_ptr ExprMgr_word_extend(const ExprMgr_ptr self, Expr_ptr w,
-                                    Expr_ptr i,
-                                    const SymbTable_ptr st);
+Expr_ptr ExprMgr_word_extend(const ExprMgr_ptr self, Expr_ptr w, Expr_ptr i,
+                             const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -1047,7 +1046,8 @@ Expr_ptr ExprMgr_attime_get_untimed(const ExprMgr_ptr self, Expr_ptr e);
 
   \se None
 */
-Expr_ptr ExprMgr_union(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_union(const ExprMgr_ptr self, const Expr_ptr a,
+                       const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -1058,7 +1058,8 @@ Expr_ptr ExprMgr_union(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr 
 
   \se None
 */
-Expr_ptr ExprMgr_setin(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b, const SymbTable_ptr st);
+Expr_ptr ExprMgr_setin(const ExprMgr_ptr self, const Expr_ptr a,
+                       const Expr_ptr b, const SymbTable_ptr st);
 
 /*!
   \methodof ExprMgr
@@ -1068,7 +1069,8 @@ Expr_ptr ExprMgr_setin(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr 
 
   \se None
 */
-Expr_ptr ExprMgr_range(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr b);
+Expr_ptr ExprMgr_range(const ExprMgr_ptr self, const Expr_ptr a,
+                       const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -1081,7 +1083,7 @@ Expr_ptr ExprMgr_range(const ExprMgr_ptr self, const Expr_ptr a, const Expr_ptr 
   \se None
 */
 Expr_ptr ExprMgr_function(const ExprMgr_ptr self, const Expr_ptr name,
-                                 const Expr_ptr params);
+                          const Expr_ptr params);
 
 /*!
   \methodof ExprMgr
@@ -1134,9 +1136,8 @@ int ExprMgr_get_time(const ExprMgr_ptr self, SymbTable_ptr st, Expr_ptr expr);
 
   \sa Expr_get_time
 */
-int* ExprMgr_get_time_interval(const ExprMgr_ptr self,
-                                      const SymbTable_ptr st,
-                                      Expr_ptr expr);
+int *ExprMgr_get_time_interval(const ExprMgr_ptr self, const SymbTable_ptr st,
+                               Expr_ptr expr);
 
 /*!
   \methodof ExprMgr
@@ -1146,7 +1147,8 @@ int* ExprMgr_get_time_interval(const ExprMgr_ptr self,
 
   \se Expr_get_time
 */
-Expr_ptr ExprMgr_untimed(const ExprMgr_ptr self, SymbTable_ptr st, Expr_ptr expr);
+Expr_ptr ExprMgr_untimed(const ExprMgr_ptr self, SymbTable_ptr st,
+                         Expr_ptr expr);
 
 /*!
   \methodof ExprMgr
@@ -1159,8 +1161,7 @@ Expr_ptr ExprMgr_untimed(const ExprMgr_ptr self, SymbTable_ptr st, Expr_ptr expr
   \se Expr_get_time
 */
 Expr_ptr ExprMgr_untimed_explicit_time(const ExprMgr_ptr self, SymbTable_ptr st,
-                                              Expr_ptr expr,
-                                              int time);
+                                       Expr_ptr expr, int time);
 
 /*!
   \methodof ExprMgr
@@ -1193,9 +1194,8 @@ Expr_ptr ExprMgr_cast_toint(const ExprMgr_ptr self, Expr_ptr l, Expr_ptr r);
 
   \sa Expr_resolve
 */
-Expr_ptr ExprMgr_simplify_floor(const ExprMgr_ptr self, const SymbTable_ptr symb_table,
-                                       Expr_ptr body);
-
+Expr_ptr ExprMgr_simplify_floor(const ExprMgr_ptr self,
+                                const SymbTable_ptr symb_table, Expr_ptr body);
 
 /*!
   \methodof ExprMgr
@@ -1207,7 +1207,6 @@ Expr_ptr ExprMgr_simplify_floor(const ExprMgr_ptr self, const SymbTable_ptr symb
 */
 Expr_ptr ExprMgr_floor(const ExprMgr_ptr self, Expr_ptr l);
 
-
 /*!
   \methodof ExprMgr
   \brief Sums one to a costant number
@@ -1216,8 +1215,7 @@ Expr_ptr ExprMgr_floor(const ExprMgr_ptr self, Expr_ptr l);
 
   \se None
 */
-Expr_ptr ExprMgr_plus_one(const ExprMgr_ptr self,
-                                 const Expr_ptr a);
+Expr_ptr ExprMgr_plus_one(const ExprMgr_ptr self, const Expr_ptr a);
 
 /*!
   \methodof ExprMgr
@@ -1227,8 +1225,7 @@ Expr_ptr ExprMgr_plus_one(const ExprMgr_ptr self,
 
   \se None
 */
-Expr_ptr ExprMgr_minus_one(const ExprMgr_ptr self,
-                                  const Expr_ptr a);
+Expr_ptr ExprMgr_minus_one(const ExprMgr_ptr self, const Expr_ptr a);
 
 /*!
   \methodof ExprMgr
@@ -1237,9 +1234,8 @@ Expr_ptr ExprMgr_minus_one(const ExprMgr_ptr self,
   Calls ExprMgr_plus after having converted b to the proper
   type (the same of a).
 */
-Expr_ptr ExprMgr_plus_number(const ExprMgr_ptr self,
-                                    const Expr_ptr a,
-                                    const Expr_ptr b);
+Expr_ptr ExprMgr_plus_number(const ExprMgr_ptr self, const Expr_ptr a,
+                             const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -1249,10 +1245,8 @@ Expr_ptr ExprMgr_plus_number(const ExprMgr_ptr self,
 
   \se None
 */
-Expr_ptr ExprMgr_simplify_iff(const ExprMgr_ptr self,
-                                     const SymbTable_ptr st,
-                                     const Expr_ptr a,
-                                     const Expr_ptr b);
+Expr_ptr ExprMgr_simplify_iff(const ExprMgr_ptr self, const SymbTable_ptr st,
+                              const Expr_ptr a, const Expr_ptr b);
 
 /*!
   \methodof ExprMgr
@@ -1262,10 +1256,9 @@ Expr_ptr ExprMgr_simplify_iff(const ExprMgr_ptr self,
 
   \se None
 */
-Expr_ptr ExprMgr_simplify_word_resize(const ExprMgr_ptr self, const SymbTable_ptr st,
-                                             Expr_ptr w,
-                                             Expr_ptr i);
-
+Expr_ptr ExprMgr_simplify_word_resize(const ExprMgr_ptr self,
+                                      const SymbTable_ptr st, Expr_ptr w,
+                                      Expr_ptr i);
 
 /*!
   \methodof ExprMgr
@@ -1274,8 +1267,8 @@ Expr_ptr ExprMgr_simplify_word_resize(const ExprMgr_ptr self, const SymbTable_pt
   Does not perform any simplification
 
 */
-Expr_ptr ExprMgr_cast_to_unsigned_word(const ExprMgr_ptr self,
-                                       Expr_ptr width, Expr_ptr arg);
+Expr_ptr ExprMgr_cast_to_unsigned_word(const ExprMgr_ptr self, Expr_ptr width,
+                                       Expr_ptr arg);
 
 /*!
   \methodof ExprMgr
@@ -1316,10 +1309,9 @@ boolean ExprMgr_time_is_next(const ExprMgr_ptr self, int time);
 
   Moves the next operator to the tree leafs (i.e. on identifiers)
 */
-Expr_ptr ExprMgr_move_next_to_leaves(const ExprMgr_ptr self, SymbTable_ptr st, Expr_ptr expr);
+Expr_ptr ExprMgr_move_next_to_leaves(const ExprMgr_ptr self, SymbTable_ptr st,
+                                     Expr_ptr expr);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_WFF_EXPR_MGR_H__ */

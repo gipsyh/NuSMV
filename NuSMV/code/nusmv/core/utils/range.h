@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,33 +34,30 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_RANGE_H__
 #define __NUSMV_CORE_UTILS_RANGE_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \brief Called before using Utils_range_check callback function
 
-  
+
 
   \se Utils_range_check
 */
-void Utils_set_data_for_range_check(const NuSMVEnv_ptr env,
-                                           node_ptr var,
-                                           node_ptr range);
+void Utils_set_data_for_range_check(const NuSMVEnv_ptr env, node_ptr var,
+                                    node_ptr range);
 
 /*!
   \brief Called before using Utils_range_check callback function
 
-  
+
 
   \se Utils_range_check
 */
-void Utils_set_mode_for_range_check(const NuSMVEnv_ptr env,
-                                           boolean is_fatal);
+void Utils_set_mode_for_range_check(const NuSMVEnv_ptr env, boolean is_fatal);
 
 /*!
   \brief Checks if the values of <code>n</code> is in the
@@ -72,7 +69,7 @@ void Utils_set_mode_for_range_check(const NuSMVEnv_ptr env,
   invocation of this function.
   An error occure if:
    1. the value is not in the range (all FAILURE node are, of course, irgnored)
-  
+
 
   \se Utils_set_data_for_range_check
 */
@@ -82,7 +79,7 @@ void Utils_range_check(const NuSMVEnv_ptr env, node_ptr n);
   \brief Checks if the values of <code>n</code> does not
   contains FAILURE node. If they do then report and terminate.
 
-  
+
 
   \se Utils_set_data_for_range_check
 */
@@ -120,6 +117,5 @@ boolean Utils_check_subrange(node_ptr subrange);
   \sa Utils_check_subrange
 */
 boolean Utils_check_subrange_not_negative(node_ptr subrange);
-
 
 #endif /* __NUSMV_CORE_UTILS_RANGE_H__ */

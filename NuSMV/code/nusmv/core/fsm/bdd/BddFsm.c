@@ -40,30 +40,27 @@
 
 */
 
-
 #include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/fsm/bdd/BddFsm_private.h"
-#include "nusmv/core/fsm/bdd/bddInt.h"
-#include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/fsm/bdd/FairnessList.h"
+#include "nusmv/core/fsm/bdd/bddInt.h"
 
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/utils/OStream.h"
 #include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/utils/utils_io.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils_io.h"
 
 #include "nusmv/core/compile/compile.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/enc/enc.h"
+#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/parser/parser.h"
 #include "nusmv/core/parser/symbols.h"
 
 /* libraries */
 #include <math.h>
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -77,10 +74,9 @@
 /*                     Static functions prototypes                        */
 /* ---------------------------------------------------------------------- */
 
-static void bdd_fsm_init(BddFsm_ptr self, BddEnc_ptr encoding,
-                         BddStates init, BddInvarStates invar_states,
-                         BddInvarInputs invar_inputs,
-                         BddTrans_ptr trans,
+static void bdd_fsm_init(BddFsm_ptr self, BddEnc_ptr encoding, BddStates init,
+                         BddInvarStates invar_states,
+                         BddInvarInputs invar_inputs, BddTrans_ptr trans,
                          JusticeList_ptr justice,
                          CompassionList_ptr compassion);
 
@@ -90,72 +86,57 @@ static void bdd_fsm_deinit(BddFsm_ptr self);
 
 static void bdd_fsm_compute_reachable_states(BddFsm_ptr self);
 
-static BddStatesInputs
-bdd_fsm_get_legal_state_input(BddFsm_ptr self);
+static BddStatesInputs bdd_fsm_get_legal_state_input(BddFsm_ptr self);
 
 /* The new code for fairness */
 static BddStatesInputs
-bdd_fsm_get_fair_or_revfair_states_inputs(BddFsm_ptr self,
-                                          BddFsm_dir dir);
+bdd_fsm_get_fair_or_revfair_states_inputs(BddFsm_ptr self, BddFsm_dir dir);
 
-static BddStatesInputs
-bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace(
+static BddStatesInputs bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace(
     const BddFsm_ptr self, BddStatesInputs subspace, BddFsm_dir dir);
 
-static BddStatesInputs
-bdd_fsm_compute_EL_SI_subset(const BddFsm_ptr self,
-                             BddStatesInputs subspace,
-                             BddFsm_dir dir);
+static BddStatesInputs bdd_fsm_compute_EL_SI_subset(const BddFsm_ptr self,
+                                                    BddStatesInputs subspace,
+                                                    BddFsm_dir dir);
 
 static BddStatesInputs
-bdd_fsm_compute_EL_SI_subset_aux(const BddFsm_ptr self,
-                                 BddStatesInputs states,
-                                 BddStatesInputs subspace,
-                                 BddFsm_dir dir);
-
+bdd_fsm_compute_EL_SI_subset_aux(const BddFsm_ptr self, BddStatesInputs states,
+                                 BddStatesInputs subspace, BddFsm_dir dir);
 
 static void bdd_fsm_check_init_state_invar_emptiness(const BddFsm_ptr self);
 static void bdd_fsm_check_fairness_emptiness(const BddFsm_ptr self);
-
 
 /* ---------------------------------------------------------------------- */
 /*                          public methods                                */
 /* ---------------------------------------------------------------------- */
 
-BddFsm_ptr BddFsm_create(BddEnc_ptr encoding,
-                         BddStates init,
+BddFsm_ptr BddFsm_create(BddEnc_ptr encoding, BddStates init,
                          BddInvarStates invar_states,
-                         BddInvarInputs invar_inputs,
-                         BddTrans_ptr trans,
+                         BddInvarInputs invar_inputs, BddTrans_ptr trans,
                          JusticeList_ptr justice,
-                         CompassionList_ptr compassion)
-{
-  BddFsm_ptr self = ALLOC( BddFsm, 1 );
+                         CompassionList_ptr compassion) {
+  BddFsm_ptr self = ALLOC(BddFsm, 1);
   BDD_FSM_CHECK_INSTANCE(self);
 
-  bdd_fsm_init(self, encoding, init, invar_states, invar_inputs,
-               trans, justice, compassion);
+  bdd_fsm_init(self, encoding, init, invar_states, invar_inputs, trans, justice,
+               compassion);
 
   return self;
 }
 
-
-void BddFsm_destroy(BddFsm_ptr self)
-{
+void BddFsm_destroy(BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
 
   bdd_fsm_deinit(self);
   FREE(self);
 }
 
-
-BddFsm_ptr BddFsm_copy(const BddFsm_ptr self)
-{
+BddFsm_ptr BddFsm_copy(const BddFsm_ptr self) {
   BddFsm_ptr copy;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  copy = ALLOC( BddFsm, 1 );
+  copy = ALLOC(BddFsm, 1);
   BDD_FSM_CHECK_INSTANCE(copy);
 
   bdd_fsm_copy(self, copy);
@@ -163,84 +144,67 @@ BddFsm_ptr BddFsm_copy(const BddFsm_ptr self)
   return copy;
 }
 
-
 void BddFsm_copy_cache(BddFsm_ptr self, const BddFsm_ptr other,
-                       boolean keep_family)
-{
+                       boolean keep_family) {
   BDD_FSM_CHECK_INSTANCE(self);
 
   BddFsmCache_destroy(self->cache);
-  if (keep_family) self->cache = BddFsmCache_soft_copy(other->cache);
-  else self->cache = BddFsmCache_hard_copy(other->cache);
+  if (keep_family)
+    self->cache = BddFsmCache_soft_copy(other->cache);
+  else
+    self->cache = BddFsmCache_hard_copy(other->cache);
 }
 
-
-JusticeList_ptr BddFsm_get_justice(const BddFsm_ptr self)
-{
+JusticeList_ptr BddFsm_get_justice(const BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
   return self->justice;
 }
 
-
-CompassionList_ptr BddFsm_get_compassion(const BddFsm_ptr self)
-{
+CompassionList_ptr BddFsm_get_compassion(const BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
   return self->compassion;
 }
 
-
-BddStates BddFsm_get_init(const BddFsm_ptr self)
-{
+BddStates BddFsm_get_init(const BddFsm_ptr self) {
   bdd_ptr res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  res = bdd_dup((bdd_ptr) self->init);
+  res = bdd_dup((bdd_ptr)self->init);
   return BDD_STATES(res);
 }
 
-
-BddInvarStates BddFsm_get_state_constraints(const BddFsm_ptr self)
-{
+BddInvarStates BddFsm_get_state_constraints(const BddFsm_ptr self) {
   bdd_ptr res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  res = bdd_dup( (bdd_ptr) self->invar_states );
+  res = bdd_dup((bdd_ptr)self->invar_states);
   return BDD_INVAR_STATES(res);
 }
 
-
-BddInvarInputs BddFsm_get_input_constraints(const BddFsm_ptr self)
-{
+BddInvarInputs BddFsm_get_input_constraints(const BddFsm_ptr self) {
   bdd_ptr res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  res = bdd_dup( (bdd_ptr) self->invar_inputs );
+  res = bdd_dup((bdd_ptr)self->invar_inputs);
   return BDD_INVAR_INPUTS(res);
 }
 
-
-BddTrans_ptr BddFsm_get_trans(const BddFsm_ptr self)
-{
+BddTrans_ptr BddFsm_get_trans(const BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
 
   return self->trans;
 }
 
-
-BddEnc_ptr BddFsm_get_bdd_encoding(const BddFsm_ptr self)
-{
+BddEnc_ptr BddFsm_get_bdd_encoding(const BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
   return self->enc;
 }
 
-
 boolean BddFsm_get_cached_reachable_states(const BddFsm_ptr self,
-                                           BddStates** layers,
-                                           int* size)
-{
+                                           BddStates **layers, int *size) {
   BDD_FSM_CHECK_INSTANCE(self);
 
   *layers = CACHE_GET(reachable.layers);
@@ -249,44 +213,34 @@ boolean BddFsm_get_cached_reachable_states(const BddFsm_ptr self,
   return CACHE_GET(reachable.computed);
 }
 
-
-void BddFsm_set_reachable_states(const BddFsm_ptr self,
-                                 BddStates reachable)
-{
+void BddFsm_set_reachable_states(const BddFsm_ptr self, BddStates reachable) {
   BDD_FSM_CHECK_INSTANCE(self);
   BddFsmCache_set_reachable_states(self->cache, reachable);
 }
 
-
-boolean BddFsm_has_cached_reachable_states(const BddFsm_ptr self)
-{
+boolean BddFsm_has_cached_reachable_states(const BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
   return !CACHE_IS_EQUAL(reachable.reachable_states, (bdd_ptr)NULL);
 }
 
-
 void BddFsm_update_cached_reachable_states(const BddFsm_ptr self,
-                                           node_ptr layers_list,
-                                           int size,
-                                           boolean completed)
-{
+                                           node_ptr layers_list, int size,
+                                           boolean completed) {
   BDD_FSM_CHECK_INSTANCE(self);
 
   BddFsmCache_set_reachables(self->cache, layers_list, size, completed);
 }
 
-
-boolean BddFsm_reachable_states_computed(BddFsm_ptr self)
-{
+boolean BddFsm_reachable_states_computed(BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
 
-  if ( CACHE_IS_EQUAL(reachable.computed, false) ) return false;
-  else return true;
+  if (CACHE_IS_EQUAL(reachable.computed, false))
+    return false;
+  else
+    return true;
 }
 
-
-BddStates BddFsm_get_reachable_states(BddFsm_ptr self)
-{
+BddStates BddFsm_get_reachable_states(BddFsm_ptr self) {
   BddStates res;
 
   BDD_FSM_CHECK_INSTANCE(self);
@@ -299,29 +253,25 @@ BddStates BddFsm_get_reachable_states(BddFsm_ptr self)
   /* Otherwise compute them, if necessary */
   else {
 
-    if ( CACHE_IS_EQUAL(reachable.computed, false) ) {
+    if (CACHE_IS_EQUAL(reachable.computed, false)) {
       bdd_fsm_compute_reachable_states(self);
     }
 
     if (CACHE_GET(reachable.diameter) > 0) {
       res = CACHE_GET(reachable.layers[CACHE_GET(reachable.diameter) - 1]);
-    }
-    else {
+    } else {
       res = bdd_false(self->dd);
     }
-
   }
 
-  bdd_ref((bdd_ptr) res);
+  bdd_ref((bdd_ptr)res);
 
   return res;
 }
 
-
 void BddFsm_copy_reachable_states(BddFsm_ptr self, BddFsm_ptr other,
                                   boolean keep_family,
-                                  boolean force_calculation)
-{
+                                  boolean force_calculation) {
   BDD_FSM_CHECK_INSTANCE(self);
 
   /* computes reachables in other if needed */
@@ -339,10 +289,8 @@ void BddFsm_copy_reachable_states(BddFsm_ptr self, BddFsm_ptr other,
   BddFsmCache_copy_reachables(self->cache, other->cache);
 }
 
-
 BddStates BddFsm_get_reachable_states_at_distance(BddFsm_ptr self,
-                                                  int distance)
-{
+                                                  int distance) {
   BddStates res;
 
   BDD_FSM_CHECK_INSTANCE(self);
@@ -385,14 +333,12 @@ BddStates BddFsm_get_reachable_states_at_distance(BddFsm_ptr self,
   return res;
 }
 
-
-bdd_ptr BddFsm_get_monolithic_trans_bdd(BddFsm_ptr self)
-{
+bdd_ptr BddFsm_get_monolithic_trans_bdd(BddFsm_ptr self) {
   bdd_ptr res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  if ( CACHE_IS_EQUAL(monolithic_trans, (bdd_ptr) NULL) ) {
+  if (CACHE_IS_EQUAL(monolithic_trans, (bdd_ptr)NULL)) {
     res = BddTrans_get_monolithic_bdd(self->trans);
 
     CACHE_SET_BDD(monolithic_trans, res);
@@ -403,9 +349,7 @@ bdd_ptr BddFsm_get_monolithic_trans_bdd(BddFsm_ptr self)
   return res;
 }
 
-
-int BddFsm_get_distance_of_states(BddFsm_ptr self, BddStates states)
-{
+int BddFsm_get_distance_of_states(BddFsm_ptr self, BddStates states) {
   bdd_ptr constr_states;
   int i;
   int diameter;
@@ -418,14 +362,13 @@ int BddFsm_get_distance_of_states(BddFsm_ptr self, BddStates states)
   }
 
   /* applies state constraints: */
-  constr_states = bdd_and(self->dd,
-                          (bdd_ptr) states,
-                          (bdd_ptr) self->invar_states);
+  constr_states =
+      bdd_and(self->dd, (bdd_ptr)states, (bdd_ptr)self->invar_states);
 
   diameter = CACHE_GET(reachable.diameter);
 
-  for (i=0; i<diameter; ++i) {
-    bdd_ptr Ri = (bdd_ptr) BddFsm_get_reachable_states_at_distance(self, i);
+  for (i = 0; i < diameter; ++i) {
+    bdd_ptr Ri = (bdd_ptr)BddFsm_get_reachable_states_at_distance(self, i);
     int entailed = bdd_entailed(self->dd, constr_states, Ri);
 
     if (entailed == 1) {
@@ -441,9 +384,7 @@ int BddFsm_get_distance_of_states(BddFsm_ptr self, BddStates states)
   return result;
 }
 
-
-int BddFsm_get_minimum_distance_of_states(BddFsm_ptr self, BddStates states)
-{
+int BddFsm_get_minimum_distance_of_states(BddFsm_ptr self, BddStates states) {
   bdd_ptr constr_states;
   int i;
   int diameter;
@@ -456,16 +397,18 @@ int BddFsm_get_minimum_distance_of_states(BddFsm_ptr self, BddStates states)
   }
 
   /* applies state constraints: */
-  constr_states = bdd_and(self->dd, (bdd_ptr) states,
-                          (bdd_ptr) self->invar_states);
+  constr_states =
+      bdd_and(self->dd, (bdd_ptr)states, (bdd_ptr)self->invar_states);
 
   diameter = CACHE_GET(reachable.diameter);
 
-  for (i=0; (-1 == result) && i<diameter; ++i) {
-    bdd_ptr Ri  = (bdd_ptr) BddFsm_get_reachable_states_at_distance(self, i);
+  for (i = 0; (-1 == result) && i < diameter; ++i) {
+    bdd_ptr Ri = (bdd_ptr)BddFsm_get_reachable_states_at_distance(self, i);
 
     bdd_and_accumulate(self->dd, &Ri, constr_states);
-    if (bdd_isnot_false(self->dd, Ri)) { result = i; }
+    if (bdd_isnot_false(self->dd, Ri)) {
+      result = i;
+    }
 
     bdd_free(self->dd, Ri);
   }
@@ -474,9 +417,7 @@ int BddFsm_get_minimum_distance_of_states(BddFsm_ptr self, BddStates states)
   return result;
 }
 
-
-int BddFsm_get_diameter(BddFsm_ptr self)
-{
+int BddFsm_get_diameter(BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
 
   if (CACHE_IS_EQUAL(reachable.computed, false)) {
@@ -486,17 +427,15 @@ int BddFsm_get_diameter(BddFsm_ptr self)
   return CACHE_GET(reachable.diameter);
 }
 
-
-BddStates BddFsm_get_not_successor_states(BddFsm_ptr self)
-{
+BddStates BddFsm_get_not_successor_states(BddFsm_ptr self) {
   BddStates res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  if ( CACHE_IS_EQUAL(not_successor_states, BDD_STATES(NULL)) ) {
+  if (CACHE_IS_EQUAL(not_successor_states, BDD_STATES(NULL))) {
     bdd_ptr all_states = bdd_true(self->dd);
-    bdd_ptr succ       = BddFsm_get_backward_image(self, all_states);
-    bdd_ptr not_succ   = bdd_not(self->dd, succ);
+    bdd_ptr succ = BddFsm_get_backward_image(self, all_states);
+    bdd_ptr not_succ = bdd_not(self->dd, succ);
     bdd_ptr no_succ_constr = bdd_and(self->dd, not_succ, self->invar_states);
 
     bdd_free(self->dd, not_succ);
@@ -511,14 +450,12 @@ BddStates BddFsm_get_not_successor_states(BddFsm_ptr self)
   return res;
 }
 
-
-BddStates BddFsm_get_deadlock_states(BddFsm_ptr self)
-{
+BddStates BddFsm_get_deadlock_states(BddFsm_ptr self) {
   BddStates res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  if ( CACHE_IS_EQUAL(deadlock_states, BDD_STATES(NULL)) ) {
+  if (CACHE_IS_EQUAL(deadlock_states, BDD_STATES(NULL))) {
     BddStates no_succ = BddFsm_get_not_successor_states(self);
     BddStates reachable = BddFsm_get_reachable_states(self);
 
@@ -534,9 +471,7 @@ BddStates BddFsm_get_deadlock_states(BddFsm_ptr self)
   return res;
 }
 
-
-boolean BddFsm_is_total(BddFsm_ptr self)
-{
+boolean BddFsm_is_total(BddFsm_ptr self) {
   BddStates no_succ;
   boolean res;
 
@@ -544,15 +479,13 @@ boolean BddFsm_is_total(BddFsm_ptr self)
 
   no_succ = BddFsm_get_not_successor_states(self);
 
-  res = bdd_is_false(self->dd, (bdd_ptr) no_succ);
+  res = bdd_is_false(self->dd, (bdd_ptr)no_succ);
   bdd_free(self->dd, no_succ);
 
   return res;
 }
 
-
-boolean BddFsm_is_deadlock_free(BddFsm_ptr self)
-{
+boolean BddFsm_is_deadlock_free(BddFsm_ptr self) {
   BddStates deadlock;
   boolean res;
 
@@ -560,15 +493,13 @@ boolean BddFsm_is_deadlock_free(BddFsm_ptr self)
 
   deadlock = BddFsm_get_deadlock_states(self);
 
-  res = bdd_is_false(self->dd, (bdd_ptr) deadlock);
+  res = bdd_is_false(self->dd, (bdd_ptr)deadlock);
   bdd_free(self->dd, deadlock);
 
   return res;
 }
 
-
-BddStates BddFsm_get_forward_image(const BddFsm_ptr self, BddStates states)
-{
+BddStates BddFsm_get_forward_image(const BddFsm_ptr self, BddStates states) {
   BddStatesInputs one = bdd_true(self->dd);
   BddStates res;
 
@@ -580,12 +511,9 @@ BddStates BddFsm_get_forward_image(const BddFsm_ptr self, BddStates states)
   return res;
 }
 
-
 BddStates
-BddFsm_get_constrained_forward_image(const BddFsm_ptr self,
-                                     BddStates states,
-                                     BddStatesInputsNexts constraints)
-{
+BddFsm_get_constrained_forward_image(const BddFsm_ptr self, BddStates states,
+                                     BddStatesInputsNexts constraints) {
   BddStates res;
   bdd_ptr constr_trans;
   bdd_ptr tmp;
@@ -602,19 +530,15 @@ BddFsm_get_constrained_forward_image(const BddFsm_ptr self,
   tmp = BddTrans_get_forward_image_state(self->trans, constr_trans);
   bdd_free(self->dd, constr_trans);
 
-  res = BDD_STATES( BddEnc_next_state_var_to_state_var(self->enc, tmp) );
+  res = BDD_STATES(BddEnc_next_state_var_to_state_var(self->enc, tmp));
   bdd_free(self->dd, tmp);
 
-  bdd_and_accumulate(self->dd, (bdd_ptr*) &res, self->invar_states);
+  bdd_and_accumulate(self->dd, (bdd_ptr *)&res, self->invar_states);
   return res;
 }
 
-
-BddStates
-BddFsm_get_sins_constrained_forward_image(const BddFsm_ptr self,
-                                          BddStates states,
-                                          BddStatesInputsNexts constraints)
-{
+BddStates BddFsm_get_sins_constrained_forward_image(
+    const BddFsm_ptr self, BddStates states, BddStatesInputsNexts constraints) {
   BddStates res;
   bdd_ptr constr_trans;
   bdd_ptr tmp;
@@ -631,18 +555,15 @@ BddFsm_get_sins_constrained_forward_image(const BddFsm_ptr self,
   tmp = BddTrans_get_forward_image_state(self->trans, constr_trans);
   bdd_free(self->dd, constr_trans);
 
-  res = BDD_STATES( BddEnc_next_state_var_to_state_var(self->enc, tmp) );
+  res = BDD_STATES(BddEnc_next_state_var_to_state_var(self->enc, tmp));
   bdd_free(self->dd, tmp);
 
-  bdd_and_accumulate(self->dd, (bdd_ptr*) &res, self->invar_states);
+  bdd_and_accumulate(self->dd, (bdd_ptr *)&res, self->invar_states);
   return res;
 }
 
-
-BddStatesInputs
-BddFsm_get_forward_image_states_inputs(const BddFsm_ptr self,
-                                       BddStatesInputs si)
-{
+BddStatesInputs BddFsm_get_forward_image_states_inputs(const BddFsm_ptr self,
+                                                       BddStatesInputs si) {
   BddStatesInputs one = bdd_true(self->dd);
   BddStatesInputs res;
 
@@ -654,13 +575,9 @@ BddFsm_get_forward_image_states_inputs(const BddFsm_ptr self,
   return res;
 }
 
-
-BddStatesInputs
-BddFsm_get_constrained_forward_image_states_inputs(
-                                    const BddFsm_ptr self,
-                                    BddStatesInputs si,
-                                    BddStatesInputsNexts constraints)
-{
+BddStatesInputs BddFsm_get_constrained_forward_image_states_inputs(
+    const BddFsm_ptr self, BddStatesInputs si,
+    BddStatesInputsNexts constraints) {
   BddStatesInputs res;
   bdd_ptr constr_trans;
   bdd_ptr tmp;
@@ -677,17 +594,15 @@ BddFsm_get_constrained_forward_image_states_inputs(
   tmp = BddTrans_get_forward_image_state(self->trans, constr_trans);
   bdd_free(self->dd, constr_trans);
 
-  res = BDD_STATES_INPUTS( BddEnc_next_state_var_to_state_var(self->enc, tmp) );
+  res = BDD_STATES_INPUTS(BddEnc_next_state_var_to_state_var(self->enc, tmp));
   bdd_free(self->dd, tmp);
 
-  bdd_and_accumulate(self->dd, (bdd_ptr*) &res, self->invar_states);
-  bdd_and_accumulate(self->dd, (bdd_ptr*) &res, self->invar_inputs);
+  bdd_and_accumulate(self->dd, (bdd_ptr *)&res, self->invar_states);
+  bdd_and_accumulate(self->dd, (bdd_ptr *)&res, self->invar_inputs);
   return res;
 }
 
-
-BddStates BddFsm_get_backward_image(const BddFsm_ptr self, BddStates states)
-{
+BddStates BddFsm_get_backward_image(const BddFsm_ptr self, BddStates states) {
   BddStates res;
   BddStatesInputs one;
 
@@ -701,12 +616,9 @@ BddStates BddFsm_get_backward_image(const BddFsm_ptr self, BddStates states)
   return res;
 }
 
-
 BddStates
-BddFsm_get_constrained_backward_image(const BddFsm_ptr self,
-                                      BddStates states,
-                                      BddStatesInputsNexts constraints)
-{
+BddFsm_get_constrained_backward_image(const BddFsm_ptr self, BddStates states,
+                                      BddStatesInputsNexts constraints) {
   bdd_ptr constr_trans;
   bdd_ptr tmp, result;
 
@@ -728,11 +640,8 @@ BddFsm_get_constrained_backward_image(const BddFsm_ptr self,
   return BDD_STATES(result);
 }
 
-
 BddStatesInputs BddFsm_get_k_backward_image(const BddFsm_ptr self,
-                                            BddStates states,
-                                            int k)
-{
+                                            BddStates states, int k) {
   bdd_ptr tmp, tmp1, result;
 
   BDD_FSM_CHECK_INSTANCE(self);
@@ -755,10 +664,8 @@ BddStatesInputs BddFsm_get_k_backward_image(const BddFsm_ptr self,
   return BDD_STATES(result);
 }
 
-
 BddStatesInputs BddFsm_get_weak_backward_image(const BddFsm_ptr self,
-                                               BddStates states)
-{
+                                               BddStates states) {
   bdd_ptr constr_trans;
   bdd_ptr tmp, result;
 
@@ -778,10 +685,8 @@ BddStatesInputs BddFsm_get_weak_backward_image(const BddFsm_ptr self,
   return BDD_STATES(result);
 }
 
-
 BddStatesInputs BddFsm_get_strong_backward_image(const BddFsm_ptr self,
-                                                 BddStates states)
-{
+                                                 BddStates states) {
   bdd_ptr not_states;
   bdd_ptr tmp, result;
 
@@ -813,7 +718,7 @@ BddStatesInputs BddFsm_get_strong_backward_image(const BddFsm_ptr self,
      which have have at least one successor  and all state/input/successor
      satisty the invariants.
   */
-  tmp = (bdd_ptr) bdd_fsm_get_legal_state_input(self);
+  tmp = (bdd_ptr)bdd_fsm_get_legal_state_input(self);
 
   bdd_and_accumulate(self->dd, &result, tmp);
   bdd_free(self->dd, tmp);
@@ -826,28 +731,22 @@ BddStatesInputs BddFsm_get_strong_backward_image(const BddFsm_ptr self,
   return BDD_STATES_INPUTS(result);
 }
 
-
-BddStatesInputs BddFsm_get_fair_states_inputs(BddFsm_ptr self)
-{
+BddStatesInputs BddFsm_get_fair_states_inputs(BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
   return bdd_fsm_get_fair_or_revfair_states_inputs(self, BDD_FSM_DIR_BWD);
 }
 
-
-BddStatesInputs BddFsm_get_revfair_states_inputs(BddFsm_ptr self)
-{
+BddStatesInputs BddFsm_get_revfair_states_inputs(BddFsm_ptr self) {
   BDD_FSM_CHECK_INSTANCE(self);
   return bdd_fsm_get_fair_or_revfair_states_inputs(self, BDD_FSM_DIR_FWD);
 }
 
-
-BddStates BddFsm_get_fair_states(BddFsm_ptr self)
-{
+BddStates BddFsm_get_fair_states(BddFsm_ptr self) {
   BddStates res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  if ( CACHE_IS_EQUAL(fair_states, BDD_STATES(NULL)) ) {
+  if (CACHE_IS_EQUAL(fair_states, BDD_STATES(NULL))) {
     BddStatesInputs si = BddFsm_get_fair_states_inputs(self);
     BddStates fs = BddFsm_states_inputs_to_states(self, si);
 
@@ -860,14 +759,12 @@ BddStates BddFsm_get_fair_states(BddFsm_ptr self)
   return res;
 }
 
-
-BddStates BddFsm_get_revfair_states(BddFsm_ptr self)
-{
+BddStates BddFsm_get_revfair_states(BddFsm_ptr self) {
   BddStates res;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  if ( CACHE_IS_EQUAL(revfair_states, BDD_STATES(NULL)) ) {
+  if (CACHE_IS_EQUAL(revfair_states, BDD_STATES(NULL))) {
     BddStatesInputs si = BddFsm_get_revfair_states_inputs(self);
     BddStates fs = BddFsm_states_inputs_to_states(self, si);
 
@@ -880,11 +777,9 @@ BddStates BddFsm_get_revfair_states(BddFsm_ptr self)
   return res;
 }
 
-
 BddInputs BddFsm_states_to_states_get_inputs(const BddFsm_ptr self,
                                              BddStates cur_states,
-                                             BddStates next_states)
-{
+                                             BddStates next_states) {
   BddStates bwd_image_si;
   BddInputs inputs;
 
@@ -899,9 +794,7 @@ BddInputs BddFsm_states_to_states_get_inputs(const BddFsm_ptr self,
   return inputs;
 }
 
-
-boolean BddFsm_is_fair_states(const BddFsm_ptr self, BddStates states)
-{
+boolean BddFsm_is_fair_states(const BddFsm_ptr self, BddStates states) {
   BddStates fair_states;
   boolean res;
 
@@ -915,13 +808,11 @@ boolean BddFsm_is_fair_states(const BddFsm_ptr self, BddStates states)
   return res;
 }
 
-
 BddStatesInputs BddFsm_get_states_inputs_constraints(const BddFsm_ptr self,
-                                                     BddFsm_dir dir)
-{
+                                                     BddFsm_dir dir) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->enc));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   BddStatesInputs result;
   BddStates all_states;
@@ -930,14 +821,13 @@ BddStatesInputs BddFsm_get_states_inputs_constraints(const BddFsm_ptr self,
 
   if (opt_use_reachable_states(opts)) {
     all_states = BddFsm_get_reachable_states(self);
-  }
-  else all_states = bdd_true(self->dd);
+  } else
+    all_states = bdd_true(self->dd);
 
   /* it would be a better idea to cache it */
   if (dir == BDD_FSM_DIR_BWD) {
     result = BddTrans_get_backward_image_state_input(self->trans, all_states);
-  }
-  else {
+  } else {
     /* TODO[VS] make symmetric? */
     result = BddFsm_get_forward_image_states_inputs(self, all_states);
   }
@@ -945,10 +835,8 @@ BddStatesInputs BddFsm_get_states_inputs_constraints(const BddFsm_ptr self,
   return result;
 }
 
-
 BddStates BddFsm_states_inputs_to_states(const BddFsm_ptr self,
-                                         BddStatesInputs si)
-{
+                                         BddStatesInputs si) {
   BddStates states;
   bdd_ptr input_vars_cube;
 
@@ -963,19 +851,16 @@ BddStates BddFsm_states_inputs_to_states(const BddFsm_ptr self,
   return states;
 }
 
-
-boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
-                                              int k,
-                                              int max_seconds)
-{
+boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self, int k,
+                                              int max_seconds) {
   bdd_ptr reachable_states_bdd;
-  bdd_ptr from_lower_bound;   /* the frontier */
+  bdd_ptr from_lower_bound; /* the frontier */
   bdd_ptr invars;
   node_ptr reachable_states_layers;
 
   int diameter;
   boolean completed;
-  BddStates* layers;
+  BddStates *layers;
   boolean result;
 
   long start_time;
@@ -1007,15 +892,14 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
 
     if (completed) {
       return true; /* already ready */
-    }
-    else {
+    } else {
       /* The cached analysis is not complete, so we have to resume the
          last state */
 
       /* Regen the list */
-      for (i=0; i<diameter; i++) {
-        reachable_states_layers =
-          cons(nodemgr, (node_ptr) bdd_dup(layers[i]), reachable_states_layers);
+      for (i = 0; i < diameter; i++) {
+        reachable_states_layers = cons(nodemgr, (node_ptr)bdd_dup(layers[i]),
+                                       reachable_states_layers);
       }
 
       /* Last layer contains the last reachable set */
@@ -1027,19 +911,15 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
         bdd_ptr tmp;
 
         tmp = bdd_not(self->dd, layers[diameter - 2]);
-        from_lower_bound = bdd_and(self->dd,
-                                   reachable_states_bdd,
-                                   tmp);
+        from_lower_bound = bdd_and(self->dd, reachable_states_bdd, tmp);
         bdd_free(self->dd, tmp);
-      }
-      else {
+      } else {
         /* We computed only the init state, so the frontier is the
            init itself */
         from_lower_bound = bdd_dup(layers[0]);
       }
     }
-  }
-  else {
+  } else {
     /* No cache, we hawe to start from scratch */
 
     /* Initial state = inits && invars */
@@ -1053,11 +933,11 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
 
     if (bdd_isnot_false(self->dd, reachable_states_bdd)) {
       reachable_states_layers =
-        cons(nodemgr, (node_ptr) bdd_dup(reachable_states_bdd), reachable_states_layers);
+          cons(nodemgr, (node_ptr)bdd_dup(reachable_states_bdd),
+               reachable_states_layers);
 
       diameter = 1;
-    }
-    else {
+    } else {
       /* If the initial region is empty then diameter is 0 */
       reachable_states_layers = Nil;
       diameter = 0;
@@ -1071,25 +951,25 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
 
   /* Real analysis: the cycle terminates when fixpoint is reached so
      no new states can be visited */
-  while ((bdd_isnot_false(self->dd, from_lower_bound)) &&
-         (0 != k) &&
-         ((-1 == max_seconds) ||
-          (util_cpu_time()-start_time) < limit_time)) {
+  while ((bdd_isnot_false(self->dd, from_lower_bound)) && (0 != k) &&
+         ((-1 == max_seconds) || (util_cpu_time() - start_time) < limit_time)) {
     bdd_ptr from_upper_bound, img, not_from_upper_bound;
 
     /* Decrease the remaining steps if k is not < 0*/
-    if (k>0) k--;
+    if (k > 0)
+      k--;
 
     /* Save old reachables */
     from_upper_bound = bdd_dup(reachable_states_bdd);
 
     if (opt_verbose_level_gt(opts, 2)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      Logger_log(logger,
-              "  iteration %d: BDD size = %d, frontier size = %d, states = %g\n",
-              diameter, bdd_size(self->dd, reachable_states_bdd),
-              bdd_size(self->dd, from_lower_bound),
-              BddEnc_count_states_of_bdd(self->enc, reachable_states_bdd));
+      Logger_log(
+          logger,
+          "  iteration %d: BDD size = %d, frontier size = %d, states = %g\n",
+          diameter, bdd_size(self->dd, reachable_states_bdd),
+          bdd_size(self->dd, from_lower_bound),
+          BddEnc_count_states_of_bdd(self->enc, reachable_states_bdd));
     }
 
     /* Get the forward image */
@@ -1098,12 +978,12 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
     /* Now the reachable states are the old ones union the forward
        image */
     bdd_or_accumulate(self->dd, &reachable_states_bdd, img);
-    bdd_free(self->dd, (bdd_ptr) img);
+    bdd_free(self->dd, (bdd_ptr)img);
 
     if (opt_verbose_level_gt(opts, 2)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_log(logger, "  forward step done, size = %d\n",
-              bdd_size(self->dd, reachable_states_bdd));
+                 bdd_size(self->dd, reachable_states_bdd));
     }
 
     /* Now, update the frontier */
@@ -1117,9 +997,8 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
     /* New frontier is the differnece between old reachables and new
        ones so we do the intersection between the complementar set of
        old reachables with the new reachables. See also issue 4475 */
-    from_lower_bound = bdd_and(self->dd,
-                                 reachable_states_bdd,
-                                 not_from_upper_bound);
+    from_lower_bound =
+        bdd_and(self->dd, reachable_states_bdd, not_from_upper_bound);
 
     /* Free old reachables negation */
     bdd_free(self->dd, not_from_upper_bound);
@@ -1127,7 +1006,7 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
     if (opt_verbose_level_gt(opts, 2)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_log(logger, "  new frontier computed, size = %d\n",
-              bdd_size(self->dd, from_lower_bound));
+                 bdd_size(self->dd, from_lower_bound));
     }
 
     /* Free old reachables */
@@ -1138,7 +1017,8 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
 
     /* Update the reachable list */
     reachable_states_layers =
-      cons(nodemgr, (node_ptr) bdd_dup(reachable_states_bdd), reachable_states_layers);
+        cons(nodemgr, (node_ptr)bdd_dup(reachable_states_bdd),
+             reachable_states_layers);
 
   } /* while loop */
 
@@ -1156,15 +1036,14 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
 
       tmp = reachable_states_layers;
       reachable_states_layers = cdr(reachable_states_layers);
-      bdd_free(self->dd, (bdd_ptr) car(tmp));
+      bdd_free(self->dd, (bdd_ptr)car(tmp));
       free_node(nodemgr, tmp);
-      diameter --;
+      diameter--;
     }
 
     BddFsm_update_cached_reachable_states(self, reachable_states_layers,
                                           diameter, true);
-  }
-  else {
+  } else {
     /*
        Cache the partial computed layers.
        BddFsm_update_cached_reachables is responsible of the free of the list
@@ -1189,10 +1068,8 @@ boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
   return result;
 }
 
-
 BddStates BddFsm_states_inputs_to_inputs(const BddFsm_ptr self,
-                                         BddStatesInputs si)
-{
+                                         BddStatesInputs si) {
   BddStates input;
   bdd_ptr vars_cube;
 
@@ -1205,9 +1082,7 @@ BddStates BddFsm_states_inputs_to_inputs(const BddFsm_ptr self,
   return input;
 }
 
-
-void BddFsm_check_machine(const BddFsm_ptr self)
-{
+void BddFsm_check_machine(const BddFsm_ptr self) {
   StreamMgr_ptr streams;
   NuSMVEnv_ptr env;
   OptsHandler_ptr opts;
@@ -1226,67 +1101,81 @@ void BddFsm_check_machine(const BddFsm_ptr self)
   bdd_fsm_check_init_state_invar_emptiness(self);
   bdd_fsm_check_fairness_emptiness(self);
 
-  if (! BddFsm_is_total(self)) {
+  if (!BddFsm_is_total(self)) {
     OStream_ptr outstream = StreamMgr_get_output_ostream(streams);
     bdd_ptr noSuccStates = BddFsm_get_not_successor_states(self);
     bdd_ptr ds = BddEnc_pick_one_state(self->enc, noSuccStates);
     NodeList_ptr vars;
     bdd_free(self->dd, noSuccStates);
 
-    StreamMgr_print_output(streams,  "\n##########################################################\n");
-    StreamMgr_print_output(streams,  "The transition relation is not total. A state without\n");
-    StreamMgr_print_output(streams,  "successors is:\n");
+    StreamMgr_print_output(
+        streams,
+        "\n##########################################################\n");
+    StreamMgr_print_output(
+        streams, "The transition relation is not total. A state without\n");
+    StreamMgr_print_output(streams, "successors is:\n");
 
-    vars = SymbTable_get_layers_sf_i_vars(self->symb_table,
-                                          SymbTable_get_class_layer_names(self->symb_table, (const char*) NULL));
+    vars = SymbTable_get_layers_sf_i_vars(
+        self->symb_table,
+        SymbTable_get_class_layer_names(self->symb_table, (const char *)NULL));
     BddEnc_print_bdd_begin(self->enc, vars, false);
-    BddEnc_print_bdd(self->enc, ds, (VPFBEFNNV) NULL, outstream, NULL);
+    BddEnc_print_bdd(self->enc, ds, (VPFBEFNNV)NULL, outstream, NULL);
 
     if (CACHE_IS_EQUAL(reachable.computed, true) ||
         opt_use_reachable_states(opts)) {
       /* here the reachable states calculation has been done or requested. */
-      if (! BddFsm_is_deadlock_free(self)) {
+      if (!BddFsm_is_deadlock_free(self)) {
 
         bdd_ptr deadlockStates = BddFsm_get_deadlock_states(self);
         bdd_ptr ds = BddEnc_pick_one_state(self->enc, deadlockStates);
         bdd_free(self->dd, deadlockStates);
 
-        StreamMgr_print_output(streams,  "The transition relation is not deadlock-free.\n");
-        StreamMgr_print_output(streams,  "A deadlock state is:\n");
-        BddEnc_print_bdd(self->enc, ds, (VPFBEFNNV) NULL, outstream, NULL);
+        StreamMgr_print_output(
+            streams, "The transition relation is not deadlock-free.\n");
+        StreamMgr_print_output(streams, "A deadlock state is:\n");
+        BddEnc_print_bdd(self->enc, ds, (VPFBEFNNV)NULL, outstream, NULL);
+      } else {
+        StreamMgr_print_output(
+            streams, "However, all the states without successors are\n");
+        StreamMgr_print_output(
+            streams, "non-reachable, so the machine is deadlock-free.\n");
       }
-      else {
-        StreamMgr_print_output(streams,  "However, all the states without successors are\n");
-        StreamMgr_print_output(streams,  "non-reachable, so the machine is deadlock-free.\n");
-      }
-    }
-    else {
+    } else {
       /* reachables states should be calculated */
-      StreamMgr_print_output(streams,  "NOTE: No-successor states could be non-reachable, so\n");
-      StreamMgr_print_output(streams,  "      the machine could still be deadlock-free.\n");
-      StreamMgr_print_output(streams,  "      Reachable states have to be computed to check this.\n");
+      StreamMgr_print_output(
+          streams, "NOTE: No-successor states could be non-reachable, so\n");
+      StreamMgr_print_output(
+          streams, "      the machine could still be deadlock-free.\n");
+      StreamMgr_print_output(
+          streams,
+          "      Reachable states have to be computed to check this.\n");
     }
 
     BddEnc_print_bdd_end(self->enc);
     NodeList_destroy(vars);
 
-    StreamMgr_print_output(streams,  "##########################################################\n");
+    StreamMgr_print_output(
+        streams,
+        "##########################################################\n");
     bdd_free(self->dd, ds);
-  }
-  else {
-    StreamMgr_print_output(streams,  "\n##########################################################\n");
-    StreamMgr_print_output(streams,  "The transition relation is total: No deadlock state exists\n");
-    StreamMgr_print_output(streams,  "##########################################################\n");
+  } else {
+    StreamMgr_print_output(
+        streams,
+        "\n##########################################################\n");
+    StreamMgr_print_output(
+        streams,
+        "The transition relation is total: No deadlock state exists\n");
+    StreamMgr_print_output(
+        streams,
+        "##########################################################\n");
   }
 }
-
 
 void BddFsm_apply_synchronous_product_custom_varsets(BddFsm_ptr self,
                                                      const BddFsm_ptr other,
                                                      bdd_ptr state_vars_cube,
                                                      bdd_ptr input_vars_cube,
-                                                     bdd_ptr next_vars_cube)
-{
+                                                     bdd_ptr next_vars_cube) {
   BddFsmCache_ptr new_cache;
 
   BDD_FSM_CHECK_INSTANCE(self);
@@ -1318,9 +1207,7 @@ void BddFsm_apply_synchronous_product_custom_varsets(BddFsm_ptr self,
   self->cache = new_cache;
 }
 
-
-void BddFsm_apply_synchronous_product(BddFsm_ptr self, const BddFsm_ptr other)
-{
+void BddFsm_apply_synchronous_product(BddFsm_ptr self, const BddFsm_ptr other) {
   bdd_ptr input_vars_cube;
   bdd_ptr state_vars_cube;
   bdd_ptr next_vars_cube;
@@ -1331,21 +1218,16 @@ void BddFsm_apply_synchronous_product(BddFsm_ptr self, const BddFsm_ptr other)
   state_vars_cube = BddEnc_get_state_vars_cube(self->enc);
   next_vars_cube = BddEnc_get_next_state_vars_cube(self->enc);
 
-  BddFsm_apply_synchronous_product_custom_varsets(self,
-                                                  other,
-                                                  state_vars_cube,
-                                                  input_vars_cube,
-                                                  next_vars_cube);
+  BddFsm_apply_synchronous_product_custom_varsets(
+      self, other, state_vars_cube, input_vars_cube, next_vars_cube);
 
-  bdd_free(self->dd, (bdd_ptr) next_vars_cube);
-  bdd_free(self->dd, (bdd_ptr) state_vars_cube);
-  bdd_free(self->dd, (bdd_ptr) input_vars_cube);
+  bdd_free(self->dd, (bdd_ptr)next_vars_cube);
+  bdd_free(self->dd, (bdd_ptr)state_vars_cube);
+  bdd_free(self->dd, (bdd_ptr)input_vars_cube);
 }
 
-
-boolean BddFsm_compute_reachable(BddFsm_ptr self, int k, int t, int* diameter)
-{
-  BddStates* layers = NULL;
+boolean BddFsm_compute_reachable(BddFsm_ptr self, int k, int t, int *diameter) {
+  BddStates *layers = NULL;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
@@ -1354,40 +1236,35 @@ boolean BddFsm_compute_reachable(BddFsm_ptr self, int k, int t, int* diameter)
   return BddFsm_get_cached_reachable_states(self, &layers, diameter);
 }
 
-
-double BddFsm_count_transitions(const BddFsm_ptr self,
-                                BddStatesInputs bdd)
-{
+double BddFsm_count_transitions(const BddFsm_ptr self, BddStatesInputs bdd) {
   double num = 0;
   size_t array_size;
-  bdd_ptr* array;
+  bdd_ptr *array;
 
   BDD_FSM_CHECK_INSTANCE(self);
 
-  {  /* computes all pairs */
+  { /* computes all pairs */
     int res;
-    bdd_ptr mask_bdd =
-        BddEnc_apply_state_frozen_vars_mask_bdd(self->enc, bdd);
+    bdd_ptr mask_bdd = BddEnc_apply_state_frozen_vars_mask_bdd(self->enc, bdd);
 
     array_size = BddEnc_count_states_inputs_of_bdd(self->enc, mask_bdd);
     nusmv_assert(array_size >= 0);
     array = ALLOC(bdd_ptr, array_size);
     nusmv_assert(NULL != array);
 
-    res = BddEnc_pick_all_terms_states_inputs(
-        self->enc, mask_bdd, array, array_size);
+    res = BddEnc_pick_all_terms_states_inputs(self->enc, mask_bdd, array,
+                                              array_size);
     nusmv_assert(!res);
 
     bdd_free(self->dd, mask_bdd);
   }
 
-  {  /* loop over the pairs, accumulate the number of transitions */
+  { /* loop over the pairs, accumulate the number of transitions */
     BddStates one = bdd_true(self->dd);
     size_t j;
 
-    for (j=0; j<array_size; ++j) {
-      bdd_ptr image =
-          BddFsm_get_constrained_forward_image(self, one, array[j]);
+    for (j = 0; j < array_size; ++j) {
+      bdd_ptr image = BddFsm_get_constrained_forward_image(self, one, array[j]);
       bdd_ptr mask_image =
           BddEnc_apply_state_frozen_vars_mask_bdd(self->enc, image);
 
@@ -1405,23 +1282,19 @@ double BddFsm_count_transitions(const BddFsm_ptr self,
   return num;
 }
 
-
-int BddFsm_dump_fsm(BddFsm_ptr self,
-                    const NuSMVEnv_ptr env, node_ptr node_expr,
-                    char* str_constr,
-                    boolean init,
-                    boolean invar, boolean trans, boolean fair,
-                    boolean reachable, FILE* outfile)
-{
+int BddFsm_dump_fsm(BddFsm_ptr self, const NuSMVEnv_ptr env, node_ptr node_expr,
+                    char *str_constr, boolean init, boolean invar,
+                    boolean trans, boolean fair, boolean reachable,
+                    FILE *outfile) {
   const BddFsm_ptr fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
   const BddEnc_ptr bdd_enc = BddFsm_get_bdd_encoding(fsm);
   const DDMgr_ptr dd = BddEnc_get_dd_manager(bdd_enc);
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  AddArray_ptr aar_expr = (AddArray_ptr) NULL;
+  AddArray_ptr aar_expr = (AddArray_ptr)NULL;
   AddArray_ptr addarray;
-  const char** labels;
+  const char **labels;
   int res = 0;
 
   if (NULL != node_expr) {
@@ -1432,27 +1305,28 @@ int BddFsm_dump_fsm(BddFsm_ptr self,
   {
     struct {
       boolean enabled;
-      const char* label;
+      const char *label;
       bdd_ptr bdd;
     } info[] = {
-      { init, "Init", BddFsm_get_init(fsm) },
-      { invar, "Invar", BddFsm_get_state_constraints(fsm) },
-      { trans, "Trans", BddFsm_get_monolithic_trans_bdd(fsm) },
-      { fair, "Fair", BddFsm_get_fair_states(fsm) },
-      { reachable, "Reachables", BddFsm_get_reachable_states(fsm) },
+        {init, "Init", BddFsm_get_init(fsm)},
+        {invar, "Invar", BddFsm_get_state_constraints(fsm)},
+        {trans, "Trans", BddFsm_get_monolithic_trans_bdd(fsm)},
+        {fair, "Fair", BddFsm_get_fair_states(fsm)},
+        {reachable, "Reachables", BddFsm_get_reachable_states(fsm)},
     };
     int i, idx;
     int entries = init + invar + trans + fair + reachable;
-    if ((AddArray_ptr) NULL != aar_expr) {
+    if ((AddArray_ptr)NULL != aar_expr) {
       entries += AddArray_get_size(aar_expr);
     }
 
     nusmv_assert(entries > 0);
     addarray = AddArray_create(entries);
-    labels = ALLOC(const char*, entries);
-    nusmv_assert((const char**) NULL != labels);
+    labels = ALLOC(const char *, entries);
+    nusmv_assert((const char **)NULL != labels);
 
-    for (idx=0, i=0; i<sizeof(info)/sizeof(info[0]) && idx<entries; ++i) {
+    for (idx = 0, i = 0; i < sizeof(info) / sizeof(info[0]) && idx < entries;
+         ++i) {
       if (info[i].enabled) {
         labels[idx] = util_strsav(info[i].label);
         AddArray_set_n(addarray, idx, bdd_to_add(dd, info[i].bdd));
@@ -1461,40 +1335,46 @@ int BddFsm_dump_fsm(BddFsm_ptr self,
     }
 
     /* adds all labels and adds coming possibly from the given expression */
-    if ((AddArray_ptr) NULL != aar_expr) {
-      const char* oname_fmt = "%s[%0*d]";
-      const int digits = (int) log10(AddArray_get_size(aar_expr));
-      const int oname_len = (strlen(str_constr) + strlen(oname_fmt) + digits + 1);
+    if ((AddArray_ptr)NULL != aar_expr) {
+      const char *oname_fmt = "%s[%0*d]";
+      const int digits = (int)log10(AddArray_get_size(aar_expr));
+      const int oname_len =
+          (strlen(str_constr) + strlen(oname_fmt) + digits + 1);
 
       /* keeps going from last reached idx */
-      for (i=idx; i<entries; ++i) {
-        char* oname = ALLOC(char, oname_len);
+      for (i = idx; i < entries; ++i) {
+        char *oname = ALLOC(char, oname_len);
         int c;
-        nusmv_assert((char*) NULL != oname);
-        c = snprintf(oname, oname_len, oname_fmt, str_constr, digits, i-idx);
+        nusmv_assert((char *)NULL != oname);
+        c = snprintf(oname, oname_len, oname_fmt, str_constr, digits, i - idx);
         SNPRINTF_CHECK(c, oname_len);
 
         labels[i] = oname;
-        AddArray_set_n(addarray, i, add_dup(AddArray_get_n(aar_expr, i-idx)));
+        AddArray_set_n(addarray, i, add_dup(AddArray_get_n(aar_expr, i - idx)));
       }
     }
 
     res = BddEnc_dump_addarray_dot(bdd_enc, addarray, labels, outfile);
 
     /* cleanup */
-    for (i=0; i<entries; ++i) { FREE(labels[i]); }
+    for (i = 0; i < entries; ++i) {
+      FREE(labels[i]);
+    }
     FREE(labels);
-    for (i=0; i<sizeof(info)/sizeof(info[0]); ++i) {
-      if ((bdd_ptr) NULL != info[i].bdd) { bdd_free(dd, info[i].bdd); }
+    for (i = 0; i < sizeof(info) / sizeof(info[0]); ++i) {
+      if ((bdd_ptr)NULL != info[i].bdd) {
+        bdd_free(dd, info[i].bdd);
+      }
     }
 
     AddArray_destroy(dd, addarray);
-    if ((AddArray_ptr) NULL != aar_expr) { AddArray_destroy(dd, aar_expr); }
+    if ((AddArray_ptr)NULL != aar_expr) {
+      AddArray_destroy(dd, aar_expr);
+    }
   }
 
   return res;
 }
-
 
 /* ---------------------------------------------------------------------- */
 /*                         Static functions                               */
@@ -1503,15 +1383,11 @@ int BddFsm_dump_fsm(BddFsm_ptr self,
 /*!
   \brief Private initializer
 */
-static void bdd_fsm_init(BddFsm_ptr self,
-                         BddEnc_ptr encoding,
-                         BddStates init,
+static void bdd_fsm_init(BddFsm_ptr self, BddEnc_ptr encoding, BddStates init,
                          BddInvarStates invar_states,
-                         BddInvarInputs invar_inputs,
-                         BddTrans_ptr trans,
+                         BddInvarInputs invar_inputs, BddTrans_ptr trans,
                          JusticeList_ptr justice,
-                         CompassionList_ptr compassion)
-{
+                         CompassionList_ptr compassion) {
   self->enc = encoding;
   self->dd = BddEnc_get_dd_manager(encoding);
   self->symb_table = BaseEnc_get_symb_table(BASE_ENC(encoding));
@@ -1524,9 +1400,9 @@ static void bdd_fsm_init(BddFsm_ptr self,
 
   nusmv_assert(init != NULL);
 
-  self->init = BDD_STATES( bdd_dup((bdd_ptr) init) );
-  self->invar_states = BDD_INVAR_STATES( bdd_dup((bdd_ptr) invar_states) );
-  self->invar_inputs = BDD_INVAR_INPUTS( bdd_dup((bdd_ptr) invar_inputs) );
+  self->init = BDD_STATES(bdd_dup((bdd_ptr)init));
+  self->invar_states = BDD_INVAR_STATES(bdd_dup((bdd_ptr)invar_states));
+  self->invar_inputs = BDD_INVAR_INPUTS(bdd_dup((bdd_ptr)invar_inputs));
   self->trans = trans;
   self->justice = justice;
   self->compassion = compassion;
@@ -1542,21 +1418,18 @@ static void bdd_fsm_init(BddFsm_ptr self,
 
 
 */
-static void bdd_fsm_copy(const BddFsm_ptr self, BddFsm_ptr copy)
-{
+static void bdd_fsm_copy(const BddFsm_ptr self, BddFsm_ptr copy) {
   copy->dd = self->dd;
   copy->enc = self->enc;
   copy->symb_table = self->symb_table;
 
-  copy->init = BDD_STATES( bdd_dup((bdd_ptr) self->init ) );
-  copy->invar_states =
-    BDD_INVAR_STATES( bdd_dup((bdd_ptr) self->invar_states ) );
-  copy->invar_inputs  =
-    BDD_INVAR_INPUTS( bdd_dup((bdd_ptr) self->invar_inputs ) );
+  copy->init = BDD_STATES(bdd_dup((bdd_ptr)self->init));
+  copy->invar_states = BDD_INVAR_STATES(bdd_dup((bdd_ptr)self->invar_states));
+  copy->invar_inputs = BDD_INVAR_INPUTS(bdd_dup((bdd_ptr)self->invar_inputs));
 
-  copy->trans = BDD_TRANS( Object_copy(OBJECT(self->trans)) );
-  copy->justice = JUSTICE_LIST( Object_copy(OBJECT(self->justice)));
-  copy->compassion = COMPASSION_LIST( Object_copy(OBJECT(self->compassion)));
+  copy->trans = BDD_TRANS(Object_copy(OBJECT(self->trans)));
+  copy->justice = JUSTICE_LIST(Object_copy(OBJECT(self->justice)));
+  copy->compassion = COMPASSION_LIST(Object_copy(OBJECT(self->compassion)));
 
   copy->cache = BddFsmCache_soft_copy(self->cache);
 }
@@ -1566,11 +1439,10 @@ static void bdd_fsm_copy(const BddFsm_ptr self, BddFsm_ptr copy)
 
 
 */
-static void bdd_fsm_deinit(BddFsm_ptr self)
-{
-  bdd_free(self->dd, (bdd_ptr) self->init);
-  bdd_free(self->dd, (bdd_ptr) self->invar_states);
-  bdd_free(self->dd, (bdd_ptr) self->invar_inputs);
+static void bdd_fsm_deinit(BddFsm_ptr self) {
+  bdd_free(self->dd, (bdd_ptr)self->init);
+  bdd_free(self->dd, (bdd_ptr)self->invar_states);
+  bdd_free(self->dd, (bdd_ptr)self->invar_inputs);
 
   Object_destroy(OBJECT(self->trans), NULL);
   Object_destroy(OBJECT(self->justice), NULL);
@@ -1586,8 +1458,7 @@ static void bdd_fsm_deinit(BddFsm_ptr self)
 
   \se Changes the internal cache
 */
-static void bdd_fsm_compute_reachable_states(BddFsm_ptr self)
-{
+static void bdd_fsm_compute_reachable_states(BddFsm_ptr self) {
   boolean res;
 
   /* Expand cacked reachable states until fixpoint without time limitations */
@@ -1619,11 +1490,10 @@ static void bdd_fsm_compute_reachable_states(BddFsm_ptr self)
 
   \se Cache can change
 */
-static BddStatesInputs bdd_fsm_get_legal_state_input(BddFsm_ptr self)
-{
+static BddStatesInputs bdd_fsm_get_legal_state_input(BddFsm_ptr self) {
   BddStatesInputs res;
 
-  if ( CACHE_IS_EQUAL(legal_state_input, BDD_STATES_INPUTS(NULL)) ) {
+  if (CACHE_IS_EQUAL(legal_state_input, BDD_STATES_INPUTS(NULL))) {
     bdd_ptr one = bdd_true(self->dd);
     /* Here we use weak-backward-image because
        it automatically applies invariant contrains on state, input, next-state.
@@ -1655,9 +1525,7 @@ static BddStatesInputs bdd_fsm_get_legal_state_input(BddFsm_ptr self)
 */
 
 static BddStatesInputs bdd_fsm_EXorEY_SI(const BddFsm_ptr self,
-                                         BddStatesInputs si,
-                                         BddFsm_dir dir)
-{
+                                         BddStatesInputs si, BddFsm_dir dir) {
   BddStatesInputs si_image;
   NuSMVEnv_ptr env;
   OptsHandler_ptr opts;
@@ -1667,7 +1535,6 @@ static BddStatesInputs bdd_fsm_EXorEY_SI(const BddFsm_ptr self,
   env = EnvObject_get_environment(ENV_OBJECT(self->enc));
   opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-
   if (dir == BDD_FSM_DIR_BWD) {
     BddStates states;
 
@@ -1675,8 +1542,7 @@ static BddStatesInputs bdd_fsm_EXorEY_SI(const BddFsm_ptr self,
     si_image = BddFsm_get_weak_backward_image(self, states);
 
     bdd_free(self->dd, states);
-  }
-  else {
+  } else {
     si_image = BddFsm_get_forward_image_states_inputs(self, si);
   }
 
@@ -1690,7 +1556,6 @@ static BddStatesInputs bdd_fsm_EXorEY_SI(const BddFsm_ptr self,
   return si_image;
 }
 
-
 /*!
   \brief Computes the set of state-input pairs that satisfy E(f U g)
    (if dir = BDD_FSM_DIR_BWD) or E(f S g) (otherwise),
@@ -1701,8 +1566,7 @@ static BddStatesInputs bdd_fsm_EXorEY_SI(const BddFsm_ptr self,
 
 static BddStatesInputs bdd_fsm_EUorES_SI(const BddFsm_ptr self,
                                          BddStatesInputs f, BddStatesInputs g,
-                                         BddFsm_dir dir)
-{
+                                         BddFsm_dir dir) {
   int i;
   BddStatesInputs resY;
   BddStatesInputs newY;
@@ -1734,9 +1598,9 @@ static BddStatesInputs bdd_fsm_EUorES_SI(const BddFsm_ptr self,
     if (opt_verbose_level_gt(opts, 5)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       Logger_log(logger,
-              "    size of Y%d = %g <states>x<inputs>, %d BDD nodes\n",
-              i, BddEnc_count_states_inputs_of_bdd(self->enc, resY),
-              bdd_size(self->dd, resY));
+                 "    size of Y%d = %g <states>x<inputs>, %d BDD nodes\n", i,
+                 BddEnc_count_states_inputs_of_bdd(self->enc, resY),
+                 bdd_size(self->dd, resY));
     }
 
     oldNotY = bdd_not(self->dd, resY);
@@ -1761,7 +1625,7 @@ static BddStatesInputs bdd_fsm_EUorES_SI(const BddFsm_ptr self,
 
   /* We do not free resY since it is rersposibility of the caller to
      free it. Functions always return a referenced bdd. */
-  return BDD_STATES_INPUTS( resY );
+  return BDD_STATES_INPUTS(resY);
 }
 
 /*!
@@ -1772,8 +1636,7 @@ static BddStatesInputs bdd_fsm_EUorES_SI(const BddFsm_ptr self,
 */
 static BddStatesInputs bdd_fsm_compute_EL_SI_subset(const BddFsm_ptr self,
                                                     BddStatesInputs subspace,
-                                                    BddFsm_dir dir)
-{
+                                                    BddFsm_dir dir) {
   BddStatesInputs res;
   BddStatesInputs old;
   int i = 0;
@@ -1794,23 +1657,25 @@ static BddStatesInputs bdd_fsm_compute_EL_SI_subset(const BddFsm_ptr self,
 
     if (opt_verbose_level_gt(opts, 5)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      Logger_log(logger, "  size of res%d = %g <states>x<input>, %d BDD nodes\n",
-              i++, BddEnc_count_states_inputs_of_bdd(self->enc, res),
-              bdd_size(self->dd, res));
+      Logger_log(logger,
+                 "  size of res%d = %g <states>x<input>, %d BDD nodes\n", i++,
+                 BddEnc_count_states_inputs_of_bdd(self->enc, res),
+                 bdd_size(self->dd, res));
     }
 
     bdd_free(self->dd, old);
     old = bdd_dup(res);
 
     /* See issue 4476 */
-    _new = bdd_fsm_compute_EL_SI_subset_aux(self, BDD_STATES_INPUTS(res), subspace, dir);
+    _new = bdd_fsm_compute_EL_SI_subset_aux(self, BDD_STATES_INPUTS(res),
+                                            subspace, dir);
 
     /* TODO[AT] is not it true that "new" is always a subset of "res" and only
        "subspace" is required? */
-    bdd_and_accumulate(self->dd, &res, (bdd_ptr) _new);
-    bdd_and_accumulate(self->dd, &res, (bdd_ptr) subspace);
+    bdd_and_accumulate(self->dd, &res, (bdd_ptr)_new);
+    bdd_and_accumulate(self->dd, &res, (bdd_ptr)subspace);
 
-    bdd_free(self->dd, (bdd_ptr) _new);
+    bdd_free(self->dd, (bdd_ptr)_new);
   }
   bdd_free(self->dd, old);
 
@@ -1829,11 +1694,9 @@ static BddStatesInputs bdd_fsm_compute_EL_SI_subset(const BddFsm_ptr self,
    in bdd_fsm_compute_EL_SI_subset! See issue 4477.
 
 */
-static BddStatesInputs bdd_fsm_compute_EL_SI_subset_aux(const BddFsm_ptr self,
-                                                        BddStatesInputs states,
-                                                        BddStatesInputs subspace,
-                                                        BddFsm_dir dir)
-{
+static BddStatesInputs
+bdd_fsm_compute_EL_SI_subset_aux(const BddFsm_ptr self, BddStatesInputs states,
+                                 BddStatesInputs subspace, BddFsm_dir dir) {
   BddStatesInputs res;
   FairnessListIterator_ptr iter;
   BddStatesInputs partial_result;
@@ -1844,8 +1707,8 @@ static BddStatesInputs bdd_fsm_compute_EL_SI_subset_aux(const BddFsm_ptr self,
   i = 0;
 
   /* Accumulates justice constraints: */
-  iter = FairnessList_begin( FAIRNESS_LIST(self->justice) );
-  while ( ! FairnessListIterator_is_end(iter) ) {
+  iter = FairnessList_begin(FAIRNESS_LIST(self->justice));
+  while (!FairnessListIterator_is_end(iter)) {
     /* See issue 4478 */
     BddStatesInputs p;
     BddStatesInputs constrained_state;
@@ -1878,15 +1741,12 @@ static BddStatesInputs bdd_fsm_compute_EL_SI_subset_aux(const BddFsm_ptr self,
    BDD_FSM_DIR_BWD) or reverse fair states (otherwise) by calling the
    Emerson-Lei algorithm.
 */
-static BddStatesInputs
-bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace(const BddFsm_ptr self,
-                                                      BddStatesInputs subspace,
-                                                      BddFsm_dir dir)
-{
+static BddStatesInputs bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace(
+    const BddFsm_ptr self, BddStatesInputs subspace, BddFsm_dir dir) {
   BddStatesInputs fair_or_revfair_states_inputs;
 
   fair_or_revfair_states_inputs =
-    bdd_fsm_compute_EL_SI_subset(self, subspace, dir);
+      bdd_fsm_compute_EL_SI_subset(self, subspace, dir);
 
   return fair_or_revfair_states_inputs;
 }
@@ -1903,8 +1763,7 @@ bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace(const BddFsm_ptr self,
   \sa bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace
 */
 static BddStatesInputs
-bdd_fsm_get_fair_or_revfair_states_inputs(BddFsm_ptr self, BddFsm_dir dir)
-{
+bdd_fsm_get_fair_or_revfair_states_inputs(BddFsm_ptr self, BddFsm_dir dir) {
   BddStatesInputs res;
   NuSMVEnv_ptr env;
   OptsHandler_ptr opts;
@@ -1914,10 +1773,10 @@ bdd_fsm_get_fair_or_revfair_states_inputs(BddFsm_ptr self, BddFsm_dir dir)
   env = EnvObject_get_environment(ENV_OBJECT(self->enc));
   opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
-  if ( (dir == BDD_FSM_DIR_BWD &&
-        CACHE_IS_EQUAL(fair_states_inputs, BDD_STATES(NULL))) ||
-       (dir == BDD_FSM_DIR_FWD &&
-        CACHE_IS_EQUAL(revfair_states_inputs, BDD_STATES(NULL))) ) {
+  if ((dir == BDD_FSM_DIR_BWD &&
+       CACHE_IS_EQUAL(fair_states_inputs, BDD_STATES(NULL))) ||
+      (dir == BDD_FSM_DIR_FWD &&
+       CACHE_IS_EQUAL(revfair_states_inputs, BDD_STATES(NULL)))) {
     BddStatesInputs si;
     BddStates fair_or_revfair_si;
 
@@ -1940,36 +1799,33 @@ bdd_fsm_get_fair_or_revfair_states_inputs(BddFsm_ptr self, BddFsm_dir dir)
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
       if (dir == BDD_FSM_DIR_BWD) {
         Logger_log(logger, "Computing the set of fair <state>x<input> pairs\n");
-      }
-      else {
-        Logger_log(logger, "Computing the set of reverse fair <state>x<input> pairs\n");
+      } else {
+        Logger_log(logger,
+                   "Computing the set of reverse fair <state>x<input> pairs\n");
       }
     }
 
     fair_or_revfair_si =
-      bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace(self, si, dir);
+        bdd_fsm_get_fair_or_revfair_states_inputs_in_subspace(self, si, dir);
 
     if (opt_verbose_level_gt(opts, 1)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      Logger_log(logger,"done\n");
+      Logger_log(logger, "done\n");
     }
 
     if (dir == BDD_FSM_DIR_BWD) {
       CACHE_SET_BDD(fair_states_inputs, fair_or_revfair_si);
-    }
-    else {
+    } else {
       CACHE_SET_BDD(revfair_states_inputs, fair_or_revfair_si);
     }
 
     bdd_free(self->dd, fair_or_revfair_si);
     bdd_free(self->dd, si);
-
   }
 
   if (dir == BDD_FSM_DIR_BWD) {
     res = CACHE_GET_BDD(fair_states_inputs);
-  }
-  else {
+  } else {
     res = CACHE_GET_BDD(revfair_states_inputs);
   }
 
@@ -1981,11 +1837,10 @@ bdd_fsm_get_fair_or_revfair_states_inputs(BddFsm_ptr self, BddFsm_dir dir)
 
 
 */
-static void bdd_fsm_check_init_state_invar_emptiness(const BddFsm_ptr self)
-{
+static void bdd_fsm_check_init_state_invar_emptiness(const BddFsm_ptr self) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   /* checks for emptiness of inits: */
   if (bdd_is_false(self->dd, self->init)) {
@@ -2002,19 +1857,17 @@ static void bdd_fsm_check_init_state_invar_emptiness(const BddFsm_ptr self)
 
 
 */
-static void bdd_fsm_check_fairness_emptiness(const BddFsm_ptr self)
-{
+static void bdd_fsm_check_fairness_emptiness(const BddFsm_ptr self) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   bdd_ptr fair;
 
   fair = BddFsm_get_fair_states_inputs(self);
 
   if (bdd_is_false(self->dd, fair)) {
     ErrorMgr_warning_fsm_fairness_empty(errmgr);
-  }
-  else if (bdd_isnot_false(self->dd, self->init)) {
+  } else if (bdd_isnot_false(self->dd, self->init)) {
     bdd_ptr fair_init = bdd_and(self->dd, self->init, fair);
 
     if (bdd_is_false(self->dd, fair_init)) {

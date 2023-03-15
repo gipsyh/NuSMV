@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,22 +34,19 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_CORE_H__
 #define __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_CORE_H__
 
-
-#include "nusmv/core/wff/lr/LogicRecognizerBase.h"
 #include "nusmv/core/utils/defs.h"
+#include "nusmv/core/wff/lr/LogicRecognizerBase.h"
 
 /*!
   \struct LogicRecognizerCore
   \brief Definition of the public accessor for class LogicRecognizerCore
 
-  
+
 */
-typedef struct LogicRecognizerCore_TAG*  LogicRecognizerCore_ptr;
+typedef struct LogicRecognizerCore_TAG *LogicRecognizerCore_ptr;
 
 /*!
   \brief To cast and check instances of class LogicRecognizerCore
@@ -57,18 +54,15 @@ typedef struct LogicRecognizerCore_TAG*  LogicRecognizerCore_ptr;
   These macros must be used respectively to cast and to check
   instances of class LogicRecognizerCore
 */
-#define LOGIC_RECOGNIZER_CORE(self) \
-         ((LogicRecognizerCore_ptr) self)
+#define LOGIC_RECOGNIZER_CORE(self) ((LogicRecognizerCore_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LOGIC_RECOGNIZER_CORE_CHECK_INSTANCE(self) \
-         (nusmv_assert(LOGIC_RECOGNIZER_CORE(self) != LOGIC_RECOGNIZER_CORE(NULL)))
-
-
+#define LOGIC_RECOGNIZER_CORE_CHECK_INSTANCE(self)                             \
+  (nusmv_assert(LOGIC_RECOGNIZER_CORE(self) != LOGIC_RECOGNIZER_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,9 +80,6 @@ typedef struct LogicRecognizerCore_TAG*  LogicRecognizerCore_ptr;
 */
 LogicRecognizerCore_ptr LogicRecognizerCore_create(NuSMVEnv_ptr env);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_WFF_LR_LOGIC_RECOGNIZER_CORE_H__ */

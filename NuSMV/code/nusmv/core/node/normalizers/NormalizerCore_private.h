@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,24 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_CORE_PRIVATE_H__
 #define __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_CORE_PRIVATE_H__
 
-
-#include "nusmv/core/node/normalizers/NormalizerCore.h"
 #include "nusmv/core/node/normalizers/NormalizerBase.h"
 #include "nusmv/core/node/normalizers/NormalizerBase_private.h"
+#include "nusmv/core/node/normalizers/NormalizerCore.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief NormalizerCore class definition derived from
                class NormalizerBase
 
-  
+
 
   \sa Base class NormalizerBase
 */
 
-typedef struct NormalizerCore_TAG
-{
+typedef struct NormalizerCore_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(NormalizerBase);
 
@@ -64,14 +59,11 @@ typedef struct NormalizerCore_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } NormalizerCore;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -85,9 +77,8 @@ typedef struct NormalizerCore_TAG
 
   \sa NormalizerCore_create
 */
-void
-normalizer_core_init(NormalizerCore_ptr self, const NuSMVEnv_ptr env,
-                     const char* name, int low, size_t num);
+void normalizer_core_init(NormalizerCore_ptr self, const NuSMVEnv_ptr env,
+                          const char *name, int low, size_t num);
 
 /*!
   \methodof NormalizerCore
@@ -104,9 +95,8 @@ void normalizer_core_deinit(NormalizerCore_ptr self);
   \brief Virtual menthod that normalizes the given node
    (core nodes are handled here)
 
-  
+
 */
-node_ptr
-normalizer_core_normalize_node(NormalizerBase_ptr self, node_ptr n);
+node_ptr normalizer_core_normalize_node(NormalizerBase_ptr self, node_ptr n);
 
 #endif /* __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_CORE_PRIVATE_H__ */

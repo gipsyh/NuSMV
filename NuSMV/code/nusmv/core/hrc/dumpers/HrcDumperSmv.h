@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_SMV_H__
 #define __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_SMV_H__
-
 
 #include "nusmv/core/utils/utils.h"
 
@@ -48,7 +45,7 @@
 
 
 */
-typedef struct HrcDumperSmv_TAG*  HrcDumperSmv_ptr;
+typedef struct HrcDumperSmv_TAG *HrcDumperSmv_ptr;
 
 /*!
   \brief To cast and check instances of class HrcDumperSmv
@@ -56,18 +53,15 @@ typedef struct HrcDumperSmv_TAG*  HrcDumperSmv_ptr;
   These macros must be used respectively to cast and to check
   instances of class HrcDumperSmv
 */
-#define HRC_DUMPER_SMV(self) \
-         ((HrcDumperSmv_ptr) self)
+#define HRC_DUMPER_SMV(self) ((HrcDumperSmv_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define HRC_DUMPER_SMV_CHECK_INSTANCE(self) \
-         (nusmv_assert(HRC_DUMPER_SMV(self) != HRC_DUMPER_SMV(NULL)))
-
-
+#define HRC_DUMPER_SMV_CHECK_INSTANCE(self)                                    \
+  (nusmv_assert(HRC_DUMPER_SMV(self) != HRC_DUMPER_SMV(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -83,12 +77,8 @@ typedef struct HrcDumperSmv_TAG*  HrcDumperSmv_ptr;
 
   \sa HrcDumper_destroy
 */
-HrcDumperSmv_ptr HrcDumperSmv_create(const NuSMVEnv_ptr env,
-                                     FILE* fout);
-
+HrcDumperSmv_ptr HrcDumperSmv_create(const NuSMVEnv_ptr env, FILE *fout);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_SMV_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,24 +34,21 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_DEPENDENCY_FORMULA_DEPENDENCY_H__
 #define __NUSMV_CORE_COMPILE_DEPENDENCY_FORMULA_DEPENDENCY_H__
 
-
-#include "nusmv/core/node/MasterNodeWalker.h"
-#include "nusmv/core/utils/defs.h"
-#include "nusmv/core/set/set.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/node/MasterNodeWalker.h"
+#include "nusmv/core/set/set.h"
+#include "nusmv/core/utils/defs.h"
 
 /*!
   \struct FormulaDependency
   \brief Definition of the public accessor for class FormulaDependency
 
-  
+
 */
-typedef struct FormulaDependency_TAG*  FormulaDependency_ptr;
+typedef struct FormulaDependency_TAG *FormulaDependency_ptr;
 
 /*!
   \brief To cast and check instances of class FormulaDependency
@@ -59,18 +56,15 @@ typedef struct FormulaDependency_TAG*  FormulaDependency_ptr;
   These macros must be used respectively to cast and to check
   instances of class FormulaDependency
 */
-#define FORMULA_DEPENDENCY(self) \
-         ((FormulaDependency_ptr) self)
+#define FORMULA_DEPENDENCY(self) ((FormulaDependency_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FORMULA_DEPENDENCY_CHECK_INSTANCE(self) \
-         (nusmv_assert(FORMULA_DEPENDENCY(self) != FORMULA_DEPENDENCY(NULL)))
-
-
+#define FORMULA_DEPENDENCY_CHECK_INSTANCE(self)                                \
+  (nusmv_assert(FORMULA_DEPENDENCY(self) != FORMULA_DEPENDENCY(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,8 +80,7 @@ typedef struct FormulaDependency_TAG*  FormulaDependency_ptr;
 
   \sa FormulaDependency_destroy
 */
-FormulaDependency_ptr
-FormulaDependency_create(const NuSMVEnv_ptr env);
+FormulaDependency_ptr FormulaDependency_create(const NuSMVEnv_ptr env);
 
 /*!
   \methodof FormulaDependency
@@ -117,9 +110,8 @@ void FormulaDependency_destroy(FormulaDependency_ptr self);
   \sa formula_dependency_get_definition_dependencies
 */
 Set_t FormulaDependency_get_dependencies(FormulaDependency_ptr self,
-                                                SymbTable_ptr symb_table,
-                                                node_ptr formula,
-                                                node_ptr context);
+                                         SymbTable_ptr symb_table,
+                                         node_ptr formula, node_ptr context);
 
 /*!
   \methodof FormulaDependency
@@ -140,13 +132,9 @@ Set_t FormulaDependency_get_dependencies(FormulaDependency_ptr self,
   \sa formulaGetDependenciesByTypeAux
    formula_dependency_get_definition_dependencies
 */
-Set_t
-FormulaDependency_get_dependencies_by_type(FormulaDependency_ptr self,
-                                           SymbTable_ptr symb_table,
-                                           node_ptr formula, node_ptr context,
-                                           SymbFilterType filter,
-                                           boolean preserve_time);
-
+Set_t FormulaDependency_get_dependencies_by_type(
+    FormulaDependency_ptr self, SymbTable_ptr symb_table, node_ptr formula,
+    node_ptr context, SymbFilterType filter, boolean preserve_time);
 
 /*!
   \methodof FormulaDependency
@@ -156,11 +144,9 @@ FormulaDependency_get_dependencies_by_type(FormulaDependency_ptr self,
   symbols of the given type occurring in them is computed. Returned
   Set must be disposed by the caller.
 */
-Set_t
-FormulaDependency_formulae_get_dependencies_by_type(FormulaDependency_ptr,
-                                                    SymbTable_ptr, node_ptr,
-                                                    node_ptr, node_ptr,
-                                                    SymbFilterType, boolean);
+Set_t FormulaDependency_formulae_get_dependencies_by_type(
+    FormulaDependency_ptr, SymbTable_ptr, node_ptr, node_ptr, node_ptr,
+    SymbFilterType, boolean);
 
 /*!
   \methodof FormulaDependency
@@ -170,15 +156,12 @@ FormulaDependency_formulae_get_dependencies_by_type(FormulaDependency_ptr,
    set of variables occurring in them is computed. Returned Set must be
    disposed by the caller
 */
-Set_t
-FormulaDependency_formulae_get_dependencies(FormulaDependency_ptr self,
-                                            SymbTable_ptr symb_table,
-                                            node_ptr formula,
-                                            node_ptr justice,
-                                            node_ptr compassion);
+Set_t FormulaDependency_formulae_get_dependencies(FormulaDependency_ptr self,
+                                                  SymbTable_ptr symb_table,
+                                                  node_ptr formula,
+                                                  node_ptr justice,
+                                                  node_ptr compassion);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_DEPENDENCY_FORMULA_DEPENDENCY_H__ */

@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``compile.type_checking.checkers'' package of NuSMV version 2.
-  Copyright (C) 2006 by FBK-irst.
+  This file is part of the ``compile.type_checking.checkers'' package of NuSMV
+version 2. Copyright (C) 2006 by FBK-irst.
 
   NuSMV version 2 is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_STATEMENT_H__
 #define __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_STATEMENT_H__
-
 
 #include "nusmv/core/compile/type_checking/checkers/CheckerCore.h"
 #include "nusmv/core/utils/utils.h"
@@ -47,9 +44,9 @@
   \struct CheckerStatement
   \brief Definition of the public accessor for class CheckerStatement
 
-  
+
 */
-typedef struct CheckerStatement_TAG*  CheckerStatement_ptr;
+typedef struct CheckerStatement_TAG *CheckerStatement_ptr;
 
 /*!
   \brief To cast and check instances of class CheckerStatement
@@ -57,18 +54,15 @@ typedef struct CheckerStatement_TAG*  CheckerStatement_ptr;
   These macros must be used respectively to cast and to check
   instances of class CheckerStatement
 */
-#define CHECKER_STATEMENT(self) \
-         ((CheckerStatement_ptr) self)
+#define CHECKER_STATEMENT(self) ((CheckerStatement_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CHECKER_STATEMENT_CHECK_INSTANCE(self) \
-         (nusmv_assert(CHECKER_STATEMENT(self) != CHECKER_STATEMENT(NULL)))
-
-
+#define CHECKER_STATEMENT_CHECK_INSTANCE(self)                                 \
+  (nusmv_assert(CHECKER_STATEMENT(self) != CHECKER_STATEMENT(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,9 +80,6 @@ typedef struct CheckerStatement_TAG*  CheckerStatement_ptr;
 */
 CheckerStatement_ptr CheckerStatement_create(const NuSMVEnv_ptr env);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_STATEMENT_H__ */

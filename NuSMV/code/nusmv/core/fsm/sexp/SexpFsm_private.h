@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,43 +35,38 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_FSM_SEXP_SEXP_FSM_PRIVATE_H__
 #define __NUSMV_CORE_FSM_SEXP_SEXP_FSM_PRIVATE_H__
 
-
 #include "nusmv/core/fsm/sexp/SexpFsm.h"
 
-#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/compile/FlatHierarchy.h"
+#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/set/set.h"
 
-#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/NodeList.h"
-#include "nusmv/core/utils/object_private.h"
+#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/object.h"
+#include "nusmv/core/utils/object_private.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief SexpFsm class definition derived from
                class Object
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct SexpFsm_TAG
-{
+typedef struct SexpFsm_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(Object);
 
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-  SymbTable_ptr st; /* the symbol table */
+  SymbTable_ptr st;            /* the symbol table */
   FlatHierarchy_ptr hierarchy; /* contains fsm data */
   Set_t vars_set;
   NodeList_ptr symbols;
@@ -79,7 +74,7 @@ typedef struct SexpFsm_TAG
   hash_ptr hash_var_fsm;
   node_ptr const_var_fsm;
 
-  int* family_counter; /* for reference counting */
+  int *family_counter; /* for reference counting */
 
   /* flag controlling inlining operations */
   boolean inlining;
@@ -93,8 +88,6 @@ typedef struct SexpFsm_TAG
 
 } SexpFsm;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -107,15 +100,14 @@ typedef struct SexpFsm_TAG
   instance. If the new sexp must be based only on a set of variables, the
   hierarchy must be empty
 */
-void sexp_fsm_init(SexpFsm_ptr self,
-                          const FlatHierarchy_ptr hierarchy,
-                          const Set_t vars_set);
+void sexp_fsm_init(SexpFsm_ptr self, const FlatHierarchy_ptr hierarchy,
+                   const Set_t vars_set);
 
 /*!
   \methodof SexpFsm
   \brief DeInitializes the vars fsm hash
 
-  
+
 */
 void sexp_fsm_deinit(SexpFsm_ptr self);
 
@@ -123,9 +115,8 @@ void sexp_fsm_deinit(SexpFsm_ptr self);
   \methodof SexpFsm
   \brief private service for copying self to other
 
-  
+
 */
 void sexp_fsm_copy_aux(const SexpFsm_ptr self, SexpFsm_ptr copy);
-
 
 #endif /* __NUSMV_CORE_FSM_SEXP_SEXP_FSM_PRIVATE_H__ */

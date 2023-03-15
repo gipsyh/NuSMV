@@ -37,17 +37,16 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_ASSOC_H__
 #define __NUSMV_CORE_UTILS_ASSOC_H__
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "cudd/util.h" /* for ARGS and EXTERN */
-#include "nusmv/core/node/node.h" /* for node_ptr */
 #include "cudd/st.h"
+#include "cudd/util.h"            /* for ARGS and EXTERN */
+#include "nusmv/core/node/node.h" /* for node_ptr */
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -90,13 +89,12 @@
                       char** value
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ASSOC_FOREACH(table, iter, key, value)  \
+#define ASSOC_FOREACH(table, iter, key, value)                                 \
   st_foreach_item(table, iter, key, value)
 
 /*!
@@ -105,14 +103,12 @@
   Generates a new iterator for the given hash
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define assoc_iter_init(table)                  \
-  st_init_gen(table)
+#define assoc_iter_init(table) st_init_gen(table)
 
 /*!
   \brief Iterate over all k-v pairs in the assoc.
@@ -121,14 +117,12 @@
                       If there are no more items, returns 0
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define assoc_iter_next(iter, key, value)       \
-  st_gen(iter, key, value)
+#define assoc_iter_next(iter, key, value) st_gen(iter, key, value)
 
 /*!
   \brief Generates a new iterator for the given hash
@@ -136,14 +130,12 @@
   Generates a new iterator for the given hash
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define assoc_iter_free(iter)                   \
-  st_free_gen(iter)
+#define assoc_iter_free(iter) st_free_gen(iter)
 
 /*!
   \brief Retrieve the number of elements in the hash
@@ -151,14 +143,12 @@
   Retrieve the number of elements in the hash
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define assoc_get_size(table)                   \
-  st_count(table)
+#define assoc_get_size(table) st_count(table)
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -170,7 +160,7 @@
 
   \todo Missing description
 */
-typedef struct st_table* hash_ptr;
+typedef struct st_table *hash_ptr;
 typedef enum st_retval assoc_retval;
 
 /*!
@@ -178,7 +168,7 @@ typedef enum st_retval assoc_retval;
 
   \todo Missing description
 */
-typedef st_generator* assoc_iter;
+typedef st_generator *assoc_iter;
 
 /*!
   \brief \todo Missing synopsis
@@ -187,8 +177,7 @@ typedef st_generator* assoc_iter;
 */
 typedef ST_PFSR PF_STCPCPCP;
 
-typedef struct AssocAndDestroy_TAG
-{
+typedef struct AssocAndDestroy_TAG {
   hash_ptr assoc;
   PF_STCPCPCP destroy_func;
 } AssocAndDestroy;
@@ -199,7 +188,7 @@ typedef struct AssocAndDestroy_TAG
 
   \todo Missing description
 */
-typedef struct AssocAndDestroy_TAG* AssocAndDestroy_ptr;
+typedef struct AssocAndDestroy_TAG *AssocAndDestroy_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -225,8 +214,7 @@ hash_ptr new_assoc_with_size(int initial_size);
 
 
 */
-hash_ptr new_assoc_with_params(ST_PFICPCP compare_fun,
-                                      ST_PFICPI hash_fun);
+hash_ptr new_assoc_with_params(ST_PFICPCP compare_fun, ST_PFICPI hash_fun);
 
 /*!
   \brief
@@ -271,9 +259,7 @@ void clear_assoc_and_free_entries(hash_ptr, ST_PFSR);
 
   this is actually a very general function
 */
-void
-clear_assoc_and_free_entries_arg(hash_ptr hash, ST_PFSR fn, char* arg);
-
+void clear_assoc_and_free_entries_arg(hash_ptr hash, ST_PFSR fn, char *arg);
 
 /* Getters and Setters ********************************************************/
 
@@ -314,10 +300,8 @@ node_ptr remove_assoc(hash_ptr hash, node_ptr key);
             the list of nodes is created (and has to be freed). Use
             ASSOC_FOREACH or assoc_foreach if possible
 */
-node_ptr assoc_get_keys(hash_ptr hash,
-                        NodeMgr_ptr nodemgr,
+node_ptr assoc_get_keys(hash_ptr hash, NodeMgr_ptr nodemgr,
                         boolean ignore_nils);
-
 
 /* Miscellaneous **************************************************************/
 

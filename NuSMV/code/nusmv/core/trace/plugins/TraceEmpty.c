@@ -13,10 +13,8 @@
 
 */
 
-
 #include "nusmv/core/trace/plugins/TraceEmpty.h"
 #include "nusmv/core/trace/plugins/TraceEmpty_private.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -39,22 +37,19 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void trace_empty_finalize(Object_ptr object, void* dummy);
-
+static void trace_empty_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-TraceEmpty_ptr TraceEmpty_create(void)
-{
+TraceEmpty_ptr TraceEmpty_create(void) {
   TraceEmpty_ptr self = ALLOC(TraceEmpty, 1);
   TRACE_EMPTY_CHECK_INSTANCE(self);
 
@@ -62,27 +57,23 @@ TraceEmpty_ptr TraceEmpty_create(void)
   return self;
 }
 
-void TraceEmpty_destroy(TraceEmpty_ptr self)
-{
+void TraceEmpty_destroy(TraceEmpty_ptr self) {
   TRACE_EMPTY_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-int trace_empty_action(const TracePlugin_ptr self)
-{
+int trace_empty_action(const TracePlugin_ptr self) {
   UNUSED_PARAM(self);
-  
+
   return 0;
 }
 
-void trace_empty_init(TraceEmpty_ptr self)
-{
+void trace_empty_init(TraceEmpty_ptr self) {
   /* base class initialization */
   trace_plugin_init(TRACE_PLUGIN(self), "Empty Trace Plugin");
 
@@ -96,15 +87,12 @@ void trace_empty_init(TraceEmpty_ptr self)
   /*OVERRIDE(TracePlugin, virtual_method) = trace_empty_virtual_method;*/
 }
 
-void trace_empty_deinit(TraceEmpty_ptr self)
-{
+void trace_empty_deinit(TraceEmpty_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   trace_plugin_deinit(TRACE_PLUGIN(self));
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -115,8 +103,7 @@ void trace_empty_deinit(TraceEmpty_ptr self)
 
   Called by the class destructor
 */
-static void trace_empty_finalize(Object_ptr object, void* dummy)
-{
+static void trace_empty_finalize(Object_ptr object, void *dummy) {
   TraceEmpty_ptr self = TRACE_EMPTY(object);
 
   UNUSED_PARAM(dummy);
@@ -125,7 +112,4 @@ static void trace_empty_finalize(Object_ptr object, void* dummy)
   FREE(self);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

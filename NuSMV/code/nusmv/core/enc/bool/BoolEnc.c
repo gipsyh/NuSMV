@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,22 +34,21 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
-#include "nusmv/core/node/NodeMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/enc/bool/BoolEnc.h"
 #include "nusmv/core/enc/bool/BoolEnc_private.h"
+#include "nusmv/core/node/NodeMgr.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
-#include "nusmv/core/enc/encInt.h"
 #include "nusmv/core/compile/compile.h"
+#include "nusmv/core/enc/encInt.h"
 #include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/set/set.h"
 
 #include "nusmv/core/utils/WordNumberMgr.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/utils/ustring.h"
 
@@ -62,8 +61,7 @@
 
   \todo Missing description
 */
-#define BOOL_ENC_DEFAULT_LAYER_SUFFIX \
-  "_bool"
+#define BOOL_ENC_DEFAULT_LAYER_SUFFIX "_bool"
 
 /*!
   \brief \todo Missing synopsis
@@ -71,7 +69,6 @@
   \todo Missing description
 */
 #define ENV_BOOLEAN_TYPE "bool_enc_boolean_type"
-
 
 /* Initialized the first time an instance of class BoolEnc is created
   within an environment (see SymbTable constructor), and deinitialized
@@ -98,7 +95,7 @@
 
   \todo Missing description
 */
-#define ENV_BOOL_ENC_OWNED_LAYERS   "bool_enc_owned_layers"
+#define ENV_BOOL_ENC_OWNED_LAYERS "bool_enc_owned_layers"
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -113,7 +110,6 @@
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
@@ -124,7 +120,7 @@
 
   \todo Missing description
 */
-#define BOOL_ENCODING_HIGHER_TO_LOWER_BALANCED  1 /* this is best in average */
+#define BOOL_ENCODING_HIGHER_TO_LOWER_BALANCED 1 /* this is best in average */
 
 /* these are kept for record and testing */
 
@@ -133,15 +129,16 @@
 
   \todo Missing description
 */
-#define BOOL_ENCODING_LOWER_TO_HIGHER_BALANCED  0 /* the old default */
+#define BOOL_ENCODING_LOWER_TO_HIGHER_BALANCED 0 /* the old default */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BOOL_ENCODING_HIGHER_TO_LOWER_INCREMENTAL  0 /* this is better
-                                                        in some cases */
+#define BOOL_ENCODING_HIGHER_TO_LOWER_INCREMENTAL                              \
+  0 /* this is better                                                          \
+       in some cases */
 
 /**AutomaticStart*************************************************************/
 
@@ -149,41 +146,37 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void bool_enc_finalize(Object_ptr object, void* dummy);
+static void bool_enc_finalize(Object_ptr object, void *dummy);
 
-static void
-bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
-                    SymbLayer_ptr src_layer, SymbLayer_ptr dest_layer);
+static void bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
+                                SymbLayer_ptr src_layer,
+                                SymbLayer_ptr dest_layer);
 
-static node_ptr
-bool_enc_encode_scalar_var(BoolEnc_ptr self, node_ptr name, int suffix,
-                           node_ptr values,
-                           SymbLayer_ptr src_layer,
-                           SymbLayer_ptr dest_layer);
+static node_ptr bool_enc_encode_scalar_var(BoolEnc_ptr self, node_ptr name,
+                                           int suffix, node_ptr values,
+                                           SymbLayer_ptr src_layer,
+                                           SymbLayer_ptr dest_layer);
 
-static void
-bool_enc_set_var_encoding(BoolEnc_ptr self, node_ptr name,
-                          node_ptr enc);
+static void bool_enc_set_var_encoding(BoolEnc_ptr self, node_ptr name,
+                                      node_ptr enc);
 
-static node_ptr
-bool_enc_get_var_encoding(const BoolEnc_ptr self, node_ptr name);
+static node_ptr bool_enc_get_var_encoding(const BoolEnc_ptr self,
+                                          node_ptr name);
 
-static void
-bool_enc_traverse_encoding(const BoolEnc_ptr self,
-                           node_ptr enc, NodeList_ptr list);
+static void bool_enc_traverse_encoding(const BoolEnc_ptr self, node_ptr enc,
+                                       NodeList_ptr list);
 
-static node_ptr
-bool_enc_get_var_mask_recur(const BoolEnc_ptr self,
-                            node_ptr enc,
-                            NodeList_ptr cube,
-                            ListIter_ptr cube_iter);
+static node_ptr bool_enc_get_var_mask_recur(const BoolEnc_ptr self,
+                                            node_ptr enc, NodeList_ptr cube,
+                                            ListIter_ptr cube_iter);
 
-static node_ptr
-bool_enc_compute_set_encoding(BoolEnc_ptr self, node_ptr set,
-                              node_ptr bit_prefix, int bit_suffix,
-                              Set_t* out_bits, boolean top);
+static node_ptr bool_enc_compute_set_encoding(BoolEnc_ptr self, node_ptr set,
+                                              node_ptr bit_prefix,
+                                              int bit_suffix, Set_t *out_bits,
+                                              boolean top);
 
-static boolean bool_enc_is_boolean_range(const ExprMgr_ptr exprs, node_ptr values);
+static boolean bool_enc_is_boolean_range(const ExprMgr_ptr exprs,
+                                         node_ptr values);
 
 static node_ptr bool_enc_get_boolean_type(const BoolEnc_ptr self);
 
@@ -191,8 +184,7 @@ static node_ptr bool_enc_get_boolean_type(const BoolEnc_ptr self);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-BoolEnc_ptr BoolEnc_create(SymbTable_ptr symb_table)
-{
+BoolEnc_ptr BoolEnc_create(SymbTable_ptr symb_table) {
   BoolEnc_ptr self = ALLOC(BoolEnc, 1);
   BOOL_ENC_CHECK_INSTANCE(self);
 
@@ -200,21 +192,18 @@ BoolEnc_ptr BoolEnc_create(SymbTable_ptr symb_table)
   return self;
 }
 
-VIRTUAL void BoolEnc_destroy(BoolEnc_ptr self)
-{
+VIRTUAL void BoolEnc_destroy(BoolEnc_ptr self) {
   BOOL_ENC_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-boolean BoolEnc_is_var_bit(const BoolEnc_ptr self, node_ptr name)
-{
+boolean BoolEnc_is_var_bit(const BoolEnc_ptr self, node_ptr name) {
   BOOL_ENC_CHECK_INSTANCE(self);
   return (node_get_type(name) == BIT);
 }
 
-boolean BoolEnc_is_var_scalar(const BoolEnc_ptr self, node_ptr name)
-{
+boolean BoolEnc_is_var_scalar(const BoolEnc_ptr self, node_ptr name) {
   node_ptr enc;
 
   BOOL_ENC_CHECK_INSTANCE(self);
@@ -223,35 +212,32 @@ boolean BoolEnc_is_var_scalar(const BoolEnc_ptr self, node_ptr name)
   return enc != bool_enc_get_boolean_type(self);
 }
 
-node_ptr BoolEnc_get_scalar_var_from_bit(const BoolEnc_ptr self, node_ptr name)
-{
+node_ptr BoolEnc_get_scalar_var_from_bit(const BoolEnc_ptr self,
+                                         node_ptr name) {
   BOOL_ENC_CHECK_INSTANCE(self);
   nusmv_assert(BoolEnc_is_var_bit(self, name));
 
   return car(name);
 }
 
-node_ptr BoolEnc_make_var_bit(const BoolEnc_ptr self, node_ptr name, int index)
-{
+node_ptr BoolEnc_make_var_bit(const BoolEnc_ptr self, node_ptr name,
+                              int index) {
   BOOL_ENC_CHECK_INSTANCE(self);
 
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
     return find_node(nodemgr, BIT, name, NODE_FROM_INT(index));
   }
 }
 
-int BoolEnc_get_index_from_bit(const BoolEnc_ptr self, node_ptr name)
-{
+int BoolEnc_get_index_from_bit(const BoolEnc_ptr self, node_ptr name) {
   BOOL_ENC_CHECK_INSTANCE(self);
   nusmv_assert(BoolEnc_is_var_bit(self, name));
   return NODE_TO_INT(cdr(name));
 }
 
-NodeList_ptr BoolEnc_get_var_bits(const BoolEnc_ptr self, node_ptr name)
-{
+NodeList_ptr BoolEnc_get_var_bits(const BoolEnc_ptr self, node_ptr name) {
   NodeList_ptr res;
   node_ptr enc;
 
@@ -263,8 +249,7 @@ NodeList_ptr BoolEnc_get_var_bits(const BoolEnc_ptr self, node_ptr name)
   return res;
 }
 
-node_ptr BoolEnc_get_var_encoding(const BoolEnc_ptr self, node_ptr name)
-{
+node_ptr BoolEnc_get_var_encoding(const BoolEnc_ptr self, node_ptr name) {
   node_ptr enc;
 
   BOOL_ENC_CHECK_INSTANCE(self);
@@ -275,9 +260,7 @@ node_ptr BoolEnc_get_var_encoding(const BoolEnc_ptr self, node_ptr name)
 }
 
 node_ptr BoolEnc_get_values_bool_encoding(const BoolEnc_ptr self,
-                                          node_ptr values,
-                                          Set_t* bits)
-{
+                                          node_ptr values, Set_t *bits) {
   node_ptr var_name;
 
   BOOL_ENC_CHECK_INSTANCE(self);
@@ -286,8 +269,7 @@ node_ptr BoolEnc_get_values_bool_encoding(const BoolEnc_ptr self,
   return bool_enc_compute_set_encoding(self, values, var_name, 0, bits, true);
 }
 
-node_ptr BoolEnc_get_var_mask(const BoolEnc_ptr self, node_ptr name)
-{
+node_ptr BoolEnc_get_var_mask(const BoolEnc_ptr self, node_ptr name) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
   node_ptr enc;
@@ -307,7 +289,8 @@ node_ptr BoolEnc_get_var_mask(const BoolEnc_ptr self, node_ptr name)
   if (SymbType_is_enum(var_type) && !SymbType_is_boolean(var_type)) {
     /* check memoized mask */
     res = find_assoc(self->var2mask, name);
-    if (Nil != res) return res; /* hit */
+    if (Nil != res)
+      return res; /* hit */
 
     enc = BoolEnc_get_var_encoding(self, name);
     nusmv_assert(Nil != enc); /* must be previoulsy encoded */
@@ -323,8 +306,7 @@ node_ptr BoolEnc_get_var_mask(const BoolEnc_ptr self, node_ptr name)
 
     /* memoizes the result */
     insert_assoc(self->var2mask, name, res);
-  }
-  else {
+  } else {
     res = ExprMgr_true(exprs);
   }
 
@@ -332,45 +314,54 @@ node_ptr BoolEnc_get_var_mask(const BoolEnc_ptr self, node_ptr name)
 }
 
 node_ptr BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
-                                         const BitValues_ptr bit_values)
-{
+                                         const BitValues_ptr bit_values) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr var = BitValues_get_scalar_var(bit_values);
-  SymbType_ptr var_type = SymbTable_get_var_type(
-                           BaseEnc_get_symb_table(BASE_ENC(self)), var);
+  SymbType_ptr var_type =
+      SymbTable_get_var_type(BaseEnc_get_symb_table(BASE_ENC(self)), var);
   node_ptr enc = BoolEnc_get_var_encoding(self, var);
 
   if (SymbType_is_enum(var_type)) {
     while (true) {
-      if (enc == Nil) return Nil;
+      if (enc == Nil)
+        return Nil;
 
       switch (node_get_type(enc)) {
       case IFTHENELSE: {
         int bit_index = BoolEnc_get_index_from_bit(self, car(car(enc)));
         switch (BitValues_get(bit_values, bit_index)) {
-        case BIT_VALUE_FALSE: enc = cdr(enc); break;
+        case BIT_VALUE_FALSE:
+          enc = cdr(enc);
+          break;
         case BIT_VALUE_TRUE:
-        case BIT_VALUE_DONTCARE: enc = cdr(car(enc)); break;
-        default: error_unreachable_code(); /* no other known values */
+        case BIT_VALUE_DONTCARE:
+          enc = cdr(car(enc));
+          break;
+        default:
+          error_unreachable_code(); /* no other known values */
         }
         break;
       }
 
-      case DOT: case ATOM: case NUMBER: case TRUEEXP: case FALSEEXP:
+      case DOT:
+      case ATOM:
+      case NUMBER:
+      case TRUEEXP:
+      case FALSEEXP:
         return enc; /* found the value */
 
-      default: error_unreachable_code(); /* no other known cases */
+      default:
+        error_unreachable_code(); /* no other known cases */
       }
     } /* traversing loop */
-  } /* a scalar variable */
+  }   /* a scalar variable */
 
   if (SymbType_is_word(var_type)) {
     /* re-constructs word number value from values of bits */
     const WordNumberMgr_ptr wmgr =
-      WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
+        WORD_NUMBER_MGR(NuSMVEnv_get_value(env, ENV_WORD_NUMBER_MGR));
 
     WordNumber_ptr one;
     WordNumber_ptr value;
@@ -378,10 +369,10 @@ node_ptr BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
     nusmv_assert(node_get_type(enc) == UNSIGNED_WORD ||
                  node_get_type(enc) == SIGNED_WORD);
 
-    one = WordNumberMgr_integer_to_word_number(wmgr, 1ULL,
-                                    SymbType_get_word_width(var_type));
-    value = WordNumberMgr_integer_to_word_number(wmgr, 0ULL,
-                                    SymbType_get_word_width(var_type));
+    one = WordNumberMgr_integer_to_word_number(
+        wmgr, 1ULL, SymbType_get_word_width(var_type));
+    value = WordNumberMgr_integer_to_word_number(
+        wmgr, 0ULL, SymbType_get_word_width(var_type));
 
     for (iter = car(enc); iter != Nil; iter = cdr(iter)) {
       node_ptr bit;
@@ -401,7 +392,8 @@ node_ptr BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
         value = WordNumberMgr_or(wmgr, value, one);
         break;
 
-      default: error_unreachable_code(); /* no other known values */
+      default:
+        error_unreachable_code(); /* no other known values */
       }
     }
 
@@ -409,16 +401,14 @@ node_ptr BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
        but constants can be signed and unsigned.
        check the type for var for sign instead */
     if (SymbType_is_unsigned_word(var_type)) {
-      return find_node(nodemgr, NUMBER_UNSIGNED_WORD, (node_ptr) value, Nil);
-    }
-    else {
-      return find_node(nodemgr, NUMBER_SIGNED_WORD, (node_ptr) value, Nil);
+      return find_node(nodemgr, NUMBER_UNSIGNED_WORD, (node_ptr)value, Nil);
+    } else {
+      return find_node(nodemgr, NUMBER_SIGNED_WORD, (node_ptr)value, Nil);
     }
   } /* a word variable */
 
   error_unreachable_code(); /* no other known var types */
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
@@ -432,8 +422,7 @@ node_ptr BoolEnc_get_value_from_var_bits(const BoolEnc_ptr self,
   \sa BoolEnc_create
 */
 
-void bool_enc_init(BoolEnc_ptr self, SymbTable_ptr symb_table)
-{
+void bool_enc_init(BoolEnc_ptr self, SymbTable_ptr symb_table) {
   int counter = 0;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(symb_table));
 
@@ -444,7 +433,8 @@ void bool_enc_init(BoolEnc_ptr self, SymbTable_ptr symb_table)
   if (NuSMVEnv_has_value(env, ENV_BOOL_ENC_COUNT)) {
     counter = NODE_TO_INT(NuSMVEnv_get_value(env, ENV_BOOL_ENC_COUNT));
   }
-  NuSMVEnv_set_or_replace_value(env, ENV_BOOL_ENC_COUNT, NODE_FROM_INT(counter + 1));
+  NuSMVEnv_set_or_replace_value(env, ENV_BOOL_ENC_COUNT,
+                                NODE_FROM_INT(counter + 1));
 
   if (counter == 0) {
     hash_ptr bool_enc_owned_layers = new_assoc();
@@ -463,7 +453,6 @@ void bool_enc_init(BoolEnc_ptr self, SymbTable_ptr symb_table)
   OVERRIDE(BaseEnc, remove_layer) = bool_enc_remove_layer;
 }
 
-
 /*!
   \brief The BoolEnc class private deinitializer
 
@@ -472,10 +461,10 @@ void bool_enc_init(BoolEnc_ptr self, SymbTable_ptr symb_table)
   \sa BoolEnc_destroy
 */
 
-void bool_enc_deinit(BoolEnc_ptr self)
-{
+void bool_enc_deinit(BoolEnc_ptr self) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  hash_ptr bool_enc_owned_layers = (hash_ptr)NuSMVEnv_get_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
+  hash_ptr bool_enc_owned_layers =
+      (hash_ptr)NuSMVEnv_get_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
   int bool_enc_instances = 0;
 
   /* members deinitialization */
@@ -489,7 +478,7 @@ void bool_enc_deinit(BoolEnc_ptr self)
       SymbLayer_ptr lyr;
       int count;
       lyr = SYMB_LAYER(NodeList_get_elem_at(layers, iter));
-      count = PTR_TO_INT(find_assoc(bool_enc_owned_layers, (node_ptr) lyr));
+      count = PTR_TO_INT(find_assoc(bool_enc_owned_layers, (node_ptr)lyr));
       nusmv_assert(count >= 0);
 
       if (count == 1) { /* the layer has to be destroyed */
@@ -500,7 +489,7 @@ void bool_enc_deinit(BoolEnc_ptr self)
         /* SymbTable_remove_layer also performs the destruction of lyr */
         SymbTable_remove_layer(BASE_ENC(self)->symb_table, lyr);
 
-        insert_assoc(bool_enc_owned_layers, (node_ptr) lyr,
+        insert_assoc(bool_enc_owned_layers, (node_ptr)lyr,
                      PTR_FROM_INT(node_ptr, 0));
         NodeList_remove_elem_at(layers, iter);
 
@@ -509,8 +498,8 @@ void bool_enc_deinit(BoolEnc_ptr self)
       }
 
       else if (count > 1) {
-        insert_assoc(bool_enc_owned_layers, (node_ptr) lyr,
-                     PTR_FROM_INT(node_ptr, count-1));
+        insert_assoc(bool_enc_owned_layers, (node_ptr)lyr,
+                     PTR_FROM_INT(node_ptr, count - 1));
       }
 
       iter = ListIter_get_next(iter);
@@ -524,7 +513,7 @@ void bool_enc_deinit(BoolEnc_ptr self)
 
   if (bool_enc_instances == 1) { /* This is the last instance in the env */
     hash_ptr bool_enc_owned_layers =
-      (hash_ptr)NuSMVEnv_remove_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
+        (hash_ptr)NuSMVEnv_remove_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
 
     NuSMVEnv_remove_value(env, ENV_BOOL_ENC_COUNT);
 
@@ -535,14 +524,11 @@ void bool_enc_deinit(BoolEnc_ptr self)
     if (NuSMVEnv_has_value(env, ENV_BOOLEAN_TYPE)) {
       (void)NuSMVEnv_remove_value(env, ENV_BOOLEAN_TYPE);
     }
-  }
-  else {
+  } else {
     NuSMVEnv_set_or_replace_value(env, ENV_BOOL_ENC_COUNT,
                                   NODE_FROM_INT(bool_enc_instances - 1));
   }
 }
-
-
 
 /*!
   \brief Encodes all variables within the given layer
@@ -553,7 +539,7 @@ void bool_enc_deinit(BoolEnc_ptr self)
   locked by self either until the layer is was originally created from
   is released or until self is destroyed. Given a committed layer, it
   is always possible to obtain the corresponding created boolean layer
-  by calling BoolEnc_scalar_layer_to_bool_layer. 
+  by calling BoolEnc_scalar_layer_to_bool_layer.
 
   \se A new layer will be created if not already existing
 
@@ -561,27 +547,25 @@ void bool_enc_deinit(BoolEnc_ptr self)
 */
 
 VIRTUAL void bool_enc_commit_layer(BaseEnc_ptr base_enc,
-                                   const char* layer_name)
-{
+                                   const char *layer_name) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(base_enc));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   hash_ptr bool_enc_owned_layers =
-    (hash_ptr)NuSMVEnv_get_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
+      (hash_ptr)NuSMVEnv_get_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
 
   BoolEnc_ptr self;
   SymbLayer_ptr src_layer, dest_layer;
-  const char* dest_layer_name;
+  const char *dest_layer_name;
   SymbLayerIter iter;
 
   self = BOOL_ENC(base_enc);
 
   if (opt_verbose_level_ge(opts, 3)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-    Logger_log(logger, "BoolEnc committing layer '%s'\n",
-            layer_name);
+    Logger_log(logger, "BoolEnc committing layer '%s'\n", layer_name);
   }
 
   /* Calls the base method to add this layer */
@@ -597,24 +581,23 @@ VIRTUAL void bool_enc_commit_layer(BaseEnc_ptr base_enc,
   if (dest_layer == SYMB_LAYER(NULL)) {
     /* does not exist yet, creates one. It will be created with the same policy
        the layer it derives from has */
-    dest_layer = SymbTable_create_layer(BASE_ENC(self)->symb_table,
-                                        dest_layer_name,
-                                        SymbLayer_get_insert_policy(src_layer));
+    dest_layer =
+        SymbTable_create_layer(BASE_ENC(self)->symb_table, dest_layer_name,
+                               SymbLayer_get_insert_policy(src_layer));
 
     /* encoders become the new layer owners */
-    nusmv_assert(find_assoc(bool_enc_owned_layers, (node_ptr) dest_layer) ==
-                 (node_ptr) NULL);
-    insert_assoc(bool_enc_owned_layers, (node_ptr) dest_layer,
+    nusmv_assert(find_assoc(bool_enc_owned_layers, (node_ptr)dest_layer) ==
+                 (node_ptr)NULL);
+    insert_assoc(bool_enc_owned_layers, (node_ptr)dest_layer,
                  PTR_FROM_INT(node_ptr, 1));
-  }
-  else { /* if it is a layer whose owner is a another bool enc,
-            increments the counter of users */
-    int count = PTR_TO_INT(
-                 find_assoc(bool_enc_owned_layers, (node_ptr) dest_layer));
+  } else { /* if it is a layer whose owner is a another bool enc,
+              increments the counter of users */
+    int count =
+        PTR_TO_INT(find_assoc(bool_enc_owned_layers, (node_ptr)dest_layer));
     nusmv_assert(count >= 0);
     if (count > 0) {
-      insert_assoc(bool_enc_owned_layers, (node_ptr) dest_layer,
-                   PTR_FROM_INT(node_ptr, count+1));
+      insert_assoc(bool_enc_owned_layers, (node_ptr)dest_layer,
+                   PTR_FROM_INT(node_ptr, count + 1));
     }
   }
 
@@ -628,13 +611,13 @@ VIRTUAL void bool_enc_commit_layer(BaseEnc_ptr base_enc,
 
     if (opt_verbose_level_gt(opts, 4)) {
       Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-      Logger_nlog(logger, wffprint, "BoolEnc: encoding variable '%N'...\n", var);
+      Logger_nlog(logger, wffprint, "BoolEnc: encoding variable '%N'...\n",
+                  var);
     }
 
     bool_enc_encode_var(self, var, src_layer, dest_layer);
   }
 }
-
 
 /*!
   \brief Removes the encoding of all variables occurring within
@@ -651,22 +634,21 @@ VIRTUAL void bool_enc_commit_layer(BaseEnc_ptr base_enc,
 */
 
 VIRTUAL void bool_enc_remove_layer(BaseEnc_ptr base_enc,
-                                   const char* layer_name)
-{
+                                   const char *layer_name) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(base_enc));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   hash_ptr bool_enc_owned_layers =
-    (hash_ptr)NuSMVEnv_get_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
+      (hash_ptr)NuSMVEnv_get_value(env, ENV_BOOL_ENC_OWNED_LAYERS);
 
   BoolEnc_ptr self;
   SymbLayer_ptr layer, bool_layer;
   SymbLayerIter iter;
-  const char* bool_layer_name;
+  const char *bool_layer_name;
   SymbType_ptr type;
 
   self = BOOL_ENC(base_enc);
@@ -684,12 +666,13 @@ VIRTUAL void bool_enc_remove_layer(BaseEnc_ptr base_enc,
     /*  Only ENUM and WORD types are implemented at the moment */
     switch (SymbType_get_tag(type)) {
     case SYMB_TYPE_BOOLEAN:
-    case SYMB_TYPE_ENUM: /* ENUM type */
+    case SYMB_TYPE_ENUM:          /* ENUM type */
     case SYMB_TYPE_UNSIGNED_WORD: /* Word type */
-    case SYMB_TYPE_SIGNED_WORD: /* Word type */
+    case SYMB_TYPE_SIGNED_WORD:   /* Word type */
       if (opt_verbose_level_gt(opts, 4)) {
         Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
-        Logger_nlog(logger, wffprint, "BoolEnc: removing encoding of variable '%N'...\n", var);
+        Logger_nlog(logger, wffprint,
+                    "BoolEnc: removing encoding of variable '%N'...\n", var);
       }
 
       if (bool_enc_get_var_encoding(self, var) != Nil) {
@@ -718,7 +701,7 @@ VIRTUAL void bool_enc_remove_layer(BaseEnc_ptr base_enc,
       }
       break;
     case SYMB_TYPE_WORDARRAY: /* WordArray type */
-      StreamMgr_print_error(streams,  "Unable to booleanize WordArrays.\n");
+      StreamMgr_print_error(streams, "Unable to booleanize WordArrays.\n");
       nusmv_assert((false));
       break;
     case SYMB_TYPE_INTEGER:
@@ -744,13 +727,13 @@ VIRTUAL void bool_enc_remove_layer(BaseEnc_ptr base_enc,
   /* Removes the boolean layer from the symb table if this
      is the last user of it */
   {
-    int count = PTR_TO_INT(
-          find_assoc(bool_enc_owned_layers, (node_ptr) bool_layer));
+    int count =
+        PTR_TO_INT(find_assoc(bool_enc_owned_layers, (node_ptr)bool_layer));
     nusmv_assert(count >= 0);
 
     if (count != 0) {
-      insert_assoc(bool_enc_owned_layers, (node_ptr) bool_layer,
-                   PTR_FROM_INT(node_ptr, count-1));
+      insert_assoc(bool_enc_owned_layers, (node_ptr)bool_layer,
+                   PTR_FROM_INT(node_ptr, count - 1));
 
       if (count == 1) {
         SymbTable_remove_layer(BASE_ENC(self)->symb_table, bool_layer);
@@ -759,42 +742,38 @@ VIRTUAL void bool_enc_remove_layer(BaseEnc_ptr base_enc,
   }
 }
 
-const char* BoolEnc_scalar_layer_to_bool_layer(const BoolEnc_ptr self,
-                                               const char* layer_name)
-{
+const char *BoolEnc_scalar_layer_to_bool_layer(const BoolEnc_ptr self,
+                                               const char *layer_name) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-   UStringMgr_ptr strings = USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
+  UStringMgr_ptr strings = USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
 
-  char* bool_layer_name;
+  char *bool_layer_name;
   string_ptr str;
 
   bool_layer_name = ALLOC(char, strlen(layer_name) +
-                          strlen(BOOL_ENC_DEFAULT_LAYER_SUFFIX) + 1);
-  nusmv_assert(bool_layer_name != (char*) NULL);
+                                    strlen(BOOL_ENC_DEFAULT_LAYER_SUFFIX) + 1);
+  nusmv_assert(bool_layer_name != (char *)NULL);
   strcpy(bool_layer_name, layer_name);
   strcat(bool_layer_name, BOOL_ENC_DEFAULT_LAYER_SUFFIX);
 
   /* the strings are used to avoid caring about memory */
-  str =  UStringMgr_find_string(strings, bool_layer_name);
+  str = UStringMgr_find_string(strings, bool_layer_name);
   FREE(bool_layer_name);
 
   return UStringMgr_get_string_text(str);
 }
 
-boolean BoolEnc_is_bool_layer(const char* layer_name)
-{
+boolean BoolEnc_is_bool_layer(const char *layer_name) {
   unsigned name_length;
   unsigned bool_length = strlen(BOOL_ENC_DEFAULT_LAYER_SUFFIX);
 
   nusmv_assert(NIL(char) != layer_name);
   name_length = strlen(layer_name);
 
-  return (name_length > bool_length) && \
-    (0 == strcmp(layer_name + name_length - bool_length,
-                 BOOL_ENC_DEFAULT_LAYER_SUFFIX));
+  return (name_length > bool_length) &&
+         (0 == strcmp(layer_name + name_length - bool_length,
+                      BOOL_ENC_DEFAULT_LAYER_SUFFIX));
 }
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -806,8 +785,7 @@ boolean BoolEnc_is_bool_layer(const char* layer_name)
   Called by the class destructor
 */
 
-static VIRTUAL void bool_enc_finalize(Object_ptr object, void* dummy)
-{
+static VIRTUAL void bool_enc_finalize(Object_ptr object, void *dummy) {
   BoolEnc_ptr self = BOOL_ENC(object);
 
   bool_enc_deinit(self);
@@ -815,22 +793,20 @@ static VIRTUAL void bool_enc_finalize(Object_ptr object, void* dummy)
 }
 
 /*!
-  \brief Encodes a single variable 
+  \brief Encodes a single variable
 
   If it is a scalar variable, its values are expanded and a
   set of bits (new boolean variables) will be created within the
   dest_layer. All leaves (constant values of the values) will be
   created within the src_layer, it they are not defined yet.
 */
-static void
-bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
-                    SymbLayer_ptr src_layer, SymbLayer_ptr dest_layer)
-{
+static void bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
+                                SymbLayer_ptr src_layer,
+                                SymbLayer_ptr dest_layer) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr scalar_enc;
   SymbType_ptr type;
@@ -845,8 +821,8 @@ bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
   case SYMB_TYPE_ENUM: { /* ENUM type */
     node_ptr values = SymbType_get_enum_type_values(type);
     nusmv_assert(Nil != values);
-    scalar_enc = bool_enc_encode_scalar_var(self, var, 0, values,
-                                            src_layer, dest_layer);
+    scalar_enc =
+        bool_enc_encode_scalar_var(self, var, 0, values, src_layer, dest_layer);
     break;
   }
 
@@ -857,25 +833,26 @@ bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
     int suffix;
     node_ptr iter;
     node_ptr bits = Nil;
-    /* higher bits are submitted first to make them higher in the BDD var order */
-    for (suffix = width-1; suffix >= 0; --suffix) {
+    /* higher bits are submitted first to make them higher in the BDD var order
+     */
+    for (suffix = width - 1; suffix >= 0; --suffix) {
       node_ptr bitVar = BoolEnc_make_var_bit(self, var, suffix);
       /* declare a new boolean var -- bit of the Word */
-      if (! SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, bitVar)) {
+      if (!SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, bitVar)) {
         /* the type is created every time, because the "reset" frees them */
         SymbType_ptr type = SymbType_create(env, SYMB_TYPE_BOOLEAN, Nil);
 
         if (SymbTable_is_symbol_input_var(BASE_ENC(self)->symb_table, var)) {
           SymbLayer_declare_input_var(dest_layer, bitVar, type);
-        }
-        else if (SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table, var)) {
+        } else if (SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table,
+                                                 var)) {
           SymbLayer_declare_state_var(dest_layer, bitVar, type);
-        }
-        else {
+        } else {
           SymbLayer_declare_frozen_var(dest_layer, bitVar, type);
         }
 
-        bool_enc_set_var_encoding(self, bitVar, bool_enc_get_boolean_type(self));
+        bool_enc_set_var_encoding(self, bitVar,
+                                  bool_enc_get_boolean_type(self));
       }
       /* create a list of bits (high bits now goes last) */
       bits = cons(nodemgr, bitVar, bits);
@@ -892,9 +869,9 @@ bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
     /* wrap the list into a unsigned WORD node =>
      result is always *unsigned* because it is just representation
      and the type is of no importance */
-    scalar_enc = find_node(nodemgr, UNSIGNED_WORD,
-                           scalar_enc,
-                           find_node(nodemgr, NUMBER, NODE_FROM_INT(width), Nil));
+    scalar_enc =
+        find_node(nodemgr, UNSIGNED_WORD, scalar_enc,
+                  find_node(nodemgr, NUMBER, NODE_FROM_INT(width), Nil));
     break;
   }
 
@@ -911,8 +888,9 @@ bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
   case SYMB_TYPE_WORDARRAY:
     return;
 
-  default: error_unreachable_code(); /* no other kinds of types are implemented */
-  } /* switch */
+  default:
+    error_unreachable_code(); /* no other kinds of types are implemented */
+  }                           /* switch */
 
   bool_enc_set_var_encoding(self, var, scalar_enc);
 }
@@ -920,7 +898,7 @@ bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
 /*!
   \brief Encodes a scalar variable, by creating all boolean vars
   (bits) needed to encode the var itself. Created bool vars are pushed
-  within the given destination layer. 
+  within the given destination layer.
 
   The returned structure is a tree, whose internal nodes
   are ITE nodes or BITS variables, and leaves are constants values.
@@ -929,19 +907,18 @@ bool_enc_encode_var(BoolEnc_ptr self, node_ptr var,
             constant
 
   where bit is a variable name (a bit), and left and right are <expr>.
-  
+
 */
-static node_ptr
-bool_enc_encode_scalar_var(BoolEnc_ptr self, node_ptr name, int suffix,
-                           node_ptr values,
-                           SymbLayer_ptr src_layer, SymbLayer_ptr dest_layer)
-{
+static node_ptr bool_enc_encode_scalar_var(BoolEnc_ptr self, node_ptr name,
+                                           int suffix, node_ptr values,
+                                           SymbLayer_ptr src_layer,
+                                           SymbLayer_ptr dest_layer) {
   node_ptr result;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
 
   { /* declare constants if needed */
     node_ptr iter;
-    for (iter=values; iter != Nil; iter = cdr(iter)) {
+    for (iter = values; iter != Nil; iter = cdr(iter)) {
       node_ptr val = car(iter);
       if (SymbLayer_can_declare_constant(src_layer, val)) {
         SymbLayer_declare_constant(src_layer, val);
@@ -953,20 +930,20 @@ bool_enc_encode_scalar_var(BoolEnc_ptr self, node_ptr name, int suffix,
     Set_t bits = Set_MakeEmpty();
     Set_Iterator_t iter;
 
-    result = bool_enc_compute_set_encoding(self, values, name, suffix, &bits, true);
+    result =
+        bool_enc_compute_set_encoding(self, values, name, suffix, &bits, true);
 
     SET_FOREACH(bits, iter) {
-      node_ptr bit = (node_ptr) Set_GetMember(bits, iter);
+      node_ptr bit = (node_ptr)Set_GetMember(bits, iter);
 
-      if (! SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, bit)) {
+      if (!SymbTable_is_symbol_var(BASE_ENC(self)->symb_table, bit)) {
         SymbType_ptr type = SymbType_create(env, SYMB_TYPE_BOOLEAN, Nil);
         if (SymbTable_is_symbol_input_var(BASE_ENC(self)->symb_table, name)) {
           SymbLayer_declare_input_var(dest_layer, bit, type);
-        }
-        else if (SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table, name)) {
+        } else if (SymbTable_is_symbol_state_var(BASE_ENC(self)->symb_table,
+                                                 name)) {
           SymbLayer_declare_state_var(dest_layer, bit, type);
-        }
-        else {
+        } else {
           SymbLayer_declare_frozen_var(dest_layer, bit, type);
         }
       }
@@ -985,15 +962,15 @@ bool_enc_encode_scalar_var(BoolEnc_ptr self, node_ptr name, int suffix,
 
   Return true if the given list is {TRUE,FALSE}
 */
-static boolean bool_enc_is_boolean_range(const ExprMgr_ptr exprs, node_ptr values)
-{
-  if (ExprMgr_is_boolean_range(exprs, values)) return true;
+static boolean bool_enc_is_boolean_range(const ExprMgr_ptr exprs,
+                                         node_ptr values) {
+  if (ExprMgr_is_boolean_range(exprs, values))
+    return true;
 
   while (Nil != values) {
     node_ptr v = car(values);
 
-    if (!(TRUEEXP == node_get_type(v) ||
-          FALSEEXP == node_get_type(v))) {
+    if (!(TRUEEXP == node_get_type(v) || FALSEEXP == node_get_type(v))) {
       return false;
     }
 
@@ -1028,15 +1005,13 @@ static boolean bool_enc_is_boolean_range(const ExprMgr_ptr exprs, node_ptr value
 
   \todo Missing description
 */
-static node_ptr
-bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
-                              node_ptr bit_prefix, int bit_suffix,
-                              Set_t* out_bits, boolean top)
-{
+static node_ptr bool_enc_compute_set_encoding(const BoolEnc_ptr self,
+                                              node_ptr set, node_ptr bit_prefix,
+                                              int bit_suffix, Set_t *out_bits,
+                                              boolean top) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr var, left, right;
 
@@ -1048,11 +1023,10 @@ bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
   /* Intermediate case, declare the scalar variable */
   if ((true == top) && bool_enc_is_boolean_range(exprs, set)) {
     var = bit_prefix;
-  }
-  else {
+  } else {
     var = BoolEnc_make_var_bit(self, bit_prefix, bit_suffix);
   }
-  *out_bits = Set_AddMember(*out_bits, (Set_Element_t) var);
+  *out_bits = Set_AddMember(*out_bits, (Set_Element_t)var);
 
   { /* Finally construct the sub binary tree, by decomposing left
        and right sides: */
@@ -1060,51 +1034,47 @@ bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
     node_ptr ls_right;
 
     ls_left = even_elements(nodemgr, set);
-    left  = bool_enc_compute_set_encoding(self, ls_left,
-                                          bit_prefix, bit_suffix + 1,
-                                          out_bits, false);
+    left = bool_enc_compute_set_encoding(self, ls_left, bit_prefix,
+                                         bit_suffix + 1, out_bits, false);
     free_list(nodemgr, ls_left);
 
     ls_right = odd_elements(nodemgr, set);
-    right = bool_enc_compute_set_encoding(self, ls_right,
-                                          bit_prefix, bit_suffix + 1,
-                                          out_bits, false);
+    right = bool_enc_compute_set_encoding(self, ls_right, bit_prefix,
+                                          bit_suffix + 1, out_bits, false);
     free_list(nodemgr, ls_right);
   }
 
-  return find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, left), right);
+  return find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, left),
+                   right);
 }
 
 #elif BOOL_ENCODING_HIGHER_TO_LOWER_BALANCED
 /* this is proved to increase performances */
 
-static node_ptr
-bool_enc_compute_set_encoding_aux(const BoolEnc_ptr self, node_ptr set,
-                                  node_ptr bit_prefix, int bit_suffix,
-                                  Set_t* out_bits, boolean top);
+static node_ptr bool_enc_compute_set_encoding_aux(const BoolEnc_ptr self,
+                                                  node_ptr set,
+                                                  node_ptr bit_prefix,
+                                                  int bit_suffix,
+                                                  Set_t *out_bits, boolean top);
 
-static node_ptr
-bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
-                              node_ptr bit_prefix, int bit_suffix,
-                              Set_t* out_bits, boolean top)
-{
+static node_ptr bool_enc_compute_set_encoding(const BoolEnc_ptr self,
+                                              node_ptr set, node_ptr bit_prefix,
+                                              int bit_suffix, Set_t *out_bits,
+                                              boolean top) {
   /* 'max()' to fix issue 2563, as at least one bit is required */
-  int bits = Utils_log2_round(max(llength(set)-1, 1));
-  nusmv_assert(bits>0);
-  return bool_enc_compute_set_encoding_aux(self, set, bit_prefix,
-                                           bit_suffix + bits - 1,
-                                           out_bits, top);
+  int bits = Utils_log2_round(max(llength(set) - 1, 1));
+  nusmv_assert(bits > 0);
+  return bool_enc_compute_set_encoding_aux(
+      self, set, bit_prefix, bit_suffix + bits - 1, out_bits, top);
 }
 
 static node_ptr
 bool_enc_compute_set_encoding_aux(const BoolEnc_ptr self, node_ptr set,
                                   node_ptr bit_prefix, int bit_suffix,
-                                  Set_t* out_bits, boolean top)
-{
+                                  Set_t *out_bits, boolean top) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr var, left, right;
 
@@ -1117,11 +1087,10 @@ bool_enc_compute_set_encoding_aux(const BoolEnc_ptr self, node_ptr set,
   /* Intermediate case, declare the scalar variable */
   if ((true == top) && bool_enc_is_boolean_range(exprs, set)) {
     var = bit_prefix;
-  }
-  else {
+  } else {
     var = BoolEnc_make_var_bit(self, bit_prefix, bit_suffix);
   }
-  *out_bits = Set_AddMember(*out_bits, (Set_Element_t) var);
+  *out_bits = Set_AddMember(*out_bits, (Set_Element_t)var);
 
   { /* Finally construct the sub binary tree, by decomposing left
        and right sides: */
@@ -1129,19 +1098,18 @@ bool_enc_compute_set_encoding_aux(const BoolEnc_ptr self, node_ptr set,
     node_ptr ls_right;
 
     ls_left = even_elements(nodemgr, set);
-    left  = bool_enc_compute_set_encoding_aux(self, ls_left,
-                                              bit_prefix, bit_suffix - 1,
-                                              out_bits, false);
+    left = bool_enc_compute_set_encoding_aux(self, ls_left, bit_prefix,
+                                             bit_suffix - 1, out_bits, false);
     free_list(nodemgr, ls_left);
 
     ls_right = odd_elements(nodemgr, set);
-    right = bool_enc_compute_set_encoding_aux(self, ls_right,
-                                              bit_prefix, bit_suffix - 1,
-                                              out_bits, false);
+    right = bool_enc_compute_set_encoding_aux(self, ls_right, bit_prefix,
+                                              bit_suffix - 1, out_bits, false);
     free_list(nodemgr, ls_right);
   }
 
-  return find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, left), right);
+  return find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, left),
+                   right);
 }
 
 #elif BOOL_ENCODING_HIGHER_TO_LOWER_INCREMENTAL
@@ -1149,22 +1117,20 @@ bool_enc_compute_set_encoding_aux(const BoolEnc_ptr self, node_ptr set,
    constructed more efficiency, but the encoding results
    unbalanced. However its incrementality may result in better
    performances. See issue 2549 */
-static node_ptr
-bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
-                              node_ptr bit_prefix, int bit_suffix,
-                              Set_t* out_bits, boolean top)
-{
+static node_ptr bool_enc_compute_set_encoding(const BoolEnc_ptr self,
+                                              node_ptr set, node_ptr bit_prefix,
+                                              int bit_suffix, Set_t *out_bits,
+                                              boolean top) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  array_t* array1;
+  array_t *array1;
   node_ptr res;
   node_ptr bit_list = Nil; /* used to reverse added bits in out_bits */
 
   array1 = array_alloc(node_ptr, 2);
-  nusmv_assert((array_t*) NULL != array1);
+  nusmv_assert((array_t *)NULL != array1);
 
   { /* first loop along the given list, to avoid one unneeded traversal */
     node_ptr var = Nil;
@@ -1180,18 +1146,17 @@ bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
           if ((ExprMgr_is_false(exprs, el1) && ExprMgr_is_true(exprs, el2)) ||
               (ExprMgr_is_false(exprs, el2) && ExprMgr_is_true(exprs, el1))) {
             var = bit_prefix; /* reuse bit for boolean local encoding */
-          }
-          else {
+          } else {
             var = BoolEnc_make_var_bit(self, bit_prefix, bit_suffix);
           }
           bit_list = cons(nodemgr, var, bit_list);
         }
-        el = find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, el1), el2);
+        el = find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, el1),
+                       el2);
         array_insert_last(node_ptr, array1, el);
 
         iter = cddr(iter); /* advance two elements */
-      }
-      else {
+      } else {
         /* append the last remaining element */
         array_insert_last(node_ptr, array1, car(iter));
         iter = cdr(iter); /* advance one element */
@@ -1201,12 +1166,12 @@ bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
 
   /* now proceed with the arrays only */
   while (array_n(array1) > 1) {
-    array_t* array2;
+    array_t *array2;
     int idx;
     node_ptr var;
 
     array2 = array_alloc(node_ptr, array_n(array1) / 2 + 1);
-    nusmv_assert((array_t*) NULL != array1);
+    nusmv_assert((array_t *)NULL != array1);
 
     /* a new bit has to be created */
     bit_suffix += 1;
@@ -1219,33 +1184,31 @@ bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
         /* there are at least two elements */
         node_ptr el;
         node_ptr el1 = array_fetch(node_ptr, array1, idx);
-        node_ptr el2 = array_fetch(node_ptr, array1, idx+1);
+        node_ptr el2 = array_fetch(node_ptr, array1, idx + 1);
 
         if (Nil == var) {
           if ((ExprMgr_is_false(exprs, el1) && ExprMgr_is_true(exprs, el2)) ||
               (ExprMgr_is_false(exprs, el2) && ExprMgr_is_true(exprs, el1))) {
             var = bit_prefix; /* reuse bit for boolean local encoding */
-          }
-          else {
+          } else {
             var = BoolEnc_make_var_bit(self, bit_prefix, bit_suffix);
           }
           bit_list = cons(nodemgr, var, bit_list);
         }
-        el = find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, el1), el2);
+        el = find_node(nodemgr, IFTHENELSE, find_node(nodemgr, COLON, var, el1),
+                       el2);
 
         array_insert_last(node_ptr, array2, el);
         idx += 2;
-      }
-      else {
+      } else {
         /* last element */
-        array_insert_last(node_ptr, array2,
-                          array_fetch(node_ptr, array1, idx));
+        array_insert_last(node_ptr, array2, array_fetch(node_ptr, array1, idx));
         idx += 1;
       }
     }
 
     { /* now array2 substitutes array1 */
-      array_t* tmp = array1;
+      array_t *tmp = array1;
       array1 = array2;
       array_free(tmp); /* frees previous array1 */
     }
@@ -1253,8 +1216,8 @@ bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
 
   { /* dumps all collected bits in reversed order, to keep the
        right order (higher indices before lower) */
-    for (; Nil!=bit_list; bit_list=cdr(bit_list)) {
-      *out_bits = Set_AddMember(*out_bits, (Set_Element_t) car(bit_list));
+    for (; Nil != bit_list; bit_list = cdr(bit_list)) {
+      *out_bits = Set_AddMember(*out_bits, (Set_Element_t)car(bit_list));
     }
   }
 
@@ -1273,11 +1236,12 @@ bool_enc_compute_set_encoding(const BoolEnc_ptr self, node_ptr set,
   \brief Associates the given variable with the specified
   boolean encoding
 
-  
+
 */
-static void
-bool_enc_set_var_encoding(BoolEnc_ptr self, node_ptr name, node_ptr enc)
-{ insert_assoc(self->var2enc, name, enc); }
+static void bool_enc_set_var_encoding(BoolEnc_ptr self, node_ptr name,
+                                      node_ptr enc) {
+  insert_assoc(self->var2enc, name, enc);
+}
 
 /*!
   \brief Given a variable, returns its boolean encoding, or NULL
@@ -1285,42 +1249,46 @@ bool_enc_set_var_encoding(BoolEnc_ptr self, node_ptr name, node_ptr enc)
 
   Private service
 */
-static node_ptr
-bool_enc_get_var_encoding(const BoolEnc_ptr self, node_ptr name)
-{ return find_assoc(self->var2enc, name); }
+static node_ptr bool_enc_get_var_encoding(const BoolEnc_ptr self,
+                                          node_ptr name) {
+  return find_assoc(self->var2enc, name);
+}
 
 /*!
   \brief Fills the given list with the BIT vars which
   occurs into the given var encoding
 
-  
+
 */
-static void bool_enc_traverse_encoding(const BoolEnc_ptr self,
-                                       node_ptr enc, NodeList_ptr list)
-{
+static void bool_enc_traverse_encoding(const BoolEnc_ptr self, node_ptr enc,
+                                       NodeList_ptr list) {
   node_ptr bit;
 
   /* constant or number terminate (numbers are not stored as constants): */
-  if ( SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, enc)
-       || (node_get_type(enc) == NUMBER) || (enc == bool_enc_get_boolean_type(self))) return;
+  if (SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, enc) ||
+      (node_get_type(enc) == NUMBER) ||
+      (enc == bool_enc_get_boolean_type(self)))
+    return;
 
   if (node_get_type(enc) == IFTHENELSE) { /* usual IFTHENELSE encoding */
     bit = caar(enc);
-    if (! NodeList_belongs_to(list, bit)) NodeList_append(list, bit);
+    if (!NodeList_belongs_to(list, bit))
+      NodeList_append(list, bit);
 
     bool_enc_traverse_encoding(self, cdar(enc), list); /* 'then' */
-    bool_enc_traverse_encoding(self, cdr(enc), list);      /* 'else' */
-  }
-  else if (node_get_type(enc) == UNSIGNED_WORD) { /* Word, i.e. array of bit-vars */
+    bool_enc_traverse_encoding(self, cdr(enc), list);  /* 'else' */
+  } else if (node_get_type(enc) ==
+             UNSIGNED_WORD) { /* Word, i.e. array of bit-vars */
     node_ptr iter;
     for (iter = car(enc); iter != Nil; iter = cdr(iter)) {
-      if(!NodeList_belongs_to(list, car(iter))) NodeList_append(list, car(iter));
+      if (!NodeList_belongs_to(list, car(iter)))
+        NodeList_append(list, car(iter));
     }
   }
   /* no other kind of node can appear at this level: */
-  else error_unreachable_code();
+  else
+    error_unreachable_code();
 }
-
 
 /*!
   \brief Given a variable, it returns the mask of its encoding
@@ -1345,17 +1313,19 @@ static void bool_enc_traverse_encoding(const BoolEnc_ptr self,
 
      ITE(x0, ITE(x2, 0, 1), ITE(x1, 1, ITE(x2, 0,  1)))
 
-  that removes the redundant assignments where needed. 
+  that removes the redundant assignments where needed.
 */
 
-#define _IS_LEAF(self,enc) (SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, enc) || \
-                            ((Nil != enc) && (node_get_type(enc) == NUMBER)) || \
-                            (enc == bool_enc_get_boolean_type(self)))
+#define _IS_LEAF(self, enc)                                                    \
+  (SymbTable_is_symbol_constant(BASE_ENC(self)->symb_table, enc) ||            \
+   ((Nil != enc) && (node_get_type(enc) == NUMBER)) ||                         \
+   (enc == bool_enc_get_boolean_type(self)))
 #define _COND(enc) car(car(enc))
 #define _THEN(enc) cdr(car(enc))
 #define _ELSE(enc) cdr(enc)
-#define _IS_ITE(enc) ((enc != Nil) && (IFTHENELSE == node_get_type(enc)) && \
-                      (Nil != car(enc)) && (COLON ==  node_get_type(car(enc))))
+#define _IS_ITE(enc)                                                           \
+  ((enc != Nil) && (IFTHENELSE == node_get_type(enc)) && (Nil != car(enc)) &&  \
+   (COLON == node_get_type(car(enc))))
 
 /*!
   \brief \todo Missing synopsis
@@ -1363,10 +1333,8 @@ static void bool_enc_traverse_encoding(const BoolEnc_ptr self,
   \todo Missing description
 */
 static node_ptr bool_enc_get_var_mask_recur(const BoolEnc_ptr self,
-                                            node_ptr enc,
-                                            NodeList_ptr cube,
-                                            ListIter_ptr cube_iter)
-{
+                                            node_ptr enc, NodeList_ptr cube,
+                                            ListIter_ptr cube_iter) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ExprMgr_ptr exprs = EXPR_MGR(NuSMVEnv_get_value(env, ENV_EXPR_MANAGER));
 
@@ -1378,21 +1346,17 @@ static node_ptr bool_enc_get_var_mask_recur(const BoolEnc_ptr self,
        we must be guaranteed to be on a leaf of the DAG */
     nusmv_assert(_IS_LEAF(self, enc));
     res = ExprMgr_true(exprs);
-  }
-  else {
+  } else {
     node_ptr var = NodeList_get_elem_at(cube, cube_iter);
 
     if (_IS_LEAF(self, enc) || _COND(enc) != var) {
       /* There is a gap:
          we assign a value to missing variables in cube */
-      node_ptr t = bool_enc_get_var_mask_recur(self,
-                                               enc,
-                                               cube,
+      node_ptr t = bool_enc_get_var_mask_recur(self, enc, cube,
                                                ListIter_get_next(cube_iter));
 
       res = ExprMgr_ite(exprs, var, ExprMgr_false(exprs), t, symb_table);
-    }
-    else {
+    } else {
       /* It is a variable:
          we keep visiting the dag, searching for gaps to fill */
 
@@ -1404,10 +1368,10 @@ static node_ptr bool_enc_get_var_mask_recur(const BoolEnc_ptr self,
       nusmv_assert(_COND(enc) == var);
 
       t = bool_enc_get_var_mask_recur(self, _THEN(enc), cube,
-                                               ListIter_get_next(cube_iter));
+                                      ListIter_get_next(cube_iter));
 
       e = bool_enc_get_var_mask_recur(self, _ELSE(enc), cube,
-                                               ListIter_get_next(cube_iter));
+                                      ListIter_get_next(cube_iter));
 
       res = ExprMgr_ite(exprs, _COND(enc), t, e, symb_table);
     }
@@ -1421,20 +1385,17 @@ static node_ptr bool_enc_get_var_mask_recur(const BoolEnc_ptr self,
 
   \todo Missing description
 */
-static node_ptr bool_enc_get_boolean_type(const BoolEnc_ptr self)
-{
+static node_ptr bool_enc_get_boolean_type(const BoolEnc_ptr self) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   node_ptr boolean_type;
 
   if (!NuSMVEnv_has_value(env, ENV_BOOLEAN_TYPE)) {
-    const NodeMgr_ptr nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
     boolean_type = find_node(nodemgr, BOOLEAN, Nil, Nil);
 
     NuSMVEnv_set_value(env, ENV_BOOLEAN_TYPE, boolean_type);
-  }
-  else {
+  } else {
     boolean_type = NODE_PTR(NuSMVEnv_get_value(env, ENV_BOOLEAN_TYPE));
   }
 

@@ -23,7 +23,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,16 +36,15 @@
 
 */
 
-
 #ifndef __NUSMV_SHELL_BMC_SBMC_SBMC_CMD_H__
 #define __NUSMV_SHELL_BMC_SBMC_SBMC_CMD_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/prop/Prop.h"
+#include "nusmv/core/utils/utils.h"
 
 /**AutomaticStart*************************************************************/
 
@@ -56,7 +55,7 @@
 /*!
   \brief Adds all bmc-related commands to the interactive shell
 
-  
+
 
   \sa CInit_Init
 */
@@ -65,7 +64,7 @@ void SBmc_AddCmd(NuSMVEnv_ptr env);
 /*!
   \brief Adds all bmc-related commands to the interactive shell
 
-  
+
 
   \sa CInit_Init
 */
@@ -77,7 +76,7 @@ void Sbmc_Cmd_quit(NuSMVEnv_ptr env);
   \command_args{[-h | -n idx | -p "formula" [IN context] | -P
   "name"] [-k max_length] [-l loopback] [-1] [-o filename]}
 
-  
+
   This command generates one or more problems, and calls
   SAT solver for each one. Each problem is related to a specific problem
   bound, which increases from zero (0) to the given maximum problem
@@ -147,8 +146,7 @@ void Sbmc_Cmd_quit(NuSMVEnv_ptr env);
   Springer-Verlag.
 
 */
-int
-Sbmc_CommandCheckLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv);
+int Sbmc_CommandCheckLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{gen_ltlspec_sbmc} Dumps into one or more dimacs files the given LTL
@@ -163,9 +161,9 @@ Sbmc_CommandCheckLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv);
   dumps each problem into a dimacs file. Each problem is related to a specific
   problem bound, which increases from zero (0) to the given maximum problem
   bound. In this short description "<i>length</i>" is the bound of the
-  problem that system is going to dump out. Uses Kepa's and Timo's method for doing bmc. <BR>
-  In this context the maximum problem bound is represented by the
-  <i>max_length</i> parameter, or by its default value stored in the
+  problem that system is going to dump out. Uses Kepa's and Timo's method for
+  doing bmc. <BR> In this context the maximum problem bound is represented by
+  the <i>max_length</i> parameter, or by its default value stored in the
   environment variable <i>bmc_length</i>.<BR>
   Each dumped problem also depends on the loopback you can explicitly
   specify by the <i>-l</i> option, or by its default value stored in the
@@ -229,8 +227,7 @@ Sbmc_CommandCheckLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv);
   Springer-Verlag.
 
 */
-int
-Sbmc_CommandGenLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv);
+int Sbmc_CommandGenLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*!
   \command{check_ltlspec_sbmc_inc} Incremental SBMC LTL model checking
@@ -238,7 +235,7 @@ Sbmc_CommandGenLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv);
   \command_args{[-h | -n idx | -p "formula" [IN context] | -P
   "name"] [-k max_length] [-c] [-N]}
 
-  
+
   This command generates one or more problems, and calls
   SAT solver for each one. Each problem is related to a specific problem
   bound, which increases from zero (0) to the given maximum problem
@@ -285,8 +282,7 @@ Sbmc_CommandGenLtlSpecSBmc(NuSMVEnv_ptr env, int argc, char** argv);
   Springer-Verlag.
 
 */
-int
-Sbmc_CommandLTLCheckZigzagInc(NuSMVEnv_ptr env, int argc, char** argv);
+int Sbmc_CommandLTLCheckZigzagInc(NuSMVEnv_ptr env, int argc, char **argv);
 
 /**AutomaticEnd***************************************************************/
 

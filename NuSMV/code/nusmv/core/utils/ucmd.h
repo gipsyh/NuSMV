@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,19 +35,16 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_UCMD_H__
 #define __NUSMV_CORE_UTILS_UCMD_H__
 
-#include <stdlib.h> /* for strtol */
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/opt/opt.h" /* for OPT_USER_POV_NULL_STRING */
-
+#include "nusmv/core/utils/utils.h"
+#include <stdlib.h> /* for strtol */
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -58,30 +55,31 @@
 
   \todo Missing description
 */
-typedef enum { sv_string, sv_integer, sv_floating, sv_pointer, sv_undef }
-  SubstValueType;
-
+typedef enum {
+  sv_string,
+  sv_integer,
+  sv_floating,
+  sv_pointer,
+  sv_undef
+} SubstValueType;
 
 /*!
   \brief SubstValue a service structure used by SubstString. Ignore.
 
-  
+
 
   \sa SubstString
 */
 
-typedef struct SubstValue_TAG
-{
+typedef struct SubstValue_TAG {
   SubstValueType type;
-  union
-  {
-    const char* string;
-    int    integer;
+  union {
+    const char *string;
+    int integer;
     double floating;
-    void*  pointer;
+    void *pointer;
   } assign;
 } SubstValue;
-
 
 /*!
   \brief SubstString is the structure passed to the function
@@ -94,23 +92,19 @@ typedef struct SubstValue_TAG
   \sa SYMBOL_CREATE, SYMBOL_ASSIGN, apply_string_macro_expansion
 */
 
-typedef struct SubstString_TAG
-{
-  const char* symbol;
+typedef struct SubstString_TAG {
+  const char *symbol;
   SubstValue value;
-  const char* format;
+  const char *format;
 } SubstString;
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -121,18 +115,18 @@ typedef struct SubstString_TAG
   usable with the function apply_string_macro_expansion
 
   The macro parameter is the symbol string which will be
-  searched for substitution in the function apply_string_macro_expansion 
+  searched for substitution in the function apply_string_macro_expansion
 
   \sa SYMBOL_ASSIGN, apply_string_macro_expansion
 */
-#define SYMBOL_CREATE() \
+#define SYMBOL_CREATE()                                                        \
   { "\0", {sv_undef, {NULL}}, "" }
 
 /*!
   \brief SYMBOL_ASSIGN helps to fill the fields of the SubstString
-  structure, previously allocated with the SYMBOL_CREATE macro 
+  structure, previously allocated with the SYMBOL_CREATE macro
 
-  
+
   The first parameter is the variable assigned by SYMBOL_CREATE; <BR>
   The third parameter is the type of the value that will substitute
   the symbol. Can be: string, integer, floating or pointer. <BR>
@@ -145,13 +139,11 @@ typedef struct SubstString_TAG
 
   \sa SYMBOL_CREATE, apply_string_macro_expansion
 */
-#define SYMBOL_ASSIGN(_subst, _symbol, _type, _format, _value) \
-_subst.symbol = _symbol; \
-_subst.value.type = sv_##_type;    \
-_subst.format = _format;  \
-_subst.value.assign._type = _value
-
-
+#define SYMBOL_ASSIGN(_subst, _symbol, _type, _format, _value)                 \
+  _subst.symbol = _symbol;                                                     \
+  _subst.value.type = sv_##_type;                                              \
+  _subst.format = _format;                                                     \
+  _subst.value.assign._type = _value
 
 /**AutomaticStart*************************************************************/
 
@@ -194,15 +186,14 @@ _subst.value.assign._type = _value
     apply_string_macro_expansion(&sb, szBuffer, sizeof(szBuffer));
   }
   </PRE>
-  
+
 
   \se The given string will change
 
   \sa SYMBOL_CREATE, SYMBOL_ASSIGN, SubstString
 */
-void
-apply_string_macro_expansion(const SubstString* const subst,
-                   char* string, size_t buf_len);
+void apply_string_macro_expansion(const SubstString *const subst, char *string,
+                                  size_t buf_len);
 
 /*!
   \brief Converts a given string representing a number (base 10)
@@ -213,7 +204,7 @@ apply_string_macro_expansion(const SubstString* const subst,
 
   \se 'value' parameter might change
 */
-int util_str2int(const char* str, int* value);
+int util_str2int(const char *str, int *value);
 
 /*!
   \brief Checks if given string is NULL, "", or the converted
@@ -222,9 +213,9 @@ int util_str2int(const char* str, int* value);
   Returns 1 if the string is equal to "", NULL or
   equal to the converted string of NULL (as sprintf does).
   Otherwise returns 0.
-  
+
 */
-int util_is_string_null(const char* string);
+int util_is_string_null(const char *string);
 
 /*!
   \brief An abstraction over BSD strtol for integers
@@ -245,7 +236,7 @@ int util_is_string_null(const char* string);
                contains the integer value corresponding to the parsed
                string.
 */
-int util_str2int_incr(const char* str, char **endptr, int* out);
+int util_str2int_incr(const char *str, char **endptr, int *out);
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_UTILS_UCMD_H__ */

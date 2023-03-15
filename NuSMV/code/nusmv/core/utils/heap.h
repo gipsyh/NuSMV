@@ -2,7 +2,7 @@
 #define __NUSMV_CORE_UTILS_HEAP_H__
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/utils/defs.h"
@@ -20,7 +20,7 @@
 
   \todo Missing description
 */
-typedef struct heap_ * heap;
+typedef struct heap_ *heap;
 
 /*!
   \brief \todo Missing synopsis
@@ -41,7 +41,7 @@ void heap_destroy(heap h);
 
   \todo Missing description
 */
-void heap_add(heap h, float val, void * el);
+void heap_add(heap h, float val, void *el);
 
 /*!
   \brief \todo Missing synopsis
@@ -55,6 +55,6 @@ int heap_isempty(heap h);
 
   \todo Missing description
 */
-void* heap_getmax(heap h);
+void *heap_getmax(heap h);
 
 #endif

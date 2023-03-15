@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
   \todo: Missing description
 
 */
-
 
 #ifndef __NUSMV_CORE_UTILS_BIGNUMBERS_BVNUMBERS_INT_H__
 
@@ -74,36 +73,36 @@
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
 
-boolean BVQNumber_fits(const QNumber* n, size_t num_bits);
+boolean BVQNumber_fits(const QNumber *n, size_t num_bits);
 
-boolean BVQNumber_is_pow2(const QNumber* n, size_t* out_n);
+boolean BVQNumber_is_pow2(const QNumber *n, size_t *out_n);
 
-QNumber BVQNumber_twos_complement(const QNumber* n, size_t num_bits);
+QNumber BVQNumber_twos_complement(const QNumber *n, size_t num_bits);
 
 QNumber BVQNumber_pow2(size_t n);
 
 /* bit-manipulating functions */
-boolean BVQNumber_test_bit(const QNumber* n, size_t index);
+boolean BVQNumber_test_bit(const QNumber *n, size_t index);
 
-void BVQNumber_set_bit(QNumber* n, size_t index, int value);
+void BVQNumber_set_bit(QNumber *n, size_t index, int value);
 
-QNumber BVQNumber_bit_and(const QNumber* n1, const QNumber* n2);
+QNumber BVQNumber_bit_and(const QNumber *n1, const QNumber *n2);
 
-QNumber BVQNumber_bit_or(const QNumber* n1, const QNumber* n2);
+QNumber BVQNumber_bit_or(const QNumber *n1, const QNumber *n2);
 
-QNumber BVQNumber_bit_xor(const QNumber* n1, const QNumber* n2);
+QNumber BVQNumber_bit_xor(const QNumber *n1, const QNumber *n2);
 
-QNumber BVQNumber_bit_complement(const QNumber* n);
+QNumber BVQNumber_bit_complement(const QNumber *n);
 
-QNumber BVQNumber_bit_left_shift(const QNumber* n, size_t i);
+QNumber BVQNumber_bit_left_shift(const QNumber *n, size_t i);
 
-QNumber BVQNumber_bit_right_shift(const QNumber* n, size_t i);
+QNumber BVQNumber_bit_right_shift(const QNumber *n, size_t i);
 
-size_t BVQNumber_scan_bit_1(const QNumber* n, size_t start_index);
+size_t BVQNumber_scan_bit_1(const QNumber *n, size_t start_index);
 
-boolean BVQNumber_to_long(const QNumber* n, long* out);
+boolean BVQNumber_to_long(const QNumber *n, long *out);
 
-void BVQNumber_check_bv(const QNumber* n);
+void BVQNumber_check_bv(const QNumber *n);
 
 long BVQNumber_bit_and_l(long a, long b);
 

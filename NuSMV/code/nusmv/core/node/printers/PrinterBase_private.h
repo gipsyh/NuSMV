@@ -35,17 +35,13 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_BASE_PRIVATE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_BASE_PRIVATE_H__
 
-
-#include "nusmv/core/node/printers/PrinterBase.h"
 #include "nusmv/core/node/NodeWalker_private.h"
+#include "nusmv/core/node/printers/PrinterBase.h"
 
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief PrinterBase class definition derived from
@@ -56,8 +52,7 @@
   \sa Base class Object
 */
 
-typedef struct PrinterBase_TAG
-{
+typedef struct PrinterBase_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(NodeWalker);
 
@@ -71,8 +66,6 @@ typedef struct PrinterBase_TAG
   int (*print_node)(PrinterBase_ptr self, node_ptr n, int priority);
 
 } PrinterBase;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
@@ -92,9 +85,8 @@ typedef struct PrinterBase_TAG
 
   \sa PrinterBase_destroy
 */
-PrinterBase_ptr
-PrinterBase_create(const NuSMVEnv_ptr env, const char* name, int low,
-                   size_t num);
+PrinterBase_ptr PrinterBase_create(const NuSMVEnv_ptr env, const char *name,
+                                   int low, size_t num);
 
 /*!
   \methodof PrinterBase
@@ -104,10 +96,9 @@ PrinterBase_create(const NuSMVEnv_ptr env, const char* name, int low,
 
   \sa PrinterBase_create
 */
-void
-printer_base_init(PrinterBase_ptr self, const NuSMVEnv_ptr env,
-                  const char* name, int low, size_t num,
-                  boolean can_handle_null);
+void printer_base_init(PrinterBase_ptr self, const NuSMVEnv_ptr env,
+                       const char *name, int low, size_t num,
+                       boolean can_handle_null);
 
 /*!
   \methodof PrinterBase
@@ -126,9 +117,8 @@ void printer_base_deinit(PrinterBase_ptr self);
 
 
 */
-int
-printer_base_throw_print_node(PrinterBase_ptr self,
-                              node_ptr n, int priority);
+int printer_base_throw_print_node(PrinterBase_ptr self, node_ptr n,
+                                  int priority);
 
 /*!
   \methodof PrinterBase
@@ -137,8 +127,6 @@ printer_base_throw_print_node(PrinterBase_ptr self,
 
 
 */
-int
-printer_base_print_string(PrinterBase_ptr self, const char* str);
-
+int printer_base_print_string(PrinterBase_ptr self, const char *str);
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_PRINTER_BASE_PRIVATE_H__ */

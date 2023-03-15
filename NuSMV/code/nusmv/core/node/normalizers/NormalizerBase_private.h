@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,30 +34,26 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_BASE_PRIVATE_H__
 #define __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_BASE_PRIVATE_H__
 
-
-#include "nusmv/core/node/normalizers/NormalizerBase.h"
 #include "nusmv/core/node/NodeWalker_private.h"
+#include "nusmv/core/node/normalizers/NormalizerBase.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/utils/WordNumberMgr.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \brief NormalizerBase class definition derived from
                class NodeWalker
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct NormalizerBase_TAG
-{
+typedef struct NormalizerBase_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(NodeWalker);
 
@@ -71,8 +67,6 @@ typedef struct NormalizerBase_TAG
   node_ptr (*normalize_node)(NormalizerBase_ptr self, node_ptr n);
 
 } NormalizerBase;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
@@ -92,8 +86,8 @@ typedef struct NormalizerBase_TAG
 
   \sa NormalizerBase_destroy
 */
-NormalizerBase_ptr
-NormalizerBase_create(const NuSMVEnv_ptr env, const char* name, int low, size_t num);
+NormalizerBase_ptr NormalizerBase_create(const NuSMVEnv_ptr env,
+                                         const char *name, int low, size_t num);
 
 /*!
   \methodof NormalizerBase
@@ -103,10 +97,9 @@ NormalizerBase_create(const NuSMVEnv_ptr env, const char* name, int low, size_t 
 
   \sa NormalizerBase_create
 */
-void
-normalizer_base_init(NormalizerBase_ptr self, const NuSMVEnv_ptr env,
-                     const char* name, int low, size_t num,
-                     boolean can_handle_null);
+void normalizer_base_init(NormalizerBase_ptr self, const NuSMVEnv_ptr env,
+                          const char *name, int low, size_t num,
+                          boolean can_handle_null);
 
 /*!
   \methodof NormalizerBase
@@ -123,11 +116,9 @@ void normalizer_base_deinit(NormalizerBase_ptr self);
   \brief This method must be called by the virtual method
   print_node to recursively print sub nodes
 
-  
-*/
-node_ptr
-normalizer_base_throw_normalize_node(NormalizerBase_ptr self,
-                                     node_ptr n);
 
+*/
+node_ptr normalizer_base_throw_normalize_node(NormalizerBase_ptr self,
+                                              node_ptr n);
 
 #endif /* __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_BASE_PRIVATE_H__ */

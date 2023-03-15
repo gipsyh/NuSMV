@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,26 +34,23 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_SATPARTIAL_TRACE_EXECUTOR_H__
 #define __NUSMV_CORE_TRACE_EXEC_SATPARTIAL_TRACE_EXECUTOR_H__
-
 
 #include "nusmv/core/trace/exec/PartialTraceExecutor.h"
 #include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/fsm/be/BeFsm.h"
-#include "nusmv/core/enc/be/BeEnc.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
+#include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/fsm/be/BeFsm.h"
 
 /*!
   \struct SATPartialTraceExecutor
   \brief Definition of the public accessor for class SATPartialTraceExecutor
 
-  
+
 */
-typedef struct SATPartialTraceExecutor_TAG*  SATPartialTraceExecutor_ptr;
+typedef struct SATPartialTraceExecutor_TAG *SATPartialTraceExecutor_ptr;
 
 /*!
   \brief To cast and check instances of class SATPartialTraceExecutor
@@ -61,16 +58,16 @@ typedef struct SATPartialTraceExecutor_TAG*  SATPartialTraceExecutor_ptr;
   These macros must be used respectively to cast and to check
   instances of class SATPartialTraceExecutor
 */
-#define SAT_PARTIAL_TRACE_EXECUTOR(self) \
-         ((SATPartialTraceExecutor_ptr) self)
+#define SAT_PARTIAL_TRACE_EXECUTOR(self) ((SATPartialTraceExecutor_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SAT_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self) \
-         (nusmv_assert(SAT_PARTIAL_TRACE_EXECUTOR(self) != SAT_PARTIAL_TRACE_EXECUTOR(NULL)))
+#define SAT_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)                        \
+  (nusmv_assert(SAT_PARTIAL_TRACE_EXECUTOR(self) !=                            \
+                SAT_PARTIAL_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,8 +83,9 @@ typedef struct SATPartialTraceExecutor_TAG*  SATPartialTraceExecutor_ptr;
 
   \sa SATPartialTraceExecutor_destroy
 */
-SATPartialTraceExecutor_ptr SATPartialTraceExecutor_create(const BeFsm_ptr fsm, const BeEnc_ptr enc, const BddEnc_ptr bdd_enc,
-boolean use_restart);
+SATPartialTraceExecutor_ptr
+SATPartialTraceExecutor_create(const BeFsm_ptr fsm, const BeEnc_ptr enc,
+                               const BddEnc_ptr bdd_enc, boolean use_restart);
 
 /*!
   \methodof SATPartialTraceExecutor
@@ -97,11 +95,8 @@ boolean use_restart);
 
   \sa SATPartialTraceExecutor_create
 */
-void
-SATPartialTraceExecutor_destroy(SATPartialTraceExecutor_ptr self);
+void SATPartialTraceExecutor_destroy(SATPartialTraceExecutor_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_SATPARTIAL_TRACE_EXECUTOR_H__ */

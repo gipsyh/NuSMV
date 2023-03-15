@@ -37,18 +37,16 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_FSM_BDD_BDD_FSM_H__
 #define __NUSMV_CORE_FSM_BDD_BDD_FSM_H__
 
-#include "nusmv/core/fsm/bdd/bdd.h"
 #include "nusmv/core/fsm/bdd/FairnessList.h"
+#include "nusmv/core/fsm/bdd/bdd.h"
 
 #include "nusmv/core/dd/dd.h"
-#include "nusmv/core/trans/bdd/BddTrans.h"
 #include "nusmv/core/enc/bdd/BddEnc.h" /* Encoding */
-#include "nusmv/core/fsm/sexp/sexp.h" /* VarSet_ptr */
+#include "nusmv/core/fsm/sexp/sexp.h"  /* VarSet_ptr */
+#include "nusmv/core/trans/bdd/BddTrans.h"
 
 /*!
   \struct BddFsm
@@ -56,39 +54,35 @@
 
 
 */
-typedef struct BddFsm_TAG*  BddFsm_ptr;
+typedef struct BddFsm_TAG *BddFsm_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_FSM(x) \
-         ((BddFsm_ptr) x)
+#define BDD_FSM(x) ((BddFsm_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_FSM_CHECK_INSTANCE(x) \
-         (nusmv_assert( BDD_FSM(x) != BDD_FSM(NULL) ))
+#define BDD_FSM_CHECK_INSTANCE(x) (nusmv_assert(BDD_FSM(x) != BDD_FSM(NULL)))
 
-
-enum Bdd_Fsm_dir_TAG {BDD_FSM_DIR_BWD, BDD_FSM_DIR_FWD};
+enum Bdd_Fsm_dir_TAG { BDD_FSM_DIR_BWD, BDD_FSM_DIR_FWD };
 typedef enum Bdd_Fsm_dir_TAG BddFsm_dir;
 
 /*!
   \brief Format used by printers of transitions
 */
 enum BddFsmTransPrinterFormat {
-  BDD_FSM_TRANS_PRINTER_SILENT,  /* use to avoid printing */
+  BDD_FSM_TRANS_PRINTER_SILENT, /* use to avoid printing */
   BDD_FSM_TRANS_PRINTER_SMV,
   BDD_FSM_TRANS_PRINTER_CSV,
   BDD_FSM_TRANS_PRINTER_DOT,
   BDD_FSM_TRANS_PRINTER_INVALID = -1,
 };
-
 
 /* ---------------------------------------------------------------------- */
 /* public interface                                                       */
@@ -102,11 +96,11 @@ enum BddFsmTransPrinterFormat {
    self becomes the owner of given trans, justice and compassion objects,
    whereas the encoding is owned by the caller
 */
-BddFsm_ptr
-BddFsm_create(BddEnc_ptr encoding, BddStates init,
-              BddInvarStates invar_states, BddInvarInputs invar_inputs,
-              BddTrans_ptr trans,
-              JusticeList_ptr justice, CompassionList_ptr compassion);
+BddFsm_ptr BddFsm_create(BddEnc_ptr encoding, BddStates init,
+                         BddInvarStates invar_states,
+                         BddInvarInputs invar_inputs, BddTrans_ptr trans,
+                         JusticeList_ptr justice,
+                         CompassionList_ptr compassion);
 
 /*!
   \methodof BddFsm
@@ -140,7 +134,7 @@ BddFsm_ptr BddFsm_copy(const BddFsm_ptr self);
    into 'self' will be lost after the copy.
 */
 void BddFsm_copy_cache(BddFsm_ptr self, const BddFsm_ptr other,
-                              boolean keep_family);
+                       boolean keep_family);
 
 /*!
   \methodof BddFsm
@@ -181,8 +175,7 @@ BddEnc_ptr BddFsm_get_bdd_encoding(const BddFsm_ptr self);
 
   Returned bdd is referenced
 */
-BddInvarStates
-BddFsm_get_state_constraints(const BddFsm_ptr self);
+BddInvarStates BddFsm_get_state_constraints(const BddFsm_ptr self);
 
 /*!
   \methodof BddFsm
@@ -190,8 +183,7 @@ BddFsm_get_state_constraints(const BddFsm_ptr self);
 
   Returned bdd is referenced
 */
-BddInvarInputs
-BddFsm_get_input_constraints(const BddFsm_ptr self);
+BddInvarInputs BddFsm_get_input_constraints(const BddFsm_ptr self);
 
 /*!
   \methodof BddFsm
@@ -336,10 +328,9 @@ BddStates BddFsm_get_reachable_states(BddFsm_ptr self);
 
   \se Internal cache could change of both self and other
 */
-void
-BddFsm_copy_reachable_states(BddFsm_ptr self, BddFsm_ptr other,
-                             boolean keep_family,
-                             boolean force_calculation);
+void BddFsm_copy_reachable_states(BddFsm_ptr self, BddFsm_ptr other,
+                                  boolean keep_family,
+                                  boolean force_calculation);
 
 /*!
   \methodof BddFsm
@@ -369,9 +360,8 @@ BddFsm_copy_reachable_states(BddFsm_ptr self, BddFsm_ptr other,
 
   \se Internal cache could change
 */
-BddStates
-BddFsm_get_reachable_states_at_distance(BddFsm_ptr self,
-                                        int distance);
+BddStates BddFsm_get_reachable_states_at_distance(BddFsm_ptr self,
+                                                  int distance);
 
 /*!
   \methodof BddFsm
@@ -402,9 +392,7 @@ BddFsm_get_reachable_states_at_distance(BddFsm_ptr self,
 
   \se Internal cache could change
 */
-int
-BddFsm_get_distance_of_states(BddFsm_ptr self,
-                              BddStates states);
+int BddFsm_get_distance_of_states(BddFsm_ptr self, BddStates states);
 
 /*!
   \methodof BddFsm
@@ -425,9 +413,7 @@ BddFsm_get_distance_of_states(BddFsm_ptr self,
 
   \se Internal cache could change
 */
-int
-BddFsm_get_minimum_distance_of_states(BddFsm_ptr self,
-                                      BddStates states);
+int BddFsm_get_minimum_distance_of_states(BddFsm_ptr self, BddStates states);
 
 /*!
   \methodof BddFsm
@@ -471,8 +457,7 @@ int BddFsm_get_diameter(BddFsm_ptr self);
 
   \se Internal cache could change
 */
-BddStates
-BddFsm_get_not_successor_states(BddFsm_ptr self);
+BddStates BddFsm_get_not_successor_states(BddFsm_ptr self);
 
 /*!
   \methodof BddFsm
@@ -579,8 +564,7 @@ boolean BddFsm_is_deadlock_free(BddFsm_ptr self);
 
    Returned bdd is referenced.
 */
-BddStates
-BddFsm_get_forward_image(const BddFsm_ptr self, BddStates states);
+BddStates BddFsm_get_forward_image(const BddFsm_ptr self, BddStates states);
 
 /*!
   \methodof BddFsm
@@ -615,8 +599,7 @@ BddFsm_get_forward_image(const BddFsm_ptr self, BddStates states);
    Returned bdd is referenced
 */
 BddStates
-BddFsm_get_constrained_forward_image(const BddFsm_ptr self,
-                                     BddStates states,
+BddFsm_get_constrained_forward_image(const BddFsm_ptr self, BddStates states,
                                      BddStatesInputsNexts constraints);
 
 /*!
@@ -652,9 +635,7 @@ BddFsm_get_constrained_forward_image(const BddFsm_ptr self,
    Returned bdd is referenced
 */
 BddStates BddFsm_get_sins_constrained_forward_image(
-    const BddFsm_ptr self,
-    BddStates states,
-    BddStatesInputsNexts constraints);
+    const BddFsm_ptr self, BddStates states, BddStatesInputsNexts constraints);
 
 /*!
   \methodof BddFsm
@@ -685,9 +666,8 @@ BddStates BddFsm_get_sins_constrained_forward_image(
   \sa BddFsm_get_constrained_forward_image_states_inputs,
    BddFsm_get_forward_image
 */
-BddStatesInputs
-BddFsm_get_forward_image_states_inputs(const BddFsm_ptr self,
-                                       BddStatesInputs si);
+BddStatesInputs BddFsm_get_forward_image_states_inputs(const BddFsm_ptr self,
+                                                       BddStatesInputs si);
 
 /*!
   \methodof BddFsm
@@ -724,10 +704,9 @@ BddFsm_get_forward_image_states_inputs(const BddFsm_ptr self,
   \sa BddFsm_get_forward_image_states_inputs,
    BddFsm_get_constrained_forward_image
 */
-BddStatesInputs
-BddFsm_get_constrained_forward_image_states_inputs(const BddFsm_ptr self,
-BddStatesInputs si,
-BddStatesInputsNexts constraints);
+BddStatesInputs BddFsm_get_constrained_forward_image_states_inputs(
+    const BddFsm_ptr self, BddStatesInputs si,
+    BddStatesInputsNexts constraints);
 
 /*!
   \methodof BddFsm
@@ -754,8 +733,7 @@ BddStatesInputsNexts constraints);
 
    Returned bdd is referenced.
 */
-BddStates
-BddFsm_get_backward_image(const BddFsm_ptr self, BddStates states);
+BddStates BddFsm_get_backward_image(const BddFsm_ptr self, BddStates states);
 
 /*!
   \methodof BddFsm
@@ -791,9 +769,8 @@ BddFsm_get_backward_image(const BddFsm_ptr self, BddStates states);
    Returned bdd is referenced.
 */
 BddStates
-BddFsm_get_constrained_backward_image(const BddFsm_ptr self,
-BddStates states,
-BddStatesInputsNexts constraints);
+BddFsm_get_constrained_backward_image(const BddFsm_ptr self, BddStates states,
+                                      BddStatesInputsNexts constraints);
 
 /*!
   \methodof BddFsm
@@ -821,9 +798,8 @@ BddStatesInputsNexts constraints);
 
    Returned bdd is referenced.
 */
-BddStatesInputs
-BddFsm_get_weak_backward_image(const BddFsm_ptr self,
-                               BddStates states);
+BddStatesInputs BddFsm_get_weak_backward_image(const BddFsm_ptr self,
+                                               BddStates states);
 
 /*!
   \methodof BddFsm
@@ -850,10 +826,8 @@ BddFsm_get_weak_backward_image(const BddFsm_ptr self,
 
    The returned bdd is referenced.
 */
-BddStatesInputs
-BddFsm_get_k_backward_image(const BddFsm_ptr self,
-                            BddStates states,
-                            int k);
+BddStatesInputs BddFsm_get_k_backward_image(const BddFsm_ptr self,
+                                            BddStates states, int k);
 
 /*!
   \methodof BddFsm
@@ -879,9 +853,8 @@ BddFsm_get_k_backward_image(const BddFsm_ptr self,
 
    Returned bdd is referenced.
 */
-BddStatesInputs
-BddFsm_get_strong_backward_image(const BddFsm_ptr self,
-                                 BddStates states);
+BddStatesInputs BddFsm_get_strong_backward_image(const BddFsm_ptr self,
+                                                 BddStates states);
 
 /*!
   \methodof BddFsm
@@ -901,12 +874,11 @@ void BddFsm_print_info(const BddFsm_ptr self, OStream_ptr file);
   number of reachable states. It is computed taking care of the
   encoding and of the indifferent variables in the encoding.
 */
-void
-BddFsm_print_reachable_states_info(const BddFsm_ptr self,
-                                   const boolean print_states,
-                                   const boolean print_defines,
-                                   const boolean print_formula,
-                                   OStream_ptr file);
+void BddFsm_print_reachable_states_info(const BddFsm_ptr self,
+                                        const boolean print_states,
+                                        const boolean print_defines,
+                                        const boolean print_formula,
+                                        OStream_ptr file);
 
 /*!
   \methodof BddFsm
@@ -916,10 +888,8 @@ BddFsm_print_reachable_states_info(const BddFsm_ptr self,
   the indifferent variables in the encoding. In verbose mode also
   prints transitions.
 */
-void
-BddFsm_print_fair_states_info(const BddFsm_ptr self,
-                              const boolean verbose,
-                              OStream_ptr file);
+void BddFsm_print_fair_states_info(const BddFsm_ptr self, const boolean verbose,
+                                   OStream_ptr file);
 
 /*!
   \methodof BddFsm
@@ -930,8 +900,7 @@ BddFsm_print_fair_states_info(const BddFsm_ptr self,
    the encoding and of the indifferent variables in the encoding.
 */
 void BddFsm_print_fair_transitions_info(
-    const BddFsm_ptr self,
-    const enum BddFsmTransPrinterFormat format,
+    const BddFsm_ptr self, const enum BddFsmTransPrinterFormat format,
     OStream_ptr file);
 
 /*!
@@ -984,12 +953,11 @@ void BddFsm_check_machine(const BddFsm_ptr self);
   \sa BddFsm_apply_synchronous_product,
                 BddFsmCache_reset_not_reusable_fields_after_product
 */
-void
-BddFsm_apply_synchronous_product_custom_varsets(BddFsm_ptr self,
-                                                const BddFsm_ptr other,
-                                                bdd_ptr state_vars_cube,
-                                                bdd_ptr input_vars_cube,
-                                                bdd_ptr next_vars_cube);
+void BddFsm_apply_synchronous_product_custom_varsets(BddFsm_ptr self,
+                                                     const BddFsm_ptr other,
+                                                     bdd_ptr state_vars_cube,
+                                                     bdd_ptr input_vars_cube,
+                                                     bdd_ptr next_vars_cube);
 
 /*!
   \methodof BddFsm
@@ -1010,9 +978,7 @@ BddFsm_apply_synchronous_product_custom_varsets(BddFsm_ptr self,
   \sa BddFsm_apply_synchronous_product_custom_varsets,
                 BddFsmCache_reset_not_reusable_fields_after_product
 */
-void
-BddFsm_apply_synchronous_product(BddFsm_ptr self,
-                                 const BddFsm_ptr other);
+void BddFsm_apply_synchronous_product(BddFsm_ptr self, const BddFsm_ptr other);
 
 /*!
   \methodof BddFsm
@@ -1020,8 +986,7 @@ BddFsm_apply_synchronous_product(BddFsm_ptr self,
 
 
 */
-boolean BddFsm_is_fair_states(const BddFsm_ptr self,
-                                     BddStates states);
+boolean BddFsm_is_fair_states(const BddFsm_ptr self, BddStates states);
 
 /*!
   \methodof BddFsm
@@ -1031,10 +996,9 @@ boolean BddFsm_is_fair_states(const BddFsm_ptr self,
 
   Note: a state is represented by state and frozen variables.
 */
-BddInputs
-BddFsm_states_to_states_get_inputs(const BddFsm_ptr self,
-                                   BddStates cur_states,
-                                   BddStates next_states);
+BddInputs BddFsm_states_to_states_get_inputs(const BddFsm_ptr self,
+                                             BddStates cur_states,
+                                             BddStates next_states);
 
 /*!
   \methodof BddFsm
@@ -1044,9 +1008,8 @@ BddFsm_states_to_states_get_inputs(const BddFsm_ptr self,
 
 
 */
-BddStatesInputs
-BddFsm_get_states_inputs_constraints(const BddFsm_ptr self,
-                                     BddFsm_dir dir);
+BddStatesInputs BddFsm_get_states_inputs_constraints(const BddFsm_ptr self,
+                                                     BddFsm_dir dir);
 
 /*!
   \methodof BddFsm
@@ -1067,24 +1030,22 @@ BddStates BddFsm_states_inputs_to_states(const BddFsm_ptr self,
    both state and frozen variables are abstracted away.
 */
 BddStates BddFsm_states_inputs_to_inputs(const BddFsm_ptr self,
-                                                BddStatesInputs si);
+                                         BddStatesInputs si);
 
 /*!
   \methodof BddFsm
   \brief Returns the cached reachable states
 */
 boolean BddFsm_get_cached_reachable_states(const BddFsm_ptr self,
-                                                  BddStates** layers,
-                                                  int* size);
+                                           BddStates **layers, int *size);
 
 /*!
   \methodof BddFsm
   \brief Updates the cached reachable states
 */
 void BddFsm_update_cached_reachable_states(const BddFsm_ptr self,
-                                                  node_ptr layers,
-                                                  int size,
-                                                  boolean completed);
+                                           node_ptr layers, int size,
+                                           boolean completed);
 
 /*!
   \methodof BddFsm
@@ -1094,8 +1055,7 @@ void BddFsm_update_cached_reachable_states(const BddFsm_ptr self,
   Sets the whole set of reachable states for this FSM, with
    no onion ring informations
 */
-void BddFsm_set_reachable_states(const BddFsm_ptr self,
-                                        BddStates reachable);
+void BddFsm_set_reachable_states(const BddFsm_ptr self, BddStates reachable);
 
 /*!
   \methodof BddFsm
@@ -1117,10 +1077,8 @@ boolean BddFsm_has_cached_reachable_states(const BddFsm_ptr self);
 
   \se Changes the internal cache
 */
-boolean
-BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
-                                      int k,
-                                      int max_seconds);
+boolean BddFsm_expand_cached_reachable_states(BddFsm_ptr self, int k,
+                                              int max_seconds);
 
 /* Features directly called by commands */
 
@@ -1130,31 +1088,23 @@ BddFsm_expand_cached_reachable_states(BddFsm_ptr self,
 
   Computes the set of reachable states
 */
-boolean
-BddFsm_compute_reachable(BddFsm_ptr self, int k, int t, int* diameter);
-
+boolean BddFsm_compute_reachable(BddFsm_ptr self, int k, int t, int *diameter);
 
 /*!
   \methodof BddFsm
   \brief Computes the number of transitions exiting given set of
   states/inputs
 */
-double
-BddFsm_count_transitions(const BddFsm_ptr self,
-                         BddStatesInputs bdd);
+double BddFsm_count_transitions(const BddFsm_ptr self, BddStatesInputs bdd);
 
 /*!
   \methodof BddFsm
   \brief
 */
-int
-BddFsm_dump_fsm(BddFsm_ptr self,
-                const NuSMVEnv_ptr env, node_ptr node_expr,
-                char* str_constr,
-                boolean init,
-                boolean invar, boolean trans, boolean fair,
-                boolean reachable,
-                FILE* outfile);
+int BddFsm_dump_fsm(BddFsm_ptr self, const NuSMVEnv_ptr env, node_ptr node_expr,
+                    char *str_constr, boolean init, boolean invar,
+                    boolean trans, boolean fair, boolean reachable,
+                    FILE *outfile);
 
 /*!
   \methodof BddFsm
@@ -1162,11 +1112,9 @@ BddFsm_dump_fsm(BddFsm_ptr self,
 
   print_reachable_states
 */
-int
-BddFsm_print_reachable_states(BddFsm_ptr self,
-                              NuSMVEnv_ptr env, OStream_ptr stream,
-                              boolean verbose, boolean print_defines,
-                              boolean formula);
+int BddFsm_print_reachable_states(BddFsm_ptr self, NuSMVEnv_ptr env,
+                                  OStream_ptr stream, boolean verbose,
+                                  boolean print_defines, boolean formula);
 
 /*!
   \methodof BddFsm
@@ -1174,8 +1122,7 @@ BddFsm_print_reachable_states(BddFsm_ptr self,
 
   Prints the fair states.
 */
-int BddFsm_print_fair_states(BddFsm_ptr self,
-                             const NuSMVEnv_ptr env,
+int BddFsm_print_fair_states(BddFsm_ptr self, const NuSMVEnv_ptr env,
                              const OStream_ptr outstream,
                              const boolean verbose);
 
@@ -1184,8 +1131,7 @@ int BddFsm_print_fair_states(BddFsm_ptr self,
   \brief Print the fair transitions
 
 */
-int BddFsm_print_fair_transitions(BddFsm_ptr self,
-                                  const NuSMVEnv_ptr env,
+int BddFsm_print_fair_transitions(BddFsm_ptr self, const NuSMVEnv_ptr env,
                                   const enum BddFsmTransPrinterFormat format,
                                   const OStream_ptr outstream);
 
@@ -1197,8 +1143,7 @@ int BddFsm_print_fair_transitions(BddFsm_ptr self,
   destination state.
 
 */
-int BddFsm_print_fair_state_input_pairs(BddFsm_ptr self,
-                                        const NuSMVEnv_ptr env,
+int BddFsm_print_fair_state_input_pairs(BddFsm_ptr self, const NuSMVEnv_ptr env,
                                         const OStream_ptr outstream,
                                         const boolean verbose);
 /*!
@@ -1208,14 +1153,14 @@ int BddFsm_print_fair_state_input_pairs(BddFsm_ptr self,
   correspond to any valid format.
 */
 enum BddFsmTransPrinterFormat
-BddFsm_trans_printer_format_from_string(const char* format_str);
+BddFsm_trans_printer_format_from_string(const char *format_str);
 
 /*!
   \brief Returns the string representation of the given format.
   NULL is returned if the format does not exist.
   The returned string must be NOT freed by the caller.
 */
-const char*
+const char *
 BddFsm_trans_printer_format_to_string(enum BddFsmTransPrinterFormat format);
 
 /*!
@@ -1224,8 +1169,7 @@ BddFsm_trans_printer_format_to_string(enum BddFsmTransPrinterFormat format);
   The number of entries is written by the function in num.
   The returned list must be freeded by the caller.
 */
-enum BddFsmTransPrinterFormat*
-BddFsm_trans_printer_get_avail_formats(size_t* num);
-
+enum BddFsmTransPrinterFormat *
+BddFsm_trans_printer_get_avail_formats(size_t *num);
 
 #endif /* __NUSMV_CORE_FSM_BDD_BDD_FSM_H__ */

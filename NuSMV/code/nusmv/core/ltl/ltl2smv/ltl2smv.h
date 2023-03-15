@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -46,20 +46,18 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_LTL_LTL2SMV_LTL2SMV_H__
 #define __NUSMV_CORE_LTL_LTL2SMV_LTL2SMV_H__
 
 #include "nusmv/core/node/node.h"
 
 /*!
-  \brief 
+  \brief
 */
-typedef struct Ltl2SmvPrefixes_TAG
-{
-  char* pre_prefix;
-  char* prefix_name;
-  char* ltl_module_base_name;
+typedef struct Ltl2SmvPrefixes_TAG {
+  char *pre_prefix;
+  char *prefix_name;
+  char *ltl_module_base_name;
 } Ltl2SmvPrefixes;
 
 /*---------------------------------------------------------------------------*/
@@ -109,13 +107,11 @@ typedef struct Ltl2SmvPrefixes_TAG
   The return value is the created SMV module in the form of node_ptr.
 
   The computed module may contain more than one justice condition.
-  
+
 
   \sa ltl2smv_core
 */
-node_ptr ltl2smv(NuSMVEnv_ptr env,
-                        unsigned int uniqueId,
-                        node_ptr in_ltl_expr);
+node_ptr ltl2smv(NuSMVEnv_ptr env, unsigned int uniqueId, node_ptr in_ltl_expr);
 
 /*!
   \brief The main routine converting an LTL formula to am SMV Module.
@@ -140,13 +136,11 @@ node_ptr ltl2smv(NuSMVEnv_ptr env,
   not their expressions). See generate_smv_module for more info.
 
   The return value is the created SMV module in the form of node_ptr.
-  
+
 */
-node_ptr ltl2smv_core(NuSMVEnv_ptr env,
-                      unsigned int uniqueId,
-                      node_ptr in_ltl_expr,
-                      boolean single_justice,
-                      const Ltl2SmvPrefixes* prefixes);
+node_ptr ltl2smv_core(NuSMVEnv_ptr env, unsigned int uniqueId,
+                      node_ptr in_ltl_expr, boolean single_justice,
+                      const Ltl2SmvPrefixes *prefixes);
 
 /*!
   \brief The routine converting an LTL formula to am SMV Module.
@@ -171,10 +165,9 @@ node_ptr ltl2smv_core(NuSMVEnv_ptr env,
 
   The computed module will contain less than one justice condition.
 
-  
+
 */
-node_ptr ltl2smv_single_justice(NuSMVEnv_ptr env,
-                                       unsigned int uniqueId,
-                                       node_ptr in_ltl_expr);
+node_ptr ltl2smv_single_justice(NuSMVEnv_ptr env, unsigned int uniqueId,
+                                node_ptr in_ltl_expr);
 
 #endif /* __NUSMV_CORE_LTL_LTL2SMV_LTL2SMV_H__ */

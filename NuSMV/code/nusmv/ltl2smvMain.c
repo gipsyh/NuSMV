@@ -38,45 +38,50 @@
 
 */
 
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/ltl/ltl2smv/ltl2smv.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/StreamMgr.h"
 
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/cinit/cinit.h"
 #include "nusmv/core/cinit/cinit.h"
 #include "nusmv/core/compile/compile.h"
 #include "nusmv/core/parser/parser.h"
 #include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/ustring.h"
+#include "nusmv/core/utils/utils.h"
 #include <stdio.h>
 
-static void ltl2smv_print_module(const NuSMVEnv_ptr env,
-                                 FILE* ostream, node_ptr);
+static void ltl2smv_print_module(const NuSMVEnv_ptr env, FILE *ostream,
+                                 node_ptr);
 
 static void print_usage(StreamMgr_ptr streams, int argc, char **argv) {
-    StreamMgr_print_error(streams,  "%s: Converts an LTL formula to a fragment of an "
-            "SMV program.\n", argv[0]);
-    StreamMgr_print_error(streams,  "%s: %s [-s] # <ifile> [<ofile>]\n", argv[0], argv[0]);
-    StreamMgr_print_error(streams,  "Where:\n"
-            "\t[-s]\t if passed, inform to generate a single justice constraint\n"
-            "\t\tinstead of posisbly more than one\n"
-            "\t#\t is a positive number which is converted to a string\n"
-            "\t\t and then used as a part of the generated SMV model\n"
-            "\t\t name _LTL#_SPECF_N_.\n");
-    StreamMgr_print_error(streams,  "\t<ifile>\t is the file from which the LTL Formula "
-            "to be translated\n\t\t is read.\n");
-    StreamMgr_print_error(streams,  "\t<ofile>\t is the file in which the SMV code "
-            "corresponding to the\n\t\t tableau of LTL Formula is "
-            "written in.\n\t\t If not specified than stdout is used.\n");
+  StreamMgr_print_error(streams,
+                        "%s: Converts an LTL formula to a fragment of an "
+                        "SMV program.\n",
+                        argv[0]);
+  StreamMgr_print_error(streams, "%s: %s [-s] # <ifile> [<ofile>]\n", argv[0],
+                        argv[0]);
+  StreamMgr_print_error(
+      streams,
+      "Where:\n"
+      "\t[-s]\t if passed, inform to generate a single justice constraint\n"
+      "\t\tinstead of posisbly more than one\n"
+      "\t#\t is a positive number which is converted to a string\n"
+      "\t\t and then used as a part of the generated SMV model\n"
+      "\t\t name _LTL#_SPECF_N_.\n");
+  StreamMgr_print_error(streams,
+                        "\t<ifile>\t is the file from which the LTL Formula "
+                        "to be translated\n\t\t is read.\n");
+  StreamMgr_print_error(
+      streams, "\t<ofile>\t is the file in which the SMV code "
+               "corresponding to the\n\t\t tableau of LTL Formula is "
+               "written in.\n\t\t If not specified than stdout is used.\n");
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   unsigned int uniqueId;
   node_ptr in_ltl_expr;
-  FILE* output_file;
+  FILE *output_file;
   NuSMVEnv_ptr env = NuSMVEnv_create();
   StreamMgr_ptr streams;
   int i = 1;
@@ -101,18 +106,21 @@ int main(int argc, char **argv)
 
   /* check the first argument -- a zero or positive number */
   {
-    char* err_occ = "";
+    char *err_occ = "";
     long int r = strtol(argv[i], &err_occ, 10);
     if (strcmp(err_occ, "") != 0) {
-      StreamMgr_print_error(streams,  "Error: \"%s\" is not a natural number.\n", err_occ);
+      StreamMgr_print_error(streams, "Error: \"%s\" is not a natural number.\n",
+                            err_occ);
       exit(1);
     }
     if (r < 0) {
-      StreamMgr_print_error(streams,  "Error: \"%ld\" is not a positive number.\n", r);
+      StreamMgr_print_error(streams,
+                            "Error: \"%ld\" is not a positive number.\n", r);
       exit(1);
     }
     if (r != (unsigned int)r) {
-      StreamMgr_print_error(streams,  "Error: \"%ld\" is a too large number.\n", r);
+      StreamMgr_print_error(streams, "Error: \"%ld\" is a too large number.\n",
+                            r);
       exit(1);
     }
     uniqueId = (unsigned int)r;
@@ -122,13 +130,14 @@ int main(int argc, char **argv)
   {
     extern node_ptr parsed_tree; /* the result of parsing */
 
-    if ((char*)NULL == argv[i]) {
-      StreamMgr_print_error(streams,  "Error: ltl2smv : the input file is not specified.\n");
+    if ((char *)NULL == argv[i]) {
+      StreamMgr_print_error(
+          streams, "Error: ltl2smv : the input file is not specified.\n");
       exit(1);
     }
 
     if (Parser_ReadLtlExprFromFile(env, argv[i])) {
-      StreamMgr_print_error(streams,  "Paring Error in LTL expression.\n");
+      StreamMgr_print_error(streams, "Paring Error in LTL expression.\n");
       exit(1);
     }
     in_ltl_expr = parsed_tree; /* the result of parsing */
@@ -139,8 +148,9 @@ int main(int argc, char **argv)
     if (NULL != argv[i]) {
       output_file = fopen(argv[i], "w");
       if (output_file == (FILE *)NULL) {
-        StreamMgr_print_error(streams,  "Error: Unable to open file \"%s\" for writing.\n",
-                argv[i]);
+        StreamMgr_print_error(
+            streams, "Error: Unable to open file \"%s\" for writing.\n",
+            argv[i]);
         exit(1);
       }
     } else {
@@ -158,14 +168,14 @@ int main(int argc, char **argv)
 
   /* transform the expression and print it out */
   {
-    node_ptr out_smv_module = ltl2smv_core(env,
-                                           uniqueId,
-                                           Compile_pop_distrib_ops(env, in_ltl_expr),
-                                           single_fairness, NULL);
+    node_ptr out_smv_module =
+        ltl2smv_core(env, uniqueId, Compile_pop_distrib_ops(env, in_ltl_expr),
+                     single_fairness, NULL);
 
     ltl2smv_print_module(env, output_file, out_smv_module);
 
-    if (output_file != stdout) fclose(output_file);
+    if (output_file != stdout)
+      fclose(output_file);
   }
 
   NuSMVEnv_destroy(env);
@@ -174,7 +184,6 @@ int main(int argc, char **argv)
   return 0;
 }
 
-
 /* static function which prints a module */
 
 /*!
@@ -182,12 +191,11 @@ int main(int argc, char **argv)
 
   \todo Missing description
 */
-static void ltl2smv_print_module(const NuSMVEnv_ptr env,
-                                 FILE* ostream, node_ptr module)
-{
+static void ltl2smv_print_module(const NuSMVEnv_ptr env, FILE *ostream,
+                                 node_ptr module) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-\
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+
   node_ptr iter;
 
   nusmv_assert(Nil != module);
@@ -197,7 +205,8 @@ static void ltl2smv_print_module(const NuSMVEnv_ptr env,
   nusmv_assert(ATOM == node_get_type(car(car(module))));
   nusmv_assert(Nil == cdr(car(module)));
 
-  fprintf(ostream, "MODULE %s\n", UStringMgr_get_string_text((string_ptr)car(car(car(module)))));
+  fprintf(ostream, "MODULE %s\n",
+          UStringMgr_get_string_text((string_ptr)car(car(car(module)))));
 
   iter = cdr(module);
   while (Nil != iter) {
@@ -207,7 +216,7 @@ static void ltl2smv_print_module(const NuSMVEnv_ptr env,
     case VAR: { /* variable declarations */
       node_ptr var;
       var = car(car(iter));
-      if ( Nil != var) {
+      if (Nil != var) {
         fprintf(ostream, "VAR\n");
         while (Nil != var) { /* iterate over variable declarations */
 
@@ -228,7 +237,7 @@ static void ltl2smv_print_module(const NuSMVEnv_ptr env,
     case DEFINE: { /* define declarations */
       node_ptr def;
       def = car(car(iter));
-      if ( Nil != def) {
+      if (Nil != def) {
         fprintf(ostream, "DEFINE\n");
         while (Nil != def) { /* iterate over define declarations */
 
@@ -262,8 +271,9 @@ static void ltl2smv_print_module(const NuSMVEnv_ptr env,
       print_node(wffprint, ostream, car(car(iter)));
       fprintf(ostream, "\n");
       break;
-    default: error_unreachable_code(); /* unexpected node */
-    } /*switch */
+    default:
+      error_unreachable_code(); /* unexpected node */
+    }                           /*switch */
 
     iter = cdr(iter);
   } /* while */

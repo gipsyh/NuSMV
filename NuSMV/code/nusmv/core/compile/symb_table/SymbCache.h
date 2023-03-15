@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,19 +34,18 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_CACHE_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_CACHE_H__
 
+#include "nusmv/core/compile/symb_table/NFunction.h"
 #include "nusmv/core/compile/symb_table/SymbType.h"
 #include "nusmv/core/node/node.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/NodeList.h"
-#include "nusmv/core/compile/symb_table/NFunction.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct SymbCache
-  \brief The SymbCache type 
+  \brief The SymbCache type
 
   An instance of class SymbCache is hold by each instance
   of SymbTable. This means that the life cycle of a SymbCache is never
@@ -55,24 +54,22 @@
   new symbols) are performed by SymbLayers and by SymbTable, by using a
   private interface
 */
-typedef struct SymbCache_TAG*  SymbCache_ptr;
+typedef struct SymbCache_TAG *SymbCache_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_CACHE(x) \
-          ((SymbCache_ptr) x)
+#define SYMB_CACHE(x) ((SymbCache_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SYMB_CACHE_CHECK_INSTANCE(x) \
-          ( nusmv_assert(SYMB_CACHE(x) != SYMB_CACHE(NULL)) )
-
+#define SYMB_CACHE_CHECK_INSTANCE(x)                                           \
+  (nusmv_assert(SYMB_CACHE(x) != SYMB_CACHE(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Class SymbCache's public methods                                       */
@@ -92,128 +89,116 @@ NuSMVEnv_ptr SymbCache_get_environment(const SymbCache_ptr self);
 
   "name" must be a variable
 */
-SymbType_ptr
-SymbCache_get_var_type(const SymbCache_ptr self, const node_ptr name);
+SymbType_ptr SymbCache_get_var_type(const SymbCache_ptr self,
+                                    const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the body of the given DEFINE name
 
-  
+
 */
-node_ptr
-SymbCache_get_define_body(const SymbCache_ptr self,
-                          const node_ptr name);
+node_ptr SymbCache_get_define_body(const SymbCache_ptr self,
+                                   const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the actual param of the given formal parameter
 
-  
+
 */
-node_ptr
-SymbCache_get_actual_parameter(const SymbCache_ptr self,
-                               const node_ptr name);
+node_ptr SymbCache_get_actual_parameter(const SymbCache_ptr self,
+                                        const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the body of the given define array name
 
-  
+
 */
-node_ptr
-SymbCache_get_array_define_body(const SymbCache_ptr self,
-                                 const node_ptr name);
+node_ptr SymbCache_get_array_define_body(const SymbCache_ptr self,
+                                         const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the type of array variable, i.e. of variable_array
 
-  
+
 */
-SymbType_ptr
-SymbCache_get_variable_array_type(const SymbCache_ptr self,
-                               const node_ptr name);
+SymbType_ptr SymbCache_get_variable_array_type(const SymbCache_ptr self,
+                                               const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the type of a function
 */
-SymbType_ptr
-SymbCache_get_function_type(const SymbCache_ptr self,
-                            const node_ptr name);
+SymbType_ptr SymbCache_get_function_type(const SymbCache_ptr self,
+                                         const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the flattenized body of the given DEFINE name
 
-  
+
 */
-node_ptr
-SymbCache_get_define_flatten_body(const SymbCache_ptr self,
-                                  const node_ptr name);
+node_ptr SymbCache_get_define_flatten_body(const SymbCache_ptr self,
+                                           const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the flattenized actual parameter of the given
   formal parameter
 
-  
+
 */
-node_ptr
-SymbCache_get_flatten_actual_parameter(const SymbCache_ptr self,
-                                       const node_ptr name);
+node_ptr SymbCache_get_flatten_actual_parameter(const SymbCache_ptr self,
+                                                const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the context of the given DEFINE name
 
-  
+
 */
-node_ptr
-SymbCache_get_define_context(const SymbCache_ptr self,
-                             const node_ptr name);
+node_ptr SymbCache_get_define_context(const SymbCache_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the context of the given NFunction
 
-  
+
 */
-node_ptr
-SymbCache_get_function_context(const SymbCache_ptr self,
-                                 const node_ptr name);
+node_ptr SymbCache_get_function_context(const SymbCache_ptr self,
+                                        const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the context of the actual parameter associated
-  with the given formal parameter 
+  with the given formal parameter
 
-  
+
 */
-node_ptr
-SymbCache_get_actual_parameter_context(const SymbCache_ptr self,
-                                       const node_ptr name);
+node_ptr SymbCache_get_actual_parameter_context(const SymbCache_ptr self,
+                                                const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns the context of the given define array name
 
-  
+
 */
-node_ptr
-SymbCache_get_array_define_context(const SymbCache_ptr self,
-                                    const node_ptr name);
+node_ptr SymbCache_get_array_define_context(const SymbCache_ptr self,
+                                            const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is a state variable.
 
-  
+
 */
-boolean
-SymbCache_is_symbol_state_var(const SymbCache_ptr self,
-                              const node_ptr name);
+boolean SymbCache_is_symbol_state_var(const SymbCache_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -222,118 +207,106 @@ SymbCache_is_symbol_state_var(const SymbCache_ptr self,
   A variable is frozen if it is known that the var cannot
   change its value during transitions.
 */
-boolean
-SymbCache_is_symbol_frozen_var(const SymbCache_ptr self,
-                                const node_ptr name);
+boolean SymbCache_is_symbol_frozen_var(const SymbCache_ptr self,
+                                       const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the variable is a frozen or a state
   variable
 
-  
+
 */
-boolean
-SymbCache_is_symbol_state_frozen_var(const SymbCache_ptr self,
-                                const node_ptr name);
+boolean SymbCache_is_symbol_state_frozen_var(const SymbCache_ptr self,
+                                             const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is an input
   variable.
 
-  
+
 */
-boolean
-SymbCache_is_symbol_input_var(const SymbCache_ptr self,
-                              const node_ptr name);
+boolean SymbCache_is_symbol_input_var(const SymbCache_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is either a state, a frozen or
   an input variable.
 
-  
+
 */
-boolean
-SymbCache_is_symbol_var(const SymbCache_ptr self, const node_ptr name);
+boolean SymbCache_is_symbol_var(const SymbCache_ptr self, const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is declared
 
-  
+
 */
-boolean
-SymbCache_is_symbol_declared(const SymbCache_ptr self,
-                             const node_ptr name);
+boolean SymbCache_is_symbol_declared(const SymbCache_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is a declared
   DEFINE
 
-  
+
 */
-boolean
-SymbCache_is_symbol_define(const SymbCache_ptr self,
-                           const node_ptr name);
+boolean SymbCache_is_symbol_define(const SymbCache_ptr self,
+                                   const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is a declared
                       NFunction
 
-  
+
 */
-boolean
-SymbCache_is_symbol_function(const SymbCache_ptr self,
-                               const node_ptr name);
+boolean SymbCache_is_symbol_function(const SymbCache_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is a declared formal
   parameter
 
-  
+
 */
-boolean
-SymbCache_is_symbol_parameter(const SymbCache_ptr self,
-                           const node_ptr name);
+boolean SymbCache_is_symbol_parameter(const SymbCache_ptr self,
+                                      const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is a declared
   define array
 
-  
+
 */
-boolean
-SymbCache_is_symbol_array_define(const SymbCache_ptr self,
-                                  const node_ptr name);
+boolean SymbCache_is_symbol_array_define(const SymbCache_ptr self,
+                                         const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is a declared
   variable array
 
-  
-*/
-boolean
-SymbCache_is_symbol_variable_array(const SymbCache_ptr self,
-                                   const node_ptr name);
 
+*/
+boolean SymbCache_is_symbol_variable_array(const SymbCache_ptr self,
+                                           const node_ptr name);
 
 /*!
   \methodof SymbCache
   \brief Returns true if the given symbol is a declared
   constant
 
-  
+
 */
-boolean
-SymbCache_is_symbol_constant(const SymbCache_ptr self,
-                             const node_ptr name);
+boolean SymbCache_is_symbol_constant(const SymbCache_ptr self,
+                                     const node_ptr name);
 
 /*!
   \methodof SymbCache
@@ -343,9 +316,8 @@ SymbCache_is_symbol_constant(const SymbCache_ptr self,
   The given list of variables is traversed until an input
   variable is found
 */
-boolean
-SymbCache_list_contains_input_var(const SymbCache_ptr self,
-                                  const NodeList_ptr var_list);
+boolean SymbCache_list_contains_input_var(const SymbCache_ptr self,
+                                          const NodeList_ptr var_list);
 
 /*!
   \methodof SymbCache
@@ -355,9 +327,8 @@ SymbCache_list_contains_input_var(const SymbCache_ptr self,
   The given list of variables is traversed until
   a state or frozen variable is found
 */
-boolean
-SymbCache_list_contains_state_frozen_var(const SymbCache_ptr self,
-                                  const NodeList_ptr var_list);
+boolean SymbCache_list_contains_state_frozen_var(const SymbCache_ptr self,
+                                                 const NodeList_ptr var_list);
 
 /*!
   \methodof SymbCache
@@ -367,10 +338,7 @@ SymbCache_list_contains_state_frozen_var(const SymbCache_ptr self,
   Iterates through the elements in var_list
   checking each one to see if it is one undeclared variable.
 */
-boolean
-SymbCache_list_contains_undef_var(const SymbCache_ptr self,
-                                  const NodeList_ptr var_list);
-
-
+boolean SymbCache_list_contains_undef_var(const SymbCache_ptr self,
+                                          const NodeList_ptr var_list);
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_SYMB_CACHE_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,13 +34,12 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/hrc/dumpers/HrcDumperXml.h"
 #include "nusmv/core/hrc/dumpers/HrcDumperXml_private.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -77,25 +76,21 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void hrc_dumper_xml_finalize(Object_ptr object, void* dummy);
+static void hrc_dumper_xml_finalize(Object_ptr object, void *dummy);
 static void hrc_dumper_xml_dump_escaped_node(HrcDumperXml_ptr self,
                                              node_ptr node);
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-HrcDumperXml_ptr HrcDumperXml_create(const NuSMVEnv_ptr env,
-                                     FILE* fout)
-{
+HrcDumperXml_ptr HrcDumperXml_create(const NuSMVEnv_ptr env, FILE *fout) {
   HrcDumperXml_ptr self = ALLOC(HrcDumperXml, 1);
   HRC_DUMPER_XML_CHECK_INSTANCE(self);
 
@@ -103,15 +98,12 @@ HrcDumperXml_ptr HrcDumperXml_create(const NuSMVEnv_ptr env,
   return self;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void hrc_dumper_xml_init(HrcDumperXml_ptr self,
-                         const NuSMVEnv_ptr env,
-                         FILE* fout)
-{
+void hrc_dumper_xml_init(HrcDumperXml_ptr self, const NuSMVEnv_ptr env,
+                         FILE *fout) {
   /* base class initialization */
   hrc_dumper_init(HRC_DUMPER(self), env, fout);
 
@@ -123,30 +115,26 @@ void hrc_dumper_xml_init(HrcDumperXml_ptr self,
   OVERRIDE(HrcDumper, dump_comment) = hrc_dumper_xml_dump_comment;
 }
 
-void hrc_dumper_xml_deinit(HrcDumperXml_ptr self)
-{
+void hrc_dumper_xml_deinit(HrcDumperXml_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   hrc_dumper_deinit(HRC_DUMPER(self));
 }
 
-void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
-                                 HrcDumperSnippet snippet,
-                                 const HrcDumperInfo* info)
-{
-  #define buf_size 150
-  char buf[buf_size+1];
+void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
+                                 const HrcDumperInfo *info) {
+#define buf_size 150
+  char buf[buf_size + 1];
   int c;
-  const char* tag;
+  const char *tag;
 
   HRC_DUMPER_CHECK_INSTANCE(self);
 
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const ErrorMgr_ptr errmgr =
-      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
     switch (snippet) {
     case HDS_HRC_TOP:
@@ -162,7 +150,8 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_MODS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       tag = "Modules";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
@@ -175,8 +164,7 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
     case HDS_MOD:
       tag = "Module";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, info->n2.lineno);
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag, info->n2.lineno);
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
       }
@@ -186,7 +174,7 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_MOD_NAME:
-      tag="name";
+      tag = "name";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
         /* [MD] Shouldn't be _HRC_DUMP_XML_NODE? */
@@ -203,7 +191,8 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_MOD_FORMAL_PARAMS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       tag = "FormalParameters";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
@@ -214,7 +203,7 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_MOD_FORMAL_PARAM:
-      tag="FormalParameter";
+      tag = "FormalParameter";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
 
@@ -228,7 +217,8 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_MOD_INSTANCES:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       tag = "ModInstances";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
@@ -241,11 +231,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
     case HDS_MOD_INSTANCE:
       tag = "ModInstance";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.name));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
-
       }
       if (info->stage & HRC_STAGE_END) {
         _HRC_DUMP_XML_TAG_END(tag);
@@ -299,16 +288,30 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_SYMBOLS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
 
       switch (info->symb_cat) {
-      case SYMBOL_STATE_VAR: tag="StateVars"; break;
-      case SYMBOL_INPUT_VAR: tag="InputVars"; break;
-      case SYMBOL_FROZEN_VAR: tag="FrozenVars"; break;
-      case SYMBOL_CONSTANT: tag="Constants"; break;
-      case SYMBOL_DEFINE: tag="Defines"; break;
-      case SYMBOL_FUNCTION: tag="Functions"; break;
-      default: ErrorMgr_internal_error(errmgr, "Unexpected type of list of symbols");
+      case SYMBOL_STATE_VAR:
+        tag = "StateVars";
+        break;
+      case SYMBOL_INPUT_VAR:
+        tag = "InputVars";
+        break;
+      case SYMBOL_FROZEN_VAR:
+        tag = "FrozenVars";
+        break;
+      case SYMBOL_CONSTANT:
+        tag = "Constants";
+        break;
+      case SYMBOL_DEFINE:
+        tag = "Defines";
+        break;
+      case SYMBOL_FUNCTION:
+        tag = "Functions";
+        break;
+      default:
+        ErrorMgr_internal_error(errmgr, "Unexpected type of list of symbols");
       }
 
       if (info->stage & HRC_STAGE_BEGIN) {
@@ -326,23 +329,23 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
         case SYMBOL_INPUT_VAR:
         case SYMBOL_FROZEN_VAR:
           tag = "Var";
-          c = snprintf(buf, buf_size,
-                       "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+          c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                       node_get_lineno(info->n1.name));
           SNPRINTF_CHECK(c, buf_size);
           _HRC_DUMP_STR(buf);
 
           _HRC_DUMP_XML_NODE_BEGIN_END("name", info->n1.name);
           _HRC_DUMP_XML_TAG_BEGIN("type");
           hrc_dumper_dump_var_type(self, info->n2.type);
-          _HRC_DUMP_XML_TAG_END("type") ;
+          _HRC_DUMP_XML_TAG_END("type");
 
           _HRC_DUMP_XML_TAG_END(tag);
           break;
 
         case SYMBOL_CONSTANT:
           tag = "Constant";
-          c = snprintf(buf, buf_size,
-                       "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+          c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                       node_get_lineno(info->n1.name));
           SNPRINTF_CHECK(c, buf_size);
           _HRC_DUMP_STR(buf);
 
@@ -353,8 +356,8 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
 
         case SYMBOL_DEFINE:
           tag = "Define";
-          c = snprintf(buf, buf_size,
-                       "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+          c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                       node_get_lineno(info->n1.name));
           SNPRINTF_CHECK(c, buf_size);
           _HRC_DUMP_STR(buf);
 
@@ -366,20 +369,21 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
 
         case SYMBOL_FUNCTION:
           tag = "Function";
-          c = snprintf(buf, buf_size,
-                       "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+          c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                       node_get_lineno(info->n1.name));
           SNPRINTF_CHECK(c, buf_size);
           _HRC_DUMP_STR(buf);
 
           _HRC_DUMP_XML_NODE_BEGIN_END("name", info->n1.name);
           _HRC_DUMP_XML_TAG_BEGIN("type");
           hrc_dumper_dump_var_type(self, info->n2.type);
-          _HRC_DUMP_XML_TAG_END("type") ;
+          _HRC_DUMP_XML_TAG_END("type");
 
           _HRC_DUMP_XML_TAG_END(tag);
           break;
 
-        default: ErrorMgr_internal_error(errmgr, "Unexpected symbol type");
+        default:
+          ErrorMgr_internal_error(errmgr, "Unexpected symbol type");
         }
       }
       if (info->stage & HRC_STAGE_END) {
@@ -389,9 +393,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break; /* end of case HDS_SYMBOL */
 
     case HDS_LIST_ASSIGNS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
 
-      tag="Assigns";
+      tag = "Assigns";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
       }
@@ -401,10 +406,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_ASSIGN_INIT:
-      tag="InitAssign";
+      tag = "InitAssign";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.name));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
 
@@ -417,10 +422,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_ASSIGN_INVAR:
-      tag="InvarAssign";
+      tag = "InvarAssign";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.name));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
 
@@ -433,10 +438,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_ASSIGN_NEXT:
-      tag="NextAssign";
+      tag = "NextAssign";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.name));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.name));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
 
@@ -449,9 +454,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_CONSTRAINTS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
 
-      tag="Constraints";
+      tag = "Constraints";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
       }
@@ -461,10 +467,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_CONSTRAINT_INIT:
-      tag="Init";
+      tag = "Init";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.expr));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.expr));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
         _HRC_DUMP_XML_NODE_BEGIN_END("expr", info->n1.expr);
@@ -475,10 +481,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_CONSTRAINT_INVAR:
-      tag="Invar";
+      tag = "Invar";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.expr));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.expr));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
         _HRC_DUMP_XML_NODE_BEGIN_END("expr", info->n1.expr);
@@ -489,10 +495,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_CONSTRAINT_TRANS:
-      tag="Trans";
+      tag = "Trans";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.expr));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.expr));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
         _HRC_DUMP_XML_NODE_BEGIN_END("expr", info->n1.expr);
@@ -503,9 +509,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_FAIRNESS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
 
-      tag="Fairness";
+      tag = "Fairness";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
       }
@@ -515,10 +522,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_JUSTICE:
-      tag="Justice";
+      tag = "Justice";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.expr));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.expr));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
         _HRC_DUMP_XML_NODE_BEGIN_END("expr", info->n1.expr);
@@ -529,10 +536,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_COMPASSION:
-      tag="Compassion";
+      tag = "Compassion";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n1.expr));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n1.expr));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
         _HRC_DUMP_XML_NODE_BEGIN_END("expr1", info->n1.expr);
@@ -544,9 +551,10 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_SPECS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
 
-      tag="Specs";
+      tag = "Specs";
       if (info->stage & HRC_STAGE_BEGIN) {
         _HRC_DUMP_XML_TAG_BEGIN(tag);
       }
@@ -558,8 +566,8 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
     case HDS_SPEC:
       tag = "Spec";
       if (info->stage & HRC_STAGE_BEGIN) {
-        c = snprintf(buf, buf_size,
-                     "<%s lineno=\"%d\">", tag, node_get_lineno(info->n2.expr));
+        c = snprintf(buf, buf_size, "<%s lineno=\"%d\">", tag,
+                     node_get_lineno(info->n2.expr));
         SNPRINTF_CHECK(c, buf_size);
         _HRC_DUMP_STR(buf);
 
@@ -596,7 +604,8 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_COMPILER_INFO:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       tag = "CompilerInfo";
 
       if (info->stage & HRC_STAGE_BEGIN) {
@@ -608,7 +617,8 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
       break;
 
     case HDS_LIST_SYNTAX_ERRORS:
-      if (info->list_is_empty) break;
+      if (info->list_is_empty)
+        break;
       tag = "SyntaxErrors";
 
       if (info->stage & HRC_STAGE_BEGIN) {
@@ -646,8 +656,7 @@ void hrc_dumper_xml_dump_snippet(HrcDumper_ptr self,
   }
 }
 
-void hrc_dumper_xml_dump_comment(HrcDumper_ptr self, const char* msg)
-{
+void hrc_dumper_xml_dump_comment(HrcDumper_ptr self, const char *msg) {
   _HRC_DUMP_STR(HRC_DUMPER_XML_COMMENT_PREFIX);
   _HRC_DUMP_STR(msg);
   _HRC_DUMP_STR_NL(HRC_DUMPER_XML_COMMENT_SUFFIX);
@@ -662,8 +671,7 @@ void hrc_dumper_xml_dump_comment(HrcDumper_ptr self, const char* msg)
 
   Called by the class destructor
 */
-static void hrc_dumper_xml_finalize(Object_ptr object, void* dummy)
-{
+static void hrc_dumper_xml_finalize(Object_ptr object, void *dummy) {
   HrcDumperXml_ptr self = HRC_DUMPER_XML(object);
 
   hrc_dumper_xml_deinit(self);
@@ -673,20 +681,18 @@ static void hrc_dumper_xml_finalize(Object_ptr object, void* dummy)
 /*!
   \brief Dumps escaped node
 
-  
+
 */
 static void hrc_dumper_xml_dump_escaped_node(HrcDumperXml_ptr self,
-                                             node_ptr node)
-{
+                                             node_ptr node) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-  char* node_str = sprint_node(wffprint, node);
+  char *node_str = sprint_node(wffprint, node);
   hrc_dumper_dump_indent(HRC_DUMPER(self));
   Utils_str_escape_xml_file(node_str, HRC_DUMPER(self)->fout);
   FREE(node_str);
 }
 
 /**AutomaticEnd***************************************************************/
-

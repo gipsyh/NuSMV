@@ -34,35 +34,33 @@
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include <math.h>
 
 #include "nusmv/core/bmc/bmc.h"
-#include "nusmv/core/bmc/bmcInt.h"
-#include "nusmv/core/bmc/bmcUtils.h"
-#include "nusmv/core/bmc/bmcTableau.h"
 #include "nusmv/core/bmc/bmcConv.h"
+#include "nusmv/core/bmc/bmcInt.h"
+#include "nusmv/core/bmc/bmcTableau.h"
 #include "nusmv/core/bmc/bmcTest.h"
+#include "nusmv/core/bmc/bmcUtils.h"
 
-#include "nusmv/core/wff/wff.h"
 #include "nusmv/core/wff/w2w/w2w.h"
+#include "nusmv/core/wff/wff.h"
 
-#include "nusmv/core/enc/enc.h"
-#include "nusmv/core/enc/be/BeEnc.h"
 #include "nusmv/core/be/be.h"
+#include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/enc/enc.h"
 
 #include "nusmv/core/fsm/be/BeFsm.h"
 
-#include "nusmv/core/prop/propPkg.h"
 #include "nusmv/core/parser/symbols.h" /* for constants */
+#include "nusmv/core/prop/propPkg.h"
 #include "nusmv/core/utils/error.h"
 
 /* [AT] I did not updated this file after introduction of the frozen
    vars. Look in text for "BE_VAR_TYPE_CURR" and "state" for critical
    code parts. */
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -79,11 +77,9 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -94,58 +90,40 @@ static int generated_formulas = 0;
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static node_ptr
-bmc_test_mk_loopback_ltl(const BeEnc_ptr be_enc,
-                         const int k, const int l);
+static node_ptr bmc_test_mk_loopback_ltl(const BeEnc_ptr be_enc, const int k,
+                                         const int l);
 
-static node_ptr
-bmc_test_gen_wff(const BeEnc_ptr be_enc,
-                 int max_depth, int max_conns,
-                 boolean usePastOperators);
+static node_ptr bmc_test_gen_wff(const BeEnc_ptr be_enc, int max_depth,
+                                 int max_conns, boolean usePastOperators);
 
-static node_ptr
-bmc_test_gen_tableau(const BeFsm_ptr be_fsm, const node_ptr ltl_nnf_wff,
-                     const int k, const int l,
-                     boolean usePastOperators);
+static node_ptr bmc_test_gen_tableau(const BeFsm_ptr be_fsm,
+                                     const node_ptr ltl_nnf_wff, const int k,
+                                     const int l, boolean usePastOperators);
 
-static void
-bmc_test_bexpr_output(const BeEnc_ptr be_enc, FILE* f,
-                      const node_ptr bexp, const int output_type);
-
+static void bmc_test_bexpr_output(const BeEnc_ptr be_enc, FILE *f,
+                                  const node_ptr bexp, const int output_type);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Bmc_TestReset()
-{
-  generated_formulas = 0;
-}
+void Bmc_TestReset() { generated_formulas = 0; }
 
-int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
-                          node_ptr wff,
-                          GenWffOperator wff_operator,
-                          int max_depth,
-                          int max_conns,
-                          boolean usePastOperators,
-                          boolean crossComparison,
-                          int k,
-                          int l)
-{
+int Bmc_Test_test_tableau(NuSMVEnv_ptr env, node_ptr wff,
+                          GenWffOperator wff_operator, int max_depth,
+                          int max_conns, boolean usePastOperators,
+                          boolean crossComparison, int k, int l) {
   BeFsm_ptr const be_fsm = BE_FSM(NuSMVEnv_get_value(env, ENV_BE_FSM));
   BeEnc_ptr const be_enc = BeFsm_get_be_encoding(be_fsm);
-  NodeMgr_ptr const nodemgr =
-     NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-  FILE *f,*f1,*f2;
+  NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  FILE *f, *f1, *f2;
   char szLoopback[16];
   node_ptr tableau_test;
 
@@ -160,43 +138,56 @@ int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
       break;
 
     case GWO_Globally:
-      wff = Wff_make_globally(nodemgr, bmc_test_gen_wff(be_enc, max_depth,
-                                                max_conns, usePastOperators));
+      wff = Wff_make_globally(
+          nodemgr,
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
       break;
 
     case GWO_Future:
-      wff = Wff_make_eventually(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns,
-                                                  usePastOperators));
+      wff = Wff_make_eventually(
+          nodemgr,
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
       break;
 
     case GWO_Until:
-      wff = Wff_make_until(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                            bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+      wff = Wff_make_until(
+          nodemgr,
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
       break;
 
     case GWO_Releases:
-      wff = Wff_make_releases(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                               bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+      wff = Wff_make_releases(
+          nodemgr,
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
       break;
 
     case GWO_Historically:
-      wff = Wff_make_historically(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+      wff = Wff_make_historically(
+          nodemgr,
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
       break;
 
     case GWO_Once:
-      wff = Wff_make_once(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+      wff =
+          Wff_make_once(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns,
+                                                  usePastOperators));
       break;
 
     case GWO_Since:
-      wff = Wff_make_since(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                            bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+      wff = Wff_make_since(
+          nodemgr,
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
       break;
 
     case GWO_Triggered:
-      wff = Wff_make_triggered(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                                bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+      wff = Wff_make_triggered(
+          nodemgr,
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+          bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
       break;
-
 
     default:
       error_unreachable_code();
@@ -211,7 +202,7 @@ int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
 
     /* writes down the imply formula */
     if (generated_formulas == 0) {
-      int i=0;
+      int i = 0;
 
       f = fopen("Bmc_TestTableau.smv", "w");
       nusmv_assert(f != NULL);
@@ -221,31 +212,29 @@ int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
       for (i = 0; i < BeEnc_get_state_vars_num(be_enc); i++) {
         fprintf(f, "p%d: boolean;\n", i);
       }
-    }
-    else {
+    } else {
       /* this command has already been invoked */
       f = fopen("Bmc_TestTableau.smv", "a");
       nusmv_assert(f != NULL);
     }
 
     Bmc_Utils_ConvertLoopFromInteger(l, szLoopback, sizeof(szLoopback));
-    fprintf(f, "\n\n-- Property %d (k=%d, l=%s, max_depth=%d, max_conns=%d): \n",
+    fprintf(f,
+            "\n\n-- Property %d (k=%d, l=%s, max_depth=%d, max_conns=%d): \n",
             generated_formulas, k, szLoopback, max_depth, max_conns);
     fprintf(f, "LTLSPEC ");
 
     ++generated_formulas;
 
-    fprintf (f, "\n");
-    bmc_test_bexpr_output(be_enc, f, tableau_test,
-                          BMC_BEXP_OUTPUT_SMV);
+    fprintf(f, "\n");
+    bmc_test_bexpr_output(be_enc, f, tableau_test, BMC_BEXP_OUTPUT_SMV);
     fprintf(f, "\n\n");
 
     fclose(f);
-  }
-  else {
+  } else {
     /* writes down the formula */
     if (generated_formulas == 0) {
-      int i=0;
+      int i = 0;
 
       f1 = fopen("Bmc_TestTableau_BMC.smv", "w");
       f2 = fopen("Bmc_TestTableau_BDD.smv", "w");
@@ -259,8 +248,7 @@ int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
         fprintf(f1, "p%d: boolean;\n", i);
         fprintf(f2, "p%d: boolean;\n", i);
       }
-    }
-    else {
+    } else {
       /* this command has already been invoked */
       f1 = fopen("Bmc_TestTableau_BMC.smv", "a");
       f2 = fopen("Bmc_TestTableau_BDD.smv", "a");
@@ -269,22 +257,24 @@ int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
     }
 
     Bmc_Utils_ConvertLoopFromInteger(l, szLoopback, sizeof(szLoopback));
-    fprintf(f1, "\n\n-- Property %d (k=%d, l=%s, max_depth=%d, max_conns=%d): \n",
+    fprintf(f1,
+            "\n\n-- Property %d (k=%d, l=%s, max_depth=%d, max_conns=%d): \n",
             generated_formulas, k, szLoopback, max_depth, max_conns);
     fprintf(f1, "LTLSPEC ");
-    fprintf(f2, "\n\n-- Property %d (k=%d, l=%s, max_depth=%d, max_conns=%d): \n",
+    fprintf(f2,
+            "\n\n-- Property %d (k=%d, l=%s, max_depth=%d, max_conns=%d): \n",
             generated_formulas, k, szLoopback, max_depth, max_conns);
     fprintf(f2, "LTLSPEC ");
 
     ++generated_formulas;
 
-    fprintf (f1, "\n");
-    fprintf (f2, "\n");
+    fprintf(f1, "\n");
+    fprintf(f2, "\n");
 
     bmc_test_bexpr_output(be_enc, f1, wff, BMC_BEXP_OUTPUT_SMV);
 
-    wff = Wff_make_implies(nodemgr, bmc_test_mk_loopback_ltl(be_enc, k, l), wff);
-
+    wff =
+        Wff_make_implies(nodemgr, bmc_test_mk_loopback_ltl(be_enc, k, l), wff);
 
     bmc_test_bexpr_output(be_enc, f2, wff, BMC_BEXP_OUTPUT_SMV);
 
@@ -301,7 +291,6 @@ int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -352,15 +341,13 @@ int Bmc_Test_test_tableau(NuSMVEnv_ptr env,
  where:
    p0..pn are all boolean variables into the model
    X^(n) is expanded to XXX..X n-times.
- Note that frozen vars can be ignored since they are always equal to their previous
- values
+ Note that frozen vars can be ignored since they are always equal to their
+ previous values
 */
-static node_ptr
-bmc_test_mk_loopback_ltl(const BeEnc_ptr be_enc, const int k, const int l)
-{
+static node_ptr bmc_test_mk_loopback_ltl(const BeEnc_ptr be_enc, const int k,
+                                         const int l) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr result;
   node_ptr bigand_vars;
@@ -369,27 +356,30 @@ bmc_test_mk_loopback_ltl(const BeEnc_ptr be_enc, const int k, const int l)
   int idx;
   int loop_len = 0;
 
-  nusmv_assert( !Bmc_Utils_IsNoLoopback(l) && (l < k) );
-  nusmv_assert( BeEnc_get_state_vars_num(be_enc) > 0 );
+  nusmv_assert(!Bmc_Utils_IsNoLoopback(l) && (l < k));
+  nusmv_assert(BeEnc_get_state_vars_num(be_enc) > 0);
 
-  loop_len = k-l;
+  loop_len = k - l;
 
   /* first cycle is performed manually, in order to optimize a bit */
   idx = BeEnc_get_first_untimed_var_index(be_enc, BE_VAR_TYPE_CURR);
   var = BeEnc_index_to_name(be_enc, idx);
-  bigand_vars = Wff_make_iff(nodemgr, var, Wff_make_opnext_times(nodemgr, var, loop_len));
+  bigand_vars =
+      Wff_make_iff(nodemgr, var, Wff_make_opnext_times(nodemgr, var, loop_len));
 
   /* iterates across the remaining variables: */
   idx = BeEnc_get_next_var_index(be_enc, idx, BE_VAR_TYPE_CURR);
   while (BeEnc_is_var_index_valid(be_enc, idx)) {
     var = BeEnc_index_to_name(be_enc, idx);
-    single_var_eq = Wff_make_iff(nodemgr, var, Wff_make_opnext_times(nodemgr, var, loop_len));
+    single_var_eq = Wff_make_iff(nodemgr, var,
+                                 Wff_make_opnext_times(nodemgr, var, loop_len));
     bigand_vars = Wff_make_and(nodemgr, bigand_vars, single_var_eq);
     idx = BeEnc_get_next_var_index(be_enc, idx, BE_VAR_TYPE_CURR);
   }
 
   result = Wff_make_globally(nodemgr, bigand_vars);
-  result = Wff_make_opnext_times(nodemgr, result, l); /* shifts to loop starting point */
+  result = Wff_make_opnext_times(nodemgr, result,
+                                 l); /* shifts to loop starting point */
 
   return result;
 }
@@ -400,18 +390,16 @@ bmc_test_mk_loopback_ltl(const BeEnc_ptr be_enc, const int k, const int l)
 
   This function is used to test tableau formulae
 */
-static node_ptr
-bmc_test_gen_tableau(const BeFsm_ptr be_fsm, const node_ptr ltl_nnf_wff,
-                     const int k, const int l, boolean usePastOperators)
-{
+static node_ptr bmc_test_gen_tableau(const BeFsm_ptr be_fsm,
+                                     const node_ptr ltl_nnf_wff, const int k,
+                                     const int l, boolean usePastOperators) {
   node_ptr tableau_as_wff;
   node_ptr implies_formula;
   be_ptr tableau_k_l_ltl_wff;
   BeEnc_ptr be_enc = BeFsm_get_be_encoding(be_fsm);
 
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   /* generates the tableau (with no fairness): */
   tableau_k_l_ltl_wff = Bmc_GetTestTableau(be_enc, ltl_nnf_wff, k, l);
@@ -422,13 +410,14 @@ bmc_test_gen_tableau(const BeFsm_ptr be_fsm, const node_ptr ltl_nnf_wff,
   /* build the implies: */
   if (Bmc_Utils_IsNoLoopback(l)) {
     implies_formula = Wff_make_implies(nodemgr, tableau_as_wff, ltl_nnf_wff);
-  }
-  else {
-    nusmv_assert(!Bmc_Utils_IsAllLoopbacks(l)); /* all loops are not allowed nowadays */
-    implies_formula = Wff_make_implies(nodemgr,
-                        Wff_make_and(nodemgr, tableau_as_wff,
+  } else {
+    nusmv_assert(
+        !Bmc_Utils_IsAllLoopbacks(l)); /* all loops are not allowed nowadays */
+    implies_formula =
+        Wff_make_implies(nodemgr,
+                         Wff_make_and(nodemgr, tableau_as_wff,
                                       bmc_test_mk_loopback_ltl(be_enc, k, l)),
-                        ltl_nnf_wff);
+                         ltl_nnf_wff);
   }
 
   return implies_formula;
@@ -442,13 +431,10 @@ bmc_test_gen_tableau(const BeFsm_ptr be_fsm, const node_ptr ltl_nnf_wff,
 
   \se node hash may change
 */
-static node_ptr bmc_test_gen_wff(const BeEnc_ptr be_enc,
-                                 int max_depth, int max_conns,
-                                 boolean usePastOperators)
-{
+static node_ptr bmc_test_gen_wff(const BeEnc_ptr be_enc, int max_depth,
+                                 int max_conns, boolean usePastOperators) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   int rnd;
   double rnd_tmp;
@@ -459,23 +445,24 @@ static node_ptr bmc_test_gen_wff(const BeEnc_ptr be_enc,
      the "usePastOperators" flag is true.*/
 
   do {
-   rnd_tmp = floor(rand()) / (RAND_MAX + 1.0);
+    rnd_tmp = floor(rand()) / (RAND_MAX + 1.0);
 
-   rnd = (int) floor((GEN_WFF_CONSES_OP_NUMBER + BeEnc_get_state_vars_num(be_enc))
-                     * rnd_tmp) + 1;
-  }
-  while (!usePastOperators && (rnd>10 && rnd<=15));
+    rnd = (int)floor(
+              (GEN_WFF_CONSES_OP_NUMBER + BeEnc_get_state_vars_num(be_enc)) *
+              rnd_tmp) +
+          1;
+  } while (!usePastOperators && (rnd > 10 && rnd <= 15));
 
   /* if depth or connses of wff are exausted get a random number such that:
      (rnd >= 0) && (rnd < 'number of state variables')... */
   if ((max_depth < 0) || (max_conns < 0)) {
     int idx;
-    rnd = (int) (((float) BeEnc_get_state_vars_num(be_enc) * rand()) /
-                 (RAND_MAX + 1.0));
+    rnd = (int)(((float)BeEnc_get_state_vars_num(be_enc) * rand()) /
+                (RAND_MAX + 1.0));
 
-    idx = BeEnc_get_var_index_with_offset(be_enc,
-                  BeEnc_get_first_untimed_var_index(be_enc, BE_VAR_TYPE_CURR),
-                  rnd, BE_VAR_TYPE_CURR);
+    idx = BeEnc_get_var_index_with_offset(
+        be_enc, BeEnc_get_first_untimed_var_index(be_enc, BE_VAR_TYPE_CURR),
+        rnd, BE_VAR_TYPE_CURR);
 
     /* ...then return correspondent state variable to the random integer */
     return BeEnc_index_to_name(be_enc, idx);
@@ -483,72 +470,100 @@ static node_ptr bmc_test_gen_wff(const BeEnc_ptr be_enc,
 
   /* exclude atoms from depth and connses decrement contributes */
   if (rnd <= GEN_WFF_CONSES_OP_NUMBER) {
-    --max_depth; --max_conns;
+    --max_depth;
+    --max_conns;
   }
 
   switch (rnd) {
   /* Propositional operators */
   case 1:
-    return Wff_make_not(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_not(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns,
+                                                  usePastOperators));
 
   case 2:
-    return Wff_make_or (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                         bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_or(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 3:
-    return Wff_make_and(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                         bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_and(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 4:
-    return Wff_make_implies(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                             bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_implies(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 5:
-    return Wff_make_iff(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                         bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_iff(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   /* Future operators */
   case 6:
-    return Wff_make_opnext    (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_opnext(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 7:
-    return Wff_make_eventually(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_eventually(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 8:
-    return Wff_make_globally  (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_globally(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 9:
-    return Wff_make_until     (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                                bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_until(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
   case 10:
-    return Wff_make_releases  (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                                bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_releases(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   /* Past operators */
   case 11:
-    return Wff_make_opprec      (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_opprec(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 12:
-    return Wff_make_once        (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_once(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns,
+                                                   usePastOperators));
 
   case 13:
-    return Wff_make_historically(nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_historically(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
   case 14:
-    return Wff_make_since       (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                                  bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_since(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
   case 15:
-    return Wff_make_triggered   (nodemgr, bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
-                                  bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
+    return Wff_make_triggered(
+        nodemgr,
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators),
+        bmc_test_gen_wff(be_enc, max_depth, max_conns, usePastOperators));
 
-  default:
-    {
-      int idx = BeEnc_get_var_index_with_offset(be_enc,
-        BeEnc_get_first_untimed_var_index(be_enc, BE_VAR_TYPE_CURR),
+  default: {
+    int idx = BeEnc_get_var_index_with_offset(
+        be_enc, BeEnc_get_first_untimed_var_index(be_enc, BE_VAR_TYPE_CURR),
         rnd - GEN_WFF_CONSES_OP_NUMBER - 1, BE_VAR_TYPE_CURR);
 
-      return BeEnc_index_to_name(be_enc, idx);
-    }
+    return BeEnc_index_to_name(be_enc, idx);
+  }
   }
 }
 
@@ -561,211 +576,209 @@ static node_ptr bmc_test_gen_wff(const BeEnc_ptr be_enc,
 
   \se None
 */
-static void
-bmc_test_bexpr_output(const BeEnc_ptr be_enc, FILE* f,
-                      const node_ptr bexp, const int output_type)
-{
+static void bmc_test_bexpr_output(const BeEnc_ptr be_enc, FILE *f,
+                                  const node_ptr bexp, const int output_type) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   int type;
 
   nusmv_assert(f != NULL);
 
   /* exit from recursion if given formula is Nil */
-  if (bexp == Nil) return;
+  if (bexp == Nil)
+    return;
 
   /* assert that input formula type can't be a NEXT operator, that is
      used in model specification (section ASSIGN). We use here only OP_NEXT
      operator used in the module (section LTLSPEC). */
-  nusmv_assert (node_get_type (bexp) != NEXT);
+  nusmv_assert(node_get_type(bexp) != NEXT);
 
-  type = node_get_type (bexp);
+  type = node_get_type(bexp);
 
   switch (type) {
-  case FALSEEXP:                        /* FALSEEXP  */
-    fprintf (f, "%s", (output_type == BMC_BEXP_OUTPUT_SMV) ? "FALSE" : "false");
+  case FALSEEXP: /* FALSEEXP  */
+    fprintf(f, "%s", (output_type == BMC_BEXP_OUTPUT_SMV) ? "FALSE" : "false");
     break;
 
-  case TRUEEXP:                         /* TRUEEXP   */
-    fprintf (f, "%s", (output_type == BMC_BEXP_OUTPUT_SMV) ? "TRUE" : "true");
+  case TRUEEXP: /* TRUEEXP   */
+    fprintf(f, "%s", (output_type == BMC_BEXP_OUTPUT_SMV) ? "TRUE" : "true");
     break;
 
-  case AND:                             /* AND       */
+  case AND: /* AND       */
     fprintf(f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
     fprintf(f, " %s ", (output_type == BMC_BEXP_OUTPUT_SMV) ? "&" : "/\\");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
     fprintf(f, ")");
     break;
 
-  case OR:                              /* OR        */
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, " %s ", (output_type == BMC_BEXP_OUTPUT_SMV) ? "|" : "\\/");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
-    fprintf (f, ")");
+  case OR: /* OR        */
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, " %s ", (output_type == BMC_BEXP_OUTPUT_SMV) ? "|" : "\\/");
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case NOT:                             /* NOT       */
-    fprintf (f, "%c", (output_type == BMC_BEXP_OUTPUT_SMV) ? '!' : '~');
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, ")");
+  case NOT: /* NOT       */
+    fprintf(f, "%c", (output_type == BMC_BEXP_OUTPUT_SMV) ? '!' : '~');
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case IMPLIES:                         /* IMPLIES   */
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, " -> ");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
-    fprintf (f, ")");
+  case IMPLIES: /* IMPLIES   */
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, " -> ");
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case IFF:                             /* IFF       */
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, " <-> ");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
-    fprintf (f, ")");
+  case IFF: /* IFF       */
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, " <-> ");
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case OP_FUTURE:                       /* OP_FUTURE */
-    fprintf (f, "F(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, ")");
+  case OP_FUTURE: /* OP_FUTURE */
+    fprintf(f, "F(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case OP_ONCE:                       /* OP_ONCE */
-    fprintf (f, "O(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, ")");
+  case OP_ONCE: /* OP_ONCE */
+    fprintf(f, "O(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case OP_GLOBAL:                       /* OP_GLOBAL */
-    fprintf (f, "G(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, ")");
+  case OP_GLOBAL: /* OP_GLOBAL */
+    fprintf(f, "G(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case OP_HISTORICAL:                       /* OP_HISTORICAL */
-    fprintf (f, "H(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, ")");
+  case OP_HISTORICAL: /* OP_HISTORICAL */
+    fprintf(f, "H(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case UNTIL:                           /* UNTIL     */
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, " U ");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
-    fprintf (f, ")");
+  case UNTIL: /* UNTIL     */
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, " U ");
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case SINCE:                           /* SINCE     */
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, " S ");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
-    fprintf (f, ")");
+  case SINCE: /* SINCE     */
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, " S ");
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case RELEASES:                        /* RELEASES  */
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, " V ");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
-    fprintf (f, ")");
+  case RELEASES: /* RELEASES  */
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, " V ");
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case TRIGGERED:                       /* TRIGGERED  */
-    fprintf (f, "(");
-    bmc_test_bexpr_output(be_enc, f, car (bexp), output_type);
-    fprintf (f, " T ");
-    bmc_test_bexpr_output(be_enc, f, cdr (bexp), output_type);
-    fprintf (f, ")");
+  case TRIGGERED: /* TRIGGERED  */
+    fprintf(f, "(");
+    bmc_test_bexpr_output(be_enc, f, car(bexp), output_type);
+    fprintf(f, " T ");
+    bmc_test_bexpr_output(be_enc, f, cdr(bexp), output_type);
+    fprintf(f, ")");
     break;
 
-  case OP_NEXT:                         /* OP_NEXT   */
+  case OP_NEXT: /* OP_NEXT   */
+  {
+    node_ptr temp_bexp = bexp;
+    int i = 0;
     {
-      node_ptr temp_bexp = bexp;
-      int i = 0;
-      {
-        /* prints out "X(" suffix while OP_NEXT is encountred */
-        do {
-          fprintf (f, "X(");
-          temp_bexp = car(temp_bexp);
-          nusmv_assert(temp_bexp != Nil);
-          i++;
-        } while (node_get_type(temp_bexp) == OP_NEXT);
-      }
-
-      /* then print the internal bexp */
-      bmc_test_bexpr_output(be_enc, f, temp_bexp, output_type);
-
-      while ((i--) > 0) fprintf (f, ")");
+      /* prints out "X(" suffix while OP_NEXT is encountred */
+      do {
+        fprintf(f, "X(");
+        temp_bexp = car(temp_bexp);
+        nusmv_assert(temp_bexp != Nil);
+        i++;
+      } while (node_get_type(temp_bexp) == OP_NEXT);
     }
-    break;
 
-  case OP_PREC:                         /* OP_PREC   */
+    /* then print the internal bexp */
+    bmc_test_bexpr_output(be_enc, f, temp_bexp, output_type);
+
+    while ((i--) > 0)
+      fprintf(f, ")");
+  } break;
+
+  case OP_PREC: /* OP_PREC   */
+  {
+    node_ptr temp_bexp = bexp;
+    int i = 0;
     {
-      node_ptr temp_bexp = bexp;
-      int i = 0;
-      {
-        /* prints out "Y(" suffix while OP_PREC is encountred */
-        do {
-          fprintf (f, "Y(");
-          temp_bexp = car(temp_bexp);
-          nusmv_assert(temp_bexp != Nil);
-          i++;
-        } while (node_get_type(temp_bexp) == OP_PREC);
-      }
-
-      /* then print the internal bexp */
-      bmc_test_bexpr_output(be_enc, f, temp_bexp, output_type);
-
-      while ((i--) > 0) fprintf (f, ")");
+      /* prints out "Y(" suffix while OP_PREC is encountred */
+      do {
+        fprintf(f, "Y(");
+        temp_bexp = car(temp_bexp);
+        nusmv_assert(temp_bexp != Nil);
+        i++;
+      } while (node_get_type(temp_bexp) == OP_PREC);
     }
-    break;
 
-  case OP_NOTPRECNOT:                         /* OP_PREC   */
+    /* then print the internal bexp */
+    bmc_test_bexpr_output(be_enc, f, temp_bexp, output_type);
+
+    while ((i--) > 0)
+      fprintf(f, ")");
+  } break;
+
+  case OP_NOTPRECNOT: /* OP_PREC   */
+  {
+    node_ptr temp_bexp = bexp;
+    int i = 0;
     {
-      node_ptr temp_bexp = bexp;
-      int i = 0;
-      {
-  /* prints out "Z(" suffix while OP_NOTPRECNOT is encountred */
-        do {
-          fprintf (f, "Z(");
-          temp_bexp = car(temp_bexp);
-          nusmv_assert(temp_bexp != Nil);
-          i++;
-        } while (node_get_type(temp_bexp) == OP_NOTPRECNOT);
-      }
-
-      /* then print the internal bexp */
-      bmc_test_bexpr_output(be_enc, f, temp_bexp, output_type);
-
-      while ((i--) > 0) fprintf (f, ")");
+      /* prints out "Z(" suffix while OP_NOTPRECNOT is encountred */
+      do {
+        fprintf(f, "Z(");
+        temp_bexp = car(temp_bexp);
+        nusmv_assert(temp_bexp != Nil);
+        i++;
+      } while (node_get_type(temp_bexp) == OP_NOTPRECNOT);
     }
-    break;
 
+    /* then print the internal bexp */
+    bmc_test_bexpr_output(be_enc, f, temp_bexp, output_type);
 
-  default:                              /* (default action) */
-    {
-      be_ptr r;
+    while ((i--) > 0)
+      fprintf(f, ")");
+  } break;
 
-      /* gets the the be correspondent to the state variable */
-      r = BeEnc_name_to_untimed(be_enc, bexp);
+  default: /* (default action) */
+  {
+    be_ptr r;
 
-      /* if bexp is a really state variable, then prints out the index
-         of correspondent be variable */
-      if (r != (be_ptr) NULL) {
-        fprintf(f, "p%d", Be_Var2Index(BeEnc_get_be_manager(be_enc), r));
-      }
-      else {
-        ErrorMgr_internal_error(errmgr, "bmc_test_bexpr_output: given wff atom isn\' in BE environ\n");
-      }
+    /* gets the the be correspondent to the state variable */
+    r = BeEnc_name_to_untimed(be_enc, bexp);
+
+    /* if bexp is a really state variable, then prints out the index
+       of correspondent be variable */
+    if (r != (be_ptr)NULL) {
+      fprintf(f, "p%d", Be_Var2Index(BeEnc_get_be_manager(be_enc), r));
+    } else {
+      ErrorMgr_internal_error(
+          errmgr,
+          "bmc_test_bexpr_output: given wff atom isn\' in BE environ\n");
     }
   }
-
+  }
 }

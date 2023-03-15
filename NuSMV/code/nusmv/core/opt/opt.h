@@ -35,30 +35,29 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_OPT_OPT_H__
 #define __NUSMV_CORE_OPT_OPT_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #if NUSMV_HAVE_REGEX_H
-# if NUSMV_HAVE_SYS_TYPES_H
+#if NUSMV_HAVE_SYS_TYPES_H
 /* posix requires that sys/types.h is included before regex */
-#  include <sys/types.h>
-# endif
-# include <regex.h>
+#include <sys/types.h>
+#endif
+#include <regex.h>
 #endif
 
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/sat/sat.h" /* for SAT Solver */
-#include "nusmv/core/trans/trans.h" /* for TransType */
+#include "nusmv/core/be/be.h" /* For RBC2CNF algorithms */
+#include "nusmv/core/cinit/NuSMVEnv.h"
 #include "nusmv/core/enc/enc.h" /* for VarsOrderType and BddSohEnum*/
 #include "nusmv/core/fsm/bdd/bdd.h" /* for BddOregJusticeEmptinessBddAlgorithmType */
-#include "nusmv/core/be/be.h" /* For RBC2CNF algorithms */
 #include "nusmv/core/opt/OptsHandler.h"
-#include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/sat/sat.h"     /* for SAT Solver */
+#include "nusmv/core/trans/trans.h" /* for TransType */
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -71,14 +70,14 @@
 
   \todo Missing description
 */
-#define DEFAULT_PGM_NAME   NUSMV_PACKAGE_NAME
+#define DEFAULT_PGM_NAME NUSMV_PACKAGE_NAME
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_PGM_PATH   (char *)NULL
+#define DEFAULT_PGM_PATH (char *)NULL
 
 /*!
   \brief \todo Missing synopsis
@@ -175,12 +174,12 @@
 
   \todo Missing description
 */
-#define DEFAULT_SAT_SOLVER        "MiniSat"
+#define DEFAULT_SAT_SOLVER "MiniSat"
 #else
 #if NUSMV_HAVE_SOLVER_ZCHAFF
-#define DEFAULT_SAT_SOLVER        "zchaff"
+#define DEFAULT_SAT_SOLVER "zchaff"
 #else
-#define DEFAULT_SAT_SOLVER        (char*)NULL
+#define DEFAULT_SAT_SOLVER (char *)NULL
 #endif
 #endif
 
@@ -189,14 +188,14 @@
 
   \todo Missing description
 */
-#define OPT_USER_POV_NULL_STRING  "" /* user pov of the null string */
+#define OPT_USER_POV_NULL_STRING "" /* user pov of the null string */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM \
+#define DEFAULT_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM                           \
   BDD_OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM_EL_BWD
 
 /*!
@@ -232,12 +231,7 @@
 
   \todo Missing description
 */
-typedef enum {
-  FORWARD,
-  BACKWARD,
-  FORWARD_BACKWARD,
-  BDD_BMC
-} Check_Strategy;
+typedef enum { FORWARD, BACKWARD, FORWARD_BACKWARD, BDD_BMC } Check_Strategy;
 
 /*!
   \brief \todo Missing synopsis
@@ -251,10 +245,7 @@ typedef enum {
 
   \todo Missing description
 */
-typedef enum {
-  ZIGZAG_HEURISTIC,
-  SMALLEST_BDD_HEURISTIC
-} FB_Heuristic;
+typedef enum { ZIGZAG_HEURISTIC, SMALLEST_BDD_HEURISTIC } FB_Heuristic;
 
 /*!
   \brief \todo Missing synopsis
@@ -268,10 +259,7 @@ typedef enum {
 
   \todo Missing description
 */
-typedef enum {
-  STEPS_HEURISTIC,
-  SIZE_HEURISTIC
-} Bdd2bmc_Heuristic;
+typedef enum { STEPS_HEURISTIC, SIZE_HEURISTIC } Bdd2bmc_Heuristic;
 
 /*!
   \brief \todo Missing synopsis
@@ -320,35 +308,35 @@ typedef enum {
 
   \todo Missing description
 */
-#define PROGRAM_NAME      "program_name"
+#define PROGRAM_NAME "program_name"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PROGRAM_PATH      "program_path"
+#define PROGRAM_PATH "program_path"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define INPUT_FILE        "input_file"
+#define INPUT_FILE "input_file"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SCRIPT_FILE       "script_file"
+#define SCRIPT_FILE "script_file"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define INPUT_ORDER_FILE  "input_order_file"
+#define INPUT_ORDER_FILE "input_order_file"
 
 /*!
   \brief \todo Missing synopsis
@@ -362,7 +350,7 @@ typedef enum {
 
   \todo Missing description
 */
-#define TRANS_ORDER_FILE  "trans_order_file"
+#define TRANS_ORDER_FILE "trans_order_file"
 
 /*!
   \brief \todo Missing synopsis
@@ -404,77 +392,77 @@ typedef enum {
 
   \todo Missing description
 */
-#define VERBOSE_LEVEL     "verbose_level"
+#define VERBOSE_LEVEL "verbose_level"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define RUN_CPP           "run_cpp"
+#define RUN_CPP "run_cpp"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PP_LIST           "pp_list"
+#define PP_LIST "pp_list"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SHOWN_STATES      "shown_states"
+#define SHOWN_STATES "shown_states"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define IGNORE_SPEC       "ignore_spec"
+#define IGNORE_SPEC "ignore_spec"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define IGNORE_COMPUTE    "ignore_compute"
+#define IGNORE_COMPUTE "ignore_compute"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define IGNORE_LTLSPEC    "ignore_ltlspec"
+#define IGNORE_LTLSPEC "ignore_ltlspec"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define IGNORE_PSLSPEC    "ignore_pslspec"
+#define IGNORE_PSLSPEC "ignore_pslspec"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OPT_CHECK_FSM   "check_fsm"
+#define OPT_CHECK_FSM "check_fsm"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define IGNORE_INVAR      "ignore_invar"
+#define IGNORE_INVAR "ignore_invar"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FORWARD_SEARCH    "forward_search"
+#define FORWARD_SEARCH "forward_search"
 
 /*!
   \brief \todo Missing synopsis
@@ -488,42 +476,42 @@ typedef enum {
 
   \todo Missing description
 */
-#define PRINT_REACHABLE   "print_reachable"
+#define PRINT_REACHABLE "print_reachable"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENABLE_REORDER    "enable_reorder"
+#define ENABLE_REORDER "enable_reorder"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_METHOD    "reorder_method"
+#define REORDER_METHOD "reorder_method"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DYNAMIC_REORDER   "dynamic_reorder"
+#define DYNAMIC_REORDER "dynamic_reorder"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENABLE_SEXP2BDD_CACHING   "enable_sexp2bdd_caching"
+#define ENABLE_SEXP2BDD_CACHING "enable_sexp2bdd_caching"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PARTITION_METHOD  "partition_method"
+#define PARTITION_METHOD "partition_method"
 
 /*!
   \brief \todo Missing synopsis
@@ -544,14 +532,14 @@ typedef enum {
 
   \todo Missing description
 */
-#define IGNORE_INIT_FILE  "ignore_init_file"
+#define IGNORE_INIT_FILE "ignore_init_file"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define AG_ONLY_SEARCH    "ag_only_search"
+#define AG_ONLY_SEARCH "ag_only_search"
 
 /*!
   \brief \todo Missing synopsis
@@ -579,7 +567,7 @@ typedef enum {
 
   \todo Missing description
 */
-#define PROP_NO         "prop_no"
+#define PROP_NO "prop_no"
 
 /*!
   \brief \todo Missing synopsis
@@ -593,56 +581,56 @@ typedef enum {
 
   \todo Missing description
 */
-#define IWLS95_PREORDER  "iwls95preorder"
+#define IWLS95_PREORDER "iwls95preorder"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define AFFINITY_CLUSTERING  "affinity"
+#define AFFINITY_CLUSTERING "affinity"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define APPEND_CLUSTERS  "append_clusters"
+#define APPEND_CLUSTERS "append_clusters"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define USE_REACHABLE_STATES  "use_reachable_states"
+#define USE_REACHABLE_STATES "use_reachable_states"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define USE_FAIR_STATES  "use_fair_states"
+#define USE_FAIR_STATES "use_fair_states"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define COUNTER_EXAMPLES  "counter_examples"
+#define COUNTER_EXAMPLES "counter_examples"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACES_HIDING_PREFIX  "traces_hiding_prefix"
+#define TRACES_HIDING_PREFIX "traces_hiding_prefix"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_TRACES_HIDING_PREFIX  "__"
+#define DEFAULT_TRACES_HIDING_PREFIX "__"
 
 /*!
   \brief \todo Missing synopsis
@@ -672,7 +660,7 @@ typedef enum {
 
   \todo Missing description
 */
-#define TRACES_REGEXP  "traces_regexp"
+#define TRACES_REGEXP "traces_regexp"
 #endif
 
 /*!
@@ -680,7 +668,7 @@ typedef enum {
 
   \todo Missing description
 */
-#define DEFAULT_TRACE_PLUGIN  "default_trace_plugin"
+#define DEFAULT_TRACE_PLUGIN "default_trace_plugin"
 
 /*!
   \brief \todo Missing synopsis
@@ -715,7 +703,7 @@ typedef enum {
 
   \todo Missing description
 */
-#define BDD_STATIC_ORDER_HEURISTICS   "bdd_static_order_heuristics"
+#define BDD_STATIC_ORDER_HEURISTICS "bdd_static_order_heuristics"
 
 /*!
   \brief \todo Missing synopsis
@@ -820,7 +808,7 @@ typedef enum {
 
   \todo Missing description
 */
-#define OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM    \
+#define OREG_JUSTICE_EMPTINESS_BDD_ALGORITHM                                   \
   "oreg_justice_emptiness_bdd_algorithm"
 
 /*!
@@ -887,7 +875,8 @@ typedef enum {
 
   \todo Missing description
 */
-#define BOOLEAN_CONVERSION_USES_PREDICATE_NORMALIZATION "boolean_conversion_uses_predicate_normalization"
+#define BOOLEAN_CONVERSION_USES_PREDICATE_NORMALIZATION                        \
+  "boolean_conversion_uses_predicate_normalization"
 
 /*!
   \brief \todo Missing synopsis
@@ -906,7 +895,7 @@ typedef enum {
 
   \todo Missing description
 */
-typedef struct options_TAG*  options_ptr;
+typedef struct options_TAG *options_ptr;
 
 /*!
   \brief \todo Missing synopsis
@@ -950,7 +939,6 @@ void unset_use_fair_states(OptsHandler_ptr);
 */
 boolean opt_use_fair_states(OptsHandler_ptr);
 
-
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
@@ -960,126 +948,126 @@ boolean opt_use_fair_states(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_pgm_name(OptsHandler_ptr, char *);
+void set_pgm_name(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_pgm_name(OptsHandler_ptr);
+void reset_pgm_name(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_pgm_name(OptsHandler_ptr);
+char *get_pgm_name(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_script_file(OptsHandler_ptr, char *);
+void set_script_file(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_script_file(OptsHandler_ptr);
+void reset_script_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_script_file(OptsHandler_ptr);
+char *get_script_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_pgm_path(OptsHandler_ptr, char *);
+void set_pgm_path(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_pgm_path(OptsHandler_ptr);
+void reset_pgm_path(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_pgm_path(OptsHandler_ptr);
+char *get_pgm_path(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_input_file(OptsHandler_ptr, const char *);
+void set_input_file(OptsHandler_ptr, const char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_input_file(OptsHandler_ptr);
+void reset_input_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_input_file(OptsHandler_ptr);
+char *get_input_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_input_order_file(OptsHandler_ptr, char *);
+void set_input_order_file(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_input_order_file(OptsHandler_ptr);
+void reset_input_order_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_input_order_file(OptsHandler_ptr);
+char *get_input_order_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_output_order_file(OptsHandler_ptr, char *);
+void set_output_order_file(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_output_order_file(OptsHandler_ptr);
+void reset_output_order_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_output_order_file(OptsHandler_ptr);
+char *get_output_order_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1093,21 +1081,21 @@ boolean is_default_order_file(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-void    set_trans_order_file(OptsHandler_ptr, char *);
+void set_trans_order_file(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_trans_order_file(OptsHandler_ptr);
+void reset_trans_order_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_trans_order_file(OptsHandler_ptr);
+char *get_trans_order_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1121,70 +1109,70 @@ boolean opt_trans_order_file(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_output_flatten_model_file(OptsHandler_ptr, char *);
+void set_output_flatten_model_file(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_output_flatten_model_file(OptsHandler_ptr);
+void reset_output_flatten_model_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_output_flatten_model_file(OptsHandler_ptr);
+char *get_output_flatten_model_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_output_boolean_model_file(OptsHandler_ptr, char *);
+void set_output_boolean_model_file(OptsHandler_ptr, char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_output_boolean_model_file(OptsHandler_ptr);
+void reset_output_boolean_model_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_output_boolean_model_file(OptsHandler_ptr);
+char *get_output_boolean_model_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_output_word_format(OptsHandler_ptr, int i);
+void set_output_word_format(OptsHandler_ptr, int i);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-int     get_output_word_format(OptsHandler_ptr);
+int get_output_word_format(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_backward_comp(OptsHandler_ptr);
+void set_backward_comp(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_backward_comp(OptsHandler_ptr);
+void unset_backward_comp(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1198,14 +1186,14 @@ boolean opt_backward_comp(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_type_checking_warning_on(OptsHandler_ptr);
+void set_type_checking_warning_on(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_type_checking_warning_on(OptsHandler_ptr);
+void unset_type_checking_warning_on(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1219,14 +1207,14 @@ boolean opt_type_checking_warning_on(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_verbose_level(OptsHandler_ptr, int);
+void set_verbose_level(OptsHandler_ptr, int);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-int     get_verbose_level(OptsHandler_ptr);
+int get_verbose_level(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1268,42 +1256,42 @@ boolean opt_verbose_level_le(OptsHandler_ptr, int);
 
   \todo Missing description
 */
-void    set_pp_list(OptsHandler_ptr, char *, const NuSMVEnv_ptr env);
+void set_pp_list(OptsHandler_ptr, char *, const NuSMVEnv_ptr env);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_pp_list(OptsHandler_ptr);
+char *get_pp_list(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_shown_states_level(OptsHandler_ptr, int);
+void set_shown_states_level(OptsHandler_ptr, int);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-int     opt_shown_states_level(OptsHandler_ptr);
+int opt_shown_states_level(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_ignore_spec(OptsHandler_ptr);
+void set_ignore_spec(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_ignore_spec(OptsHandler_ptr);
+void unset_ignore_spec(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1317,14 +1305,14 @@ boolean opt_ignore_spec(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_ignore_compute(OptsHandler_ptr);
+void set_ignore_compute(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_ignore_compute(OptsHandler_ptr);
+void unset_ignore_compute(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1338,14 +1326,14 @@ boolean opt_ignore_compute(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_ignore_ltlspec(OptsHandler_ptr);
+void set_ignore_ltlspec(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_ignore_ltlspec(OptsHandler_ptr);
+void unset_ignore_ltlspec(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1359,14 +1347,14 @@ boolean opt_ignore_ltlspec(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_ignore_pslspec(OptsHandler_ptr);
+void set_ignore_pslspec(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_ignore_pslspec(OptsHandler_ptr);
+void unset_ignore_pslspec(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1380,14 +1368,14 @@ boolean opt_ignore_pslspec(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_check_fsm(OptsHandler_ptr);
+void set_check_fsm(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_check_fsm(OptsHandler_ptr);
+void unset_check_fsm(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1401,14 +1389,14 @@ boolean opt_check_fsm(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_ignore_invar(OptsHandler_ptr);
+void set_ignore_invar(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_ignore_invar(OptsHandler_ptr);
+void unset_ignore_invar(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1422,14 +1410,14 @@ boolean opt_ignore_invar(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_forward_search(OptsHandler_ptr);
+void set_forward_search(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_forward_search(OptsHandler_ptr);
+void unset_forward_search(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1464,14 +1452,14 @@ boolean opt_ltl_tableau_forward_search(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-void    set_print_reachable(OptsHandler_ptr);
+void set_print_reachable(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_print_reachable(OptsHandler_ptr);
+void unset_print_reachable(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1485,14 +1473,14 @@ boolean opt_print_reachable(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_reorder(OptsHandler_ptr);
+void set_reorder(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_reorder(OptsHandler_ptr);
+void unset_reorder(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1506,7 +1494,7 @@ boolean opt_reorder(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_reorder_method(OptsHandler_ptr, unsigned int);
+void set_reorder_method(OptsHandler_ptr, unsigned int);
 
 /*!
   \brief \todo Missing synopsis
@@ -1520,14 +1508,14 @@ unsigned int get_reorder_method(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_dynamic_reorder(OptsHandler_ptr);
+void set_dynamic_reorder(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_dynamic_reorder(OptsHandler_ptr);
+void unset_dynamic_reorder(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1541,14 +1529,14 @@ boolean opt_dynamic_reorder(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_enable_sexp2bdd_caching(OptsHandler_ptr);
+void set_enable_sexp2bdd_caching(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_enable_sexp2bdd_caching(OptsHandler_ptr);
+void unset_enable_sexp2bdd_caching(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1562,14 +1550,14 @@ boolean opt_enable_sexp2bdd_caching(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_batch(OptsHandler_ptr);
+void set_batch(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_batch(OptsHandler_ptr);
+void unset_batch(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1597,28 +1585,28 @@ TransType get_partition_method(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-void    reset_partitioning_method(OptsHandler_ptr);
+void reset_partitioning_method(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_monolithic(OptsHandler_ptr);
+void set_monolithic(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_conj_partitioning(OptsHandler_ptr);
+void set_conj_partitioning(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_iwls95cp_partitioning(OptsHandler_ptr);
+void set_iwls95cp_partitioning(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1646,21 +1634,21 @@ boolean opt_iwls95cp_partitioning(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_conj_part_threshold(OptsHandler_ptr, int);
+void set_conj_part_threshold(OptsHandler_ptr, int);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_conj_part_threshold(OptsHandler_ptr);
+void reset_conj_part_threshold(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-int     get_conj_part_threshold(OptsHandler_ptr);
+int get_conj_part_threshold(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1688,14 +1676,14 @@ int get_image_cluster_size(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_ignore_init_file(OptsHandler_ptr);
+void set_ignore_init_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_ignore_init_file(OptsHandler_ptr);
+void unset_ignore_init_file(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1709,14 +1697,14 @@ boolean opt_ignore_init_file(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_ag_only(OptsHandler_ptr);
+void set_ag_only(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_ag_only(OptsHandler_ptr);
+void unset_ag_only(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1730,14 +1718,14 @@ boolean opt_ag_only(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_cone_of_influence(OptsHandler_ptr);
+void set_cone_of_influence(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_cone_of_influence(OptsHandler_ptr);
+void unset_cone_of_influence(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1751,14 +1739,14 @@ boolean opt_cone_of_influence(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_list_properties(OptsHandler_ptr);
+void set_list_properties(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    unset_list_properties(OptsHandler_ptr);
+void unset_list_properties(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1772,49 +1760,49 @@ boolean opt_list_properties(OptsHandler_ptr);
 
   \todo Missing description
 */
-void    set_pp_cpp_path(OptsHandler_ptr, const char *);
+void set_pp_cpp_path(OptsHandler_ptr, const char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_pp_cpp_path(OptsHandler_ptr);
+void reset_pp_cpp_path(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_pp_cpp_path(OptsHandler_ptr);
+char *get_pp_cpp_path(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    set_pp_m4_path(OptsHandler_ptr, const char *);
+void set_pp_m4_path(OptsHandler_ptr, const char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void    reset_pp_m4_path(OptsHandler_ptr);
+void reset_pp_m4_path(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-char *  get_pp_m4_path(OptsHandler_ptr);
+char *get_pp_m4_path(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void set_prop_print_method(OptsHandler_ptr opt, const char* string);
+void set_prop_print_method(OptsHandler_ptr opt, const char *string);
 
 /*!
   \brief \todo Missing synopsis
@@ -1835,14 +1823,14 @@ int get_prop_print_method(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-void    set_prop_no(OptsHandler_ptr, int n);
+void set_prop_no(OptsHandler_ptr, int n);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-int     get_prop_no(OptsHandler_ptr);
+int get_prop_no(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1856,14 +1844,14 @@ void print_partition_method(FILE *);
 
   \todo Missing description
 */
-void set_sat_solver(OptsHandler_ptr, const char*);
+void set_sat_solver(OptsHandler_ptr, const char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-const char* get_sat_solver(OptsHandler_ptr);
+const char *get_sat_solver(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -1970,14 +1958,14 @@ boolean opt_counter_examples(OptsHandler_ptr);
 
   \todo Missing description
 */
-void set_traces_hiding_prefix(OptsHandler_ptr, const char*);
+void set_traces_hiding_prefix(OptsHandler_ptr, const char *);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-const char* opt_traces_hiding_prefix(OptsHandler_ptr);
+const char *opt_traces_hiding_prefix(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -2014,14 +2002,14 @@ boolean opt_bdd_encoding_word_bits(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-const char* opt_traces_regexp(OptsHandler_ptr);
+const char *opt_traces_regexp(OptsHandler_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-boolean set_traces_regexp(OptsHandler_ptr, const char*);
+boolean set_traces_regexp(OptsHandler_ptr, const char *);
 #endif
 
 /* others */
@@ -2285,8 +2273,7 @@ boolean opt_show_defines_with_next(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-void
-set_check_invar_strategy(OptsHandler_ptr opt, Check_Strategy strategy);
+void set_check_invar_strategy(OptsHandler_ptr opt, Check_Strategy strategy);
 
 /*!
   \brief \todo Missing synopsis
@@ -2300,15 +2287,14 @@ Check_Strategy opt_check_invar_strategy(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-const char* opt_check_invar_strategy_as_string(OptsHandler_ptr opt);
+const char *opt_check_invar_strategy_as_string(OptsHandler_ptr opt);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void
-set_check_invar_fb_heuristic(OptsHandler_ptr opt, FB_Heuristic strategy);
+void set_check_invar_fb_heuristic(OptsHandler_ptr opt, FB_Heuristic strategy);
 
 /*!
   \brief \todo Missing synopsis
@@ -2322,48 +2308,43 @@ FB_Heuristic opt_check_invar_fb_heuristic(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-const char* opt_check_invar_fb_heuristic_as_string(OptsHandler_ptr opt);
+const char *opt_check_invar_fb_heuristic_as_string(OptsHandler_ptr opt);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void
-set_check_invar_bddbmc_heuristic(OptsHandler_ptr opt,
-                                 Bdd2bmc_Heuristic strategy);
+void set_check_invar_bddbmc_heuristic(OptsHandler_ptr opt,
+                                      Bdd2bmc_Heuristic strategy);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-Bdd2bmc_Heuristic
-opt_check_invar_bddbmc_heuristic(OptsHandler_ptr opt);
+Bdd2bmc_Heuristic opt_check_invar_bddbmc_heuristic(OptsHandler_ptr opt);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-const char*
-opt_check_invar_bddbmc_heuristic_as_string(OptsHandler_ptr opt);
+const char *opt_check_invar_bddbmc_heuristic_as_string(OptsHandler_ptr opt);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void
-set_check_invar_bddbmc_heuristic_threshold(OptsHandler_ptr opt, int t);
+void set_check_invar_bddbmc_heuristic_threshold(OptsHandler_ptr opt, int t);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-int
-opt_check_invar_bddbmc_heuristic_threshold(OptsHandler_ptr opt);
+int opt_check_invar_bddbmc_heuristic_threshold(OptsHandler_ptr opt);
 
 /* Daggifier on/off */
 
@@ -2400,8 +2381,7 @@ int opt_get_daggifier_counter_threshold(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-void opt_set_daggifier_counter_threshold(OptsHandler_ptr opt,
-                                                int x);
+void opt_set_daggifier_counter_threshold(OptsHandler_ptr opt, int x);
 
 /*!
   \brief \todo Missing synopsis
@@ -2415,8 +2395,7 @@ int opt_get_daggifier_depth_threshold(OptsHandler_ptr opt);
 
   \todo Missing description
 */
-void opt_set_daggifier_depth_threshold(OptsHandler_ptr opt,
-                                              int x);
+void opt_set_daggifier_depth_threshold(OptsHandler_ptr opt, int x);
 
 /*!
   \brief \todo Missing synopsis
@@ -2465,11 +2444,10 @@ void unset_daggifier_statistics(OptsHandler_ptr opt);
 /* different BDD-based algorithms to check language emptiness for
    omega-regular properties */
 BddOregJusticeEmptinessBddAlgorithmType
-  get_oreg_justice_emptiness_bdd_algorithm(OptsHandler_ptr opt);
-void set_oreg_justice_emptiness_bdd_algorithm
-(OptsHandler_ptr opt, BddOregJusticeEmptinessBddAlgorithmType alg);
-void reset_oreg_justice_emptiness_bdd_algorithm
-(OptsHandler_ptr opt);
+get_oreg_justice_emptiness_bdd_algorithm(OptsHandler_ptr opt);
+void set_oreg_justice_emptiness_bdd_algorithm(
+    OptsHandler_ptr opt, BddOregJusticeEmptinessBddAlgorithmType alg);
+void reset_oreg_justice_emptiness_bdd_algorithm(OptsHandler_ptr opt);
 
 /* RBC2CNF */
 
@@ -2478,24 +2456,21 @@ void reset_oreg_justice_emptiness_bdd_algorithm
 
   \todo Missing description
 */
-void
-set_rbc2cnf_algorithm(OptsHandler_ptr opt, Be_CnfAlgorithm alg);
+void set_rbc2cnf_algorithm(OptsHandler_ptr opt, Be_CnfAlgorithm alg);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void
-unset_rbc2cnf_algorithm(OptsHandler_ptr opt);
+void unset_rbc2cnf_algorithm(OptsHandler_ptr opt);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-Be_CnfAlgorithm
-get_rbc2cnf_algorithm(OptsHandler_ptr opt);
+Be_CnfAlgorithm get_rbc2cnf_algorithm(OptsHandler_ptr opt);
 
 /*!
   \brief \todo Missing synopsis

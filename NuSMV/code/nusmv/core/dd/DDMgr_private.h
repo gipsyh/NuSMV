@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,45 +34,37 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_DD_DDMGR_PRIVATE_H__
 #define __NUSMV_CORE_DD_DDMGR_PRIVATE_H__
-
 
 #include "nusmv/core/dd/DDMgr.h"
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
 #include "nusmv/core/utils/utils.h"
 
-
 /*!
   \brief DDMgr class definition derived from
                class EnvObject
 
-  
+
 
   \sa Base class EnvObject
 */
 
-typedef struct DDMgr_TAG
-{
+typedef struct DDMgr_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
-  DdManager* dd;
+  DdManager *dd;
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-
 
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } DDMgr;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -97,7 +89,5 @@ void dd_manager_init(DDMgr_ptr self, const NuSMVEnv_ptr env);
   \sa DDMgr_destroy
 */
 void dd_manager_deinit(DDMgr_ptr self);
-
-
 
 #endif /* __NUSMV_CORE_DD_DDMGR_PRIVATE_H__ */

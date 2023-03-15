@@ -1,28 +1,28 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``utils'' package of NuSMV version 2. 
-  Copyright (C) 2010 by FBK-irst. 
+  This file is part of the ``utils'' package of NuSMV version 2.
+  Copyright (C) 2010 by FBK-irst.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,25 +34,22 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_SYMB_TABLE_NFUNCTION_H__
 #define __NUSMV_CORE_COMPILE_SYMB_TABLE_NFUNCTION_H__
 
-
-#include "nusmv/core/utils/utils.h" 
 #include "nusmv/core/compile/symb_table/SymbType.h"
 #include "nusmv/core/utils/NodeList.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct NFunction
   \brief Definition of the public accessor for class NFunction
 
-  
+
 */
 #ifdef DEFINED_NFunction_ptr
 #else
-typedef struct NFunction_TAG*  NFunction_ptr;
+typedef struct NFunction_TAG *NFunction_ptr;
 #define DEFINED_NFunction_ptr 1
 #endif
 
@@ -62,18 +59,15 @@ typedef struct NFunction_TAG*  NFunction_ptr;
   These macros must be used respectively to cast and to check
 f  instances of class NFunction
 */
-#define N_FUNCTION(self)                        \
-  ((NFunction_ptr) self)
+#define N_FUNCTION(self) ((NFunction_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define N_FUNCTION_CHECK_INSTANCE(self)                 \
+#define N_FUNCTION_CHECK_INSTANCE(self)                                        \
   (nusmv_assert(N_FUNCTION(self) != N_FUNCTION(NULL)))
-
-
 
 /**AutomaticStart*************************************************************/
 
@@ -89,9 +83,8 @@ f  instances of class NFunction
 
   \sa NFunction_destroy
 */
-NFunction_ptr NFunction_create_uninterpreted(int num_args,
-                                                    SymbType_ptr* args,
-                                                    SymbType_ptr ret);
+NFunction_ptr NFunction_create_uninterpreted(int num_args, SymbType_ptr *args,
+                                             SymbType_ptr ret);
 
 /*!
   \methodof NFunction
@@ -101,10 +94,8 @@ NFunction_ptr NFunction_create_uninterpreted(int num_args,
 
   \sa NFunction_destroy
 */
-NFunction_ptr NFunction_create_interpreted(int num_args,
-                                                  SymbType_ptr* args,
-                                                  SymbType_ptr ret,
-                                                  void* body);
+NFunction_ptr NFunction_create_interpreted(int num_args, SymbType_ptr *args,
+                                           SymbType_ptr ret, void *body);
 
 /*!
   \methodof NFunction
@@ -178,16 +169,13 @@ boolean NFunction_is_uninterpreted(NFunction_ptr self);
 
   The NFunction body field getter
 */
-void* NFunction_get_body(NFunction_ptr self);
+void *NFunction_get_body(NFunction_ptr self);
 
 /*!
 \brief Comparison service
 */
-boolean NFunction_equals(NFunction_ptr self,
-                         NFunction_ptr other);
+boolean NFunction_equals(NFunction_ptr self, NFunction_ptr other);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_SYMB_TABLE_NFUNCTION_H__ */

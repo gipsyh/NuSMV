@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -39,15 +39,12 @@
 
 */
 
-
-
-
 #ifndef __NUSMV_CORE_FSM_FSM_BUILDER_H__
 #define __NUSMV_CORE_FSM_FSM_BUILDER_H__
 
-#include "nusmv/core/fsm/sexp/SexpFsm.h"
-#include "nusmv/core/fsm/sexp/BoolSexpFsm.h"
 #include "nusmv/core/fsm/bdd/BddFsm.h"
+#include "nusmv/core/fsm/sexp/BoolSexpFsm.h"
+#include "nusmv/core/fsm/sexp/SexpFsm.h"
 
 #include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/dd/dd.h"
@@ -58,26 +55,24 @@
   \struct FsmBuilder
   \brief FSM builder class constructor
 
-  
+
 */
-typedef struct FsmBuilder_TAG* FsmBuilder_ptr;
+typedef struct FsmBuilder_TAG *FsmBuilder_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FSM_BUILDER(x) \
-         ((FsmBuilder_ptr) x)
+#define FSM_BUILDER(x) ((FsmBuilder_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define FSM_BUILDER_CHECK_INSTANCE(x) \
-         ( nusmv_assert(FSM_BUILDER(x) != FSM_BUILDER(NULL)) )
-
+#define FSM_BUILDER_CHECK_INSTANCE(x)                                          \
+  (nusmv_assert(FSM_BUILDER(x) != FSM_BUILDER(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -91,16 +86,15 @@ typedef struct FsmBuilder_TAG* FsmBuilder_ptr;
                       will need some basic structures (NodeMgr,
                       ErrorMgr, DDMgr, OptsHandler, StreamMgr)
 */
-FsmBuilder_ptr
-FsmBuilder_create(NuSMVEnv_ptr env);
+FsmBuilder_ptr FsmBuilder_create(NuSMVEnv_ptr env);
 
 /*!
   \methodof FsmBuilder
   \brief Class FsmBuilder destructor
 
-  
+
 */
-void  FsmBuilder_destroy(FsmBuilder_ptr self);
+void FsmBuilder_destroy(FsmBuilder_ptr self);
 
 /*!
   \methodof FsmBuilder
@@ -108,10 +102,9 @@ void  FsmBuilder_destroy(FsmBuilder_ptr self);
 
   The caller becomes the owner of the returned object
 */
-SexpFsm_ptr
-FsmBuilder_create_scalar_sexp_fsm(const FsmBuilder_ptr self,
-                                  FlatHierarchy_ptr flat_hierarchy,
-                                  const Set_t vars_list);
+SexpFsm_ptr FsmBuilder_create_scalar_sexp_fsm(const FsmBuilder_ptr self,
+                                              FlatHierarchy_ptr flat_hierarchy,
+                                              const Set_t vars_list);
 
 /*!
   \methodof FsmBuilder
@@ -126,27 +119,22 @@ FsmBuilder_create_scalar_sexp_fsm(const FsmBuilder_ptr self,
                       ordering is specified and an error occurs
                       while parsing it.
 */
-BoolSexpFsm_ptr
-FsmBuilder_create_boolean_sexp_fsm(const FsmBuilder_ptr self,
-                                   FlatHierarchy_ptr flat_hierarchy,
-                                   const Set_t vars,
-                                   BddEnc_ptr bdd_enc,
-                                   SymbLayer_ptr det_layer);
+BoolSexpFsm_ptr FsmBuilder_create_boolean_sexp_fsm(
+    const FsmBuilder_ptr self, FlatHierarchy_ptr flat_hierarchy,
+    const Set_t vars, BddEnc_ptr bdd_enc, SymbLayer_ptr det_layer);
 
 /*!
   \methodof FsmBuilder
   \brief Creates a BddFsm instance from a given SexpFsm
 
-  
+
   Note: all variables from provided encoding will go to the BDD FSM.
   Use FsmBuilder_create_bdd_fsm_of_vars if only SOME variables should be taken
   into account.
 */
-BddFsm_ptr
-FsmBuilder_create_bdd_fsm(const FsmBuilder_ptr self,
-                          BddEnc_ptr enc,
-                          const SexpFsm_ptr sexp_fsm,
-                          const TransType trans_type);
+BddFsm_ptr FsmBuilder_create_bdd_fsm(const FsmBuilder_ptr self, BddEnc_ptr enc,
+                                     const SexpFsm_ptr sexp_fsm,
+                                     const TransType trans_type);
 
 /*!
   \methodof FsmBuilder
@@ -157,28 +145,23 @@ FsmBuilder_create_bdd_fsm(const FsmBuilder_ptr self,
 
   Note: The functions will take a copy of provided cubes.
 */
-BddFsm_ptr
-FsmBuilder_create_bdd_fsm_of_vars(const FsmBuilder_ptr self,
-                                  const SexpFsm_ptr sexp_fsm,
-                                  const TransType trans_type,
-                                  BddEnc_ptr enc,
-                                  BddVarSet_ptr state_vars_cube,
-                                  BddVarSet_ptr input_vars_cube,
-                                  BddVarSet_ptr next_state_vars_cube);
+BddFsm_ptr FsmBuilder_create_bdd_fsm_of_vars(
+    const FsmBuilder_ptr self, const SexpFsm_ptr sexp_fsm,
+    const TransType trans_type, BddEnc_ptr enc, BddVarSet_ptr state_vars_cube,
+    BddVarSet_ptr input_vars_cube, BddVarSet_ptr next_state_vars_cube);
 
 /*!
   \methodof FsmBuilder
   \brief Given an expression, returns a bdd ClusterList with
   each conjuction occurring into expr contained in each cluster of
-  the list. 
+  the list.
 
   Each cluster into the list represents a piece of
   transition relation. If the given expression contains
   duplicates, they will not occur into the returned cluster
   list. Returned list should be destroyed by the caller.
 */
-ClusterList_ptr
-FsmBuilder_clusterize_expr(FsmBuilder_ptr self,
-                           BddEnc_ptr enc, Expr_ptr expr);
+ClusterList_ptr FsmBuilder_clusterize_expr(FsmBuilder_ptr self, BddEnc_ptr enc,
+                                           Expr_ptr expr);
 
 #endif /* __NUSMV_CORE_FSM_FSM_BUILDER_H__ */

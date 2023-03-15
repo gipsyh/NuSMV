@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,7 +33,6 @@
   \todo: Missing description
 
 */
-
 
 #ifndef __NUSMV_CORE_BMC_BMC_PKG_H__
 #define __NUSMV_CORE_BMC_BMC_PKG_H__
@@ -60,8 +59,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -79,7 +76,7 @@ void Bmc_Init(NuSMVEnv_ptr env);
 /*!
   \brief Frees all resources allocated for the BMC model manager
 
-  
+
 */
 void Bmc_Quit(NuSMVEnv_ptr env);
 
@@ -88,7 +85,7 @@ void Bmc_Quit(NuSMVEnv_ptr env);
    dependencies. Call Bmc_Quit to deinitialize everything it is is what
    you need instead.
 
-  
+
 */
 void Bmc_QuitData(void);
 
@@ -100,7 +97,7 @@ void Bmc_QuitData(void);
 void Bmc_init_opt(NuSMVEnv_ptr env);
 
 /*!
-  \brief 
+  \brief
 
   Creates the BE fsm from the Sexpr FSM. Currently the be
    enc is a singleton global private variable which is shared between
@@ -114,10 +111,9 @@ void Bmc_Pkg_build_master_be_fsm(const NuSMVEnv_ptr env);
   \brief Initialize the bmc package and optionally builds the be
   fsm and registers the trace executors
 
-  
+
 */
-int Bmc_Pkg_bmc_setup(NuSMVEnv_ptr env,
-                             boolean forced);
+int Bmc_Pkg_bmc_setup(NuSMVEnv_ptr env, boolean forced);
 
 /*!
   \brief A service for commands, to check if bmc
@@ -132,11 +128,8 @@ int Bmc_Pkg_bmc_setup(NuSMVEnv_ptr env,
   printed accordingly (used by the commands that always require that
   the model is built (e.g. bmc_simulate).
 */
-int Bmc_check_if_model_was_built(NuSMVEnv_ptr env,
-                                        FILE* err, boolean forced);
-
+int Bmc_check_if_model_was_built(NuSMVEnv_ptr env, FILE *err, boolean forced);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_BMC_BMC_PKG_H__ */
-

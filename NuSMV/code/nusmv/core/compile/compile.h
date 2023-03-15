@@ -42,10 +42,10 @@
 
 #include "nusmv/core/be/be.h" /* the generic boolean expressions interface */
 #include "nusmv/core/cinit/NuSMVEnv.h"
-#include "nusmv/core/compile/compileUtil.h"
 #include "nusmv/core/compile/FlatHierarchy.h"
 #include "nusmv/core/compile/PredicateExtractor.h"
 #include "nusmv/core/compile/PredicateNormaliser.h"
+#include "nusmv/core/compile/compileUtil.h"
 #include "nusmv/core/compile/symb_table/SymbLayer.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/dd/dd.h"
@@ -54,6 +54,7 @@
 #include "nusmv/core/fsm/sexp/BoolSexpFsm.h"
 #include "nusmv/core/fsm/sexp/SexpFsm.h"
 #include "nusmv/core/hrc/HrcNode.h"
+#include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/prop/Prop.h"
 #include "nusmv/core/set/set.h"
@@ -61,7 +62,6 @@
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/utils.h"
 #include "nusmv/core/wff/ExprMgr.h"
-#include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
@@ -79,7 +79,7 @@
 
   \todo Missing description
 */
-#define ENV_PROC_SELECTOR_VNAME        "proc_selector_vname"
+#define ENV_PROC_SELECTOR_VNAME "proc_selector_vname"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -91,7 +91,7 @@
 
 
 */
-typedef struct cmp_struct* cmp_struct_ptr;
+typedef struct cmp_struct *cmp_struct_ptr;
 
 /*!
   \brief \todo Missing synopsis
@@ -119,14 +119,21 @@ typedef enum {
 
   Enumerates the different types of a specification
 */
-typedef enum {ST_Notype, ST_Ctl, ST_Ltl, ST_Invar, ST_Compute} Spec_Type;
+typedef enum { ST_Notype, ST_Ctl, ST_Ltl, ST_Invar, ST_Compute } Spec_Type;
 
 /*!
   \brief Enumerates the status of a specification
 
   Enumerates the status of a specification
 */
-typedef enum {SS_Nostatus, SS_Unchecked, SS_True, SS_False, SS_Wrong, SS_Number} Spec_Status;
+typedef enum {
+  SS_Nostatus,
+  SS_Unchecked,
+  SS_True,
+  SS_False,
+  SS_Wrong,
+  SS_Number
+} Spec_Status;
 
 /*!
   \struct _Fsm_SexpRec
@@ -134,13 +141,8 @@ typedef enum {SS_Nostatus, SS_Unchecked, SS_True, SS_False, SS_Wrong, SS_Number}
 
   \todo Missing description
 */
-typedef struct _Fsm_SexpRec    Fsm_SexpRec;
-typedef struct _Fsm_SexpRec  * Fsm_SexpPtr;
-
-
-
-
-
+typedef struct _Fsm_SexpRec Fsm_SexpRec;
+typedef struct _Fsm_SexpRec *Fsm_SexpPtr;
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -151,7 +153,7 @@ typedef struct _Fsm_SexpRec  * Fsm_SexpPtr;
 
   Use this name when creating the layer of model symbols
 */
-#define MODEL_LAYER_NAME  "model"
+#define MODEL_LAYER_NAME "model"
 
 /*!
   \brief The name of the standard layer dedicated to determinization
@@ -249,8 +251,7 @@ void CompileFlatten_quit_flattener(NuSMVEnv_ptr env);
    list of known modules. After this function has been invoked, the
    module will be recognized by the flattener
 */
-void CompileFlatten_hash_module(const NuSMVEnv_ptr env,
-                                       node_ptr parsed_module);
+void CompileFlatten_hash_module(const NuSMVEnv_ptr env, node_ptr parsed_module);
 
 /*!
   \brief Traverse the module hierarchy, collect all required
@@ -293,14 +294,11 @@ void CompileFlatten_hash_module(const NuSMVEnv_ptr env,
   \se None
 */
 FlatHierarchy_ptr
-Compile_FlattenHierarchy(const NuSMVEnv_ptr env,
-                         const SymbTable_ptr symb_table,
-                         SymbLayer_ptr layer,
-                         node_ptr, node_ptr, node_ptr,
+Compile_FlattenHierarchy(const NuSMVEnv_ptr env, const SymbTable_ptr symb_table,
+                         SymbLayer_ptr layer, node_ptr, node_ptr, node_ptr,
                          boolean create_process_variable,
                          boolean calc_vars_constr,
-                         boolean expand_bounded_arrays,
-                         HrcNode_ptr hrc_result);
+                         boolean expand_bounded_arrays, HrcNode_ptr hrc_result);
 
 /*!
   \brief Semantic checks on assignments of the module.
@@ -338,9 +336,8 @@ void Compile_check_case(const SymbTable_ptr, node_ptr expr);
 
 
 */
-void Compile_check_next(const SymbTable_ptr st,
-                               node_ptr expr, node_ptr context,
-                               boolean is_one_next_allowed);
+void Compile_check_next(const SymbTable_ptr st, node_ptr expr, node_ptr context,
+                        boolean is_one_next_allowed);
 
 /*!
   \brief Checks that given expression contains no input
@@ -350,8 +347,8 @@ void Compile_check_next(const SymbTable_ptr st,
   iff the expression contains a next statement which itself has an
   input variable in it.
 */
-void Compile_check_input_next(const SymbTable_ptr st,
-                                     node_ptr expr, node_ptr context);
+void Compile_check_input_next(const SymbTable_ptr st, node_ptr expr,
+                              node_ptr context);
 
 /*!
   \brief Concatenates contexts ctx1 and ctx2
@@ -380,9 +377,8 @@ void Compile_check_input_next(const SymbTable_ptr st,
    Important: nodes in ctx2 are traversed and possibly recreated with find_node
 
 */
-node_ptr
-CompileFlatten_concat_contexts(const NuSMVEnv_ptr env,
-                               node_ptr ctx1, node_ptr ctx2);
+node_ptr CompileFlatten_concat_contexts(const NuSMVEnv_ptr env, node_ptr ctx1,
+                                        node_ptr ctx2);
 
 /*!
   \brief Returns a range going from a to b
@@ -390,9 +386,7 @@ CompileFlatten_concat_contexts(const NuSMVEnv_ptr env,
   Returns a range going from a to b. An empty range (Nil)
    is returned whether given 'a' is greater than 'b'
 */
-node_ptr
-CompileFlatten_expand_range(const NuSMVEnv_ptr env,
-                            int a, int b);
+node_ptr CompileFlatten_expand_range(const NuSMVEnv_ptr env, int a, int b);
 
 /*!
   \brief Resolves the given symbol to be a number
@@ -405,9 +399,8 @@ CompileFlatten_expand_range(const NuSMVEnv_ptr env,
    NUMBER, NUMBER_SIGNED_WORD or NUMBER_UNSIGNED_WORD.
    symb_table MUST be a valid SymbTable instance
 */
-node_ptr
-CompileFlatten_resolve_number(SymbTable_ptr symb_table,
-                              node_ptr n, node_ptr context);
+node_ptr CompileFlatten_resolve_number(SymbTable_ptr symb_table, node_ptr n,
+                                       node_ptr context);
 
 /*!
   \brief Takes an expression, and if it is a define or parameter
@@ -425,17 +418,15 @@ CompileFlatten_resolve_number(SymbTable_ptr symb_table,
 
    Note that array defines are not resolved to its definition.
 */
-node_ptr
-CompileFlatten_resolve_define_chains(const SymbTable_ptr symb_table,
-                                     node_ptr expr, node_ptr context);
+node_ptr CompileFlatten_resolve_define_chains(const SymbTable_ptr symb_table,
+                                              node_ptr expr, node_ptr context);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-void insert_module_hash(const NuSMVEnv_ptr env, node_ptr x,
-                               node_ptr y);
+void insert_module_hash(const NuSMVEnv_ptr env, node_ptr x, node_ptr y);
 
 /*!
   \brief \todo Missing synopsis
@@ -664,10 +655,9 @@ void cmp_struct_unset_bmc_setup(cmp_struct_ptr cmp);
   Context can be given with "IN". If input string is NULL, TRUE is
   returned. Returns NULL if an error occurs.
 */
-Expr_ptr
-Compile_compile_simpwff_from_string(NuSMVEnv_ptr env,
-                                    const SymbTable_ptr st,
-                                    const char* str_formula);
+Expr_ptr Compile_compile_simpwff_from_string(NuSMVEnv_ptr env,
+                                             const SymbTable_ptr st,
+                                             const char *str_formula);
 
 /*!
   \brief High level function which parses and type checks a
@@ -676,10 +666,9 @@ Compile_compile_simpwff_from_string(NuSMVEnv_ptr env,
   Context can be given with "IN". If input string is NULL, TRUE is
   returned. Returns NULL if an error occurs.
 */
-Expr_ptr
-Compile_compile_nextwff_from_string(NuSMVEnv_ptr,
-                                    const SymbTable_ptr st,
-                                    const char* str_formula);
+Expr_ptr Compile_compile_nextwff_from_string(NuSMVEnv_ptr,
+                                             const SymbTable_ptr st,
+                                             const char *str_formula);
 
 /*!
   \brief High level function which parses and type checks a
@@ -688,11 +677,10 @@ Compile_compile_nextwff_from_string(NuSMVEnv_ptr,
   Context can be given with "IN". If input string is NULL, TRUE is
   returned. Returns NULL if an error occurs.
 */
-Expr_ptr
-Compile_compile_spec_from_string(NuSMVEnv_ptr env,
-                                 const SymbTable_ptr st,
-                                 const char* str_formula,
-                                 const Prop_Type prop_type);
+Expr_ptr Compile_compile_spec_from_string(NuSMVEnv_ptr env,
+                                          const SymbTable_ptr st,
+                                          const char *str_formula,
+                                          const Prop_Type prop_type);
 
 /*!
   \brief Builds the flattened version of an expression.
@@ -703,8 +691,8 @@ Compile_compile_spec_from_string(NuSMVEnv_ptr env,
 
   \sa Flatten_GetDefinition, Compile_FlattenSexpExpandDefine
 */
-node_ptr
-Compile_FlattenSexp(const SymbTable_ptr symb_table, node_ptr, node_ptr);
+node_ptr Compile_FlattenSexp(const SymbTable_ptr symb_table, node_ptr,
+                             node_ptr);
 
 /*!
   \brief Flattens an expression and expands defined symbols.
@@ -713,23 +701,19 @@ Compile_FlattenSexp(const SymbTable_ptr symb_table, node_ptr, node_ptr);
 
   \sa Flatten_GetDefinition, Compile_FlattenSexp
 */
-node_ptr
-Compile_FlattenSexpExpandDefine(const SymbTable_ptr symb_table,
-                                node_ptr, node_ptr);
+node_ptr Compile_FlattenSexpExpandDefine(const SymbTable_ptr symb_table,
+                                         node_ptr, node_ptr);
 
 /*!
   \brief
 
 
 */
-void
-Compile_WriteFlattenModel(const NuSMVEnv_ptr env,
-                          FILE* out,
-                          const SymbTable_ptr st,
-                          const array_t* layer_names,
-                          const char* fsm_name,
-                          FlatHierarchy_ptr hierarchy,
-                          boolean force_flattening);
+void Compile_WriteFlattenModel(const NuSMVEnv_ptr env, FILE *out,
+                               const SymbTable_ptr st,
+                               const array_t *layer_names, const char *fsm_name,
+                               FlatHierarchy_ptr hierarchy,
+                               boolean force_flattening);
 
 /*!
   \brief Dumps the flatten model on the given FILE
@@ -738,30 +722,23 @@ Compile_WriteFlattenModel(const NuSMVEnv_ptr env,
                        The dumped model is restricted to the set of variables
                        defined in the given FlatHierarchy
 */
-void
-Compile_WriteRestrictedFlattenModel(const NuSMVEnv_ptr env,
-                                    FILE* out,
-                                    const SymbTable_ptr st,
-                                    const array_t* layer_names,
-                                    const char* fsm_name,
-                                    FlatHierarchy_ptr hierarchy,
-                                    boolean force_flattening);
+void Compile_WriteRestrictedFlattenModel(const NuSMVEnv_ptr env, FILE *out,
+                                         const SymbTable_ptr st,
+                                         const array_t *layer_names,
+                                         const char *fsm_name,
+                                         FlatHierarchy_ptr hierarchy,
+                                         boolean force_flattening);
 
 /*!
   \brief
 
 
 */
-void
-Compile_WriteObfuscatedFlattenModel(const NuSMVEnv_ptr env,
-                                    FILE* out,
-                                    const SymbTable_ptr st,
-                                    const array_t* layer_names,
-                                    const char* fsm_name,
-                                    FlatHierarchy_ptr hierarchy,
-                                    boolean print_map,
-                                    boolean force_flattening,
-                                    NodeAnonymizerBase_ptr anonymizer);
+void Compile_WriteObfuscatedFlattenModel(
+    const NuSMVEnv_ptr env, FILE *out, const SymbTable_ptr st,
+    const array_t *layer_names, const char *fsm_name,
+    FlatHierarchy_ptr hierarchy, boolean print_map, boolean force_flattening,
+    NodeAnonymizerBase_ptr anonymizer);
 
 /*!
   \brief Prints the flatten version of FSM of an SMV model.
@@ -775,27 +752,22 @@ Compile_WriteObfuscatedFlattenModel(const NuSMVEnv_ptr env,
    obtained from the symbol table. fsm_name is a name of the output
    structure, usually it is "MODULE main".
 */
-void
-Compile_WriteFlattenFsm(const NuSMVEnv_ptr env,
-                        FILE* out,
-                        const SymbTable_ptr symb_table,
-                        const array_t* layer_names,
-                        const char* fsm_name,
-                        FlatHierarchy_ptr hierarchy,
-                        boolean force_flattening);
+void Compile_WriteFlattenFsm(const NuSMVEnv_ptr env, FILE *out,
+                             const SymbTable_ptr symb_table,
+                             const array_t *layer_names, const char *fsm_name,
+                             FlatHierarchy_ptr hierarchy,
+                             boolean force_flattening);
 
 /*!
   \brief
 
 
 */
-void
-Compile_WriteFlattenModel_udg(const NuSMVEnv_ptr env,
-                              FILE* out,
-                              const SymbTable_ptr st,
-                              const array_t* layer_names,
-                              const char* fsm_name,
-                              FlatHierarchy_ptr hierarchy);
+void Compile_WriteFlattenModel_udg(const NuSMVEnv_ptr env, FILE *out,
+                                   const SymbTable_ptr st,
+                                   const array_t *layer_names,
+                                   const char *fsm_name,
+                                   FlatHierarchy_ptr hierarchy);
 
 /*!
   \brief Prints the given flatten specifications.
@@ -803,26 +775,20 @@ Compile_WriteFlattenModel_udg(const NuSMVEnv_ptr env,
   Prints into the specified file the flatten
    specifications.
 */
-void
-Compile_WriteFlattenSpecs(const NuSMVEnv_ptr env,
-                          FILE* out,
-                          const SymbTable_ptr st,
-                          FlatHierarchy_ptr hierarchy,
-                          boolean force_flattening);
+void Compile_WriteFlattenSpecs(const NuSMVEnv_ptr env, FILE *out,
+                               const SymbTable_ptr st,
+                               FlatHierarchy_ptr hierarchy,
+                               boolean force_flattening);
 
 /*!
   \brief Prints the given boolean model
 
 
 */
-void
-Compile_WriteBoolModel(const NuSMVEnv_ptr env,
-                       FILE* out,
-                       BddEnc_ptr enc,
-                       NodeList_ptr layers,
-                       const char* fsm_name,
-                       BoolSexpFsm_ptr bool_sexp_fsm,
-                       boolean force_flattening);
+void Compile_WriteBoolModel(const NuSMVEnv_ptr env, FILE *out, BddEnc_ptr enc,
+                            NodeList_ptr layers, const char *fsm_name,
+                            BoolSexpFsm_ptr bool_sexp_fsm,
+                            boolean force_flattening);
 
 /*!
   \brief Prints the boolean FSM of an SMV model.
@@ -834,14 +800,10 @@ Compile_WriteBoolModel(const NuSMVEnv_ptr env,
    usually this parameter is a list of all layers committed to enc. The array
    should be ended by a NULL element.
 */
-void
-Compile_WriteBoolFsm(const NuSMVEnv_ptr env,
-                     FILE* out,
-                     const SymbTable_ptr symb_table,
-                     NodeList_ptr layers,
-                     const char* fsm_name,
-                     BoolSexpFsm_ptr bool_sexp_fsm,
-                     boolean force_flattening);
+void Compile_WriteBoolFsm(const NuSMVEnv_ptr env, FILE *out,
+                          const SymbTable_ptr symb_table, NodeList_ptr layers,
+                          const char *fsm_name, BoolSexpFsm_ptr bool_sexp_fsm,
+                          boolean force_flattening);
 
 /*!
   \brief Prints the boolean specifications of an SMV model.
@@ -855,11 +817,8 @@ Compile_WriteBoolFsm(const NuSMVEnv_ptr env,
    after the specs.
 
 */
-void
-Compile_WriteBoolSpecs(const NuSMVEnv_ptr env,
-                       FILE* out,
-                       BddEnc_ptr enc,
-                       FlatHierarchy_ptr hierarchy);
+void Compile_WriteBoolSpecs(const NuSMVEnv_ptr env, FILE *out, BddEnc_ptr enc,
+                            FlatHierarchy_ptr hierarchy);
 
 /*!
   \brief Check if an expr is of a finite range type
@@ -879,10 +838,9 @@ Compile_WriteBoolSpecs(const NuSMVEnv_ptr env,
 
   \se none
 */
-boolean Compile_is_expr_booleanizable(const SymbTable_ptr st,
-                                             node_ptr expr,
-                                             boolean word_booleanizable,
-                                             hash_ptr cache);
+boolean Compile_is_expr_booleanizable(const SymbTable_ptr st, node_ptr expr,
+                                      boolean word_booleanizable,
+                                      hash_ptr cache);
 
 /*!
   \brief Converts a scalar expression into a boolean expression.
@@ -912,9 +870,8 @@ boolean Compile_is_expr_booleanizable(const SymbTable_ptr st,
 
   \sa Compile_detexpr2bexpr, expr2bexpr_recur
 */
-Expr_ptr Compile_expr2bexpr(BddEnc_ptr enc,
-                                   SymbLayer_ptr det_layer,
-                                   Expr_ptr expr);
+Expr_ptr Compile_expr2bexpr(BddEnc_ptr enc, SymbLayer_ptr det_layer,
+                            Expr_ptr expr);
 
 /*!
   \brief Converts a scalar expression into a boolean expression.
@@ -978,8 +935,7 @@ Expr_ptr Compile_detexpr2bexpr(BddEnc_ptr enc, Expr_ptr expr);
   \sa Compile_detexpr2bexpr, Compile_expr2bexpr,
   expr2bexpr_recur
 */
-Expr_ptr
-Compile_detexpr2bexpr_list(BddEnc_ptr enc, Expr_ptr expr);
+Expr_ptr Compile_detexpr2bexpr_list(BddEnc_ptr enc, Expr_ptr expr);
 
 /*!
   \brief Computes dependencies of a given SMV expression
@@ -997,8 +953,7 @@ Compile_detexpr2bexpr_list(BddEnc_ptr enc, Expr_ptr expr);
 
   \sa formulaGetDefinitionDependencies
 */
-Set_t
-Formula_GetDependencies(const SymbTable_ptr, node_ptr, node_ptr);
+Set_t Formula_GetDependencies(const SymbTable_ptr, node_ptr, node_ptr);
 
 /*!
   \brief Computes the dependencies of an SMV expression by type
@@ -1018,10 +973,8 @@ Formula_GetDependencies(const SymbTable_ptr, node_ptr, node_ptr);
   \sa formulaGetDependenciesByTypeAux
    formulaGetDefinitionDependencies
 */
-Set_t
-Formula_GetDependenciesByType(const SymbTable_ptr, node_ptr, node_ptr,
-                              SymbFilterType, boolean);
-
+Set_t Formula_GetDependenciesByType(const SymbTable_ptr, node_ptr, node_ptr,
+                                    SymbFilterType, boolean);
 
 /*!
   \brief Compute the dependencies of two set of formulae by type
@@ -1031,9 +984,8 @@ Formula_GetDependenciesByType(const SymbTable_ptr, node_ptr, node_ptr,
   computed. Returned Set must be disposed by the caller.
 
 */
-Set_t
-Formulae_GetDependenciesByType(const SymbTable_ptr, node_ptr, node_ptr, node_ptr,
-                               SymbFilterType, boolean);
+Set_t Formulae_GetDependenciesByType(const SymbTable_ptr, node_ptr, node_ptr,
+                                     node_ptr, SymbFilterType, boolean);
 
 /*!
   \brief Calculates the set of constants occurring into
@@ -1042,9 +994,8 @@ Formulae_GetDependenciesByType(const SymbTable_ptr, node_ptr, node_ptr, node_ptr
   Given a formula the set of constants occurring in
    them is computed and returned. Returned set must be disposed by the caller
 */
-Set_t
-Formula_GetConstants(const SymbTable_ptr symb_table,
-                     node_ptr formula, node_ptr context);
+Set_t Formula_GetConstants(const SymbTable_ptr symb_table, node_ptr formula,
+                           node_ptr context);
 
 /*!
   \brief Compute the dependencies of two set of formulae
@@ -1053,9 +1004,8 @@ Formula_GetConstants(const SymbTable_ptr symb_table,
    set of variables occurring in them is computed. Returned Set must be
    disposed by the caller
 */
-Set_t
-Formulae_GetDependencies(const SymbTable_ptr, node_ptr, node_ptr,
-                         node_ptr);
+Set_t Formulae_GetDependencies(const SymbTable_ptr, node_ptr, node_ptr,
+                               node_ptr);
 
 /*!
   \brief Computes the COI of a given expression
@@ -1067,10 +1017,9 @@ Formulae_GetDependencies(const SymbTable_ptr, node_ptr, node_ptr,
    is set to true.
 */
 Set_t ComputeCOIFixpoint(const SymbTable_ptr symb_table,
-                                const FlatHierarchy_ptr hierarchy,
-                                const Expr_ptr expression,
-                                const int steps,
-                                boolean* reached_fixpoint);
+                         const FlatHierarchy_ptr hierarchy,
+                         const Expr_ptr expression, const int steps,
+                         boolean *reached_fixpoint);
 
 /*!
   \brief Computes the COI of a given set of variables, defined
@@ -1079,8 +1028,7 @@ Set_t ComputeCOIFixpoint(const SymbTable_ptr symb_table,
   Computes the COI of a given set of variables, defined
    within the given hierarchy. Returned Set must be disposed by the caller
 */
-Set_t ComputeCOI(const SymbTable_ptr,
-                        const FlatHierarchy_ptr, Set_t);
+Set_t ComputeCOI(const SymbTable_ptr, const FlatHierarchy_ptr, Set_t);
 
 /*!
   \brief Gets the flattened version of an atom.
@@ -1093,9 +1041,8 @@ Set_t ComputeCOI(const SymbTable_ptr,
   \se The <tt>flatten_def_hash</tt> is modified in
    order to memoize previously computed definition expansion.
 */
-node_ptr
-Flatten_GetDefinition(const SymbTable_ptr symb_table, node_ptr atom,
-                      const boolean expand_defines);
+node_ptr Flatten_GetDefinition(const SymbTable_ptr symb_table, node_ptr atom,
+                               const boolean expand_defines);
 
 /*!
   \brief Resets the hashed information about the given symbol
@@ -1117,9 +1064,8 @@ void Flatten_remove_symbol_info(const NuSMVEnv_ptr env, node_ptr name);
   Takes a list of values and returns the same
    list being normalised
 */
-node_ptr
-CompileFlatten_normalise_value_list(const NuSMVEnv_ptr env,
-                                    node_ptr old_value_list);
+node_ptr CompileFlatten_normalise_value_list(const NuSMVEnv_ptr env,
+                                             node_ptr old_value_list);
 
 /*!
   \brief convert a type from node_ptr-form constructed by parser
@@ -1143,11 +1089,10 @@ CompileFlatten_normalise_value_list(const NuSMVEnv_ptr env,
 
    NOTE: An invoker has to free the returned type.
 */
-SymbType_ptr
-Compile_InstantiateType(SymbTable_ptr st, SymbLayer_ptr layer,
-                        node_ptr name, node_ptr type,
-                        node_ptr context,
-                        boolean expand_bounded_arrays);
+SymbType_ptr Compile_InstantiateType(SymbTable_ptr st, SymbLayer_ptr layer,
+                                     node_ptr name, node_ptr type,
+                                     node_ptr context,
+                                     boolean expand_bounded_arrays);
 
 /*!
   \brief Instantiates the given variable.
@@ -1173,11 +1118,10 @@ Compile_InstantiateType(SymbTable_ptr st, SymbLayer_ptr layer,
 
   \sa compile_instantiate_var
 */
-boolean
-Compile_DeclareVariable(SymbTable_ptr symb_table, SymbLayer_ptr layer,
-                        node_ptr name, SymbType_ptr type,
-                        node_ptr context,
-                        Instantiation_Variables_Mode_Type mode);
+boolean Compile_DeclareVariable(SymbTable_ptr symb_table, SymbLayer_ptr layer,
+                                node_ptr name, SymbType_ptr type,
+                                node_ptr context,
+                                Instantiation_Variables_Mode_Type mode);
 
 /*!
   \brief Instantiates the given function.
@@ -1199,19 +1143,18 @@ Compile_DeclareVariable(SymbTable_ptr symb_table, SymbLayer_ptr layer,
 
   \sa compile_instantiate_fun
 */
-boolean
-Compile_DeclareFunction(SymbTable_ptr symb_table, SymbLayer_ptr layer,
-                        node_ptr name, SymbType_ptr type,
-                        node_ptr context,
-                        Instantiation_Functions_Mode_Type mode);
+boolean Compile_DeclareFunction(SymbTable_ptr symb_table, SymbLayer_ptr layer,
+                                node_ptr name, SymbType_ptr type,
+                                node_ptr context,
+                                Instantiation_Functions_Mode_Type mode);
 
 /*!
   \brief
 
   Returns a node COLON(NUMBER count, NUMBER depth)
 */
-node_ptr Compile_make_dag_info(const NuSMVEnv_ptr env,
-                                      node_ptr expr, hash_ptr hash);
+node_ptr Compile_make_dag_info(const NuSMVEnv_ptr env, node_ptr expr,
+                               hash_ptr hash);
 
 /*!
   \brief Top level function to create dags from expressions
@@ -1219,10 +1162,8 @@ node_ptr Compile_make_dag_info(const NuSMVEnv_ptr env,
 
 */
 node_ptr Compile_convert_to_dag(const NuSMVEnv_ptr env,
-                                       SymbTable_ptr symb_table,
-                                       node_ptr expr,
-                                       hash_ptr hash,
-                                       hash_ptr defines);
+                                SymbTable_ptr symb_table, node_ptr expr,
+                                hash_ptr hash, hash_ptr defines);
 
 /*!
   \brief Dumps to the given file the DEFINEs that had been created by
@@ -1230,8 +1171,8 @@ node_ptr Compile_convert_to_dag(const NuSMVEnv_ptr env,
 
   \sa Compile_declare_dag_defines_in_layer
 */
-void Compile_write_dag_defines(const NuSMVEnv_ptr env,
-                               FILE* out, hash_ptr defines);
+void Compile_write_dag_defines(const NuSMVEnv_ptr env, FILE *out,
+                               hash_ptr defines);
 
 /*!
   \brief Declares to the given layer the DEFINEs that had been created
@@ -1263,14 +1204,13 @@ void Compile_write_dag_defines(const NuSMVEnv_ptr env,
 void Compile_declare_dag_defines_in_layer(SymbLayer_ptr layer,
                                           hash_ptr defines);
 
-
 /*!
   \brief Frees the content of given structures.
 
   Warning: the hashes are not freed, only the content
 */
-void Compile_destroy_dag_info(const NuSMVEnv_ptr env,
-                                     hash_ptr dag_info, hash_ptr defines);
+void Compile_destroy_dag_info(const NuSMVEnv_ptr env, hash_ptr dag_info,
+                              hash_ptr defines);
 
 /*!
   \brief Prints an array define node to out file.
@@ -1281,7 +1221,8 @@ void Compile_destroy_dag_info(const NuSMVEnv_ptr env,
    TODO[AT] remove this function.
 
 */
-void Compile_print_array_define(const NuSMVEnv_ptr env, FILE* out, const node_ptr n);
+void Compile_print_array_define(const NuSMVEnv_ptr env, FILE *out,
+                                const node_ptr n);
 
 /*!
   \brief Creates and fills an HrcNode (and all children) reading
@@ -1293,9 +1234,8 @@ void Compile_print_array_define(const NuSMVEnv_ptr env, FILE* out, const node_pt
   \se None
 */
 HrcNode_ptr Compile_hrc_from_parse_tree(const NuSMVEnv_ptr env,
-                                               NodeMgr_ptr nomgr,
-                                               node_ptr mod_name,
-                                               node_ptr parse_tree);
+                                        NodeMgr_ptr nomgr, node_ptr mod_name,
+                                        node_ptr parse_tree);
 
 /*!
   \brief Given a module definition body, fills the given HrcNode
@@ -1306,11 +1246,9 @@ HrcNode_ptr Compile_hrc_from_parse_tree(const NuSMVEnv_ptr env,
 
   \se None
 */
-void Compile_fill_hrc_from_mod_body(const NuSMVEnv_ptr env,
-                                           NodeMgr_ptr nomgr,
-                                           node_ptr mod_body,
-                                           HrcNode_ptr hrc_result,
-                                           hash_ptr mod_defs);
+void Compile_fill_hrc_from_mod_body(const NuSMVEnv_ptr env, NodeMgr_ptr nomgr,
+                                    node_ptr mod_body, HrcNode_ptr hrc_result,
+                                    hash_ptr mod_defs);
 
 /* directly or indirectly called by commmands */
 
@@ -1323,22 +1261,19 @@ void Compile_fill_hrc_from_mod_body(const NuSMVEnv_ptr env,
 
   \se
 */
-int
-CompileFlatten_flatten_smv(NuSMVEnv_ptr env,
-                           boolean calc_vars_constrains,
-                           boolean expand_bounded_arrays);
+int CompileFlatten_flatten_smv(NuSMVEnv_ptr env, boolean calc_vars_constrains,
+                               boolean expand_bounded_arrays);
 
 /*!
   \brief
 
 
 */
-void
-Compile_show_vars(const NuSMVEnv_ptr env, const boolean total_only,
-                 const boolean defs_only, const boolean vars_only,
-                 const boolean statevars, const boolean frozenvars,
-                 const boolean inputvars, const OStream_ptr ostream,
-                 const boolean verbose);
+void Compile_show_vars(const NuSMVEnv_ptr env, const boolean total_only,
+                       const boolean defs_only, const boolean vars_only,
+                       const boolean statevars, const boolean frozenvars,
+                       const boolean inputvars, const OStream_ptr ostream,
+                       const boolean verbose);
 
 /*!
   \brief Writes a flat and boolean model of a given SMV file
@@ -1346,8 +1281,7 @@ Compile_show_vars(const NuSMVEnv_ptr env, const boolean total_only,
   Writes a flat and boolean model of a given SMV file
 */
 int Compile_write_model_flat_bool(const NuSMVEnv_ptr env,
-                                         const char* output_file,
-                                         FILE* ofileid);
+                                  const char *output_file, FILE *ofileid);
 
 /*!
   \brief print predicates
@@ -1389,37 +1323,33 @@ int Compile_create_boolean_model(NuSMVEnv_ptr env);
   Removes expression in the form "a := b" from the given
    expression. The new expression is returned
 */
-Expr_ptr
-Compile_remove_assignments(const NuSMVEnv_ptr env, Expr_ptr expr);
+Expr_ptr Compile_remove_assignments(const NuSMVEnv_ptr env, Expr_ptr expr);
 
 /*!
   \brief Dumps the model applied to COI for the given property
 
   Dumps the model applied to COI for the given property
 */
-void Compile_write_coi_prop_fsm(const NuSMVEnv_ptr env,
-                                       FlatHierarchy_ptr fh,
-                                       Set_t cone, Set_t props,
-                                       OStream_ptr output_file);
+void Compile_write_coi_prop_fsm(const NuSMVEnv_ptr env, FlatHierarchy_ptr fh,
+                                Set_t cone, Set_t props,
+                                OStream_ptr output_file);
 
 /*!
   \brief Dumps the COI for the given property
 
   Dumps the COI for the given property
 */
-void Compile_write_coi_prop(const NuSMVEnv_ptr env,
-                                   Set_t cone, Set_t props,
-                                   OStream_ptr output_file);
+void Compile_write_coi_prop(const NuSMVEnv_ptr env, Set_t cone, Set_t props,
+                            OStream_ptr output_file);
 
 /*!
   \brief
 
 
 */
-void Compile_print_summary(const NuSMVEnv_ptr env,
-                                  OStream_ptr file, SymbTable_ptr st,
-                                  NodeList_ptr list, const char * str,
-                                  boolean limit_output);
+void Compile_print_summary(const NuSMVEnv_ptr env, OStream_ptr file,
+                           SymbTable_ptr st, NodeList_ptr list, const char *str,
+                           boolean limit_output);
 
 /*!
   \brief Computes the total bit number of symbols in the given
@@ -1437,10 +1367,8 @@ int Compile_get_bits(const SymbTable_ptr st, const NodeList_ptr lst);
    by type using prop_type: if prop_type == Prop_NoType,
    all properties are used
 */
-void Compile_write_global_coi_fsm(NuSMVEnv_ptr env,
-                                         FlatHierarchy_ptr hierarchy,
-                                         Prop_Type prop_type,
-                                         OStream_ptr output_file);
+void Compile_write_global_coi_fsm(NuSMVEnv_ptr env, FlatHierarchy_ptr hierarchy,
+                                  Prop_Type prop_type, OStream_ptr output_file);
 
 /*!
   \brief Dumps properties shared COI FSMs or sets
@@ -1454,11 +1382,9 @@ void Compile_write_global_coi_fsm(NuSMVEnv_ptr env,
    type using prop_type: if prop_type ==
    Prop_NoType, all properties are used
 */
-int Compile_write_properties_coi(NuSMVEnv_ptr env,
-                                        FlatHierarchy_ptr hierarchy,
-                                        Prop_Type prop_type,
-                                        boolean only_dump_coi,
-                                        const char* file_name);
+int Compile_write_properties_coi(NuSMVEnv_ptr env, FlatHierarchy_ptr hierarchy,
+                                 Prop_Type prop_type, boolean only_dump_coi,
+                                 const char *file_name);
 
 /*!
   \brief Prints the given type to the given stream
@@ -1476,9 +1402,8 @@ int Compile_write_properties_coi(NuSMVEnv_ptr env,
    TODO[MR]: Possibly to extend with other types
 
 */
-void Compile_print_type(const NuSMVEnv_ptr env,
-                               OStream_ptr file, node_ptr ntype,
-                               int threshold);
+void Compile_print_type(const NuSMVEnv_ptr env, OStream_ptr file,
+                        node_ptr ntype, int threshold);
 
 /*!
   \brief Creates an internal representaion of the symbol type
@@ -1493,8 +1418,7 @@ void Compile_print_type(const NuSMVEnv_ptr env,
    TODO[MR]: Possibly to extend with other types
 
 */
-node_ptr Compile_get_var_type(const NuSMVEnv_ptr env,
-                                     SymbType_ptr type);
+node_ptr Compile_get_var_type(const NuSMVEnv_ptr env, SymbType_ptr type);
 
 /*!
   \brief Prints the flatten version of FSM of an SMV model.
@@ -1508,12 +1432,11 @@ node_ptr Compile_get_var_type(const NuSMVEnv_ptr env,
    obtained from the symbol table. fsm_name is a name of the output
    structure, usually it is "MODULE main".
 */
-void Compile_WriteFlattenFsm_udg(const NuSMVEnv_ptr env,
-                                        FILE* out,
-                                        const SymbTable_ptr st,
-                                        const array_t* layer_names,
-                                        const char* fsm_name,
-                                        FlatHierarchy_ptr hierarchy);
+void Compile_WriteFlattenFsm_udg(const NuSMVEnv_ptr env, FILE *out,
+                                 const SymbTable_ptr st,
+                                 const array_t *layer_names,
+                                 const char *fsm_name,
+                                 FlatHierarchy_ptr hierarchy);
 
 /*!
   \brief Prints the given flatten specifications.
@@ -1521,22 +1444,19 @@ void Compile_WriteFlattenFsm_udg(const NuSMVEnv_ptr env,
   Prints into the specified file the flatten
    specifications.
 */
-void Compile_WriteFlattenSpecs_udg(const NuSMVEnv_ptr env,
-                                          FILE* out,
-                                          const SymbTable_ptr st,
-                                          FlatHierarchy_ptr hierarchy);
+void Compile_WriteFlattenSpecs_udg(const NuSMVEnv_ptr env, FILE *out,
+                                   const SymbTable_ptr st,
+                                   FlatHierarchy_ptr hierarchy);
 
 /*!
   \brief Prints the given boolean model
 
 
 */
-void Compile_WriteBoolModel_udg(const NuSMVEnv_ptr env,
-                                       FILE* out,
-                                       BddEnc_ptr enc,
-                                       NodeList_ptr layers,
-                                       const char* fsm_name,
-                                       BoolSexpFsm_ptr bool_sexp_fsm);
+void Compile_WriteBoolModel_udg(const NuSMVEnv_ptr env, FILE *out,
+                                BddEnc_ptr enc, NodeList_ptr layers,
+                                const char *fsm_name,
+                                BoolSexpFsm_ptr bool_sexp_fsm);
 
 /*!
   \brief Prints the boolean FSM of an SMV model.
@@ -1548,10 +1468,10 @@ void Compile_WriteBoolModel_udg(const NuSMVEnv_ptr env,
    usually this parameter is a list of all layers committed to enc. The array
    should be ended by a NULL element.
 */
-void Compile_WriteBoolFsm_udg(const NuSMVEnv_ptr env,
-                                     FILE* out, const SymbTable_ptr st,
-                                     NodeList_ptr layers, const char* fsm_name,
-                                     BoolSexpFsm_ptr bool_sexp_fsm);
+void Compile_WriteBoolFsm_udg(const NuSMVEnv_ptr env, FILE *out,
+                              const SymbTable_ptr st, NodeList_ptr layers,
+                              const char *fsm_name,
+                              BoolSexpFsm_ptr bool_sexp_fsm);
 
 /*!
   \brief Prints the boolean specifications of an SMV model.
@@ -1565,17 +1485,16 @@ void Compile_WriteBoolFsm_udg(const NuSMVEnv_ptr env,
    after the specs.
 
 */
-void Compile_WriteBoolSpecs_udg(const NuSMVEnv_ptr env, FILE* out,
-                                       BddEnc_ptr enc,
-                                       FlatHierarchy_ptr hierarchy);
+void Compile_WriteBoolSpecs_udg(const NuSMVEnv_ptr env, FILE *out,
+                                BddEnc_ptr enc, FlatHierarchy_ptr hierarchy);
 
 /*!
   \brief
 
   Returns a node COLON(NUMBER count, NUMBER depth)
 */
-node_ptr Compile_make_dag_info_udg(const NuSMVEnv_ptr env,
-                                          node_ptr expr, hash_ptr hash);
+node_ptr Compile_make_dag_info_udg(const NuSMVEnv_ptr env, node_ptr expr,
+                                   hash_ptr hash);
 
 /*!
   \brief Top level function to create dags from expressions
@@ -1583,10 +1502,8 @@ node_ptr Compile_make_dag_info_udg(const NuSMVEnv_ptr env,
 
 */
 node_ptr Compile_convert_to_dag_udg(const NuSMVEnv_ptr env,
-                                           SymbTable_ptr symb_table,
-                                           node_ptr expr,
-                                           hash_ptr dag_hash,
-                                           hash_ptr defines);
+                                    SymbTable_ptr symb_table, node_ptr expr,
+                                    hash_ptr dag_hash, hash_ptr defines);
 
 /*!
   \brief Prints a array define node to out file.
@@ -1594,9 +1511,8 @@ node_ptr Compile_convert_to_dag_udg(const NuSMVEnv_ptr env,
   Prints a array define node to out file.
    This function is exported so the hrc package can use it.
 */
-void Compile_print_array_define_udg(const NuSMVEnv_ptr env,
-                                           FILE* out,
-                                           const node_ptr n);
+void Compile_print_array_define_udg(const NuSMVEnv_ptr env, FILE *out,
+                                    const node_ptr n);
 
 /* Moved here because it is called from Hycomp */
 
@@ -1623,13 +1539,10 @@ void Compile_print_array_define_udg(const NuSMVEnv_ptr env,
    create_process_variables enables creation of process variables.
 
 */
-void Compile_ProcessHierarchy(const NuSMVEnv_ptr env,
-                                     SymbTable_ptr symb_table,
-                                     SymbLayer_ptr layer,
-                                     FlatHierarchy_ptr hierachy,
-                                     node_ptr name,
-                                     boolean create_process_variables,
-                                     boolean calc_vars_constr);
+void Compile_ProcessHierarchy(const NuSMVEnv_ptr env, SymbTable_ptr symb_table,
+                              SymbLayer_ptr layer, FlatHierarchy_ptr hierachy,
+                              node_ptr name, boolean create_process_variables,
+                              boolean calc_vars_constr);
 
 /*!
   \brief Prints usage statistic.
@@ -1648,18 +1561,14 @@ int Compile_print_usage(NuSMVEnv_ptr env, OStream_ptr file);
 
   if "printPreds" it prints also the predicates of the fsm
 */
-int Compile_print_fsm_stats(NuSMVEnv_ptr env,
-                                   BddFsm_ptr fsm,
-                                   FILE* outstream,
-                                   boolean printPreds);
+int Compile_print_fsm_stats(NuSMVEnv_ptr env, BddFsm_ptr fsm, FILE *outstream,
+                            boolean printPreds);
 
 /* not declared b/c these are supposed to be used by the Python
    wrapper */
-int Compile_encode_variables(NuSMVEnv_ptr env,
-                             char* input_order_file_name,
+int Compile_encode_variables(NuSMVEnv_ptr env, char *input_order_file_name,
                              boolean bdd_enc_enum_only);
-int Compile_build_model(NuSMVEnv_ptr env,
-                        TransType partition_method);
+int Compile_build_model(NuSMVEnv_ptr env, TransType partition_method);
 
 /*!
   \brief Checks if the flattening has been carried out
@@ -1668,8 +1577,7 @@ int Compile_build_model(NuSMVEnv_ptr env,
   not NULL, an error message is also printed out to it (typically, you
   will use errstream)
 */
-int Compile_check_if_flattening_was_built(const NuSMVEnv_ptr env,
-                                                 FILE* err);
+int Compile_check_if_flattening_was_built(const NuSMVEnv_ptr env, FILE *err);
 
 /*!
   \brief Checks if the variables enconding has been constructed
@@ -1678,8 +1586,7 @@ int Compile_check_if_flattening_was_built(const NuSMVEnv_ptr env,
   not NULL, an error message is also printed out to it (typically, you
   will use errstream)
 */
-int Compile_check_if_encoding_was_built(const NuSMVEnv_ptr env,
-                                               FILE* err);
+int Compile_check_if_encoding_was_built(const NuSMVEnv_ptr env, FILE *err);
 
 /*!
   \brief Checks if the encoding really committed the
@@ -1689,7 +1596,7 @@ int Compile_check_if_encoding_was_built(const NuSMVEnv_ptr env,
   err can be NULL if the function does not have to produce an output
 */
 int Compile_check_if_model_layer_is_in_bddenc(const NuSMVEnv_ptr env,
-                                                     FILE* err);
+                                              FILE *err);
 
 /*!
   \brief Checks if flat model has been constructed
@@ -1699,9 +1606,8 @@ int Compile_check_if_model_layer_is_in_bddenc(const NuSMVEnv_ptr env,
   will use errstream). If forced is true, than the model is
   requested to be built even when COI is enabled.
 */
-int Compile_check_if_flat_model_was_built(const NuSMVEnv_ptr env,
-                                                 FILE* err,
-                                                 boolean forced);
+int Compile_check_if_flat_model_was_built(const NuSMVEnv_ptr env, FILE *err,
+                                          boolean forced);
 
 /*!
   \brief Checks if boolean model has been constructed
@@ -1711,9 +1617,8 @@ int Compile_check_if_flat_model_was_built(const NuSMVEnv_ptr env,
   will use errstream). If forced is true, thatn the model is
   requested to be built even when COI is enabled.
 */
-int Compile_check_if_bool_model_was_built(const NuSMVEnv_ptr env,
-                                                 FILE* err,
-                                                 boolean forced);
+int Compile_check_if_bool_model_was_built(const NuSMVEnv_ptr env, FILE *err,
+                                          boolean forced);
 
 /*!
   \brief Checks if bdd model has been constructed
@@ -1723,8 +1628,7 @@ int Compile_check_if_bool_model_was_built(const NuSMVEnv_ptr env,
   will use errstream). Use this function from commands that require
   the model to be constructed for being executed.
 */
-int Compile_check_if_model_was_built(const NuSMVEnv_ptr env,
-                                            FILE* err,
-                                            boolean forced);
+int Compile_check_if_model_was_built(const NuSMVEnv_ptr env, FILE *err,
+                                     boolean forced);
 
 #endif /* __NUSMV_CORE_COMPILE_COMPILE_H__ */

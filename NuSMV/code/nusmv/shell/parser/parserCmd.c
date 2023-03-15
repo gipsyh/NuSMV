@@ -35,9 +35,8 @@
 
 */
 
-
-#include "nusmv/shell/cmd/cmd.h"
 #include "nusmv/shell/parser/parserCmd.h"
+#include "nusmv/shell/cmd/cmd.h"
 
 #include "nusmv/core/compile/compile.h"
 #include "nusmv/core/parser/parser.h"
@@ -55,14 +54,13 @@ extern cmp_struct_ptr cmps;
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 static int UsageReadModel(const NuSMVEnv_ptr env);
-static int CommandReadModel(NuSMVEnv_ptr env, int argc, char** argv);
+static int CommandReadModel(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 /* WARNING [MD] quit function missing */
-void Parser_Cmd_init(NuSMVEnv_ptr const env)
-{
+void Parser_Cmd_init(NuSMVEnv_ptr const env) {
   Cmd_CommandAdd(env, "read_model", CommandReadModel, 0, true);
 }
 
@@ -86,47 +84,52 @@ void Parser_Cmd_init(NuSMVEnv_ptr const env)
   </dl>
 */
 
-static int CommandReadModel(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int CommandReadModel(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   int c;
-  char* i_file = (char*)NULL;
+  char *i_file = (char *)NULL;
   int res = 1;
 
   util_getopt_reset();
-  while((c = util_getopt(argc,argv,"hi:")) != EOF){
-    switch(c){
+  while ((c = util_getopt(argc, argv, "hi:")) != EOF) {
+    switch (c) {
     case 'i': {
       /* -i already specified */
-      if ((char*)NULL != i_file) { goto read_model_usage; }
+      if ((char *)NULL != i_file) {
+        goto read_model_usage;
+      }
 
       i_file = util_strsav(util_optarg);
       break;
     }
-    case 'h': goto read_model_usage;
-    default: goto read_model_usage;
+    case 'h':
+      goto read_model_usage;
+    default:
+      goto read_model_usage;
     }
   }
 
-  if (argc != util_optind) { goto read_model_usage; }
+  if (argc != util_optind) {
+    goto read_model_usage;
+  }
 
   if (cmp_struct_get_read_model(cmps)) {
     StreamMgr_print_error(streams,
-            "A model appears to be already read from file: %s.\n",
-            get_input_file(opts));
+                          "A model appears to be already read from file: %s.\n",
+                          get_input_file(opts));
     goto read_model_free;
   }
 
   /* NULL input files are allowed in batch mode (that calls this
      command) when reading from stdin */
-  if (NULL == i_file &&
-      get_input_file(opts) == (char*)NULL &&
+  if (NULL == i_file && get_input_file(opts) == (char *)NULL &&
       !opt_batch(opts)) {
-    StreamMgr_print_error(streams,
-            "Input file is (null). You must set the input file before.\n");
+    StreamMgr_print_error(
+        streams, "Input file is (null). You must set the input file before.\n");
     goto read_model_free;
   }
 
@@ -134,11 +137,11 @@ static int CommandReadModel(NuSMVEnv_ptr env, int argc, char** argv)
 
   goto read_model_free;
 
- read_model_usage:
+read_model_usage:
   res = UsageReadModel(env);
 
- read_model_free:
-  if ((char*)NULL != i_file) {
+read_model_free:
+  if ((char *)NULL != i_file) {
     FREE(i_file);
   }
 
@@ -154,11 +157,12 @@ static int CommandReadModel(NuSMVEnv_ptr env, int argc, char** argv)
 
   \sa optional
 */
-static int UsageReadModel(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "usage: read_model [-h] [-i <file>]\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "   -i <file> \tReads the model from the specified <file>.\n");
-  return(1);
+static int UsageReadModel(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(streams, "usage: read_model [-h] [-i <file>]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  StreamMgr_print_error(
+      streams, "   -i <file> \tReads the model from the specified <file>.\n");
+  return (1);
 }

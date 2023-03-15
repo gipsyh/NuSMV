@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,36 +36,31 @@
 */
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
+#include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/portability.h"
 #include "nusmv/core/utils/ucmd.h"
-#include "nusmv/core/utils/error.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -75,16 +70,14 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void apply_string_macro_expansion(const SubstString* const subst,
-				  char* string, size_t buf_len)
-{
+void apply_string_macro_expansion(const SubstString *const subst, char *string,
+                                  size_t buf_len) {
   static char szSubst[256];
-  char* szSymbolPos = NULL;
+  char *szSymbolPos = NULL;
   size_t string_len = strlen(string);
   int c = 0;
 
@@ -92,9 +85,9 @@ void apply_string_macro_expansion(const SubstString* const subst,
 
   /* substitutes all symbols in input string, forall symbols: */
   szSymbolPos = strstr(string, subst->symbol);
-  while(szSymbolPos != NULL) {
+  while (szSymbolPos != NULL) {
     /* applies format: */
-    switch(subst->value.type) {
+    switch (subst->value.type) {
     case sv_string:
       c = snprintf(szSubst, sizeof(szSubst), subst->format,
                    subst->value.assign.string);
@@ -126,13 +119,13 @@ void apply_string_macro_expansion(const SubstString* const subst,
     {
       /* now substitutes the symbol with the string: */
       size_t symbol_len = strlen(subst->symbol);
-      size_t subst_len  = strlen(szSubst);
-      char*  moveTo   = szSymbolPos+subst_len;
-      char*  moveFrom = szSymbolPos+symbol_len;
+      size_t subst_len = strlen(szSubst);
+      char *moveTo = szSymbolPos + subst_len;
+      char *moveFrom = szSymbolPos + symbol_len;
 
       /* prepare space for subst: */
-      memmove( moveTo, moveFrom, string_len - (moveFrom - string) + 1 );
-      string_len += (subst_len-symbol_len);
+      memmove(moveTo, moveFrom, string_len - (moveFrom - string) + 1);
+      string_len += (subst_len - symbol_len);
 
       /* substitutes the symbol :*/
       memcpy(szSymbolPos, szSubst, subst_len);
@@ -143,18 +136,16 @@ void apply_string_macro_expansion(const SubstString* const subst,
   } /* end of search for the single symbol */
 }
 
-int util_str2int(const char* str, int* value)
-{
+int util_str2int(const char *str, int *value) {
   int res = 1;
-  char* error_pos = NIL(char);
+  char *error_pos = NIL(char);
   long dummy;
 
   dummy = strtol(str, &error_pos, 10);
 
-  if ( (str != NIL(char)) && (error_pos == NULL ||
-                              error_pos == (str+strlen(str)) ||
-                              *error_pos == ' ' ||
-                              *error_pos == '\t') ) {
+  if ((str != NIL(char)) &&
+      (error_pos == NULL || error_pos == (str + strlen(str)) ||
+       *error_pos == ' ' || *error_pos == '\t')) {
 
     /* conversion has been succesfully carried out */
     res = 0;
@@ -162,7 +153,7 @@ int util_str2int(const char* str, int* value)
     /* as an additional check, verify that the value can fit into an
        ordinary int */
 /* warning [MD] on 32 bit, INT_MIN == LONG_MIN, so the test is always false */
-#if ! ((INT_MIN == LONG_MIN) && (INT_MAX == LONG_MAX))
+#if !((INT_MIN == LONG_MIN) && (INT_MAX == LONG_MAX))
     if ((dummy < INT_MIN) || (INT_MAX < dummy)) {
       res = 1;
     }
@@ -174,61 +165,58 @@ int util_str2int(const char* str, int* value)
   return res;
 }
 
-int util_str2int_incr(const char* str, char **endptr, int* out)
-{
-  long tmp; /* required by strtol */
+int util_str2int_incr(const char *str, char **endptr, int *out) {
+  long tmp;    /* required by strtol */
   int res = 0; /* no error */
 
-  errno = 0;    /* To distinguish success/failure after call */
+  errno = 0; /* To distinguish success/failure after call */
   tmp = strtol(str, endptr, 10);
 
   /* Check for various possible errors */
 
-  if ((errno == ERANGE && (tmp == LONG_MAX || tmp == LONG_MIN))
-      || (errno != 0 && tmp == 0)) {
-    res = 1; goto leave;
+  if ((errno == ERANGE && (tmp == LONG_MAX || tmp == LONG_MIN)) ||
+      (errno != 0 && tmp == 0)) {
+    res = 1;
+    goto leave;
   }
 
   /* as an additional check, verify that the value can fit into an
      ordinary int */
   /* warning [MD] on 32 bit, INT_MIN == LONG_MIN, so the test is always false */
-#if ! ((INT_MIN == LONG_MIN) && (INT_MAX == LONG_MAX))
+#if !((INT_MIN == LONG_MIN) && (INT_MAX == LONG_MAX))
   if ((tmp < INT_MIN) || (INT_MAX < tmp)) {
-    res = 1; goto leave;
+    res = 1;
+    goto leave;
   }
 #endif
 
   /* here tmp can be safely cast to int */
   (*out) = (int)(tmp);
 
- leave:
+leave:
   return res;
 } /* util_str2int */
 
-int util_is_string_null(const char* string)
-{
+int util_is_string_null(const char *string) {
   int ret = 0;
-  if (string == (char*)NULL) ret = 1;
+  if (string == (char *)NULL)
+    ret = 1;
   else {
-    if (strcmp(string, "") == 0) ret = 1;
+    if (strcmp(string, "") == 0)
+      ret = 1;
     else {
-      if (strcmp(string, OPT_USER_POV_NULL_STRING) == 0) ret = 1;
+      if (strcmp(string, OPT_USER_POV_NULL_STRING) == 0)
+        ret = 1;
     }
   }
 
   return ret;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
-

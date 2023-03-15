@@ -3,7 +3,7 @@
 
   This file is part of the ``required'' package.
   %COPYRIGHT%
-  
+
 
 -----------------------------------------------------------------------------*/
 
@@ -15,7 +15,6 @@
 
 */
 
-
 #ifndef __NUSMV_SHELL_CMD_CMD_CMD_H__
 #define __NUSMV_SHELL_CMD_CMD_CMD_H__
 
@@ -25,31 +24,26 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
-//used to import command help list from cmdHelp.c
+// used to import command help list from cmdHelp.c
 typedef struct command_item_TAG {
-      const char* command_name;
-      const char* command_description;
+  const char *command_name;
+  const char *command_description;
 } command_item;
 
 extern command_item command_help[];
 extern int command_number;
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -60,7 +54,7 @@ extern int command_number;
 
   \todo Missing description
 */
-#define ENV_CMD_HELP           "CMD_HELP"
+#define ENV_CMD_HELP "CMD_HELP"
 
 /**AutomaticStart*************************************************************/
 
@@ -69,37 +63,38 @@ extern int command_number;
 /*---------------------------------------------------------------------------*/
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
-char* cmd_help_get(NuSMVEnv_ptr env, char* command_name);
+char *cmd_help_get(NuSMVEnv_ptr env, char *command_name);
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
-void cmd_help_add(NuSMVEnv_ptr env, const char* command_name, const char* command_description);
+void cmd_help_add(NuSMVEnv_ptr env, const char *command_name,
+                  const char *command_description);
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
-void cmd_help_remove(NuSMVEnv_ptr env, char* command_name);
+void cmd_help_remove(NuSMVEnv_ptr env, char *command_name);
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 void Cmd_init_cmd(NuSMVEnv_ptr env);
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 void Cmd_quit_cmd(NuSMVEnv_ptr env);
 
@@ -110,7 +105,7 @@ void Cmd_quit_cmd(NuSMVEnv_ptr env);
 
   Prints a message and returns error
 */
-int Cmd_command_not_available(NuSMVEnv_ptr env, int argc, char** argv);
+int Cmd_command_not_available(NuSMVEnv_ptr env, int argc, char **argv);
 
 /**AutomaticEnd***************************************************************/
 

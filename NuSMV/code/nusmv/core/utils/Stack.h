@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -45,14 +45,14 @@
 /*!
   \brief Implementation of Stack class
 
-  
+
 */
 
 struct Stack_TAG {
   size_t allocated;
   size_t index;
 
-  void** array;
+  void **array;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -66,23 +66,21 @@ struct Stack_TAG {
   \todo Missing description
 */
 typedef struct Stack_TAG Stack;
-typedef struct Stack_TAG* Stack_ptr;
+typedef struct Stack_TAG *Stack_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define STACK(x) \
-         ((Stack_ptr) x)
+#define STACK(x) ((Stack_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define STACK_CHECK_INSTANCE(x) \
-         ( nusmv_assert(STACK(x) != STACK(NULL)) )
+#define STACK_CHECK_INSTANCE(x) (nusmv_assert(STACK(x) != STACK(NULL)))
 
 /*!
   \brief \todo Missing synopsis
@@ -104,15 +102,15 @@ typedef struct Stack_TAG* Stack_ptr;
 
 /*!
   \methodof Stack
-  \brief Creates an instance of a Stack 
+  \brief Creates an instance of a Stack
 
-  
+
 */
 Stack_ptr Stack_create(void);
 
 /*!
   \methodof Stack
-  \brief Creates an instance of a Stack 
+  \brief Creates an instance of a Stack
 
   Allow the user to define the initial size
 */
@@ -132,7 +130,7 @@ void Stack_destroy(Stack_ptr self);
   \methodof Stack
   \brief Creates a copy of a given stack
 
-  
+
 */
 Stack_ptr Stack_copy(Stack_ptr self);
 
@@ -140,11 +138,11 @@ Stack_ptr Stack_copy(Stack_ptr self);
   \methodof Stack
   \brief Pushes an element at the top of the stack
 
-  
+
 
   \sa Stack_pop
 */
-void Stack_push(Stack_ptr self, void* element);
+void Stack_push(Stack_ptr self, void *element);
 
 /*!
   \methodof Stack
@@ -154,23 +152,23 @@ void Stack_push(Stack_ptr self, void* element);
 
   \sa Stack_push
 */
-void* Stack_pop(Stack_ptr self);
+void *Stack_pop(Stack_ptr self);
 
 /*!
   \methodof Stack
   \brief Returns the element at the top of the stack
 
-  
+
 
   \sa Stack_pop
 */
-void* Stack_top(Stack_ptr self);
+void *Stack_top(Stack_ptr self);
 
 /*!
   \methodof Stack
   \brief Returns true iff the stack is empty
 
-  
+
 */
 boolean Stack_is_empty(Stack_ptr self);
 
@@ -178,7 +176,7 @@ boolean Stack_is_empty(Stack_ptr self);
   \methodof Stack
   \brief Returns the size of the stack
 
-  
+
 */
 size_t Stack_get_size(Stack_ptr self);
 

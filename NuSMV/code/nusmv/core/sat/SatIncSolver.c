@@ -38,10 +38,10 @@
 
 ******************************************************************************/
 
+#include "nusmv/core/sat/SatIncSolver_private.h"
+#include "nusmv/core/sat/satInt.h" /* just for 'options' */
 #include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/utils/error.h"
-#include "nusmv/core/sat/satInt.h" /* just for 'options' */
-#include "nusmv/core/sat/SatIncSolver_private.h"
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
@@ -59,36 +59,29 @@ static void sat_inc_solver_finalize(Object_ptr object, void *dummy);
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void SatIncSolver_destroy(SatIncSolver_ptr self)
-{
+void SatIncSolver_destroy(SatIncSolver_ptr self) {
   SatSolver_destroy(SAT_SOLVER(self));
 }
 
-SatSolverGroup
-SatIncSolver_create_group(const SatIncSolver_ptr self)
-{
+SatSolverGroup SatIncSolver_create_group(const SatIncSolver_ptr self) {
   SAT_INC_SOLVER_CHECK_INSTANCE(self);
   return self->create_group(self);
 }
 
-void
-SatIncSolver_destroy_group(const SatIncSolver_ptr self, SatSolverGroup group)
-{
+void SatIncSolver_destroy_group(const SatIncSolver_ptr self,
+                                SatSolverGroup group) {
   SAT_INC_SOLVER_CHECK_INSTANCE(self);
   self->destroy_group(self, group);
 }
 
-void
-SatIncSolver_move_to_permanent_and_destroy_group(const SatIncSolver_ptr self,
-                                                 SatSolverGroup group)
-{
+void SatIncSolver_move_to_permanent_and_destroy_group(
+    const SatIncSolver_ptr self, SatSolverGroup group) {
   SAT_INC_SOLVER_CHECK_INSTANCE(self);
   self->move_to_permanent_and_destroy_group(self, group);
 }
 
-SatSolverResult
-SatIncSolver_solve_groups(const SatIncSolver_ptr self, const Olist_ptr groups)
-{
+SatSolverResult SatIncSolver_solve_groups(const SatIncSolver_ptr self,
+                                          const Olist_ptr groups) {
   SatSolverResult result;
   NuSMVEnv_ptr env;
   OptsHandler_ptr opts;
@@ -105,27 +98,26 @@ SatIncSolver_solve_groups(const SatIncSolver_ptr self, const Olist_ptr groups)
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Invoking solver '%s'...\n",
-            SatSolver_get_name(SAT_SOLVER(self)));
+               SatSolver_get_name(SAT_SOLVER(self)));
   }
 
   SAT_SOLVER(self)->solvingTime = util_cpu_time();
   result = self->solve_groups(self, groups);
-  SAT_SOLVER(self)->solvingTime = util_cpu_time() - SAT_SOLVER(self)->solvingTime;
+  SAT_SOLVER(self)->solvingTime =
+      util_cpu_time() - SAT_SOLVER(self)->solvingTime;
 
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Solver '%s' returned after %f secs \n",
-            SatSolver_get_name(SAT_SOLVER(self)),
-            SatSolver_get_last_solving_time(SAT_SOLVER(self))/1000.0);
+               SatSolver_get_name(SAT_SOLVER(self)),
+               SatSolver_get_last_solving_time(SAT_SOLVER(self)) / 1000.0);
   }
 
   return result;
 }
 
-SatSolverResult
-SatIncSolver_solve_without_groups(const SatIncSolver_ptr self,
-                                  const Olist_ptr groups)
-{
+SatSolverResult SatIncSolver_solve_without_groups(const SatIncSolver_ptr self,
+                                                  const Olist_ptr groups) {
   SatSolverResult result;
   NuSMVEnv_ptr env;
   OptsHandler_ptr opts;
@@ -145,23 +137,23 @@ SatIncSolver_solve_without_groups(const SatIncSolver_ptr self,
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Invoking solver '%s'...\n",
-            SatSolver_get_name(SAT_SOLVER(self)));
+               SatSolver_get_name(SAT_SOLVER(self)));
   }
 
   SAT_SOLVER(self)->solvingTime = util_cpu_time();
   result = self->solve_without_groups(self, groups);
-  SAT_SOLVER(self)->solvingTime = util_cpu_time() - SAT_SOLVER(self)->solvingTime;
+  SAT_SOLVER(self)->solvingTime =
+      util_cpu_time() - SAT_SOLVER(self)->solvingTime;
 
   if (opt_verbose_level_gt(opts, 0)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Solver '%s' returned after %f secs \n",
-            SatSolver_get_name(SAT_SOLVER(self)),
-            SatSolver_get_last_solving_time(SAT_SOLVER(self))/1000.0);
+               SatSolver_get_name(SAT_SOLVER(self)),
+               SatSolver_get_last_solving_time(SAT_SOLVER(self)) / 1000.0);
   }
 
   return result;
 }
-
 
 /* ---------------------------------------------------------------------- */
 /* Private Methods                                                        */
@@ -176,9 +168,7 @@ SatIncSolver_solve_without_groups(const SatIncSolver_ptr self,
   \sa SatIncSolver_add
 */
 
-SatSolverGroup
-sat_inc_solver_create_group (const SatIncSolver_ptr self)
-{
+SatSolverGroup sat_inc_solver_create_group(const SatIncSolver_ptr self) {
   error_unreachable_code(); /* Pure Virtual Member Function */
   return -1;
 }
@@ -192,10 +182,8 @@ sat_inc_solver_create_group (const SatIncSolver_ptr self)
   \sa SatIncSolver_add
 */
 
-void
-sat_inc_solver_destroy_group (const SatIncSolver_ptr self,
-                              SatSolverGroup group)
-{
+void sat_inc_solver_destroy_group(const SatIncSolver_ptr self,
+                                  SatSolverGroup group) {
   error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
@@ -209,10 +197,8 @@ sat_inc_solver_destroy_group (const SatIncSolver_ptr self,
   \sa SatIncSolver_add
 */
 
-void
-sat_inc_solver_move_to_permanent_and_destroy_group (const SatIncSolver_ptr self,
-                                                    SatSolverGroup group)
-{
+void sat_inc_solver_move_to_permanent_and_destroy_group(
+    const SatIncSolver_ptr self, SatSolverGroup group) {
   error_unreachable_code(); /* Pure Virtual Member Function */
 }
 
@@ -227,9 +213,8 @@ sat_inc_solver_move_to_permanent_and_destroy_group (const SatIncSolver_ptr self,
   \sa SatIncSolver_add
 */
 
-SatSolverResult
-sat_inc_solver_solve_groups (const SatIncSolver_ptr self, const Olist_ptr groups)
-{
+SatSolverResult sat_inc_solver_solve_groups(const SatIncSolver_ptr self,
+                                            const Olist_ptr groups) {
   error_unreachable_code(); /* Pure Virtual Member Function */
   return SAT_SOLVER_INTERNAL_ERROR;
 }
@@ -245,10 +230,8 @@ sat_inc_solver_solve_groups (const SatIncSolver_ptr self, const Olist_ptr groups
   \sa SatIncSolver_add
 */
 
-SatSolverResult
-sat_inc_solver_solve_without_groups (const SatIncSolver_ptr self,
-                                     const Olist_ptr groups)
-{
+SatSolverResult sat_inc_solver_solve_without_groups(const SatIncSolver_ptr self,
+                                                    const Olist_ptr groups) {
   error_unreachable_code(); /* Pure Virtual Member Function */
   return SAT_SOLVER_INTERNAL_ERROR;
 }
@@ -257,17 +240,14 @@ sat_inc_solver_solve_without_groups (const SatIncSolver_ptr self,
 /* Initializer and De-initializer                                         */
 /* ---------------------------------------------------------------------- */
 
-
 /*!
   \brief This function initializes the SatIncSolver class.
 
-  
+
 */
 
-void sat_inc_solver_init(SatIncSolver_ptr self,
-                         const NuSMVEnv_ptr env,
-                         const char* name)
-{
+void sat_inc_solver_init(SatIncSolver_ptr self, const NuSMVEnv_ptr env,
+                         const char *name) {
   SAT_INC_SOLVER_CHECK_INSTANCE(self);
 
   sat_solver_init(SAT_SOLVER(self), env, name);
@@ -276,12 +256,12 @@ void sat_inc_solver_init(SatIncSolver_ptr self,
   /* use default SatSolver pure-virtual functions */
   OVERRIDE(SatIncSolver, create_group) = sat_inc_solver_create_group;
   OVERRIDE(SatIncSolver, destroy_group) = sat_inc_solver_destroy_group;
-  OVERRIDE(SatIncSolver, move_to_permanent_and_destroy_group)
-    = sat_inc_solver_move_to_permanent_and_destroy_group;
+  OVERRIDE(SatIncSolver, move_to_permanent_and_destroy_group) =
+      sat_inc_solver_move_to_permanent_and_destroy_group;
   OVERRIDE(SatIncSolver, solve_groups) = sat_inc_solver_solve_groups;
   OVERRIDE(SatIncSolver, solve_groups) = sat_inc_solver_solve_groups;
-  OVERRIDE(SatIncSolver, solve_without_groups)
-    = sat_inc_solver_solve_without_groups;
+  OVERRIDE(SatIncSolver, solve_without_groups) =
+      sat_inc_solver_solve_without_groups;
 
   /* inits members: */
 }
@@ -289,11 +269,10 @@ void sat_inc_solver_init(SatIncSolver_ptr self,
 /*!
   \brief This function de-initializes the SatIncSolver class.
 
-  
+
 */
 
-void sat_inc_solver_deinit(SatIncSolver_ptr self)
-{
+void sat_inc_solver_deinit(SatIncSolver_ptr self) {
   SAT_INC_SOLVER_CHECK_INSTANCE(self);
 
   sat_solver_deinit(SAT_SOLVER(self));
@@ -308,8 +287,7 @@ void sat_inc_solver_deinit(SatIncSolver_ptr self)
 
   Pure virtual function. This must be refined by derived classes.
 */
-static void sat_inc_solver_finalize(Object_ptr object, void* dummy)
-{
+static void sat_inc_solver_finalize(Object_ptr object, void *dummy) {
   SatIncSolver_ptr self = SAT_INC_SOLVER(object);
 
   SAT_INC_SOLVER_CHECK_INSTANCE(self);
@@ -317,4 +295,3 @@ static void sat_inc_solver_finalize(Object_ptr object, void* dummy)
   sat_inc_solver_deinit(self);
   error_unreachable_code();
 }
-

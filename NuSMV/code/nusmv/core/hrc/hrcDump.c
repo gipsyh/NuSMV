@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -41,64 +41,57 @@
 
 */
 
-
-
-#include "nusmv/core/hrc/hrc.h"
 #include "nusmv/core/hrc/HrcNode.h"
+#include "nusmv/core/hrc/hrc.h"
 
 #include "nusmv/core/hrc/dumpers/HrcDumper.h"
 
-#include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/compile/compile.h" /* for Compile_print_array_define */
 #include "nusmv/core/parser/parser.h"
+#include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/utils/Slist.h"
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/compile/compile.h" /* for Compile_print_array_define */
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-#define _DUMP_SNIPPET_BEGIN(snippet, dumper, info)  \
-  (info)->stage = HRC_STAGE_BEGIN;                  \
+#define _DUMP_SNIPPET_BEGIN(snippet, dumper, info)                             \
+  (info)->stage = HRC_STAGE_BEGIN;                                             \
   HrcDumper_dump_snippet(dumper, snippet, info)
 
-#define _DUMP_SNIPPET_BEGIN_INDENT(snippet, dumper, info)  \
-  (info)->stage = HRC_STAGE_BEGIN;                         \
-  HrcDumper_dump_snippet(dumper, snippet, info);           \
+#define _DUMP_SNIPPET_BEGIN_INDENT(snippet, dumper, info)                      \
+  (info)->stage = HRC_STAGE_BEGIN;                                             \
+  HrcDumper_dump_snippet(dumper, snippet, info);                               \
   HrcDumper_inc_indent(dumper)
 
-#define _DUMP_SNIPPET_END(snippet, dumper, info)    \
-  (info)->stage = HRC_STAGE_END;                    \
+#define _DUMP_SNIPPET_END(snippet, dumper, info)                               \
+  (info)->stage = HRC_STAGE_END;                                               \
   HrcDumper_dump_snippet(dumper, snippet, info)
 
-#define _DUMP_SNIPPET_END_INDENT(snippet, dumper, info)    \
-  HrcDumper_dec_indent(dumper);                            \
-  (info)->stage = HRC_STAGE_END;                           \
+#define _DUMP_SNIPPET_END_INDENT(snippet, dumper, info)                        \
+  HrcDumper_dec_indent(dumper);                                                \
+  (info)->stage = HRC_STAGE_END;                                               \
   HrcDumper_dump_snippet(dumper, snippet, info)
 
-#define _DUMP_SNIPPET_BEGIN_END(snippet, dumper, info)  \
-  (info)->stage = HRC_STAGE_BEGIN | HRC_STAGE_END;      \
+#define _DUMP_SNIPPET_BEGIN_END(snippet, dumper, info)                         \
+  (info)->stage = HRC_STAGE_BEGIN | HRC_STAGE_END;                             \
   HrcDumper_dump_snippet(dumper, snippet, info)
-
 
 /**AutomaticStart*************************************************************/
 
@@ -106,25 +99,20 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
-                                     HrcDumper_ptr dumper,
-                                     HrcDumperInfo* info,
+static void hrc_dump_module_instance(HrcNode_ptr hrcNode, HrcDumper_ptr dumper,
+                                     HrcDumperInfo *info,
                                      hash_ptr printed_module_map);
 
-static void hrc_dump_compile_info(HrcNode_ptr hrcNode,
-                                  HrcDumper_ptr dumper,
-                                  HrcDumperInfo* info);
-
+static void hrc_dump_compile_info(HrcNode_ptr hrcNode, HrcDumper_ptr dumper,
+                                  HrcDumperInfo *info);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Hrc_DumpModel(HrcNode_ptr hrcNode, HrcDumper_ptr dumper)
-{
+void Hrc_DumpModel(HrcNode_ptr hrcNode, HrcDumper_ptr dumper) {
   HrcDumperInfo info;
   hash_ptr printed_module_map; /* hash table used to keep track of
                                   previously printed modules. */
@@ -138,14 +126,14 @@ void Hrc_DumpModel(HrcNode_ptr hrcNode, HrcDumper_ptr dumper)
   _DUMP_SNIPPET_BEGIN(HDS_HRC_TOP, dumper, &info);
 
   /* list of modules */
-  info.list_is_empty = ((HrcNode_ptr) NULL == hrcNode);
+  info.list_is_empty = ((HrcNode_ptr)NULL == hrcNode);
   _DUMP_SNIPPET_BEGIN(HDS_LIST_MODS, dumper, &info);
 
   /* call the recursive creation of the modules */
   hrc_dump_module_instance(hrcNode, dumper, &info, printed_module_map);
 
   info.hrcNode = hrcNode;
-  info.list_is_empty = ((HrcNode_ptr) NULL == hrcNode);
+  info.list_is_empty = ((HrcNode_ptr)NULL == hrcNode);
   _DUMP_SNIPPET_END(HDS_LIST_MODS, dumper, &info);
 
   /* compiler info */
@@ -159,8 +147,6 @@ void Hrc_DumpModel(HrcNode_ptr hrcNode, HrcDumper_ptr dumper)
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -176,14 +162,12 @@ void Hrc_DumpModel(HrcNode_ptr hrcNode, HrcDumper_ptr dumper)
   \se printed_module_map is changed to keep track of
   printed modules.
 */
-static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
-                                     HrcDumper_ptr dumper,
-                                     HrcDumperInfo* info,
-                                     hash_ptr printed_module_map)
-{
+static void hrc_dump_module_instance(HrcNode_ptr hrcNode, HrcDumper_ptr dumper,
+                                     HrcDumperInfo *info,
+                                     hash_ptr printed_module_map) {
   node_ptr module_name = HrcNode_get_name(hrcNode);
-  Slist_ptr rev_child_stack = \
-    Slist_copy_reversed(HrcNode_get_child_hrc_nodes(hrcNode));
+  Slist_ptr rev_child_stack =
+      Slist_copy_reversed(HrcNode_get_child_hrc_nodes(hrcNode));
 
   /* Set the module as printed  */
   insert_assoc(printed_module_map, module_name, PTR_FROM_INT(node_ptr, 1));
@@ -209,7 +193,7 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
       info->list_is_empty = (Oiter_is_end(params));
       _DUMP_SNIPPET_BEGIN(HDS_LIST_MOD_FORMAL_PARAMS, dumper, info);
 
-      while(! Oiter_is_end(params)) {
+      while (!Oiter_is_end(params)) {
         info->n1.name = car(NODE_PTR(Oiter_element(params)));
         info->n2.type = cdr(NODE_PTR(Oiter_element(params)));
         info->last_in_list = Oiter_is_end(Oiter_next(params));
@@ -232,7 +216,7 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
     info->list_is_empty = Slist_is_empty(rev_child_stack);
     _DUMP_SNIPPET_BEGIN_INDENT(HDS_LIST_MOD_INSTANCES, dumper, info);
 
-    SLIST_FOREACH (rev_child_stack, iter) {
+    SLIST_FOREACH(rev_child_stack, iter) {
       HrcNode_ptr child = HRC_NODE(Siter_element(iter));
 
       info->last_in_list = Siter_is_end(Siter_next(iter));
@@ -251,8 +235,7 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
         info->list_is_empty = (Oiter_is_end(actuals));
         _DUMP_SNIPPET_BEGIN(HDS_LIST_MOD_INSTANCE_ACTUAL_PARAMS, dumper, info);
 
-        for (; ! Oiter_is_end(actuals);
-             actuals = Oiter_next(actuals)) {
+        for (; !Oiter_is_end(actuals); actuals = Oiter_next(actuals)) {
           info->n1.value = car(Oiter_element(actuals));
           info->last_in_list = Oiter_is_end(Oiter_next(actuals));
           _DUMP_SNIPPET_BEGIN_END(HDS_MOD_INSTANCE_ACTUAL_PARAM, dumper, info);
@@ -271,25 +254,25 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
 
   /* ---------------------------------------------------------------------- */
   { /* data (non-instance) variables */
-      Oiter oi = HrcNode_get_state_variables_iter(hrcNode);
+    Oiter oi = HrcNode_get_state_variables_iter(hrcNode);
 
     struct {
       Oiter iter;
       SymbCategory cat;
     } lists[] = {
-        { {HrcNode_get_state_variables_iter(hrcNode).node}, SYMBOL_STATE_VAR },
-        { {HrcNode_get_input_variables_iter(hrcNode).node}, SYMBOL_INPUT_VAR },
-        { {HrcNode_get_frozen_variables_iter(hrcNode).node}, SYMBOL_FROZEN_VAR },
+        {{HrcNode_get_state_variables_iter(hrcNode).node}, SYMBOL_STATE_VAR},
+        {{HrcNode_get_input_variables_iter(hrcNode).node}, SYMBOL_INPUT_VAR},
+        {{HrcNode_get_frozen_variables_iter(hrcNode).node}, SYMBOL_FROZEN_VAR},
     };
     unsigned int idx;
-    for (idx=0; idx < sizeof(lists)/sizeof(lists[0]); ++idx) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
       Oiter iter;
 
       info->symb_cat = lists[idx].cat;
       info->list_is_empty = Oiter_is_end(lists[idx].iter);
       _DUMP_SNIPPET_BEGIN_INDENT(HDS_LIST_SYMBOLS, dumper, info);
 
-      for (iter = lists[idx].iter; ! Oiter_is_end(iter);
+      for (iter = lists[idx].iter; !Oiter_is_end(iter);
            iter = Oiter_next(iter)) {
         node_ptr elem = NODE_PTR(Oiter_element(iter));
         info->n1.name = car(elem);
@@ -304,20 +287,17 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
 
   /* ---------------------------------------------------------------------- */
   { /* data (non-instance) defines */
-    Oiter lists[] = {
-        {HrcNode_get_defines_iter(hrcNode).node},
-        {HrcNode_get_array_defines_iter(hrcNode).node}
-    };
+    Oiter lists[] = {{HrcNode_get_defines_iter(hrcNode).node},
+                     {HrcNode_get_array_defines_iter(hrcNode).node}};
     unsigned int idx;
-    for (idx=0; idx < sizeof(lists)/sizeof(lists[0]); ++idx) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
       Oiter iter;
 
       info->symb_cat = SYMBOL_DEFINE;
       info->list_is_empty = Oiter_is_end(lists[idx]);
       _DUMP_SNIPPET_BEGIN_INDENT(HDS_LIST_SYMBOLS, dumper, info);
 
-      for (iter = lists[idx]; ! Oiter_is_end(iter);
-           iter = Oiter_next(iter)) {
+      for (iter = lists[idx]; !Oiter_is_end(iter); iter = Oiter_next(iter)) {
         node_ptr elem = NODE_PTR(Oiter_element(iter));
         info->n1.name = car(elem);
         info->n2.body = cdr(elem);
@@ -335,15 +315,14 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
         {HrcNode_get_frozen_functions_iter(hrcNode).node},
     };
     unsigned int idx;
-    for (idx=0; idx < sizeof(lists)/sizeof(lists[0]); ++idx) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
       Oiter iter;
 
       info->symb_cat = SYMBOL_FUNCTION;
       info->list_is_empty = Oiter_is_end(lists[idx]);
       _DUMP_SNIPPET_BEGIN_INDENT(HDS_LIST_SYMBOLS, dumper, info);
 
-      for (iter = lists[idx]; ! Oiter_is_end(iter);
-           iter = Oiter_next(iter)) {
+      for (iter = lists[idx]; !Oiter_is_end(iter); iter = Oiter_next(iter)) {
         node_ptr elem = NODE_PTR(Oiter_element(iter));
         info->n1.name = car(elem);
         info->n2.body = cdr(elem);
@@ -363,7 +342,7 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
     info->list_is_empty = Oiter_is_end(iter);
     _DUMP_SNIPPET_BEGIN_INDENT(HDS_LIST_SYMBOLS, dumper, info);
 
-    for (; ! Oiter_is_end(iter); iter = Oiter_next(iter)) {
+    for (; !Oiter_is_end(iter); iter = Oiter_next(iter)) {
       info->n1.name = NODE_PTR(Oiter_element(iter));
       info->last_in_list = Oiter_is_end(Oiter_next(iter));
       _DUMP_SNIPPET_BEGIN_END(HDS_SYMBOL, dumper, info);
@@ -378,15 +357,15 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
       HrcDumperSnippet id;
       Oiter iter;
     } lists[] = {
-        { HDS_ASSIGN_INIT, {HrcNode_get_init_assign_exprs_iter(hrcNode).node} },
-        { HDS_ASSIGN_INVAR, {HrcNode_get_invar_assign_exprs_iter(hrcNode).node} },
-        { HDS_ASSIGN_NEXT, {HrcNode_get_next_assign_exprs_iter(hrcNode).node} },
+        {HDS_ASSIGN_INIT, {HrcNode_get_init_assign_exprs_iter(hrcNode).node}},
+        {HDS_ASSIGN_INVAR, {HrcNode_get_invar_assign_exprs_iter(hrcNode).node}},
+        {HDS_ASSIGN_NEXT, {HrcNode_get_next_assign_exprs_iter(hrcNode).node}},
     };
 
     boolean is_empty = true;
     unsigned int idx;
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
-      if (! Oiter_is_end(lists[idx].iter)) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
+      if (!Oiter_is_end(lists[idx].iter)) {
         is_empty = false;
         break;
       }
@@ -394,9 +373,9 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
 
     info->list_is_empty = is_empty;
     _DUMP_SNIPPET_BEGIN_INDENT(HDS_LIST_ASSIGNS, dumper, info);
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
       Oiter iter;
-      for (iter = lists[idx].iter; ! Oiter_is_end(iter);
+      for (iter = lists[idx].iter; !Oiter_is_end(iter);
            iter = Oiter_next(iter)) {
         node_ptr elem = NODE_PTR(Oiter_element(iter));
         info->n1.name = car(elem);
@@ -415,15 +394,15 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
       HrcDumperSnippet id;
       Oiter iter;
     } lists[] = {
-        { HDS_CONSTRAINT_INIT, {HrcNode_get_init_exprs_iter(hrcNode).node} },
-        { HDS_CONSTRAINT_INVAR, {HrcNode_get_invar_exprs_iter(hrcNode).node} },
-        { HDS_CONSTRAINT_TRANS, {HrcNode_get_trans_exprs_iter(hrcNode).node} },
+        {HDS_CONSTRAINT_INIT, {HrcNode_get_init_exprs_iter(hrcNode).node}},
+        {HDS_CONSTRAINT_INVAR, {HrcNode_get_invar_exprs_iter(hrcNode).node}},
+        {HDS_CONSTRAINT_TRANS, {HrcNode_get_trans_exprs_iter(hrcNode).node}},
     };
 
     boolean is_empty = true;
     unsigned int idx;
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
-      if (! Oiter_is_end(lists[idx].iter)) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
+      if (!Oiter_is_end(lists[idx].iter)) {
         is_empty = false;
         break;
       }
@@ -431,9 +410,9 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
     info->list_is_empty = is_empty;
     _DUMP_SNIPPET_BEGIN(HDS_LIST_CONSTRAINTS, dumper, info);
     /* RC: dumped in reversed order here: (issue 2552)" */
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
       Oiter iter;
-      for (iter = lists[idx].iter; ! Oiter_is_end(iter);
+      for (iter = lists[idx].iter; !Oiter_is_end(iter);
            iter = Oiter_next(iter)) {
         info->n1.expr = Oiter_element(iter);
         info->last_in_list = Oiter_is_end(Oiter_next(iter));
@@ -449,14 +428,14 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
       HrcDumperSnippet id;
       Oiter iter;
     } lists[] = {
-        { HDS_JUSTICE, {HrcNode_get_justice_exprs_iter(hrcNode).node} },
-      { HDS_COMPASSION, {HrcNode_get_compassion_exprs_iter(hrcNode).node} },
+        {HDS_JUSTICE, {HrcNode_get_justice_exprs_iter(hrcNode).node}},
+        {HDS_COMPASSION, {HrcNode_get_compassion_exprs_iter(hrcNode).node}},
     };
 
     boolean is_empty = true;
     unsigned int idx;
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
-      if (! Oiter_is_end(lists[idx].iter)) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
+      if (!Oiter_is_end(lists[idx].iter)) {
         is_empty = false;
         break;
       }
@@ -464,16 +443,15 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
     info->list_is_empty = is_empty;
     _DUMP_SNIPPET_BEGIN(HDS_LIST_FAIRNESS, dumper, info);
 
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
       Oiter iter;
-      for (iter = lists[idx].iter; ! Oiter_is_end(iter);
+      for (iter = lists[idx].iter; !Oiter_is_end(iter);
            iter = Oiter_next(iter)) {
         node_ptr elem = NODE_PTR(Oiter_element(iter));
         if (HDS_COMPASSION == lists[idx].id) {
           info->n1.expr = car(elem);
           info->n2.expr = cdr(elem);
-        }
-        else {
+        } else {
           info->n1.expr = elem;
         }
 
@@ -490,17 +468,17 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
       Prop_Type spec_type;
       Oiter iter;
     } lists[] = {
-      { Prop_Ctl, {HrcNode_get_ctl_properties_iter(hrcNode).node} },
-      { Prop_Ltl, {HrcNode_get_ltl_properties_iter(hrcNode).node} },
-      { Prop_Psl, {HrcNode_get_psl_properties_iter(hrcNode).node} },
-      { Prop_Invar, {HrcNode_get_invar_properties_iter(hrcNode).node} },
-      { Prop_Compute, {HrcNode_get_compute_properties_iter(hrcNode).node} },
+        {Prop_Ctl, {HrcNode_get_ctl_properties_iter(hrcNode).node}},
+        {Prop_Ltl, {HrcNode_get_ltl_properties_iter(hrcNode).node}},
+        {Prop_Psl, {HrcNode_get_psl_properties_iter(hrcNode).node}},
+        {Prop_Invar, {HrcNode_get_invar_properties_iter(hrcNode).node}},
+        {Prop_Compute, {HrcNode_get_compute_properties_iter(hrcNode).node}},
     };
 
     boolean is_empty = true;
     unsigned int idx;
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
-      if (! Oiter_is_end(lists[idx].iter)) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
+      if (!Oiter_is_end(lists[idx].iter)) {
         is_empty = false;
         break;
       }
@@ -508,9 +486,9 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
     info->list_is_empty = is_empty;
     _DUMP_SNIPPET_BEGIN(HDS_LIST_SPECS, dumper, info);
 
-    for (idx=0; idx<sizeof(lists)/sizeof(lists[0]); ++idx) {
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
       Oiter iter;
-      for (iter = lists[idx].iter; ! Oiter_is_end(iter);
+      for (iter = lists[idx].iter; !Oiter_is_end(iter);
            iter = Oiter_next(iter)) {
         node_ptr elem = NODE_PTR(Oiter_element(iter));
         info->spec_type = lists[idx].spec_type;
@@ -524,14 +502,12 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
     _DUMP_SNIPPET_END(HDS_LIST_SPECS, dumper, info);
   }
 
-
   /* ---------------------------------------------------------------------- */
   /* close module */
   info->n1.name = HrcNode_get_crude_name(hrcNode);
   info->n2.lineno = HrcNode_get_lineno(hrcNode);
   info->hrcNode = hrcNode;
   _DUMP_SNIPPET_END_INDENT(HDS_MOD, dumper, info);
-
 
   /* ---------------------------------------------------------------------- */
   { /* Recursive creation of child modules. Reversed children stack
@@ -560,12 +536,10 @@ static void hrc_dump_module_instance(HrcNode_ptr hrcNode,
 /*!
   \brief Dumps the compiler information
 
-  
+
 */
-static void hrc_dump_compile_info(HrcNode_ptr hrcNode,
-                                  HrcDumper_ptr dumper,
-                                  HrcDumperInfo* info)
-{
+static void hrc_dump_compile_info(HrcNode_ptr hrcNode, HrcDumper_ptr dumper,
+                                  HrcDumperInfo *info) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(hrcNode));
   node_ptr errors = Parser_get_syntax_errors_list(env);
 
@@ -579,10 +553,8 @@ static void hrc_dump_compile_info(HrcNode_ptr hrcNode,
   {
     node_ptr iter = errors;
     while (iter != Nil) {
-      Parser_get_syntax_error(car(iter),
-                              &(info->error.filename),
-                              &(info->error.lineno),
-                              &(info->error.token),
+      Parser_get_syntax_error(car(iter), &(info->error.filename),
+                              &(info->error.lineno), &(info->error.token),
                               &(info->error.message));
       _DUMP_SNIPPET_BEGIN_END(HDS_ERROR, dumper, info);
       iter = cdr(iter);

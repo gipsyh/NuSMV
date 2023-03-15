@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,10 +37,9 @@
 
 */
 
-
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/fsm/bdd/bdd.h"
 #include "nusmv/core/fsm/bdd/bddInt.h"
+#include "nusmv/core/node/NodeMgr.h"
 
 /* ----------------------------------------------------------------------
    When you add a new data member:
@@ -52,7 +51,6 @@
              - use macros CACHE_UNREF_BDD and CACHE_COPY_BDD
    ---------------------------------------------------------------------- */
 
-
 /* some utilities to help addition of bdd members: */
 
 /*!
@@ -60,10 +58,10 @@
 
   \todo Missing description
 */
-#define CACHE_UNREF_BDD(type, member)                  \
-  if ( self->member != (type) NULL ) {                 \
-     bdd_free(self->dd, (bdd_ptr) (self->member) );    \
-     self->member = (type) NULL;                       \
+#define CACHE_UNREF_BDD(type, member)                                          \
+  if (self->member != (type)NULL) {                                            \
+    bdd_free(self->dd, (bdd_ptr)(self->member));                               \
+    self->member = (type)NULL;                                                 \
   }
 
 /*!
@@ -71,23 +69,20 @@
 
   \todo Missing description
 */
-#define CACHE_COPY_BDD(type, member)                       \
-  if ( self->member != (type) NULL ) {                     \
-    copy->member = (type) bdd_dup((bdd_ptr) self->member); \
+#define CACHE_COPY_BDD(type, member)                                           \
+  if (self->member != (type)NULL) {                                            \
+    copy->member = (type)bdd_dup((bdd_ptr)self->member);                       \
   }
-
 
 static void bdd_fsm_cache_init(BddFsmCache_ptr self, DDMgr_ptr dd);
 static void bdd_fsm_cache_deinit(BddFsmCache_ptr self);
 static void bdd_fsm_cache_deinit_reachables(BddFsmCache_ptr self);
 
-
 /* ---------------------------------------------------------------------- */
 /*                          private methods                               */
 /* ---------------------------------------------------------------------- */
 
-BddFsmCache_ptr BddFsmCache_create(DDMgr_ptr dd)
-{
+BddFsmCache_ptr BddFsmCache_create(DDMgr_ptr dd) {
   BddFsmCache_ptr self = ALLOC(BddFsmCache, 1);
 
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
@@ -97,8 +92,7 @@ BddFsmCache_ptr BddFsmCache_create(DDMgr_ptr dd)
   return self;
 }
 
-void BddFsmCache_destroy(BddFsmCache_ptr self)
-{
+void BddFsmCache_destroy(BddFsmCache_ptr self) {
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
 
   (*self->family_counter)--;
@@ -108,8 +102,7 @@ void BddFsmCache_destroy(BddFsmCache_ptr self)
   }
 }
 
-BddFsmCache_ptr BddFsmCache_hard_copy(const BddFsmCache_ptr self)
-{
+BddFsmCache_ptr BddFsmCache_hard_copy(const BddFsmCache_ptr self) {
   BddFsmCache_ptr copy;
 
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
@@ -130,8 +123,7 @@ BddFsmCache_ptr BddFsmCache_hard_copy(const BddFsmCache_ptr self)
   return copy;
 }
 
-void BddFsmCache_reset_not_reusable_fields_after_product(BddFsmCache_ptr self)
-{
+void BddFsmCache_reset_not_reusable_fields_after_product(BddFsmCache_ptr self) {
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
 
   CACHE_UNREF_BDD(BddStates, fair_states);
@@ -144,8 +136,7 @@ void BddFsmCache_reset_not_reusable_fields_after_product(BddFsmCache_ptr self)
   CACHE_UNREF_BDD(BddStatesInputs, monolithic_trans);
 }
 
-BddFsmCache_ptr BddFsmCache_soft_copy(const BddFsmCache_ptr self)
-{
+BddFsmCache_ptr BddFsmCache_soft_copy(const BddFsmCache_ptr self) {
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
 
   (*self->family_counter)++;
@@ -153,13 +144,13 @@ BddFsmCache_ptr BddFsmCache_soft_copy(const BddFsmCache_ptr self)
 }
 
 void BddFsmCache_copy_reachables(BddFsmCache_ptr self,
-                                 const BddFsmCache_ptr other)
-{
+                                 const BddFsmCache_ptr other) {
   int count;
 
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
 
-  if (self->family_counter == other->family_counter) return; /*same family*/
+  if (self->family_counter == other->family_counter)
+    return; /*same family*/
 
   /* shuts down the current reachables */
   bdd_fsm_cache_deinit_reachables(self);
@@ -172,7 +163,7 @@ void BddFsmCache_copy_reachables(BddFsmCache_ptr self,
      "other" one */
   if ((bdd_ptr)NULL != other->reachable.reachable_states) {
     self->reachable.reachable_states =
-      bdd_dup(other->reachable.reachable_states);
+        bdd_dup(other->reachable.reachable_states);
   }
 
   count = other->reachable.diameter;
@@ -181,15 +172,14 @@ void BddFsmCache_copy_reachables(BddFsmCache_ptr self,
     while (count > 0) {
       bdd_ptr tmp;
       count -= 1;
-      tmp = (bdd_ptr) other->reachable.layers[count];
+      tmp = (bdd_ptr)other->reachable.layers[count];
       self->reachable.layers[count] = BDD_STATES(bdd_dup(tmp));
     }
   }
 }
 
 void BddFsmCache_set_reachable_states(BddFsmCache_ptr self,
-                                      BddStates reachable)
-{
+                                      BddStates reachable) {
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
 
   if ((bdd_ptr)NULL != self->reachable.reachable_states) {
@@ -199,21 +189,18 @@ void BddFsmCache_set_reachable_states(BddFsmCache_ptr self,
   self->reachable.reachable_states = bdd_dup(reachable);
 }
 
-void BddFsmCache_set_reachables(BddFsmCache_ptr self,
-                                node_ptr  layers_list,
-                                const int diameter,
-                                boolean completed)
-{
+void BddFsmCache_set_reachables(BddFsmCache_ptr self, node_ptr layers_list,
+                                const int diameter, boolean completed) {
   int i;
 
   BDD_FSM_CACHE_CHECK_INSTANCE(self);
 
   /* If we have previously saved states free them */
   if (self->reachable.diameter > 0) {
-        for (i = 0; i < self->reachable.diameter; i++) {
-                bdd_free(self->dd, self->reachable.layers[i]);
-        }
-        FREE(self->reachable.layers);
+    for (i = 0; i < self->reachable.diameter; i++) {
+      bdd_free(self->dd, self->reachable.layers[i]);
+    }
+    FREE(self->reachable.layers);
   }
 
   /* Update the cache */
@@ -221,18 +208,17 @@ void BddFsmCache_set_reachables(BddFsmCache_ptr self,
   self->reachable.diameter = diameter;
 
   self->reachable.layers = ALLOC(BddStates, diameter);
-  nusmv_assert(self->reachable.layers != (BddStates*) NULL);
+  nusmv_assert(self->reachable.layers != (BddStates *)NULL);
 
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self->dd));
-    const NodeMgr_ptr nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-    for (i = diameter-1; i >= 0; --i) {
+    for (i = diameter - 1; i >= 0; --i) {
       node_ptr tmp;
-      bdd_ptr  layer;
+      bdd_ptr layer;
 
-      layer = BDD_STATES( car(layers_list) );
+      layer = BDD_STATES(car(layers_list));
       self->reachable.layers[i] = bdd_dup(layer);
       tmp = layers_list;
       layers_list = cdr(layers_list);
@@ -247,10 +233,9 @@ void BddFsmCache_set_reachables(BddFsmCache_ptr self,
 
   private initializer
 */
-static void bdd_fsm_cache_init(BddFsmCache_ptr self, DDMgr_ptr dd)
-{
+static void bdd_fsm_cache_init(BddFsmCache_ptr self, DDMgr_ptr dd) {
   self->family_counter = ALLOC(unsigned int, 1);
-  nusmv_assert(self->family_counter != (unsigned int*) NULL);
+  nusmv_assert(self->family_counter != (unsigned int *)NULL);
 
   *(self->family_counter) = 1;
 
@@ -262,14 +247,14 @@ static void bdd_fsm_cache_init(BddFsmCache_ptr self, DDMgr_ptr dd)
   self->revfair_states_inputs = BDD_STATES_INPUTS(NULL);
 
   self->reachable.computed = false;
-  self->reachable.layers   = (BddStates*) NULL;
+  self->reachable.layers = (BddStates *)NULL;
   self->reachable.diameter = -1;
   self->reachable.reachable_states = (BddStates)NULL;
 
-  self->not_successor_states  = BDD_STATES(NULL);
-  self->deadlock_states       = BDD_STATES(NULL);
-  self->legal_state_input   = BDD_STATES_INPUTS(NULL);
-  self->monolithic_trans      = BDD_STATES_INPUTS(NULL);
+  self->not_successor_states = BDD_STATES(NULL);
+  self->deadlock_states = BDD_STATES(NULL);
+  self->legal_state_input = BDD_STATES_INPUTS(NULL);
+  self->monolithic_trans = BDD_STATES_INPUTS(NULL);
 }
 
 /*!
@@ -277,8 +262,7 @@ static void bdd_fsm_cache_init(BddFsmCache_ptr self, DDMgr_ptr dd)
 
   private deinitializer. Call only if family_counter is 0
 */
-static void bdd_fsm_cache_deinit(BddFsmCache_ptr self)
-{
+static void bdd_fsm_cache_deinit(BddFsmCache_ptr self) {
   nusmv_assert(*(self->family_counter) == 0);
 
   CACHE_UNREF_BDD(BddStates, fair_states);
@@ -301,8 +285,7 @@ static void bdd_fsm_cache_deinit(BddFsmCache_ptr self)
 
   Call only if family_counter is 0
 */
-static void bdd_fsm_cache_deinit_reachables(BddFsmCache_ptr self)
-{
+static void bdd_fsm_cache_deinit_reachables(BddFsmCache_ptr self) {
   nusmv_assert(*(self->family_counter) <= 1); /* not shared */
 
   if (self->reachable.computed) {
@@ -310,7 +293,7 @@ static void bdd_fsm_cache_deinit_reachables(BddFsmCache_ptr self)
     while (self->reachable.diameter > 0) {
       bdd_ptr tmp;
       self->reachable.diameter -= 1;
-      tmp = (bdd_ptr) self->reachable.layers[self->reachable.diameter];
+      tmp = (bdd_ptr)self->reachable.layers[self->reachable.diameter];
       bdd_free(self->dd, tmp);
     }
 

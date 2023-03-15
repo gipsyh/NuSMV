@@ -26,11 +26,11 @@
 -----------------------------------------------------------------------------*/
 
 #include "nusmv/core/utils/watchdog_util.h"
-#include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/opt/opt.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/defs.h"
+#include "nusmv/core/utils/error.h"
 
 /*!
   \author Sergio Mover
@@ -42,26 +42,21 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -71,34 +66,29 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-void watchdog_action(void* inputenv)
-{
+void watchdog_action(void *inputenv) {
   NuSMVEnv_ptr env = NUSMV_ENV(inputenv);
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env,
-                                                        ENV_STREAM_MANAGER));
-  ErrorMgr_ptr errmgr = ERROR_MGR(NuSMVEnv_get_value(env,
-                                                      ENV_ERROR_MANAGER));
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env,
-                                                         ENV_OPTS_HANDLER));
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  ErrorMgr_ptr errmgr = ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   StreamMgr_print_output(streams, "Watchdog Timer: reached timeout\n");
-  if (! opt_batch(opts)) {
+  if (!opt_batch(opts)) {
     StreamMgr_print_error(streams,
-                          "Warning: %s status may not be consistent."   \
+                          "Warning: %s status may not be consistent."
                           "Use 'reset' command if needed.\n",
                           get_pgm_name(opts));
   }

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,30 +34,25 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_SMV_PRIVATE_H__
 #define __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_SMV_PRIVATE_H__
 
-
-#include "nusmv/core/hrc/dumpers/HrcDumperSmv.h"
 #include "nusmv/core/hrc/dumpers/HrcDumper.h"
+#include "nusmv/core/hrc/dumpers/HrcDumperSmv.h"
 #include "nusmv/core/hrc/dumpers/HrcDumper_private.h"
 
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief HrcDumperSmv class definition derived from
                class HrcDumper
 
-  
+
 
   \sa Base class HrcDumper
 */
 
-typedef struct HrcDumperSmv_TAG
-{
+typedef struct HrcDumperSmv_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(HrcDumper);
 
@@ -65,14 +60,11 @@ typedef struct HrcDumperSmv_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } HrcDumperSmv;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
@@ -86,9 +78,8 @@ typedef struct HrcDumperSmv_TAG
 
   \sa HrcDumperSmv_create
 */
-void hrc_dumper_smv_init(HrcDumperSmv_ptr self,
-                                const NuSMVEnv_ptr env,
-                                FILE* fout);
+void hrc_dumper_smv_init(HrcDumperSmv_ptr self, const NuSMVEnv_ptr env,
+                         FILE *fout);
 
 /*!
   \methodof HrcDumperSmv
@@ -102,30 +93,27 @@ void hrc_dumper_smv_deinit(HrcDumperSmv_ptr self);
 
 /*!
   \methodof HrcDumper
-  \brief 
+  \brief
 
-  
+
 */
-void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self,
-                                        HrcDumperSnippet snippet,
-                                        const HrcDumperInfo* info);
+void hrc_dumper_smv_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
+                                 const HrcDumperInfo *info);
 
 /*!
   \methodof HrcDumper
   \brief Dumps a comment
 
-  
+
 */
-void hrc_dumper_smv_dump_comment(HrcDumper_ptr self,
-                                        const char* msg);
+void hrc_dumper_smv_dump_comment(HrcDumper_ptr self, const char *msg);
 
 /*!
   \methodof HrcDumper
-  \brief 
+  \brief
 
-  
+
 */
-void hrc_dumper_smv_dump_header(HrcDumper_ptr self,
-                                       const char* msg);
+void hrc_dumper_smv_dump_header(HrcDumper_ptr self, const char *msg);
 
 #endif /* __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_SMV_PRIVATE_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,13 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_TRANS_GENERIC_GENERIC_TRANS_PRIVATE_H__
 #define __NUSMV_CORE_TRANS_GENERIC_GENERIC_TRANS_PRIVATE_H__
 
-
 #include "nusmv/core/trans/generic/GenericTrans.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/EnvObject_private.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \brief Transition Relation Class "GenericTrans"
@@ -51,11 +48,10 @@
    This class defines a prototype for a generic
   transition relation.
   This class is virtual, and must be specialized.
-  
+
 */
 
-typedef struct GenericTrans_TAG
-{
+typedef struct GenericTrans_TAG {
   INHERITS_FROM(EnvObject);
 
   /* ---------------------------------------------------------------------- */
@@ -69,13 +65,11 @@ typedef struct GenericTrans_TAG
 
 } GenericTrans;
 
-
 /*!
   \methodof GenericTrans
   \todo
 */
-void generic_trans_init(GenericTrans_ptr self,
-                        const NuSMVEnv_ptr env,
+void generic_trans_init(GenericTrans_ptr self, const NuSMVEnv_ptr env,
                         const TransType trans_type);
 
 /*!
@@ -88,8 +82,6 @@ void generic_trans_deinit(GenericTrans_ptr self);
   \methodof GenericTrans
   \todo
 */
-void generic_trans_copy_aux(const GenericTrans_ptr self,
-                            GenericTrans_ptr copy);
-
+void generic_trans_copy_aux(const GenericTrans_ptr self, GenericTrans_ptr copy);
 
 #endif /* __NUSMV_CORE_TRANS_GENERIC_GENERIC_TRANS_PRIVATE_H__ */

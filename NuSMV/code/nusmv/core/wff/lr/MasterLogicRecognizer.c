@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,17 +34,16 @@
 
 */
 
-
 #include "nusmv/core/wff/lr/MasterLogicRecognizer.h"
-#include "nusmv/core/wff/lr/MasterLogicRecognizer_private.h"
 #include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/wff/lr/LogicRecognizerBase.h"
 #include "nusmv/core/wff/lr/LogicRecognizerCore.h"
-#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/wff/lr/MasterLogicRecognizer_private.h"
 
 #ifndef NDEBUG
-#  include "nusmv/core/compile/type_checking/TypeChecker.h"
-#  include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/compile/type_checking/TypeChecker.h"
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -58,7 +57,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'MasterLogicRecognizer_private.h' for class 'MasterLogicRecognizer' definition. */
+/* See 'MasterLogicRecognizer_private.h' for class 'MasterLogicRecognizer'
+ * definition. */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -68,22 +68,19 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void master_logic_recognizer_finalize(Object_ptr object, void* dummy);
-
+static void master_logic_recognizer_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-MasterLogicRecognizer_ptr MasterLogicRecognizer_create(NuSMVEnv_ptr env)
-{
+MasterLogicRecognizer_ptr MasterLogicRecognizer_create(NuSMVEnv_ptr env) {
   MasterLogicRecognizer_ptr self = ALLOC(MasterLogicRecognizer, 1);
   MASTER_LOGIC_RECOGNIZER_CHECK_INSTANCE(self);
 
@@ -91,8 +88,8 @@ MasterLogicRecognizer_ptr MasterLogicRecognizer_create(NuSMVEnv_ptr env)
   return self;
 }
 
-MasterLogicRecognizer_ptr MasterLogicRecognizer_create_with_default_recognizers(NuSMVEnv_ptr env)
-{
+MasterLogicRecognizer_ptr
+MasterLogicRecognizer_create_with_default_recognizers(NuSMVEnv_ptr env) {
   MasterLogicRecognizer_ptr self = ALLOC(MasterLogicRecognizer, 1);
   NodeWalker_ptr walker;
   boolean has_been_registered = false;
@@ -102,15 +99,14 @@ MasterLogicRecognizer_ptr MasterLogicRecognizer_create_with_default_recognizers(
 
   walker = NODE_WALKER(LogicRecognizerCore_create(env));
   NODE_WALKER_CHECK_INSTANCE(walker);
-  has_been_registered = MasterNodeWalker_register_walker(MASTER_NODE_WALKER(self),
-                                                         walker);
+  has_been_registered =
+      MasterNodeWalker_register_walker(MASTER_NODE_WALKER(self), walker);
   nusmv_assert(has_been_registered);
 
   return self;
 }
 
-void MasterLogicRecognizer_destroy(MasterLogicRecognizer_ptr self)
-{
+void MasterLogicRecognizer_destroy(MasterLogicRecognizer_ptr self) {
   MASTER_LOGIC_RECOGNIZER_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
@@ -126,9 +122,8 @@ void MasterLogicRecognizer_destroy(MasterLogicRecognizer_ptr self)
 */
 
 LogicType MasterLogicRecognizer_recognize(MasterLogicRecognizer_ptr self,
-                                                node_ptr expression,
-                                                node_ptr context)
-{
+                                          node_ptr expression,
+                                          node_ptr context) {
   LogicType retval = EXP_NONE;
 
   MASTER_LOGIC_RECOGNIZER_CHECK_INSTANCE(self);
@@ -137,11 +132,11 @@ LogicType MasterLogicRecognizer_recognize(MasterLogicRecognizer_ptr self,
   {
     NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
     SymbTable_ptr const symb_table =
-      SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
-     TypeChecker_ptr type_checker = SymbTable_get_type_checker(symb_table);
+        SYMB_TABLE(NuSMVEnv_get_value(env, ENV_SYMB_TABLE));
+    TypeChecker_ptr type_checker = SymbTable_get_type_checker(symb_table);
 
-     nusmv_assert(TypeChecker_is_expression_wellformed(type_checker, expression,
-                                                       context));
+    nusmv_assert(TypeChecker_is_expression_wellformed(type_checker, expression,
+                                                      context));
   }
 #endif
 
@@ -156,14 +151,12 @@ LogicType MasterLogicRecognizer_recognize(MasterLogicRecognizer_ptr self,
   return retval;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
 void master_logic_recognizer_init(MasterLogicRecognizer_ptr self,
-                                  NuSMVEnv_ptr env)
-{
+                                  NuSMVEnv_ptr env) {
   /* base class initialization */
   master_node_walker_init(MASTER_NODE_WALKER(self), env);
 
@@ -174,33 +167,32 @@ void master_logic_recognizer_init(MasterLogicRecognizer_ptr self,
   OVERRIDE(Object, finalize) = master_logic_recognizer_finalize;
 
   /* for example, to override a base class' virtual method: */
-  /*OVERRIDE(MasterNodeWalker, virtual_method) = master_logic_recognizer_virtual_method;*/
+  /*OVERRIDE(MasterNodeWalker, virtual_method) =
+   * master_logic_recognizer_virtual_method;*/
 }
 
-void master_logic_recognizer_deinit(MasterLogicRecognizer_ptr self)
-{
+void master_logic_recognizer_deinit(MasterLogicRecognizer_ptr self) {
   /* members deinitialization */
-  free_assoc(self->expr2logic); self->expr2logic = NULL;
+  free_assoc(self->expr2logic);
+  self->expr2logic = NULL;
 
   /* base class deinitialization */
   master_node_walker_deinit(MASTER_NODE_WALKER(self));
 }
 
 LogicType master_logic_recognizer_lookup(MasterLogicRecognizer_ptr self,
-                                               node_ptr expression,
-                                               node_ptr context)
-{
+                                         node_ptr expression,
+                                         node_ptr context) {
   LogicType retval = EXP_NONE;
   node_ptr key = NULL;
 
   if (Nil != context) {
     NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
-    NodeMgr_ptr const nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
     key = find_node(nodemgr, CONTEXT, context, expression);
-  }
-  else key = expression;
+  } else
+    key = expression;
 
   retval = (LogicType)NODE_TO_INT(find_assoc(self->expr2logic, key));
 
@@ -208,34 +200,29 @@ LogicType master_logic_recognizer_lookup(MasterLogicRecognizer_ptr self,
 }
 
 void master_logic_recognizer_insert(MasterLogicRecognizer_ptr self,
-                                    node_ptr expression,
-                                    node_ptr context,
-                                    LogicType logic)
-{
+                                    node_ptr expression, node_ptr context,
+                                    LogicType logic) {
   node_ptr key = NULL;
 
   if (Nil != context) {
     NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
-    NodeMgr_ptr const nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
     key = find_node(nodemgr, CONTEXT, context, expression);
-  }
-  else key = expression;
+  } else
+    key = expression;
 
   insert_assoc(self->expr2logic, key, NODE_PTR(logic));
 }
 
 LogicType master_logic_recognizer_recognize(MasterLogicRecognizer_ptr self,
-                                                  node_ptr expression,
-                                                  node_ptr context)
-{
+                                            node_ptr expression,
+                                            node_ptr context) {
   ListIter_ptr iter;
   iter = NodeList_get_first_iter(MASTER_NODE_WALKER(self)->walkers);
   while (!ListIter_is_end(iter)) {
-    LogicRecognizerBase_ptr recognizer =
-      LOGIC_RECOGNIZER_BASE(NodeList_get_elem_at(MASTER_NODE_WALKER(self)->walkers,
-                                                 iter));
+    LogicRecognizerBase_ptr recognizer = LOGIC_RECOGNIZER_BASE(
+        NodeList_get_elem_at(MASTER_NODE_WALKER(self)->walkers, iter));
 
     if (NodeWalker_can_handle(NODE_WALKER(recognizer), expression)) {
       return LogicRecognizerBase_recognize(recognizer, expression, context);
@@ -247,15 +234,17 @@ LogicType master_logic_recognizer_recognize(MasterLogicRecognizer_ptr self,
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
     const StreamMgr_ptr streams =
-      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+        STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
     const MasterPrinter_ptr wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
     const MasterPrinter_ptr sexpprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
+        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_SEXP_PRINTER));
 
-    StreamMgr_print_error(streams,  "Warning: no compatible logic recognizer found for expression:\n");
+    StreamMgr_print_error(
+        streams,
+        "Warning: no compatible logic recognizer found for expression:\n");
     StreamMgr_nprint_error(streams, wffprint, "%N", expression);
-    StreamMgr_print_error(streams,  "\n");
+    StreamMgr_print_error(streams, "\n");
     StreamMgr_nprint_error(streams, sexpprint, "%N", expression);
   }
 
@@ -263,9 +252,7 @@ LogicType master_logic_recognizer_recognize(MasterLogicRecognizer_ptr self,
 }
 
 LogicType master_logic_recognizer_merge(MasterLogicRecognizer_ptr master,
-                                              LogicType left,
-                                              LogicType right)
-{
+                                        LogicType left, LogicType right) {
   LogicType retval = EXP_NONE;
 
   UNUSED_PARAM(master);
@@ -275,22 +262,20 @@ LogicType master_logic_recognizer_merge(MasterLogicRecognizer_ptr master,
 
   if (left == right) {
     retval = left;
-  }
-  else {
+  } else {
     LogicType higher = EXP_NONE;
     LogicType lower = EXP_NONE;
 
     if (left > right) {
       higher = left;
       lower = right;
-    }
-    else {
+    } else {
       higher = right;
       lower = left;
     }
-    
+
     /* impossible cases */
-    nusmv_assert(! ((EXP_CTL == higher) && (EXP_LTL == lower)));
+    nusmv_assert(!((EXP_CTL == higher) && (EXP_LTL == lower)));
 
     retval = higher;
   } /* end of top level else */
@@ -307,15 +292,11 @@ LogicType master_logic_recognizer_merge(MasterLogicRecognizer_ptr master,
 
   Called by the class destructor
 */
-static void master_logic_recognizer_finalize(Object_ptr object, void* dummy)
-{
+static void master_logic_recognizer_finalize(Object_ptr object, void *dummy) {
   MasterLogicRecognizer_ptr self = MASTER_LOGIC_RECOGNIZER(object);
 
   master_logic_recognizer_deinit(self);
   FREE(self);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

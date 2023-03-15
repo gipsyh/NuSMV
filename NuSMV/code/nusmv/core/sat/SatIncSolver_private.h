@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -51,11 +51,10 @@
   \brief SatIncSolver Class
 
    This class defines a prototype for a generic SatIncSolver. This
-  class is virtual and must be specialized. 
+  class is virtual and must be specialized.
 */
 
-typedef struct SatIncSolver_TAG
-{
+typedef struct SatIncSolver_TAG {
   INHERITS_FROM(SatSolver);
 
   /* ---------------------------------------------------------------------- */
@@ -63,28 +62,25 @@ typedef struct SatIncSolver_TAG
   /* ---------------------------------------------------------------------- */
 
   /* creates a new group */
-  VIRTUAL SatSolverGroup
-  (*create_group) (const SatIncSolver_ptr self);
+  VIRTUAL SatSolverGroup (*create_group)(const SatIncSolver_ptr self);
 
   /* destroys existing group */
-  VIRTUAL void
-  (*destroy_group) (const SatIncSolver_ptr self, SatSolverGroup group);
+  VIRTUAL void (*destroy_group)(const SatIncSolver_ptr self,
+                                SatSolverGroup group);
   /* moves formulas from 'group' into permanent one and destroys 'group' */
-  VIRTUAL void
-  (*move_to_permanent_and_destroy_group) (const SatIncSolver_ptr self,
-                                          SatSolverGroup group);
+  VIRTUAL void (*move_to_permanent_and_destroy_group)(
+      const SatIncSolver_ptr self, SatSolverGroup group);
 
   /* tries to solve formulas in the groups in the given list and the permanent
      group */
-  VIRTUAL SatSolverResult
-  (*solve_groups) (const SatIncSolver_ptr self, const Olist_ptr groups);
+  VIRTUAL SatSolverResult (*solve_groups)(const SatIncSolver_ptr self,
+                                          const Olist_ptr groups);
 
   /* tries to solve the formulas belonging to the solver except those
      in the group from the given list. Permanent group should not be
      in the list ever. */
-  VIRTUAL SatSolverResult
-  (*solve_without_groups) (const SatIncSolver_ptr self,
-                           const Olist_ptr groups);
+  VIRTUAL SatSolverResult (*solve_without_groups)(const SatIncSolver_ptr self,
+                                                  const Olist_ptr groups);
 } SatIncSolver;
 
 /**AutomaticStart*************************************************************/
@@ -96,9 +92,8 @@ typedef struct SatIncSolver_TAG
   \methodof SatIncSolver
   \todo
 */
-void sat_inc_solver_init(SatIncSolver_ptr self,
-                         const NuSMVEnv_ptr env,
-                         const char* name);
+void sat_inc_solver_init(SatIncSolver_ptr self, const NuSMVEnv_ptr env,
+                         const char *name);
 
 /*!
   \methodof SatIncSolver
@@ -111,39 +106,34 @@ void sat_inc_solver_deinit(SatIncSolver_ptr self);
   \methodof SatIncSolver
   \todo
 */
-SatSolverGroup
-sat_inc_solver_create_group(const SatIncSolver_ptr self);
+SatSolverGroup sat_inc_solver_create_group(const SatIncSolver_ptr self);
 
 /*!
   \methodof SatIncSolver
   \todo
 */
-void
-sat_inc_solver_destroy_group(const SatIncSolver_ptr self,
-                             SatSolverGroup group);
+void sat_inc_solver_destroy_group(const SatIncSolver_ptr self,
+                                  SatSolverGroup group);
 
 /*!
   \methodof SatIncSolver
   \todo
 */
-void
-sat_inc_solver_move_to_permanent_and_destroy_group(const SatIncSolver_ptr self,
-SatSolverGroup group);
+void sat_inc_solver_move_to_permanent_and_destroy_group(
+    const SatIncSolver_ptr self, SatSolverGroup group);
 /*!
   \methodof SatIncSolver
   \todo
 */
-SatSolverResult
-sat_inc_solver_solve_groups(const SatIncSolver_ptr self,
-                            const Olist_ptr groups);
+SatSolverResult sat_inc_solver_solve_groups(const SatIncSolver_ptr self,
+                                            const Olist_ptr groups);
 
 /*!
   \methodof SatIncSolver
   \todo
 */
-SatSolverResult
-sat_inc_solver_solve_without_groups(const SatIncSolver_ptr self,
-                                    const Olist_ptr groups);
+SatSolverResult sat_inc_solver_solve_without_groups(const SatIncSolver_ptr self,
+                                                    const Olist_ptr groups);
 
 /**AutomaticEnd***************************************************************/
 

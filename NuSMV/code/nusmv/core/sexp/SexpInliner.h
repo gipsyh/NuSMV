@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,68 +34,63 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_SEXP_SEXP_INLINER_H__
 #define __NUSMV_CORE_SEXP_SEXP_INLINER_H__
 
-#include "nusmv/core/wff/ExprMgr.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/set/set.h"
 #include "nusmv/core/utils/utils.h"
+#include "nusmv/core/wff/ExprMgr.h"
 
 /*!
   \struct SexpInliner
-  \brief The SexpInliner type 
+  \brief The SexpInliner type
 
-  The SexpInliner type 
+  The SexpInliner type
 */
-typedef struct SexpInliner_TAG* SexpInliner_ptr;
+typedef struct SexpInliner_TAG *SexpInliner_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SEXP_INLINER(x) \
-         ((SexpInliner_ptr) x)
+#define SEXP_INLINER(x) ((SexpInliner_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SEXP_INLINER_CHECK_INSTANCE(x) \
-         (nusmv_assert(SEXP_INLINER(x) != SEXP_INLINER(NULL)))
+#define SEXP_INLINER_CHECK_INSTANCE(x)                                         \
+  (nusmv_assert(SEXP_INLINER(x) != SEXP_INLINER(NULL)))
 
 /*!
   \struct InlineRes
-  \brief Inliner result type 
+  \brief Inliner result type
 
-  Inliner result type 
+  Inliner result type
 */
-typedef struct InlineRes_TAG* InlineRes_ptr;
+typedef struct InlineRes_TAG *InlineRes_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define INLINE_RES(x) \
-         ((InlineRes_ptr) x)
+#define INLINE_RES(x) ((InlineRes_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define INLINE_RES_CHECK_INSTANCE(x) \
-         (nusmv_assert(INLINE_RES(x) != INLINE_RES(NULL)))
-
+#define INLINE_RES_CHECK_INSTANCE(x)                                           \
+  (nusmv_assert(INLINE_RES(x) != INLINE_RES(NULL)))
 
 /*---------------------------------------------------------------------------*/
 /* Public Function Interface                                                 */
 /*---------------------------------------------------------------------------*/
-
 
 /* ===================  SexpInliner  =================== */
 
@@ -109,13 +104,13 @@ typedef struct InlineRes_TAG* InlineRes_ptr;
                       no limit.
 */
 SexpInliner_ptr SexpInliner_create(SymbTable_ptr st,
-                                          const size_t fixpoint_limit);
+                                   const size_t fixpoint_limit);
 
 /*!
   \methodof SexpInliner
   \brief Copy costructor
 
-  
+
 */
 SexpInliner_ptr SexpInliner_copy(const SexpInliner_ptr self);
 
@@ -123,7 +118,7 @@ SexpInliner_ptr SexpInliner_copy(const SexpInliner_ptr self);
   \methodof SexpInliner
   \brief Destructor
 
-  
+
 */
 void SexpInliner_destroy(SexpInliner_ptr self);
 
@@ -132,10 +127,9 @@ void SexpInliner_destroy(SexpInliner_ptr self);
   \brief Returns the symbol table that is connected to the
                       BoolEnc instance connected to self
 
-  
+
 */
-SymbTable_ptr
-SexpInliner_get_symb_table(const SexpInliner_ptr self);
+SymbTable_ptr SexpInliner_get_symb_table(const SexpInliner_ptr self);
 
 /*!
   \methodof SexpInliner
@@ -149,9 +143,8 @@ SexpInliner_get_symb_table(const SexpInliner_ptr self);
                       variable. Returns true if the equivalence was
                       accepted, or false otherwise.
 */
-boolean
-SexpInliner_force_equivalence(SexpInliner_ptr self,
-                              node_ptr var, Expr_ptr expr);
+boolean SexpInliner_force_equivalence(SexpInliner_ptr self, node_ptr var,
+                                      Expr_ptr expr);
 
 /*!
   \methodof SexpInliner
@@ -167,8 +160,7 @@ SexpInliner_force_equivalence(SexpInliner_ptr self,
                       Returns true if any equivalence was accepted,
                       false if all were rejected
 */
-boolean
-SexpInliner_force_equivalences(SexpInliner_ptr self, Set_t equivs);
+boolean SexpInliner_force_equivalences(SexpInliner_ptr self, Set_t equivs);
 
 /*!
   \methodof SexpInliner
@@ -186,9 +178,8 @@ SexpInliner_force_equivalences(SexpInliner_ptr self, Set_t equivs);
                       Returns true if the invariant was successfully
                       forced, or false otherwise.
 */
-boolean
-SexpInliner_force_invariant(SexpInliner_ptr self,
-                            node_ptr var, Expr_ptr expr);
+boolean SexpInliner_force_invariant(SexpInliner_ptr self, node_ptr var,
+                                    Expr_ptr expr);
 
 /*!
   \methodof SexpInliner
@@ -204,8 +195,7 @@ SexpInliner_force_invariant(SexpInliner_ptr self,
                       Returns true if any invariant was accepted,
                       false if all were rejected
 */
-boolean
-SexpInliner_force_invariants(SexpInliner_ptr self, Set_t invars);
+boolean SexpInliner_force_invariants(SexpInliner_ptr self, Set_t invars);
 
 /*!
   \methodof SexpInliner
@@ -214,35 +204,31 @@ SexpInliner_force_invariants(SexpInliner_ptr self, Set_t invars);
   Any name occurring in the blacklist will be not
                       substituted. Use to avoid inlining a set of variables.
 */
-void
-SexpInliner_blacklist_name(SexpInliner_ptr self, node_ptr var);
+void SexpInliner_blacklist_name(SexpInliner_ptr self, node_ptr var);
 
 /*!
   \methodof SexpInliner
   \brief Clears the internal cache of forced equivalences
 
-  
+
 */
-void
-SexpInliner_clear_equivalences(SexpInliner_ptr self);
+void SexpInliner_clear_equivalences(SexpInliner_ptr self);
 
 /*!
   \methodof SexpInliner
   \brief Clears the internal cache of forced invariants
 
-  
+
 */
-void
-SexpInliner_clear_invariants(SexpInliner_ptr self);
+void SexpInliner_clear_invariants(SexpInliner_ptr self);
 
 /*!
   \methodof SexpInliner
   \brief Clears the internal set of blacklisted names.
 
-  
+
 */
-void
-SexpInliner_clear_blacklist(SexpInliner_ptr self);
+void SexpInliner_clear_blacklist(SexpInliner_ptr self);
 
 /*!
   \methodof SexpInliner
@@ -265,9 +251,8 @@ SexpInliner_clear_blacklist(SexpInliner_ptr self);
                  flattened, and normalized (all nodes created with
                  find_node)
 */
-InlineRes_ptr
-SexpInliner_inline(SexpInliner_ptr self, Expr_ptr expr,
-                   boolean* changed);
+InlineRes_ptr SexpInliner_inline(SexpInliner_ptr self, Expr_ptr expr,
+                                 boolean *changed);
 
 /*!
   \methodof SexpInliner
@@ -291,9 +276,8 @@ SexpInliner_inline(SexpInliner_ptr self, Expr_ptr expr,
 
   \se SexpInliner_inline
 */
-Expr_ptr
-SexpInliner_inline_no_learning(SexpInliner_ptr self, Expr_ptr expr,
-                               boolean* changed);
+Expr_ptr SexpInliner_inline_no_learning(SexpInliner_ptr self, Expr_ptr expr,
+                                        boolean *changed);
 
 /*!
   \methodof SexpInliner
@@ -302,8 +286,7 @@ SexpInliner_inline_no_learning(SexpInliner_ptr self, Expr_ptr expr,
   Get the internal var2expr hash. Do not perform any
   side-effects on this hash
 */
-hash_ptr
-SexpInliner_get_var2expr_hash(SexpInliner_ptr self);
+hash_ptr SexpInliner_get_var2expr_hash(SexpInliner_ptr self);
 
 /*!
   \methodof SexpInliner
@@ -312,8 +295,7 @@ SexpInliner_get_var2expr_hash(SexpInliner_ptr self);
   Get the internal var2invar hash. Do not perform any
   side-effects on this hash
 */
-hash_ptr
-SexpInliner_get_var2invar_hash(SexpInliner_ptr self);
+hash_ptr SexpInliner_get_var2invar_hash(SexpInliner_ptr self);
 
 /* ===================  InlineRes  =================== */
 
@@ -321,7 +303,7 @@ SexpInliner_get_var2invar_hash(SexpInliner_ptr self);
   \methodof InlineRes
   \brief Class destroyer
 
-  
+
 */
 void InlineRes_destroy(InlineRes_ptr self);
 
@@ -329,20 +311,18 @@ void InlineRes_destroy(InlineRes_ptr self);
   \methodof InlineRes
   \brief Returns the original expression which has been inlined
 
-  
+
 */
-Expr_ptr
-InlineRes_get_original_expr(const InlineRes_ptr self);
+Expr_ptr InlineRes_get_original_expr(const InlineRes_ptr self);
 
 /*!
   \methodof InlineRes
   \brief Composes the whole result, making the conjuction of the
                  inlined expression, equivalences and invariants
 
-  
+
 */
-Expr_ptr
-InlineRes_get_result(const InlineRes_ptr self);
+Expr_ptr InlineRes_get_result(const InlineRes_ptr self);
 
 /*!
   \methodof InlineRes
@@ -352,28 +332,25 @@ InlineRes_get_result(const InlineRes_ptr self);
   The equivalences and the invariants are sorted before being
   conjuncted to the inlined expression, to return a unique expression.
 */
-Expr_ptr
-InlineRes_get_result_unique(const InlineRes_ptr self);
+Expr_ptr InlineRes_get_result_unique(const InlineRes_ptr self);
 
 /*!
   \methodof InlineRes
   \brief Returns the inlined expression, without equivalences and
                  invariants
 
-  
+
 */
-Expr_ptr
-InlineRes_get_inlined_expr(const InlineRes_ptr self);
+Expr_ptr InlineRes_get_inlined_expr(const InlineRes_ptr self);
 
 /*!
   \methodof InlineRes
   \brief Returns the extracted and forced equivalences as an
                  expression
 
-  
+
 */
-Expr_ptr
-InlineRes_get_equivalences_expr(const InlineRes_ptr self);
+Expr_ptr InlineRes_get_equivalences_expr(const InlineRes_ptr self);
 
 /*!
   \methodof InlineRes
@@ -381,17 +358,15 @@ InlineRes_get_equivalences_expr(const InlineRes_ptr self);
 
   Returned set belongs to self, do not free it
 */
-Set_t
-InlineRes_get_equivalences(const InlineRes_ptr self);
+Set_t InlineRes_get_equivalences(const InlineRes_ptr self);
 
 /*!
   \methodof InlineRes
   \brief Returns the conjuction of all forced invariants
 
-  
+
 */
-Expr_ptr
-InlineRes_get_invariant_expr(const InlineRes_ptr self);
+Expr_ptr InlineRes_get_invariant_expr(const InlineRes_ptr self);
 
 /*!
   \methodof InlineRes
@@ -399,7 +374,6 @@ InlineRes_get_invariant_expr(const InlineRes_ptr self);
 
   Returned set belongs to self, do not free it
 */
-Set_t
-InlineRes_get_invariants(const InlineRes_ptr self);
+Set_t InlineRes_get_invariants(const InlineRes_ptr self);
 
 #endif /* __SEXP_INLINER_H__ */

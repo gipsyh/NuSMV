@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,12 +34,11 @@
 
 */
 
-
 #include "nusmv/core/utils/LRUCache.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/OAHash_private.h"
-#include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/object.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -54,11 +53,11 @@
 /*---------------------------------------------------------------------------*/
 
 typedef struct LRUNode_TAG {
-  struct LRUNode_TAG* prev;
-  struct LRUNode_TAG* next;
+  struct LRUNode_TAG *prev;
+  struct LRUNode_TAG *next;
 
-  void* key; /* This is held just for freeing it */
-  void* value;
+  void *key; /* This is held just for freeing it */
+  void *value;
 } LRUNode;
 
 /*!
@@ -72,26 +71,23 @@ typedef enum {
   LRU_NODE_ACTION_CLEAR
 } LRUNodeActionEnum;
 
-typedef struct LRUCache_TAG
-{
+typedef struct LRUCache_TAG {
   INHERITS_FROM(OAHash);
 
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-  LRUNode* head;
-  LRUNode* tail;
+  LRUNode *head;
+  LRUNode *tail;
 
   size_t threshold;
 
   /* Those are used for the custom free_entry_fun */
   LRUNodeActionEnum _free_lru_node;
   LRU_CACHE_FREE_FUN _free_fun;
-  void* _free_fun_argument;
+  void *_free_fun_argument;
 } LRUCache;
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -106,7 +102,7 @@ typedef struct LRUCache_TAG
 
   \todo Missing description
 */
-#define LRUNULL ((LRUNode*)NULL)
+#define LRUNULL ((LRUNode *)NULL)
 
 /**AutomaticStart*************************************************************/
 
@@ -118,12 +114,11 @@ static void lru_cache_init(LRUCache_ptr self, size_t threshold,
                            LRU_CACHE_EQ_FUN key_eq_fun,
                            LRU_CACHE_HASH_FUN key_hash_fun,
                            LRU_CACHE_FREE_FUN free_entry_fun,
-                           void* free_entry_fun_arg);
+                           void *free_entry_fun_arg);
 
 static void lru_cache_deinit(LRUCache_ptr self);
 
-static void lru_cache_free_entry_fun(void* k, void* v, void* arg);
-
+static void lru_cache_free_entry_fun(void *k, void *v, void *arg);
 
 /*!
   \brief Removes the given node from the double linked list
@@ -131,25 +126,21 @@ static void lru_cache_free_entry_fun(void* k, void* v, void* arg);
   Removes the given node from the double linked list
 */
 
-static inline void lru_cache_remove(LRUCache_ptr self, LRUNode* node)
-{
+static inline void lru_cache_remove(LRUCache_ptr self, LRUNode *node) {
   if (LRUNULL == node->next) {
     nusmv_assert(self->head == node);
     self->head = node->prev;
-  }
-  else {
+  } else {
     node->next->prev = node->prev;
   }
 
   if (LRUNULL == node->prev) {
     nusmv_assert(self->tail == node);
     self->tail = node->next;
-  }
-  else {
+  } else {
     node->prev->next = node->next;
   }
 }
-
 
 /*!
   \brief Appends the given node to the tail of the
@@ -159,8 +150,7 @@ static inline void lru_cache_remove(LRUCache_ptr self, LRUNode* node)
                       double linked list
 */
 
-static inline void lru_cache_append(LRUCache_ptr self, LRUNode* node)
-{
+static inline void lru_cache_append(LRUCache_ptr self, LRUNode *node) {
   /* Update to defaults the prev and next */
   node->prev = LRUNULL;
   node->next = LRUNULL;
@@ -168,8 +158,7 @@ static inline void lru_cache_append(LRUCache_ptr self, LRUNode* node)
   if (LRUNULL == self->tail) {
     nusmv_assert(LRUNULL == self->head);
     self->head = node;
-  }
-  else {
+  } else {
     node->next = self->tail;
     self->tail->prev = node;
   }
@@ -178,40 +167,35 @@ static inline void lru_cache_append(LRUCache_ptr self, LRUNode* node)
   self->tail = node;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-LRUCache_ptr LRUCache_create(size_t threshold,
-                             LRU_CACHE_EQ_FUN key_eq_fun,
+LRUCache_ptr LRUCache_create(size_t threshold, LRU_CACHE_EQ_FUN key_eq_fun,
                              LRU_CACHE_HASH_FUN key_hash_fun,
                              LRU_CACHE_FREE_FUN free_entry_fun,
-                             void* custom_arg)
-{
+                             void *custom_arg) {
   LRUCache_ptr self = ALLOC(LRUCache, 1);
 
   LRU_CACHE_CHECK_INSTANCE(self);
   nusmv_assert(NULL != key_hash_fun);
   nusmv_assert(NULL != key_eq_fun);
 
-  lru_cache_init(self, threshold, key_eq_fun, key_hash_fun,
-                 free_entry_fun, custom_arg);
+  lru_cache_init(self, threshold, key_eq_fun, key_hash_fun, free_entry_fun,
+                 custom_arg);
   return self;
 }
 
-void LRUCache_destroy(LRUCache_ptr self)
-{
+void LRUCache_destroy(LRUCache_ptr self) {
   LRU_CACHE_CHECK_INSTANCE(self);
 
   lru_cache_deinit(self);
   FREE(self);
 }
 
-boolean LRUCache_insert(LRUCache_ptr self, const void* key, const void* value)
-{
+boolean LRUCache_insert(LRUCache_ptr self, const void *key, const void *value) {
   /* Get and remove the possibly duplicate */
-  LRUNode* curr_val = (LRUNode*)OAHash_lookup(OA_HASH(self), key);
+  LRUNode *curr_val = (LRUNode *)OAHash_lookup(OA_HASH(self), key);
   boolean replaced = false;
   boolean res;
 
@@ -227,8 +211,7 @@ boolean LRUCache_insert(LRUCache_ptr self, const void* key, const void* value)
     lru_cache_remove(self, curr_val);
 
     replaced = true;
-  }
-  else {
+  } else {
     if (OAHash_get_size(OA_HASH(self)) >= self->threshold) {
       /* Recycle the node we remove */
       curr_val = self->head;
@@ -239,8 +222,7 @@ boolean LRUCache_insert(LRUCache_ptr self, const void* key, const void* value)
 
       /* Remove the head.. */
       lru_cache_remove(self, curr_val);
-    }
-    else {
+    } else {
       curr_val = ALLOC(LRUNode, 1);
     }
   }
@@ -252,18 +234,17 @@ boolean LRUCache_insert(LRUCache_ptr self, const void* key, const void* value)
   lru_cache_append(self, curr_val);
 
   /* Update the value */
-  curr_val->key = (void*)key;
-  curr_val->value = (void*)value;
+  curr_val->key = (void *)key;
+  curr_val->value = (void *)value;
 
   return replaced;
 }
 
-void* LRUCache_lookup(LRUCache_ptr self, const void* key)
-{
-  LRUNode* curr_val = (LRUNode*)OAHash_lookup(OA_HASH(self), key);
+void *LRUCache_lookup(LRUCache_ptr self, const void *key) {
+  LRUNode *curr_val = (LRUNode *)OAHash_lookup(OA_HASH(self), key);
 
   if (LRUNULL == curr_val) {
-    return (void*)NULL;
+    return (void *)NULL;
   }
 
   /* Update the node position, moving it to the tail (lowest priority
@@ -274,8 +255,7 @@ void* LRUCache_lookup(LRUCache_ptr self, const void* key)
   return curr_val->value;
 }
 
-boolean LRUCache_remove(LRUCache_ptr self, const void* key)
-{
+boolean LRUCache_remove(LRUCache_ptr self, const void *key) {
   boolean res;
 
   /* Tell the freeing function that we want to free the LRUNode
@@ -287,8 +267,7 @@ boolean LRUCache_remove(LRUCache_ptr self, const void* key)
   return res;
 }
 
-void LRUCache_clear(LRUCache_ptr self)
-{
+void LRUCache_clear(LRUCache_ptr self) {
   LRU_CACHE_CHECK_INSTANCE(self);
 
   /* Tell the freeing function that we want to free all LRUNodes in
@@ -302,19 +281,17 @@ void LRUCache_clear(LRUCache_ptr self)
 }
 
 void LRUCache_iter_values(const LRUCache_ptr self, const LRUCacheIter iter,
-                          void** key, void** value)
-{
+                          void **key, void **value) {
   OAHash_iter_values(OA_HASH(self), (OAHashIter)iter, key, value);
 
-  if ((void**)NULL != value) {
-    *value = ((LRUNode*)(*value))->value;
+  if ((void **)NULL != value) {
+    *value = ((LRUNode *)(*value))->value;
   }
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -331,8 +308,7 @@ static void lru_cache_init(LRUCache_ptr self, size_t threshold,
                            LRU_CACHE_EQ_FUN key_eq_fun,
                            LRU_CACHE_HASH_FUN key_hash_fun,
                            LRU_CACHE_FREE_FUN free_entry_fun,
-                           void* custom_arg)
-{
+                           void *custom_arg) {
   /* members initialization */
   oa_hash_init(OA_HASH(self), key_eq_fun, key_hash_fun,
                lru_cache_free_entry_fun, custom_arg);
@@ -360,8 +336,7 @@ static void lru_cache_init(LRUCache_ptr self, size_t threshold,
 
   \sa LRUCache_destroy
 */
-static void lru_cache_deinit(LRUCache_ptr self)
-{
+static void lru_cache_deinit(LRUCache_ptr self) {
   /* oa_hash_deinit will also free our LRUNodes */
   self->_free_lru_node = LRU_NODE_ACTION_CLEAR;
   oa_hash_deinit(OA_HASH(self));
@@ -379,14 +354,12 @@ static void lru_cache_deinit(LRUCache_ptr self)
 
   \sa LRUCache_destroy
 */
-static void lru_cache_free_entry_fun(void* k, void* v, void* arg)
-{
+static void lru_cache_free_entry_fun(void *k, void *v, void *arg) {
   LRUCache_ptr self = LRU_CACHE(arg);
-  LRUNode* lrunode = (LRUNode*)v;
+  LRUNode *lrunode = (LRUNode *)v;
 
   if (NULL != self->_free_fun) {
-    self->_free_fun(lrunode->key, lrunode->value,
-                    self->_free_fun_argument);
+    self->_free_fun(lrunode->key, lrunode->value, self->_free_fun_argument);
   }
 
   switch (self->_free_lru_node) {
@@ -411,4 +384,3 @@ static void lru_cache_free_entry_fun(void* k, void* v, void* arg)
 }
 
 /**AutomaticEnd***************************************************************/
-

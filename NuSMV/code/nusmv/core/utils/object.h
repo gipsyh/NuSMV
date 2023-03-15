@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,13 +35,11 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_OBJECT_H__
 #define __NUSMV_CORE_UTILS_OBJECT_H__
 
-#include <memory.h>
 #include <assert.h>
+#include <memory.h>
 
 #include "nusmv/core/utils/utils.h"
 
@@ -51,24 +49,21 @@
 
   \todo Missing description
 */
-typedef struct Object_TAG*  Object_ptr;
+typedef struct Object_TAG *Object_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OBJECT(x)  \
-        ((Object_ptr) x)
+#define OBJECT(x) ((Object_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OBJECT_CHECK_INSTANCE(x)  \
-        (nusmv_assert(OBJECT(x) != OBJECT(NULL)))
-
+#define OBJECT_CHECK_INSTANCE(x) (nusmv_assert(OBJECT(x) != OBJECT(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* OO keywords:                                                           */
@@ -87,19 +82,15 @@ typedef struct Object_TAG*  Object_ptr;
 
   \todo Missing description
 */
-#define INHERITS_FROM(x) \
-       x  __parent__
+#define INHERITS_FROM(x) x __parent__
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OVERRIDE(Class, virtual_method) \
-       ((Class*) self)->virtual_method
+#define OVERRIDE(Class, virtual_method) ((Class *)self)->virtual_method
 /* ---------------------------------------------------------------------- */
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -112,7 +103,7 @@ typedef struct Object_TAG*  Object_ptr;
   Class virtual destructor. Call this to destroy any
   instance of any derived class.
 */
-VIRTUAL void Object_destroy(Object_ptr self, void* arg);
+VIRTUAL void Object_destroy(Object_ptr self, void *arg);
 
 /*!
   \methodof Object
@@ -124,9 +115,8 @@ VIRTUAL void Object_destroy(Object_ptr self, void* arg);
                       Since Object is a virtual class, it cannot be
                       really instantiated. This means that the copy constructor
                       must be implemented by derived class if the copy is
-                      a needed operation. 
+                      a needed operation.
 */
 VIRTUAL Object_ptr Object_copy(const Object_ptr self);
-
 
 #endif /* __NUSMV_CORE_UTILS_OBJECT_H__ */

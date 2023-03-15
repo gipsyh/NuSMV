@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,15 +34,12 @@
 
 */
 
-
 #include "nusmv/core/utils/OStream.h"
-#include <stdarg.h>
-#include <stdio.h>
-#include "nusmv/core/utils/OStream.h"
+#include "nusmv/core/utils/error.h"
 #include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/utils_io.h"
-#include "nusmv/core/utils/error.h"
-
+#include <stdarg.h>
+#include <stdio.h>
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -63,19 +60,16 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct OStream_TAG
-{
+typedef struct OStream_TAG {
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-  FILE* stream;
+  FILE *stream;
   int indent_size;
   boolean split_nl;
 
   boolean next_needs_indentation;
 } OStream;
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -85,18 +79,16 @@ typedef struct OStream_TAG
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void ostream_init(OStream_ptr self, FILE* stream);
+static void ostream_init(OStream_ptr self, FILE *stream);
 static void ostream_deinit(OStream_ptr self, boolean close_stream);
 
-static inline void ostream_indent(OStream_ptr self)
-{
+static inline void ostream_indent(OStream_ptr self) {
   int k;
 
   for (k = 0; k < self->indent_size; ++k) {
@@ -112,17 +104,15 @@ static inline void ostream_indent(OStream_ptr self)
 
 static inline void print_splitted_node(OStream_ptr self,
                                        MasterPrinter_ptr printer,
-                                       const char* format,
-                                       va_list args)
-{
+                                       const char *format, va_list args) {
 
-  if ((FILE*)NULL != self->stream) {
+  if ((FILE *)NULL != self->stream) {
     if (self->split_nl) {
-      FILE* output = self->stream;
+      FILE *output = self->stream;
       size_t i = 0;
       char buf[32];
 
-      nusmv_assert((const char*)NULL != format);
+      nusmv_assert((const char *)NULL != format);
 
       while (format[i] != '\0') {
 
@@ -136,10 +126,9 @@ static inline void print_splitted_node(OStream_ptr self,
           if (format[i + 1] == '%') {
             fprintf(output, "%%");
             i += 2;
-          }
-          else if (format[i + 1] == 'N') {
+          } else if (format[i + 1] == 'N') {
             node_ptr node = va_arg(args, node_ptr);
-            char* str;
+            char *str;
 
             MASTER_PRINTER_CHECK_INSTANCE(printer);
 
@@ -147,72 +136,95 @@ static inline void print_splitted_node(OStream_ptr self,
             fprintf(output, "%s", str);
             FREE(str);
             i += 2;
-          }
-          else {
+          } else {
             enum var_type type;
             enum var_modifier mod;
             int read;
 
             read = UtilsIO_get_param_len(format + i, &type, &mod);
-            nusmv_assert(read < sizeof(buf)/sizeof(buf[0]));
+            nusmv_assert(read < sizeof(buf) / sizeof(buf[0]));
             strncpy(buf, format + i, read);
             buf[read] = '\0'; /* terminator */
 
             switch (type) {
 
             case VAR_INT:
-              switch(mod) {
+              switch (mod) {
               case MOD_NONE:
               case MOD_SHORT:
-              case MOD_SHORT_SHORT: fprintf(output, buf, va_arg(args, int)); break;
-              case MOD_SIZE_T: fprintf(output, buf, va_arg(args, size_t)); break;
-              case MOD_LONG: fprintf(output, buf, va_arg(args, long int)); break;
-              case MOD_LONG_LONG: fprintf(output, buf, va_arg(args, long long int)); break;
+              case MOD_SHORT_SHORT:
+                fprintf(output, buf, va_arg(args, int));
+                break;
+              case MOD_SIZE_T:
+                fprintf(output, buf, va_arg(args, size_t));
+                break;
+              case MOD_LONG:
+                fprintf(output, buf, va_arg(args, long int));
+                break;
+              case MOD_LONG_LONG:
+                fprintf(output, buf, va_arg(args, long long int));
+                break;
 
                 /* The rest is an error (or unhandled feature) */
-              default: error_unreachable_code();
+              default:
+                error_unreachable_code();
               }
               break; /* case VAR_INT */
 
             case VAR_CHAR:
-              switch(mod) {
-              case MOD_NONE: fprintf(output, buf, va_arg(args, int)); break;
+              switch (mod) {
+              case MOD_NONE:
+                fprintf(output, buf, va_arg(args, int));
+                break;
 
                 /* The rest is an error (or unhandled feature) */
-              default: error_unreachable_code();
+              default:
+                error_unreachable_code();
               }
               break; /* case VAR_CHAR */
 
             case VAR_STRING:
-              switch(mod) {
-              case MOD_NONE: fprintf(output, buf, va_arg(args, char*)); break;
+              switch (mod) {
+              case MOD_NONE:
+                fprintf(output, buf, va_arg(args, char *));
+                break;
 
                 /* The rest is an error (or unhandled feature) */
-              default: error_unreachable_code();
+              default:
+                error_unreachable_code();
               }
-              break;  /* case VAR_STRING */
+              break; /* case VAR_STRING */
 
             case VAR_POINTER:
-              switch(mod) {
-              case MOD_NONE: fprintf(output, buf, va_arg(args, void*)); break;
+              switch (mod) {
+              case MOD_NONE:
+                fprintf(output, buf, va_arg(args, void *));
+                break;
 
                 /* The rest is an error (or unhandled feature) */
-              default: error_unreachable_code();
+              default:
+                error_unreachable_code();
               }
-              break;  /* case VAR_POINTER */
+              break; /* case VAR_POINTER */
 
             case VAR_DOUBLE:
-              switch(mod) {
-              case MOD_NONE: fprintf(output, buf, va_arg(args, double)); break;
-              case MOD_LONG_DOUBLE: fprintf(output, buf, va_arg(args, long double)); break;
+              switch (mod) {
+              case MOD_NONE:
+                fprintf(output, buf, va_arg(args, double));
+                break;
+              case MOD_LONG_DOUBLE:
+                fprintf(output, buf, va_arg(args, long double));
+                break;
 
                 /* The rest is an error (or unhandled feature) */
-              default: error_unreachable_code();
+              default:
+                error_unreachable_code();
               }
               break; /* case VAR_DOUBLE */
 
               /* Errors */
-            default: error_unreachable_code();
+            default:
+              error_unreachable_code();
             }
 
             i += read;
@@ -222,22 +234,19 @@ static inline void print_splitted_node(OStream_ptr self,
           fprintf(output, "\n");
           self->next_needs_indentation = true;
           ++i;
-        }
-        else {
+        } else {
           fprintf(output, "%c", format[i]);
           ++i;
         }
       }
-    }
-    else {
+    } else {
       if (self->next_needs_indentation) {
         ostream_indent(self);
       }
 
       if (MASTER_PRINTER(NULL) == printer) {
         vfprintf(self->stream, format, args);
-      }
-      else {
+      } else {
         UtilsIO_node_vfprintf(printer, self->stream, format, args);
       }
 
@@ -250,8 +259,7 @@ static inline void print_splitted_node(OStream_ptr self,
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-OStream_ptr OStream_create(FILE* stream)
-{
+OStream_ptr OStream_create(FILE *stream) {
   OStream_ptr self = ALLOC(OStream, 1);
   OSTREAM_CHECK_INSTANCE(self);
 
@@ -259,19 +267,17 @@ OStream_ptr OStream_create(FILE* stream)
   return self;
 }
 
-OStream_ptr OStream_create_file(const char* fname, boolean append)
-{
-  FILE* file = fopen(fname, append ? "a" : "w");
+OStream_ptr OStream_create_file(const char *fname, boolean append) {
+  FILE *file = fopen(fname, append ? "a" : "w");
 
-  if ((FILE*)NULL == file) {
+  if ((FILE *)NULL == file) {
     error_unreachable_code_msg("Unable to create file %s", fname);
   }
 
   return OStream_create(file);
 }
 
-OStream_ptr OStream_copy(OStream_ptr self)
-{
+OStream_ptr OStream_copy(OStream_ptr self) {
   OStream_ptr copy = ALLOC(OStream, 1);
 
   OSTREAM_CHECK_INSTANCE(self);
@@ -286,29 +292,23 @@ OStream_ptr OStream_copy(OStream_ptr self)
   return copy;
 }
 
-FILE* OStream_get_stream(const OStream_ptr self)
-{
-  return self->stream;
-}
+FILE *OStream_get_stream(const OStream_ptr self) { return self->stream; }
 
-void OStream_destroy(OStream_ptr self)
-{
+void OStream_destroy(OStream_ptr self) {
   OSTREAM_CHECK_INSTANCE(self);
 
   ostream_deinit(self, true);
   FREE(self);
 }
 
-void OStream_destroy_safe(OStream_ptr self)
-{
+void OStream_destroy_safe(OStream_ptr self) {
   OSTREAM_CHECK_INSTANCE(self);
 
   ostream_deinit(self, false);
   FREE(self);
 }
 
-void OStream_printf(const OStream_ptr self, const char* format, ...)
-{
+void OStream_printf(const OStream_ptr self, const char *format, ...) {
   va_list args;
 
   va_start(args, format);
@@ -317,59 +317,39 @@ void OStream_printf(const OStream_ptr self, const char* format, ...)
 }
 
 void OStream_nprintf(const OStream_ptr self,
-                     const MasterPrinter_ptr node_printer,
-                     const char* format, ...)
-{
+                     const MasterPrinter_ptr node_printer, const char *format,
+                     ...) {
   va_list args;
   va_start(args, format);
   print_splitted_node(self, node_printer, format, args);
   va_end(args);
 }
 
-void OStream_vprintf(const OStream_ptr self, const char* format, va_list args)
-{
+void OStream_vprintf(const OStream_ptr self, const char *format, va_list args) {
   print_splitted_node(self, NULL, format, args);
 }
 
 void OStream_nvprintf(const OStream_ptr self,
-                      const MasterPrinter_ptr node_printer,
-                      const char* format, va_list args)
-{
+                      const MasterPrinter_ptr node_printer, const char *format,
+                      va_list args) {
   print_splitted_node(self, node_printer, format, args);
 }
 
-void OStream_flush(const OStream_ptr self)
-{
-  fflush(self->stream);
-}
+void OStream_flush(const OStream_ptr self) { fflush(self->stream); }
 
-void OStream_inc_indent_size(OStream_ptr self)
-{
-  self->indent_size++;
-}
+void OStream_inc_indent_size(OStream_ptr self) { self->indent_size++; }
 
-void OStream_dec_indent_size(OStream_ptr self)
-{
-  self->indent_size--;
-}
+void OStream_dec_indent_size(OStream_ptr self) { self->indent_size--; }
 
-int OStream_get_indent_size(const OStream_ptr self)
-{
+int OStream_get_indent_size(const OStream_ptr self) {
   return self->indent_size;
 }
 
-void OStream_reset_indent_size(OStream_ptr self)
-{
-  self->indent_size = 0;
-}
+void OStream_reset_indent_size(OStream_ptr self) { self->indent_size = 0; }
 
-void OStream_set_indent_size(OStream_ptr self, int n)
-{
-  self->indent_size = n;
-}
+void OStream_set_indent_size(OStream_ptr self, int n) { self->indent_size = n; }
 
-void OStream_set_split_newline(OStream_ptr self, boolean enabled)
-{
+void OStream_set_split_newline(OStream_ptr self, boolean enabled) {
   self->split_nl = enabled;
 }
 
@@ -377,10 +357,9 @@ void OStream_set_split_newline(OStream_ptr self, boolean enabled)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void OStream_set_stream(OStream_ptr self, FILE* stream)
-{
+void OStream_set_stream(OStream_ptr self, FILE *stream) {
   if (self->stream != stream) {
-    if ((FILE*)NULL != self->stream) {
+    if ((FILE *)NULL != self->stream) {
       fflush(self->stream);
 
       if (stdout != self->stream && stderr != self->stream) {
@@ -392,13 +371,12 @@ void OStream_set_stream(OStream_ptr self, FILE* stream)
   }
 }
 
-FILE* OStream_reset_stream(OStream_ptr self)
-{
-  FILE* rv = self->stream;
+FILE *OStream_reset_stream(OStream_ptr self) {
+  FILE *rv = self->stream;
 
   OSTREAM_CHECK_INSTANCE(self);
 
-  self->stream = (FILE*)NULL;
+  self->stream = (FILE *)NULL;
 
   return rv;
 }
@@ -414,8 +392,7 @@ FILE* OStream_reset_stream(OStream_ptr self)
 
   \sa OStream_create
 */
-static void ostream_init(OStream_ptr self, FILE* stream)
-{
+static void ostream_init(OStream_ptr self, FILE *stream) {
   /* members initialization */
   self->stream = stream;
   self->indent_size = 0;
@@ -431,21 +408,16 @@ static void ostream_init(OStream_ptr self, FILE* stream)
 
   \sa OStream_destroy
 */
-static void ostream_deinit(OStream_ptr self, boolean close_stream)
-{
+static void ostream_deinit(OStream_ptr self, boolean close_stream) {
   /* members deinitialization */
 
-  if ((FILE*)NULL != self->stream) {
+  if ((FILE *)NULL != self->stream) {
     fflush(self->stream);
 
     if (close_stream && stdout != self->stream && stderr != self->stream) {
       fclose(self->stream);
     }
   }
-
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

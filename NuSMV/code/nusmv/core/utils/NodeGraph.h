@@ -35,16 +35,13 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_NODE_GRAPH_H__
 #define __NUSMV_CORE_UTILS_NODE_GRAPH_H__
 
-
 #include "nusmv/core/node/node.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/set/set.h"
 #include "nusmv/core/utils/utils.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 
 /*!
   \struct NodeGraph
@@ -52,7 +49,7 @@
 
 
 */
-typedef struct NodeGraph_TAG*  NodeGraph_ptr;
+typedef struct NodeGraph_TAG *NodeGraph_ptr;
 
 /*!
   \brief To cast and check instances of class NodeGraph
@@ -60,18 +57,15 @@ typedef struct NodeGraph_TAG*  NodeGraph_ptr;
   These macros must be used respectively to cast and to check
   instances of class NodeGraph
 */
-#define NODE_GRAPH(self) \
-         ((NodeGraph_ptr) self)
+#define NODE_GRAPH(self) ((NodeGraph_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_GRAPH_CHECK_INSTANCE(self) \
-         (nusmv_assert(NODE_GRAPH(self) != NODE_GRAPH(NULL)))
-
-
+#define NODE_GRAPH_CHECK_INSTANCE(self)                                        \
+  (nusmv_assert(NODE_GRAPH(self) != NODE_GRAPH(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -108,16 +102,14 @@ void NodeGraph_destroy(NodeGraph_ptr self);
          node that contains NULL pointer. NodeGraph_get_parents
          will not return empty set for those nodes.
 */
-void
-NodeGraph_add_children(NodeGraph_ptr self, node_ptr var,
-                       const Set_t children);
+void NodeGraph_add_children(NodeGraph_ptr self, node_ptr var,
+                            const Set_t children);
 
 /*!
   \methodof NodeGraph
   \brief
 */
-void
-NodeGraph_remove_nodes(NodeGraph_ptr self, const Set_t nodes);
+void NodeGraph_remove_nodes(NodeGraph_ptr self, const Set_t nodes);
 
 /*!
   \methodof NodeGraph
@@ -150,20 +142,15 @@ Set_t NodeGraph_get_leaves(const NodeGraph_ptr self);
 
   The returned set has to be returned by caller.
 */
-Set_t NodeGraph_get_parents(const NodeGraph_ptr self,
-                            node_ptr child);
+Set_t NodeGraph_get_parents(const NodeGraph_ptr self, node_ptr child);
 
 /*!
   \methodof NodeGraph
   \brief Prints out the graph
 */
-void NodeGraph_print(const NodeGraph_ptr self,
-                            MasterPrinter_ptr printer,
-                            FILE* out);
-
+void NodeGraph_print(const NodeGraph_ptr self, MasterPrinter_ptr printer,
+                     FILE *out);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_NODE_GRAPH_H__ */

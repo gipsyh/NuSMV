@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,37 +34,32 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_DEPENDENCY_FORMULA_DEPENDENCY_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_DEPENDENCY_FORMULA_DEPENDENCY_PRIVATE_H__
-
 
 #include "nusmv/core/compile/dependency/FormulaDependency.h"
 #include "nusmv/core/node/MasterNodeWalker.h"
 #include "nusmv/core/node/MasterNodeWalker_private.h"
+#include "nusmv/core/utils/Tuple5.h"
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/defs.h"
-#include "nusmv/core/utils/Tuple5.h"
 
 /*!
   \brief FormulaDependency class definition derived from
                class MasterNodeWalker
 
-  
+
 
   \sa Base class MasterNodeWalker
 */
 
-typedef struct FormulaDependency_TAG
-{
+typedef struct FormulaDependency_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(MasterNodeWalker);
 
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-
 
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
@@ -79,32 +74,30 @@ typedef struct FormulaDependency_TAG
    defined symbols to keep track that compuation is ongoing to discover
    circular definitions.
 */
-#define BUILDING_DEP_SET (Set_t)-10
+#define BUILDING_DEP_SET (Set_t) - 10
 
 /*!
   \brief Indicates that the dependency is empty
 
-  
+
 */
-#define EMPTY_DEP_SET (Set_t)-11
+#define EMPTY_DEP_SET (Set_t) - 11
 
 /*!
   \brief Indicates that no dependency has been yet computed.
 
-  
+
 */
-#define NO_DEP_SET (Set_t)-12
+#define NO_DEP_SET (Set_t) - 12
 
 /*!
   \brief True if the set is not NULL or equal the fake sets used as
                  placeholder
 
-  
+
 */
-#define IS_VALID_SET(set)                          \
-  (EMPTY_DEP_SET != set &&                         \
-   BUILDING_DEP_SET != set &&                      \
-   NO_DEP_SET != set &&                            \
+#define IS_VALID_SET(set)                                                      \
+  (EMPTY_DEP_SET != set && BUILDING_DEP_SET != set && NO_DEP_SET != set &&     \
    (Set_t)NULL != set)
 
 /* ---------------------------------------------------------------------- */
@@ -120,7 +113,7 @@ typedef struct FormulaDependency_TAG
   \sa FormulaDependency_create
 */
 void formula_dependency_init(FormulaDependency_ptr self,
-                                    const NuSMVEnv_ptr env);
+                             const NuSMVEnv_ptr env);
 
 /*!
   \methodof FormulaDependency
@@ -141,13 +134,12 @@ void formula_dependency_deinit(FormulaDependency_ptr self);
   \sa formula_dependency_get_definition_dependencies
    FormulaDependency_GetDependenciesByType
 */
-Set_t
-formula_dependency_get_dependencies(FormulaDependency_ptr self,
-                                    SymbTable_ptr symb_table,
-                                    node_ptr formula, node_ptr context,
-                                    SymbFilterType filter,
-                                    boolean preserve_time, int time,
-                                    hash_ptr dependencies_hash);
+Set_t formula_dependency_get_dependencies(FormulaDependency_ptr self,
+                                          SymbTable_ptr symb_table,
+                                          node_ptr formula, node_ptr context,
+                                          SymbFilterType filter,
+                                          boolean preserve_time, int time,
+                                          hash_ptr dependencies_hash);
 
 /*!
   \methodof FormulaDependency
@@ -169,23 +161,20 @@ formula_dependency_get_dependencies(FormulaDependency_ptr self,
 
   \sa FormulaDependency_GetDependencies
 */
-Set_t
-formula_dependency_get_definition_dependencies(FormulaDependency_ptr self,
-                                               SymbTable_ptr symb_table,
-                                               node_ptr formula,
-                                               SymbFilterType filter,
-                                               boolean preserve_time, int time,
-                                               hash_ptr dependencies_hash);
+Set_t formula_dependency_get_definition_dependencies(
+    FormulaDependency_ptr self, SymbTable_ptr symb_table, node_ptr formula,
+    SymbFilterType filter, boolean preserve_time, int time,
+    hash_ptr dependencies_hash);
 
 /*!
   \methodof FormulaDependency
   \brief Call SymbTable_get_handled_hash_ptr to get the
    hash table used to store the dependencies
 
-  
+
 */
 hash_ptr formula_dependency_get_hash(FormulaDependency_ptr self,
-                                            SymbTable_ptr symb_table);
+                                     SymbTable_ptr symb_table);
 
 /*!
   \brief Insertion function for dependencies_hash
@@ -194,9 +183,8 @@ hash_ptr formula_dependency_get_hash(FormulaDependency_ptr self,
    the stack), allocates it and insert it in the hash table.
    Assumes the key not be already in the table.
 */
-void formula_dependency_insert_hash(hash_ptr dep_hash,
-                                           node_ptr key,
-                                           Set_t value);
+void formula_dependency_insert_hash(hash_ptr dep_hash, node_ptr key,
+                                    Set_t value);
 
 /*!
   \brief Insertion function for dependencies_hash
@@ -208,28 +196,24 @@ void formula_dependency_insert_hash(hash_ptr dep_hash,
    Tuple5_init() (memorized on the stack) and use it to replace the associated
    valued in the hash.
 */
-void formula_dependency_close_define_hash(hash_ptr dep_hash,
-                                                 node_ptr key,
-                                                 Set_t value);
+void formula_dependency_close_define_hash(hash_ptr dep_hash, node_ptr key,
+                                          Set_t value);
 
 /*!
   \brief Lookup function for dependencies_hash
 
-  
+
 */
-Set_t formula_dependency_lookup_hash(hash_ptr dep_hash,
-                                            node_ptr key);
+Set_t formula_dependency_lookup_hash(hash_ptr dep_hash, node_ptr key);
 
 /*!
   \brief Make the hash key used by dependencies_hash
 
   The Tuple5 has to freed by the caller
 */
-void
-formula_dependency_mk_hash_key(node_ptr e, node_ptr c, SymbFilterType filter,
-                               boolean preserve_time, int time,
-                               Tuple5_ptr key);
-
-
+void formula_dependency_mk_hash_key(node_ptr e, node_ptr c,
+                                    SymbFilterType filter,
+                                    boolean preserve_time, int time,
+                                    Tuple5_ptr key);
 
 #endif /* __NUSMV_CORE_COMPILE_DEPENDENCY_FORMULA_DEPENDENCY_PRIVATE_H__ */

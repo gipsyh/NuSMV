@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -30,7 +30,7 @@
   \author Andrei Tchaltsev
   \brief Public interface for a predicate-extractor class
 
-  
+
 
   The purpose of PredicateExtractor class is to extract predicates and
   clusters from expressions. This class is similar to
@@ -74,20 +74,17 @@
 
   This is a stand-alone class. This class needs only a type checker --
   to get the type of input expression and type check the generated
-  (returned) expressions.  
+  (returned) expressions.
 
 */
-
-
 
 #ifndef __NUSMV_CORE_COMPILE_PREDICATE_EXTRACTOR_H__
 #define __NUSMV_CORE_COMPILE_PREDICATE_EXTRACTOR_H__
 
-#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/compile/FlatHierarchy.h" /* for FlatHierarchy_ptr */
+#include "nusmv/core/compile/symb_table/SymbTable.h"
 #include "nusmv/core/set/set.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -97,26 +94,24 @@
   \struct PredicateExtractor
   \brief Preicate Extractor class
 
-  
+
 */
-typedef struct PredicateExtractor_TAG* PredicateExtractor_ptr;
+typedef struct PredicateExtractor_TAG *PredicateExtractor_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PREDICATE_EXTRACTOR(x) \
-         ((PredicateExtractor_ptr) x)
+#define PREDICATE_EXTRACTOR(x) ((PredicateExtractor_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PREDICATE_EXTRACTOR_CHECK_INSTANCE(x) \
-         ( nusmv_assert(PREDICATE_EXTRACTOR(x) != PREDICATE_EXTRACTOR(NULL)) )
-
+#define PREDICATE_EXTRACTOR_CHECK_INSTANCE(x)                                  \
+  (nusmv_assert(PREDICATE_EXTRACTOR(x) != PREDICATE_EXTRACTOR(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /* Public interface                                                       */
@@ -139,23 +134,23 @@ typedef struct PredicateExtractor_TAG* PredicateExtractor_ptr;
    NOTE that the type checker remembers the type of checked
    expressions (free or reuse nodes with care).
 */
-PredicateExtractor_ptr
-PredicateExtractor_create(SymbTable_ptr st, boolean use_approx);
+PredicateExtractor_ptr PredicateExtractor_create(SymbTable_ptr st,
+                                                 boolean use_approx);
 
 /*!
   \methodof PredicateExtractor
   \brief Class PredicateExtractor destructor
 
-  
+
 */
-void  PredicateExtractor_destroy(PredicateExtractor_ptr self);
+void PredicateExtractor_destroy(PredicateExtractor_ptr self);
 
 /*!
   \methodof PredicateExtractor
   \brief The function computes and collects
    the predicates of a given expression
 
-  
+
    See PredicateExtractor.h for more info on predicates and clusters.
 
    Note: that normalization of the input expression is not done.  Only
@@ -176,11 +171,10 @@ void  PredicateExtractor_destroy(PredicateExtractor_ptr self);
 
    Collected clusters/predicates are stored internally and can be
    obtained with PredicateExtractor_get_all_preds and
-   PredicateExtractor_get_all_clusters.  
+   PredicateExtractor_get_all_clusters.
 */
-void
-PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
-                                 node_ptr expr);
+void PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
+                                      node_ptr expr);
 
 /*!
   \methodof PredicateExtractor
@@ -190,9 +184,8 @@ PredicateExtractor_compute_preds(PredicateExtractor_ptr self,
   Note that symbol table in self has to correspond to
    the hierarchy, i.e. contains all the required symbols
 */
-void
-PredicateExtractor_compute_preds_from_hierarchy(PredicateExtractor_ptr self,
-                                                FlatHierarchy_ptr fh);
+void PredicateExtractor_compute_preds_from_hierarchy(
+    PredicateExtractor_ptr self, FlatHierarchy_ptr fh);
 
 /*!
   \methodof PredicateExtractor
@@ -202,8 +195,7 @@ PredicateExtractor_compute_preds_from_hierarchy(PredicateExtractor_ptr self,
    created with find_node, i.e. no freeing or modifications are allowed.
    Returned Set_t belongs to self.
 */
-Set_t
-PredicateExtractor_get_all_preds(const PredicateExtractor_ptr self);
+Set_t PredicateExtractor_get_all_preds(const PredicateExtractor_ptr self);
 
 /*!
   \methodof PredicateExtractor
@@ -225,8 +217,7 @@ PredicateExtractor_get_all_preds(const PredicateExtractor_ptr self);
    NOTE: subsequent call of PredicateExtractor_compute_preds makes any
    data returned by this function invalid.
 */
-Set_t
-PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self);
+Set_t PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self);
 
 /*!
   \methodof PredicateExtractor
@@ -246,9 +237,8 @@ PredicateExtractor_get_all_clusters(const PredicateExtractor_ptr self);
    NOTE: subsequent call of PredicateExtractor_compute_preds makes any
    data returned by this function invalid.
 */
-Set_t
-PredicateExtractor_get_var_cluster(const PredicateExtractor_ptr self,
-                                  node_ptr var);
+Set_t PredicateExtractor_get_var_cluster(const PredicateExtractor_ptr self,
+                                         node_ptr var);
 
 /*!
   \methodof PredicateExtractor
@@ -265,8 +255,8 @@ PredicateExtractor_get_var_cluster(const PredicateExtractor_ptr self,
    data returned by this function or
    PredicateExtractor_get_all_clusters invalid.
 */
-Set_t PredicateExtractor_get_preds_of_a_cluster(const PredicateExtractor_ptr self,
-Set_t cluster);
+Set_t PredicateExtractor_get_preds_of_a_cluster(
+    const PredicateExtractor_ptr self, Set_t cluster);
 
 /*!
   \methodof PredicateExtractor
@@ -285,12 +275,9 @@ Set_t cluster);
 
    Note that if clusters were not computed so far but asked to be
    printed, they will be computed.
-   
+
 */
-void
-PredicateExtractor_print(const PredicateExtractor_ptr self,
-                         FILE* stream,
-                         boolean printPredicates,
-                         boolean printClusters);
+void PredicateExtractor_print(const PredicateExtractor_ptr self, FILE *stream,
+                              boolean printPredicates, boolean printClusters);
 
 #endif /* __NUSMV_CORE_COMPILE_PREDICATE_EXTRACTOR_H__ */

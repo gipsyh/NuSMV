@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,18 +34,14 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_WFF_LR_MASTER_LOGIC_RECOGNIZER_PRIVATE_H__
 #define __NUSMV_CORE_WFF_LR_MASTER_LOGIC_RECOGNIZER_PRIVATE_H__
 
-
-#include "nusmv/core/wff/lr/MasterLogicRecognizer.h"
 #include "nusmv/core/node/MasterNodeWalker.h"
 #include "nusmv/core/node/MasterNodeWalker_private.h"
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/utils/assoc.h"
-
+#include "nusmv/core/utils/defs.h"
+#include "nusmv/core/wff/lr/MasterLogicRecognizer.h"
 
 /*!
   \brief MasterLogicRecognizer class definition derived from
@@ -57,8 +53,7 @@
   \sa Base class MasterNodeWalker
 */
 
-typedef struct MasterLogicRecognizer_TAG
-{
+typedef struct MasterLogicRecognizer_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(MasterNodeWalker);
 
@@ -73,8 +68,6 @@ typedef struct MasterLogicRecognizer_TAG
 
 } MasterLogicRecognizer;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -88,7 +81,7 @@ typedef struct MasterLogicRecognizer_TAG
   \sa MasterLogicRecognizer_create
 */
 void master_logic_recognizer_init(MasterLogicRecognizer_ptr self,
-                                         NuSMVEnv_ptr env);
+                                  NuSMVEnv_ptr env);
 
 /*!
   \methodof MasterLogicRecognizer
@@ -107,29 +100,27 @@ void master_logic_recognizer_deinit(MasterLogicRecognizer_ptr self);
   internal method
 */
 LogicType master_logic_recognizer_recognize(MasterLogicRecognizer_ptr self,
-                                                         node_ptr expression,
-                                                         node_ptr context);
+                                            node_ptr expression,
+                                            node_ptr context);
 
 /*!
   \methodof MasterLogicRecognizer
   \brief Insert a new association between expression and logic
 
-  
+
 */
 void master_logic_recognizer_insert(MasterLogicRecognizer_ptr self,
-                                           node_ptr expression,
-                                           node_ptr context,
-                                           LogicType logic);
+                                    node_ptr expression, node_ptr context,
+                                    LogicType logic);
 
 /*!
   \methodof MasterLogicRecognizer
   \brief Lookups the association for expression
 
-  
+
 */
 LogicType master_logic_recognizer_lookup(MasterLogicRecognizer_ptr self,
-                                                      node_ptr expression,
-                                                      node_ptr context);
+                                         node_ptr expression, node_ptr context);
 
 /*!
   \brief Given two LogicType returns the more general one
@@ -137,7 +128,6 @@ LogicType master_logic_recognizer_lookup(MasterLogicRecognizer_ptr self,
   Non compatible LogicType are not allowed
 */
 LogicType master_logic_recognizer_merge(MasterLogicRecognizer_ptr master,
-                                                     LogicType left,
-                                                     LogicType right);
+                                        LogicType left, LogicType right);
 
 #endif /* __NUSMV_CORE_WFF_LR_MASTER_LOGIC_RECOGNIZER_PRIVATE_H__ */

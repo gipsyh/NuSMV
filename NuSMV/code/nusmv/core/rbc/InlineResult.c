@@ -37,8 +37,8 @@
 #include "nusmv/core/rbc/InlineResult.h"
 #include "nusmv/core/rbc/ConjSet.h"
 #include "nusmv/core/rbc/rbcInt.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -57,21 +57,19 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct InlineResult_TAG
-{
+typedef struct InlineResult_TAG {
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-  Rbc_Manager_t* mgr;
+  Rbc_Manager_t *mgr;
   ConjSet_ptr conj;
-  Rbc_t* f;      /* original f */
-  Rbc_t* fns;    /* f after C construction, not substituted by C */
-  Rbc_t* fin;    /* fns substituted by C */
-  Rbc_t* finc;   /* fin & C */
-  Rbc_t* c;      /* Big AND of conj */
-  int refs;      /* Used for reference counting */
+  Rbc_t *f;    /* original f */
+  Rbc_t *fns;  /* f after C construction, not substituted by C */
+  Rbc_t *fin;  /* fns substituted by C */
+  Rbc_t *finc; /* fin & C */
+  Rbc_t *c;    /* Big AND of conj */
+  int refs;    /* Used for reference counting */
 } InlineResult;
-
 
 /*!
   \brief Data passing in inlining-DFS
@@ -80,11 +78,10 @@ typedef struct InlineResult_TAG
 */
 
 typedef struct InlineDfsData_TAG {
-  Rbc_Manager_t* mgr;
+  Rbc_Manager_t *mgr;
   InlineResult_ptr res;
-  Rbc_t* tmp_res;
+  Rbc_t *tmp_res;
 } InlineDfsData;
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -94,36 +91,32 @@ typedef struct InlineDfsData_TAG {
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void
-inline_result_init(InlineResult_ptr self,
-                   Rbc_Manager_t* rbcm, Rbc_t* f);
+static void inline_result_init(InlineResult_ptr self, Rbc_Manager_t *rbcm,
+                               Rbc_t *f);
 
 static void inline_result_deinit(InlineResult_ptr self);
 
-static void
-inline_result_copy(const InlineResult_ptr self, InlineResult_ptr copy);
+static void inline_result_copy(const InlineResult_ptr self,
+                               InlineResult_ptr copy);
 
 static void inline_result_calc_cset(InlineResult_ptr self);
 
-
-static int inline_set(Rbc_t* f, char* _data, nusmv_ptrint sign);
-static void inline_first(Rbc_t* f, char* _data, nusmv_ptrint sign);
-static void inline_back(Rbc_t* f, char* _data, nusmv_ptrint sign);
-static void inline_last(Rbc_t* f, char* _data, nusmv_ptrint sign);
+static int inline_set(Rbc_t *f, char *_data, nusmv_ptrint sign);
+static void inline_first(Rbc_t *f, char *_data, nusmv_ptrint sign);
+static void inline_back(Rbc_t *f, char *_data, nusmv_ptrint sign);
+static void inline_last(Rbc_t *f, char *_data, nusmv_ptrint sign);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-InlineResult_ptr InlineResult_create(Rbc_Manager_t* mgr, Rbc_t* f)
-{
+InlineResult_ptr InlineResult_create(Rbc_Manager_t *mgr, Rbc_t *f) {
   InlineResult_ptr self = ALLOC(InlineResult, 1);
   INLINE_RESULT_CHECK_INSTANCE(self);
 
@@ -131,8 +124,7 @@ InlineResult_ptr InlineResult_create(Rbc_Manager_t* mgr, Rbc_t* f)
   return self;
 }
 
-InlineResult_ptr InlineResult_copy(const InlineResult_ptr self)
-{
+InlineResult_ptr InlineResult_copy(const InlineResult_ptr self) {
   InlineResult_ptr copy = ALLOC(InlineResult, 1);
   INLINE_RESULT_CHECK_INSTANCE(self);
 
@@ -140,8 +132,7 @@ InlineResult_ptr InlineResult_copy(const InlineResult_ptr self)
   return copy;
 }
 
-void InlineResult_destroy(InlineResult_ptr self)
-{
+void InlineResult_destroy(InlineResult_ptr self) {
   INLINE_RESULT_CHECK_INSTANCE(self);
   self->refs -= 1;
   nusmv_assert(self->refs >= 0);
@@ -152,54 +143,45 @@ void InlineResult_destroy(InlineResult_ptr self)
   }
 }
 
-InlineResult_ptr InlineResult_ref(InlineResult_ptr self)
-{
+InlineResult_ptr InlineResult_ref(InlineResult_ptr self) {
   INLINE_RESULT_CHECK_INSTANCE(self);
   nusmv_assert(self->refs > 0);
   self->refs += 1;
   return self;
 }
 
-Rbc_t* InlineResult_get_original_f(InlineResult_ptr self)
-{
+Rbc_t *InlineResult_get_original_f(InlineResult_ptr self) {
   INLINE_RESULT_CHECK_INSTANCE(self);
   return self->f;
 }
 
-Rbc_t* InlineResult_get_inlined_f(InlineResult_ptr self)
-{
+Rbc_t *InlineResult_get_inlined_f(InlineResult_ptr self) {
   INLINE_RESULT_CHECK_INSTANCE(self);
   return self->fin;
 }
 
-Rbc_t* InlineResult_get_inlined_f_and_c(InlineResult_ptr self)
-{
+Rbc_t *InlineResult_get_inlined_f_and_c(InlineResult_ptr self) {
   INLINE_RESULT_CHECK_INSTANCE(self);
-  if (self->finc == (Rbc_t*) NULL) {
-    self->finc = Rbc_MakeAnd(self->mgr,
-                             InlineResult_get_c(self),
-                             InlineResult_get_inlined_f(self),
-                             RBC_TRUE);
+  if (self->finc == (Rbc_t *)NULL) {
+    self->finc = Rbc_MakeAnd(self->mgr, InlineResult_get_c(self),
+                             InlineResult_get_inlined_f(self), RBC_TRUE);
   }
 
   return self->finc;
 }
 
-Rbc_t* InlineResult_get_c(InlineResult_ptr self)
-{
+Rbc_t *InlineResult_get_c(InlineResult_ptr self) {
   INLINE_RESULT_CHECK_INSTANCE(self);
-  if (self->c == (Rbc_t*) NULL) {
+  if (self->c == (Rbc_t *)NULL) {
     self->c = ConjSet_conjoin(self->conj, Rbc_GetOne(self->mgr));
   }
 
   return self->c;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -212,17 +194,17 @@ Rbc_t* InlineResult_get_c(InlineResult_ptr self)
 
   \sa InlineResult_create
 */
-static void
-inline_result_init(InlineResult_ptr self, Rbc_Manager_t* rbcm, Rbc_t* f)
-{
+static void inline_result_init(InlineResult_ptr self, Rbc_Manager_t *rbcm,
+                               Rbc_t *f) {
   /* members initialization */
   self->mgr = rbcm;
   self->conj = ConjSet_create(rbcm);
   self->f = f;
-  self->fns = (Rbc_t*) NULL;;
-  self->fin = (Rbc_t*) NULL;
-  self->finc = (Rbc_t*) NULL;
-  self->c = (Rbc_t*) NULL;
+  self->fns = (Rbc_t *)NULL;
+  ;
+  self->fin = (Rbc_t *)NULL;
+  self->finc = (Rbc_t *)NULL;
+  self->c = (Rbc_t *)NULL;
 
   /* performs the C set construction and inlining */
   inline_result_calc_cset(self);
@@ -238,9 +220,8 @@ inline_result_init(InlineResult_ptr self, Rbc_Manager_t* rbcm, Rbc_t* f)
 
   \sa InlineResult_copy
 */
-static void
-inline_result_copy(const InlineResult_ptr self, InlineResult_ptr copy)
-{
+static void inline_result_copy(const InlineResult_ptr self,
+                               InlineResult_ptr copy) {
   /* members initialization */
   copy->mgr = self->mgr;
   copy->conj = ConjSet_copy(self->conj);
@@ -249,7 +230,7 @@ inline_result_copy(const InlineResult_ptr self, InlineResult_ptr copy)
   copy->fin = self->fin;
   copy->finc = self->finc;
   copy->c = self->c;
-  copy->refs = 1;  /* refs start from 1 in the copy */
+  copy->refs = 1; /* refs start from 1 in the copy */
 }
 
 /*!
@@ -259,26 +240,25 @@ inline_result_copy(const InlineResult_ptr self, InlineResult_ptr copy)
 
   \sa InlineResult_destroy
 */
-static void inline_result_calc_cset(InlineResult_ptr self)
-{
+static void inline_result_calc_cset(InlineResult_ptr self) {
   Dag_DfsFunctions_t funcs;
   InlineDfsData data;
 
   /* clears the user fields. */
-  Dag_Dfs(self->f, Rbc_ManagerGetDfsCleanFun(self->mgr), (char*) NULL);
+  Dag_Dfs(self->f, Rbc_ManagerGetDfsCleanFun(self->mgr), (char *)NULL);
 
   /* sets up the DFS functions */
-  funcs.Set        = (PF_IVPCPI)inline_set;
+  funcs.Set = (PF_IVPCPI)inline_set;
   funcs.FirstVisit = (PF_VPVPCPI)inline_first;
-  funcs.BackVisit  = (PF_VPVPCPI)inline_back;
-  funcs.LastVisit  = (PF_VPVPCPI)inline_last;
+  funcs.BackVisit = (PF_VPVPCPI)inline_back;
+  funcs.LastVisit = (PF_VPVPCPI)inline_last;
 
   /* sets up data */
   data.mgr = self->mgr;
   data.res = self;
 
   /* Calling DFS on f. */
-  Dag_Dfs(self->f, &funcs, (char*)(&data));
+  Dag_Dfs(self->f, &funcs, (char *)(&data));
 
   /* flattenizes the produced ConjSet */
   ConjSet_flattenize(self->conj);
@@ -293,8 +273,7 @@ static void inline_result_calc_cset(InlineResult_ptr self)
 
   \sa InlineResult_destroy
 */
-static void inline_result_deinit(InlineResult_ptr self)
-{
+static void inline_result_deinit(InlineResult_ptr self) {
   /* members deinitialization */
   ConjSet_destroy(self->conj);
 }
@@ -314,12 +293,12 @@ static void inline_result_deinit(InlineResult_ptr self)
                RBCVAR or a not negated RBCAND.
                if a var assignment is found, _data->res->conj is updated.
 */
-static int inline_set(Rbc_t* f, char* _data, nusmv_ptrint sign)
-{
-  InlineDfsData* data = (InlineDfsData*) _data;
+static int inline_set(Rbc_t *f, char *_data, nusmv_ptrint sign) {
+  InlineDfsData *data = (InlineDfsData *)_data;
 
   { /* reuses previous result searching in cache */
-    InlineResult_ptr cir = rbc_inlining_cache_lookup_result(data->mgr, RbcId(f, sign));
+    InlineResult_ptr cir =
+        rbc_inlining_cache_lookup_result(data->mgr, RbcId(f, sign));
     if (cir != INLINE_RESULT(NULL)) {
       ConjSet_inherit_from(data->res->conj, cir->conj);
       data->tmp_res = cir->fns;
@@ -338,54 +317,46 @@ static int inline_set(Rbc_t* f, char* _data, nusmv_ptrint sign)
     {
 
 #if !RBC_ENABLE_ITE_CONNECTIVE
-      Rbc_t* left = RBC_GET_LEFTMOST_CHILD(f);
-      Rbc_t* right = RBC_GET_SECOND_CHILD(f);
+      Rbc_t *left = RBC_GET_LEFTMOST_CHILD(f);
+      Rbc_t *right = RBC_GET_SECOND_CHILD(f);
       if ((RbcGetRef(left)->symbol == RBCAND) &&
-          (RbcGetRef(right)->symbol == RBCAND) &&
-          (RbcIsSet(left)) &&
-          (RbcIsSet(right)))
-        {
-          Rbc_t* l1 = RBC_GET_LEFTMOST_CHILD(left);
-          Rbc_t* l2 = RBC_GET_SECOND_CHILD(left);
-          Rbc_t* r1 = RBC_GET_LEFTMOST_CHILD(right);
-          Rbc_t* r2 = RBC_GET_SECOND_CHILD(right);
-          if (((l1 == RbcId(r1, RBC_FALSE)) || (l1 == RbcId(r2, RBC_FALSE))) &&
-              ((l2 == RbcId(r1, RBC_FALSE)) || (l2 == RbcId(r2, RBC_FALSE))))
-            {
-              /* makes v <-> phi */
-              if ((RbcGetRef(l1)->symbol != RBCVAR) &&
-                  (RbcGetRef(l2)->symbol == RBCVAR))
-                {
-                  Rbc_t* tmp = l1;
-                  l1 = l2; l2 = tmp;
-                }
-              /* is it a var assignment? */
-              if (RbcGetRef(l1)->symbol == RBCVAR)
-                {
-                  /* no signed variables in cache */
-                  if (RbcIsSet(l1))
-                    {
-                      /* move the "IFF's" sign to the right */
-                      ConjSet_add_var_assign(data->res->conj,
-                                             RbcId(l1, RBC_FALSE),
-                                             RbcId(l2, sign));
-                    }
-                  else
-                    {
-                      /* move the "IFF's" sign to the right */
-                      ConjSet_add_var_assign(data->res->conj,
-                                             l1,
-                                             RbcId(l2, sign ^ RBC_FALSE));
-                    }
-                  /* keeps it, will be substituted later */
-                  data->tmp_res = RbcId(f, sign);
-                  break;
-                }
+          (RbcGetRef(right)->symbol == RBCAND) && (RbcIsSet(left)) &&
+          (RbcIsSet(right))) {
+        Rbc_t *l1 = RBC_GET_LEFTMOST_CHILD(left);
+        Rbc_t *l2 = RBC_GET_SECOND_CHILD(left);
+        Rbc_t *r1 = RBC_GET_LEFTMOST_CHILD(right);
+        Rbc_t *r2 = RBC_GET_SECOND_CHILD(right);
+        if (((l1 == RbcId(r1, RBC_FALSE)) || (l1 == RbcId(r2, RBC_FALSE))) &&
+            ((l2 == RbcId(r1, RBC_FALSE)) || (l2 == RbcId(r2, RBC_FALSE)))) {
+          /* makes v <-> phi */
+          if ((RbcGetRef(l1)->symbol != RBCVAR) &&
+              (RbcGetRef(l2)->symbol == RBCVAR)) {
+            Rbc_t *tmp = l1;
+            l1 = l2;
+            l2 = tmp;
+          }
+          /* is it a var assignment? */
+          if (RbcGetRef(l1)->symbol == RBCVAR) {
+            /* no signed variables in cache */
+            if (RbcIsSet(l1)) {
+              /* move the "IFF's" sign to the right */
+              ConjSet_add_var_assign(data->res->conj, RbcId(l1, RBC_FALSE),
+                                     RbcId(l2, sign));
+            } else {
+              /* move the "IFF's" sign to the right */
+              ConjSet_add_var_assign(data->res->conj, l1,
+                                     RbcId(l2, sign ^ RBC_FALSE));
             }
+            /* keeps it, will be substituted later */
+            data->tmp_res = RbcId(f, sign);
+            break;
+          }
         }
+      }
 #endif
       /* AND, continue */
-      if (sign == RBC_TRUE) return -1;
+      if (sign == RBC_TRUE)
+        return -1;
       /* OR, keep it, and backtrack */
       data->tmp_res = RbcId(f, sign);
       break;
@@ -393,13 +364,14 @@ static int inline_set(Rbc_t* f, char* _data, nusmv_ptrint sign)
 
   case RBCIFF: {
     /* inlining, collects the IFF and removes it */
-    Rbc_t* left = RBC_GET_LEFTMOST_CHILD(f);
-    Rbc_t* right = RBC_GET_SECOND_CHILD(f);
+    Rbc_t *left = RBC_GET_LEFTMOST_CHILD(f);
+    Rbc_t *right = RBC_GET_SECOND_CHILD(f);
 
     if (RbcGetRef(left)->symbol != RBCVAR &&
         RbcGetRef(right)->symbol == RBCVAR) { /* makes v <-> phi */
-      Rbc_t* tmp = left;
-      left = right; right = tmp;
+      Rbc_t *tmp = left;
+      left = right;
+      right = tmp;
     }
 
     /* is it a var assignment? */
@@ -431,14 +403,13 @@ static int inline_set(Rbc_t* f, char* _data, nusmv_ptrint sign)
 
   \se None
 */
-static void inline_first(Rbc_t* f, char* _data, nusmv_ptrint sign)
-{
+static void inline_first(Rbc_t *f, char *_data, nusmv_ptrint sign) {
   nusmv_assert(f->symbol == RBCAND || f->symbol == RBCVAR ||
                f->symbol == RBCTOP);
 
   /* Reset the counter for the sons list */
   if (f->symbol == RBCAND) {
-    f->gRef = (char*) ALLOC(Rbc_t*, RBC_MAX_OUTDEGREE);
+    f->gRef = (char *)ALLOC(Rbc_t *, RBC_MAX_OUTDEGREE);
     f->iRef = 0;
   }
 }
@@ -450,17 +421,16 @@ static void inline_first(Rbc_t* f, char* _data, nusmv_ptrint sign)
 
   \se None
 */
-static void inline_back(Rbc_t* f, char* _data, nusmv_ptrint sign)
-{
-  InlineDfsData* data = (InlineDfsData*) _data;
+static void inline_back(Rbc_t *f, char *_data, nusmv_ptrint sign) {
+  InlineDfsData *data = (InlineDfsData *)_data;
 
   nusmv_assert(f->symbol == RBCAND || f->symbol == RBCTOP);
 
   /* Get the current result and add it to the temp list of sons */
   if (f->symbol == RBCAND) {
     nusmv_assert(f->iRef < RBC_MAX_OUTDEGREE && f->iRef >= 0);
-    nusmv_assert(data->tmp_res != (Rbc_t*) NULL);
-    ((Rbc_t**)(f->gRef))[(f->iRef)++] = data->tmp_res;
+    nusmv_assert(data->tmp_res != (Rbc_t *)NULL);
+    ((Rbc_t **)(f->gRef))[(f->iRef)++] = data->tmp_res;
   }
 }
 
@@ -471,9 +441,8 @@ static void inline_back(Rbc_t* f, char* _data, nusmv_ptrint sign)
 
   \se None
 */
-static void inline_last(Rbc_t* f, char* _data, nusmv_ptrint sign)
-{
-  InlineDfsData* data = (InlineDfsData*) _data;
+static void inline_last(Rbc_t *f, char *_data, nusmv_ptrint sign) {
+  InlineDfsData *data = (InlineDfsData *)_data;
   switch (f->symbol) {
   case RBCVAR:
     ConjSet_add_var_assign(data->res->conj, f, RbcId(data->mgr->one, sign));
@@ -481,7 +450,7 @@ static void inline_last(Rbc_t* f, char* _data, nusmv_ptrint sign)
     break;
 
   case RBCAND: {
-    Rbc_t** sons = (Rbc_t**)(f->gRef);
+    Rbc_t **sons = (Rbc_t **)(f->gRef);
     nusmv_assert(f->iRef == 2);
 
     data->tmp_res = Rbc_MakeAnd(data->mgr, sons[0], sons[1], sign);
@@ -493,7 +462,6 @@ static void inline_last(Rbc_t* f, char* _data, nusmv_ptrint sign)
   default:
     error_unreachable_code(); /* no other possible cases */
   }
-
 }
 
 /**AutomaticEnd***************************************************************/

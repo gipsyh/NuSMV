@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,26 +34,23 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_H__
 #define __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_H__
-
 
 #include "nusmv/core/trace/exec/CompleteTraceExecutor.h" /* fix this */
 #include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/fsm/be/BeFsm.h"
-#include "nusmv/core/enc/be/BeEnc.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
+#include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/fsm/be/BeFsm.h"
 
 /*!
   \struct SATCompleteTraceExecutor
   \brief Definition of the public accessor for class SATCompleteTraceExecutor
 
-  
+
 */
-typedef struct SATCompleteTraceExecutor_TAG*  SATCompleteTraceExecutor_ptr;
+typedef struct SATCompleteTraceExecutor_TAG *SATCompleteTraceExecutor_ptr;
 
 /*!
   \brief To cast and check instances of class SATCompleteTraceExecutor
@@ -61,18 +58,16 @@ typedef struct SATCompleteTraceExecutor_TAG*  SATCompleteTraceExecutor_ptr;
   These macros must be used respectively to cast and to check
   instances of class SATCompleteTraceExecutor
 */
-#define SAT_COMPLETE_TRACE_EXECUTOR(self) \
-         ((SATCompleteTraceExecutor_ptr) self)
+#define SAT_COMPLETE_TRACE_EXECUTOR(self) ((SATCompleteTraceExecutor_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SAT_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self) \
-         (nusmv_assert(SAT_COMPLETE_TRACE_EXECUTOR(self) != SAT_COMPLETE_TRACE_EXECUTOR(NULL)))
-
-
+#define SAT_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                       \
+  (nusmv_assert(SAT_COMPLETE_TRACE_EXECUTOR(self) !=                           \
+                SAT_COMPLETE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -89,8 +84,7 @@ typedef struct SATCompleteTraceExecutor_TAG*  SATCompleteTraceExecutor_ptr;
   \sa SATCompleteTraceExecutor_destroy
 */
 SATCompleteTraceExecutor_ptr
-SATCompleteTraceExecutor_create(const BeFsm_ptr fsm,
-                                const BeEnc_ptr enc,
+SATCompleteTraceExecutor_create(const BeFsm_ptr fsm, const BeEnc_ptr enc,
                                 const BddEnc_ptr bdd_enc);
 
 /*!
@@ -104,7 +98,5 @@ SATCompleteTraceExecutor_create(const BeFsm_ptr fsm,
 void SATCompleteTraceExecutor_destroy(SATCompleteTraceExecutor_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_SATCOMPLETE_TRACE_EXECUTOR_H__ */

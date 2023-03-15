@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,18 +34,16 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/node/normalizers/NormalizerBase.h"
 #include "nusmv/core/node/normalizers/NormalizerBase_private.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
 #include "nusmv/core/node/normalizers/MasterNormalizer.h"
 #include "nusmv/core/node/normalizers/MasterNormalizer_private.h"
 
 #include "nusmv/core/node/MasterNodeWalker.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -68,26 +66,24 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void normalizer_base_finalize(Object_ptr object, void* dummy);
+static void normalizer_base_finalize(Object_ptr object, void *dummy);
 
-static node_ptr
-normalizer_base_normalize_node(NormalizerBase_ptr self, node_ptr n);
-
+static node_ptr normalizer_base_normalize_node(NormalizerBase_ptr self,
+                                               node_ptr n);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-NormalizerBase_ptr
-NormalizerBase_create(const NuSMVEnv_ptr env, const char* name, int low, size_t num)
-{
+NormalizerBase_ptr NormalizerBase_create(const NuSMVEnv_ptr env,
+                                         const char *name, int low,
+                                         size_t num) {
   NormalizerBase_ptr self = ALLOC(NormalizerBase, 1);
   NORMALIZER_BASE_CHECK_INSTANCE(self);
 
@@ -95,9 +91,8 @@ NormalizerBase_create(const NuSMVEnv_ptr env, const char* name, int low, size_t 
   return self;
 }
 
-VIRTUAL node_ptr
-NormalizerBase_normalize_node(NormalizerBase_ptr self, node_ptr n)
-{
+VIRTUAL node_ptr NormalizerBase_normalize_node(NormalizerBase_ptr self,
+                                               node_ptr n) {
   node_ptr res;
   MasterNormalizer_ptr master;
   NORMALIZER_BASE_CHECK_INSTANCE(self);
@@ -106,7 +101,8 @@ NormalizerBase_normalize_node(NormalizerBase_ptr self, node_ptr n)
 
   /* Lookup in the cache, return cached data if found */
   res = MasterNormalizer_lookup_cache(master, n);
-  if (Nil != res) return res;
+  if (Nil != res)
+    return res;
 
   res = self->normalize_node(self, n);
 
@@ -115,15 +111,13 @@ NormalizerBase_normalize_node(NormalizerBase_ptr self, node_ptr n)
   return res;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
 void normalizer_base_init(NormalizerBase_ptr self, const NuSMVEnv_ptr env,
-                          const char* name,
-                          int low, size_t num, boolean can_handle_null)
-{
+                          const char *name, int low, size_t num,
+                          boolean can_handle_null) {
   /* base class initialization */
   node_walker_init(NODE_WALKER(self), env, name, low, num, can_handle_null);
   /* members initialization */
@@ -133,25 +127,23 @@ void normalizer_base_init(NormalizerBase_ptr self, const NuSMVEnv_ptr env,
   OVERRIDE(NormalizerBase, normalize_node) = normalizer_base_normalize_node;
 }
 
-void normalizer_base_deinit(NormalizerBase_ptr self)
-{
+void normalizer_base_deinit(NormalizerBase_ptr self) {
   /* members deinitialization */
 
   /* base class initialization */
   node_walker_deinit(NODE_WALKER(self));
 }
 
-node_ptr normalizer_base_throw_normalize_node(NormalizerBase_ptr self, node_ptr n)
-{
+node_ptr normalizer_base_throw_normalize_node(NormalizerBase_ptr self,
+                                              node_ptr n) {
   if (NodeWalker_can_handle(NODE_WALKER(self), n)) {
     /* checks if self can handle the node without need of re-throw
        to the master */
     return NormalizerBase_normalize_node(self, n);
   }
   return master_normalizer_normalize_node(
-           MASTER_NORMALIZER(NODE_WALKER(self)->master), n);
+      MASTER_NORMALIZER(NODE_WALKER(self)->master), n);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -162,8 +154,7 @@ node_ptr normalizer_base_throw_normalize_node(NormalizerBase_ptr self, node_ptr 
 
   Called by the class destructor
 */
-static void normalizer_base_finalize(Object_ptr object, void* dummy)
-{
+static void normalizer_base_finalize(Object_ptr object, void *dummy) {
   NormalizerBase_ptr self = NORMALIZER_BASE(object);
 
   normalizer_base_deinit(self);
@@ -176,14 +167,14 @@ static void normalizer_base_finalize(Object_ptr object, void* dummy)
   This is a pure virtual method, to be implemented by derived
   class, and cannot be called
 */
-static node_ptr
-normalizer_base_normalize_node(NormalizerBase_ptr self, node_ptr n)
-{
+static node_ptr normalizer_base_normalize_node(NormalizerBase_ptr self,
+                                               node_ptr n) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
-  ErrorMgr_internal_error(errmgr, "NormalizerBase: Pure virtual method normalize_node "  \
-                 "not implemented\n");
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+  ErrorMgr_internal_error(errmgr,
+                          "NormalizerBase: Pure virtual method normalize_node "
+                          "not implemented\n");
   return Nil;
 }
 

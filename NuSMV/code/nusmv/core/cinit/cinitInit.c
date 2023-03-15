@@ -34,37 +34,37 @@
 */
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/cinit/cinitInt.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/cinit/cinitInt.h"
 
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/utils/assoc.h"
-#include "nusmv/core/utils/utils_io.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/utils/NodeList.h"
 #include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/utils/WordNumber.h" /* for WordNumber_init and ..._quit */
-#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/ustring.h"
+#include "nusmv/core/utils/utils_io.h"
 
 #include "nusmv/core/compile/FlatHierarchy.h"
 #include "nusmv/core/dd/VarsHandler.h"
-#include "nusmv/core/wff/wff.h"
 #include "nusmv/core/enc/enc.h"
 #include "nusmv/core/opt/opt.h"
-#include "nusmv/core/simulate/simulate.h"
 #include "nusmv/core/parser/parser.h"
+#include "nusmv/core/simulate/simulate.h"
+#include "nusmv/core/wff/wff.h"
 
 /* package initializers/deinitializers */
-#include "nusmv/core/opt/optPkg.h"
-#include "nusmv/core/prop/propPkg.h"
 #include "nusmv/core/bmc/bmcPkg.h"
-#include "nusmv/core/trace/pkg_trace.h"
 #include "nusmv/core/fsm/fsm.h"
 #include "nusmv/core/hrc/hrc.h"
+#include "nusmv/core/opt/optPkg.h"
+#include "nusmv/core/prop/propPkg.h"
+#include "nusmv/core/trace/pkg_trace.h"
 
 #include <string.h>
 
@@ -100,14 +100,14 @@
 
   \todo Missing description
 */
-#define PP_FIELDS_NUM  3
+#define PP_FIELDS_NUM 3
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-FILE* nusmv_historyFile;
-FILE* nusmv_stdpipe;
+FILE *nusmv_historyFile;
+FILE *nusmv_stdpipe;
 
 /**AutomaticStart*************************************************************/
 
@@ -115,22 +115,19 @@ FILE* nusmv_stdpipe;
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static char* get_executable_name(const char* command);
+static char *get_executable_name(const char *command);
 
-static const char* user_preprocessor(const NuSMVEnv_ptr env,
-                                     const char* name);
+static const char *user_preprocessor(const NuSMVEnv_ptr env, const char *name);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void CInit_reset_first(NuSMVEnv_ptr env)
-{
+void CInit_reset_first(NuSMVEnv_ptr env) {
   OptsHandler_ptr opt =
-      (OptsHandler_ptr) NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
+      (OptsHandler_ptr)NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
 
   TracePkg_quit(env);
   PropPkg_quit(env);
@@ -150,8 +147,8 @@ void CInit_reset_first(NuSMVEnv_ptr env)
   Hrc_quit(env);
   Parser_Quit(env);
 
-  /* WARNING [MD]: bad use of a generic name. Did you mean NDEBUG? */
-  #ifdef DEBUG
+/* WARNING [MD]: bad use of a generic name. Did you mean NDEBUG? */
+#ifdef DEBUG
   if (opt_verbose_level_gt(opt, 4)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     int result = dd_checkzeroref(dd);
@@ -162,7 +159,7 @@ void CInit_reset_first(NuSMVEnv_ptr env)
                  result);
     }
   }
-  #endif
+#endif
 
   if (opt_verbose_level_gt(opt, 2)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
@@ -182,8 +179,7 @@ void CInit_reset_first(NuSMVEnv_ptr env)
   }
 }
 
-void CInit_reset_last(NuSMVEnv_ptr env)
-{
+void CInit_reset_last(NuSMVEnv_ptr env) {
   OptsHandler_ptr opt = NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
   DDMgr_ptr dd;
 
@@ -232,13 +228,11 @@ void CInit_reset_last(NuSMVEnv_ptr env)
   }
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void CInit_init(NuSMVEnv_ptr env)
-{
+void CInit_init(NuSMVEnv_ptr env) {
   init_memory();
   nusmv_historyFile = NIL(FILE);
   Stream_init(env);
@@ -248,14 +242,14 @@ void CInit_init(NuSMVEnv_ptr env)
 #if NUSMV_HAVE_SETVBUF && (defined(__MINGW32__) || defined(__CYGWIN__))
   {
     StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-# if SETVBUF_REVERSED
-    setvbuf(StreamMgr_get_output_stream(streams), _IOLBF, (char *) NULL, 0);
-    setvbuf(StreamMgr_get_error_stream(streams), _IONBF, (char *) NULL, 0);
-# else
-    setvbuf(StreamMgr_get_output_stream(streams), (char *) NULL, _IOLBF, 0);
-    setvbuf(StreamMgr_get_error_stream(streams), (char *) NULL, _IONBF, 0);
-# endif
+        STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+#if SETVBUF_REVERSED
+    setvbuf(StreamMgr_get_output_stream(streams), _IOLBF, (char *)NULL, 0);
+    setvbuf(StreamMgr_get_error_stream(streams), _IONBF, (char *)NULL, 0);
+#else
+    setvbuf(StreamMgr_get_output_stream(streams), (char *)NULL, _IOLBF, 0);
+    setvbuf(StreamMgr_get_error_stream(streams), (char *)NULL, _IONBF, 0);
+#endif
   }
 #endif
 
@@ -298,8 +292,7 @@ void CInit_init(NuSMVEnv_ptr env)
   Simulate_Pkg_init(env); /* Does nothing at the moment */
 }
 
-void CInit_end(NuSMVEnv_ptr env)
-{
+void CInit_end(NuSMVEnv_ptr env) {
   boolean print_final = false;
   OptsHandler_ptr opt = NuSMVEnv_get_value(env, ENV_OPTS_HANDLER);
   StreamMgr_ptr streams = NuSMVEnv_get_value(env, ENV_STREAM_MANAGER);
@@ -329,8 +322,8 @@ void CInit_end(NuSMVEnv_ptr env)
     int result = dd_checkzeroref(dd);
     if (result != 0) {
       Logger_log(logger,
-              "%d non-zero DD reference counts after dereferencing\n",
-              result);
+                 "%d non-zero DD reference counts after dereferencing\n",
+                 result);
     }
   }
 #endif
@@ -353,7 +346,8 @@ void CInit_end(NuSMVEnv_ptr env)
     StreamMgr_print_error(streams, "\nSuccessful termination\n");
   }
 
-  if (nusmv_historyFile != NIL(FILE)) fclose(nusmv_historyFile);
+  if (nusmv_historyFile != NIL(FILE))
+    fclose(nusmv_historyFile);
   nusmv_historyFile = NIL(FILE);
 
   Logger_quit(env);
@@ -365,26 +359,25 @@ void CInit_end(NuSMVEnv_ptr env)
 
   \todo Missing description
 */
-void init_preprocessors(const NuSMVEnv_ptr env)
-{
+void init_preprocessors(const NuSMVEnv_ptr env) {
   /* This array is used to store the names of the avaliable
      pre-processors on the system, as well as the command to excecute
      them. The names are stored in even indices, with the
      corresponding command stored and the location immediately
      succeeding the name. The last two entries are NULL to indicate
      that there are no more entries. */
-  char** preprocessors_list;
-  char* cpp_call = (char*) NULL;
+  char **preprocessors_list;
+  char *cpp_call = (char *)NULL;
 
   /* const ErrorMgr_ptr errmgr =
     ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER)); */
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
   /* two triplets preprocessor/filename/command, one triplet for
      termination */
-  preprocessors_list = ALLOC(char*, PP_FIELDS_NUM*3);
-  nusmv_assert(preprocessors_list != (char**) NULL);
+  preprocessors_list = ALLOC(char *, PP_FIELDS_NUM * 3);
+  nusmv_assert(preprocessors_list != (char **)NULL);
 
   NuSMVEnv_set_value(env, ENV_PREPROCESSORS_LIST, preprocessors_list);
 
@@ -393,7 +386,7 @@ void init_preprocessors(const NuSMVEnv_ptr env)
   cpp_call = getenv("CPP");
 #endif
 
-  if (cpp_call == (char*) NULL) {
+  if (cpp_call == (char *)NULL) {
 #if NUSMV_HAVE_CPP
     cpp_call = NUSMV_PROG_CPP;
 #else
@@ -402,9 +395,11 @@ void init_preprocessors(const NuSMVEnv_ptr env)
 #endif
   }
 
-  if (cpp_call == (char*) NULL) {
-    //ErrorMgr_internal_error(errmgr, "The pre-proprocessor could not be found.\n");
-    StreamMgr_print_error(streams, "The pre-proprocessor could not be found.\n");
+  if (cpp_call == (char *)NULL) {
+    // ErrorMgr_internal_error(errmgr, "The pre-proprocessor could not be
+    // found.\n");
+    StreamMgr_print_error(streams,
+                          "The pre-proprocessor could not be found.\n");
   }
 
   /* Stores the names of avaliable pre-processors along with the
@@ -422,9 +417,9 @@ void init_preprocessors(const NuSMVEnv_ptr env)
   preprocessors_list[5] = util_strsav(NUSMV_M4_NAME);
 
   /* terminators: */
-  preprocessors_list[6] = (char*) NULL;
-  preprocessors_list[7] = (char*) NULL;
-  preprocessors_list[8] = (char*) NULL;
+  preprocessors_list[6] = (char *)NULL;
+  preprocessors_list[7] = (char *)NULL;
+  preprocessors_list[8] = (char *)NULL;
 }
 
 /*!
@@ -432,20 +427,19 @@ void init_preprocessors(const NuSMVEnv_ptr env)
 
   \todo Missing description
 */
-void quit_preprocessors(const NuSMVEnv_ptr env)
-{
-  char** preprocessors_list =
-    (char**)NuSMVEnv_remove_value(env, ENV_PREPROCESSORS_LIST);
+void quit_preprocessors(const NuSMVEnv_ptr env) {
+  char **preprocessors_list =
+      (char **)NuSMVEnv_remove_value(env, ENV_PREPROCESSORS_LIST);
 
-  char** iter;
+  char **iter;
 
-  nusmv_assert(preprocessors_list != (char**) NULL);
+  nusmv_assert(preprocessors_list != (char **)NULL);
   iter = preprocessors_list;
-  while (*iter != (char*) NULL) {
-    char** n = iter;
+  while (*iter != (char *)NULL) {
+    char **n = iter;
     int count = 0;
-    while (count < PP_FIELDS_NUM){
-      char* nn = *n;
+    while (count < PP_FIELDS_NUM) {
+      char *nn = *n;
       FREE(nn);
       ++n;
       ++count;
@@ -466,36 +460,36 @@ void quit_preprocessors(const NuSMVEnv_ptr env)
   \se If not already specified, extension suffix is appended
   to the returned string. Returned string must be freed.
 */
-static char* get_executable_name(const char* command)
-{
-  char* space;
-  char* exec_name = (char*) NULL;
+static char *get_executable_name(const char *command) {
+  char *space;
+  char *exec_name = (char *)NULL;
   size_t exec_len;
   size_t exeext_len;
 
   space = strchr(command, ' ');
-  if (space != (char*) NULL) exec_len = (size_t) (space - command);
-  else exec_len = strlen(command);
+  if (space != (char *)NULL)
+    exec_len = (size_t)(space - command);
+  else
+    exec_len = strlen(command);
 
   exeext_len = strlen(NUSMV_EXEEXT);
 
   exec_name = ALLOC(char, exec_len + exeext_len + 1);
-  nusmv_assert(exec_name != (char*) NULL);
+  nusmv_assert(exec_name != (char *)NULL);
 
   strncpy(exec_name, command, exec_len);
   exec_name[exec_len] = '\0'; /* adds a terminator */
 
   if ((exec_len > exeext_len) && (exeext_len > 0)) {
     /* the command might already contain NUSMV_EXEEXT: */
-    char* pos;
+    char *pos;
     pos = strstr(exec_name, NUSMV_EXEEXT);
-    if ( (pos == (char*) NULL) ||
-         (((int) (pos - exec_name)) < (exec_len-exeext_len)) ) {
+    if ((pos == (char *)NULL) ||
+        (((int)(pos - exec_name)) < (exec_len - exeext_len))) {
       /* add the suffix: */
       strcat(exec_name, NUSMV_EXEEXT);
     }
-  }
-  else {
+  } else {
     /* it can't contain the suffix: add it */
     strcat(exec_name, NUSMV_EXEEXT);
   }
@@ -503,43 +497,42 @@ static char* get_executable_name(const char* command)
   return exec_name;
 }
 
-
 /*!
   \brief Check and returns path of user preprocessors,
                returns Null if does not exist
 
   \todo Missing description
 */
-static const char* user_preprocessor(const NuSMVEnv_ptr env, const char* name)
-{
+static const char *user_preprocessor(const NuSMVEnv_ptr env, const char *name) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  const char* res = (char*) NULL;
+  const char *res = (char *)NULL;
 
-/*!
-  \brief \todo Missing synopsis
+  /*!
+    \brief \todo Missing synopsis
 
-  \todo Missing description
-*/
-typedef char* (*getPP_ptr) (OptsHandler_ptr);
+    \todo Missing description
+  */
+  typedef char *(*getPP_ptr)(OptsHandler_ptr);
 
   struct UserPreprocessorStructure {
-      const char* name;
-      getPP_ptr get_pp;
+    const char *name;
+    getPP_ptr get_pp;
   } user_pp_stack[] = {{NUSMV_CPP_NAME, get_pp_cpp_path},
-                       {NUSMV_M4_NAME, get_pp_m4_path }};
+                       {NUSMV_M4_NAME, get_pp_m4_path}};
 
   int i;
   int size_user_pp_stack;
   size_user_pp_stack = sizeof(user_pp_stack) / sizeof(user_pp_stack[0]);
 
-  for(i=0; i<size_user_pp_stack; i++){
-    if (strncmp(name,user_pp_stack[i].name, strlen(user_pp_stack[i].name)) == 0){
-      res =user_pp_stack[i].get_pp(opts);
-      if (NULL != res){
+  for (i = 0; i < size_user_pp_stack; i++) {
+    if (strncmp(name, user_pp_stack[i].name, strlen(user_pp_stack[i].name)) ==
+        0) {
+      res = user_pp_stack[i].get_pp(opts);
+      if (NULL != res) {
         if (true == Utils_file_exists(res))
           return res;
         else
@@ -551,66 +544,65 @@ typedef char* (*getPP_ptr) (OptsHandler_ptr);
   return res;
 }
 
-char* get_preprocessor_call(const NuSMVEnv_ptr env, const char* name)
-{
-  char** preprocessors_list =
-    (char**)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
+char *get_preprocessor_call(const NuSMVEnv_ptr env, const char *name) {
+  char **preprocessors_list =
+      (char **)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
 
-  const char* res = (char*) NULL;
-  char** iter;
+  const char *res = (char *)NULL;
+  char **iter;
 
   /* check if user set the preprocessor */
   /* if it is, return user value */
   res = user_preprocessor(env, name);
-  if (NULL != res) return (char*) res;
+  if (NULL != res)
+    return (char *)res;
 
   /* returns default preprocessor */
   iter = preprocessors_list;
-  while (*iter != (char*) NULL) {
+  while (*iter != (char *)NULL) {
     if (strncmp(*iter, name, strlen(name) + 1) == 0) {
       res = *(iter + 2);
       break;
     }
     iter += PP_FIELDS_NUM;
   }
-  return (char*) res;
+  return (char *)res;
 }
 
-char* get_preprocessor_filename(const NuSMVEnv_ptr env, const char* name)
-{
-  char** preprocessors_list =
-    (char**)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
+char *get_preprocessor_filename(const NuSMVEnv_ptr env, const char *name) {
+  char **preprocessors_list =
+      (char **)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
 
-  const char* res = (char*) NULL;
-  char** iter;
+  const char *res = (char *)NULL;
+  char **iter;
 
   /* check if user set the preprocessor */
   /* if it is, return user value */
   res = user_preprocessor(env, name);
-  if (NULL != res) return (char*) Utils_StripPath(res);
+  if (NULL != res)
+    return (char *)Utils_StripPath(res);
 
   /* returns default preprocessor */
   iter = preprocessors_list;
-  while (*iter != (char*) NULL) {
+  while (*iter != (char *)NULL) {
     if (strncmp(*iter, name, strlen(name) + 1) == 0) {
       res = *(iter + 1);
       break;
     }
     iter += PP_FIELDS_NUM;
   }
-  return (char*) res;
+  return (char *)res;
 }
 
-int get_preprocessors_num(const NuSMVEnv_ptr env)
-{
-  char** preprocessors_list =
-    (char**)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
+int get_preprocessors_num(const NuSMVEnv_ptr env) {
+  char **preprocessors_list =
+      (char **)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
 
   int len = 0;
-  char** iter;
+  char **iter;
 
   iter = preprocessors_list;
-  while (*iter != (char*) NULL) {
+  while (*iter != (char *)NULL) {
     ++len;
     iter += PP_FIELDS_NUM;
   }
@@ -618,29 +610,28 @@ int get_preprocessors_num(const NuSMVEnv_ptr env)
   return len;
 }
 
-char* get_preprocessor_names(const NuSMVEnv_ptr env)
-{
-  char** preprocessors_list =
-    (char**)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
+char *get_preprocessor_names(const NuSMVEnv_ptr env) {
+  char **preprocessors_list =
+      (char **)NuSMVEnv_get_value(env, ENV_PREPROCESSORS_LIST);
 
   int len;
-  char* names;
-  char** iter;
+  char *names;
+  char **iter;
 
   /* length of the string: */
   len = 0;
   iter = preprocessors_list;
-  while (*iter != (char*) NULL) {
+  while (*iter != (char *)NULL) {
     len += strlen(*iter) + 1; /* for the additional space */
     iter += PP_FIELDS_NUM;
   }
 
-  names = ALLOC(char, len+1);
-  nusmv_assert(names != (char*) NULL);
+  names = ALLOC(char, len + 1);
+  nusmv_assert(names != (char *)NULL);
 
   names[0] = '\0';
   iter = preprocessors_list;
-  while (*iter != (char*) NULL) {
+  while (*iter != (char *)NULL) {
     strncat(names, *iter, strlen(*iter));
     strncat(names, " ", 1);
     iter += PP_FIELDS_NUM;

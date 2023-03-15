@@ -9,18 +9,16 @@
   \author Mirco Giacobbe
   \brief Public interface of class 'BiMap'
 
-  This class implements a bijective map, 
+  This class implements a bijective map,
                namely a one-to-one correspondance
 
 */
-
-
 
 #ifndef __NUSMV_CORE_UTILS_BI_MAP_H__
 #define __NUSMV_CORE_UTILS_BI_MAP_H__
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 /*!
@@ -30,28 +28,28 @@
 */
 #define BI_MAP_FAST_ITERATOR
 
-#include "nusmv/core/utils/defs.h"
+#include "nusmv/core/node/node.h"
 #include "nusmv/core/utils/NodeList.h"
 #include "nusmv/core/utils/assoc.h"
-#include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/defs.h"
 
 /*!
   \struct BiMap
   \brief Definition of the public accessor for class BiMap
 
-  
+
 */
-typedef struct BiMap_TAG*  BiMap_ptr;
+typedef struct BiMap_TAG *BiMap_ptr;
 
 #ifndef BI_MAP_FAST_ITERATOR
-typedef struct BiMapIter_TAG{
+typedef struct BiMapIter_TAG {
   st_generator gen;
-  char* key_p;
-  char* value_p;
+  char *key_p;
+  char *value_p;
   int end;
 } BiMapIter;
 #else
-typedef struct BiMapIter_TAG{
+typedef struct BiMapIter_TAG {
   ListIter_ptr d_iter;
   ListIter_ptr c_iter;
 } BiMapIter;
@@ -63,27 +61,23 @@ typedef struct BiMapIter_TAG{
   These macros must be used respectively to cast and to check
   instances of class BiMap
 */
-#define BI_MAP(self) \
-         ((BiMap_ptr) self)
+#define BI_MAP(self) ((BiMap_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BI_MAP_CHECK_INSTANCE(self) \
-         (nusmv_assert(BI_MAP(self) != BI_MAP(NULL)))
+#define BI_MAP_CHECK_INSTANCE(self) (nusmv_assert(BI_MAP(self) != BI_MAP(NULL)))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BI_MAP_FOREACH(self, iter) \
-  for (BiMap_gen_iter(self, &iter); \
-       !BiMap_iter_is_end(self, &iter); \
-       BiMap_iter_next(self, &iter)) \
-
+#define BI_MAP_FOREACH(self, iter)                                             \
+  for (BiMap_gen_iter(self, &iter); !BiMap_iter_is_end(self, &iter);           \
+       BiMap_iter_next(self, &iter))
 
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
@@ -114,10 +108,11 @@ void BiMap_destroy(BiMap_ptr self);
   \brief Put a new mapping
 
   It inserts a new domain_element - codomain_element mapping.
-               It does not allow overwriting of previous elements 
+               It does not allow overwriting of previous elements
                in the respective domains.
 */
-void BiMap_put(BiMap_ptr self, node_ptr domain_element, node_ptr codomain_element);
+void BiMap_put(BiMap_ptr self, node_ptr domain_element,
+               node_ptr codomain_element);
 
 /*!
   \methodof BiMap
@@ -140,7 +135,7 @@ node_ptr BiMap_inverse_get(BiMap_ptr self, node_ptr codomain_element);
   \brief Returns true if the given domain element is mapped to any value,
                false otherwise.
 
-  
+
 */
 boolean BiMap_domain_contains(BiMap_ptr self, node_ptr domain_element);
 
@@ -149,7 +144,7 @@ boolean BiMap_domain_contains(BiMap_ptr self, node_ptr domain_element);
   \brief Returns true if the given codomain element is mapped from any value,
                false otherwise.
 
-  
+
 */
 boolean BiMap_codomain_contains(BiMap_ptr self, node_ptr codomain_element);
 
@@ -157,7 +152,7 @@ boolean BiMap_codomain_contains(BiMap_ptr self, node_ptr codomain_element);
   \methodof BiMap
   \brief Returns the number of element to element mappings.
 
-  
+
 */
 unsigned BiMap_size(BiMap_ptr self);
 
@@ -171,9 +166,9 @@ boolean BiMap_is_empty(BiMap_ptr self);
 
 /*!
   \methodof BiMap
-  \brief 
+  \brief
 
-  
+
 */
 void BiMap_clear(BiMap_ptr self);
 
@@ -183,43 +178,41 @@ void BiMap_clear(BiMap_ptr self);
   \methodof BiMap
   \brief Generate a new iter
 
-  
+
 */
-void BiMap_gen_iter(BiMap_ptr self, BiMapIter* iter);
+void BiMap_gen_iter(BiMap_ptr self, BiMapIter *iter);
 
 /*!
   \methodof BiMap
   \brief Returns true if the iteration is ended
 
-  
+
 */
-boolean BiMap_iter_is_end(BiMap_ptr self, BiMapIter* iter);
+boolean BiMap_iter_is_end(BiMap_ptr self, BiMapIter *iter);
 
 /*!
   \methodof BiMap
   \brief Sets the iterator to the next element
 
-  
+
 */
-void BiMap_iter_next(BiMap_ptr self, BiMapIter* iter);
+void BiMap_iter_next(BiMap_ptr self, BiMapIter *iter);
 
 /*!
   \methodof BiMap
   \brief Returns the number of element to element mappings.
 
-  
+
 */
-node_ptr BiMap_iter_get_domain_element(BiMap_ptr self, 
-                                          BiMapIter* iter);
+node_ptr BiMap_iter_get_domain_element(BiMap_ptr self, BiMapIter *iter);
 
 /*!
   \methodof BiMap
   \brief Returns the number of element to element mappings.
 
-  
+
 */
-node_ptr BiMap_iter_get_codomain_element(BiMap_ptr self, 
-                                            BiMapIter* iter);
+node_ptr BiMap_iter_get_codomain_element(BiMap_ptr self, BiMapIter *iter);
 
 /* big getters */
 

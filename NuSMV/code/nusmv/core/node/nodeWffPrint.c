@@ -22,7 +22,7 @@
    or email to <nusmv-users@fbk.eu>.
    Please report bugs to <nusmv-users@fbk.eu>.
 
-   To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+   To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,7 +35,6 @@
 
 */
 
-
 #if HAVE_CONFIG_H
 #include "nusmv-config.h"
 #endif
@@ -46,9 +45,9 @@
 #if NUSMV_HAVE_STRING_H
 #include <string.h> /* for strdup */
 #else
-# ifndef strdup
-char* strdup(const char*); /* forward declaration */
-# endif
+#ifndef strdup
+char *strdup(const char *); /* forward declaration */
+#endif
 #endif
 
 /*---------------------------------------------------------------------------*/

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,13 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_H__
 #define __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_H__
 
-
 #include "nusmv/core/utils/object.h"
 
-#include "nusmv/core/hrc/HrcNode.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
+#include "nusmv/core/hrc/HrcNode.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/prop/Prop.h"
 #include "nusmv/core/utils/utils.h"
@@ -52,9 +49,9 @@
   \struct HrcDumper
   \brief Definition of the public accessor for class HrcDumper
 
-  
+
 */
-typedef struct HrcDumper_TAG*  HrcDumper_ptr;
+typedef struct HrcDumper_TAG *HrcDumper_ptr;
 
 /*!
   \brief To cast and check instances of class HrcDumper
@@ -62,23 +59,20 @@ typedef struct HrcDumper_TAG*  HrcDumper_ptr;
   These macros must be used respectively to cast and to check
   instances of class HrcDumper
 */
-#define HRC_DUMPER(self) \
-         ((HrcDumper_ptr) self)
+#define HRC_DUMPER(self) ((HrcDumper_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define HRC_DUMPER_CHECK_INSTANCE(self) \
-         (nusmv_assert(HRC_DUMPER(self) != HRC_DUMPER(NULL)))
-
-
+#define HRC_DUMPER_CHECK_INSTANCE(self)                                        \
+  (nusmv_assert(HRC_DUMPER(self) != HRC_DUMPER(NULL)))
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 
 typedef enum HrcDumperSnippet_TAG {
@@ -87,12 +81,12 @@ typedef enum HrcDumperSnippet_TAG {
 
   HDS_LIST_MODS, /* list of modules, used for initial/final
                     comments and/or headers */
-  HDS_MOD, /* module begins/ends */
+  HDS_MOD,       /* module begins/ends */
 
   HDS_MOD_NAME, /* module name */
 
   HDS_LIST_MOD_FORMAL_PARAMS, /* module formal parameters */
-  HDS_MOD_FORMAL_PARAM, /* single mod parameter */
+  HDS_MOD_FORMAL_PARAM,       /* single mod parameter */
 
   HDS_LIST_MOD_INSTANCES, /* list of module instances. Use category
                              to know the exact type (VAR, IVAR,...)*/
@@ -127,20 +121,18 @@ typedef enum HrcDumperSnippet_TAG {
   HDS_COMPASSION,
 
   HDS_LIST_SPECS, /* list of specifications */
-  HDS_SPEC, /* single specification. Type in */
+  HDS_SPEC,       /* single specification. Type in */
 
   HDS_LIST_COMPILER_INFO, /* compiler information */
   HDS_LIST_SYNTAX_ERRORS, /* list of all syntactic errors, when available */
-  HDS_ERROR, /* a single error */
+  HDS_ERROR,              /* a single error */
 
 } HrcDumperSnippet;
 
-
-
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 
 typedef struct HrcDumperInfo_TAG {
@@ -164,15 +156,15 @@ typedef struct HrcDumperInfo_TAG {
     int lineno;
   } n2;
 
-  struct {   /* for errors */
+  struct { /* for errors */
     int lineno;
-    const char* filename; /* can be NULL for stdin */
-    const char* message;
-    const char* token; /* can be NULL */
+    const char *filename; /* can be NULL for stdin */
+    const char *message;
+    const char *token; /* can be NULL */
   } error;
 
   SymbCategory symb_cat; /* used for category of symbol(s) */
-  Prop_Type spec_type; /* type of specification(s) */
+  Prop_Type spec_type;   /* type of specification(s) */
 
   /* (only for list elements) true iff element is last of the list: */
   boolean last_in_list;
@@ -181,10 +173,8 @@ typedef struct HrcDumperInfo_TAG {
 
   HrcNode_ptr hrcNode; /* the node currently processed */
 
-  void* user; /* to carry additional information handled by the user */
+  void *user; /* to carry additional information handled by the user */
 } HrcDumperInfo;
-
-
 
 /**AutomaticStart*************************************************************/
 
@@ -201,8 +191,7 @@ typedef struct HrcDumperInfo_TAG {
 
   \sa HrcDumper_destroy
 */
-HrcDumper_ptr HrcDumper_create(const NuSMVEnv_ptr env,
-                                      FILE* fout);
+HrcDumper_ptr HrcDumper_create(const NuSMVEnv_ptr env, FILE *fout);
 
 /*!
   \methodof HrcDumper
@@ -224,17 +213,16 @@ void HrcDumper_destroy(HrcDumper_ptr self);
   \sa HrcDumper_destroy
 */
 VIRTUAL void HrcDumper_dump_snippet(HrcDumper_ptr self,
-                                           HrcDumperSnippet snippet,
-                                           const HrcDumperInfo* info);
+                                    HrcDumperSnippet snippet,
+                                    const HrcDumperInfo *info);
 
 /*!
   \methodof HrcDumper
   \brief Enables/disables the indentation
 
-  
+
 */
-void HrcDumper_enable_indentation(HrcDumper_ptr self,
-                                         boolean flag);
+void HrcDumper_enable_indentation(HrcDumper_ptr self, boolean flag);
 
 /*!
   \methodof HrcDumper
@@ -263,14 +251,10 @@ void HrcDumper_dec_indent(HrcDumper_ptr self);
   \brief Controls if module names must be dumped with a
   (default) suffix or not.
 
-  
-*/
-void HrcDumper_enable_mod_suffix(HrcDumper_ptr self,
-                                        boolean flag);
 
+*/
+void HrcDumper_enable_mod_suffix(HrcDumper_ptr self, boolean flag);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_HRC_DUMPERS_HRC_DUMPER_H__ */

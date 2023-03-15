@@ -34,13 +34,11 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_PRINTERS_MASTER_PRINTER_H__
 #define __NUSMV_CORE_NODE_PRINTERS_MASTER_PRINTER_H__
 
-#include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/MasterNodeWalker.h"
+#include "nusmv/core/node/NodeMgr.h"
 
 /*!
   \struct MasterPrinter
@@ -48,7 +46,7 @@
 
 
 */
-typedef struct MasterPrinter_TAG*  MasterPrinter_ptr;
+typedef struct MasterPrinter_TAG *MasterPrinter_ptr;
 
 /*!
   \brief To cast and check instances of class MasterPrinter
@@ -56,17 +54,15 @@ typedef struct MasterPrinter_TAG*  MasterPrinter_ptr;
   These macros must be used respectively to cast and to check
   instances of class MasterPrinter
 */
-#define MASTER_PRINTER(self) \
-         ((MasterPrinter_ptr) self)
+#define MASTER_PRINTER(self) ((MasterPrinter_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MASTER_PRINTER_CHECK_INSTANCE(self) \
-         (nusmv_assert(MASTER_PRINTER(self) != MASTER_PRINTER(NULL)))
-
+#define MASTER_PRINTER_CHECK_INSTANCE(self)                                    \
+  (nusmv_assert(MASTER_PRINTER(self) != MASTER_PRINTER(NULL)))
 
 /*!
   \brief Definition of enumeration StreamType
@@ -76,12 +72,12 @@ typedef struct MasterPrinter_TAG*  MasterPrinter_ptr;
 */
 
 typedef enum StreamType_TAG {
-  STREAM_TYPE_DEFAULT,  /* the default stream type (STREAM_TYPE_STDOUT) */
+  STREAM_TYPE_DEFAULT, /* the default stream type (STREAM_TYPE_STDOUT) */
   STREAM_TYPE_STDOUT,
   STREAM_TYPE_STDERR,
   STREAM_TYPE_STRING,
-  STREAM_TYPE_FILE,     /* This requires a parameter */
-  STREAM_TYPE_FUNCTION  /* This requires a parameter */
+  STREAM_TYPE_FILE,    /* This requires a parameter */
+  STREAM_TYPE_FUNCTION /* This requires a parameter */
 } StreamType;
 
 /*!
@@ -94,8 +90,7 @@ typedef enum StreamType_TAG {
   NOTE: The argument 'arg' is a generic argument useful for passing
   information in a reentrant way
 */
-typedef int (*StreamTypeFunction_ptr)(const char* str, void* arg);
-
+typedef int (*StreamTypeFunction_ptr)(const char *str, void *arg);
 
 /*!
   \brief Definition of enumeration StreamType
@@ -104,29 +99,25 @@ typedef int (*StreamTypeFunction_ptr)(const char* str, void* arg);
   type to be used by the MasterPrinter when producing a printing output
 */
 
-union StreamTypeArg
-{
+union StreamTypeArg {
   /* for STREAM_TYPE_FILE */
-  FILE* file;
+  FILE *file;
 
   /* for STREAM_TYPE_FUNCTION */
   struct {
     /* The function pointer */
     StreamTypeFunction_ptr func_ptr;
     /* The argument to pass to each function call */
-    void* argument;
+    void *argument;
   } function;
 };
-
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define STREAM_TYPE_ARG_UNUSED   \
-  NULL
-
+#define STREAM_TYPE_ARG_UNUSED NULL
 
 /**AutomaticStart*************************************************************/
 
@@ -149,7 +140,7 @@ int print_node(MasterPrinter_ptr wffprinter, FILE *, node_ptr);
   Pretty print a formula into a string. The returned
    string must be freed after using it. Returns NULL in case of failure.
 */
-char* sprint_node(MasterPrinter_ptr wffprinter, node_ptr);
+char *sprint_node(MasterPrinter_ptr wffprinter, node_ptr);
 
 /*!
   \brief Pretty print a formula on a file (indenting)
@@ -157,8 +148,8 @@ char* sprint_node(MasterPrinter_ptr wffprinter, node_ptr);
   Pretty print a formula on a file (indenting), starting
    at given offset.
 */
-int print_node_indent_at(MasterPrinter_ptr iwffprinter,
-                                FILE *stream, node_ptr n, int ofs);
+int print_node_indent_at(MasterPrinter_ptr iwffprinter, FILE *stream,
+                         node_ptr n, int ofs);
 
 /*!
   \brief Pretty print a formula into a string (indenting)
@@ -167,8 +158,7 @@ int print_node_indent_at(MasterPrinter_ptr iwffprinter,
    starting at given offset. The returned string must be freed after
    using it. Returns NULL in case of failure.
 */
-char* sprint_node_indent_at(MasterPrinter_ptr iwffprinter,
-                                   node_ptr n, int ofs);
+char *sprint_node_indent_at(MasterPrinter_ptr iwffprinter, node_ptr n, int ofs);
 
 /*!
   \brief Pretty print a formula on a file (indenting)
@@ -176,8 +166,7 @@ char* sprint_node_indent_at(MasterPrinter_ptr iwffprinter,
   Pretty print a formula on a file (indenting), starting
    at column 0.
 */
-int print_node_indent(MasterPrinter_ptr iwffprinter,
-                             FILE *stream, node_ptr n);
+int print_node_indent(MasterPrinter_ptr iwffprinter, FILE *stream, node_ptr n);
 
 /*!
   \brief Pretty print a formula into a string (indenting)
@@ -186,9 +175,7 @@ int print_node_indent(MasterPrinter_ptr iwffprinter,
    starting at column 0. The returned string must be freed after using
    it. Returns NULL in case of failure.
 */
-char* sprint_node_indent(MasterPrinter_ptr iwffprinter,
-                                node_ptr n);
-
+char *sprint_node_indent(MasterPrinter_ptr iwffprinter, node_ptr n);
 
 /* MasterPrinter class methods */
 
@@ -210,8 +197,7 @@ MasterPrinter_ptr MasterPrinter_create(const NuSMVEnv_ptr env);
   obtained be calling MasterPrinter_get_streamed_string. Returns
   0 if an error occurred for some reason.
 */
-int
-MasterPrinter_print_node(MasterPrinter_ptr self, node_ptr n);
+int MasterPrinter_print_node(MasterPrinter_ptr self, node_ptr n);
 
 /*!
   \methodof MasterPrinter
@@ -221,8 +207,7 @@ MasterPrinter_print_node(MasterPrinter_ptr self, node_ptr n);
   obtained be calling MasterPrinter_get_streamed_string. Returns
   0 if an error occurred for some reason.
 */
-int
-MasterPrinter_print_string(MasterPrinter_ptr self, const char* str);
+int MasterPrinter_print_string(MasterPrinter_ptr self, const char *str);
 
 /*!
   \methodof MasterPrinter
@@ -235,8 +220,7 @@ MasterPrinter_print_string(MasterPrinter_ptr self, const char* str);
 
   \sa master_printer_reset_string_stream
 */
-const char*
-MasterPrinter_get_streamed_string(const MasterPrinter_ptr self);
+const char *MasterPrinter_get_streamed_string(const MasterPrinter_ptr self);
 
 /*!
   \methodof MasterPrinter
@@ -245,8 +229,7 @@ MasterPrinter_get_streamed_string(const MasterPrinter_ptr self);
   Set the indentation offset for this stream. Negative
   offsets are silently discarded.
 */
-void
-MasterPrinter_reset_stream(MasterPrinter_ptr self, int offs);
+void MasterPrinter_reset_stream(MasterPrinter_ptr self, int offs);
 
 /*!
   \methodof MasterPrinter
@@ -263,10 +246,8 @@ MasterPrinter_reset_stream(MasterPrinter_ptr self, int offs);
   an open writable file.
 
 */
-void
-MasterPrinter_set_stream_type(MasterPrinter_ptr self,
-                              StreamType type,
-                              const union StreamTypeArg* arg);
+void MasterPrinter_set_stream_type(MasterPrinter_ptr self, StreamType type,
+                                   const union StreamTypeArg *arg);
 
 /*!
   \methodof MasterPrinter
@@ -274,8 +255,7 @@ MasterPrinter_set_stream_type(MasterPrinter_ptr self,
 
   Returns the currently set stream type
 */
-StreamType
-MasterPrinter_get_stream_type(const MasterPrinter_ptr self);
+StreamType MasterPrinter_get_stream_type(const MasterPrinter_ptr self);
 
 /*!
   \methodof MasterPrinter
@@ -284,8 +264,7 @@ MasterPrinter_get_stream_type(const MasterPrinter_ptr self);
   The currently set stream is flushed out (i.e. no
   unstreamed data remains afterwards.
 */
-int
-MasterPrinter_flush_stream(MasterPrinter_ptr self);
+int MasterPrinter_flush_stream(MasterPrinter_ptr self);
 
 /*!
   \methodof MasterPrinter
@@ -299,8 +278,7 @@ MasterPrinter_flush_stream(MasterPrinter_ptr self);
   This function is provided to allow the called to forget the set
   stream after setting it into the master printer.
 */
-void
-MasterPrinter_close_stream(MasterPrinter_ptr self);
+void MasterPrinter_close_stream(MasterPrinter_ptr self);
 
 /*!
   \brief
@@ -317,6 +295,5 @@ void debug_print_node(NuSMVEnv_ptr env, node_ptr node);
 void debug_print_sexp(NuSMVEnv_ptr env, node_ptr node);
 
 /**AutomaticEnd***************************************************************/
-
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_MASTER_PRINTER_H__ */

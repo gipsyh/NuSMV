@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_TABLEAU_H__
 #define __NUSMV_CORE_BMC_BMC_TABLEAU_H__
 
@@ -43,7 +42,6 @@
 #include "cudd/util.h"
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/node/node.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -65,7 +63,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -79,10 +76,8 @@
   Fairness evaluate to true if there are not fairness
   in the model, otherwise them evaluate to false because of no loop
 */
-be_ptr
-Bmc_Tableau_GetNoLoop(const BeFsm_ptr be_fsm,
-                      const node_ptr ltl_wff,
-                      const int k);
+be_ptr Bmc_Tableau_GetNoLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
+                             const int k);
 
 /*!
   \brief Builds tableau for all possible loops in \[l, k\], in
@@ -92,10 +87,8 @@ Bmc_Tableau_GetNoLoop(const BeFsm_ptr be_fsm,
   Builds the tableau in the case depth==1 as suggested
   by R. Sebastiani
 */
-be_ptr
-Bmc_Tableau_GetSingleLoop(const BeFsm_ptr be_fsm,
-                          const node_ptr ltl_wff,
-                          const int k, const int l);
+be_ptr Bmc_Tableau_GetSingleLoop(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
+                                 const int k, const int l);
 
 /*!
   \brief Builds tableau for all possible loops in \[l, k\[,
@@ -108,16 +101,15 @@ Bmc_Tableau_GetSingleLoop(const BeFsm_ptr be_fsm,
 
   SeeAlso            []
 
-*****************************************************************************[EXTRACT_DOC_NOTE: * /]
+*****************************************************************************[EXTRACT_DOC_NOTE:
+* /]
 
 
   Each tableau takes into account of fairnesses relative
   to its step. All tableau are collected together into a disjunctive form.
 */
-be_ptr
-Bmc_Tableau_GetAllLoops(const BeFsm_ptr be_fsm,
-                        const node_ptr ltl_wff,
-                        const int k, const int l);
+be_ptr Bmc_Tableau_GetAllLoops(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
+                               const int k, const int l);
 
 /*!
   \brief Builds tableau for all possible loops in \[l, k\], in
@@ -127,20 +119,17 @@ Bmc_Tableau_GetAllLoops(const BeFsm_ptr be_fsm,
   Builds the tableau in the case depth==1 as suggested
   by R. Sebastiani
 */
-be_ptr
-Bmc_Tableau_GetAllLoopsDepth1(const BeFsm_ptr be_fsm,
-                              const node_ptr ltl_wff, const int k);
+be_ptr Bmc_Tableau_GetAllLoopsDepth1(const BeFsm_ptr be_fsm,
+                                     const node_ptr ltl_wff, const int k);
 
 /*!
   \brief Builds a tableau for the LTL at length k with loopback l
   (single loop, no loop and all loopbacks are allowed)
 
-  
+
 */
-be_ptr
-Bmc_Tableau_GetLtlTableau(const BeFsm_ptr be_fsm,
-                const node_ptr ltl_wff,
-                const int k, const int l);
+be_ptr Bmc_Tableau_GetLtlTableau(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
+                                 const int k, const int l);
 
 /**AutomaticEnd***************************************************************/
 

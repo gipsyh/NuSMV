@@ -1,29 +1,29 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``compile.type_checking'' package of NuSMV 
-  version 2. 
-  Copyright (C) 2005 by FBK-irst. 
+  This file is part of the ``compile.type_checking'' package of NuSMV
+  version 2.
+  Copyright (C) 2005 by FBK-irst.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -31,8 +31,8 @@
   \author Andrei Tchaltsev
   \brief Public interface of class 'TypeChecker'
 
-   This class contains the functions performing type checking. 
-  The class uses type_checking_violation_handler to deal with 
+   This class contains the functions performing type checking.
+  The class uses type_checking_violation_handler to deal with
   type system violations (which may result in an error or warning)
   in the input files.
   After the type checking is performed, use function
@@ -41,22 +41,18 @@
   After the type checking is performed it is possible to obtain the
   type of an expression. Only memory-sharing types (SymbTablePkg_..._type)
   are used, so you can compare pointers instead of the type's contents.
-  
+
 
 */
-
-
 
 #ifndef __NUSMV_CORE_COMPILE_TYPE_CHECKING_TYPE_CHECKER_H__
 #define __NUSMV_CORE_COMPILE_TYPE_CHECKING_TYPE_CHECKER_H__
 
 #include "nusmv/core/node/MasterNodeWalker.h"
 
-#include "nusmv/core/compile/symb_table/SymbType.h" 
-#include "nusmv/core/compile/symb_table/SymbLayer.h" 
-#include "nusmv/core/utils/utils.h" 
-
-
+#include "nusmv/core/compile/symb_table/SymbLayer.h"
+#include "nusmv/core/compile/symb_table/SymbType.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type definitions                                                          */
@@ -66,9 +62,9 @@
   \struct TypeChecker
   \brief Definition of the public type for class TypeChecker
 
-  
+
 */
-typedef struct TypeChecker_TAG*  TypeChecker_ptr;
+typedef struct TypeChecker_TAG *TypeChecker_ptr;
 
 /*!
   \brief To cast and check instances of class TypeChecker
@@ -76,23 +72,19 @@ typedef struct TypeChecker_TAG*  TypeChecker_ptr;
   These macros must be used respectively to cast and to check
   instances of class TypeChecker
 */
-#define TYPE_CHECKER(self) \
-         ((TypeChecker_ptr) self)
+#define TYPE_CHECKER(self) ((TypeChecker_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TYPE_CHECKER_CHECK_INSTANCE(self) \
-         (nusmv_assert(TYPE_CHECKER(self) != TYPE_CHECKER(NULL)))
-
-
+#define TYPE_CHECKER_CHECK_INSTANCE(self)                                      \
+  (nusmv_assert(TYPE_CHECKER(self) != TYPE_CHECKER(NULL)))
 
 /* forward declaration, to avoid  circular dependency */
 struct Prop_TAG;
 struct SymbTable_TAG;
-
 
 /**AutomaticStart*************************************************************/
 
@@ -110,8 +102,7 @@ struct SymbTable_TAG;
 
   \sa TypeChecker_destroy
 */
-TypeChecker_ptr 
-TypeChecker_create(struct SymbTable_TAG* symbolTable);
+TypeChecker_ptr TypeChecker_create(struct SymbTable_TAG *symbolTable);
 
 /*!
   \methodof TypeChecker
@@ -125,7 +116,8 @@ TypeChecker_create(struct SymbTable_TAG* symbolTable);
 
   \sa TypeChecker_destroy
 */
-TypeChecker_ptr TypeChecker_create_with_default_checkers(struct SymbTable_TAG* symbolTable);
+TypeChecker_ptr
+TypeChecker_create_with_default_checkers(struct SymbTable_TAG *symbolTable);
 
 /*!
   \methodof TypeChecker
@@ -150,18 +142,16 @@ void TypeChecker_destroy(TypeChecker_ptr self);
 
   \sa TypeChecker_create
 */
-struct SymbTable_TAG*
-TypeChecker_get_symb_table(TypeChecker_ptr self);
+struct SymbTable_TAG *TypeChecker_get_symb_table(TypeChecker_ptr self);
 
 /*!
   \methodof TypeChecker
   \brief Calls TypeChecker_check_layer over all the layers of the symbol table
-  of self 
+  of self
 
   \sa TypeChecker_check_layer
 */
-boolean 
-TypeChecker_check_symb_table(TypeChecker_ptr self);
+boolean TypeChecker_check_symb_table(TypeChecker_ptr self);
 
 /*!
   \methodof TypeChecker
@@ -184,19 +174,17 @@ TypeChecker_check_symb_table(TypeChecker_ptr self);
    input text), since they can be implicitly used in ASSIGN(TRANS) contrains.
 
    Returns true if all the types are correctly formed and the defines
-   are correct, false otherwise. 
+   are correct, false otherwise.
 
   \sa TypeChecker_is_type_wellformed
 */
-boolean 
-TypeChecker_check_layer(TypeChecker_ptr self,
-                        SymbLayer_ptr layer);
+boolean TypeChecker_check_layer(TypeChecker_ptr self, SymbLayer_ptr layer);
 
 /*!
   \methodof TypeChecker
   \brief Checks all the module contrains are correctly typed
 
-  
+
    The module contrains are declarations INIT, INVAR, TRANS, ASSIGN,
    JUSTICE, COMPASSION.
 
@@ -226,20 +214,19 @@ TypeChecker_check_layer(TypeChecker_ptr self,
 
    Returns false if the module contrains violate the type system, and
    otherwise true is returned.
-   
+
 */
-boolean
-TypeChecker_check_constrains(TypeChecker_ptr self,
-                             node_ptr init, node_ptr trans, 
-                             node_ptr invar, node_ptr assign, 
-                             node_ptr justice, node_ptr compassion);
+boolean TypeChecker_check_constrains(TypeChecker_ptr self, node_ptr init,
+                                     node_ptr trans, node_ptr invar,
+                                     node_ptr assign, node_ptr justice,
+                                     node_ptr compassion);
 
 /*!
   \methodof TypeChecker
   \brief Checks that the expression constituting the
    property is correctly typed
 
-  
+
    If some of expressions violates the type system, the type checker's
    violation handler is invoked. See checkers into the checkers
    sub-package for more info.
@@ -251,9 +238,8 @@ TypeChecker_check_constrains(TypeChecker_ptr self,
    If the property violates the type system, the false value is return,
    and true value otherwise.
 */
-boolean 
-TypeChecker_check_property(TypeChecker_ptr self, 
-                           struct Prop_TAG* property);
+boolean TypeChecker_check_property(TypeChecker_ptr self,
+                                   struct Prop_TAG *property);
 
 /*!
   \methodof TypeChecker
@@ -261,7 +247,7 @@ TypeChecker_check_property(TypeChecker_ptr self,
    if an expression is wellformed with respect to the type system and
    false otherwise.
 
-  
+
    The main purpose of this function is to be invoked on temporarily
    created expressions before they are evaluated to ADD or BDD.
    This function may not be useful for expressions read from files (such as
@@ -279,16 +265,15 @@ TypeChecker_check_property(TypeChecker_ptr self,
 
   \sa type_checker_check_expression
 */
-boolean 
-TypeChecker_is_expression_wellformed(TypeChecker_ptr self,
-                                     node_ptr expression, 
-                                     node_ptr context);
+boolean TypeChecker_is_expression_wellformed(TypeChecker_ptr self,
+                                             node_ptr expression,
+                                             node_ptr context);
 
 /*!
   \methodof TypeChecker
   \brief Performs type checking of a specification
 
-  
+
    A specification is a usual (i.e. able to have a type)
    expression wrapped into a node with a specification tag such as INIT,
    INVAR, SPEC, COMPASSION, etc.
@@ -310,15 +295,14 @@ TypeChecker_is_expression_wellformed(TypeChecker_ptr self,
 
   \sa type_checker_check_expression
 */
-boolean 
-TypeChecker_is_specification_wellformed(TypeChecker_ptr self, 
-                                        node_ptr expression);
+boolean TypeChecker_is_specification_wellformed(TypeChecker_ptr self,
+                                                node_ptr expression);
 
 /*!
   \methodof TypeChecker
   \brief Checks that a type is well formed.
 
-  
+
    This function is used to check the well-formedness of a type
    from a symbol table. This type should have properly created body,
    in particular, bodies should have correct line info.
@@ -338,13 +322,12 @@ TypeChecker_is_specification_wellformed(TypeChecker_ptr self,
    In the case of a type violation the violation handler obtain an
    expression CONS with variable name as left child and the body of the type
    as the right child.
-   
+
 
   \sa type_checker_check_expression
 */
-boolean 
-TypeChecker_is_type_wellformed(TypeChecker_ptr self,
-                               SymbType_ptr type, node_ptr varName);
+boolean TypeChecker_is_type_wellformed(TypeChecker_ptr self, SymbType_ptr type,
+                                       node_ptr varName);
 
 /*!
   \methodof TypeChecker
@@ -363,37 +346,34 @@ TypeChecker_is_type_wellformed(TypeChecker_ptr self,
    (see SymbTablePkg_..._type). So you can compare pointers instead of
    the type's contents.
 
-   
+
 
   \se TypeChecker_is_expression_wellformed,
    TypeChecker_is_specification_wellformed
 */
-SymbType_ptr 
-TypeChecker_get_expression_type(TypeChecker_ptr self,
-                                node_ptr expression,
-                                node_ptr context);
+SymbType_ptr TypeChecker_get_expression_type(TypeChecker_ptr self,
+                                             node_ptr expression,
+                                             node_ptr context);
 
 /*!
   \methodof TypeChecker
   \brief Returns true iff a given expression has been type checked
 
   If this function returns true then
-   TypeChecker_get_expression_type will return the cached type without performing
-   the actual type checking.
+   TypeChecker_get_expression_type will return the cached type without
+  performing the actual type checking.
 
    The parameter 'context' indicates the context where expression
    has been checked. It should be exactly the same as during type checking.
    For outside user this parameter is usually Nil.
-   
+
 
   \sa TypeChecker_get_expression_type
 */
-boolean
-TypeChecker_is_expression_type_checked(TypeChecker_ptr self,
-                                       node_ptr expression,
-                                       node_ptr context);
-  
-/**AutomaticEnd***************************************************************/
+boolean TypeChecker_is_expression_type_checked(TypeChecker_ptr self,
+                                               node_ptr expression,
+                                               node_ptr context);
 
+/**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_TYPE_CHECKER_H__ */

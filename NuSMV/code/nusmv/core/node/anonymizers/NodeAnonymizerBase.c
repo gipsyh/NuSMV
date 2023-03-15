@@ -35,23 +35,23 @@
 */
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
+#include "nusmv/core/compile/compileUtil.h"
+#include "nusmv/core/node/MasterNodeWalker.h"
 #include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
 #include "nusmv/core/node/anonymizers/NodeAnonymizerBase_private.h"
-#include "nusmv/core/node/normalizers/MasterNormalizer.h"
-#include "nusmv/core/compile/compileUtil.h"
-#include "nusmv/core/utils/error.h"
 #include "nusmv/core/node/anonymizers/PrinterNonAmbiguousDot.h"
-#include "nusmv/core/utils/object.h"
-#include "nusmv/core/node/MasterNodeWalker.h"
+#include "nusmv/core/node/normalizers/MasterNormalizer.h"
 #include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/object.h"
 
 #if NUSMV_HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  error "string.h has not been found, but is required for strlen"
+#error "string.h has not been found, but is required for strlen"
 #endif
 
 #include <stdio.h>
@@ -67,7 +67,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'NodeAnonymizerBase_private.h' for class 'NodeAnonymizerBase' definition. */
+/* See 'NodeAnonymizerBase_private.h' for class 'NodeAnonymizerBase' definition.
+ */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -84,46 +85,40 @@
 */
 #define NAB_MAX_LINE_LEN 1000
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void node_anonymizer_base_finalize(Object_ptr object, void* dummy);
-static node_ptr node_anonymizer_base_search_mapping_back(NodeAnonymizerBase_ptr self,
-                                                         node_ptr id);
-static node_ptr nab_map_expr_rec(NodeAnonymizerBase_ptr self,
-                                 node_ptr expr);
-static node_ptr nab_map_back_rec(NodeAnonymizerBase_ptr self,
-                                 node_ptr expr);
-static int nab_print_map_entry(NodeAnonymizerBase_ptr self,
-                               node_ptr orig,
+static void node_anonymizer_base_finalize(Object_ptr object, void *dummy);
+static node_ptr
+node_anonymizer_base_search_mapping_back(NodeAnonymizerBase_ptr self,
+                                         node_ptr id);
+static node_ptr nab_map_expr_rec(NodeAnonymizerBase_ptr self, node_ptr expr);
+static node_ptr nab_map_back_rec(NodeAnonymizerBase_ptr self, node_ptr expr);
+static int nab_print_map_entry(NodeAnonymizerBase_ptr self, node_ptr orig,
                                MasterPrinter_ptr anon_print);
 static node_ptr nab_convert_id_str_to_node(NodeAnonymizerBase_ptr self,
-                                           char** id);
+                                           char **id);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void NodeAnonymizerBase_destroy(NodeAnonymizerBase_ptr self)
-{
+void NodeAnonymizerBase_destroy(NodeAnonymizerBase_ptr self) {
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-int NodeAnonymizerBase_map(NodeAnonymizerBase_ptr self,
-                           node_ptr id,
-                           const char* prefix)
-{
+int NodeAnonymizerBase_map(NodeAnonymizerBase_ptr self, node_ptr id,
+                           const char *prefix) {
   int retval = 0;
 
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
   nusmv_assert(self->is_id(self, id));
-  nusmv_assert(! node_anonymizer_base_is_id_original(self, id));
+  nusmv_assert(!node_anonymizer_base_is_id_original(self, id));
   nusmv_assert(NULL != prefix);
 
   (void)self->translate(self, id, prefix);
@@ -131,17 +126,15 @@ int NodeAnonymizerBase_map(NodeAnonymizerBase_ptr self,
   return retval;
 }
 
-int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self,
-                                 node_ptr original,
-                                 node_ptr anonymous)
-{
+int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self, node_ptr original,
+                                 node_ptr anonymous) {
   int retval = 0;
 
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
   nusmv_assert(self->is_id(self, original));
   nusmv_assert(self->is_id(self, anonymous));
-  nusmv_assert(! node_anonymizer_base_is_id_original(self, original));
-  nusmv_assert(! node_anonymizer_base_is_id_anonymous(self, anonymous));
+  nusmv_assert(!node_anonymizer_base_is_id_original(self, original));
+  nusmv_assert(!node_anonymizer_base_is_id_anonymous(self, anonymous));
 
   node_anonymizer_base_insert_mapping(self, original, anonymous);
 
@@ -149,51 +142,45 @@ int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self,
 }
 
 boolean NodeAnonymizerBase_is_id_original(NodeAnonymizerBase_ptr self,
-                                          node_ptr id)
-{
+                                          node_ptr id) {
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
 
   return node_anonymizer_base_is_id_original(self, id);
 }
 
 boolean NodeAnonymizerBase_is_id_anonymous(NodeAnonymizerBase_ptr self,
-                                           node_ptr id)
-{
+                                           node_ptr id) {
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
 
   return node_anonymizer_base_is_id_anonymous(self, id);
 }
 
 node_ptr NodeAnonymizerBase_map_expr(NodeAnonymizerBase_ptr self,
-                                     node_ptr expr)
-{
+                                     node_ptr expr) {
   node_ptr retval = NULL;
 
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
 
   retval = node_anonymizer_base_map_expr(self, expr);
 
-  nusmv_assert(Nil == expr || (node_ptr)NULL !=  retval);
+  nusmv_assert(Nil == expr || (node_ptr)NULL != retval);
 
   return retval;
 }
 
 node_ptr NodeAnonymizerBase_map_back(NodeAnonymizerBase_ptr self,
-                                     node_ptr expr)
-{
+                                     node_ptr expr) {
   node_ptr retval;
 
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
-  nusmv_assert((node_ptr)NULL !=  expr);
+  nusmv_assert((node_ptr)NULL != expr);
 
   retval = node_anonymizer_base_map_back(self, expr);
 
   return retval;
 }
 
-int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self,
-                                 FILE* stream)
-{
+int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self, FILE *stream) {
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
   MasterPrinter_ptr anon_print = NULL;
   int retval = 0;
@@ -202,7 +189,7 @@ int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self,
 
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
   nusmv_assert(NULL != stream);
-  nusmv_assert(! BiMap_is_empty(self->map));
+  nusmv_assert(!BiMap_is_empty(self->map));
 
   /* Printer setup */
   anon_print = MasterPrinter_create(env);
@@ -237,13 +224,12 @@ int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self,
 }
 
 int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
-                                            FILE* stream)
-{
+                                            FILE *stream) {
   int status = 1;
 
   /* First read the map. In case of errors, self is not modified */
   BiMap_ptr tmp_map;
-  char* line = ALLOC(char, NAB_MAX_LINE_LEN);
+  char *line = ALLOC(char, NAB_MAX_LINE_LEN);
 
   tmp_map = BiMap_create();
 
@@ -256,25 +242,28 @@ int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
 
   /* foreach line */
   while (NULL != line) {
-    char* sorig = NULL;
-    char* sanonymous = NULL;
+    char *sorig = NULL;
+    char *sanonymous = NULL;
 
     NAB_DEBUG_PRINT("%s INPUT\n%s", __func__, line);
 
     /* get the two identifiers */
     {
-      char* pch;
+      char *pch;
 
       sorig = strtok(line, NODE_ANONYMIZER_DELIMITER_STR);
-      if (NULL == sorig) goto error;
+      if (NULL == sorig)
+        goto error;
 
       /* do not read the newline as well */
-      sanonymous = strtok(NULL, NODE_ANONYMIZER_DELIMITER_STR"\r\n");
-      if (NULL == sanonymous) goto error;
+      sanonymous = strtok(NULL, NODE_ANONYMIZER_DELIMITER_STR "\r\n");
+      if (NULL == sanonymous)
+        goto error;
 
       pch = strtok(NULL, NODE_ANONYMIZER_DELIMITER_STR);
       /* This could be just a warning */
-      if (NULL != pch) goto error;
+      if (NULL != pch)
+        goto error;
     }
 
     /* convert them to nodes and add to the bimap */
@@ -283,9 +272,11 @@ int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
       node_ptr nanonymous;
 
       norig = nab_convert_id_str_to_node(self, &sorig);
-      if (NULL == norig) goto error;
+      if (NULL == norig)
+        goto error;
       nanonymous = nab_convert_id_str_to_node(self, &sanonymous);
-      if (NULL == nanonymous) goto error;
+      if (NULL == nanonymous)
+        goto error;
 
       NAB_DEBUG_PRINT("%s OUTPUT\n%N\n%N", __func__, norig, nanonymous);
 
@@ -298,40 +289,39 @@ int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
   /* If no error, update self */
   status = node_anonymizer_read_map_from_bimap(self, tmp_map);
 
-  if (0 != status) goto error;
+  if (0 != status)
+    goto error;
 
   /* Success */
   status = 0;
   goto exit;
 
- error:
+error:
   status = 1;
 
   /* Cleanup */
- exit:
+exit:
   FREE(line);
-  if (NULL != tmp_map) BiMap_destroy(tmp_map);
+  if (NULL != tmp_map)
+    BiMap_destroy(tmp_map);
 
   return status;
 }
 
 int NodeAnonymizer_read_map_from_bimap(NodeAnonymizerBase_ptr self,
-                                       BiMap_ptr map)
-{
+                                       BiMap_ptr map) {
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
 
-  return node_anonymizer_read_map_from_bimap(self,  map);
+  return node_anonymizer_read_map_from_bimap(self, map);
 }
 
-size_t NodeAnonymizerBase_get_map_size(NodeAnonymizerBase_ptr self)
-{
+size_t NodeAnonymizerBase_get_map_size(NodeAnonymizerBase_ptr self) {
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
 
   return (size_t)BiMap_size(self->map);
 }
 
-boolean NodeAnonymizerBase_is_map_empty(NodeAnonymizerBase_ptr self)
-{
+boolean NodeAnonymizerBase_is_map_empty(NodeAnonymizerBase_ptr self) {
   NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self);
 
   return BiMap_is_empty(self->map);
@@ -342,8 +332,7 @@ boolean NodeAnonymizerBase_is_map_empty(NodeAnonymizerBase_ptr self)
 /*---------------------------------------------------------------------------*/
 
 boolean node_anonymizer_base_is_id_original(NodeAnonymizerBase_ptr self,
-                                            node_ptr id)
-{
+                                            node_ptr id) {
   boolean retval;
   node_ptr anonymous;
 
@@ -356,8 +345,7 @@ boolean node_anonymizer_base_is_id_original(NodeAnonymizerBase_ptr self,
 }
 
 boolean node_anonymizer_base_is_id_anonymous(NodeAnonymizerBase_ptr self,
-                                             node_ptr id)
-{
+                                             node_ptr id) {
   boolean retval;
   node_ptr original;
 
@@ -369,39 +357,33 @@ boolean node_anonymizer_base_is_id_anonymous(NodeAnonymizerBase_ptr self,
   return retval;
 }
 
-void node_anonymizer_base_init(NodeAnonymizerBase_ptr self,
-                               NuSMVEnv_ptr env,
-                               const char* default_prefix,
-                               size_t memoization_threshold)
-{
+void node_anonymizer_base_init(NodeAnonymizerBase_ptr self, NuSMVEnv_ptr env,
+                               const char *default_prefix,
+                               size_t memoization_threshold) {
   /* base class initialization */
   env_object_init(ENV_OBJECT(self), env);
 
   /* members initialization */
   self->map = BiMap_create();
   self->memoization_threshold = memoization_threshold;
-  self->orig2anon = LRUCache_create(self->memoization_threshold / 2,
-                                    OAHash_pointer_eq_fun,
-                                    OAHash_pointer_hash_fun,
-                                    NULL,
-                                    NULL);
-  self->anon2orig = LRUCache_create(self->memoization_threshold / 2,
-                                    OAHash_pointer_eq_fun,
-                                    OAHash_pointer_hash_fun,
-                                    NULL,
-                                    NULL);
+  self->orig2anon =
+      LRUCache_create(self->memoization_threshold / 2, OAHash_pointer_eq_fun,
+                      OAHash_pointer_hash_fun, NULL, NULL);
+  self->anon2orig =
+      LRUCache_create(self->memoization_threshold / 2, OAHash_pointer_eq_fun,
+                      OAHash_pointer_hash_fun, NULL, NULL);
   self->counter = 1;
   if (NULL != default_prefix) {
     self->default_prefix = default_prefix;
-  }
-  else self->default_prefix = "x";
+  } else
+    self->default_prefix = "x";
 
   /* virtual methods settings */
   OVERRIDE(Object, finalize) = node_anonymizer_base_finalize;
 
   OVERRIDE(NodeAnonymizerBase, translate) = node_anonymizer_base_translate;
   OVERRIDE(NodeAnonymizerBase, build_anonymous) =
-    node_anonymizer_base_build_anonymous;
+      node_anonymizer_base_build_anonymous;
   OVERRIDE(NodeAnonymizerBase, is_leaf) = node_anonymizer_base_is_leaf;
   OVERRIDE(NodeAnonymizerBase, is_id) = node_anonymizer_base_is_id;
 
@@ -411,12 +393,14 @@ void node_anonymizer_base_init(NodeAnonymizerBase_ptr self,
 #endif
 }
 
-void node_anonymizer_base_deinit(NodeAnonymizerBase_ptr self)
-{
+void node_anonymizer_base_deinit(NodeAnonymizerBase_ptr self) {
   /* members deinitialization */
-  BiMap_destroy(self->map); self->map = NULL;
-  LRUCache_destroy(self->orig2anon); self->orig2anon = NULL;
-  LRUCache_destroy(self->anon2orig); self->anon2orig = NULL;
+  BiMap_destroy(self->map);
+  self->map = NULL;
+  LRUCache_destroy(self->orig2anon);
+  self->orig2anon = NULL;
+  LRUCache_destroy(self->anon2orig);
+  self->anon2orig = NULL;
   self->memoization_threshold = 0;
   self->counter = 0;
   self->default_prefix = NULL;
@@ -425,20 +409,19 @@ void node_anonymizer_base_deinit(NodeAnonymizerBase_ptr self)
   env_object_deinit(ENV_OBJECT(self));
 
 #ifdef NODE_ANONYMIZER_BASE_DEBUG
-  if (NULL != nab_debug_logger) Logger_destroy(nab_debug_logger);
+  if (NULL != nab_debug_logger)
+    Logger_destroy(nab_debug_logger);
   nab_debug_logger = NULL;
   nab_debug_stream = NULL;
 #endif
 }
 
 node_ptr node_anonymizer_base_translate(NodeAnonymizerBase_ptr self,
-                                        node_ptr id,
-                                        const char* prefix)
-{
+                                        node_ptr id, const char *prefix) {
   node_ptr retval = NULL;
 
   nusmv_assert(self->is_id);
-  nusmv_assert((char*)NULL !=  prefix);
+  nusmv_assert((char *)NULL != prefix);
 
   NAB_DEBUG_PRINT("%s INPUT\n%N", __func__, id);
 
@@ -448,15 +431,14 @@ node_ptr node_anonymizer_base_translate(NodeAnonymizerBase_ptr self,
   if (NULL == retval) {
     NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
     /* Not in the map: build the string */
-    const char* anonymous_name = NULL;
-    NodeMgr_ptr const nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const char *anonymous_name = NULL;
+    NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
     do {
       anonymous_name = self->build_anonymous(self, id, prefix);
 
       /* build the node */
-      retval = sym_intern(env, (char*)anonymous_name);
+      retval = sym_intern(env, (char *)anonymous_name);
       FREE(anonymous_name);
     } while (NodeAnonymizerBase_is_id_anonymous(self, retval));
 
@@ -466,14 +448,13 @@ node_ptr node_anonymizer_base_translate(NodeAnonymizerBase_ptr self,
 
   NAB_DEBUG_PRINT("%s INPUT\n%N", __func__, retval);
 
-  nusmv_assert((node_ptr)NULL !=  retval);
+  nusmv_assert((node_ptr)NULL != retval);
 
   return retval;
 }
 
 boolean node_anonymizer_base_is_leaf(NodeAnonymizerBase_ptr self,
-                                     node_ptr node)
-{
+                                     node_ptr node) {
   boolean retval;
 
   retval = node_is_leaf(node) || self->is_id(self, node);
@@ -481,28 +462,26 @@ boolean node_anonymizer_base_is_leaf(NodeAnonymizerBase_ptr self,
   return retval;
 }
 
-boolean node_anonymizer_base_is_id(NodeAnonymizerBase_ptr self,
-                                   node_ptr id)
-{
+boolean node_anonymizer_base_is_id(NodeAnonymizerBase_ptr self, node_ptr id) {
   boolean retval = false;
 
-  error_unreachable_code_msg("Error: NodeAnonymizerBase is an abstract class and \
+  error_unreachable_code_msg(
+      "Error: NodeAnonymizerBase is an abstract class and \
 method is_id has to be implemented by the subclasses");
 
   return retval;
 }
 
-const char* node_anonymizer_base_choose_prefix(NodeAnonymizerBase_ptr self,
-                                               const char* prefix)
-{
-  const char* out_prefix = NULL;
+const char *node_anonymizer_base_choose_prefix(NodeAnonymizerBase_ptr self,
+                                               const char *prefix) {
+  const char *out_prefix = NULL;
 
   nusmv_assert(NULL != prefix);
 
   if ('\0' == prefix[0]) {
     out_prefix = self->default_prefix;
-  }
-  else out_prefix = prefix;
+  } else
+    out_prefix = prefix;
 
   nusmv_assert(NULL != out_prefix);
 
@@ -510,26 +489,24 @@ const char* node_anonymizer_base_choose_prefix(NodeAnonymizerBase_ptr self,
 }
 
 node_ptr node_anonymizer_base_map_expr(NodeAnonymizerBase_ptr self,
-                                       node_ptr expr)
-{
+                                       node_ptr expr) {
   node_ptr retval;
 
   if (Nil == expr) {
     retval = Nil;
-  }
-  else retval = nab_map_expr_rec(self, expr);
+  } else
+    retval = nab_map_expr_rec(self, expr);
 
-  nusmv_assert(Nil == expr || (node_ptr)NULL !=  retval);
+  nusmv_assert(Nil == expr || (node_ptr)NULL != retval);
 
   return retval;
 }
 
 node_ptr node_anonymizer_base_map_back(NodeAnonymizerBase_ptr self,
-                                       node_ptr expr)
-{
+                                       node_ptr expr) {
   node_ptr retval;
 
-  nusmv_assert((node_ptr)NULL !=  expr);
+  nusmv_assert((node_ptr)NULL != expr);
 
   retval = nab_map_back_rec(self, expr);
 
@@ -537,13 +514,12 @@ node_ptr node_anonymizer_base_map_back(NodeAnonymizerBase_ptr self,
 }
 
 node_ptr node_anonymizer_base_search_expr_cache(NodeAnonymizerBase_ptr self,
-                                                node_ptr expr)
-{
+                                                node_ptr expr) {
   node_ptr retval;
 
-  nusmv_assert((node_ptr)NULL !=  expr);
-  nusmv_assert(! self->is_leaf(self, expr));
-  nusmv_assert(! self->is_id(self, expr));
+  nusmv_assert((node_ptr)NULL != expr);
+  nusmv_assert(!self->is_leaf(self, expr));
+  nusmv_assert(!self->is_id(self, expr));
 
   retval = NODE_PTR(LRUCache_lookup(self->orig2anon, expr));
 
@@ -552,32 +528,29 @@ node_ptr node_anonymizer_base_search_expr_cache(NodeAnonymizerBase_ptr self,
 
 void node_anonymizer_base_insert_expr_cache(NodeAnonymizerBase_ptr self,
                                             node_ptr expr,
-                                            node_ptr anonymous_expr)
-{
+                                            node_ptr anonymous_expr) {
   boolean replaced = true;
 
-  nusmv_assert((node_ptr)NULL !=  expr);
-  nusmv_assert(! self->is_leaf(self, expr));
-  nusmv_assert(! self->is_id(self, expr));
-  nusmv_assert((node_ptr)NULL !=  anonymous_expr);
-  nusmv_assert(! self->is_leaf(self, anonymous_expr));
-  nusmv_assert(! self->is_id(self, anonymous_expr));
+  nusmv_assert((node_ptr)NULL != expr);
+  nusmv_assert(!self->is_leaf(self, expr));
+  nusmv_assert(!self->is_id(self, expr));
+  nusmv_assert((node_ptr)NULL != anonymous_expr);
+  nusmv_assert(!self->is_leaf(self, anonymous_expr));
+  nusmv_assert(!self->is_id(self, anonymous_expr));
 
-  replaced = LRUCache_insert(self->orig2anon,
-                             (void*)expr,
-                             (void*)anonymous_expr);
+  replaced =
+      LRUCache_insert(self->orig2anon, (void *)expr, (void *)anonymous_expr);
 
-  nusmv_assert(! replaced);
+  nusmv_assert(!replaced);
 }
 
 node_ptr node_anonymizer_base_search_anon2orig(NodeAnonymizerBase_ptr self,
-                                               node_ptr expr)
-{
+                                               node_ptr expr) {
   node_ptr retval;
 
-  nusmv_assert((node_ptr)NULL !=  expr);
-  nusmv_assert(! self->is_leaf(self, expr));
-  nusmv_assert(! self->is_id(self, expr));
+  nusmv_assert((node_ptr)NULL != expr);
+  nusmv_assert(!self->is_leaf(self, expr));
+  nusmv_assert(!self->is_id(self, expr));
 
   retval = NODE_PTR(LRUCache_lookup(self->anon2orig, expr));
 
@@ -586,27 +559,24 @@ node_ptr node_anonymizer_base_search_anon2orig(NodeAnonymizerBase_ptr self,
 
 void node_anonymizer_base_insert_anon2orig(NodeAnonymizerBase_ptr self,
                                            node_ptr anonymous_expr,
-                                           node_ptr expr)
-{
+                                           node_ptr expr) {
   boolean replaced = true;
 
-  nusmv_assert((node_ptr)NULL !=  expr);
-  nusmv_assert(! self->is_leaf(self, expr));
-  nusmv_assert(! self->is_id(self, expr));
-  nusmv_assert((node_ptr)NULL !=  anonymous_expr);
-  nusmv_assert(! self->is_leaf(self, anonymous_expr));
-  nusmv_assert(! self->is_id(self, anonymous_expr));
+  nusmv_assert((node_ptr)NULL != expr);
+  nusmv_assert(!self->is_leaf(self, expr));
+  nusmv_assert(!self->is_id(self, expr));
+  nusmv_assert((node_ptr)NULL != anonymous_expr);
+  nusmv_assert(!self->is_leaf(self, anonymous_expr));
+  nusmv_assert(!self->is_id(self, anonymous_expr));
 
-  replaced = LRUCache_insert(self->anon2orig,
-                             (void*)anonymous_expr,
-                             (void*)expr);
+  replaced =
+      LRUCache_insert(self->anon2orig, (void *)anonymous_expr, (void *)expr);
 
-  nusmv_assert(! replaced);
+  nusmv_assert(!replaced);
 }
 
 int node_anonymizer_read_map_from_bimap(NodeAnonymizerBase_ptr self,
-                                        BiMap_ptr map)
-{
+                                        BiMap_ptr map) {
   int status = 0;
   BiMapIter iter;
 
@@ -627,12 +597,10 @@ int node_anonymizer_read_map_from_bimap(NodeAnonymizerBase_ptr self,
         status = 1;
         break;
       }
-    }
-    else if (BiMap_codomain_contains(self->map, codomain)) {
+    } else if (BiMap_codomain_contains(self->map, codomain)) {
       status = 1;
       break;
-    }
-    else {
+    } else {
       node_anonymizer_base_insert_mapping(self, domain, codomain);
     }
   }
@@ -649,21 +617,19 @@ int node_anonymizer_read_map_from_bimap(NodeAnonymizerBase_ptr self,
 
   Called by the class destructor
 */
-static void node_anonymizer_base_finalize(Object_ptr object, void* dummy)
-{
+static void node_anonymizer_base_finalize(Object_ptr object, void *dummy) {
   NodeAnonymizerBase_ptr self = NODE_ANONYMIZER_BASE(object);
 
   node_anonymizer_base_deinit(self);
   FREE(self);
 }
 
-const char* node_anonymizer_base_build_anonymous(NodeAnonymizerBase_ptr self,
+const char *node_anonymizer_base_build_anonymous(NodeAnonymizerBase_ptr self,
                                                  node_ptr id,
-                                                 const char* prefix)
-{
-  const char* anonymous_name;
-  const char* out_prefix;
-  const char* str_counter;
+                                                 const char *prefix) {
+  const char *anonymous_name;
+  const char *out_prefix;
+  const char *str_counter;
   size_t len_prefix;
   size_t len_counter;
   size_t len_anonymous;
@@ -680,8 +646,7 @@ const char* node_anonymizer_base_build_anonymous(NodeAnonymizerBase_ptr self,
   anonymous_name = ALLOC(char, len_anonymous);
 
   {
-    int c = snprintf((char*)anonymous_name, len_anonymous, "%s%s",
-                     out_prefix,
+    int c = snprintf((char *)anonymous_name, len_anonymous, "%s%s", out_prefix,
                      str_counter);
     SNPRINTF_CHECK(c, len_anonymous);
   }
@@ -692,20 +657,19 @@ const char* node_anonymizer_base_build_anonymous(NodeAnonymizerBase_ptr self,
 }
 
 node_ptr node_anonymizer_base_search_mapping(NodeAnonymizerBase_ptr self,
-                                             node_ptr id)
-{
+                                             node_ptr id) {
   node_ptr retval = NULL;
   node_ptr id_norm = NULL;
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
   MasterNormalizer_ptr const master_norm =
-    MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
+      MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
 
   id = MasterNormalizer_normalize_node(master_norm, id);
 
   if (BiMap_domain_contains(self->map, id)) {
     retval = BiMap_get(self->map, id);
-  }
-  else retval = NULL;
+  } else
+    retval = NULL;
 
   return retval;
 }
@@ -717,36 +681,34 @@ node_ptr node_anonymizer_base_search_mapping(NodeAnonymizerBase_ptr self,
   @node_ptr the original id corresponding to id if found, otherwise null
 */
 
-static node_ptr node_anonymizer_base_search_mapping_back(NodeAnonymizerBase_ptr self,
-                                                         node_ptr id)
-{
+static node_ptr
+node_anonymizer_base_search_mapping_back(NodeAnonymizerBase_ptr self,
+                                         node_ptr id) {
   node_ptr retval = NULL;
   node_ptr id_norm = NULL;
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
   MasterNormalizer_ptr const master_norm =
-    MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
+      MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
 
   id = MasterNormalizer_normalize_node(master_norm, id);
 
   if (BiMap_codomain_contains(self->map, id)) {
     retval = BiMap_inverse_get(self->map, id);
-  }
-  else retval = NULL;
+  } else
+    retval = NULL;
 
   return retval;
 }
 
 void node_anonymizer_base_insert_mapping(NodeAnonymizerBase_ptr self,
-                                         node_ptr id,
-                                         node_ptr anonymous)
-{
+                                         node_ptr id, node_ptr anonymous) {
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
   MasterNormalizer_ptr const master_norm =
-    MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
+      MASTER_NORMALIZER(NuSMVEnv_get_value(env, ENV_NODE_NORMALIZER));
 
   id = MasterNormalizer_normalize_node(master_norm, id);
 
-  nusmv_assert(! BiMap_domain_contains(self->map, id));
+  nusmv_assert(!BiMap_domain_contains(self->map, id));
   nusmv_assert(NULL != anonymous);
 
   BiMap_put(self->map, id, anonymous);
@@ -758,19 +720,17 @@ void node_anonymizer_base_insert_mapping(NodeAnonymizerBase_ptr self,
   identifiers and leaves are not cached
 */
 
-static node_ptr nab_map_expr_rec(NodeAnonymizerBase_ptr self,
-                                 node_ptr expr)
-{
+static node_ptr nab_map_expr_rec(NodeAnonymizerBase_ptr self, node_ptr expr) {
   node_ptr retval;
 
-  nusmv_assert((node_ptr)NULL !=  expr);
+  nusmv_assert((node_ptr)NULL != expr);
 
   NAB_DEBUG_PRINT("%s INPUT\n%N", __func__, expr)
 
   if (self->is_id(self, expr)) {
     retval = self->translate(self, expr, "");
-  }
-  else if (self->is_leaf(self, expr)) retval = expr;
+  } else if (self->is_leaf(self, expr))
+    retval = expr;
   else {
     /* check cache */
     retval = node_anonymizer_base_search_expr_cache(self, expr);
@@ -779,12 +739,12 @@ static node_ptr nab_map_expr_rec(NodeAnonymizerBase_ptr self,
       /* not in cache */
       NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
       NodeMgr_ptr const nodemgr =
-        NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+          NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
       retval =
-        find_node(nodemgr, node_get_type(expr),
-                  Nil != car(expr) ? nab_map_expr_rec(self, car(expr)) : Nil,
-                  Nil != cdr(expr) ? nab_map_expr_rec(self, cdr(expr)) : Nil);
+          find_node(nodemgr, node_get_type(expr),
+                    Nil != car(expr) ? nab_map_expr_rec(self, car(expr)) : Nil,
+                    Nil != cdr(expr) ? nab_map_expr_rec(self, cdr(expr)) : Nil);
 
       /* update cache */
       node_anonymizer_base_insert_expr_cache(self, expr, retval);
@@ -793,7 +753,7 @@ static node_ptr nab_map_expr_rec(NodeAnonymizerBase_ptr self,
 
   NAB_DEBUG_PRINT("%s OUTPUT\n%N", __func__, retval)
 
-  nusmv_assert((node_ptr)NULL !=  retval);
+  nusmv_assert((node_ptr)NULL != retval);
 
   return retval;
 }
@@ -804,19 +764,17 @@ static node_ptr nab_map_expr_rec(NodeAnonymizerBase_ptr self,
   identifiers and leaves are not cached
 */
 
-static node_ptr nab_map_back_rec(NodeAnonymizerBase_ptr self,
-                                 node_ptr expr)
-{
+static node_ptr nab_map_back_rec(NodeAnonymizerBase_ptr self, node_ptr expr) {
   node_ptr retval;
 
-  nusmv_assert((node_ptr)NULL !=  expr);
+  nusmv_assert((node_ptr)NULL != expr);
 
   NAB_DEBUG_PRINT("%s INPUT\n%N", __func__, expr)
 
   if (self->is_id(self, expr)) {
     retval = node_anonymizer_base_search_mapping_back(self, expr);
-  }
-  else if (self->is_leaf(self, expr)) retval = expr;
+  } else if (self->is_leaf(self, expr))
+    retval = expr;
   else {
     /* check cache */
     retval = node_anonymizer_base_search_anon2orig(self, expr);
@@ -825,12 +783,12 @@ static node_ptr nab_map_back_rec(NodeAnonymizerBase_ptr self,
       /* not in cache */
       NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
       NodeMgr_ptr const nodemgr =
-        NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+          NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
       retval =
-        find_node(nodemgr, node_get_type(expr),
-                  Nil != car(expr) ? nab_map_back_rec(self, car(expr)) : Nil,
-                  Nil != cdr(expr) ? nab_map_back_rec(self, cdr(expr)) : Nil);
+          find_node(nodemgr, node_get_type(expr),
+                    Nil != car(expr) ? nab_map_back_rec(self, car(expr)) : Nil,
+                    Nil != cdr(expr) ? nab_map_back_rec(self, cdr(expr)) : Nil);
 
       /* update cache */
       node_anonymizer_base_insert_anon2orig(self, expr, retval);
@@ -848,10 +806,8 @@ static node_ptr nab_map_back_rec(NodeAnonymizerBase_ptr self,
 
 */
 
-static int nab_print_map_entry(NodeAnonymizerBase_ptr self,
-                               node_ptr orig,
-                               MasterPrinter_ptr anon_print)
-{
+static int nab_print_map_entry(NodeAnonymizerBase_ptr self, node_ptr orig,
+                               MasterPrinter_ptr anon_print) {
   node_ptr anonymous;
   int retval = 0;
 
@@ -878,54 +834,49 @@ static int nab_print_map_entry(NodeAnonymizerBase_ptr self,
 */
 
 static node_ptr nab_convert_id_str_to_node(NodeAnonymizerBase_ptr self,
-                                           char** id)
-{
+                                           char **id) {
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
-  NodeMgr_ptr const nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr retval = NULL;
   node_ptr nleft = NULL;
   node_ptr nright = NULL;
-  char* str = NULL;
+  char *str = NULL;
   size_t span;
 
   NAB_DEBUG_PRINT("%s INPUT\n%s", __func__, *id);
 
-  switch(**id) {
-  case NODE_ANONYMIZER_DOT_CHAR:
-    {
+  switch (**id) {
+  case NODE_ANONYMIZER_DOT_CHAR: {
+    *id = *id + 1;
+
+    nleft = nab_convert_id_str_to_node(self, id);
+    nright = nab_convert_id_str_to_node(self, id);
+
+    retval = find_node(nodemgr, DOT, nleft, nright);
+  } break;
+
+  case NODE_ANONYMIZER_SEPARATOR_CHAR: {
+    *id = *id + 1;
+    retval = NULL;
+  } break;
+
+  default: {
+    /* It is an identifier */
+    span =
+        strcspn(*id, NODE_ANONYMIZER_DOT_STR "" NODE_ANONYMIZER_SEPARATOR_STR);
+    str = ALLOC(char, span + 1);
+    str[0] = '\0';
+    (void)strncat(str, *id, span);
+
+    retval = sym_intern(env, str);
+
+    *id = *id + span;
+    if (**id == NODE_ANONYMIZER_SEPARATOR_CHAR)
       *id = *id + 1;
 
-      nleft = nab_convert_id_str_to_node(self, id);
-      nright = nab_convert_id_str_to_node(self, id);
-
-      retval = find_node(nodemgr, DOT, nleft, nright);
-    }
-    break;
-
-  case NODE_ANONYMIZER_SEPARATOR_CHAR:
-    {
-      *id = *id + 1;
-      retval = NULL;
-    }
-    break;
-
-  default:
-    {
-      /* It is an identifier */
-      span = strcspn(*id, NODE_ANONYMIZER_DOT_STR""NODE_ANONYMIZER_SEPARATOR_STR);
-      str = ALLOC(char, span + 1);
-      str[0] = '\0';
-      (void)strncat(str, *id, span);
-
-      retval = sym_intern(env, str);
-
-      *id = *id + span;
-      if (**id == NODE_ANONYMIZER_SEPARATOR_CHAR) *id = *id + 1;
-
-      FREE(str);
-    }
+    FREE(str);
+  }
   }
 
   NAB_DEBUG_PRINT("%s OUTPUT\n%N", __func__, retval);

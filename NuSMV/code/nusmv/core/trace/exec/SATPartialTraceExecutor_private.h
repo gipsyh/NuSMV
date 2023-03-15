@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,8 +34,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_SATPARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_SATPARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 
@@ -46,18 +44,16 @@
 
 #include "nusmv/core/utils/utils.h"
 
-
 /*!
   \brief SATPartialTraceExecutor class definition derived from
                class PartialTraceExecutor
 
-  
+
 
   \sa Base class PartialTraceExecutor
 */
 
-typedef struct SATPartialTraceExecutor_TAG
-{
+typedef struct SATPartialTraceExecutor_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(PartialTraceExecutor);
 
@@ -76,8 +72,6 @@ typedef struct SATPartialTraceExecutor_TAG
 
 } SATPartialTraceExecutor;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -90,11 +84,10 @@ typedef struct SATPartialTraceExecutor_TAG
 
   \sa SATPartialTraceExecutor_create
 */
-void
-sat_partial_trace_executor_init(SATPartialTraceExecutor_ptr self,
-                                const BeFsm_ptr fsm, const BeEnc_ptr enc,
-                                const BddEnc_ptr bdd_enc,
-                                boolean use_restart);
+void sat_partial_trace_executor_init(SATPartialTraceExecutor_ptr self,
+                                     const BeFsm_ptr fsm, const BeEnc_ptr enc,
+                                     const BddEnc_ptr bdd_enc,
+                                     boolean use_restart);
 
 /*!
   \methodof SATPartialTraceExecutor
@@ -104,7 +97,6 @@ sat_partial_trace_executor_init(SATPartialTraceExecutor_ptr self,
 
   \sa SATPartialTraceExecutor_destroy
 */
-void
-sat_partial_trace_executor_deinit(SATPartialTraceExecutor_ptr self);
+void sat_partial_trace_executor_deinit(SATPartialTraceExecutor_ptr self);
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_SATPARTIAL_TRACE_EXECUTOR_PRIVATE_H__ */

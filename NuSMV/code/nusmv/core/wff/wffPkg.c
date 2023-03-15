@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,11 +36,10 @@
 
 */
 
-
-#include "nusmv/core/wff/wff.h"
-#include "nusmv/core/wff/w2w/w2wInt.h"
 #include "nusmv/core/wff/ExprMgr.h"
 #include "nusmv/core/wff/lr/MasterLogicRecognizer.h"
+#include "nusmv/core/wff/w2w/w2wInt.h"
+#include "nusmv/core/wff/wff.h"
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -50,13 +49,11 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void wff_pkg_init(const NuSMVEnv_ptr env)
-{
+void wff_pkg_init(const NuSMVEnv_ptr env) {
   {
     ExprMgr_ptr expr_mgr = ExprMgr_create(env);
     NuSMVEnv_set_value(env, ENV_EXPR_MANAGER, expr_mgr);
@@ -64,13 +61,12 @@ void wff_pkg_init(const NuSMVEnv_ptr env)
 
   {
     MasterLogicRecognizer_ptr master_recogn =
-      MasterLogicRecognizer_create_with_default_recognizers(env);
+        MasterLogicRecognizer_create_with_default_recognizers(env);
     NuSMVEnv_set_value(env, ENV_MASTER_LOGIC_RECOGNIZER, master_recogn);
   }
 }
 
-void wff_pkg_quit(const NuSMVEnv_ptr env)
-{
+void wff_pkg_quit(const NuSMVEnv_ptr env) {
 
   {
     hash_ptr wff2nnf = NuSMVEnv_get_handled_hash_ptr(env, ENV_W2W_WFF2NNF_HASH);
@@ -78,13 +74,14 @@ void wff_pkg_quit(const NuSMVEnv_ptr env)
   }
 
   {
-    ExprMgr_ptr expr_mgr = EXPR_MGR(NuSMVEnv_remove_value(env, ENV_EXPR_MANAGER));
+    ExprMgr_ptr expr_mgr =
+        EXPR_MGR(NuSMVEnv_remove_value(env, ENV_EXPR_MANAGER));
     ExprMgr_destroy(expr_mgr);
   }
 
   {
     MasterLogicRecognizer_ptr master_recogn =
-      NuSMVEnv_remove_value(env, ENV_MASTER_LOGIC_RECOGNIZER);
+        NuSMVEnv_remove_value(env, ENV_MASTER_LOGIC_RECOGNIZER);
     MasterLogicRecognizer_destroy(master_recogn);
   }
 }
@@ -93,8 +90,6 @@ void wff_pkg_quit(const NuSMVEnv_ptr env)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-

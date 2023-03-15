@@ -15,20 +15,19 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
-#include "nusmv/shell/cmd/cmdInt.h"
 #include "nusmv/shell/cmd/cmdCmd.h"
 #include "nusmv/shell/cmd/cmdCmdInt.h"
+#include "nusmv/shell/cmd/cmdInt.h"
 
+#include "nusmv/core/cinit/cinit.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/OStream.h"
 #include "nusmv/core/utils/StreamMgr.h"
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/error.h"
-#include "nusmv/core/cinit/cinit.h"
 
 #include <stdio.h>
 
@@ -36,7 +35,7 @@
 #include <string.h> /* for strdup */
 #else
 #ifndef strdup
-char* strdup(const char*); /* forward declaration */
+char *strdup(const char *); /* forward declaration */
 #endif
 #endif
 
@@ -49,58 +48,52 @@ char* strdup(const char*); /* forward declaration */
 
   \todo Missing description
 */
-#define MAX_STR         65536
+#define MAX_STR 65536
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static int CommandTime(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandEcho(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandMemoryProfile(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandQuit(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandUsage(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandWhich(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandHistory(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandAlias(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandUnalias(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandHelp(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandSource(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandShowHelp(NuSMVEnv_ptr env, int argc, char** argv);
+static int CommandTime(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandEcho(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandMemoryProfile(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandQuit(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandUsage(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandWhich(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandHistory(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandAlias(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandUnalias(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandHelp(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandSource(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandShowHelp(NuSMVEnv_ptr env, int argc, char **argv);
 
-static void print_alias(const NuSMVEnv_ptr env, char * value);
-static char * command_alias_help(avl_tree* aliasTable, char * command);
+static void print_alias(const NuSMVEnv_ptr env, char *value);
+static char *command_alias_help(avl_tree *aliasTable, char *command);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Cmd_init_cmd(NuSMVEnv_ptr env)
-{
+void Cmd_init_cmd(NuSMVEnv_ptr env) {
   Cmd_CommandAdd(env, "alias", CommandAlias, 0, true);
   Cmd_CommandAdd(env, "echo", CommandEcho, 0, true);
   Cmd_CommandAdd(env, "help", CommandHelp, 0, true);
@@ -118,16 +111,14 @@ void Cmd_init_cmd(NuSMVEnv_ptr env)
   cmd_help_init(env);
 }
 
-void Cmd_quit_cmd(NuSMVEnv_ptr env)
-{
+void Cmd_quit_cmd(NuSMVEnv_ptr env) {
   /*Here deinitialize the command help hash table  */
   cmd_help_quit(env);
 }
 
-int Cmd_command_not_available(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int Cmd_command_not_available(NuSMVEnv_ptr env, int argc, char **argv) {
   StreamMgr_ptr const streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
   StreamMgr_print_error(streams, "Error: command %s is currently disabled\n",
                         argv[0]);
@@ -138,7 +129,6 @@ int Cmd_command_not_available(NuSMVEnv_ptr env, int argc, char** argv)
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -153,10 +143,9 @@ int Cmd_command_not_available(NuSMVEnv_ptr env, int argc, char** argv)
   of the \"time\" command, and the total processor time used since NuSMV
   was started.
 */
-static int CommandTime(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int CommandTime(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   static long last_time = 0;
   long time;
   int c;
@@ -167,12 +156,12 @@ static int CommandTime(NuSMVEnv_ptr env, int argc, char** argv)
   start_time = PTR_TO_INT(NuSMVEnv_get_value(env, ENV_START_TIME)) - 1;
 
   util_getopt_reset();
-  while ((c = util_getopt(argc,argv,"h")) != EOF){
-    switch(c){
-      case 'h':
-        goto usage;
-      default:
-        goto usage;
+  while ((c = util_getopt(argc, argv, "h")) != EOF) {
+    switch (c) {
+    case 'h':
+      goto usage;
+    default:
+      goto usage;
     }
   }
 
@@ -181,16 +170,15 @@ static int CommandTime(NuSMVEnv_ptr env, int argc, char** argv)
   }
 
   time = util_cpu_time();
-  StreamMgr_print_output(streams,
-           "elapse: %2.2f seconds, total: %2.2f seconds\n",
-           (time - start_time - last_time) / 1000.0,
-           (time - start_time) / 1000.0 );
+  StreamMgr_print_output(
+      streams, "elapse: %2.2f seconds, total: %2.2f seconds\n",
+      (time - start_time - last_time) / 1000.0, (time - start_time) / 1000.0);
   last_time = time;
   return 0;
 
 usage:
-  StreamMgr_print_error(streams,  "usage: time [-h]\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
+  StreamMgr_print_error(streams, "usage: time [-h]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
   return 1;
 }
 
@@ -215,34 +203,34 @@ usage:
           instead of overwriting it.
   </dl>
 */
-static int CommandEcho(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int CommandEcho(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
-  FILE* outstream = StreamMgr_get_output_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
+  FILE *outstream = StreamMgr_get_output_stream(streams);
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   int init_idx = 1;
   int i;
   int c;
 
-  FILE* fout = outstream;
-  char* fname = (char*) NULL;
+  FILE *fout = outstream;
+  char *fname = (char *)NULL;
   boolean must_append = false;
   boolean trailing_nl = true;
 
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "ha2no:")) != EOF) {
-    switch(c) {
+    switch (c) {
     case 'h':
-        goto usage;
-        break;
+      goto usage;
+      break;
 
     case 'o':
-      if (fname != (char*) NULL) FREE(fname);
-      fname = ALLOC(char, strlen(util_optarg)+1);
-      nusmv_assert(fname != (char*) NULL);
+      if (fname != (char *)NULL)
+        FREE(fname);
+      fname = ALLOC(char, strlen(util_optarg) + 1);
+      nusmv_assert(fname != (char *)NULL);
       strcpy(fname, util_optarg);
       init_idx += 2;
       break;
@@ -263,20 +251,23 @@ static int CommandEcho(NuSMVEnv_ptr env, int argc, char** argv)
       break;
 
     default:
-      if (fname != (char*) NULL) FREE(fname);
+      if (fname != (char *)NULL)
+        FREE(fname);
       goto usage;
     }
   }
 
-  if (fname != (char*) NULL) {
+  if (fname != (char *)NULL) {
     /* the user asked to dump to a file */
-    if (must_append) fout = fopen(fname, "a");
-    else fout = fopen(fname, "w");
+    if (must_append)
+      fout = fopen(fname, "a");
+    else
+      fout = fopen(fname, "w");
 
-    if (fout == (FILE*) NULL) {
+    if (fout == (FILE *)NULL) {
       /* counld not successfully open */
-      StreamMgr_print_error(streams,  "echo: unable to open file %s for writing.\n",
-              fname);
+      StreamMgr_print_error(
+          streams, "echo: unable to open file %s for writing.\n", fname);
       FREE(fname);
       ErrorMgr_rpterr(errmgr, "echo: an error occured");
     }
@@ -284,21 +275,31 @@ static int CommandEcho(NuSMVEnv_ptr env, int argc, char** argv)
     FREE(fname);
   }
 
-  for (i = init_idx; i < argc; i++) { fprintf(fout, "%s ", argv[i]); }
-  if (trailing_nl) fprintf(fout, "\n");
+  for (i = init_idx; i < argc; i++) {
+    fprintf(fout, "%s ", argv[i]);
+  }
+  if (trailing_nl)
+    fprintf(fout, "\n");
 
-  if (fout != outstream && fout != errstream) fclose(fout);
+  if (fout != outstream && fout != errstream)
+    fclose(fout);
   return 0;
 
-  usage:
-  StreamMgr_print_error(streams,  "usage: echo [-h] [-2] [-n] [[-o filename] [-a]] string \n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "   -2 \t\tRedirects to the standard error.\n");
-  StreamMgr_print_error(streams,  "   -n \t\tDoes not output the trailing newline.\n");
-  StreamMgr_print_error(streams,  "   -o filename \tRedirects the output to the specified file.\n");
+usage:
+  StreamMgr_print_error(
+      streams, "usage: echo [-h] [-2] [-n] [[-o filename] [-a]] string \n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
   StreamMgr_print_error(streams,
-          "   -a \t\tAppends the output to the end of the file specified \n"\
-          "      \t\tby the option -o\n");
+                        "   -2 \t\tRedirects to the standard error.\n");
+  StreamMgr_print_error(streams,
+                        "   -n \t\tDoes not output the trailing newline.\n");
+  StreamMgr_print_error(
+      streams,
+      "   -o filename \tRedirects the output to the specified file.\n");
+  StreamMgr_print_error(
+      streams,
+      "   -a \t\tAppends the output to the end of the file specified \n"
+      "      \t\tby the option -o\n");
   return 1;
 }
 
@@ -360,20 +361,18 @@ static int CommandEcho(NuSMVEnv_ptr env, int argc, char** argv)
   </dl>
 
 */
-static int
-CommandMemoryProfile(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandMemoryProfile(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  int   c;
-  char  options[128];
+  int c;
+  char options[128];
 #ifdef PURIFY
-  char  tmpFileName[128];
-  FILE  *fp;
-  char  command[256];
-  char  *NuSMVDirectoryName;
-  int   systemStatus;
+  char tmpFileName[128];
+  FILE *fp;
+  char command[256];
+  char *NuSMVDirectoryName;
+  int systemStatus;
 #endif
   /*
    * Parse command line options.
@@ -381,26 +380,25 @@ CommandMemoryProfile(NuSMVEnv_ptr env, int  argc, char ** argv)
   options[0] = 0;
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "f:hpu:")) != EOF) {
-    switch(c) {
-      case 'f':
-        strcat(options, " -f ");
-        strcat(options, util_optarg);
-        break;
-      case 'h':
-        goto usage;
-        break;
-      case 'p':
-        strcat(options, " -p ");
-        break;
-      case 'u':
-        strcat(options, " -u ");
-        strcat(options, util_optarg);
-        break;
-      default:
-        goto usage;
+    switch (c) {
+    case 'f':
+      strcat(options, " -f ");
+      strcat(options, util_optarg);
+      break;
+    case 'h':
+      goto usage;
+      break;
+    case 'p':
+      strcat(options, " -p ");
+      break;
+    case 'u':
+      strcat(options, " -u ");
+      strcat(options, util_optarg);
+      break;
+    default:
+      goto usage;
     }
   }
-
 
 #if defined(PURIFY) && NUSMV_HAVE_SYSTEM
   /* Flag to remember that a file has been created by purify */
@@ -416,9 +414,9 @@ CommandMemoryProfile(NuSMVEnv_ptr env, int  argc, char ** argv)
   NuSMVDirectoryName = CInit_NuSMVObtainLibrary();
 
   /* Prepare the string to be sent to a shell */
-  c = snprintf(command, sizeof(command), "%s/memoryaccount %s %s/.fmap ./.fmap >%s",
-               NuSMVDirectoryName, options, NuSMVDirectoryName,
-               tmpFileName);
+  c = snprintf(command, sizeof(command),
+               "%s/memoryaccount %s %s/.fmap ./.fmap >%s", NuSMVDirectoryName,
+               options, NuSMVDirectoryName, tmpFileName);
   SNPRINTF_CHECK(c, sizeof(command));
 
   /* Effectively execute the perlscript */
@@ -431,13 +429,13 @@ CommandMemoryProfile(NuSMVEnv_ptr env, int  argc, char ** argv)
 
   /* Check if the open has been successful */
   if (fp == NIL(FILE)) {
-    StreamMgr_print_error(streams,  "File %s was not found\n", tmpFileName);
+    StreamMgr_print_error(streams, "File %s was not found\n", tmpFileName);
     return 1;
   }
 
   /* Dump the contents of the result file in outstream */
-  while(fgets(command, 128, fp) != NIL(char)) {
-    StreamMgr_print_output(streams,  "%s", command);
+  while (fgets(command, 128, fp) != NIL(char)) {
+    StreamMgr_print_output(streams, "%s", command);
   }
   fclose(fp);
 
@@ -446,26 +444,29 @@ CommandMemoryProfile(NuSMVEnv_ptr env, int  argc, char ** argv)
   unlink(tmpFileName);
 #endif
 #else
-  StreamMgr_print_error(streams,  "Command not available: " \
-          NUSMV_PACKAGE_NAME " has not been ");
-  StreamMgr_print_error(streams,  "compiled with purify.\n");
+  StreamMgr_print_error(streams, "Command not available: " NUSMV_PACKAGE_NAME
+                                 " has not been ");
+  StreamMgr_print_error(streams, "compiled with purify.\n");
 #endif
 
-  return 0;             /* normal exit */
+  return 0; /* normal exit */
 
-  usage:
-  StreamMgr_print_error(streams,  "usage: _memory_profile [-h] [-f <filename>]");
-  StreamMgr_print_error(streams,  "[-p] [-u <units>] <filenames>\n");
-  StreamMgr_print_error(streams,  "   -h\t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "   -f <file>\tFile to read the purify dump");
-  StreamMgr_print_error(streams,  " from. The default is \"purify.log\".\n");
-  StreamMgr_print_error(streams,  "   -p\t\tPrints also the packages that do not ");
-  StreamMgr_print_error(streams,  "allocate any memory.\n");
-  StreamMgr_print_error(streams,  "   -u <units>\tUnits to print the memory usage");
-  StreamMgr_print_error(streams,  " in. It may be b for bytes\n");
-  StreamMgr_print_error(streams,  "     \t\tk for kilobytes, m for megabytes and ");
-  StreamMgr_print_error(streams,  "g for gigabytes.\n");
-  return 1;             /* error exit */
+usage:
+  StreamMgr_print_error(streams, "usage: _memory_profile [-h] [-f <filename>]");
+  StreamMgr_print_error(streams, "[-p] [-u <units>] <filenames>\n");
+  StreamMgr_print_error(streams, "   -h\t\tPrints the command usage.\n");
+  StreamMgr_print_error(streams, "   -f <file>\tFile to read the purify dump");
+  StreamMgr_print_error(streams, " from. The default is \"purify.log\".\n");
+  StreamMgr_print_error(streams,
+                        "   -p\t\tPrints also the packages that do not ");
+  StreamMgr_print_error(streams, "allocate any memory.\n");
+  StreamMgr_print_error(streams,
+                        "   -u <units>\tUnits to print the memory usage");
+  StreamMgr_print_error(streams, " in. It may be b for bytes\n");
+  StreamMgr_print_error(streams,
+                        "     \t\tk for kilobytes, m for megabytes and ");
+  StreamMgr_print_error(streams, "g for gigabytes.\n");
+  return 1; /* error exit */
 }
 
 /*!
@@ -488,40 +489,39 @@ CommandMemoryProfile(NuSMVEnv_ptr env, int  argc, char ** argv)
   </dl>
 
 */
-static int
-CommandQuit(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandQuit(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   int c;
 
   util_getopt_reset();
-  while ((c = util_getopt(argc,argv,"hsx")) != EOF){
-    switch(c){
-      case 'h':
-        goto usage;
-        break;
-      case 's':
-        return -2;
-      case 'x':
-        return -4;
+  while ((c = util_getopt(argc, argv, "hsx")) != EOF) {
+    switch (c) {
+    case 'h':
+      goto usage;
+      break;
+    case 's':
+      return -2;
+    case 'x':
+      return -4;
 
-      default:
-        goto usage;
+    default:
+      goto usage;
     }
   }
 
-  if ( argc != util_optind){
+  if (argc != util_optind) {
     goto usage;
   }
   return -1;
 
-  usage:
-    StreamMgr_print_error(streams,  "usage: quit [-h] [-s] | [-x] \n");
-    StreamMgr_print_error(streams,  "   -h  Prints the command usage.\n");
-    StreamMgr_print_error(streams,  "   -s  Frees all the used memory before quitting.\n");
-    StreamMgr_print_error(streams,  "   -x  Exits abruptly and silently.\n");
-    return 1;
+usage:
+  StreamMgr_print_error(streams, "usage: quit [-h] [-s] | [-x] \n");
+  StreamMgr_print_error(streams, "   -h  Prints the command usage.\n");
+  StreamMgr_print_error(streams,
+                        "   -s  Frees all the used memory before quitting.\n");
+  StreamMgr_print_error(streams, "   -x  Exits abruptly and silently.\n");
+  return 1;
 }
 
 /*!
@@ -533,35 +533,33 @@ CommandQuit(NuSMVEnv_ptr env, int  argc, char ** argv)
   statistics. For Berkeley Unix, this includes all of the information in the
   getrusage() structure.
 */
-static int
-CommandUsage(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandUsage(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* outstream = StreamMgr_get_output_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *outstream = StreamMgr_get_output_stream(streams);
   int c;
 
   util_getopt_reset();
-  while ((c = util_getopt(argc,argv,"h")) != EOF){
-    switch(c){
-      case 'h':
-        goto usage;
-        break;
-      default:
-        goto usage;
+  while ((c = util_getopt(argc, argv, "h")) != EOF) {
+    switch (c) {
+    case 'h':
+      goto usage;
+      break;
+    default:
+      goto usage;
     }
   }
 
-  if (argc != util_optind){
+  if (argc != util_optind) {
     goto usage;
   }
   util_print_cpu_stats(outstream);
   return 0;
 
-  usage:
-    StreamMgr_print_error(streams,  "usage: usage [-h]\n");
-    StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-    return 1;
+usage:
+  StreamMgr_print_error(streams, "usage: usage [-h]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  return 1;
 }
 
 /*!
@@ -583,42 +581,40 @@ CommandUsage(NuSMVEnv_ptr env, int  argc, char ** argv)
 
   \sa set
 */
-static int
-CommandWhich(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandWhich(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   FILE *fp;
   char *filename;
   int c;
 
   util_getopt_reset();
-  while ((c = util_getopt(argc,argv,"h")) != EOF){
-    switch(c){
-      case 'h':
-        goto usage;
-        break;
-      default:
-        goto usage;
+  while ((c = util_getopt(argc, argv, "h")) != EOF) {
+    switch (c) {
+    case 'h':
+      goto usage;
+      break;
+    default:
+      goto usage;
     }
   }
 
-  if (argc-1 != util_optind){
+  if (argc - 1 != util_optind) {
     goto usage;
   }
 
   fp = Cmd_FileOpen(env, argv[1], "r", &filename, 0);
   if (fp != 0) {
-    StreamMgr_print_output(streams,  "%s\n", filename);
-    (void) fclose(fp);
+    StreamMgr_print_output(streams, "%s\n", filename);
+    (void)fclose(fp);
   }
   FREE(filename);
   return 0;
 
-  usage:
-    StreamMgr_print_error(streams, "usage: which [-h] file_name\n");
-    StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-    return 1;
+usage:
+  StreamMgr_print_error(streams, "usage: which [-h] file_name\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  return 1;
 }
 
 /*!
@@ -667,31 +663,29 @@ CommandWhich(NuSMVEnv_ptr env, int  argc, char ** argv)
         <dl><dt>%stuf <dd>   Last command beginning with "stuf".</dl>
         <dl><dt>%n    <dd>   Repeat the n-th command.</dl>
         <dl><dt>%-n   <dd>   Repeat the n-th previous command.</dl>
-        <dl><dt>^old^new  <dd>       Replace "old" with "new" in previous command.
-        Trailing spaces are significant during substitution.
-        Initial spaces are not significant.</dl>
+        <dl><dt>^old^new  <dd>       Replace "old" with "new" in previous
+  command. Trailing spaces are significant during substitution. Initial spaces
+  are not significant.</dl>
 
   \sa set
 */
-static int
-CommandHistory(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandHistory(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  array_t* cmdHistoryArray = (array_t*)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_HISTORY);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  array_t *cmdHistoryArray =
+      (array_t *)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_HISTORY);
   int i, num, lineno;
   int size;
   int c;
 
-
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch(c) {
-      case 'h':
-        goto usage;
-        break;
-      default:
-        goto usage;
+    switch (c) {
+    case 'h':
+      goto usage;
+      break;
+    default:
+      goto usage;
     }
   }
 
@@ -704,12 +698,10 @@ CommandHistory(NuSMVEnv_ptr env, int  argc, char ** argv)
     if (argv[i][0] == '-') {
       if (argv[i][1] == 'h') {
         lineno = 0;
-      }
-      else {
+      } else {
         goto usage;
       }
-    }
-    else {
+    } else {
       num = atoi(argv[i]);
       if (num <= 0) {
         goto usage;
@@ -720,17 +712,18 @@ CommandHistory(NuSMVEnv_ptr env, int  argc, char ** argv)
   num = (num < size) ? num : size;
   for (i = size - num; i < size; i++) {
     if (lineno != 0) {
-      StreamMgr_print_output(streams,  "%d\t", i + 1);
+      StreamMgr_print_output(streams, "%d\t", i + 1);
     }
-    StreamMgr_print_output(streams,  "%s\n", array_fetch(char *, cmdHistoryArray, i));
+    StreamMgr_print_output(streams, "%s\n",
+                           array_fetch(char *, cmdHistoryArray, i));
   }
-  return(0);
+  return (0);
 
 usage:
-  StreamMgr_print_error(streams,  "usage: history [-h] [num]\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "   num \t\tPrints the last num commands.\n");
-  return(1);
+  StreamMgr_print_error(streams, "usage: history [-h] [num]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  StreamMgr_print_error(streams, "   num \t\tPrints the last num commands.\n");
+  return (1);
 }
 
 /*!
@@ -795,12 +788,11 @@ usage:
 
   \sa unalias
 */
-static int
-CommandAlias(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandAlias(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  avl_tree* aliasTable = (avl_tree*)NuSMVEnv_get_value(env, ENV_CMD_ALIAS_TABLE);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  avl_tree *aliasTable =
+      (avl_tree *)NuSMVEnv_get_value(env, ENV_CMD_ALIAS_TABLE);
   int i;
   char *key, *value;
   CmdAliasDescr_t *alias;
@@ -810,15 +802,14 @@ CommandAlias(NuSMVEnv_ptr env, int  argc, char ** argv)
 
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch(c) {
-      case 'h':
-        goto usage;
-        break;
-      default:
-        goto usage;
+    switch (c) {
+    case 'h':
+      goto usage;
+      break;
+    default:
+      goto usage;
     }
   }
-
 
   if (argc == 1) {
     avl_foreach_item(aliasTable, gen, AVL_FORWARD, &key, &value) {
@@ -826,8 +817,7 @@ CommandAlias(NuSMVEnv_ptr env, int  argc, char ** argv)
     }
     return 0;
 
-  }
-  else if (argc == 2) {
+  } else if (argc == 2) {
     if (avl_lookup(aliasTable, argv[1], &value)) {
       print_alias(env, value);
     }
@@ -844,17 +834,17 @@ CommandAlias(NuSMVEnv_ptr env, int  argc, char ** argv)
   alias->name = util_strsav(argv[1]);
   alias->argc = argc - 2;
   alias->argv = ALLOC(char *, alias->argc);
-  for(i = 2; i < argc; i++) {
-    alias->argv[i-2] = util_strsav(argv[i]);
+  for (i = 2; i < argc; i++) {
+    alias->argv[i - 2] = util_strsav(argv[i]);
   }
-  status = avl_insert(aliasTable, alias->name, (char *) alias);
-  nusmv_assert(!status);  /* error here in SIS version, TRS, 8/4/95 */
+  status = avl_insert(aliasTable, alias->name, (char *)alias);
+  nusmv_assert(!status); /* error here in SIS version, TRS, 8/4/95 */
   return 0;
 
-  usage:
-    StreamMgr_print_error(streams,  "usage: alias [-h] [command [string]]\n");
-    StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-    return (1);
+usage:
+  StreamMgr_print_error(streams, "usage: alias [-h] [command [string]]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  return (1);
 }
 
 /*!
@@ -873,24 +863,23 @@ CommandAlias(NuSMVEnv_ptr env, int  argc, char ** argv)
 
   \sa alias
 */
-static int
-CommandUnalias(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandUnalias(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  avl_tree* aliasTable = (avl_tree*)NuSMVEnv_get_value(env, ENV_CMD_ALIAS_TABLE);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  avl_tree *aliasTable =
+      (avl_tree *)NuSMVEnv_get_value(env, ENV_CMD_ALIAS_TABLE);
   int i;
   char *key, *value;
   int c;
 
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch(c) {
-      case 'h':
-        goto usage;
-        break;
-      default:
-        goto usage;
+    switch (c) {
+    case 'h':
+      goto usage;
+      break;
+    default:
+      goto usage;
     }
   }
 
@@ -898,7 +887,7 @@ CommandUnalias(NuSMVEnv_ptr env, int  argc, char ** argv)
     goto usage;
   }
 
-  for(i = 1; i < argc; i++) {
+  for (i = 1; i < argc; i++) {
     key = argv[i];
     if (avl_delete(aliasTable, &key, &value)) {
       CmdAliasFree(value);
@@ -906,10 +895,10 @@ CommandUnalias(NuSMVEnv_ptr env, int  argc, char ** argv)
   }
   return 0;
 
-  usage:
-    StreamMgr_print_error(streams,  "usage: unalias [-h] alias_names\n");
-    StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-    return 1;
+usage:
+  StreamMgr_print_error(streams, "usage: unalias [-h] alias_names\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  return 1;
 }
 
 /*!
@@ -932,13 +921,14 @@ CommandUnalias(NuSMVEnv_ptr env, int  argc, char ** argv)
           <dd> Disables the use of a pager like 'more' or any set
           in environment variable 'PAGER'. </dl>
 */
-static int CommandHelp(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int CommandHelp(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  avl_tree* commandTable = (avl_tree*)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_TABLE);
-  avl_tree* aliasTable = (avl_tree*)NuSMVEnv_get_value(env, ENV_CMD_ALIAS_TABLE);
+  avl_tree *commandTable =
+      (avl_tree *)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_TABLE);
+  avl_tree *aliasTable =
+      (avl_tree *)NuSMVEnv_get_value(env, ENV_CMD_ALIAS_TABLE);
   int c, i, all;
   char *key;
   avl_generator *gen;
@@ -947,15 +937,15 @@ static int CommandHelp(NuSMVEnv_ptr env, int argc, char** argv)
 #if NUSMV_HAVE_GETENV
   char *pager;
 #endif
-  FILE* outstream = StreamMgr_get_output_stream(streams);
-  FILE* old_outstream = NIL(FILE);
+  FILE *outstream = StreamMgr_get_output_stream(streams);
+  FILE *old_outstream = NIL(FILE);
   OStream_ptr ostream;
   short int useMore = 1;
 
   util_getopt_reset();
   all = 0;
   while ((c = util_getopt(argc, argv, "hap")) != EOF) {
-    switch(c) {
+    switch (c) {
     case 'a':
       all = 1;
       break;
@@ -982,30 +972,31 @@ static int CommandHelp(NuSMVEnv_ptr env, int argc, char** argv)
         /* If command should be printed on the second column, but it
            is too width, newline */
         if ((i % 2) == 1 && ow) {
-          StreamMgr_print_output(streams,  "\n");
+          StreamMgr_print_output(streams, "\n");
         }
 
-        StreamMgr_print_output(streams,  "%-35s", key);
+        StreamMgr_print_output(streams, "%-35s", key);
         ++i;
 
         if ((i % 2) == 0 || ow) {
-          StreamMgr_print_output(streams,  "\n");
+          StreamMgr_print_output(streams, "\n");
           nl_printed = true;
+        } else {
+          nl_printed = false;
         }
-        else { nl_printed = false; }
 
         /* One long command takes 2 columns! If a newline has been
            printed because of a long command, next iteration we need
            to skip one newline printing! */
-        if (ow && (i % 2) == 1) ++i;
+        if (ow && (i % 2) == 1)
+          ++i;
       }
     }
     if (!nl_printed) {
-      StreamMgr_print_output(streams,  "\n");
+      StreamMgr_print_output(streams, "\n");
     }
-  }
-  else if (argc - util_optind == 1) {
-    char* command_description;
+  } else if (argc - util_optind == 1) {
+    char *command_description;
 
 #if NUSMV_HAVE_SYSTEM
     command = command_alias_help(aliasTable, argv[util_optind]);
@@ -1015,81 +1006,84 @@ static int CommandHelp(NuSMVEnv_ptr env, int argc, char** argv)
     command_description = cmd_help_get(env, command);
 
     if (command_description == NULL) {
-      StreamMgr_print_error(streams,  "Unfound help for command: %s.\n", command);
+      StreamMgr_print_error(streams, "Unfound help for command: %s.\n",
+                            command);
       return 1;
     }
 
     if (useMore) {
 #if NUSMV_HAVE_POPEN
-    old_outstream = outstream;
+      old_outstream = outstream;
 #if NUSMV_HAVE_GETENV
-    pager = getenv("PAGER");
-    if (pager == NULL) {
+      pager = getenv("PAGER");
+      if (pager == NULL) {
+        outstream = popen("more", "w");
+        if (outstream == NULL) {
+          StreamMgr_print_error(streams,
+                                "Unable to open pipe with \"more\".\n");
+          StreamMgr_print_error(streams,
+                                "Use option -p to disable the use of pager.\n");
+          outstream = old_outstream;
+          return 1;
+        }
+      } else {
+        outstream = popen(pager, "w");
+        if (outstream == NULL) {
+          StreamMgr_print_error(streams, "Unable to open pipe with \"%s\".\n",
+                                pager);
+          StreamMgr_print_error(streams,
+                                "Use option -p to disable the use of pager.\n");
+          outstream = old_outstream;
+          return 1;
+        }
+      }
+#else  /* NUSMV_HAVE_GETENV */
       outstream = popen("more", "w");
       if (outstream == NULL) {
-        StreamMgr_print_error(streams,  "Unable to open pipe with \"more\".\n");
+        StreamMgr_print_error(streams, "Unable to open pipe with \"more\".\n");
         StreamMgr_print_error(streams,
                               "Use option -p to disable the use of pager.\n");
         outstream = old_outstream;
         return 1;
       }
-    }
-    else {
-      outstream = popen(pager, "w");
-      if (outstream == NULL) {
-        StreamMgr_print_error(streams,  "Unable to open pipe with \"%s\".\n", pager);
-        StreamMgr_print_error(streams,
-                              "Use option -p to disable the use of pager.\n");
-        outstream = old_outstream;
-        return 1;
-      }
-    }
-#else /* NUSMV_HAVE_GETENV */
-    outstream = popen("more", "w");
-    if (outstream == NULL) {
-      StreamMgr_print_error(streams,  "Unable to open pipe with \"more\".\n");
-      StreamMgr_print_error(streams,
-                            "Use option -p to disable the use of pager.\n");
-      outstream = old_outstream;
-      return 1;
-    }
 #endif /* NUSMV_HAVE_GETENV */
 
-#else /* NUSMV_HAVE_POPEN */
-    StreamMgr_print_error(streams,  "Pipe is not supported\n");
-    StreamMgr_print_error(streams,
-                          "Use option -p to disable the use of pager.\n");
-    return 1;
+#else  /* NUSMV_HAVE_POPEN */
+      StreamMgr_print_error(streams, "Pipe is not supported\n");
+      StreamMgr_print_error(streams,
+                            "Use option -p to disable the use of pager.\n");
+      return 1;
 #endif /* NUSMV_HAVE_POPEN */
     }
 
-  ostream = OStream_create(outstream);
-  OStream_printf(ostream, "%s\n", command_description);
+    ostream = OStream_create(outstream);
+    OStream_printf(ostream, "%s\n", command_description);
 
 #if NUSMV_HAVE_POPEN
-  if (useMore) {
-    pclose(outstream);
-    outstream = old_outstream;
-  }
+    if (useMore) {
+      pclose(outstream);
+      outstream = old_outstream;
+    }
 #endif
 
-  OStream_destroy_safe(ostream);
+    OStream_destroy_safe(ostream);
 
 #else /* NUSMV_HAVE_SYSTEM */
-    StreamMgr_print_error(streams,  "The manual is not available.\n");
+    StreamMgr_print_error(streams, "The manual is not available.\n");
 #endif
-  }
-  else {
+  } else {
     goto usage;
   }
 
   return 0;
 
- usage:
-  StreamMgr_print_error(streams,  "usage: help [-h] [-a] [-p] [command]\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
-  StreamMgr_print_error(streams,  "   -a \t\tPrints help for all internal (hidden) commands.\n");
-  StreamMgr_print_error(streams,  "   -p \t\tDisable the use of a pager like 'more'\n");
+usage:
+  StreamMgr_print_error(streams, "usage: help [-h] [-a] [-p] [command]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
+  StreamMgr_print_error(
+      streams, "   -a \t\tPrints help for all internal (hidden) commands.\n");
+  StreamMgr_print_error(streams,
+                        "   -p \t\tDisable the use of a pager like 'more'\n");
   return 1;
 }
 
@@ -1104,11 +1098,9 @@ static int CommandHelp(NuSMVEnv_ptr env, int argc, char** argv)
     <dt> -p
        <dd> Prints a prompt before reading each command.
     <dt> -s
-       <dd> Silently ignores an attempt to execute commands from a nonexistent file.
-    <dt> -x
-       <dd> Echoes each command before it is executed.
-    <dt> &lt;file&gt;
-       <dd> File name
+       <dd> Silently ignores an attempt to execute commands from a nonexistent
+  file. <dt> -x <dd> Echoes each command before it is executed. <dt>
+  &lt;file&gt; <dd> File name
   </dl>
 
   Arguments on the command line after the filename are remembered but not
@@ -1170,13 +1162,13 @@ static int CommandHelp(NuSMVEnv_ptr env, int argc, char** argv)
 
   \sa history
 */
-static int
-CommandSource(NuSMVEnv_ptr env, int  argc, char ** argv)
-{
+static int CommandSource(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  const OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  array_t* cmdHistoryArray = (array_t*)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_HISTORY);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  const OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  array_t *cmdHistoryArray =
+      (array_t *)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_HISTORY);
   int c, echo, prompt, silent, interactive, quit_count, lp_count;
   int status = 0; /* initialize so that lint doesn't complain */
   int lp_file_index, did_subst;
@@ -1186,29 +1178,29 @@ CommandSource(NuSMVEnv_ptr env, int  argc, char ** argv)
   interactive = silent = prompt = echo = 0;
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "hipsx")) != EOF) {
-    switch(c) {
-        case 'h':
-          goto usage ;
-          break;
-        case 'i':               /* a hack to distinguish EOF from stdin */
-          interactive = 1;
-          break;
-        case 'p':
-          prompt = 1;
-          break;
-        case 's':
-          silent = 1;
-          break;
-        case 'x':
-          echo = 1;
-          break;
-      default:
-          goto usage;
+    switch (c) {
+    case 'h':
+      goto usage;
+      break;
+    case 'i': /* a hack to distinguish EOF from stdin */
+      interactive = 1;
+      break;
+    case 'p':
+      prompt = 1;
+      break;
+    case 's':
+      silent = 1;
+      break;
+    case 'x':
+      echo = 1;
+      break;
+    default:
+      goto usage;
     }
   }
 
   /* added to avoid core-dumping when no script file is specified */
-  if (argc == util_optind){
+  if (argc == util_optind) {
     goto usage;
   }
   lp_file_index = util_optind;
@@ -1223,21 +1215,21 @@ CommandSource(NuSMVEnv_ptr env, int  argc, char ** argv)
    * twice.
    */
   do {
-    lp_count ++; /* increment the loop counter */
+    lp_count++; /* increment the loop counter */
 
     fp = Cmd_FileOpen(env, argv[lp_file_index], "r", &real_filename, silent);
     if (fp == NULL) {
       FREE(real_filename);
-      return ! silent;  /* error return if not silent */
+      return !silent; /* error return if not silent */
     }
 
     quit_count = 0;
     do {
-      char* prompt_string = (char*) NULL;
+      char *prompt_string = (char *)NULL;
 
       if (prompt) {
-        char* stmp = ALLOC(char, strlen(NuSMVCore_get_prompt_string())+1);
-        nusmv_assert(stmp != (char*) NULL);
+        char *stmp = ALLOC(char, strlen(NuSMVCore_get_prompt_string()) + 1);
+        nusmv_assert(stmp != (char *)NULL);
 
         stmp[0] = '\0';
         strcat(stmp, NuSMVCore_get_prompt_string());
@@ -1250,26 +1242,26 @@ CommandSource(NuSMVEnv_ptr env, int  argc, char ** argv)
       /* read another command line */
       if (CmdFgetsFilec(env, line, MAX_STR, fp, prompt_string) == NULL) {
 
-        if (prompt_string != (char*) NULL) FREE(prompt_string);
+        if (prompt_string != (char *)NULL)
+          FREE(prompt_string);
 
         if (interactive) {
           if (quit_count++ < 5) {
-            StreamMgr_print_error(streams,  "\nUse \"quit\" to leave %s.\n",
-                    get_pgm_name(opts));
+            StreamMgr_print_error(streams, "\nUse \"quit\" to leave %s.\n",
+                                  get_pgm_name(opts));
             continue;
           }
-          status = -1;          /* fake a 'quit' */
-        }
-        else {
-          status = 0;           /* successful end of 'source' ; loop? */
+          status = -1; /* fake a 'quit' */
+        } else {
+          status = 0; /* successful end of 'source' ; loop? */
         }
         break;
-      }
-      else if (prompt_string != (char*) NULL) FREE(prompt_string);
+      } else if (prompt_string != (char *)NULL)
+        FREE(prompt_string);
       quit_count = 0;
 
       if (echo) {
-        StreamMgr_print_output(streams,  "%s", line);
+        StreamMgr_print_output(streams, "%s", line);
       }
       command = CmdHistorySubstitution(env, line, &did_subst);
       if (command == NIL(char)) {
@@ -1278,17 +1270,17 @@ CommandSource(NuSMVEnv_ptr env, int  argc, char ** argv)
       }
       if (did_subst) {
         if (interactive) {
-          StreamMgr_print_output(streams,  "%s\n", command);
+          StreamMgr_print_output(streams, "%s\n", command);
         }
       }
       if (command != line) {
-        (void) strcpy(line, command);
+        (void)strcpy(line, command);
       }
       if (interactive && *line != '\0') {
         array_insert_last(char *, cmdHistoryArray, util_strsav(line));
         if (nusmv_historyFile != NIL(FILE)) {
           fprintf(nusmv_historyFile, "%s\n", line);
-          (void) fflush(nusmv_historyFile);
+          (void)fflush(nusmv_historyFile);
         }
       }
 
@@ -1298,24 +1290,27 @@ CommandSource(NuSMVEnv_ptr env, int  argc, char ** argv)
 
     if (fp != stdin) {
       if (status > 0) {
-        StreamMgr_print_error(streams,  "aborting 'source %s'\n", real_filename);
+        StreamMgr_print_error(streams, "aborting 'source %s'\n", real_filename);
       }
-      (void) fclose(fp);
+      (void)fclose(fp);
     }
     FREE(real_filename);
 
   } while ((status == 0) && (lp_count <= 0));
   /* An error occured during script execution */
-  if (opt_on_failure_script_quits(opts) && (status > 0)) return -3;
+  if (opt_on_failure_script_quits(opts) && (status > 0))
+    return -3;
 
   return status;
 
 usage:
-  StreamMgr_print_error(streams,  "source [-h] [-p] [-s] [-x] file_name [args]\n");
-  StreamMgr_print_error(streams,  "\t-h Prints the command usage.\n");
-  StreamMgr_print_error(streams,  "\t-p Supplies prompt before reading each line.\n");
-  StreamMgr_print_error(streams,  "\t-s Silently ignores nonexistent file.\n");
-  StreamMgr_print_error(streams,  "\t-x Echoes each line as it is executed.\n");
+  StreamMgr_print_error(streams,
+                        "source [-h] [-p] [-s] [-x] file_name [args]\n");
+  StreamMgr_print_error(streams, "\t-h Prints the command usage.\n");
+  StreamMgr_print_error(streams,
+                        "\t-p Supplies prompt before reading each line.\n");
+  StreamMgr_print_error(streams, "\t-s Silently ignores nonexistent file.\n");
+  StreamMgr_print_error(streams, "\t-x Echoes each line as it is executed.\n");
   return 1;
 }
 
@@ -1335,24 +1330,24 @@ usage:
 
   </dl>
 */
-static int CommandShowHelp(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int CommandShowHelp(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* errstream = StreamMgr_get_error_stream(streams);
-  avl_tree* commandTable = (avl_tree*)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_TABLE);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *errstream = StreamMgr_get_error_stream(streams);
+  avl_tree *commandTable =
+      (avl_tree *)NuSMVEnv_get_value(env, ENV_CMD_COMMAND_TABLE);
   int c, longmaual;
   char *key, *lib_name;
   char ch;
   avl_generator *gen;
   char command[1024];
   char fname[1024];
-  FILE* fileid;
+  FILE *fileid;
 
   util_getopt_reset();
   longmaual = 0;
   while ((c = util_getopt(argc, argv, "f")) != EOF) {
-    switch(c) {
+    switch (c) {
     case 'f':
       longmaual = 1;
       break;
@@ -1367,43 +1362,47 @@ static int CommandShowHelp(NuSMVEnv_ptr env, int argc, char** argv)
   lib_name = CInit_NuSMVObtainLibrary();
 
   avl_foreach_item(commandTable, gen, AVL_FORWARD, &key, NIL(char *)) {
-    StreamMgr_print_error(streams,
-            "==============================================================================\n");
+    StreamMgr_print_error(streams, "==========================================="
+                                   "===================================\n");
     if (1 == longmaual) {
       int c = snprintf(fname, 1023, "%s/help/%sCmd.txt", lib_name, key);
       SNPRINTF_CHECK(c, 1023);
 
       fileid = fopen(fname, "r");
       if ((FILE *)NULL == fileid) {
-        StreamMgr_print_error(streams,  "The manual for the command '%s'"\
-                "is not available.\n", key);
+        StreamMgr_print_error(streams,
+                              "The manual for the command '%s'"
+                              "is not available.\n",
+                              key);
       } else {
-        while(!feof(fileid)) {
+        while (!feof(fileid)) {
           ch = fgetc(fileid);
-          if (EOF != ch) fputc(ch, errstream);
+          if (EOF != ch)
+            fputc(ch, errstream);
         }
         fclose(fileid);
       }
-    }
-    else {
+    } else {
       int c = 0;
-      StreamMgr_print_error(streams,  "COMMAND = %s\n", key);
+      StreamMgr_print_error(streams, "COMMAND = %s\n", key);
       c = snprintf(command, 1023, "%s -h", key);
       SNPRINTF_CHECK(c, 1023);
       Cmd_CommandExecute(env, command);
     }
-    StreamMgr_print_error(streams,
-            "==============================================================================\n");
+    StreamMgr_print_error(streams, "==========================================="
+                                   "===================================\n");
   }
   FREE(lib_name);
 
   return 0;
 
-  usage:
-    StreamMgr_print_error(streams,  "usage: _show_help [-f] [-h]\n");
-    StreamMgr_print_error(streams,  "   -f \t\tPrints the long help for all commands.\n");
-    StreamMgr_print_error(streams,  "      \t\tBy default the short help is printed.\n");
-    return 1;
+usage:
+  StreamMgr_print_error(streams, "usage: _show_help [-f] [-h]\n");
+  StreamMgr_print_error(streams,
+                        "   -f \t\tPrints the long help for all commands.\n");
+  StreamMgr_print_error(streams,
+                        "      \t\tBy default the short help is printed.\n");
+  return 1;
 }
 
 /*!
@@ -1415,21 +1414,19 @@ static int CommandShowHelp(NuSMVEnv_ptr env, int argc, char** argv)
 
   \sa optional
 */
-static void
-print_alias(const NuSMVEnv_ptr env, char * value)
-{
+static void print_alias(const NuSMVEnv_ptr env, char *value) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
   int i;
   CmdAliasDescr_t *alias;
 
-  alias = (CmdAliasDescr_t *) value;
-  StreamMgr_print_output(streams,  "%s\t", alias->name);
-  for(i = 0; i < alias->argc; i++) {
-    StreamMgr_print_output(streams,  " %s", alias->argv[i]);
+  alias = (CmdAliasDescr_t *)value;
+  StreamMgr_print_output(streams, "%s\t", alias->name);
+  for (i = 0; i < alias->argc; i++) {
+    StreamMgr_print_output(streams, " %s", alias->argv[i]);
   }
-  StreamMgr_print_output(streams,  "\n");
+  StreamMgr_print_output(streams, "\n");
 }
 
 /*!
@@ -1441,14 +1438,13 @@ print_alias(const NuSMVEnv_ptr env, char * value)
 
   \sa optional
 */
-static char * command_alias_help(avl_tree* aliasTable, char * command)
-{
+static char *command_alias_help(avl_tree *aliasTable, char *command) {
   char *value;
   CmdAliasDescr_t *alias;
 
   if (!avl_lookup(aliasTable, command, &value)) {
     return command;
   }
-  alias = (CmdAliasDescr_t *) value;
+  alias = (CmdAliasDescr_t *)value;
   return alias->argv[0];
 }

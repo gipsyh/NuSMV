@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,19 +34,17 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_GEN_H__
 #define __NUSMV_CORE_BMC_SBMC_SBMC_GEN_H__
 
 #include "nusmv/core/bmc/bmc.h"
-#include "nusmv/core/bmc/sbmc/sbmcBmcInc.h"
 #include "nusmv/core/bmc/sbmc/sbmcBmc.h"
+#include "nusmv/core/bmc/sbmc/sbmcBmcInc.h"
 
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/fsm/be/BeFsm.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /**AutomaticStart*************************************************************/
 
@@ -58,20 +56,18 @@
   \brief Returns the LTL problem at length k with loopback l
   (single loop, no loop and all loopbacks are allowed)
 
-  
+
 */
-be_ptr
-Bmc_Gen_SBMCProblem(const BeFsm_ptr be_fsm,
-                    const node_ptr ltl_wff,
-                    const int k, const int l);
+be_ptr Bmc_Gen_SBMCProblem(const BeFsm_ptr be_fsm, const node_ptr ltl_wff,
+                           const int k, const int l);
 
 /*!
   \brief Top-level function for bmc of PSL properties
 
   The parameters are:
   - prop is the PSL property to be checked
-  - dump_prob is true if the problem must be dumped as DIMACS file (default filename
-  from system corresponding variable)
+  - dump_prob is true if the problem must be dumped as DIMACS file (default
+  filename from system corresponding variable)
   - inc_sat is true if incremental sat must be used. If there is no
   support for inc sat, an internal error will occur.
   - is_single_prob is true if k must be not incremented from 0 to k_max
@@ -80,14 +76,11 @@ Bmc_Gen_SBMCProblem(const BeFsm_ptr be_fsm,
 
   \se None
 */
-int Sbmc_Gen_check_psl_property(NuSMVEnv_ptr env,
-                                       Prop_ptr prop,
-                                       boolean dump_prob,
-                                       boolean inc_sat,
-                                       boolean do_completeness_check,
-                                       boolean do_virtual_unrolling,
-                                       boolean single_prob,
-                                       int k, int rel_loop);
+int Sbmc_Gen_check_psl_property(NuSMVEnv_ptr env, Prop_ptr prop,
+                                boolean dump_prob, boolean inc_sat,
+                                boolean do_completeness_check,
+                                boolean do_virtual_unrolling,
+                                boolean single_prob, int k, int rel_loop);
 
 /**AutomaticEnd***************************************************************/
 

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,25 +34,22 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_BDDPARTIAL_TRACE_EXECUTOR_H__
 #define __NUSMV_CORE_TRACE_EXEC_BDDPARTIAL_TRACE_EXECUTOR_H__
-
 
 #include "nusmv/core/trace/exec/PartialTraceExecutor.h" /* fix this */
 #include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
+#include "nusmv/core/fsm/bdd/BddFsm.h"
 
 /*!
   \struct BDDPartialTraceExecutor
   \brief Definition of the public accessor for class BDDPartialTraceExecutor
 
-  
+
 */
-typedef struct BDDPartialTraceExecutor_TAG*  BDDPartialTraceExecutor_ptr;
+typedef struct BDDPartialTraceExecutor_TAG *BDDPartialTraceExecutor_ptr;
 
 /*!
   \brief To cast and check instances of class BDDPartialTraceExecutor
@@ -60,16 +57,16 @@ typedef struct BDDPartialTraceExecutor_TAG*  BDDPartialTraceExecutor_ptr;
   These macros must be used respectively to cast and to check
   instances of class BDDPartialTraceExecutor
 */
-#define BDD_PARTIAL_TRACE_EXECUTOR(self) \
-         ((BDDPartialTraceExecutor_ptr) self)
+#define BDD_PARTIAL_TRACE_EXECUTOR(self) ((BDDPartialTraceExecutor_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self) \
-         (nusmv_assert(BDD_PARTIAL_TRACE_EXECUTOR(self) != BDD_PARTIAL_TRACE_EXECUTOR(NULL)))
+#define BDD_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self)                        \
+  (nusmv_assert(BDD_PARTIAL_TRACE_EXECUTOR(self) !=                            \
+                BDD_PARTIAL_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -86,8 +83,7 @@ typedef struct BDDPartialTraceExecutor_TAG*  BDDPartialTraceExecutor_ptr;
   \sa BDDPartialTraceExecutor_destroy
 */
 BDDPartialTraceExecutor_ptr
-BDDPartialTraceExecutor_create(const BddFsm_ptr fsm,
-                               const BddEnc_ptr enc);
+BDDPartialTraceExecutor_create(const BddFsm_ptr fsm, const BddEnc_ptr enc);
 
 /*!
   \methodof BDDPartialTraceExecutor
@@ -100,7 +96,5 @@ BDDPartialTraceExecutor_create(const BddFsm_ptr fsm,
 void BDDPartialTraceExecutor_destroy(BDDPartialTraceExecutor_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_BDDPARTIAL_TRACE_EXECUTOR_H__ */

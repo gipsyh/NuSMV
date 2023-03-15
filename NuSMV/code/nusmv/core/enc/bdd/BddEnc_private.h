@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_ENC_BDD_BDD_ENC_PRIVATE_H__
 #define __NUSMV_CORE_ENC_BDD_BDD_ENC_PRIVATE_H__
-
 
 #include "nusmv/core/enc/bdd/BddEnc.h"
 #include "nusmv/core/enc/bdd/BddEncCache.h"
@@ -56,7 +53,6 @@
 */
 #define BDD_ENC_INIT_VAR_NUM 4096
 
-
 /*!
   \brief BddEnc class definition derived from
                class BoolEncClient
@@ -66,8 +62,7 @@
   \sa Base class BoolEncClient
 */
 
-typedef struct BddEnc_TAG
-{
+typedef struct BddEnc_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(BoolEncClient);
 
@@ -86,7 +81,7 @@ typedef struct BddEnc_TAG
   hash_ptr layer2groups;
 
   /* used to shuffle the variable ordering */
-  array_t* level2index; /* array of int */
+  array_t *level2index; /* array of int */
 
   /* used to lock/unlock vars ordering: */
   dd_reorderingtype curr_reord_type;
@@ -101,15 +96,15 @@ typedef struct BddEnc_TAG
 
   /* The array of symbolic variable names. Each element i contains the
      symbolic name associated to the variable with index i */
-  array_t* index2name; /* array of node_ptr */
+  array_t *index2name; /* array of node_ptr */
   hash_ptr name2index;
 
   /* These arrays are used to maintain correspondence between current
   and next variables. Position i contains the index of the
   corresponding next state variable. They are used to perform forward
   and backward shifting respectively */
-  array_t* current2next; /* array of int */
-  array_t* next2current; /* array of int */
+  array_t *current2next; /* array of int */
+  array_t *next2current; /* array of int */
 
   /* Arrays used to pick up a minterm from a given BDD. These arrays
      should contain at least all variables in the support of the BDD
@@ -117,27 +112,26 @@ typedef struct BddEnc_TAG
      these arrays will be compacted, i.e. no gaps are allowed to
      exist at any time.
      Associtated to each array there is the current frontier. */
-  array_t* minterm_input_vars; /* array of bdd_ptr */
+  array_t *minterm_input_vars; /* array of bdd_ptr */
   int minterm_input_vars_dim;
 
   /* array sizes are kept explicit here because due to compaction
      array size and size can be different */
 
-  array_t* minterm_state_vars; /* array of bdd_ptr */
+  array_t *minterm_state_vars; /* array of bdd_ptr */
   int minterm_state_vars_dim;
 
-  array_t* minterm_next_state_vars; /* array of bdd_ptr */
+  array_t *minterm_next_state_vars; /* array of bdd_ptr */
   int minterm_next_state_vars_dim;
 
-  array_t* minterm_frozen_vars; /* array of bdd_ptr */
+  array_t *minterm_frozen_vars; /* array of bdd_ptr */
   int minterm_frozen_vars_dim;
 
-  array_t* minterm_state_frozen_vars; /* array of bdd_ptr */
+  array_t *minterm_state_frozen_vars; /* array of bdd_ptr */
   int minterm_state_frozen_vars_dim;
 
-  array_t* minterm_state_frozen_input_vars; /* array of bdd_ptr */
+  array_t *minterm_state_frozen_input_vars; /* array of bdd_ptr */
   int minterm_state_frozen_input_vars_dim;
-
 
   /* This list is intended to hold the indices of variables there were
      removed and are then available for reusing. If this list is empty,
@@ -194,7 +188,6 @@ typedef struct BddEnc_TAG
      get_definition). */
   boolean enforce_constant;
 
-
   /* Masks: */
   add_ptr input_vars_mask_add;
   add_ptr state_frozen_vars_mask_add;
@@ -203,7 +196,6 @@ typedef struct BddEnc_TAG
   bdd_ptr input_vars_mask_bdd;
   bdd_ptr state_frozen_vars_mask_bdd;
   bdd_ptr state_frozen_input_vars_mask_bdd;
-
 
   /* To check failure leaves quickly */
   hash_ptr failures_hash;
@@ -221,7 +213,6 @@ typedef struct BddEnc_TAG
 */
 #define BDD_ENC_EVALUATING (ADD_ARRAY(-1))
 
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
 /* ---------------------------------------------------------------------- */
@@ -229,8 +220,7 @@ typedef struct BddEnc_TAG
   \methodof BddEnc
   \todo
 */
-void bdd_enc_init(BddEnc_ptr self,
-                  SymbTable_ptr symb_table,
+void bdd_enc_init(BddEnc_ptr self, SymbTable_ptr symb_table,
                   BoolEnc_ptr bool_enc, VarsHandler_ptr dd_vars_hdlr,
                   OrdGroups_ptr ord_groups);
 
@@ -240,10 +230,9 @@ void bdd_enc_init(BddEnc_ptr self,
 */
 void bdd_enc_deinit(BddEnc_ptr self);
 
-void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char* layer_name);
+void bdd_enc_commit_layer(BaseEnc_ptr enc_base, const char *layer_name);
 
-void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name);
-
+void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char *layer_name);
 
 /*
    Later on this method should be moved to public interface.
@@ -253,6 +242,5 @@ void bdd_enc_remove_layer(BaseEnc_ptr enc_base, const char* layer_name);
   \methodof BddEnc
   \todo
 */
-void bdd_enc_shuffle_variables_order(BddEnc_ptr self,
-                                     NodeList_ptr vars);
+void bdd_enc_shuffle_variables_order(BddEnc_ptr self, NodeList_ptr vars);
 #endif /* __NUSMV_CORE_ENC_BDD_BDD_ENC_PRIVATE_H__ */

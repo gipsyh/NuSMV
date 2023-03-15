@@ -35,17 +35,16 @@
 
 */
 
-
-#include "nusmv/shell/cmd/cmd.h"
 #include "nusmv/shell/dd/ddCmd.h"
+#include "nusmv/shell/cmd/cmd.h"
 
 #include "nusmv/core/opt/opt.h"
 #include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/error.h"
 
-int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char** argv);
-int CommandSetBddParameters(NuSMVEnv_ptr env, int argc, char** argv);
-int CommandPrintBddStats(NuSMVEnv_ptr env, int argc, char** argv);
+int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char **argv);
+int CommandSetBddParameters(NuSMVEnv_ptr env, int argc, char **argv);
+int CommandPrintBddStats(NuSMVEnv_ptr env, int argc, char **argv);
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
@@ -56,12 +55,11 @@ static int UsageDynamicVarOrdering(const NuSMVEnv_ptr env);
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void dd_AddCmd(NuSMVEnv_ptr env)
-{
-  Cmd_CommandAdd(env, "dynamic_var_ordering", CommandDynamicVarOrdering, 0, true);
-  Cmd_CommandAdd(env, "set_bdd_parameters" , CommandSetBddParameters, 0, true);
-  Cmd_CommandAdd(env, "print_bdd_stats" , CommandPrintBddStats, 0, true);
-
+void dd_AddCmd(NuSMVEnv_ptr env) {
+  Cmd_CommandAdd(env, "dynamic_var_ordering", CommandDynamicVarOrdering, 0,
+                 true);
+  Cmd_CommandAdd(env, "set_bdd_parameters", CommandSetBddParameters, 0, true);
+  Cmd_CommandAdd(env, "print_bdd_stats", CommandPrintBddStats, 0, true);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -155,20 +153,19 @@ void dd_AddCmd(NuSMVEnv_ptr env)
   </dl>
 */
 
-int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   OptsHandler_ptr const opts =
-     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
   DDMgr_ptr const dd_manager = DD_MGR(NuSMVEnv_get_value(env, ENV_DD_MGR));
   int c;
   dd_reorderingtype currentMethod;
   int dynOrderingMethod = REORDER_NONE; /* for lint */
   boolean currentlyEnabled = false;
-  boolean disableFlag   = false;
-  boolean enableFlag    = false;
-  boolean forceFlag     = false;
+  boolean disableFlag = false;
+  boolean enableFlag = false;
+  boolean forceFlag = false;
   DdDynVarOrderAction action = 0;
   int retval = 0;
 
@@ -179,8 +176,9 @@ int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char** argv)
       forceFlag = true;
       dynOrderingMethod = StringConvertToDynOrderType(util_optarg);
       if (dynOrderingMethod == REORDER_NONE) {
-        StreamMgr_print_error(streams,  "unknown method: %s\n", util_optarg);
-        retval = UsageDynamicVarOrdering(env); goto exit;
+        StreamMgr_print_error(streams, "unknown method: %s\n", util_optarg);
+        retval = UsageDynamicVarOrdering(env);
+        goto exit;
       }
       break;
 
@@ -188,8 +186,9 @@ int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char** argv)
       enableFlag = true;
       dynOrderingMethod = StringConvertToDynOrderType(util_optarg);
       if (dynOrderingMethod == REORDER_NONE) {
-        StreamMgr_print_error(streams,  "unknown method: %s\n", util_optarg);
-        retval = UsageDynamicVarOrdering(env); goto exit;
+        StreamMgr_print_error(streams, "unknown method: %s\n", util_optarg);
+        retval = UsageDynamicVarOrdering(env);
+        goto exit;
       }
       break;
 
@@ -199,51 +198,58 @@ int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char** argv)
 
     case 'h':
     default:
-      retval = UsageDynamicVarOrdering(env); goto exit;
+      retval = UsageDynamicVarOrdering(env);
+      goto exit;
     }
   }
 
   if (!NuSMVEnv_has_value(env, ENV_DD_MGR)) {
-    StreamMgr_print_error(streams,  "The DD Manager has not been created yet.\n");
-    retval = 1; goto exit;
+    StreamMgr_print_error(streams,
+                          "The DD Manager has not been created yet.\n");
+    retval = 1;
+    goto exit;
   }
 
   /* At most one option is allowed. */
-  if ((disableFlag && enableFlag) ||
-      (disableFlag && forceFlag) ||
+  if ((disableFlag && enableFlag) || (disableFlag && forceFlag) ||
       (enableFlag && forceFlag)) {
-    StreamMgr_print_error(streams,  "Only one of -d, -f, -e is allowed.\n");
-    retval = 1; goto exit;
+    StreamMgr_print_error(streams, "Only one of -d, -f, -e is allowed.\n");
+    retval = 1;
+    goto exit;
   }
   /*
    * Get the current method for reading and to save in case temporarily
    * overwritten.
-  */
+   */
   currentlyEnabled = dd_reordering_status(dd_manager, &currentMethod);
 
   /* if no option selected, print the status and exit */
   if (!(disableFlag || enableFlag || forceFlag)) {
     if (currentlyEnabled) {
-      StreamMgr_print_output(streams,  "Dynamic variable ordering is enabled ");
-      StreamMgr_print_output(streams,  "with method: \"%s\".\n",
-                     DynOrderTypeConvertToString(currentMethod));
-    }
-    else {
-      StreamMgr_print_output(streams,  "Dynamic variable ordering is disabled.\n");
+      StreamMgr_print_output(streams, "Dynamic variable ordering is enabled ");
+      StreamMgr_print_output(streams, "with method: \"%s\".\n",
+                             DynOrderTypeConvertToString(currentMethod));
+    } else {
+      StreamMgr_print_output(streams,
+                             "Dynamic variable ordering is disabled.\n");
     }
 
     retval = 0;
-  }
-  else {
-    if (disableFlag) action = DD_DYN_VAR_ORDER_ACTION_DISABLE;
-    else if (enableFlag) action = DD_DYN_VAR_ORDER_ACTION_ENABLE;
-    else if (forceFlag) action = DD_DYN_VAR_ORDER_ACTION_FORCE;
-    else error_unreachable_code();
+  } else {
+    if (disableFlag)
+      action = DD_DYN_VAR_ORDER_ACTION_DISABLE;
+    else if (enableFlag)
+      action = DD_DYN_VAR_ORDER_ACTION_ENABLE;
+    else if (forceFlag)
+      action = DD_DYN_VAR_ORDER_ACTION_FORCE;
+    else
+      error_unreachable_code();
 
-    retval = Dd_dynamic_var_ordering(env, dd_manager, dynOrderingMethod, action);
+    retval =
+        Dd_dynamic_var_ordering(env, dd_manager, dynOrderingMethod, action);
   }
 
- exit:
+exit:
   return retval;
 }
 
@@ -252,17 +258,20 @@ int CommandDynamicVarOrdering(NuSMVEnv_ptr env, int argc, char** argv)
 
   \todo Missing description
 */
-static int UsageDynamicVarOrdering(const NuSMVEnv_ptr env)
-{
-  StreamMgr_ptr streams = STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  StreamMgr_print_error(streams,  "usage: dynamic_var_ordering [[-d] | [-e method] | [-f method] [-h]]\n");
-  StreamMgr_print_error(streams,  "   -d \t\tDisables dynamic ordering\n");
-  StreamMgr_print_error(streams,  "   -e method \tEnables dynamic ordering with method\n");
-  StreamMgr_print_error(streams,  "   -f method \tForces dynamic ordering with method\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage\n");
+static int UsageDynamicVarOrdering(const NuSMVEnv_ptr env) {
+  StreamMgr_ptr streams =
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  StreamMgr_print_error(
+      streams,
+      "usage: dynamic_var_ordering [[-d] | [-e method] | [-f method] [-h]]\n");
+  StreamMgr_print_error(streams, "   -d \t\tDisables dynamic ordering\n");
+  StreamMgr_print_error(
+      streams, "   -e method \tEnables dynamic ordering with method\n");
+  StreamMgr_print_error(streams,
+                        "   -f method \tForces dynamic ordering with method\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage\n");
   return 1;
 }
-
 
 /*!
   \command{set_bdd_parameters} Creates a table with the value of all currently
@@ -294,12 +303,11 @@ static int UsageDynamicVarOrdering(const NuSMVEnv_ptr env)
 
 */
 
-int CommandSetBddParameters(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int CommandSetBddParameters(NuSMVEnv_ptr env, int argc, char **argv) {
   StreamMgr_ptr const streams =
-   STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  boolean  showAfter;
+  boolean showAfter;
   int c;
   DDMgr_ptr dd_manager;
 
@@ -308,31 +316,32 @@ int CommandSetBddParameters(NuSMVEnv_ptr env, int argc, char** argv)
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "hs")) != EOF) {
     switch (c) {
-      case 'h':
-        goto usage;
-        break;
-      case 's':
-        showAfter = true;
-        break;
-      default:
-        goto usage;
+    case 'h':
+      goto usage;
+      break;
+    case 's':
+      showAfter = true;
+      break;
+    default:
+      goto usage;
     }
   }
 
   /* flatten_hierarchy and static_order must have been invoked already. */
   if (!NuSMVEnv_has_value(env, ENV_DD_MGR)) {
-    StreamMgr_print_error(streams,  "The DD Manager has not been created yet.\n");
+    StreamMgr_print_error(streams,
+                          "The DD Manager has not been created yet.\n");
     return 1;
   }
 
-  dd_manager = (DDMgr_ptr )NuSMVEnv_get_value(env, ENV_DD_MGR);
+  dd_manager = (DDMgr_ptr)NuSMVEnv_get_value(env, ENV_DD_MGR);
 
   return Dd_set_bdd_parameters(env, dd_manager, showAfter);
 
 usage:
-  StreamMgr_print_error(streams,  "usage: set_bdd_parameters [-h | -s]\n");
-  StreamMgr_print_error(streams,  "   -h  Prints the command usage.\n");
-  StreamMgr_print_error(streams,  "   -s  Prints also the bdd statistics.\n");
+  StreamMgr_print_error(streams, "usage: set_bdd_parameters [-h | -s]\n");
+  StreamMgr_print_error(streams, "   -h  Prints the command usage.\n");
+  StreamMgr_print_error(streams, "   -s  Prints also the bdd statistics.\n");
 
   return 1;
 }
@@ -350,36 +359,36 @@ usage:
   package.
 */
 
-int CommandPrintBddStats(NuSMVEnv_ptr env, int argc, char** argv)
-{
+int CommandPrintBddStats(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* outstream = StreamMgr_get_output_stream(streams);
-  DDMgr_ptr dd = (DDMgr_ptr )NuSMVEnv_get_value(env, ENV_DD_MGR);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *outstream = StreamMgr_get_output_stream(streams);
+  DDMgr_ptr dd = (DDMgr_ptr)NuSMVEnv_get_value(env, ENV_DD_MGR);
 
   int c;
 
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "h")) != EOF) {
     switch (c) {
-      case 'h':
-        goto usage;
-        break;
-      default:
-        goto usage;
+    case 'h':
+      goto usage;
+      break;
+    default:
+      goto usage;
     }
   }
 
   if (!NuSMVEnv_has_value(env, ENV_DD_MGR)) {
-    StreamMgr_print_error(streams,  "The DD Manager has not been created yet.\n");
+    StreamMgr_print_error(streams,
+                          "The DD Manager has not been created yet.\n");
     return 1;
   }
 
   return dd_print_stats(env, dd, outstream);
 
 usage:
-  StreamMgr_print_error(streams,  "usage: print_bdd_stats [-h]\n");
-  StreamMgr_print_error(streams,  "   -h  Prints the command usage.\n");
+  StreamMgr_print_error(streams, "usage: print_bdd_stats [-h]\n");
+  StreamMgr_print_error(streams, "   -h  Prints the command usage.\n");
 
   return 1;
 }

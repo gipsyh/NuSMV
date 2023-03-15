@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,7 +36,6 @@
   is purely syntactical
 
 */
-
 
 #include "nusmv/core/node/anonymizers/NodeAnonymizerDot.h"
 #include "nusmv/core/node/anonymizers/NodeAnonymizerDot_private.h"
@@ -53,7 +52,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'NodeAnonymizerDot_private.h' for class 'NodeAnonymizerDot' definition. */
+/* See 'NodeAnonymizerDot_private.h' for class 'NodeAnonymizerDot' definition.
+ */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -63,24 +63,21 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void node_anonymizer_dot_finalize(Object_ptr object, void* dummy);
-
+static void node_anonymizer_dot_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 NodeAnonymizerDot_ptr NodeAnonymizerDot_create(NuSMVEnv_ptr env,
-                                               const char* default_prefix,
-                                               size_t memoization_threshold)
-{
+                                               const char *default_prefix,
+                                               size_t memoization_threshold) {
   NodeAnonymizerDot_ptr self = ALLOC(NodeAnonymizerDot, 1);
   NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self);
 
@@ -88,23 +85,19 @@ NodeAnonymizerDot_ptr NodeAnonymizerDot_create(NuSMVEnv_ptr env,
   return self;
 }
 
-void NodeAnonymizerDot_destroy(NodeAnonymizerDot_ptr self)
-{
+void NodeAnonymizerDot_destroy(NodeAnonymizerDot_ptr self) {
   NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void node_anonymizer_dot_init(NodeAnonymizerDot_ptr self,
-                              NuSMVEnv_ptr env,
-                              const char* default_prefix,
-                              size_t memoization_threshold)
-{
+void node_anonymizer_dot_init(NodeAnonymizerDot_ptr self, NuSMVEnv_ptr env,
+                              const char *default_prefix,
+                              size_t memoization_threshold) {
   /* base class initialization */
   node_anonymizer_base_init(NODE_ANONYMIZER_BASE(self), env, default_prefix,
                             memoization_threshold);
@@ -116,24 +109,23 @@ void node_anonymizer_dot_init(NodeAnonymizerDot_ptr self,
   OVERRIDE(NodeAnonymizerBase, is_id) = node_anonymizer_dot_is_id;
 }
 
-void node_anonymizer_dot_deinit(NodeAnonymizerDot_ptr self)
-{
+void node_anonymizer_dot_deinit(NodeAnonymizerDot_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   node_anonymizer_base_deinit(NODE_ANONYMIZER_BASE(self));
 }
 
-boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self,
-                                  node_ptr id)
-{
+boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self, node_ptr id) {
   boolean retval = false;
 
-  if (id == Nil) { /* just return false */ }
-  else if (DOT == node_get_type(id)) retval = true;
-  else if (ATOM == node_get_type(id)) retval = true;
-  else { /* just return false */ }
+  if (id == Nil) { /* just return false */
+  } else if (DOT == node_get_type(id))
+    retval = true;
+  else if (ATOM == node_get_type(id))
+    retval = true;
+  else { /* just return false */
+  }
 
   return retval;
 }
@@ -147,15 +139,11 @@ boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self,
 
   Called by the class destructor
 */
-static void node_anonymizer_dot_finalize(Object_ptr object, void* dummy)
-{
+static void node_anonymizer_dot_finalize(Object_ptr object, void *dummy) {
   NodeAnonymizerDot_ptr self = NODE_ANONYMIZER_DOT(object);
 
   node_anonymizer_dot_deinit(self);
   FREE(self);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

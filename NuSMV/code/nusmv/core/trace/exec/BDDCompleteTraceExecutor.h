@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,25 +34,22 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_TRACE_EXEC_BDDCOMPLETE_TRACE_EXECUTOR_H__
 #define __NUSMV_CORE_TRACE_EXEC_BDDCOMPLETE_TRACE_EXECUTOR_H__
-
 
 #include "nusmv/core/trace/exec/CompleteTraceExecutor.h" /* fix this */
 #include "nusmv/core/utils/utils.h"
 
-#include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/enc/bdd/BddEnc.h"
+#include "nusmv/core/fsm/bdd/BddFsm.h"
 
 /*!
   \struct BDDCompleteTraceExecutor
   \brief Definition of the public accessor for class BDDCompleteTraceExecutor
 
-  
+
 */
-typedef struct BDDCompleteTraceExecutor_TAG*  BDDCompleteTraceExecutor_ptr;
+typedef struct BDDCompleteTraceExecutor_TAG *BDDCompleteTraceExecutor_ptr;
 
 /*!
   \brief To cast and check instances of class BDDCompleteTraceExecutor
@@ -60,18 +57,16 @@ typedef struct BDDCompleteTraceExecutor_TAG*  BDDCompleteTraceExecutor_ptr;
   These macros must be used respectively to cast and to check
   instances of class BDDCompleteTraceExecutor
 */
-#define BDD_COMPLETE_TRACE_EXECUTOR(self) \
-         ((BDDCompleteTraceExecutor_ptr) self)
+#define BDD_COMPLETE_TRACE_EXECUTOR(self) ((BDDCompleteTraceExecutor_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BDD_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self) \
-         (nusmv_assert(BDD_COMPLETE_TRACE_EXECUTOR(self) != BDD_COMPLETE_TRACE_EXECUTOR(NULL)))
-
-
+#define BDD_COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                       \
+  (nusmv_assert(BDD_COMPLETE_TRACE_EXECUTOR(self) !=                           \
+                BDD_COMPLETE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -88,8 +83,7 @@ typedef struct BDDCompleteTraceExecutor_TAG*  BDDCompleteTraceExecutor_ptr;
   \sa BDDCompleteTraceExecutor_destroy
 */
 BDDCompleteTraceExecutor_ptr
-BDDCompleteTraceExecutor_create(const BddFsm_ptr fsm,
-                                const BddEnc_ptr enc);
+BDDCompleteTraceExecutor_create(const BddFsm_ptr fsm, const BddEnc_ptr enc);
 
 /*!
   \methodof BDDCompleteTraceExecutor
@@ -99,11 +93,8 @@ BDDCompleteTraceExecutor_create(const BddFsm_ptr fsm,
 
   \sa BDDCompleteTraceExecutor_create
 */
-void
-BDDCompleteTraceExecutor_destroy(BDDCompleteTraceExecutor_ptr self);
+void BDDCompleteTraceExecutor_destroy(BDDCompleteTraceExecutor_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_BDDCOMPLETE_TRACE_EXECUTOR_H__ */

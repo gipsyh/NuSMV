@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -38,16 +38,15 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_SIMULATE_SIMULATE_H__
 #define __NUSMV_CORE_SIMULATE_SIMULATE_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/dd/dd.h"
 #include "nusmv/core/fsm/bdd/BddFsm.h"
 #include "nusmv/core/node/node.h"
-#include "nusmv/core/trace/TraceMgr.h"
 #include "nusmv/core/trace/TraceLabel.h"
+#include "nusmv/core/trace/TraceMgr.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -58,7 +57,7 @@
 
   \todo Missing description
 */
-#define ENV_SIMULATE_STATE  "esimulatestate"
+#define ENV_SIMULATE_STATE "esimulatestate"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -69,7 +68,7 @@
 
   \todo Missing description
 */
-typedef enum {Deterministic, Random, Interactive} Simulation_Mode;
+typedef enum { Deterministic, Random, Interactive } Simulation_Mode;
 
 /*--------------------------------------------------------------------------*/
 /* Function prototypes                                                      */
@@ -92,20 +91,17 @@ typedef enum {Deterministic, Random, Interactive} Simulation_Mode;
 
   \sa Simulate_MultipleStep
 */
-bdd_ptr
-Simulate_ChooseOneState(NuSMVEnv_ptr, BddFsm_ptr, bdd_ptr,
-                        Simulation_Mode, int);
+bdd_ptr Simulate_ChooseOneState(NuSMVEnv_ptr, BddFsm_ptr, bdd_ptr,
+                                Simulation_Mode, int);
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
-void
-Simulate_ChooseOneStateInput(NuSMVEnv_ptr env, BddFsm_ptr,
-                             bdd_ptr, bdd_ptr,
-                             Simulation_Mode, int,
-                             bdd_ptr*,  bdd_ptr*);
+void Simulate_ChooseOneStateInput(NuSMVEnv_ptr env, BddFsm_ptr, bdd_ptr,
+                                  bdd_ptr, Simulation_Mode, int, bdd_ptr *,
+                                  bdd_ptr *);
 
 /*!
   \brief Multiple step simulation
@@ -118,49 +114,41 @@ Simulate_ChooseOneStateInput(NuSMVEnv_ptr env, BddFsm_ptr,
 
   \sa Simulate_ChooseOneState
 */
-node_ptr
-Simulate_MultipleSteps(NuSMVEnv_ptr, BddFsm_ptr, bdd_ptr, boolean,
-                       Simulation_Mode, int, int);
+node_ptr Simulate_MultipleSteps(NuSMVEnv_ptr, BddFsm_ptr, bdd_ptr, boolean,
+                                Simulation_Mode, int, int);
 
 /*!
   \brief Picks a state from the set of initial states
 
   Picks a state from the set of initial states
 */
-int
-Simulate_pick_state(const NuSMVEnv_ptr env,
-                    TraceLabel label,
-                    const Simulation_Mode mode,
-                    const int display_all, const boolean verbose,
-                    bdd_ptr bdd_constraints);
+int Simulate_pick_state(const NuSMVEnv_ptr env, TraceLabel label,
+                        const Simulation_Mode mode, const int display_all,
+                        const boolean verbose, bdd_ptr bdd_constraints);
 
 /*!
   \brief Performs a simulation from the current selected state
 
   Performs a simulation from the current selected state
 */
-int
-Simulate_simulate(const NuSMVEnv_ptr env,
-                  const boolean time_shift, const Simulation_Mode mode,
-                  const int steps, const int display_all,
-                  const boolean printrace, const boolean only_changes,
-                  const bdd_ptr bdd_constr);
+int Simulate_simulate(const NuSMVEnv_ptr env, const boolean time_shift,
+                      const Simulation_Mode mode, const int steps,
+                      const int display_all, const boolean printrace,
+                      const boolean only_changes, const bdd_ptr bdd_constr);
 
 /*!
   \brief Goes to a given state of a trace
 
   "label" representes the new current state
 */
-int Simulate_goto_state(NuSMVEnv_ptr env,
-                               TraceLabel label);
+int Simulate_goto_state(NuSMVEnv_ptr env, TraceLabel label);
 
 /*!
   \brief Prints the current state
 
   If not "Verbosely", it prints just the label
 */
-int Simulate_print_current_state(NuSMVEnv_ptr env,
-                                        boolean Verbosely);
+int Simulate_print_current_state(NuSMVEnv_ptr env, boolean Verbosely);
 
 /*!
   \brief Package init
@@ -182,13 +170,12 @@ void Simulate_Pkg_quit(NuSMVEnv_ptr env);
   and the trace number (-1 if an error occurs). There is no need to free
   TraceLabel
 
-  
+
 */
-TraceLabel
-Simulate_get_new_trace_no_from_label(NuSMVEnv_ptr env,
-                                     TraceMgr_ptr gtm,
-                                     const char* str_label,
-                                     int* out_tr_number);
+TraceLabel Simulate_get_new_trace_no_from_label(NuSMVEnv_ptr env,
+                                                TraceMgr_ptr gtm,
+                                                const char *str_label,
+                                                int *out_tr_number);
 
 /*!
   \brief Converts given constraint expression (as a string) to
@@ -209,10 +196,9 @@ Simulate_get_new_trace_no_from_label(NuSMVEnv_ptr env,
                       constr_str is read from the command line.
 */
 bdd_ptr simulate_get_constraints_from_string(NuSMVEnv_ptr env,
-                                             const char* constr_str,
+                                             const char *constr_str,
                                              BddEnc_ptr enc,
                                              boolean allow_nexts,
                                              boolean allow_inputs);
-
 
 #endif /* __NUSMV_CORE_SIMULATE_SIMULATE_H__ */

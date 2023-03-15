@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_USTRING_MGR_H__
 #define __NUSMV_CORE_UTILS_USTRING_MGR_H__
-
 
 #include "nusmv/core/utils/utils.h"
 
@@ -48,7 +45,7 @@
 
 
 */
-typedef struct UStringMgr_TAG*  UStringMgr_ptr;
+typedef struct UStringMgr_TAG *UStringMgr_ptr;
 
 /*!
   \brief To cast and check instances of class UStringMgr
@@ -56,20 +53,19 @@ typedef struct UStringMgr_TAG*  UStringMgr_ptr;
   These macros must be used respectively to cast and to check
   instances of class UStringMgr
 */
-#define USTRING_MGR(self) \
-         ((UStringMgr_ptr) self)
+#define USTRING_MGR(self) ((UStringMgr_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define USTRING_MGR_CHECK_INSTANCE(self) \
-         (nusmv_assert(USTRING_MGR(self) != USTRING_MGR(NULL)))
+#define USTRING_MGR_CHECK_INSTANCE(self)                                       \
+  (nusmv_assert(USTRING_MGR(self) != USTRING_MGR(NULL)))
 
 typedef struct string_ {
   struct string_ *link;
-  const char* text;
+  const char *text;
 } string_rec;
 
 /*!
@@ -79,7 +75,6 @@ typedef struct string_ {
   \todo Missing description
 */
 typedef struct string_ *string_ptr;
-
 
 /**AutomaticStart*************************************************************/
 
@@ -113,7 +108,7 @@ void UStringMgr_destroy(UStringMgr_ptr self);
 
   Returns the unique representation of the given string
 */
-string_ptr UStringMgr_find_string(UStringMgr_ptr self, const char* string);
+string_ptr UStringMgr_find_string(UStringMgr_ptr self, const char *string);
 
 /*!
   \brief Get the char representation of the given unique string
@@ -123,10 +118,8 @@ string_ptr UStringMgr_find_string(UStringMgr_ptr self, const char* string);
 
   \sa  UStringMgr_create
 */
-const char* UStringMgr_get_string_text(string_ptr str);
+const char *UStringMgr_get_string_text(string_ptr str);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_USTRING_MGR_H__ */

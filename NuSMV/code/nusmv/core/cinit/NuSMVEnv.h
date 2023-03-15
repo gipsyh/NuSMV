@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,21 +34,19 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_CINIT_NU_SMVENV_H__
 #define __NUSMV_CORE_CINIT_NU_SMVENV_H__
 
-#include "nusmv/core/utils/defs.h"
 #include "cudd/st.h"
+#include "nusmv/core/utils/defs.h"
 
 /*!
   \struct NuSMVEnv
   \brief Definition of the public accessor for class NuSMVEnv
 
-  
+
 */
-typedef struct NuSMVEnv_TAG*  NuSMVEnv_ptr;
+typedef struct NuSMVEnv_TAG *NuSMVEnv_ptr;
 
 /*!
   \brief To cast and check instances of class NuSMVEnv
@@ -56,16 +54,15 @@ typedef struct NuSMVEnv_TAG*  NuSMVEnv_ptr;
   These macros must be used respectively to cast and to check
   instances of class NuSMVEnv
 */
-#define NUSMV_ENV(self) \
-         ((NuSMVEnv_ptr) self)
+#define NUSMV_ENV(self) ((NuSMVEnv_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NUSMV_ENV_CHECK_INSTANCE(self) \
-         (nusmv_assert(NUSMV_ENV(self) != NUSMV_ENV(NULL)))
+#define NUSMV_ENV_CHECK_INSTANCE(self)                                         \
+  (nusmv_assert(NUSMV_ENV(self) != NUSMV_ENV(NULL)))
 
 /* Common used keys. Those are "fast" keys, since they start with a
    "+" and have a ascii character that follows it. All printable ASCII
@@ -77,21 +74,21 @@ typedef struct NuSMVEnv_TAG*  NuSMVEnv_ptr;
 
   \todo Missing description
 */
-#define ENV_LOGGER          "+!_logger"
+#define ENV_LOGGER "+!_logger"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_STREAM_MANAGER  "+\"_stream_mgr"
+#define ENV_STREAM_MANAGER "+\"_stream_mgr"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_STRING_MGR      "+#_ustring_manager"
+#define ENV_STRING_MGR "+#_ustring_manager"
 
 /*!
   \brief \todo Missing synopsis
@@ -105,42 +102,42 @@ typedef struct NuSMVEnv_TAG*  NuSMVEnv_ptr;
 
   \todo Missing description
 */
-#define ENV_NODE_MGR        "+%_node_manager"
+#define ENV_NODE_MGR "+%_node_manager"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_ERROR_MANAGER   "+&_error_manager"
+#define ENV_ERROR_MANAGER "+&_error_manager"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_EXPR_MANAGER    "+'_expr_manager"
+#define ENV_EXPR_MANAGER "+'_expr_manager"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_WFF_PRINTER     "+(_wff_printer"
+#define ENV_WFF_PRINTER "+(_wff_printer"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_IWFF_PRINTER    "+)_iwff_printer"
+#define ENV_IWFF_PRINTER "+)_iwff_printer"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_SEXP_PRINTER    "+*_sexp_printer"
+#define ENV_SEXP_PRINTER "+*_sexp_printer"
 
 /*!
   \brief \todo Missing synopsis
@@ -154,49 +151,49 @@ typedef struct NuSMVEnv_TAG*  NuSMVEnv_ptr;
 
   \todo Missing description
 */
-#define ENV_OPTS_HANDLER    "+,_opts_handler"
+#define ENV_OPTS_HANDLER "+,_opts_handler"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_SYMB_TABLE      "+-_symb_table"
+#define ENV_SYMB_TABLE "+-_symb_table"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_FLAT_HIERARCHY  "+._flat_hierarchy"
+#define ENV_FLAT_HIERARCHY "+._flat_hierarchy"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_PROP_DB         "+/_prop_db"
+#define ENV_PROP_DB "+/_prop_db"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_HRC_HIERARCHY   "+0_hrc_hierarchy"
+#define ENV_HRC_HIERARCHY "+0_hrc_hierarchy"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_FSM_BUILDER     "+1_fsm_builder"
+#define ENV_FSM_BUILDER "+1_fsm_builder"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_DD_MGR          "+2_dd_manager"
+#define ENV_DD_MGR "+2_dd_manager"
 
 /*!
   \brief \todo Missing synopsis
@@ -210,77 +207,77 @@ typedef struct NuSMVEnv_TAG*  NuSMVEnv_ptr;
 
   \todo Missing description
 */
-#define ENV_TRACE_MGR       "+4_trace_mgr"
+#define ENV_TRACE_MGR "+4_trace_mgr"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_SEXP_FSM        "+5_sexp_fsm"
+#define ENV_SEXP_FSM "+5_sexp_fsm"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_BOOL_FSM        "+6_bool_fsm"
+#define ENV_BOOL_FSM "+6_bool_fsm"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_BDD_FSM         "+7_bdd_fsm"
+#define ENV_BDD_FSM "+7_bdd_fsm"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_BE_FSM          "+8_be_fsm"
+#define ENV_BE_FSM "+8_be_fsm"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_BOOL_ENCODER    "+9_bool_enc"
+#define ENV_BOOL_ENCODER "+9_bool_enc"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_BDD_ENCODER     "+:_bdd_enc"
+#define ENV_BDD_ENCODER "+:_bdd_enc"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_BE_ENCODER      "+;_be_enc"
+#define ENV_BE_ENCODER "+;_be_enc"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_MSAT_ENCODER    "+<_msat_enc"
+#define ENV_MSAT_ENCODER "+<_msat_enc"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_FLATTENER       "+=_flattener"
+#define ENV_FLATTENER "+=_flattener"
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ENV_DEPENDENCY      "+>_dependency"
+#define ENV_DEPENDENCY "+>_dependency"
 
 /*!
   \brief \todo Missing synopsis
@@ -317,7 +314,6 @@ NuSMVEnv_ptr NuSMVEnv_create(void);
 */
 void NuSMVEnv_destroy(NuSMVEnv_ptr self);
 
-
 /* Getters and Setters ********************************************************/
 
 /*!
@@ -341,7 +337,7 @@ void NuSMVEnv_destroy(NuSMVEnv_ptr self);
 
   \sa NuSMVEnv_set_value
 */
-void* NuSMVEnv_get_value(const NuSMVEnv_ptr self, const char* key);
+void *NuSMVEnv_get_value(const NuSMVEnv_ptr self, const char *key);
 
 /*!
   \methodof NuSMVEnv
@@ -351,7 +347,7 @@ void* NuSMVEnv_get_value(const NuSMVEnv_ptr self, const char* key);
 
   \sa NuSMVEnv_create
 */
-boolean NuSMVEnv_has_value(const NuSMVEnv_ptr self, const char* key);
+boolean NuSMVEnv_has_value(const NuSMVEnv_ptr self, const char *key);
 
 /*!
   \methodof NuSMVEnv
@@ -374,7 +370,7 @@ boolean NuSMVEnv_has_value(const NuSMVEnv_ptr self, const char* key);
                       characters have been already used for
                       fast-keys.
 */
-void NuSMVEnv_set_value(NuSMVEnv_ptr self, const char* key, void* value);
+void NuSMVEnv_set_value(NuSMVEnv_ptr self, const char *key, void *value);
 
 /*!
   \methodof NuSMVEnv
@@ -397,9 +393,8 @@ void NuSMVEnv_set_value(NuSMVEnv_ptr self, const char* key, void* value);
                       characters have been already used for
                       fast-keys.
 */
-void* NuSMVEnv_set_or_replace_value(NuSMVEnv_ptr self,
-                                           const char* key,
-                                           void* value);
+void *NuSMVEnv_set_or_replace_value(NuSMVEnv_ptr self, const char *key,
+                                    void *value);
 
 /*!
   \methodof NuSMVEnv
@@ -410,7 +405,7 @@ void* NuSMVEnv_set_or_replace_value(NuSMVEnv_ptr self,
                       key is expected to exist in the given
                       environment, an assertion is thrown otherwise
 */
-void* NuSMVEnv_remove_value(NuSMVEnv_ptr self, const char* key);
+void *NuSMVEnv_remove_value(NuSMVEnv_ptr self, const char *key);
 
 /*!
   \methodof NuSMVEnv
@@ -420,7 +415,7 @@ void* NuSMVEnv_remove_value(NuSMVEnv_ptr self, const char* key);
                       if the flag does not exist, and the value of the
                       flag otherwise
 */
-boolean NuSMVEnv_get_flag(NuSMVEnv_ptr self, const char* flag);
+boolean NuSMVEnv_get_flag(NuSMVEnv_ptr self, const char *flag);
 
 /*!
   \methodof NuSMVEnv
@@ -428,8 +423,7 @@ boolean NuSMVEnv_get_flag(NuSMVEnv_ptr self, const char* flag);
 
   Setter for flag values
 */
-void NuSMVEnv_set_flag(NuSMVEnv_ptr self,
-                              const char* flag, boolean value);
+void NuSMVEnv_set_flag(NuSMVEnv_ptr self, const char *flag, boolean value);
 
 /*!
   \methodof NuSMVEnv
@@ -439,7 +433,7 @@ void NuSMVEnv_set_flag(NuSMVEnv_ptr self,
 
   \sa NuSMVEnv_create
 */
-boolean NuSMVEnv_has_flag(NuSMVEnv_ptr self, const char* flag);
+boolean NuSMVEnv_has_flag(NuSMVEnv_ptr self, const char *flag);
 
 /*!
   \methodof NuSMVEnv
@@ -448,8 +442,7 @@ boolean NuSMVEnv_has_flag(NuSMVEnv_ptr self, const char* flag);
   Remover for flags. Returns the value of the flag.
                       If the flag does not exist, returns false
 */
-boolean NuSMVEnv_remove_flag(NuSMVEnv_ptr self, const char* flag);
-
+boolean NuSMVEnv_remove_flag(NuSMVEnv_ptr self, const char *flag);
 
 /* Self-handled structures */
 
@@ -471,11 +464,8 @@ boolean NuSMVEnv_remove_flag(NuSMVEnv_ptr self, const char* flag);
                       the given key from the environment using
                       NuSMVEnv_remove_value
 */
-st_table* NuSMVEnv_get_handled_hash_ptr(NuSMVEnv_ptr self,
-                                               const char* key);
+st_table *NuSMVEnv_get_handled_hash_ptr(NuSMVEnv_ptr self, const char *key);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_CINIT_NU_SMVENV_H__ */

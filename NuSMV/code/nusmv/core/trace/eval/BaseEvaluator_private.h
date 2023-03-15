@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -38,22 +38,20 @@
 #define __NUSMV_CORE_TRACE_EVAL_BASE_EVALUATOR_PRIVATE_H__
 
 #include "nusmv/core/trace/eval/BaseEvaluator.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/object_private.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \brief BaseEvaluator class definition derived from
                class Object
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct BaseEvaluator_TAG
-{
+typedef struct BaseEvaluator_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(Object);
 
@@ -105,6 +103,6 @@ void base_evaluator_deinit(BaseEvaluator_ptr self);
   extra types
 */
 Expr_ptr base_evaluator_resolve(const BaseEvaluator_ptr self,
-                                       const Expr_ptr const_expr);
+                                const Expr_ptr const_expr);
 
 #endif /* __NUSMV_CORE_TRACE_EVAL_BASE_EVALUATOR_PRIVATE_H__ */

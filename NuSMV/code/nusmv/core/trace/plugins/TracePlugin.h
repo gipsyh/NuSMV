@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,8 +37,8 @@
 #ifndef __NUSMV_CORE_TRACE_PLUGINS_TRACE_PLUGIN_H__
 #define __NUSMV_CORE_TRACE_PLUGINS_TRACE_PLUGIN_H__
 
-#include "nusmv/core/trace/TraceOpt.h"
 #include "nusmv/core/trace/Trace.h"
+#include "nusmv/core/trace/TraceOpt.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -54,7 +54,7 @@
 
   \todo Missing description
 */
-typedef struct TracePlugin_TAG* TracePlugin_ptr;
+typedef struct TracePlugin_TAG *TracePlugin_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -69,16 +69,15 @@ typedef struct TracePlugin_TAG* TracePlugin_ptr;
 
   \todo Missing description
 */
-#define TRACE_PLUGIN(x) \
-         ((TracePlugin_ptr) x)
+#define TRACE_PLUGIN(x) ((TracePlugin_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_PLUGIN_CHECK_INSTANCE(x) \
-         (nusmv_assert(TRACE_PLUGIN(x) != TRACE_PLUGIN(NULL)))
+#define TRACE_PLUGIN_CHECK_INSTANCE(x)                                         \
+  (nusmv_assert(TRACE_PLUGIN(x) != TRACE_PLUGIN(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -95,17 +94,16 @@ typedef struct TracePlugin_TAG* TracePlugin_ptr;
 
   The return value is -1 in case of error.
 */
-VIRTUAL int
-TracePlugin_action(const TracePlugin_ptr self, const Trace_ptr trace,
-                   const TraceOpt_ptr opt);
+VIRTUAL int TracePlugin_action(const TracePlugin_ptr self,
+                               const Trace_ptr trace, const TraceOpt_ptr opt);
 
 /*!
   \methodof TracePlugin
   \brief Returns a short description of the plugin.
 
-  
+
 */
-char* TracePlugin_get_desc(const TracePlugin_ptr self);
+char *TracePlugin_get_desc(const TracePlugin_ptr self);
 
 /**AutomaticEnd***************************************************************/
 

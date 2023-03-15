@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,8 +34,6 @@
   tree symbols set
 
 */
-
-
 
 #ifndef __NUSMV_CORE_PARSER_SYMBOLS_H__
 #define __NUSMV_CORE_PARSER_SYMBOLS_H__
@@ -81,7 +79,6 @@ enum NUSMV_CORE_SYMBOLS {
 
   NUSMV_STATEMENTS_SYMBOL_LAST,
   /* ---------------------------------------------------------------------- */
-
 
   /* ---------------------------------------------------------------------- */
   NUSMV_EXPR_SYMBOL_FIRST,
@@ -202,7 +199,7 @@ enum NUSMV_CORE_SYMBOLS {
   ARRAY_DEF,  /* Define obtained via Matrix-Define */
 
   NFUNCTION,
-  NFUNCTION_TYPE, 
+  NFUNCTION_TYPE,
   FUN,
 
   COUNT,
@@ -210,13 +207,13 @@ enum NUSMV_CORE_SYMBOLS {
 
   ITYPE, /* used to represent an internal type as read from the parser */
 
-  WORDARRAY_TYPE, /* Represent generic array type with word indices */
-  INTERNAL_ARRAY_STRUCT, /* Internal representation of the array structure 
-                    for processing the write function of arrays */ 
-  CONST_ARRAY, /* 250 Constant array */
+  WORDARRAY_TYPE,        /* Represent generic array type with word indices */
+  INTERNAL_ARRAY_STRUCT, /* Internal representation of the array structure
+                    for processing the write function of arrays */
+  CONST_ARRAY,           /* 250 Constant array */
   INTARRAY,
   INTARRAY_TYPE, /* Represent generic array type with integer indices */
-  TYPEOF, /* function for returning the type of variable */
+  TYPEOF,        /* function for returning the type of variable */
 
   CAST_TO_UNSIGNED_WORD, /* integer to bv conversion */
 
@@ -225,8 +222,6 @@ enum NUSMV_CORE_SYMBOLS {
 
   NUSMV_CORE_SYMBOL_LAST,
 
-
 };
-
 
 #endif /* __NUSMV_CORE_PARSER_SYMBOLS_H__ */

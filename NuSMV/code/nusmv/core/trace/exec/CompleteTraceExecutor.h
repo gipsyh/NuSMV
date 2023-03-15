@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -46,9 +46,9 @@
   \struct CompleteTraceExecutor
   \brief Definition of the public accessor for class CompleteTraceExecutor
 
-  
+
 */
-typedef struct CompleteTraceExecutor_TAG*  CompleteTraceExecutor_ptr;
+typedef struct CompleteTraceExecutor_TAG *CompleteTraceExecutor_ptr;
 
 /*!
   \brief To cast and check instances of class CompleteTraceExecutor
@@ -56,18 +56,15 @@ typedef struct CompleteTraceExecutor_TAG*  CompleteTraceExecutor_ptr;
   These macros must be used respectively to cast and to check
   instances of class CompleteTraceExecutor
 */
-#define COMPLETE_TRACE_EXECUTOR(self) \
-         ((CompleteTraceExecutor_ptr) self)
+#define COMPLETE_TRACE_EXECUTOR(self) ((CompleteTraceExecutor_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self) \
-         (nusmv_assert(COMPLETE_TRACE_EXECUTOR(self) != COMPLETE_TRACE_EXECUTOR(NULL)))
-
-
+#define COMPLETE_TRACE_EXECUTOR_CHECK_INSTANCE(self)                           \
+  (nusmv_assert(COMPLETE_TRACE_EXECUTOR(self) != COMPLETE_TRACE_EXECUTOR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -83,8 +80,7 @@ typedef struct CompleteTraceExecutor_TAG*  CompleteTraceExecutor_ptr;
 
   \sa CompleteTraceExecutor_destroy
 */
-CompleteTraceExecutor_ptr
-CompleteTraceExecutor_create(const NuSMVEnv_ptr env);
+CompleteTraceExecutor_ptr CompleteTraceExecutor_create(const NuSMVEnv_ptr env);
 
 /*!
   \methodof CompleteTraceExecutor
@@ -110,11 +106,9 @@ void CompleteTraceExecutor_destroy(CompleteTraceExecutor_ptr self);
 
   \sa PartialTraceExecutor_execute
 */
-boolean CompleteTraceExecutor_execute(const CompleteTraceExecutor_ptr self, const Trace_ptr trace,
-int* n_steps);
+boolean CompleteTraceExecutor_execute(const CompleteTraceExecutor_ptr self,
+                                      const Trace_ptr trace, int *n_steps);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_TRACE_EXEC_COMPLETE_TRACE_EXECUTOR_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -38,7 +38,7 @@
 #define __NUSMV_CORE_TRACE_PLUGINS_TRACE_XML_DUMPER_PRIVATE_H__
 
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/trace/pkg_traceInt.h"
@@ -57,8 +57,7 @@
   subtree of a containg element or a full xml document
 */
 
-typedef struct TraceXmlDumper_TAG
-{
+typedef struct TraceXmlDumper_TAG {
   INHERITS_FROM(TracePlugin);
 
   boolean is_embedded;
@@ -71,7 +70,7 @@ typedef struct TraceXmlDumper_TAG
 
   \todo Missing description
 */
-typedef struct XmlNodes_TAG* XmlNodes_ptr;
+typedef struct XmlNodes_TAG *XmlNodes_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -86,8 +85,7 @@ typedef struct XmlNodes_TAG* XmlNodes_ptr;
   \methodof TraceXmlDumper
   \todo
 */
-void trace_xml_dumper_init(TraceXmlDumper_ptr self,
-                           boolean is_embedded);
+void trace_xml_dumper_init(TraceXmlDumper_ptr self, boolean is_embedded);
 
 /*!
   \methodof TraceXmlDumper
@@ -106,11 +104,9 @@ void trace_xml_dumper_print_symbol(TracePlugin_ptr self, node_ptr symb);
   \methodof TraceXmlDumper
   \todo
 */
-void trace_xml_dumper_print_assignment(TracePlugin_ptr self,
-                                       node_ptr symb, node_ptr val);
-
+void trace_xml_dumper_print_assignment(TracePlugin_ptr self, node_ptr symb,
+                                       node_ptr val);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __TRACE_XML_DUMPER_PRIVATE__H */
-

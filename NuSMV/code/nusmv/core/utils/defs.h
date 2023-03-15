@@ -34,66 +34,62 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_DEFS_H__
 #define __NUSMV_CORE_UTILS_DEFS_H__
 
 #if HAVE_CONFIG_H
-#  include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #if NUSMV_HAVE_STDLIB_H
-#  include <stdlib.h>
+#include <stdlib.h>
 #endif
 
-#include <assert.h>
 #include "cudd/util.h"
+#include <assert.h>
 
-#  ifndef NUSMV_GCC_WARN_UNUSED_RESULT
-#    define NUSMV_GCC_WARN_UNUSED_RESULT
-#  endif
-
+#ifndef NUSMV_GCC_WARN_UNUSED_RESULT
+#define NUSMV_GCC_WARN_UNUSED_RESULT
+#endif
 
 #ifdef EXTERN
-# ifndef HAVE_EXTERN_ARGS_MACROS
-    /* EXTERN is supposed to be no longer used if not explicitly required */
-#   undef EXTERN
-# endif
+#ifndef HAVE_EXTERN_ARGS_MACROS
+/* EXTERN is supposed to be no longer used if not explicitly required */
+#undef EXTERN
 #endif
-
+#endif
 
 #ifdef ARGS
-# ifndef HAVE_EXTERN_ARGS_MACROS
-    /* ARGS is supposed to be no longer used if not explicitly required */
-#   undef ARGS
-# endif
+#ifndef HAVE_EXTERN_ARGS_MACROS
+/* ARGS is supposed to be no longer used if not explicitly required */
+#undef ARGS
 #endif
-
+#endif
 
 /* These are potential duplicates. */
 #if HAVE_EXTERN_ARGS_MACROS
-# ifndef EXTERN
-#   ifdef __cplusplus
-#	define EXTERN extern "C"
-#   else
-#	define EXTERN extern
-#   endif
-# endif
-# ifndef ARGS
-#   if defined(__STDC__) || defined(__cplusplus) || defined(_MSC_VER)
-#	define ARGS(protos)	protos		/* ANSI C */
-#   else /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
-#	define ARGS(protos)	()		/* K&R C */
-#   endif /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
-# endif
+#ifndef EXTERN
+#ifdef __cplusplus
+#define EXTERN extern "C"
+#else
+#define EXTERN extern
+#endif
+#endif
+#ifndef ARGS
+#if defined(__STDC__) || defined(__cplusplus) || defined(_MSC_VER)
+#define ARGS(protos) protos /* ANSI C */
+#else                   /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
+#define ARGS(protos) () /* K&R C */
+#endif                  /* !(__STDC__ || __cplusplus || defined(_MSC_VER)) */
+#endif
 #endif
 
 #ifndef NORETURN
-#   if defined __GNUC__
-#       define NORETURN __attribute__ ((__noreturn__))
-#   else
-#       define NORETURN
-#   endif
+#if defined __GNUC__
+#define NORETURN __attribute__((__noreturn__))
+#else
+#define NORETURN
+#endif
 #endif
 
 /*!
@@ -101,17 +97,14 @@
 
   \todo Missing description
 */
-#define nusmv_assert(expr) \
-    assert(expr)
+#define nusmv_assert(expr) assert(expr)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NIL_PTR(ptr_type)       \
-    ((ptr_type) NULL)
-
+#define NIL_PTR(ptr_type) ((ptr_type)NULL)
 
 /* use whenever you assign an integer to or from a pointer */
 
@@ -120,7 +113,7 @@
 
   \todo Missing description
 */
-typedef util_ptrint  nusmv_ptrint;
+typedef util_ptrint nusmv_ptrint;
 
 /*!
   \brief \todo Missing synopsis
@@ -128,8 +121,6 @@ typedef util_ptrint  nusmv_ptrint;
   \todo Missing description
 */
 typedef util_ptruint nusmv_ptruint;
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -160,25 +151,21 @@ typedef util_ptruint nusmv_ptruint;
 
 
 */
-#define PTR_TO_INT(x) \
-         ((int) (nusmv_ptrint) (x))
+#define PTR_TO_INT(x) ((int)(nusmv_ptrint)(x))
 
 /*!
   \brief Casts the given int to the given pointer type
 
 
 */
-#define PTR_FROM_INT(ptr, x) \
-         ((ptr) (nusmv_ptrint) (x))
+#define PTR_FROM_INT(ptr, x) ((ptr)(nusmv_ptrint)(x))
 
 /*!
   \brief Casts the given int to void *
 
 
 */
-#define VOIDPTR_FROM_INT(x) \
-         ((void *) (nusmv_ptrint) (x))
-
+#define VOIDPTR_FROM_INT(x) ((void *)(nusmv_ptrint)(x))
 
 /* These are used to "stringize" x after its macro-evaluation: */
 /* WARNING: these macro are not safe. If the macro x contains sequences
@@ -193,16 +180,14 @@ typedef util_ptruint nusmv_ptruint;
 
   \todo Missing description
 */
-#define MACRO_STRINGIZE_2nd_LEVEL(x) \
-   #x
+#define MACRO_STRINGIZE_2nd_LEVEL(x) #x
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define MACRO_STRINGIZE(x) \
-    MACRO_STRINGIZE_2nd_LEVEL(x)
+#define MACRO_STRINGIZE(x) MACRO_STRINGIZE_2nd_LEVEL(x)
 
 /*!
   \brief This is a portable prefix to print size_t valus with printf
@@ -212,26 +197,26 @@ typedef util_ptruint nusmv_ptruint;
 */
 
 #if !NUSMV_HAVE_INTTYPES_H
-# if (defined __MINGW32__) || (defined __CYGWIN__)
-#  ifdef _WIN64
-#   define PRIuPTR "I64u"
-#   define PRIdPTR "I64d"
-#  else
-#   define PRIuPTR "u"
-#   define PRIdPTR "d"
-#  endif
-# else
-#  if __WORDSIZE == 64
-#   define PRIuPTR "lu"
-#   define PRIdPTR "ld"
-#  else
-#   define PRIuPTR "u"
-#   define PRIdPTR "d"
-#  endif
-# endif
+#if (defined __MINGW32__) || (defined __CYGWIN__)
+#ifdef _WIN64
+#define PRIuPTR "I64u"
+#define PRIdPTR "I64d"
 #else
-# include <inttypes.h>
-# endif /* NUSMV_HAVE_INTTYPES_H */
+#define PRIuPTR "u"
+#define PRIdPTR "d"
+#endif
+#else
+#if __WORDSIZE == 64
+#define PRIuPTR "lu"
+#define PRIdPTR "ld"
+#else
+#define PRIuPTR "u"
+#define PRIdPTR "d"
+#endif
+#endif
+#else
+#include <inttypes.h>
+#endif /* NUSMV_HAVE_INTTYPES_H */
 
 /*!
   \brief Fallback definition of PRI...MAX in case of missing
@@ -244,64 +229,56 @@ typedef util_ptruint nusmv_ptruint;
 */
 
 #if !NUSMV_HAVE_INTTYPES_H
-# if (defined __MINGW32__) || (defined __CYGWIN__)
-#  ifdef _WIN64
-#   define PRIuMAX "I64u"
-#   define PRIdMAX "I64d"
-#   define PRIoMAX "I64o"
-#   define PRIXMAX "I64X"
-#  else
-#   define PRIuMAX "lu"
-#   define PRIdMAX "ld"
-#   define PRIoMAX "lo"
-#   define PRIXMAX "lX"
-#  endif
-# else
-#  if __WORDSIZE == 64
-#   define PRIuMAX "llu"
-#   define PRIdMAX "lld"
-#   define PRIoMAX "llo"
-#   define PRIXMAX "llX"
-#  else
-#   define PRIuMAX "lu"
-#   define PRIdMAX "ld"
-#   define PRIoMAX "lo"
-#   define PRIXMAX "lX"
-#  endif
-# endif
+#if (defined __MINGW32__) || (defined __CYGWIN__)
+#ifdef _WIN64
+#define PRIuMAX "I64u"
+#define PRIdMAX "I64d"
+#define PRIoMAX "I64o"
+#define PRIXMAX "I64X"
 #else
-# include <inttypes.h>
-# endif /* NUSMV_HAVE_INTTYPES_H */
-
+#define PRIuMAX "lu"
+#define PRIdMAX "ld"
+#define PRIoMAX "lo"
+#define PRIXMAX "lX"
+#endif
+#else
+#if __WORDSIZE == 64
+#define PRIuMAX "llu"
+#define PRIdMAX "lld"
+#define PRIoMAX "llo"
+#define PRIXMAX "llX"
+#else
+#define PRIuMAX "lu"
+#define PRIdMAX "ld"
+#define PRIoMAX "lo"
+#define PRIXMAX "lX"
+#endif
+#endif
+#else
+#include <inttypes.h>
+#endif /* NUSMV_HAVE_INTTYPES_H */
 
 #if NUSMV_HAVE_SRANDOM
-#  if NUSMV_HAVE_GETPID
-#    define utils_random_set_seed() \
-       srandom((unsigned int)getpid())
-#  else
-#include <time.h>
-#    define utils_random_set_seed() \
-       srandom((unsigned int)time(NULL))
-#  endif
+#if NUSMV_HAVE_GETPID
+#define utils_random_set_seed() srandom((unsigned int)getpid())
 #else
-#  if NUSMV_HAVE_GETPID
-#    define utils_random_set_seed() \
-       srand((unsigned int)getpid())
-#  else
 #include <time.h>
-#    define utils_random_set_seed() \
-       srand((unsigned int)time(NULL))
-#  endif
+#define utils_random_set_seed() srandom((unsigned int)time(NULL))
+#endif
+#else
+#if NUSMV_HAVE_GETPID
+#define utils_random_set_seed() srand((unsigned int)getpid())
+#else
+#include <time.h>
+#define utils_random_set_seed() srand((unsigned int)time(NULL))
+#endif
 #endif
 
 #if NUSMV_HAVE_RANDOM
-#  define utils_random() \
-    random()
+#define utils_random() random()
 #else
-#  define utils_random() \
-    rand()
+#define utils_random() rand()
 #endif
-
 
 #if NUSMV_HAVE_STDBOOL_H
 #include <stdbool.h>
@@ -316,14 +293,13 @@ typedef bool boolean;
 #ifdef __cplusplus
 typedef bool boolean;
 #else
-typedef enum {false=0, true=1} boolean;
+typedef enum { false = 0, true = 1 } boolean;
 #endif
 #endif
 
 /* MD If OUTCOME_SUCCESS would have the value 0 it would be consistent with
    the usual boolean representation */
-typedef enum Outcome_TAG
-{
+typedef enum Outcome_TAG {
   OUTCOME_GENERIC_ERROR,
   OUTCOME_PARSER_ERROR,
   OUTCOME_SYNTAX_ERROR,
@@ -353,7 +329,7 @@ typedef enum Outcome_TAG
 
   \todo Missing description
 */
-#define ENUM_CHECK(value, first, last) \
+#define ENUM_CHECK(value, first, last)                                         \
   nusmv_assert(first < value && value < last)
 
 /* useful placeholders ********************************************************/
@@ -381,14 +357,14 @@ typedef enum Outcome_TAG
 */
 #define COMMA_OPERATOR ,
 
- /* type for comparison function */
+/* type for comparison function */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef int (*PFIVPVP)(const void*, const void*);
+typedef int (*PFIVPVP)(const void *, const void *);
 
 /* Generic void function */
 
@@ -397,6 +373,6 @@ typedef int (*PFIVPVP)(const void*, const void*);
 
   \todo Missing description
 */
-typedef void* (*PFVPVPVP)(void*, void*);
+typedef void *(*PFVPVPVP)(void *, void *);
 
 #endif /* __NUSMV_CORE_UTILS_DEFS_H__ */

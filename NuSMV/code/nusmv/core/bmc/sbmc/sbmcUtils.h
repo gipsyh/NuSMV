@@ -34,24 +34,22 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_UTILS_H__
 #define __NUSMV_CORE_BMC_SBMC_SBMC_UTILS_H__
 
-#include "nusmv/core/prop/propPkg.h"
 #include "nusmv/core/bmc/sbmc/sbmcStructs.h"
-#include "nusmv/core/enc/enc.h"
 #include "nusmv/core/enc/be/BeEnc.h"
+#include "nusmv/core/enc/enc.h"
+#include "nusmv/core/prop/propPkg.h"
+#include "nusmv/core/sat/sat.h" /* for solver and result */
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/trace/TraceMgr.h"
-#include "nusmv/core/sat/sat.h" /* for solver and result */
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -69,11 +67,9 @@ typedef struct sbmc_MetaSolver_TAG sbmc_MetaSolver;
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -92,7 +88,6 @@ typedef struct sbmc_MetaSolver_TAG sbmc_MetaSolver;
   \todo Missing description
 */
 #define sbmc_SNYI_text "%s:%d: Something not yet implemented\n"
-
 
 /**AutomaticStart*************************************************************/
 
@@ -131,9 +126,8 @@ void sbmc_increment_unique_id(const NuSMVEnv_ptr env);
 
   \se None
 */
-void sbmc_print_node(const NuSMVEnv_ptr env,
-                            FILE * out, const char * prefix, node_ptr node,
-                            const char * postfix);
+void sbmc_print_node(const NuSMVEnv_ptr env, FILE *out, const char *prefix,
+                     node_ptr node, const char *postfix);
 
 /*!
   \brief Prints a lsList of node_ptr
@@ -142,8 +136,7 @@ void sbmc_print_node(const NuSMVEnv_ptr env,
 
   \se None
 */
-void sbmc_print_node_list(const NuSMVEnv_ptr env,
-                                 FILE *out, lsList l);
+void sbmc_print_node_list(const NuSMVEnv_ptr env, FILE *out, lsList l);
 
 /*!
   \brief Declare a new boolean state variable in the layer.
@@ -155,8 +148,7 @@ void sbmc_print_node_list(const NuSMVEnv_ptr env,
   \se None
 */
 node_ptr sbmc_add_new_state_variable(const NuSMVEnv_ptr env,
-                                            SymbLayer_ptr layer,
-                                            const char *name);
+                                     SymbLayer_ptr layer, const char *name);
 
 /*!
   \brief Compute the variables that occur in the formula ltlspec.
@@ -177,8 +169,8 @@ lsList sbmc_find_formula_vars(const NuSMVEnv_ptr env, node_ptr ltlspec);
 
   \se None
 */
-void sbmc_print_varmap(const NuSMVEnv_ptr env, FILE *out,
-                              node_ptr node, sbmc_node_info *info);
+void sbmc_print_varmap(const NuSMVEnv_ptr env, FILE *out, node_ptr node,
+                       sbmc_node_info *info);
 
 /*!
   \brief Prints some of the information associated to a G
@@ -189,8 +181,8 @@ void sbmc_print_varmap(const NuSMVEnv_ptr env, FILE *out,
 
   \se None
 */
-void sbmc_print_Gvarmap(const NuSMVEnv_ptr env, FILE *out,
-                               node_ptr var, node_ptr formula);
+void sbmc_print_Gvarmap(const NuSMVEnv_ptr env, FILE *out, node_ptr var,
+                        node_ptr formula);
 
 /*!
   \brief Prints some of the information associated to a F
@@ -201,8 +193,8 @@ void sbmc_print_Gvarmap(const NuSMVEnv_ptr env, FILE *out,
 
   \se None
 */
-void sbmc_print_Fvarmap(const NuSMVEnv_ptr env, FILE *out,
-                               node_ptr var, node_ptr formula);
+void sbmc_print_Fvarmap(const NuSMVEnv_ptr env, FILE *out, node_ptr var,
+                        node_ptr formula);
 
 /*!
   \brief Creates a new fresh state variable.
@@ -213,8 +205,8 @@ void sbmc_print_Fvarmap(const NuSMVEnv_ptr env, FILE *out,
 
   \se index is incremented by one.
 */
-node_ptr sbmc_1_fresh_state_var(const NuSMVEnv_ptr env,
-                                       SymbLayer_ptr layer, unsigned int *index);
+node_ptr sbmc_1_fresh_state_var(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
+                                unsigned int *index);
 
 /*!
   \brief Creates N new fresh state variables.
@@ -226,9 +218,8 @@ node_ptr sbmc_1_fresh_state_var(const NuSMVEnv_ptr env,
 
   \se index is incremented by N.
 */
-array_t * sbmc_n_fresh_state_vars(const NuSMVEnv_ptr env,
-                                         SymbLayer_ptr layer, const unsigned int n,
-                            unsigned int *index);
+array_t *sbmc_n_fresh_state_vars(const NuSMVEnv_ptr env, SymbLayer_ptr layer,
+                                 const unsigned int n, unsigned int *index);
 
 /*!
   \brief Creates info->pastdepth+1 new state variables
@@ -242,11 +233,11 @@ array_t * sbmc_n_fresh_state_vars(const NuSMVEnv_ptr env,
   number of variables created. state_vars_formula_pd0,
   state_vars_formula_pdx and new_var_index are updated accordingly.
 */
-void sbmc_allocate_trans_vars(const NuSMVEnv_ptr env,
-                                     sbmc_node_info *info, SymbLayer_ptr layer,
-                                     lsList state_vars_formula_pd0,
-                                     lsList state_vars_formula_pdx,
-                                     unsigned int *new_var_index);
+void sbmc_allocate_trans_vars(const NuSMVEnv_ptr env, sbmc_node_info *info,
+                              SymbLayer_ptr layer,
+                              lsList state_vars_formula_pd0,
+                              lsList state_vars_formula_pdx,
+                              unsigned int *new_var_index);
 
 /*!
   \brief Takes a property and return the negation of the
@@ -281,8 +272,8 @@ node_ptr sbmc_make_boolean_formula(BddEnc_ptr bdd_enc, Prop_ptr ltlprop);
 
   \se svs is modified to store retrieved information.
 */
-void sbmc_find_relevant_vars(state_vars_struct *svs,
-                                        BeFsm_ptr be_fsm, node_ptr bltlspec);
+void sbmc_find_relevant_vars(state_vars_struct *svs, BeFsm_ptr be_fsm,
+                             node_ptr bltlspec);
 
 /*!
   \brief Extracts a trace from a sat assignment.
@@ -295,11 +286,11 @@ void sbmc_find_relevant_vars(state_vars_struct *svs,
   \sa Bmc_Utils_generate_cntexample
                       Sbmc_Utils_fill_cntexample
 */
-Trace_ptr
-Sbmc_Utils_generate_cntexample(BeEnc_ptr be_enc, sbmc_MetaSolver * solver,
-                               node_ptr l_var, const int k,
-                               const char * trace_name,
-                               NodeList_ptr symbols);
+Trace_ptr Sbmc_Utils_generate_cntexample(BeEnc_ptr be_enc,
+                                         sbmc_MetaSolver *solver,
+                                         node_ptr l_var, const int k,
+                                         const char *trace_name,
+                                         NodeList_ptr symbols);
 
 /*!
   \brief Extracts a trace from a sat assignment, and prints it.
@@ -313,14 +304,9 @@ Sbmc_Utils_generate_cntexample(BeEnc_ptr be_enc, sbmc_MetaSolver * solver,
                       Sbmc_Utils_generate_cntexample
                       Sbmc_Utils_fill_cntexample
 */
-Trace_ptr
-Sbmc_Utils_generate_and_print_cntexample(BeEnc_ptr be_enc,
-                                         TraceMgr_ptr tm,
-                                         sbmc_MetaSolver * solver,
-                                         node_ptr l_var,
-                                         const int k,
-                                         const char * trace_name,
-                                         NodeList_ptr symbols);
+Trace_ptr Sbmc_Utils_generate_and_print_cntexample(
+    BeEnc_ptr be_enc, TraceMgr_ptr tm, sbmc_MetaSolver *solver, node_ptr l_var,
+    const int k, const char *trace_name, NodeList_ptr symbols);
 
 /*!
   \brief Fills the given trace using the given sat assignment.
@@ -331,9 +317,9 @@ Sbmc_Utils_generate_and_print_cntexample(BeEnc_ptr be_enc,
 
   \sa Bmc_Utils_generate_cntexample
 */
-Trace_ptr
-Sbmc_Utils_fill_cntexample(BeEnc_ptr be_enc, sbmc_MetaSolver * solver,
-                           node_ptr l_var, const int k, Trace_ptr trace);
+Trace_ptr Sbmc_Utils_fill_cntexample(BeEnc_ptr be_enc, sbmc_MetaSolver *solver,
+                                     node_ptr l_var, const int k,
+                                     Trace_ptr trace);
 
 /*!
   \brief Routines for the state indexing scheme
@@ -388,7 +374,7 @@ unsigned int sbmc_model_k(int k);
 
   \sa sbmc_L_state sbmc_E_state sbmc_real_k sbmc_model_k
 */
-char* sbmc_real_k_string(const unsigned int k_real);
+char *sbmc_real_k_string(const unsigned int k_real);
 
 /*!
   \brief Creates a meta solver wrapper
@@ -397,7 +383,7 @@ char* sbmc_real_k_string(const unsigned int k_real);
 
   \se None
 */
-sbmc_MetaSolver * sbmc_MS_create(BeEnc_ptr be_enc);
+sbmc_MetaSolver *sbmc_MS_create(BeEnc_ptr be_enc);
 
 /*!
   \brief Destroy a meta solver wrapper
@@ -523,7 +509,8 @@ SatSolverResult sbmc_MS_solve(sbmc_MetaSolver *ms);
 
   \sa SatSolver_solve_all_groups_assume
 */
-SatSolverResult sbmc_MS_solve_assume(sbmc_MetaSolver *ms, Slist_ptr assumptions);
+SatSolverResult sbmc_MS_solve_assume(sbmc_MetaSolver *ms,
+                                     Slist_ptr assumptions);
 
 /*!
   \brief Returns the underlying solver

@@ -35,17 +35,16 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_RBC_RBC_INT_H__
 #define __NUSMV_CORE_RBC_RBC_INT_H__
 
-#include "nusmv/core/rbc/rbc.h"
 #include "nusmv/core/rbc/InlineResult.h"
+#include "nusmv/core/rbc/rbc.h"
 
 #include "nusmv/core/opt/opt.h"
 #include "nusmv/core/utils/LRUCache.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -73,35 +72,35 @@
 
   \todo Missing description
 */
-#define RBCTOP   (int) 0
+#define RBCTOP (int)0
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define RBCVAR   (int) 1
+#define RBCVAR (int)1
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define RBCAND   (int) 2
+#define RBCAND (int)2
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define RBCIFF   (int) 3
+#define RBCIFF (int)3
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define RBCITE   (int) 4
+#define RBCITE (int)4
 
 /* special value for a rbc node.
    The constant can be any illegal pointer value with proper alignment
@@ -114,7 +113,7 @@
 
   \todo Missing description
 */
-#define RBCDUMMY ((Rbc_t*) 4)
+#define RBCDUMMY ((Rbc_t *)4)
 
 /* Rbc statistics. */
 
@@ -123,14 +122,14 @@
 
   \todo Missing description
 */
-#define RBCVAR_NO   (int)  0  /* How many variables. */
+#define RBCVAR_NO (int)0 /* How many variables. */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define RBCMAX_STAT (int)  1
+#define RBCMAX_STAT (int)1
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -164,11 +163,11 @@
 
 struct RbcManager {
   NuSMVEnv_ptr environment;
-  Dag_Manager_t* dagManager;
-  Rbc_t** varTable;
+  Dag_Manager_t *dagManager;
+  Rbc_t **varTable;
   int varCapacity;
-  Rbc_t* one;
-  Rbc_t* zero;
+  Rbc_t *one;
+  Rbc_t *zero;
 
   LRUCache_ptr inlining_cache;
 
@@ -185,11 +184,9 @@ struct RbcManager {
   int stats[RBCMAX_STAT];
 };
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -251,7 +248,7 @@ struct RbcManager {
 
   \todo Missing description
 */
-#define RbcId(r,s) DagId(r,s)
+#define RbcId(r, s) DagId(r, s)
 
 /*!
   \brief \todo Missing synopsis
@@ -266,16 +263,15 @@ struct RbcManager {
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
 
-int Rbc_Convert2CnfSimple(Rbc_Manager_t* rbcManager, Rbc_t* f,
+int Rbc_Convert2CnfSimple(Rbc_Manager_t *rbcManager, Rbc_t *f,
                           Slist_ptr clauses, Slist_ptr vars,
-                          int* literalAssignedToWholeFormula);
+                          int *literalAssignedToWholeFormula);
 
-int Rbc_Convert2CnfCompact(Rbc_Manager_t* rbcManager, Rbc_t* f,
-                           int polarity,
+int Rbc_Convert2CnfCompact(Rbc_Manager_t *rbcManager, Rbc_t *f, int polarity,
                            Slist_ptr clauses, Slist_ptr vars,
-                           int* literalAssignedToWholeFormula);
+                           int *literalAssignedToWholeFormula);
 
-int Rbc_get_node_cnf(Rbc_Manager_t* rbcm, Rbc_t* f, int* maxvar);
+int Rbc_get_node_cnf(Rbc_Manager_t *rbcm, Rbc_t *f, int *maxvar);
 
 /* inlining cache control */
 void rbc_inlining_cache_init(Rbc_Manager_t *);
@@ -287,21 +283,16 @@ void rbc_inlining_cache_quit(Rbc_Manager_t *);
   Returned instance is NOT referenced, do not destroy it as
   it belongs to the cache.
 */
-InlineResult_ptr
-rbc_inlining_cache_lookup_result(Rbc_Manager_t* rbcm, Rbc_t* f);
+InlineResult_ptr rbc_inlining_cache_lookup_result(Rbc_Manager_t *rbcm,
+                                                  Rbc_t *f);
 
-void Rbc_Dfs(Rbc_t* dfsRoot,
-             RbcDfsFunctions_t* dfsFun,
-             void* dfsData,
-             Rbc_Manager_t* manager);
+void Rbc_Dfs(Rbc_t *dfsRoot, RbcDfsFunctions_t *dfsFun, void *dfsData,
+             Rbc_Manager_t *manager);
 
-void Rbc_Dfs_clean(Rbc_t* dfsRoot,
-                   Rbc_Manager_t* manager);
+void Rbc_Dfs_clean(Rbc_t *dfsRoot, Rbc_Manager_t *manager);
 
-void Rbc_Dfs_do_only_last_visit(Rbc_t* dfsRoot,
-                                RbcDfsFunctions_t* dfsFun,
-                                void* dfsData,
-                                Rbc_Manager_t* manager);
+void Rbc_Dfs_do_only_last_visit(Rbc_t *dfsRoot, RbcDfsFunctions_t *dfsFun,
+                                void *dfsData, Rbc_Manager_t *manager);
 
 /**AutomaticEnd***************************************************************/
 

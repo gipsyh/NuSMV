@@ -36,11 +36,11 @@
   * input variables
   * next operator
 
-  This is done by copying the original property and modifying both the formula and
-  the fsms. In the formula, the predicates containing something not processable
-  directly by the model checking algorithms are substited by a fresh monitor
-  variable. Then, in the fsms, the transition relation is enriched with the
-  condition:
+  This is done by copying the original property and modifying both the formula
+  and the fsms. In the formula, the predicates containing something not
+  processable directly by the model checking algorithms are substited by a fresh
+  monitor variable. Then, in the fsms, the transition relation is enriched with
+  the condition:
 
   monitor <-> predicate
 
@@ -64,7 +64,8 @@
   ...
 
   ******************************************************************************
-  * here the original property is updated with the results of model checking. This
+  * here the original property is updated with the results of model checking.
+  This
   * call have to be done, otherwise the destructor will abort
   ******************************************************************************
   Prop_Rewriter_update_original_property(rewriter);
@@ -77,44 +78,38 @@
 
 */
 
-
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/prop/Prop_Rewriter.h"
 #include "nusmv/core/prop/Prop_Rewriter_private.h"
+#include "nusmv/core/utils/defs.h"
 
-#include "nusmv/core/prop/propInt.h"
-#include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/utils/error.h"
-#include "nusmv/core/utils/Logger.h"
 #include "nusmv/core/compile/FlatHierarchy.h"
 #include "nusmv/core/compile/compile.h"
+#include "nusmv/core/parser/symbols.h"
+#include "nusmv/core/prop/propInt.h"
+#include "nusmv/core/utils/ErrorMgr.h"
+#include "nusmv/core/utils/Logger.h"
+#include "nusmv/core/utils/error.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 /* See 'Prop_Rewriter_private.h' for class 'Prop_Rewriter' definition. */
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -122,22 +117,17 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void prop_rewriter_finalize(Object_ptr object, void* dummy);
-static void pr_free_node(NuSMVEnv_ptr env,
-                         NodeMgr_ptr nodemgr,
-                         node_ptr expr);
+static void prop_rewriter_finalize(Object_ptr object, void *dummy);
+static void pr_free_node(NuSMVEnv_ptr env, NodeMgr_ptr nodemgr, node_ptr expr);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Prop_Rewriter_ptr Prop_Rewriter_create(NuSMVEnv_ptr env,
-                                       Prop_ptr prop,
+Prop_Rewriter_ptr Prop_Rewriter_create(NuSMVEnv_ptr env, Prop_ptr prop,
                                        WffRewriteMethod method,
                                        WffRewriterExpectedProperty expprop,
-                                       FsmType fsm_type,
-                                       BddEnc_ptr bddenc)
-{
+                                       FsmType fsm_type, BddEnc_ptr bddenc) {
   Prop_Rewriter_ptr self = ALLOC(Prop_Rewriter, 1);
   PROP_REWRITER_CHECK_INSTANCE(self);
 
@@ -145,8 +135,7 @@ Prop_Rewriter_ptr Prop_Rewriter_create(NuSMVEnv_ptr env,
   return self;
 }
 
-void Prop_Rewriter_destroy(Prop_Rewriter_ptr self)
-{
+void Prop_Rewriter_destroy(Prop_Rewriter_ptr self) {
   PROP_REWRITER_CHECK_INSTANCE(self);
 
   {
@@ -155,17 +144,16 @@ void Prop_Rewriter_destroy(Prop_Rewriter_ptr self)
     SymbTable_ptr symb_table = self->symb_table;
     const Prop_ptr original = self->original;
     WffRewriterExpectedProperty expprop = self->expprop;
-    const char * layer_name =
-      (NULL != self->layer) ? SymbLayer_get_name(self->layer) : NULL;
+    const char *layer_name =
+        (NULL != self->layer) ? SymbLayer_get_name(self->layer) : NULL;
 
     Object_destroy(OBJECT(self), NULL);
 
-    if (NULL != layer_name &&
-        SymbTable_has_layer(symb_table, layer_name) &&
+    if (NULL != layer_name && SymbTable_has_layer(symb_table, layer_name) &&
         /* If input property did not need rewriting, we never created the layer!
            Another rewriter created it! */
         ((Prop_needs_rewriting(symb_table, original) ||
-          (WFF_REWRITER_LTL_2_INVAR == expprop )))) {
+          (WFF_REWRITER_LTL_2_INVAR == expprop)))) {
       SymbLayer_ptr layer = SymbTable_get_layer(symb_table, layer_name);
 
       SymbTable_remove_layer(symb_table, layer);
@@ -175,22 +163,19 @@ void Prop_Rewriter_destroy(Prop_Rewriter_ptr self)
   }
 }
 
-Prop_ptr Prop_Rewriter_get_original_property(Prop_Rewriter_ptr self)
-{
+Prop_ptr Prop_Rewriter_get_original_property(Prop_Rewriter_ptr self) {
   PROP_REWRITER_CHECK_INSTANCE(self);
 
   return self->original;
 }
 
-Prop_ptr Prop_Rewriter_rewrite(Prop_Rewriter_ptr self)
-{
+Prop_ptr Prop_Rewriter_rewrite(Prop_Rewriter_ptr self) {
   PROP_REWRITER_CHECK_INSTANCE(self);
 
   return self->rewrite(self);
 }
 
-void Prop_Rewriter_update_original_property(Prop_Rewriter_ptr self)
-{
+void Prop_Rewriter_update_original_property(Prop_Rewriter_ptr self) {
   PROP_REWRITER_CHECK_INSTANCE(self);
   nusmv_assert(NULL != self->rewritten);
 
@@ -233,14 +218,13 @@ void Prop_Rewriter_ltl2invar_negate_property_to_false(Prop_Rewriter_ptr self) {
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
-{
+Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self) {
   NuSMVEnv_ptr const env = EnvObject_env(ENV_OBJECT(self));
   Logger_ptr const logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
   MasterPrinter_ptr const wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   OptsHandler_ptr const opts =
-     OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   Prop_ptr retval = NULL;
   Prop_Type proptype = Prop_NoType;
@@ -258,15 +242,14 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
     Prop_set_index(retval, -1);
   }
   /* Maybe there is nothing to do */
-  else if (! Prop_needs_rewriting(self->symb_table, self->original) &&
+  else if (!Prop_needs_rewriting(self->symb_table, self->original) &&
            WFF_REWRITER_REWRITE_INPUT_NEXT == self->expprop) {
     /* If the rewriting has only to take into account input/next
        avoiding conversion from LTL to invar, then simply copy the
        property */
     retval = Prop_copy(self->original);
     Prop_set_index(retval, -1);
-  }
-  else {
+  } else {
     SymbLayer_ptr layer = NULL;
 
     FsmBuilder_ptr fsm_builder = NULL;
@@ -278,12 +261,11 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
     /* we use a unique name by purpose so to trigger an assertion if a
        developer forgets to call Prop_Rewriter_destroy */
     if (NULL == self->layer) {
-      layer = SymbTable_create_layer(self->symb_table,
-                                     NULL,
-                                     SYMB_LAYER_POS_BOTTOM);
+      layer =
+          SymbTable_create_layer(self->symb_table, NULL, SYMB_LAYER_POS_BOTTOM);
       self->layer = layer;
       {
-        const char * layer_name = SymbLayer_get_name(layer);
+        const char *layer_name = SymbLayer_get_name(layer);
 
         nusmv_assert(NULL != layer_name);
 
@@ -293,14 +275,13 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
         if (self->monitor_visible_in_traces) {
           SymbTable_layer_add_to_class(self->symb_table, layer_name,
                                        MODEL_LAYERS_CLASS);
-        }
-        else {
+        } else {
           SymbTable_layer_add_to_class(self->symb_table, layer_name,
                                        ARTIFACTS_LAYERS_CLASS);
         }
       }
-    }
-    else layer = self->layer;
+    } else
+      layer = self->layer;
 
     {
       node_ptr formula = NULL;
@@ -310,27 +291,26 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
       formula = Prop_get_expr_core(self->original);
       spec_type = PropType_to_node_type(Prop_get_type(self->original));
 
-      rewritten_formula =
-        Wff_Rewrite_rewrite_formula_generic(env, self->method,
-                                            self->expprop,
-                                            layer,
-                                            outfh, formula, spec_type,
-                                            self->monitor_variable_initialized_to_true,
-                                            self->ltl2invar_negate_property);
+      rewritten_formula = Wff_Rewrite_rewrite_formula_generic(
+          env, self->method, self->expprop, layer, outfh, formula, spec_type,
+          self->monitor_variable_initialized_to_true,
+          self->ltl2invar_negate_property);
     }
 
     nusmv_assert((INVARSPEC == PTR_TO_INT(Pair_get_second(rewritten_formula)) ||
                   LTLSPEC == PTR_TO_INT(Pair_get_second(rewritten_formula))));
-    new_prop_type = (INVARSPEC == PTR_TO_INT(Pair_get_second(rewritten_formula))) ? \
-      Prop_Invar : Prop_Ltl;
-    retval = Prop_create_partial(env, NODE_PTR(Pair_get_first(rewritten_formula)),
-                                 new_prop_type);
+    new_prop_type =
+        (INVARSPEC == PTR_TO_INT(Pair_get_second(rewritten_formula)))
+            ? Prop_Invar
+            : Prop_Ltl;
+    retval = Prop_create_partial(
+        env, NODE_PTR(Pair_get_first(rewritten_formula)), new_prop_type);
 
     Pair_destroy(rewritten_formula);
 
     /* Commit the needed encoders */
     {
-      const char* layer_name = SymbLayer_get_name(layer);
+      const char *layer_name = SymbLayer_get_name(layer);
       BddEnc_ptr bddenc = NULL;
       BoolEnc_ptr boolenc = NULL;
 
@@ -367,8 +347,7 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
       orig_sexpfsm = Prop_get_scalar_sexp_fsm(self->original);
 
       /* ONE - Build the required fsms ****************************************/
-      if (NULL == boolfsm &&
-          (FSM_TYPE_BOOL_SEXP & self->fsm_type)) {
+      if (NULL == boolfsm && (FSM_TYPE_BOOL_SEXP & self->fsm_type)) {
         if (NULL == sexpfsm) {
           sexpfsm = SexpFsm_create(outfh, FlatHierarchy_get_vars(outfh));
         }
@@ -378,8 +357,7 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
         boolfsm = BoolSexpFsm_create_from_scalar_fsm(sexpfsm, bddenc, layer);
       }
 
-      if (NULL == bddfsm &&
-          (FSM_TYPE_BDD & self->fsm_type)) {
+      if (NULL == bddfsm && (FSM_TYPE_BDD & self->fsm_type)) {
         if (NULL == sexpfsm) {
           sexpfsm = SexpFsm_create(outfh, FlatHierarchy_get_vars(outfh));
         }
@@ -392,15 +370,13 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
                                            get_partition_method(opts));
       }
 
-      if (NULL == sexpfsm &&
-          (FSM_TYPE_SEXP & self->fsm_type)) {
+      if (NULL == sexpfsm && (FSM_TYPE_SEXP & self->fsm_type)) {
         sexpfsm = SexpFsm_create(outfh, FlatHierarchy_get_vars(outfh));
 
         SexpFsm_apply_synchronous_product(sexpfsm, orig_sexpfsm);
       }
 
-      if (NULL == befsm &&
-          (FSM_TYPE_BE & self->fsm_type)) {
+      if (NULL == befsm && (FSM_TYPE_BE & self->fsm_type)) {
         BeFsm_ptr orig_befsm = NULL;
         BeEnc_ptr beenc = NULL;
 
@@ -410,14 +386,9 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
 
         if (NULL != boolfsm) {
           befsm = BeFsm_create_from_sexp_fsm(beenc, boolfsm);
-        }
-        else {
-          boolfsm =
-            FsmBuilder_create_boolean_sexp_fsm(fsm_builder,
-                                               outfh,
-                                               FlatHierarchy_get_vars(outfh),
-                                               bddenc,
-                                               layer);
+        } else {
+          boolfsm = FsmBuilder_create_boolean_sexp_fsm(
+              fsm_builder, outfh, FlatHierarchy_get_vars(outfh), bddenc, layer);
           befsm = BeFsm_create_from_sexp_fsm(beenc, boolfsm);
           BeFsm_apply_synchronous_product(befsm, orig_befsm);
 
@@ -434,7 +405,8 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
               SexpFsm_apply_synchronous_product(sexpfsm, orig_sexpfsm);
             }
 
-            boolfsm = BoolSexpFsm_create_from_scalar_fsm(sexpfsm, bddenc, layer);
+            boolfsm =
+                BoolSexpFsm_create_from_scalar_fsm(sexpfsm, bddenc, layer);
           }
         }
       } /* end of be fsm building */
@@ -444,22 +416,26 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
       {
         if (NULL != boolfsm) {
           Prop_set_bool_sexp_fsm(retval, boolfsm);
-          BoolSexpFsm_destroy(boolfsm); boolfsm = NULL;
+          BoolSexpFsm_destroy(boolfsm);
+          boolfsm = NULL;
         }
 
         if (NULL != sexpfsm) {
           Prop_set_scalar_sexp_fsm(retval, sexpfsm);
-          SexpFsm_destroy(sexpfsm); sexpfsm = NULL;
+          SexpFsm_destroy(sexpfsm);
+          sexpfsm = NULL;
         }
 
         if (NULL != bddfsm) {
           Prop_set_bdd_fsm(retval, bddfsm);
-          BddFsm_destroy(bddfsm); bddfsm = NULL;
+          BddFsm_destroy(bddfsm);
+          bddfsm = NULL;
         }
 
         if (NULL != befsm) {
           Prop_set_be_fsm(retval, befsm);
-          BeFsm_destroy(befsm); befsm = NULL;
+          BeFsm_destroy(befsm);
+          befsm = NULL;
         }
       }
     }
@@ -477,80 +453,72 @@ Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self)
 
     Logger_vnlog_debug(logger, wffprint, opts, "Output property\n%N\n",
                        Prop_get_expr(retval));
-    if (NULL != Prop_get_scalar_sexp_fsm(retval)
-        && opt_verbose_level_ge(opts, 5)) {
-      array_t* layers = array_alloc(char*, 2);
+    if (NULL != Prop_get_scalar_sexp_fsm(retval) &&
+        opt_verbose_level_ge(opts, 5)) {
+      array_t *layers = array_alloc(char *, 2);
       if (NULL != self->layer) {
-        const char * layer_name = SymbLayer_get_name(self->layer);
+        const char *layer_name = SymbLayer_get_name(self->layer);
 
         if (SymbTable_has_layer(self->symb_table, layer_name)) {
-          (void)array_insert_last(char*, layers, (char*)layer_name);
+          (void)array_insert_last(char *, layers, (char *)layer_name);
         }
       }
       if (SymbTable_has_layer(self->symb_table, SymbLayer_get_name(layer))) {
-        (void)array_insert_last(char*, layers, (char*)SymbLayer_get_name(layer));
+        (void)array_insert_last(char *, layers,
+                                (char *)SymbLayer_get_name(layer));
       }
 
-      Compile_WriteFlattenFsm(env, Logger_get_stream(logger), self->symb_table,
-                              layers, "MODULE main",
-                              SexpFsm_get_hierarchy(Prop_get_scalar_sexp_fsm(retval)),
-                              false);
+      Compile_WriteFlattenFsm(
+          env, Logger_get_stream(logger), self->symb_table, layers,
+          "MODULE main",
+          SexpFsm_get_hierarchy(Prop_get_scalar_sexp_fsm(retval)), false);
 
-      array_free(layers); layers = NULL;
+      array_free(layers);
+      layers = NULL;
     }
   }
 
   /* Now the formula MUST be input vars and next operator free */
-  nusmv_assert(! Prop_needs_rewriting(self->symb_table, retval));
+  nusmv_assert(!Prop_needs_rewriting(self->symb_table, retval));
 
   self->rewritten = retval;
 
   return retval;
 }
 
-void prop_rewriter_init(Prop_Rewriter_ptr self,
-                        NuSMVEnv_ptr env,
-                        Prop_ptr original,
-                        WffRewriteMethod method,
-                        WffRewriterExpectedProperty expprop,
-                        FsmType fsm_type,
-                        BddEnc_ptr bddenc,
-                        SymbLayer_ptr layer)
-{
-  OptsHandler_ptr opts = OPTS_HANDLER(NuSMVEnv_get_value(env,
-                                                         ENV_OPTS_HANDLER));
+void prop_rewriter_init(Prop_Rewriter_ptr self, NuSMVEnv_ptr env,
+                        Prop_ptr original, WffRewriteMethod method,
+                        WffRewriterExpectedProperty expprop, FsmType fsm_type,
+                        BddEnc_ptr bddenc, SymbLayer_ptr layer) {
+  OptsHandler_ptr opts =
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   /* base class initialization */
   env_object_init(ENV_OBJECT(self), env);
 
   /* here all needed unset fsms are taken from the environment and
      copied into the original property */
-  if ((FSM_TYPE_SEXP |
-       FSM_TYPE_BOOL_SEXP |
-       FSM_TYPE_BDD |
-       FSM_TYPE_BE) & fsm_type) {
+  if ((FSM_TYPE_SEXP | FSM_TYPE_BOOL_SEXP | FSM_TYPE_BDD | FSM_TYPE_BE) &
+      fsm_type) {
     SexpFsm_ptr fsm = Prop_get_scalar_sexp_fsm(original);
     if (NULL == fsm) {
       if (opt_cone_of_influence(opts)) {
         Prop_apply_coi_for_scalar(env, original);
         fsm = Prop_get_scalar_sexp_fsm(original);
-      }
-      else if (NuSMVEnv_has_value(env, ENV_SEXP_FSM)) {
+      } else if (NuSMVEnv_has_value(env, ENV_SEXP_FSM)) {
         fsm = SEXP_FSM(NuSMVEnv_get_value(env, ENV_SEXP_FSM));
         Prop_set_scalar_sexp_fsm(original, fsm);
       }
     }
   }
 
-  if ((FSM_TYPE_BOOL_SEXP |
-       FSM_TYPE_BE) & fsm_type) {
+  if ((FSM_TYPE_BOOL_SEXP | FSM_TYPE_BE) & fsm_type) {
     BoolSexpFsm_ptr fsm = Prop_get_bool_sexp_fsm(original);
     if (NULL == fsm) {
       if (opt_cone_of_influence(opts)) {
         Prop_apply_coi_for_bmc(env, original);
         fsm = Prop_get_bool_sexp_fsm(original);
-      }
-      else if (NuSMVEnv_has_value(env, ENV_BOOL_FSM)) {
+      } else if (NuSMVEnv_has_value(env, ENV_BOOL_FSM)) {
         fsm = BOOL_SEXP_FSM(NuSMVEnv_get_value(env, ENV_BOOL_FSM));
         Prop_set_bool_sexp_fsm(original, fsm);
       }
@@ -562,9 +530,8 @@ void prop_rewriter_init(Prop_Rewriter_ptr self,
     if (NULL == fsm) {
       if (opt_cone_of_influence(opts)) {
         Prop_apply_coi_for_bdd(env, original);
-        fsm =  Prop_get_bdd_fsm(original);
-      }
-      else {
+        fsm = Prop_get_bdd_fsm(original);
+      } else {
         fsm = BDD_FSM(NuSMVEnv_get_value(env, ENV_BDD_FSM));
         Prop_set_bdd_fsm(original, fsm);
       }
@@ -572,7 +539,7 @@ void prop_rewriter_init(Prop_Rewriter_ptr self,
     nusmv_assert(NULL != Prop_get_scalar_sexp_fsm(original));
   }
 
-  if  (FSM_TYPE_BE & fsm_type) {
+  if (FSM_TYPE_BE & fsm_type) {
     BeFsm_ptr fsm = Prop_get_be_fsm(original);
     if (NULL == fsm) {
       fsm = BE_FSM(NuSMVEnv_get_value(env, ENV_BE_FSM));
@@ -601,22 +568,16 @@ void prop_rewriter_init(Prop_Rewriter_ptr self,
   self->ltl2invar_negate_property = false;
 
   if (NULL != Prop_get_bdd_fsm(original)) {
+    self->symb_table = BaseEnc_get_symb_table(
+        BASE_ENC(BddFsm_get_bdd_encoding(Prop_get_bdd_fsm(original))));
+    nusmv_assert(bddenc == BddFsm_get_bdd_encoding(Prop_get_bdd_fsm(original)));
+  } else if (NULL != Prop_get_be_fsm(original)) {
+    self->symb_table = BaseEnc_get_symb_table(
+        BASE_ENC(BeFsm_get_be_encoding(Prop_get_be_fsm(original))));
+  } else if (NULL != Prop_get_scalar_sexp_fsm(original)) {
     self->symb_table =
-      BaseEnc_get_symb_table(BASE_ENC(
-                      BddFsm_get_bdd_encoding(Prop_get_bdd_fsm(original))));
-    nusmv_assert(bddenc ==
-                 BddFsm_get_bdd_encoding(Prop_get_bdd_fsm(original)));
-  }
-  else if (NULL != Prop_get_be_fsm(original)) {
-    self->symb_table =
-      BaseEnc_get_symb_table(BASE_ENC(
-                      BeFsm_get_be_encoding(Prop_get_be_fsm(original))));
-  }
-  else if (NULL != Prop_get_scalar_sexp_fsm(original)) {
-    self->symb_table =
-      SexpFsm_get_symb_table(Prop_get_scalar_sexp_fsm(original));
-  }
-  else {
+        SexpFsm_get_symb_table(Prop_get_scalar_sexp_fsm(original));
+  } else {
     error_unreachable_code_msg("At least one FSM built is assumed\n");
   }
 
@@ -631,20 +592,18 @@ void prop_rewriter_init(Prop_Rewriter_ptr self,
   OVERRIDE(Prop_Rewriter, rewrite) = prop_rewriter_rewrite;
 }
 
+void prop_rewriter_deinit(Prop_Rewriter_ptr self) {
+  const char *layer_name =
+      (NULL != self->layer) ? SymbLayer_get_name(self->layer) : NULL;
 
-void prop_rewriter_deinit(Prop_Rewriter_ptr self)
-{
-  const char* layer_name =
-    (NULL != self->layer) ? SymbLayer_get_name(self->layer) : NULL;
-
-  if (! self->is_status_consistent) {
+  if (!self->is_status_consistent) {
     error_unreachable_code_msg("Error: You have to call "
                                "Prop_Rewriter_update_original_property "
                                "before destroying the Property Rewriter\n");
   }
 
   if (Prop_needs_rewriting(self->symb_table, self->original) ||
-      (WFF_REWRITER_LTL_2_INVAR == self->expprop )) {
+      (WFF_REWRITER_LTL_2_INVAR == self->expprop)) {
     BddEnc_ptr bddenc = NULL;
     BoolEnc_ptr boolenc = NULL;
     BeEnc_ptr beenc = NULL;
@@ -683,7 +642,8 @@ void prop_rewriter_deinit(Prop_Rewriter_ptr self)
   self->bddenc = NULL;
 
   /* owned */
-  Prop_destroy(self->rewritten); self->rewritten = NULL;
+  Prop_destroy(self->rewritten);
+  self->rewritten = NULL;
 
   /* base class deinitialization */
   env_object_deinit(ENV_OBJECT(self));
@@ -698,8 +658,7 @@ void prop_rewriter_deinit(Prop_Rewriter_ptr self)
 
   Called by the class destructor
 */
-static void prop_rewriter_finalize(Object_ptr object, void* dummy)
-{
+static void prop_rewriter_finalize(Object_ptr object, void *dummy) {
   Prop_Rewriter_ptr self = PROP_REWRITER(object);
 
   UNUSED_PARAM(dummy);
@@ -715,21 +674,26 @@ The formula is traversed and all the nodes are freed, but the ones that are
 believed to have been created with find_node, according to the Compiler style:
 constants and symbols.
 */
-static void pr_free_node(NuSMVEnv_ptr env,
-                         NodeMgr_ptr nodemgr,
-                         node_ptr expr)
-{
+static void pr_free_node(NuSMVEnv_ptr env, NodeMgr_ptr nodemgr, node_ptr expr) {
   if (NULL != expr) {
-    switch(node_get_type(expr)) {
+    switch (node_get_type(expr)) {
       /* --- constants ---
          the expression is find_atom */
-    case FAILURE:  case TRUEEXP:  case FALSEEXP:
-    case NUMBER:  case NUMBER_UNSIGNED_WORD:  case NUMBER_SIGNED_WORD:
-    case UWCONST: case SWCONST:
-    case NUMBER_FRAC:  case NUMBER_REAL:  case NUMBER_EXP:
+    case FAILURE:
+    case TRUEEXP:
+    case FALSEEXP:
+    case NUMBER:
+    case NUMBER_UNSIGNED_WORD:
+    case NUMBER_SIGNED_WORD:
+    case UWCONST:
+    case SWCONST:
+    case NUMBER_FRAC:
+    case NUMBER_REAL:
+    case NUMBER_EXP:
       break;
 
-    case WSIZEOF: case CAST_TOINT:
+    case WSIZEOF:
+    case CAST_TOINT:
       break;
 
     case CONTEXT:
@@ -740,7 +704,9 @@ static void pr_free_node(NuSMVEnv_ptr env,
       /* --- identifier ---
          since the expression is already flattened there is not need
          to resolve the identifier, find_atom it or create a copy. */
-    case ATOM:  case DOT:  case ARRAY:
+    case ATOM:
+    case DOT:
+    case ARRAY:
       break;
 
     case NFUNCTION:
@@ -769,7 +735,12 @@ static void pr_free_node(NuSMVEnv_ptr env,
          If kinds are different "input" and "temporal" kinds wins
          "state".*/
     case TWODOTS: /* This is dealt as a binary operator */
-    case AND: case OR: case IMPLIES: case IFF: case XOR: case XNOR:
+    case AND:
+    case OR:
+    case IMPLIES:
+    case IFF:
+    case XOR:
+    case XNOR:
       pr_free_node(env, nodemgr, car(expr));
       free_node(nodemgr, car(expr));
 
@@ -784,16 +755,34 @@ static void pr_free_node(NuSMVEnv_ptr env,
 
       /* --- binary non-temporal operators ---
          it is exactly as previous case but the operands cannot have temporal
-         operators. It is written as a special case only for debugging purposes.*/
+         operators. It is written as a special case only for debugging
+         purposes.*/
     case CONS:
-    case CASE: case COLON:
-    case EQUAL: case NOTEQUAL:
-    case LT: case GT: case LE: case GE:
-    case PLUS: case MINUS: case TIMES: case MOD: case DIVIDE:
-    case UNION: case SETIN:
-    case LSHIFT: case RSHIFT:
-    case BIT: case CONCATENATION: case BIT_SELECTION:  case EXTEND:
-    case CAST_BOOL:  case CAST_WORD1:  case CAST_SIGNED: case CAST_UNSIGNED:
+    case CASE:
+    case COLON:
+    case EQUAL:
+    case NOTEQUAL:
+    case LT:
+    case GT:
+    case LE:
+    case GE:
+    case PLUS:
+    case MINUS:
+    case TIMES:
+    case MOD:
+    case DIVIDE:
+    case UNION:
+    case SETIN:
+    case LSHIFT:
+    case RSHIFT:
+    case BIT:
+    case CONCATENATION:
+    case BIT_SELECTION:
+    case EXTEND:
+    case CAST_BOOL:
+    case CAST_WORD1:
+    case CAST_SIGNED:
+    case CAST_UNSIGNED:
     case IFTHENELSE:
       pr_free_node(env, nodemgr, car(expr));
       free_node(nodemgr, car(expr));
@@ -804,15 +793,23 @@ static void pr_free_node(NuSMVEnv_ptr env,
 
       /*  -- unary temporal operators ---
           if operand has inputs then rewrite it. */
-    case OP_NEXT: case OP_PREC: case OP_NOTPRECNOT: case OP_FUTURE:
-    case OP_ONCE: case OP_GLOBAL: case OP_HISTORICAL:
+    case OP_NEXT:
+    case OP_PREC:
+    case OP_NOTPRECNOT:
+    case OP_FUTURE:
+    case OP_ONCE:
+    case OP_GLOBAL:
+    case OP_HISTORICAL:
       pr_free_node(env, nodemgr, car(expr));
       free_node(nodemgr, car(expr));
       break;
 
       /* --- binary temporal operators ---
          If any operand has inputs then rewrite it.*/
-    case UNTIL: case SINCE: case RELEASES: case TRIGGERED:
+    case UNTIL:
+    case SINCE:
+    case RELEASES:
+    case TRIGGERED:
       pr_free_node(env, nodemgr, car(expr));
       free_node(nodemgr, car(expr));
 
@@ -820,20 +817,19 @@ static void pr_free_node(NuSMVEnv_ptr env,
       free_node(nodemgr, cdr(expr));
       break;
 
-    default:
-      {
-        StreamMgr_ptr const streams =
+    default: {
+      StreamMgr_ptr const streams =
           STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-        ErrorMgr_ptr const errmgr =
+      ErrorMgr_ptr const errmgr =
           ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-        StreamMgr_print_error(streams, "Error: %s:%d:%s: unexpected operator of type %d\n",
-                              __FILE__, __LINE__, __func__, node_get_type(expr));
-        ErrorMgr_nusmv_exit(errmgr, 1);
-      }
+      StreamMgr_print_error(streams,
+                            "Error: %s:%d:%s: unexpected operator of type %d\n",
+                            __FILE__, __LINE__, __func__, node_get_type(expr));
+      ErrorMgr_nusmv_exit(errmgr, 1);
+    }
     }
   }
 }
-
 
 /**AutomaticEnd***************************************************************/

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,24 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_CORE_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_CORE_PRIVATE_H__
 
-
-#include "nusmv/core/compile/dependency/DependencyCore.h"
 #include "nusmv/core/compile/dependency/DependencyBase.h"
 #include "nusmv/core/compile/dependency/DependencyBase_private.h"
+#include "nusmv/core/compile/dependency/DependencyCore.h"
 #include "nusmv/core/utils/defs.h"
-
 
 /*!
   \brief DependencyCore class definition derived from
                class DependencyBase
 
-  
+
 
   \sa Base class DependencyBase
 */
 
-typedef struct DependencyCore_TAG
-{
+typedef struct DependencyCore_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(DependencyBase);
 
@@ -64,14 +59,11 @@ typedef struct DependencyCore_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } DependencyCore;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -85,10 +77,8 @@ typedef struct DependencyCore_TAG
 
   \sa DependencyCore_create
 */
-void dependency_core_init(DependencyCore_ptr self,
-                                 const NuSMVEnv_ptr env,
-                                 const char* name, int low,
-                                 size_t num);
+void dependency_core_init(DependencyCore_ptr self, const NuSMVEnv_ptr env,
+                          const char *name, int low, size_t num);
 
 /*!
   \methodof DependencyCore
@@ -99,7 +89,5 @@ void dependency_core_init(DependencyCore_ptr self,
   \sa DependencyCore_destroy
 */
 void dependency_core_deinit(DependencyCore_ptr self);
-
-
 
 #endif /* __NUSMV_CORE_COMPILE_DEPENDENCY_DEPENDENCY_CORE_PRIVATE_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,7 +37,6 @@
                 </ul>
 
 */
-
 
 #include "nusmv/core/rbc/rbcInt.h"
 /*---------------------------------------------------------------------------*/
@@ -62,8 +61,8 @@
 */
 
 struct DaVinciDfsData {
-  int    label;
-  FILE * outFile;
+  int label;
+  FILE *outFile;
 };
 
 /*!
@@ -73,7 +72,7 @@ struct DaVinciDfsData {
 */
 
 struct SexprDfsData {
-  FILE * outFile;
+  FILE *outFile;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -92,11 +91,9 @@ typedef struct SexprDfsData SexprDfsData_t;
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -104,48 +101,42 @@ typedef struct SexprDfsData SexprDfsData_t;
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static int DaVinciSet(Rbc_t * f, char * daVinciData, nusmv_ptrint sign);
-static void DaVinciFirst(Rbc_t * f, char * DaVinciData, nusmv_ptrint sign);
-static void DaVinciBack(Rbc_t * f, char * daVinciData, nusmv_ptrint sign);
-static void DaVinciLast(Rbc_t * f, char * daVinciData, nusmv_ptrint sign);
+static int DaVinciSet(Rbc_t *f, char *daVinciData, nusmv_ptrint sign);
+static void DaVinciFirst(Rbc_t *f, char *DaVinciData, nusmv_ptrint sign);
+static void DaVinciBack(Rbc_t *f, char *daVinciData, nusmv_ptrint sign);
+static void DaVinciLast(Rbc_t *f, char *daVinciData, nusmv_ptrint sign);
 
-static int GdlSet(Rbc_t * f, char * GdlData, nusmv_ptrint sign);
-static void GdlFirst(Rbc_t * f, char * GdlData, nusmv_ptrint sign);
-static void GdlBack(Rbc_t * f, char * GdlData, nusmv_ptrint sign);
-static void GdlLast(Rbc_t * f, char * GdlData, nusmv_ptrint sign);
+static int GdlSet(Rbc_t *f, char *GdlData, nusmv_ptrint sign);
+static void GdlFirst(Rbc_t *f, char *GdlData, nusmv_ptrint sign);
+static void GdlBack(Rbc_t *f, char *GdlData, nusmv_ptrint sign);
+static void GdlLast(Rbc_t *f, char *GdlData, nusmv_ptrint sign);
 
-static int SexprSet(Rbc_t * f, char * SexprData, nusmv_ptrint sign);
-static void SexprFirst(Rbc_t * f, char * SexprData, nusmv_ptrint sign);
-static void SexprBack(Rbc_t * f, char * SexprData, nusmv_ptrint sign);
-static void SexprLast(Rbc_t * f, char * SexprData, nusmv_ptrint sign);
+static int SexprSet(Rbc_t *f, char *SexprData, nusmv_ptrint sign);
+static void SexprFirst(Rbc_t *f, char *SexprData, nusmv_ptrint sign);
+static void SexprBack(Rbc_t *f, char *SexprData, nusmv_ptrint sign);
+static void SexprLast(Rbc_t *f, char *SexprData, nusmv_ptrint sign);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void
-Rbc_OutputDaVinci(
-  Rbc_Manager_t * rbcManager,
-  Rbc_t         * f,
-  FILE          * outFile)
-{
+void Rbc_OutputDaVinci(Rbc_Manager_t *rbcManager, Rbc_t *f, FILE *outFile) {
   Dag_DfsFunctions_t daVinciFunctions;
-  DaVinciDfsData_t   daVinciData;
+  DaVinciDfsData_t daVinciData;
 
   /* Cleaning the user fields. */
   Dag_Dfs(f, Rbc_ManagerGetDfsCleanFun(rbcManager), NIL(char));
 
   /* Setting up the DFS functions. */
-  daVinciFunctions.Set        = (PF_IVPCPI)DaVinciSet;
+  daVinciFunctions.Set = (PF_IVPCPI)DaVinciSet;
   daVinciFunctions.FirstVisit = (PF_VPVPCPI)DaVinciFirst;
-  daVinciFunctions.BackVisit  = (PF_VPVPCPI)DaVinciBack;
-  daVinciFunctions.LastVisit  = (PF_VPVPCPI)DaVinciLast;
+  daVinciFunctions.BackVisit = (PF_VPVPCPI)DaVinciBack;
+  daVinciFunctions.LastVisit = (PF_VPVPCPI)DaVinciLast;
 
- /* Setting up the DFS data. */
-  daVinciData.label   = 0;
+  /* Setting up the DFS data. */
+  daVinciData.label = 0;
   daVinciData.outFile = outFile;
 
   /* Initialize the graph and print a fake an ancestor. */
@@ -154,7 +145,7 @@ Rbc_OutputDaVinci(
           "l(\"root\",n(\"\",[a(\"OBJECT\",\"\"),a(\"_GO\",\"box\")],[ ");
 
   /* Calling DFS on f. */
-  Dag_Dfs(f, &daVinciFunctions, (char*)(&daVinciData));
+  Dag_Dfs(f, &daVinciFunctions, (char *)(&daVinciData));
 
   /* Closing the fake ancestor (root) and the graph. */
   fprintf(outFile, "])) ]");
@@ -163,34 +154,28 @@ Rbc_OutputDaVinci(
 
 } /* End of Rbc_OutputDaVinci. */
 
-void
-Rbc_OutputSexpr(
-  Rbc_Manager_t * rbcManager,
-  Rbc_t         * f,
-  FILE          * outFile)
-{
+void Rbc_OutputSexpr(Rbc_Manager_t *rbcManager, Rbc_t *f, FILE *outFile) {
   Dag_DfsFunctions_t SexprFunctions;
-  SexprDfsData_t     SexprData;
+  SexprDfsData_t SexprData;
 
   /* Cleaning the user fields. */
   Dag_Dfs(f, Rbc_ManagerGetDfsCleanFun(rbcManager), NIL(char));
 
   /* Setting up the DFS functions. */
-  SexprFunctions.Set        = (PF_IVPCPI)SexprSet;
+  SexprFunctions.Set = (PF_IVPCPI)SexprSet;
   SexprFunctions.FirstVisit = (PF_VPVPCPI)SexprFirst;
-  SexprFunctions.BackVisit  = (PF_VPVPCPI)SexprBack;
-  SexprFunctions.LastVisit  = (PF_VPVPCPI)SexprLast;
+  SexprFunctions.BackVisit = (PF_VPVPCPI)SexprBack;
+  SexprFunctions.LastVisit = (PF_VPVPCPI)SexprLast;
 
- /* Setting up the DFS data. */
+  /* Setting up the DFS data. */
   SexprData.outFile = outFile;
 
   /* Calling DFS on f. */
-  Dag_Dfs(f, &SexprFunctions, (char*)(&SexprData));
+  Dag_Dfs(f, &SexprFunctions, (char *)(&SexprData));
 
   return;
 
 } /* End of Rbc_OutputSexpr. */
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -204,79 +189,77 @@ Rbc_OutputSexpr(
   \se None
 */
 
-static int
-DaVinciSet(
- Rbc_t  * f,
- char   * daVinciData,
- nusmv_ptrint sign)
-{
+static int DaVinciSet(Rbc_t *f, char *daVinciData, nusmv_ptrint sign) {
 
-  static char      * symbols[RBCIFF + 1] = {"", "", "/\\\\", "<-->"};
-  static char      * colors [RBCIFF + 1] = {"#CCCCCC", "#CCCCCC", "#EEEEFF", "#CCCCD7"};
+  static char *symbols[RBCIFF + 1] = {"", "", "/\\\\", "<-->"};
+  static char *colors[RBCIFF + 1] = {"#CCCCCC", "#CCCCCC", "#EEEEFF",
+                                     "#CCCCD7"};
 
-  DaVinciDfsData_t * sd = (DaVinciDfsData_t*)daVinciData;
+  DaVinciDfsData_t *sd = (DaVinciDfsData_t *)daVinciData;
 
   /* Increment the label. */
-  ++(sd -> label);
+  ++(sd->label);
 
   /* Draw the incoming edge... */
   if (sign != 0) {
     /* Red edge if the current vertex is negated... */
-    fprintf(sd -> outFile,
-            "l(\"e_%d\",e(\"\",[a(\"EDGECOLOR\",\"#e0e0e0\"),a(\"EDGEPATTERN\",\"dashed\")],", sd -> label);
+    fprintf(sd->outFile,
+            "l(\"e_%d\",e(\"\",[a(\"EDGECOLOR\",\"#e0e0e0\"),a(\"EDGEPATTERN\","
+            "\"dashed\")],",
+            sd->label);
   } else {
     /* ... green otherwise. */
-    fprintf(sd -> outFile,
-            "l(\"e_%d\",e(\"\",[a(\"EDGECOLOR\",\"blue\")],", sd -> label);
+    fprintf(sd->outFile, "l(\"e_%d\",e(\"\",[a(\"EDGECOLOR\",\"blue\")],",
+            sd->label);
   }
 
   /* Draw the node... */
-  if (f -> gRef != NIL(char)) {
+  if (f->gRef != NIL(char)) {
     /* This subtree was already visited: write the reference,
        close the edge and return. */
-    fprintf(sd -> outFile, "r(\"%s\")", f -> gRef);
-    fprintf(sd -> outFile, "))");
+    fprintf(sd->outFile, "r(\"%s\")", f->gRef);
+    fprintf(sd->outFile, "))");
     return (1);
   } else {
     /* This subtree was not yet visited: compose a label and store it. */
-    f -> gRef = ALLOC(char, LABEL_SZ);
-    switch (f -> symbol) {
-    case RBCVAR :
-      sprintf(f -> gRef, "x%d", PTR_TO_INT(f -> data));
+    f->gRef = ALLOC(char, LABEL_SZ);
+    switch (f->symbol) {
+    case RBCVAR:
+      sprintf(f->gRef, "x%d", PTR_TO_INT(f->data));
       break;
-    case RBCAND :
-      sprintf(f -> gRef, "and_%d", sd -> label);
+    case RBCAND:
+      sprintf(f->gRef, "and_%d", sd->label);
       break;
-    case RBCIFF :
-      sprintf(f -> gRef, "iff_%d", sd -> label);
+    case RBCIFF:
+      sprintf(f->gRef, "iff_%d", sd->label);
       break;
-    default :
-      sprintf(f -> gRef, "err");
+    default:
+      sprintf(f->gRef, "err");
     }
     /* Write the node. */
-    if (f -> symbol == RBCVAR) {
+    if (f->symbol == RBCVAR) {
       /* In the case of variables, also close the edge and return. */
 
-      fprintf(sd -> outFile,
-      "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\"),a(\"COLOR\",\"#FFDDDD\"),a(\"BORDER\",\"double\"),a(\"_GO\",\"box\")],[]))",
-      f -> gRef, f -> gRef);
+      fprintf(sd->outFile,
+              "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\"),a(\"COLOR\",\"#FFDDDD\"),"
+              "a(\"BORDER\",\"double\"),a(\"_GO\",\"box\")],[]))",
+              f->gRef, f->gRef);
 
-      fprintf(sd -> outFile, "))");
+      fprintf(sd->outFile, "))");
       return (1);
     } else {
       /* In the case of formulas, leave the world list and the edge open. */
-      fprintf(sd -> outFile,
+      fprintf(sd->outFile,
 
-      "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\"),a(\"COLOR\",\"%s\"),a(\"FONTFAMILY\",\"lucida\"),a(\"_GO\",\"ellipse\")],[",
-      f -> gRef, symbols[f -> symbol], colors[f -> symbol]);
-
+              "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\"),a(\"COLOR\",\"%s\"),a("
+              "\"FONTFAMILY\",\"lucida\"),a(\"_GO\",\"ellipse\")],[",
+              f->gRef, symbols[f->symbol], colors[f->symbol]);
 
       return (0);
     }
   }
 
 } /* End of DaVinciSet. */
-
 
 /*!
   \brief Dfs FirstVisit for DaVinci output.
@@ -286,18 +269,12 @@ DaVinciSet(
   \se None
 */
 
-static void
-DaVinciFirst(
- Rbc_t  * f,
- char   * DaVinciData,
- nusmv_ptrint sign)
-{
+static void DaVinciFirst(Rbc_t *f, char *DaVinciData, nusmv_ptrint sign) {
   /* Set the user-defined integer data to 1 to remember operands. */
-  f -> iRef = (f->outList!=(Dag_Vertex_t**)NULL) ? f->numSons : 0;
+  f->iRef = (f->outList != (Dag_Vertex_t **)NULL) ? f->numSons : 0;
 
   return;
 } /* End of DaVinciFirst. */
-
 
 /*!
   \brief Dfs BackVisit for DaVinci output.
@@ -307,23 +284,17 @@ DaVinciFirst(
   \se None
 */
 
-static void
-DaVinciBack(
- Rbc_t  * f,
- char   * daVinciData,
- nusmv_ptrint sign)
-{
-  DaVinciDfsData_t * sd   = (DaVinciDfsData_t*)daVinciData;
+static void DaVinciBack(Rbc_t *f, char *daVinciData, nusmv_ptrint sign) {
+  DaVinciDfsData_t *sd = (DaVinciDfsData_t *)daVinciData;
 
-  if (f -> iRef > 1) {
-    fprintf(sd -> outFile, ",");
-    --(f -> iRef);
+  if (f->iRef > 1) {
+    fprintf(sd->outFile, ",");
+    --(f->iRef);
   }
 
   return;
 
 } /* End of DaVinciBack. */
-
 
 /*!
   \brief Dfs LastVisit for DaVinci output.
@@ -333,20 +304,14 @@ DaVinciBack(
   \se None
 */
 
-static void
-DaVinciLast(
- Rbc_t  * f,
- char   * daVinciData,
- nusmv_ptrint sign)
-{
-  DaVinciDfsData_t * sd   = (DaVinciDfsData_t*)daVinciData;
+static void DaVinciLast(Rbc_t *f, char *daVinciData, nusmv_ptrint sign) {
+  DaVinciDfsData_t *sd = (DaVinciDfsData_t *)daVinciData;
 
-  fprintf(sd -> outFile, "]))))");
+  fprintf(sd->outFile, "]))))");
 
   return;
 
 } /* End of DaVinciLast. */
-
 
 /*!
   \brief Dfs Set for Sexpr output.
@@ -356,18 +321,12 @@ DaVinciLast(
   \se None
 */
 
-static int
-SexprSet(
- Rbc_t  * f,
- char   * SexprData,
- nusmv_ptrint sign)
-{
+static int SexprSet(Rbc_t *f, char *SexprData, nusmv_ptrint sign) {
 
   /* Always visit (a simple expression is a tree). */
   return (-1);
 
 } /* End of SexprSet. */
-
 
 /*!
   \brief Dfs FirstVisit for Sexpr output.
@@ -377,44 +336,38 @@ SexprSet(
   \se None
 */
 
-static void
-SexprFirst(
- Rbc_t  * f,
- char   * SexprData,
- nusmv_ptrint sign)
-{
-  SexprDfsData_t * sd   = (SexprDfsData_t*)SexprData;
+static void SexprFirst(Rbc_t *f, char *SexprData, nusmv_ptrint sign) {
+  SexprDfsData_t *sd = (SexprDfsData_t *)SexprData;
 
   /* If the sign is negative print out a negation. */
   if (sign == RBC_FALSE) {
-    fprintf(sd -> outFile, "(NOT ");
+    fprintf(sd->outFile, "(NOT ");
   }
 
   /* If this an operator print out its label. */
-  switch (f -> symbol) {
+  switch (f->symbol) {
   case RBCAND:
-    fprintf(sd -> outFile, "(AND ");
+    fprintf(sd->outFile, "(AND ");
     break;
   case RBCIFF:
-    fprintf(sd -> outFile, "(IFF ");
+    fprintf(sd->outFile, "(IFF ");
     break;
   case RBCITE:
-    fprintf(sd -> outFile, "(ITE ");
+    fprintf(sd->outFile, "(ITE ");
     break;
   case RBCVAR:
-    fprintf(sd -> outFile, "X%d", PTR_TO_INT(f -> data));
+    fprintf(sd->outFile, "X%d", PTR_TO_INT(f->data));
     break;
   default:
     break;
   }
 
   /* Set the user-defined integer data to 1 to remember operands. */
-  f -> iRef = 1;
+  f->iRef = 1;
 
   return;
 
 } /* End of SexprFirst. */
-
 
 /*!
   \brief Dfs BackVisit for Sexpr output.
@@ -424,23 +377,17 @@ SexprFirst(
   \se None
 */
 
-static void
-SexprBack(
- Rbc_t  * f,
- char   * SexprData,
- nusmv_ptrint sign)
-{
-  SexprDfsData_t * sd   = (SexprDfsData_t*)SexprData;
+static void SexprBack(Rbc_t *f, char *SexprData, nusmv_ptrint sign) {
+  SexprDfsData_t *sd = (SexprDfsData_t *)SexprData;
 
-  if (f -> iRef == 1) {
-    fprintf(sd -> outFile, " ");
-    --(f -> iRef);
+  if (f->iRef == 1) {
+    fprintf(sd->outFile, " ");
+    --(f->iRef);
   }
 
   return;
 
 } /* End of SexprBack. */
-
 
 /*!
   \brief Dfs LastVisit for Sexpr output.
@@ -450,36 +397,22 @@ SexprBack(
   \se None
 */
 
-static void
-SexprLast(
- Rbc_t  * f,
- char   * SexprData,
- nusmv_ptrint sign)
-{
-  SexprDfsData_t * sd   = (SexprDfsData_t*)SexprData;
-
+static void SexprLast(Rbc_t *f, char *SexprData, nusmv_ptrint sign) {
+  SexprDfsData_t *sd = (SexprDfsData_t *)SexprData;
 
   /* Close the operator. */
-  if (f -> symbol != RBCVAR) {
-    fprintf(sd -> outFile, ")");
+  if (f->symbol != RBCVAR) {
+    fprintf(sd->outFile, ")");
   }
 
   /* Close the negation. */
   if (sign == RBC_FALSE) {
-    fprintf(sd -> outFile, ")");
+    fprintf(sd->outFile, ")");
   }
 
   return;
 
 } /* End of SexprLast. */
-
-
-
-
-
-
-
-
 
 /*!
   \brief Data passing in Gdl output DFS.
@@ -488,40 +421,35 @@ SexprLast(
 */
 
 struct GdlDfsData {
-  int    label;
-  char * fatherName;
-  FILE * outFile;
+  int label;
+  char *fatherName;
+  FILE *outFile;
 };
 
 typedef struct GdlDfsData GdlDfsData_t;
 
-void
-Rbc_OutputGdl(
-  Rbc_Manager_t * rbcManager,
-  Rbc_t         * f,
-  FILE          * outFile)
-{
+void Rbc_OutputGdl(Rbc_Manager_t *rbcManager, Rbc_t *f, FILE *outFile) {
   Dag_DfsFunctions_t GdlFunctions;
-  GdlDfsData_t   GdlData;
+  GdlDfsData_t GdlData;
 
   /* Cleaning the user fields. */
   Dag_Dfs(f, Rbc_ManagerGetDfsCleanFun(rbcManager), NIL(char));
 
   /* Setting up the DFS functions. */
-  GdlFunctions.Set        = (PF_IVPCPI)GdlSet;
+  GdlFunctions.Set = (PF_IVPCPI)GdlSet;
   GdlFunctions.FirstVisit = (PF_VPVPCPI)GdlFirst;
-  GdlFunctions.BackVisit  = (PF_VPVPCPI)GdlBack;
-  GdlFunctions.LastVisit  = (PF_VPVPCPI)GdlLast;
+  GdlFunctions.BackVisit = (PF_VPVPCPI)GdlBack;
+  GdlFunctions.LastVisit = (PF_VPVPCPI)GdlLast;
 
- /* Setting up the DFS data. */
-  GdlData.label   = 0;
+  /* Setting up the DFS data. */
+  GdlData.label = 0;
   GdlData.outFile = outFile;
 
   /* Initialize the graph and print a fake an ancestor. */
   fprintf(outFile, "graph: {\n");
 
   /* Calling DFS on f. */
-  Dag_Dfs(f, &GdlFunctions, (char*)(&GdlData));
+  Dag_Dfs(f, &GdlFunctions, (char *)(&GdlData));
 
   /* Closing the fake ancestor (root) and the graph. */
   fprintf(outFile, "}");
@@ -538,23 +466,18 @@ Rbc_OutputGdl(
   \se None
 */
 
-static int
-GdlSet(
- Rbc_t  * f,
- char   * GdlData,
- nusmv_ptrint sign)
-{
+static int GdlSet(Rbc_t *f, char *GdlData, nusmv_ptrint sign) {
 
 #if 0 /* this is disabled */
   static char      * symbols[RBCIFF + 1] = {"", "", "&", "<->"};
 #endif
-  GdlDfsData_t * sd = (GdlDfsData_t*)GdlData;
+  GdlDfsData_t *sd = (GdlDfsData_t *)GdlData;
 
   /* Increment the label. */
-  ++(sd -> label);
+  ++(sd->label);
 
   /* Draw the incoming edge... */
-#if 0  /* this is disabled */
+#if 0 /* this is disabled */
   if (sign != 0) {
     /* Red edge if the current vertex is negated... */
     fprintf(sd -> outFile,
@@ -564,10 +487,10 @@ GdlSet(
     fprintf(sd -> outFile,
             "l(\"e_%d\",e(\"\",[a(\"EDGECOLOR\",\"blue\")],", sd -> label);
   }
-#endif 
+#endif
 
   /* Draw the node... */
-  if (f -> gRef != NIL(char)) {
+  if (f->gRef != NIL(char)) {
     /* This subtree was already visited: write the reference,
        close the edge and return. */
 #if 0 /* this is disabled */
@@ -575,34 +498,34 @@ GdlSet(
     fprintf(sd -> outFile, "))");
 #endif
     if (sd->fatherName != NULL)
-        fprintf(sd -> outFile,
-		"edge: { sourcename: \"%s\" targetname: \"%s\" }\n", sd->fatherName,f ->gRef);
+      fprintf(sd->outFile, "edge: { sourcename: \"%s\" targetname: \"%s\" }\n",
+              sd->fatherName, f->gRef);
 
     return (1);
   } else {
     /* This subtree was not yet visited: compose a label and store it. */
-    f -> gRef = ALLOC(char, LABEL_SZ);
-    switch (f -> symbol) {
-    case RBCVAR :
-      sprintf(f -> gRef, "x%d", PTR_TO_INT(f -> data));
+    f->gRef = ALLOC(char, LABEL_SZ);
+    switch (f->symbol) {
+    case RBCVAR:
+      sprintf(f->gRef, "x%d", PTR_TO_INT(f->data));
       break;
-    case RBCAND :
-      sprintf(f -> gRef, "and_%d", sd -> label);
+    case RBCAND:
+      sprintf(f->gRef, "and_%d", sd->label);
       break;
-    case RBCIFF :
-      sprintf(f -> gRef, "iff_%d", sd -> label);
+    case RBCIFF:
+      sprintf(f->gRef, "iff_%d", sd->label);
       break;
-    default :
-      sprintf(f -> gRef, "err");
+    default:
+      sprintf(f->gRef, "err");
     }
 
     /* Write the edge. */
     if (sd->fatherName != NULL)
-        fprintf(sd -> outFile,
-             "edge: { sourcename: \"%s\" targetname: \"%s\" }\n", sd->fatherName,f ->gRef);
+      fprintf(sd->outFile, "edge: { sourcename: \"%s\" targetname: \"%s\" }\n",
+              sd->fatherName, f->gRef);
 
     /* Write the node. */
-    if (f -> symbol == RBCVAR) {
+    if (f->symbol == RBCVAR) {
       /* In the case of variables, also close the edge and return. */
 #if 0 /* this is disabled */
       fprintf(sd -> outFile,
@@ -611,12 +534,10 @@ GdlSet(
       fprintf(sd -> outFile, "))");
 #endif
 
-      fprintf(sd -> outFile,
-              "    node: { title: \"%s\" }\n", f -> gRef);
+      fprintf(sd->outFile, "    node: { title: \"%s\" }\n", f->gRef);
 
       return (1);
-    }
-    else {
+    } else {
 #if 0 /* this is disabled */
       /* In the case of formulas, leave the world list and the edge open. */
       fprintf(sd -> outFile,
@@ -624,13 +545,12 @@ GdlSet(
       f -> gRef, symbols[f -> symbol]);
 #endif
 
-      fprintf(sd -> outFile, "    node: { title: \"%s\" }\n", f -> gRef);
-      sd->fatherName = f -> gRef;
+      fprintf(sd->outFile, "    node: { title: \"%s\" }\n", f->gRef);
+      sd->fatherName = f->gRef;
 
       return (0);
     }
   }
-
 
 } /* End of GdlSet. */
 
@@ -642,15 +562,10 @@ GdlSet(
   \se None
 */
 
-static void
-GdlFirst(
- Rbc_t  * f,
- char   * GdlData,
- nusmv_ptrint sign)
-{
+static void GdlFirst(Rbc_t *f, char *GdlData, nusmv_ptrint sign) {
 
   /* Set the user-defined integer data to 1 to remember operands. */
-  f -> iRef = 1;
+  f->iRef = 1;
 
   return;
 
@@ -664,21 +579,16 @@ GdlFirst(
   \se None
 */
 
-static void
-GdlBack(
- Rbc_t  * f,
- char   * GdlData,
- nusmv_ptrint sign)
-{
+static void GdlBack(Rbc_t *f, char *GdlData, nusmv_ptrint sign) {
 #if 0 /* this is disabled */
   GdlDfsData_t * sd   = (GdlDfsData_t*) GdlData;
 #endif
 
-  if (f -> iRef == 1) {
+  if (f->iRef == 1) {
 #if 0 /* this is disabled */
     fprintf(sd -> outFile, ",");
 #endif
-    --(f -> iRef);
+    --(f->iRef);
   }
 
   return;
@@ -693,12 +603,7 @@ GdlBack(
   \se None
 */
 
-static void
-GdlLast(
- Rbc_t  * f,
- char   * GdlData,
- nusmv_ptrint sign)
-{
+static void GdlLast(Rbc_t *f, char *GdlData, nusmv_ptrint sign) {
 #if 0 /* this is disabled */
   GdlDfsData_t * sd   = (GdlDfsData_t*)GdlData;
 

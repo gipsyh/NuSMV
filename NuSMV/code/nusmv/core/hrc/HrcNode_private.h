@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_HRC_HRC_NODE_PRIVATE_H__
 #define __NUSMV_CORE_HRC_HRC_NODE_PRIVATE_H__
-
 
 #include "nusmv/core/hrc/HrcNode.h"
 #include "nusmv/core/utils/EnvObject.h"
@@ -50,23 +47,22 @@
   \brief HrcNode class definition derived from
                class EnvObject
 
-  
+
 
   \sa Base class EnvObject
 */
 
-typedef struct HrcNode_TAG
-{
+typedef struct HrcNode_TAG {
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
   INHERITS_FROM(EnvObject);
 
-  SymbTable_ptr st;           /* The symbol table */
-  int lineno;                 /* line number of the module */
-  node_ptr name;              /* The name of the module */
-  node_ptr instance_name;     /* The instance name */
-  HrcNode_ptr parent;         /* The pointer to the parent node */
+  SymbTable_ptr st;            /* The symbol table */
+  int lineno;                  /* line number of the module */
+  node_ptr name;               /* The name of the module */
+  node_ptr instance_name;      /* The instance name */
+  HrcNode_ptr parent;          /* The pointer to the parent node */
   Olist_ptr formal_parameters; /* formal parameters */
   Olist_ptr actual_parameters; /* actual parameters */
   Olist_ptr state_variables;   /* state variables */
@@ -75,7 +71,7 @@ typedef struct HrcNode_TAG
   Olist_ptr state_functions;   /* state functions */
   Olist_ptr frozen_functions;  /* frozen functions */
   Olist_ptr defines;           /* DEFINE x := */
-  Olist_ptr array_defines;      /* ARRAY DEFINE x := */
+  Olist_ptr array_defines;     /* ARRAY DEFINE x := */
   Olist_ptr init_expr;         /* init expression INIT */
   Olist_ptr init_assign;       /* init assignements init(x) :=.. */
   Olist_ptr invar_expr;        /* init expression INVAR */
@@ -90,23 +86,23 @@ typedef struct HrcNode_TAG
   Olist_ptr ltl_props;         /* LTLSPEC */
   Olist_ptr psl_props;         /* PSLSPEC */
   Olist_ptr compute_props;     /* COMPUTE */
-  Slist_ptr childs;           /* List of sub-childs */
-  hash_ptr assigns_table;     /* Assignments hash (left part -> right part) */
-  void * undef;               /* For programmers use. Here additional
-                                 information can be attached for
-                                 several use without having to modify
-                                 the structure */
+  Slist_ptr childs;            /* List of sub-childs */
+  hash_ptr assigns_table;      /* Assignments hash (left part -> right part) */
+  void *undef;                 /* For programmers use. Here additional
+                                  information can be attached for
+                                  several use without having to modify
+                                  the structure */
 } HrcNode;
 
 /*!
   \brief Free a list and set its pointer to nil
 
-  
+
 
   \se List is freed.
 */
-#define FREELIST_AND_SET_TO_NIL(list)            \
-  Olist_destroy(list);                           \
+#define FREELIST_AND_SET_TO_NIL(list)                                          \
+  Olist_destroy(list);                                                         \
   list = OLIST(NULL);
 
 /*!
@@ -118,11 +114,11 @@ typedef struct HrcNode_TAG
 
   \se Elements in list are freed, list is freed.
 */
-#define FREE_LIST_AND_SET_TO_NIL(self, list)                              \
-  hrc_node_free_elements_in_list_and_list(                                \
-    NODE_MGR(NuSMVEnv_get_value(ENV_OBJECT_GET_ENV(self), ENV_NODE_MGR)), \
-    list);                                                                \
-  Olist_destroy(list);                                                    \
+#define FREE_LIST_AND_SET_TO_NIL(self, list)                                   \
+  hrc_node_free_elements_in_list_and_list(                                     \
+      NODE_MGR(NuSMVEnv_get_value(ENV_OBJECT_GET_ENV(self), ENV_NODE_MGR)),    \
+      list);                                                                   \
+  Olist_destroy(list);                                                         \
   list = OLIST(NULL);
 
 /* ---------------------------------------------------------------------- */

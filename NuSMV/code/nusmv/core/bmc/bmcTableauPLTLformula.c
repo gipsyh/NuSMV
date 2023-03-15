@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -35,11 +35,10 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/bmc/bmcInt.h"
-#include "nusmv/core/bmc/bmcUtils.h"
 #include "nusmv/core/bmc/bmcModel.h"
+#include "nusmv/core/bmc/bmcUtils.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
 #include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/utils/error.h"
@@ -52,56 +51,56 @@
 
   \todo Missing description
 */
-#define NO_BACKJUMP -(INT_MAX-1)
+#define NO_BACKJUMP -(INT_MAX - 1)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define INF           INT_MAX-1
+#define INF INT_MAX - 1
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define EVAL_OR          0
+#define EVAL_OR 0
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define EVAL_AND         1
+#define EVAL_AND 1
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define OPEN             0
+#define OPEN 0
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define CLOSED           1
+#define CLOSED 1
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define  FORWARD        +1
+#define FORWARD +1
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define BACKWARD        -1
+#define BACKWARD -1
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -114,10 +113,10 @@
 /*!
   \brief Set of time instants type
 
-  This data structure represents a set of time instants. 
+  This data structure represents a set of time instants.
   When direction==FORWARD, this set is
    EITHER
-   * the interval \[fromTime,fromTime+steps\[, 
+   * the interval \[fromTime,fromTime+steps\[,
    when backJumpFromTime==NO_BACKJUMP
 
    OR,
@@ -138,13 +137,12 @@
 */
 
 typedef struct EvalSetType {
-  int         fromTime;
-  int        direction;
-  int            steps;
+  int fromTime;
+  int direction;
+  int steps;
   int backJumpFromTime;
-  int   backJumpToTime;
+  int backJumpToTime;
 } EvalSet;
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -155,32 +153,32 @@ typedef struct EvalSetType {
 /*---------------------------------------------------------------------------*/
 
 /*!
-  \brief 
+  \brief
 
-  The function "rho" projects the time instant "i" 
-  onto the main domain of a function f on a (k,l)-loop, 
+  The function "rho" projects the time instant "i"
+  onto the main domain of a function f on a (k,l)-loop,
   where l_f=l+p*tau(f) and k_f=k+p*tau(f)
   (with p=k-l). It is rho(i,l,k)=i, when i<k, and rho(i,l,k)=rho(i-p,l,k)
   otherwise.
 */
-#define rho(i,l_f,k_f)                                                        \
-        ((i)<(k_f)) ? (i) : (l_f) + (((i)-(l_f)) % ((k_f)-(l_f)))
+#define rho(i, l_f, k_f)                                                       \
+  ((i) < (k_f)) ? (i) : (l_f) + (((i) - (l_f)) % ((k_f) - (l_f)))
 
 /*!
-  \brief 
+  \brief
 
-  This control structure iterates on all the time 
-  instants "i" in the EvalSet "set", according to the semantics of 
+  This control structure iterates on all the time
+  instants "i" in the EvalSet "set", according to the semantics of
   EvalSet given above.
 */
-#define FOR_EACH_INDEX_IN(i,set)                                              \
-          for ((i) = (set).fromTime;                                          \
-                                                                              \
-               (set).steps != 0;                                              \
-                                                                              \
-               (i) = ((i==(set).backJumpFromTime)?                            \
-                          (set).backJumpToTime :                              \
-                        i+(set).direction), (set).steps--)
+#define FOR_EACH_INDEX_IN(i, set)                                              \
+  for ((i) = (set).fromTime;                                                   \
+                                                                               \
+       (set).steps != 0;                                                       \
+                                                                               \
+       (i) = ((i == (set).backJumpFromTime) ? (set).backJumpToTime             \
+                                            : i + (set).direction),            \
+      (set).steps--)
 
 /**AutomaticStart*************************************************************/
 
@@ -188,38 +186,31 @@ typedef struct EvalSetType {
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static be_ptr
-getTableauAtTime(hash_ptr, const BeEnc_ptr be_enc,
-                 const node_ptr pltl_wff,
-                 const int time,
-                 const int k, const int l);
+static be_ptr getTableauAtTime(hash_ptr, const BeEnc_ptr be_enc,
+                               const node_ptr pltl_wff, const int time,
+                               const int k, const int l);
 
 static be_ptr evaluateOn(hash_ptr, const BeEnc_ptr be_enc,
-                   const node_ptr pltl_f,
-                   const node_ptr pltl_g,
-                   const int fromTime, const int toTime,
-                   const int k, const int l,
-                   const int evalType, const int eval_dir);
+                         const node_ptr pltl_f, const node_ptr pltl_g,
+                         const int fromTime, const int toTime, const int k,
+                         const int l, const int evalType, const int eval_dir);
 
-static EvalSet projectOntoMainDomain(const node_ptr pltl_wff,
-int a, int b,
-const int k, const int l,
-const int interval_type, const int eval_dir);
+static EvalSet projectOntoMainDomain(const node_ptr pltl_wff, int a, int b,
+                                     const int k, const int l,
+                                     const int interval_type,
+                                     const int eval_dir);
 
 static int tau(const node_ptr pltl_wff);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-be_ptr
-Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
-                           const node_ptr pltl_wff,
-                           const int k, const int l)
-{
+be_ptr Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
+                                  const node_ptr pltl_wff, const int k,
+                                  const int l) {
   SymbTable_ptr st;
   hash_ptr tableau_ltl_hash;
 
@@ -229,11 +220,8 @@ Bmc_TableauPLTL_GetTableau(const BeEnc_ptr be_enc,
   return getTableauAtTime(tableau_ltl_hash, be_enc, pltl_wff, 0, k, l);
 }
 
-be_ptr
-Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
-                                  const node_ptr pltl_wff,
-                                  const int k)
-{
+be_ptr Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
+                                         const node_ptr pltl_wff, const int k) {
   SymbTable_ptr st;
   hash_ptr tableau_ltl_hash;
 
@@ -270,15 +258,12 @@ Bmc_TableauPLTL_GetAllTimeTableau(const BeEnc_ptr be_enc,
   \sa evaluateOn
 */
 static be_ptr getTableauAtTime(hash_ptr tableau_ltl_hash,
-                               const BeEnc_ptr be_enc,
-                               const node_ptr pltl_wff,
-                               const int time, const int k, const int l)
-{
+                               const BeEnc_ptr be_enc, const node_ptr pltl_wff,
+                               const int time, const int k, const int l) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(be_enc));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
   be_ptr subfTbl1, subfTbl2, tableau = NULL;
   node_ptr subf1, subf2;
   node_ptr key;
@@ -286,70 +271,71 @@ static be_ptr getTableauAtTime(hash_ptr tableau_ltl_hash,
   Be_Manager_ptr beMgr = BeEnc_get_be_manager(be_enc);
   be_ptr truth = Be_Truth(beMgr);
 
-  int evalDir=FORWARD, start, stop, evalType=EVAL_AND, evalTime;
+  int evalDir = FORWARD, start, stop, evalType = EVAL_AND, evalTime;
 
-  int nodeType  = node_get_type(pltl_wff);
+  int nodeType = node_get_type(pltl_wff);
 
-  if (time<0 || (Bmc_Utils_IsNoLoopback(l) && 
-                 (nodeType==OP_GLOBAL || time>k))) {
+  if (time < 0 ||
+      (Bmc_Utils_IsNoLoopback(l) && (nodeType == OP_GLOBAL || time > k))) {
     return Be_Falsity(beMgr);
   }
 
   /* memoization */
-  key = bmc_tableau_memoization_get_key(nodemgr, pltl_wff,
-                                        time, k, l);
+  key = bmc_tableau_memoization_get_key(nodemgr, pltl_wff, time, k, l);
   tableau = bmc_tableau_memoization_lookup(tableau_ltl_hash, key);
-  if (tableau != (be_ptr) NULL) return tableau;
+  if (tableau != (be_ptr)NULL)
+    return tableau;
 
   switch (getOpClass(nodeType)) {
 
   case CONSTANT_EXPR:
-    tableau =
-      (nodeType==TRUEEXP) ? Be_Truth(beMgr):
-    (nodeType==FALSEEXP)? Be_Falsity(beMgr):
-    NULL;
+    tableau = (nodeType == TRUEEXP)    ? Be_Truth(beMgr)
+              : (nodeType == FALSEEXP) ? Be_Falsity(beMgr)
+                                       : NULL;
     nusmv_assert(tableau != NULL);
     return tableau; /* no memoization */
 
   case LITERAL:
-    evalTime = Bmc_Utils_IsNoLoopback(l)? time : rho(time,l,k);
-     
+    evalTime = Bmc_Utils_IsNoLoopback(l) ? time : rho(time, l, k);
+
     /* checks whether it is an input var at the initial/final state: */
     if (evalTime == k) {
       SymbTable_ptr st;
       boolean is_input;
-       
+
       st = BaseEnc_get_symb_table(BASE_ENC(be_enc));
 
-      if (nodeType==NOT) {
+      if (nodeType == NOT) {
         is_input = SymbTable_is_symbol_input_var(st, car(pltl_wff));
-      }
-      else is_input = SymbTable_is_symbol_input_var(st, pltl_wff);
+      } else
+        is_input = SymbTable_is_symbol_input_var(st, pltl_wff);
 
       if (is_input) {
         return Be_Falsity(beMgr); /* no memoization */
       }
     }
-       
-    tableau  =
-      (nodeType==DOT)?   BeEnc_name_to_timed(be_enc, pltl_wff, evalTime): 
-      (nodeType==BIT)?   BeEnc_name_to_timed(be_enc, pltl_wff, evalTime):
-      (nodeType==ARRAY)? BeEnc_name_to_timed(be_enc, pltl_wff, evalTime):
-      (nodeType==NOT)?   Be_Not(beMgr, BeEnc_name_to_timed(be_enc, car(pltl_wff), 
-                                                           evalTime)):
-      NULL;
+
+    tableau =
+        (nodeType == DOT)     ? BeEnc_name_to_timed(be_enc, pltl_wff, evalTime)
+        : (nodeType == BIT)   ? BeEnc_name_to_timed(be_enc, pltl_wff, evalTime)
+        : (nodeType == ARRAY) ? BeEnc_name_to_timed(be_enc, pltl_wff, evalTime)
+        : (nodeType == NOT)
+            ? Be_Not(beMgr,
+                     BeEnc_name_to_timed(be_enc, car(pltl_wff), evalTime))
+            : NULL;
     nusmv_assert(tableau != NULL);
     return tableau; /* no memoization */
 
   case PROP_CONNECTIVE:
-    subfTbl1 = getTableauAtTime(tableau_ltl_hash, be_enc,car(pltl_wff),time,k,l);
-    subfTbl2 = getTableauAtTime(tableau_ltl_hash, be_enc,cdr(pltl_wff),time,k,l);
+    subfTbl1 =
+        getTableauAtTime(tableau_ltl_hash, be_enc, car(pltl_wff), time, k, l);
+    subfTbl2 =
+        getTableauAtTime(tableau_ltl_hash, be_enc, cdr(pltl_wff), time, k, l);
 
-    tableau =
-      (nodeType==AND) ? Be_And(beMgr, subfTbl1, subfTbl2):
-      (nodeType==OR ) ? Be_Or (beMgr, subfTbl1, subfTbl2):
-      (nodeType==IFF) ? Be_Iff(beMgr, subfTbl1, subfTbl2):
-      NULL;
+    tableau = (nodeType == AND)   ? Be_And(beMgr, subfTbl1, subfTbl2)
+              : (nodeType == OR)  ? Be_Or(beMgr, subfTbl1, subfTbl2)
+              : (nodeType == IFF) ? Be_Iff(beMgr, subfTbl1, subfTbl2)
+                                  : NULL;
     break;
 
   case TIME_OPERATOR:
@@ -358,26 +344,66 @@ static be_ptr getTableauAtTime(hash_ptr tableau_ltl_hash,
     start = time;
 
     switch (nodeType) {
-    case OP_NEXT:       start=stop=time+1;                              break;
-    case OP_PREC:       start=stop=time-1;                              break;
-    case OP_NOTPRECNOT: if ((start=stop=time-1)==-1) tableau=truth;     break;
-    case OP_FUTURE:     stop=INF;  evalType=EVAL_OR;  evalDir=FORWARD;  break;
-    case OP_ONCE:       stop=0;    evalType=EVAL_OR;  evalDir=BACKWARD; break;
-    case OP_GLOBAL:     stop=INF;  evalType=EVAL_AND; evalDir=FORWARD;  break;
-    case OP_HISTORICAL: stop=0;    evalType=EVAL_AND; evalDir=BACKWARD; break;
-    case    UNTIL:      stop=INF;  evalType=EVAL_OR;  evalDir=FORWARD;  break;
-    case    SINCE:      stop=0;    evalType=EVAL_OR;  evalDir=BACKWARD; break;
-    case    RELEASES:   stop=INF;  evalType=EVAL_AND; evalDir=FORWARD;  break;
-    case    TRIGGERED:  stop=0;    evalType=EVAL_AND; evalDir=BACKWARD; break;
+    case OP_NEXT:
+      start = stop = time + 1;
+      break;
+    case OP_PREC:
+      start = stop = time - 1;
+      break;
+    case OP_NOTPRECNOT:
+      if ((start = stop = time - 1) == -1)
+        tableau = truth;
+      break;
+    case OP_FUTURE:
+      stop = INF;
+      evalType = EVAL_OR;
+      evalDir = FORWARD;
+      break;
+    case OP_ONCE:
+      stop = 0;
+      evalType = EVAL_OR;
+      evalDir = BACKWARD;
+      break;
+    case OP_GLOBAL:
+      stop = INF;
+      evalType = EVAL_AND;
+      evalDir = FORWARD;
+      break;
+    case OP_HISTORICAL:
+      stop = 0;
+      evalType = EVAL_AND;
+      evalDir = BACKWARD;
+      break;
+    case UNTIL:
+      stop = INF;
+      evalType = EVAL_OR;
+      evalDir = FORWARD;
+      break;
+    case SINCE:
+      stop = 0;
+      evalType = EVAL_OR;
+      evalDir = BACKWARD;
+      break;
+    case RELEASES:
+      stop = INF;
+      evalType = EVAL_AND;
+      evalDir = FORWARD;
+      break;
+    case TRIGGERED:
+      stop = 0;
+      evalType = EVAL_AND;
+      evalDir = BACKWARD;
+      break;
     }
 
-    if (tableau==NULL)
-      tableau = evaluateOn(tableau_ltl_hash, be_enc,subf1,subf2,
-                           start,stop,k,l,evalType,evalDir);
+    if (tableau == NULL)
+      tableau = evaluateOn(tableau_ltl_hash, be_enc, subf1, subf2, start, stop,
+                           k, l, evalType, evalDir);
     break;
 
   default:
-    ErrorMgr_internal_error(errmgr, "Unexpected operator, node type %d", nodeType);
+    ErrorMgr_internal_error(errmgr, "Unexpected operator, node type %d",
+                            nodeType);
   }
 
   nusmv_assert(tableau != NULL);
@@ -387,7 +413,7 @@ static be_ptr getTableauAtTime(hash_ptr tableau_ltl_hash,
 
 /*!
   \brief  Evaluates (either disjunctively or conjunctively) a PLTL
-                 formula over an interval of time. 
+                 formula over an interval of time.
 
    When only one argument is passed in (pltl_g==NULL), the
                  tableaux at the proper time instants for that argument are
@@ -407,57 +433,50 @@ static be_ptr getTableauAtTime(hash_ptr tableau_ltl_hash,
                  binary time operators in the PLTL logic).
                  In both cases, the proper evaluation set is computed
                  by calling the "projectOntoMainDomain" function, which deals
-                 with both bounded and loop paths. 
+                 with both bounded and loop paths.
 
   \sa getTableauAtTime, projectOntoMainDomain
 */
-static be_ptr evaluateOn(hash_ptr tableau_ltl_hash,
-                         const BeEnc_ptr be_enc,
-                         const node_ptr pltl_f,
-                         const node_ptr pltl_g,
-                         const int fromTime, const int toTime,
-                         const int k, const int l,
-                         const int evalType,
-                         const int evalDir)
-{
-  int j,q;
-  boolean isBinary = (pltl_g!=NULL);
+static be_ptr evaluateOn(hash_ptr tableau_ltl_hash, const BeEnc_ptr be_enc,
+                         const node_ptr pltl_f, const node_ptr pltl_g,
+                         const int fromTime, const int toTime, const int k,
+                         const int l, const int evalType, const int evalDir) {
+  int j, q;
+  boolean isBinary = (pltl_g != NULL);
 
   Be_Manager_ptr beMgr = BeEnc_get_be_manager(be_enc);
 
-  EvalSet evalSet = projectOntoMainDomain((isBinary? pltl_g:pltl_f),
-                                          fromTime,toTime,k,l,CLOSED,evalDir);
+  EvalSet evalSet = projectOntoMainDomain(
+      (isBinary ? pltl_g : pltl_f), fromTime, toTime, k, l, CLOSED, evalDir);
 
-  be_ptr result   = (evalType==EVAL_OR)? Be_Falsity(beMgr) : Be_Truth(beMgr);
+  be_ptr result = (evalType == EVAL_OR) ? Be_Falsity(beMgr) : Be_Truth(beMgr);
 
   /* This loop evaluates either the (unique) argument of a unary operator
      or the right argument of a binary operator. */
-  FOR_EACH_INDEX_IN(j,evalSet) {
+  FOR_EACH_INDEX_IN(j, evalSet) {
 
     be_ptr tempTbl = getTableauAtTime(tableau_ltl_hash, be_enc,
-                                       (isBinary? pltl_g:pltl_f),
-                                       j,k,l);
+                                      (isBinary ? pltl_g : pltl_f), j, k, l);
     if (isBinary) {
-      EvalSet evalSet2 = projectOntoMainDomain(pltl_f,fromTime,j,k,l,
-                                               OPEN,evalDir);
+      EvalSet evalSet2 =
+          projectOntoMainDomain(pltl_f, fromTime, j, k, l, OPEN, evalDir);
 
       /* This loop evaluates the left argument of a binary operator. */
-      FOR_EACH_INDEX_IN(q,evalSet2) {
+      FOR_EACH_INDEX_IN(q, evalSet2) {
 
-        be_ptr tempTblInner = getTableauAtTime(tableau_ltl_hash, be_enc,pltl_f,q,k,l);
+        be_ptr tempTblInner =
+            getTableauAtTime(tableau_ltl_hash, be_enc, pltl_f, q, k, l);
 
-        tempTbl = (evalType==EVAL_AND)?
-                   Be_Or (beMgr, tempTbl, tempTblInner):
-                   Be_And(beMgr, tempTbl, tempTblInner);
+        tempTbl = (evalType == EVAL_AND) ? Be_Or(beMgr, tempTbl, tempTblInner)
+                                         : Be_And(beMgr, tempTbl, tempTblInner);
       }
     }
 
-  result = (evalType==EVAL_OR)?
-            Be_Or (beMgr, result, tempTbl) :
-            Be_And(beMgr, result, tempTbl) ;
+    result = (evalType == EVAL_OR) ? Be_Or(beMgr, result, tempTbl)
+                                   : Be_And(beMgr, result, tempTbl);
   }
 
- return result;
+  return result;
 }
 
 /*!
@@ -465,7 +484,7 @@ static be_ptr evaluateOn(hash_ptr tableau_ltl_hash,
                  (time instants) onto the main domain of the PLTL formula
                  pltl_wff. The result of the projection can be either an
                  interval or the conjunction of two intervals. In both cases,
-                 the resulting set is returned as an "EvalSet" structure. 
+                 the resulting set is returned as an "EvalSet" structure.
 
    For bounded paths, the projection of the interval [a,b] is
                  the interval [a,b] itself, except for the possibly infinite
@@ -476,56 +495,56 @@ static be_ptr evaluateOn(hash_ptr tableau_ltl_hash,
                  EvalSet={rho(i) such that i is in [a,b]}. The function
                  "projectOntoMainDomain" thus extends to intervals the
                  transformation previously defined by "rho" with respect
-                 to single time point. 
+                 to single time point.
 
   \sa rho, evaluateOn
 */
-static EvalSet projectOntoMainDomain(const node_ptr pltl_wff,
-                                     int a, int b,
+static EvalSet projectOntoMainDomain(const node_ptr pltl_wff, int a, int b,
                                      const int k, const int l,
-                                     const int interval_type, 
-                                     const int eval_dir)
-{
+                                     const int interval_type,
+                                     const int eval_dir) {
   EvalSet evalSet;
 
   nusmv_assert(!Bmc_Utils_IsAllLoopbacks(l));
   evalSet.direction = eval_dir;
 
   if (Bmc_Utils_IsNoLoopback(l)) {
-    evalSet.fromTime         = a;
+    evalSet.fromTime = a;
     evalSet.backJumpFromTime = NO_BACKJUMP;
-    evalSet.backJumpToTime   = NO_BACKJUMP;
-    evalSet.steps            = ((b==INF) ? (k-a+1) : (abs(b-a)+1)) -
-                               ((interval_type==OPEN) ? 1:0);
+    evalSet.backJumpToTime = NO_BACKJUMP;
+    evalSet.steps = ((b == INF) ? (k - a + 1) : (abs(b - a) + 1)) -
+                    ((interval_type == OPEN) ? 1 : 0);
   }
 
   else {
-    if (eval_dir==FORWARD) {
-      int p     = k-l;
+    if (eval_dir == FORWARD) {
+      int p = k - l;
       int tau_f = tau(pltl_wff);
-      int   l_f = l+p*tau_f;
-      int   k_f = k+p*tau_f;
+      int l_f = l + p * tau_f;
+      int k_f = k + p * tau_f;
 
-      assert (b>=a || b>=l);
-      while (b<a) b+=p;
+      assert(b >= a || b >= l);
+      while (b < a)
+        b += p;
 
-      evalSet.fromTime  = rho(a,l_f,k_f);
-      evalSet.backJumpFromTime = k_f-1;
-      evalSet.backJumpToTime   = l_f;
-      evalSet.steps = (interval_type==CLOSED) ?
-                       (a<l_f) ? (min(k_f-1,b)-a+1) : min(p,(b-a+1)):
-                       (a<l_f) ? (min(k_f  ,b)-a  ) : min(p,(b-a  ));
-    }
-    else {
-      assert(b<=a);
-      evalSet.fromTime  = a;
+      evalSet.fromTime = rho(a, l_f, k_f);
+      evalSet.backJumpFromTime = k_f - 1;
+      evalSet.backJumpToTime = l_f;
+      evalSet.steps =
+          (interval_type == CLOSED)
+              ? (a < l_f) ? (min(k_f - 1, b) - a + 1) : min(p, (b - a + 1))
+          : (a < l_f) ? (min(k_f, b) - a)
+                      : min(p, (b - a));
+    } else {
+      assert(b <= a);
+      evalSet.fromTime = a;
       evalSet.backJumpFromTime = NO_BACKJUMP;
-      evalSet.backJumpToTime   = NO_BACKJUMP;
-      evalSet.steps =  (a-b+1) - ((interval_type==OPEN) ? 1:0);
+      evalSet.backJumpToTime = NO_BACKJUMP;
+      evalSet.steps = (a - b + 1) - ((interval_type == OPEN) ? 1 : 0);
     }
   }
 
- return evalSet;
+  return evalSet;
 }
 
 /*!
@@ -538,27 +557,24 @@ static EvalSet projectOntoMainDomain(const node_ptr pltl_wff,
 
   \sa projectOntoMainDomain
 */
-static int tau(const node_ptr pltl_wff)
-{
- int result = 0;
- int nodeType = node_get_type(pltl_wff);
+static int tau(const node_ptr pltl_wff) {
+  int result = 0;
+  int nodeType = node_get_type(pltl_wff);
 
- if (isVariable(nodeType) || isConstantExpr(nodeType)) {
-   result = 0;
- }
- else {
-   if (isBinaryOp(nodeType)) {
-     int sub1 = tau(car(pltl_wff));
-     int sub2 = tau(cdr(pltl_wff));
+  if (isVariable(nodeType) || isConstantExpr(nodeType)) {
+    result = 0;
+  } else {
+    if (isBinaryOp(nodeType)) {
+      int sub1 = tau(car(pltl_wff));
+      int sub2 = tau(cdr(pltl_wff));
 
-     result = max(sub1,sub2);
-   }
-   else {
-     result = tau(car(pltl_wff));
-   }
-   if (isPastOp(nodeType)) result++;
- }
+      result = max(sub1, sub2);
+    } else {
+      result = tau(car(pltl_wff));
+    }
+    if (isPastOp(nodeType))
+      result++;
+  }
 
- return result;
+  return result;
 }
-

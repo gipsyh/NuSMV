@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
   SatZchaff inherits the SatIncSolver (interface) class
 
 */
-
 
 #ifndef __NUSMV_CORE_SAT_SOLVERS_SAT_ZCHAFF_H__
 #define __NUSMV_CORE_SAT_SOLVERS_SAT_ZCHAFF_H__
@@ -55,7 +54,7 @@
 
   \todo Missing description
 */
-typedef struct SatZchaff_TAG* SatZchaff_ptr;
+typedef struct SatZchaff_TAG *SatZchaff_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -70,16 +69,15 @@ typedef struct SatZchaff_TAG* SatZchaff_ptr;
 
   \todo Missing description
 */
-#define SAT_ZCHAFF(x) \
-         ((SatZchaff_ptr) x)
+#define SAT_ZCHAFF(x) ((SatZchaff_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define SAT_ZCHAFF_CHECK_INSTANCE(x) \
-         (nusmv_assert(SAT_ZCHAFF(x) != SAT_ZCHAFF(NULL)))
+#define SAT_ZCHAFF_CHECK_INSTANCE(x)                                           \
+  (nusmv_assert(SAT_ZCHAFF(x) != SAT_ZCHAFF(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -95,8 +93,7 @@ typedef struct SatZchaff_TAG* SatZchaff_ptr;
 
   The first parameter is the name of the solver.
 */
-SatZchaff_ptr SatZchaff_create(const NuSMVEnv_ptr env,
-                                      const char* name);
+SatZchaff_ptr SatZchaff_create(const NuSMVEnv_ptr env, const char *name);
 
 /*!
   \methodof SatZchaff

@@ -11,31 +11,28 @@
   \brief Implementation of DLlist class
 
   DLlist class is a Doubly-Linked list of pointers.
-  
+
 
 */
 
-
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/DLlist.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include <stddef.h> /* for offsetof */
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
 struct DLnode_TAG {
-  void* element; /* an element stored in this node */
+  void *element;   /* an element stored in this node */
   DLnode_ptr prev; /* previous node of a list */
   DLnode_ptr next; /* next node of a list */
 };
@@ -51,21 +48,19 @@ struct DLlist_TAG {
   DLnode past_last; /* this node is past the last one. Its "prev"
                       points to the last element of a list (if any),
                       "next" is always NULL and "element" is not used.
-                      It is better to have this field at the beginning of a struct
-                      because then taking the address of this field is
+                      It is better to have this field at the beginning of a
+                      struct because then taking the address of this field is
                       simplified to taking address to the whole struct.
                    */
   DLnode_ptr first; /* pointer to a first node of the list */
-  int size; /* the size of the list */
+  int size;         /* the size of the list */
 };
 
 typedef struct DLlist_TAG DLlist;
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -78,7 +73,7 @@ typedef struct DLlist_TAG DLlist;
 
   \todo Missing description
 */
-#define DEBUG(a)  a
+#define DEBUG(a) a
 #else
 #define DEBUG(a)
 #endif
@@ -93,13 +88,11 @@ static void dl_list_deinit(DLlist_ptr self);
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-DLlist_ptr DLlist_create(void)
-{
+DLlist_ptr DLlist_create(void) {
   DLlist_ptr self = ALLOC(DLlist, 1);
 
   DL_LIST_CHECK_INSTANCE(self);
@@ -108,16 +101,14 @@ DLlist_ptr DLlist_create(void)
   return self;
 }
 
-void DLlist_destroy (DLlist_ptr self)
-{
+void DLlist_destroy(DLlist_ptr self) {
   DL_LIST_CHECK_INSTANCE(self);
 
   dl_list_deinit(self);
   FREE(self);
 }
 
-DLlist_ptr DLlist_copy(DLlist_ptr self)
-{
+DLlist_ptr DLlist_copy(DLlist_ptr self) {
   DLlist_ptr retval = DLlist_create();
   /* copying elements from the end to beginning */
   DLnode_ptr new = &(retval->past_last);
@@ -140,8 +131,7 @@ DLlist_ptr DLlist_copy(DLlist_ptr self)
   return retval;
 }
 
-DLlist_ptr DLlist_copy_reversed(DLlist_ptr self)
-{
+DLlist_ptr DLlist_copy_reversed(DLlist_ptr self) {
   DLlist_ptr retval = DLlist_create();
   DLnode_ptr new = &(retval->past_last);
   DLnode_ptr old;
@@ -164,8 +154,7 @@ DLlist_ptr DLlist_copy_reversed(DLlist_ptr self)
   return retval;
 }
 
-void DLlist_reverse(DLlist_ptr self)
-{
+void DLlist_reverse(DLlist_ptr self) {
   DLnode_ptr new = &(self->past_last);
   DLnode_ptr old = self->first;
 
@@ -179,11 +168,11 @@ void DLlist_reverse(DLlist_ptr self)
     new = tmp;
   }
   new->prev = NULL;
-  self->first = new;;
+  self->first = new;
+  ;
 }
 
-void DLlist_prepend(DLlist_ptr self, void* element)
-{
+void DLlist_prepend(DLlist_ptr self, void *element) {
   /* create and initialize a new node */
   DLnode_ptr node = ALLOC(DLnode, 1);
 
@@ -197,8 +186,7 @@ void DLlist_prepend(DLlist_ptr self, void* element)
   self->size += 1;
 }
 
-void DLlist_append(DLlist_ptr self, void* element)
-{
+void DLlist_append(DLlist_ptr self, void *element) {
   /* create and initialize a new node */
   DLnode_ptr node = ALLOC(DLnode, 1);
 
@@ -212,17 +200,15 @@ void DLlist_append(DLlist_ptr self, void* element)
   /* update the first element if required or previous otherwise*/
   if (&(self->past_last) == self->first) {
     self->first = node;
-  }
-  else {
+  } else {
     node->prev->next = node;
   }
   self->size += 1;
 }
 
-void* DLlist_delete_first(DLlist_ptr self)
-{
+void *DLlist_delete_first(DLlist_ptr self) {
   DLnode_ptr node;
-  void* element;
+  void *element;
 
   DL_LIST_CHECK_INSTANCE(self);
   nusmv_assert(self->first != &(self->past_last)); /* list must not be empty */
@@ -232,9 +218,12 @@ void* DLlist_delete_first(DLlist_ptr self)
   self->first = node->next;
   self->first->prev = NULL;
 
-  node->element = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  node->prev = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  node->next = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
+  node->element =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  node->prev =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  node->next =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
   FREE(node);
   self->size -= 1;
   nusmv_assert(self->size >= 0); /* the size cannot be negative */
@@ -242,10 +231,9 @@ void* DLlist_delete_first(DLlist_ptr self)
   return element;
 }
 
-void* DLlist_delete_last(DLlist_ptr self)
-{
+void *DLlist_delete_last(DLlist_ptr self) {
   DLnode_ptr node;
-  void* element;
+  void *element;
 
   nusmv_assert(self->first != &(self->past_last)); /* list must not be empty */
 
@@ -256,14 +244,16 @@ void* DLlist_delete_last(DLlist_ptr self)
   /* update the first element if first == last */
   if (self->first == node) {
     self->first = &(self->past_last);
-  }
-  else {
+  } else {
     node->prev->next = &(self->past_last);
   }
 
-  node->element = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  node->prev = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  node->next = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
+  node->element =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  node->prev =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  node->next =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
   FREE(node);
   self->size -= 1;
   nusmv_assert(self->size >= 0); /* the size cannot be negative */
@@ -271,8 +261,7 @@ void* DLlist_delete_last(DLlist_ptr self)
   return element;
 }
 
-int DLlist_get_size(DLlist_ptr self)
-{
+int DLlist_get_size(DLlist_ptr self) {
   DL_LIST_CHECK_INSTANCE(self);
   nusmv_assert(self->size >= 0); /* the size cannot be negative */
   nusmv_assert((self->first == &(self->past_last)) == (0 == self->size));
@@ -280,16 +269,14 @@ int DLlist_get_size(DLlist_ptr self)
   return self->size;
 }
 
-boolean DLlist_is_empty(DLlist_ptr self)
-{
+boolean DLlist_is_empty(DLlist_ptr self) {
   DL_LIST_CHECK_INSTANCE(self);
   nusmv_assert(self->size >= 0); /* the size cannot be negative */
   nusmv_assert((self->first == &(self->past_last)) == (0 == self->size));
   return self->size == 0;
 }
 
-DLiter DLlist_first(DLlist_ptr self)
-{
+DLiter DLlist_first(DLlist_ptr self) {
   DLiter iter;
   /* the iterator point to a corresponding node of a list or
    self->past_last (i.e. past the last element of a list) */
@@ -300,8 +287,7 @@ DLiter DLlist_first(DLlist_ptr self)
   return iter;
 }
 
-DLiter DLlist_end(DLlist_ptr self)
-{
+DLiter DLlist_end(DLlist_ptr self) {
   DLiter iter;
   /* the iterator point to a corresponding node of a list or
    NULL (i.e. past the list) */
@@ -312,19 +298,14 @@ DLiter DLlist_end(DLlist_ptr self)
   return iter;
 }
 
-boolean DLiter_is_first(DLiter self)
-{
+boolean DLiter_is_first(DLiter self) {
   return self.node->prev == NULL /* it is the first element */
-    && self.node->next != NULL /* it is not past the last one */;
+         && self.node->next != NULL /* it is not past the last one */;
 }
 
-boolean DLiter_is_end(DLiter self)
-{
-  return NULL == self.node->next;
-}
+boolean DLiter_is_end(DLiter self) { return NULL == self.node->next; }
 
-DLiter DLiter_next(DLiter self)
-{
+DLiter DLiter_next(DLiter self) {
   DLiter new;
 
   nusmv_assert(self.node->next != NULL); /* iterator is past the last element */
@@ -333,8 +314,7 @@ DLiter DLiter_next(DLiter self)
   return new;
 }
 
-DLiter DLiter_prev(DLiter self)
-{
+DLiter DLiter_prev(DLiter self) {
   DLiter new;
 
   nusmv_assert(self.node->prev != NULL); /* iterator points to the first */
@@ -343,14 +323,12 @@ DLiter DLiter_prev(DLiter self)
   return new;
 }
 
-void* DLiter_element(DLiter self)
-{
+void *DLiter_element(DLiter self) {
   nusmv_assert(self.node->next != NULL); /* iterator is past the last element */
   return self.node->element;
 }
 
-DLiter DLlist_insert_after(DLlist_ptr self, DLiter iter, void* element)
-{
+DLiter DLlist_insert_after(DLlist_ptr self, DLiter iter, void *element) {
   DLnode_ptr node = ALLOC(DLnode, 1);
 
   DL_LIST_CHECK_INSTANCE(self);
@@ -369,8 +347,7 @@ DLiter DLlist_insert_after(DLlist_ptr self, DLiter iter, void* element)
   return iter;
 }
 
-DLiter DLlist_insert_before(DLlist_ptr self, DLiter iter, void* element)
-{
+DLiter DLlist_insert_before(DLlist_ptr self, DLiter iter, void *element) {
   DLnode_ptr node = ALLOC(DLnode, 1);
 
   DL_LIST_CHECK_INSTANCE(self);
@@ -383,8 +360,7 @@ DLiter DLlist_insert_before(DLlist_ptr self, DLiter iter, void* element)
 
   if (NULL == node->prev) { /* update the first element */
     self->first = node;
-  }
-  else {
+  } else {
     node->prev->next = node;
   }
 
@@ -394,28 +370,31 @@ DLiter DLlist_insert_before(DLlist_ptr self, DLiter iter, void* element)
   return iter;
 }
 
-DLiter DLlist_delete(DLlist_ptr self, DLiter iter, void** element)
-{
+DLiter DLlist_delete(DLlist_ptr self, DLiter iter, void **element) {
   DLnode_ptr node = iter.node;
 
   DL_LIST_CHECK_INSTANCE(self);
-  nusmv_assert(iter.node->next != NULL); /* should not point past the last element */
+  nusmv_assert(iter.node->next !=
+               NULL); /* should not point past the last element */
 
-  if (element != NULL) *element = node->element;
+  if (element != NULL)
+    *element = node->element;
 
   node->next->prev = node->prev;
 
   if (NULL == node->prev) { /* the first element was removed => care required */
     self->first = node->next;
-  }
-  else {
+  } else {
     node->prev->next = node->next;
   }
   iter.node = node->next;
 
-  node->element = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  node->prev = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  node->next = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
+  node->element =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  node->prev =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  node->next =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
   FREE(node);
 
   self->size -= 1;
@@ -424,24 +403,23 @@ DLiter DLlist_delete(DLlist_ptr self, DLiter iter, void** element)
   return iter;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void dl_list_testing_function(StreamMgr_ptr streams)
-{
+void dl_list_testing_function(StreamMgr_ptr streams) {
   DLlist_ptr list1, list2, keeper;
   DLiter iter1;
-  void* v1 = PTR_FROM_INT(void*, 1);
-  void* v2 = PTR_FROM_INT(void*, 2);
-  void* v3 = PTR_FROM_INT(void*, 3);
-  void* v4 = PTR_FROM_INT(void*, 4);
-  void* elem;
+  void *v1 = PTR_FROM_INT(void *, 1);
+  void *v2 = PTR_FROM_INT(void *, 2);
+  void *v3 = PTR_FROM_INT(void *, 3);
+  void *v4 = PTR_FROM_INT(void *, 4);
+  void *elem;
 
   StreamMgr_print_output(streams, "TESTING DLlist class : in process ....\n");
 
-  list1 = DLlist_create();                  keeper = list1;
+  list1 = DLlist_create();
+  keeper = list1;
   DLlist_destroy(list1);
 
   list1 = DLlist_create();
@@ -681,14 +659,13 @@ void dl_list_testing_function(StreamMgr_ptr streams)
      function is freed this allocation should be exactly the same as
      the first allocation of a list.
   */
-  list1 = DLlist_create();                  nusmv_assert(keeper == list1);
+  list1 = DLlist_create();
+  nusmv_assert(keeper == list1);
   DLlist_destroy(list1);
 
   StreamMgr_print_output(streams, "TESTING DLlist class : DONE\n");
   return;
 }
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -697,13 +674,13 @@ void dl_list_testing_function(StreamMgr_ptr streams)
 /*!
   \brief Initializes the memory for a listt instance
 
-  
+
 */
-static void dl_list_init(DLlist_ptr self)
-{
+static void dl_list_init(DLlist_ptr self) {
   self->past_last.prev = NULL;
   self->past_last.next = NULL;
-  self->past_last.element = NULL; /* for debugging only. This field is not used */
+  self->past_last.element =
+      NULL; /* for debugging only. This field is not used */
   self->first = &(self->past_last);
   self->size = 0;
 }
@@ -711,17 +688,18 @@ static void dl_list_init(DLlist_ptr self)
 /*!
   \brief Deinitializes the memory from a list
 
-  
+
 */
-static void dl_list_deinit(DLlist_ptr self)
-{
+static void dl_list_deinit(DLlist_ptr self) {
   DLnode_ptr node = self->first;
 
   while (node != &(self->past_last)) {
     DLnode_ptr tmp = node;
     node = tmp->next;
-    tmp->prev = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-    tmp->next = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
+    tmp->prev =
+        PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+    tmp->next =
+        PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
     FREE(tmp);
 
     /* decrease the size of a list */
@@ -731,10 +709,11 @@ static void dl_list_deinit(DLlist_ptr self)
     nusmv_assert(self->size >= 0);
   };
 
-  nusmv_assert(0 == self->size);/* there is a problem with size */
+  nusmv_assert(0 == self->size); /* there is a problem with size */
 
-  self->first = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  self->past_last.prev = PTR_FROM_INT(void*, 1); /* for sure incorrect value for debugging */
-  self->size = -1; /* for sure incorrect value for debugging */
+  self->first =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  self->past_last.prev =
+      PTR_FROM_INT(void *, 1); /* for sure incorrect value for debugging */
+  self->size = -1;             /* for sure incorrect value for debugging */
 }
-

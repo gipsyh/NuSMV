@@ -34,13 +34,12 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_NODE_LIST_H__
 #define __NUSMV_CORE_UTILS_NODE_LIST_H__
 
 #include "nusmv/core/node/node.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct NodeList
@@ -48,23 +47,22 @@
 
 
 */
-typedef struct NodeList_TAG* NodeList_ptr;
+typedef struct NodeList_TAG *NodeList_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_LIST(x)  \
-        ((NodeList_ptr) (x))
+#define NODE_LIST(x) ((NodeList_ptr)(x))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_LIST_CHECK_INSTANCE(x)  \
-        (nusmv_assert(NODE_LIST(x) != NODE_LIST(NULL)))
+#define NODE_LIST_CHECK_INSTANCE(x)                                            \
+  (nusmv_assert(NODE_LIST(x) != NODE_LIST(NULL)))
 
 /*!
   \struct Link
@@ -72,15 +70,14 @@ typedef struct NodeList_TAG* NodeList_ptr;
 
 
 */
-typedef struct Link_TAG* ListIter_ptr;
+typedef struct Link_TAG *ListIter_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define LIST_ITER(x)  \
-        ((ListIter_ptr) (x))
+#define LIST_ITER(x) ((ListIter_ptr)(x))
 
 /*!
   \brief A type of a predicate function used by NodeList_search
@@ -88,8 +85,7 @@ typedef struct Link_TAG* ListIter_ptr;
   The function should returns true iff
   a given element "corresponds" to 'arg'. 'arg' can be any datastructure.
 */
-typedef boolean (*NodeListPred) (node_ptr element, void* arg);
-
+typedef boolean (*NodeListPred)(node_ptr element, void *arg);
 
 /*!
   \brief Used when calling method foreach
@@ -104,8 +100,7 @@ typedef boolean (*NodeListPred) (node_ptr element, void* arg);
 */
 
 typedef boolean (*NODE_LIST_FOREACH_FUN_P)(NodeList_ptr list, ListIter_ptr iter,
-                                           void* user_data);
-
+                                           void *user_data);
 
 /* NodeList_ptr, ListIter_ptr */
 
@@ -114,9 +109,9 @@ typedef boolean (*NODE_LIST_FOREACH_FUN_P)(NodeList_ptr list, ListIter_ptr iter,
 
   \todo Missing description
 */
-#define NODE_LIST_FOREACH(list, iter)                               \
-   for (iter=NodeList_get_first_iter(list); !ListIter_is_end(iter); \
-        iter=ListIter_get_next(iter))
+#define NODE_LIST_FOREACH(list, iter)                                          \
+  for (iter = NodeList_get_first_iter(list); !ListIter_is_end(iter);           \
+       iter = ListIter_get_next(iter))
 
 /* Constructors, Destructors, Copiers and Cleaners ****************************/
 
@@ -165,7 +160,6 @@ NodeList_ptr NodeList_copy(NodeList_ptr self);
 */
 void NodeList_destroy(NodeList_ptr self);
 
-
 /* Getters and Setters ********************************************************/
 
 /*!
@@ -175,7 +169,6 @@ void NodeList_destroy(NodeList_ptr self);
   Constant time
 */
 int NodeList_get_length(const NodeList_ptr self);
-
 
 /* Queries  *******************************************************************/
 
@@ -194,9 +187,7 @@ boolean NodeList_is_empty(const NodeList_ptr self);
   Constant time (cost may depend on the internal hash
   status)
 */
-boolean
-NodeList_belongs_to(const NodeList_ptr self, node_ptr elem);
-
+boolean NodeList_belongs_to(const NodeList_ptr self, node_ptr elem);
 
 /* Insertion ******************************************************************/
 
@@ -216,7 +207,6 @@ void NodeList_append(NodeList_ptr self, node_ptr elem);
 */
 void NodeList_prepend(NodeList_ptr self, node_ptr elem);
 
-
 /* Retrieval********************************************************************/
 
 /*!
@@ -225,9 +215,7 @@ void NodeList_prepend(NodeList_ptr self, node_ptr elem);
 
 
 */
-node_ptr NodeList_get_elem_at(const NodeList_ptr self,
-                                     const ListIter_ptr iter);
-
+node_ptr NodeList_get_elem_at(const NodeList_ptr self, const ListIter_ptr iter);
 
 /* Removal ********************************************************************/
 
@@ -241,11 +229,8 @@ node_ptr NodeList_get_elem_at(const NodeList_ptr self,
   removal continues, otherwise it aborts and returns with the list as
   it is at that time. Returns the number of removed elements
 */
-int NodeList_remove_elems(NodeList_ptr self,
-                                 const NodeList_ptr other,
-                                 NodeListPred disposer,
-                                 void* disposer_arg);
-
+int NodeList_remove_elems(NodeList_ptr self, const NodeList_ptr other,
+                          NodeListPred disposer, void *disposer_arg);
 
 /* ListIter subinterface ******************************************************/
 
@@ -272,7 +257,6 @@ boolean ListIter_is_end(const ListIter_ptr self);
 */
 ListIter_ptr ListIter_get_end(void);
 
-
 /* ListIter *******************************************************************/
 
 /*!
@@ -293,7 +277,7 @@ ListIter_ptr NodeList_get_first_iter(const NodeList_ptr self);
   \sa insert_after
 */
 void NodeList_insert_before(NodeList_ptr self, ListIter_ptr iter,
-                                   node_ptr elem);
+                            node_ptr elem);
 
 /*!
   \methodof NodeList
@@ -305,8 +289,7 @@ void NodeList_insert_before(NodeList_ptr self, ListIter_ptr iter,
 
   \sa insert_before
 */
-void NodeList_insert_after(NodeList_ptr self, ListIter_ptr iter,
-                                  node_ptr elem);
+void NodeList_insert_after(NodeList_ptr self, ListIter_ptr iter, node_ptr elem);
 
 /*!
   \methodof NodeList
@@ -315,8 +298,7 @@ void NodeList_insert_after(NodeList_ptr self, ListIter_ptr iter,
   The removed element is returned. The given iterator
                       won't be usable anymore. Constant time.
 */
-node_ptr NodeList_remove_elem_at(NodeList_ptr self,
-                                        ListIter_ptr iter);
+node_ptr NodeList_remove_elem_at(NodeList_ptr self, ListIter_ptr iter);
 
 /*!
   \methodof NodeList
@@ -337,9 +319,8 @@ node_ptr NodeList_remove_elem_at(NodeList_ptr self,
 
   \sa ListIter_is_end, NodeList_belongs_to
 */
-ListIter_ptr
-NodeList_search(const NodeList_ptr self, NodeListPred pred, void* arg);
-
+ListIter_ptr NodeList_search(const NodeList_ptr self, NodeListPred pred,
+                             void *arg);
 
 /* Printers *******************************************************************/
 
@@ -349,10 +330,8 @@ NodeList_search(const NodeList_ptr self, NodeListPred pred, void* arg);
 
   The list must be a list of actual node_ptr
 */
-void NodeList_print_nodes(const NodeList_ptr self,
-                          MasterPrinter_ptr printer,
-                          FILE* out);
-
+void NodeList_print_nodes(const NodeList_ptr self, MasterPrinter_ptr printer,
+                          FILE *out);
 
 /* Miscellaneous **************************************************************/
 
@@ -392,8 +371,7 @@ void NodeList_concat_unique(NodeList_ptr self, const NodeList_ptr src);
   Constant time (cost may depend on the internal hash
   status)
 */
-int
-NodeList_count_elem(const NodeList_ptr self, node_ptr elem);
+int NodeList_count_elem(const NodeList_ptr self, node_ptr elem);
 
 /*!
   \methodof NodeList
@@ -404,9 +382,8 @@ NodeList_count_elem(const NodeList_ptr self, node_ptr elem);
   than the total number of elements since foo can decide to interrupt
   the walking
 */
-int
-NodeList_foreach(NodeList_ptr self, NODE_LIST_FOREACH_FUN_P foo,
-                 void* user_data);
+int NodeList_foreach(NodeList_ptr self, NODE_LIST_FOREACH_FUN_P foo,
+                     void *user_data);
 
 /*!
   \methodof NodeList
@@ -434,7 +411,8 @@ NodeList_ptr NodeList_filter(const NodeList_ptr self, BPFN foo);
 
   qsort is used
 */
-void NodeList_sort(NodeList_ptr self, int (*cmp)(const void* el1, const void* el2));
+void NodeList_sort(NodeList_ptr self,
+                   int (*cmp)(const void *el1, const void *el2));
 
 /*!
   \brief Test NodeList_sort
@@ -442,6 +420,5 @@ void NodeList_sort(NodeList_ptr self, int (*cmp)(const void* el1, const void* el
 
 */
 int NodeList_test(NuSMVEnv_ptr env);
-
 
 #endif /* __NUSMV_CORE_UTILS_NODE_LIST_H__ */

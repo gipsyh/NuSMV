@@ -43,37 +43,31 @@
 
 */
 
-
-
-#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/compile/compile.h" /* for Compile_print_array_define */
+#include "nusmv/core/hrc/HrcNode.h"
+#include "nusmv/core/hrc/hrc.h"
 #include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
-#include "nusmv/core/hrc/hrc.h"
-#include "nusmv/core/hrc/HrcNode.h"
 #include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/utils/Slist.h"
+#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/ustring.h"
-#include "nusmv/core/compile/compile.h" /* for Compile_print_array_define */
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -92,79 +86,62 @@
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void hrc_write_expr_split(const NuSMVEnv_ptr env,
-                                 FILE* out,
-                                 Oiter n,
-                                 const char* s);
+static void hrc_write_expr_split(const NuSMVEnv_ptr env, FILE *out, Oiter n,
+                                 const char *s);
 
-static void hrc_write_spec_split(const NuSMVEnv_ptr env,
-                                 FILE* out,
-                                 Oiter iter,
-                                 const char* s);
+static void hrc_write_spec_split(const NuSMVEnv_ptr env, FILE *out, Oiter iter,
+                                 const char *s);
 
-static boolean hrc_write_assign_list(const NuSMVEnv_ptr env,
-                                     FILE* out,
-                                     int assign_node_type,
-                                     Oiter assign_iter);
+static boolean hrc_write_assign_list(const NuSMVEnv_ptr env, FILE *out,
+                                     int assign_node_type, Oiter assign_iter);
 
-static void hrc_write_print_assign(const NuSMVEnv_ptr env,
-                                   FILE * out,
-                                   node_ptr lhs,
-                                   node_ptr rhs);
+static void hrc_write_print_assign(const NuSMVEnv_ptr env, FILE *out,
+                                   node_ptr lhs, node_ptr rhs);
 
-static void hrc_write_module_instance(FILE* ofile,
-                                      HrcNode_ptr hrcNode,
-                                      st_table* printed_module_map,
+static void hrc_write_module_instance(FILE *ofile, HrcNode_ptr hrcNode,
+                                      st_table *printed_module_map,
                                       boolean append_suffix);
 
-static void hrc_write_parameters(const NuSMVEnv_ptr env,
-                                 FILE* ofile,
+static void hrc_write_parameters(const NuSMVEnv_ptr env, FILE *ofile,
                                  Oiter parameters_iter);
 
-static void
-hrc_write_declare_module_variables(FILE* ofile,
-                                   HrcNode_ptr child,
-                                   st_table* printed_module_map,
-                                   boolean append_suffix);
+static void hrc_write_declare_module_variables(FILE *ofile, HrcNode_ptr child,
+                                               st_table *printed_module_map,
+                                               boolean append_suffix);
 
-static void hrc_write_print_vars(const NuSMVEnv_ptr env,
-                                 FILE* out, HrcNode_ptr hrcNode);
+static void hrc_write_print_vars(const NuSMVEnv_ptr env, FILE *out,
+                                 HrcNode_ptr hrcNode);
 
-static void hrc_write_print_var_list(const NuSMVEnv_ptr env,
-                                     FILE* out, Oiter var_iter);
+static void hrc_write_print_var_list(const NuSMVEnv_ptr env, FILE *out,
+                                     Oiter var_iter);
 
-static void hrc_write_print_defines(FILE* out, HrcNode_ptr hrcNode);
+static void hrc_write_print_defines(FILE *out, HrcNode_ptr hrcNode);
 
-static void hrc_write_print_array_defines(FILE* out, HrcNode_ptr hrcNode);
+static void hrc_write_print_array_defines(FILE *out, HrcNode_ptr hrcNode);
 
-static void hrc_write_specifications(const NuSMVEnv_ptr env,
-                                     FILE* out, HrcNode_ptr hrcNode);
+static void hrc_write_specifications(const NuSMVEnv_ptr env, FILE *out,
+                                     HrcNode_ptr hrcNode);
 
-static void hrc_write_spec_pair_list(const NuSMVEnv_ptr env,
-                                     FILE* out,
-                                     Oiter iter,
-                                     const char* section_name);
+static void hrc_write_spec_pair_list(const NuSMVEnv_ptr env, FILE *out,
+                                     Oiter iter, const char *section_name);
 
-static boolean hrc_write_constants(const NuSMVEnv_ptr env,
-                                   FILE* out, Oiter constants_iter);
+static boolean hrc_write_constants(const NuSMVEnv_ptr env, FILE *out,
+                                   Oiter constants_iter);
 
-static void print_variable_type(const NuSMVEnv_ptr env,
-                                FILE* out, node_ptr node);
+static void print_variable_type(const NuSMVEnv_ptr env, FILE *out,
+                                node_ptr node);
 
-static void print_scalar_type(const NuSMVEnv_ptr env,
-                              FILE* out, node_ptr node);
+static void print_scalar_type(const NuSMVEnv_ptr env, FILE *out, node_ptr node);
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-int Hrc_WriteModel(HrcNode_ptr hrcNode, FILE * ofile, boolean append_suffix)
-{
+int Hrc_WriteModel(HrcNode_ptr hrcNode, FILE *ofile, boolean append_suffix) {
   int retval = 0;
-  st_table* printed_module_map; /* hash table used to keep track of
+  st_table *printed_module_map; /* hash table used to keep track of
                                    previously printed modules. */
 
   HRC_NODE_CHECK_INSTANCE(hrcNode);
@@ -173,10 +150,7 @@ int Hrc_WriteModel(HrcNode_ptr hrcNode, FILE * ofile, boolean append_suffix)
   printed_module_map = new_assoc();
 
   /* call the recursive creation of the modules */
-  hrc_write_module_instance(ofile,
-                            hrcNode,
-                            printed_module_map,
-                            append_suffix);
+  hrc_write_module_instance(ofile, hrcNode, printed_module_map, append_suffix);
 
   clear_assoc(printed_module_map);
   free_assoc(printed_module_map);
@@ -189,8 +163,6 @@ int Hrc_WriteModel(HrcNode_ptr hrcNode, FILE * ofile, boolean append_suffix)
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -206,18 +178,16 @@ int Hrc_WriteModel(HrcNode_ptr hrcNode, FILE * ofile, boolean append_suffix)
   \se printed_module_map is changed to keep track of
   printed modules.
 */
-static void hrc_write_module_instance(FILE * ofile,
-                                      HrcNode_ptr hrcNode,
-                                      st_table* printed_module_map,
-                                      boolean append_suffix)
-{
+static void hrc_write_module_instance(FILE *ofile, HrcNode_ptr hrcNode,
+                                      st_table *printed_module_map,
+                                      boolean append_suffix) {
   Siter iter;
   node_ptr module_name;
   Slist_ptr rev_child_stack;
   SymbTable_ptr st = HrcNode_get_symbol_table(hrcNode);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   module_name = HrcNode_get_name(hrcNode);
 
@@ -229,29 +199,24 @@ static void hrc_write_module_instance(FILE * ofile,
   print_node(wffprint, ofile, module_name);
 
   /* main module is never changed with the suffix */
-  if ((HRC_NODE(NULL) != HrcNode_get_parent(hrcNode)) &&
-      append_suffix) {
+  if ((HRC_NODE(NULL) != HrcNode_get_parent(hrcNode)) && append_suffix) {
     fprintf(ofile, "%s", HRC_WRITE_MODULE_SUFFIX);
   }
 
   /* print formal parameters of module */
-  hrc_write_parameters(env, ofile,
-                       HrcNode_get_formal_parameters_iter(hrcNode));
+  hrc_write_parameters(env, ofile, HrcNode_get_formal_parameters_iter(hrcNode));
   fprintf(ofile, "\n\n");
-
 
   /* Iterates over all children of this node, creating variables and
      assigning module names.
      Children stack is reversed in order to preserve order.
   */
-  rev_child_stack =
-    Slist_copy_reversed(HrcNode_get_child_hrc_nodes(hrcNode));
-
+  rev_child_stack = Slist_copy_reversed(HrcNode_get_child_hrc_nodes(hrcNode));
 
   /* All the children of the current nodes are visited instantiating
      each module variable.
   */
-  if (! Slist_is_empty(rev_child_stack)) {
+  if (!Slist_is_empty(rev_child_stack)) {
     fprintf(ofile, "VAR\n");
   }
   SLIST_FOREACH(rev_child_stack, iter) {
@@ -260,12 +225,10 @@ static void hrc_write_module_instance(FILE * ofile,
     child = HRC_NODE(Siter_element(iter));
 
     /* Declares the new module variables */
-    hrc_write_declare_module_variables(ofile,
-                                       child,
-                                       printed_module_map,
+    hrc_write_declare_module_variables(ofile, child, printed_module_map,
                                        append_suffix);
   }
-  if (! Slist_is_empty(rev_child_stack)) {
+  if (!Slist_is_empty(rev_child_stack)) {
     fprintf(ofile, "\n");
   }
 
@@ -279,29 +242,22 @@ static void hrc_write_module_instance(FILE * ofile,
   hrc_write_print_array_defines(ofile, hrcNode);
 
   /* CONSTANTS */
-  if (hrc_write_constants(env, ofile,
-                          HrcNode_get_constants_iter(hrcNode))) {
+  if (hrc_write_constants(env, ofile, HrcNode_get_constants_iter(hrcNode))) {
     fprintf(ofile, "\n");
   }
 
   /* ASSIGN: invar, init, next  */
-  if (hrc_write_assign_list(env,
-                            ofile,
-                            -1,
+  if (hrc_write_assign_list(env, ofile, -1,
                             HrcNode_get_invar_assign_exprs_iter(hrcNode))) {
     fprintf(ofile, "\n");
   }
 
-  if (hrc_write_assign_list(env,
-                            ofile,
-                            SMALLINIT,
+  if (hrc_write_assign_list(env, ofile, SMALLINIT,
                             HrcNode_get_init_assign_exprs_iter(hrcNode))) {
     fprintf(ofile, "\n");
   }
 
-  if (hrc_write_assign_list(env,
-                            ofile,
-                            NEXT,
+  if (hrc_write_assign_list(env, ofile, NEXT,
                             HrcNode_get_next_assign_exprs_iter(hrcNode))) {
     fprintf(ofile, "\n");
   }
@@ -311,7 +267,7 @@ static void hrc_write_module_instance(FILE * ofile,
   {
     struct {
       Oiter iter;
-      const char* type;
+      const char *type;
     } lists[] = {
         {{HrcNode_get_init_exprs_iter(hrcNode).node}, "INIT\n"},
         {{HrcNode_get_invar_exprs_iter(hrcNode).node}, "INVAR\n"},
@@ -319,15 +275,13 @@ static void hrc_write_module_instance(FILE * ofile,
         {{HrcNode_get_justice_exprs_iter(hrcNode).node}, "JUSTICE\n"},
     };
     unsigned int idx;
-    for (idx=0; idx < sizeof(lists)/sizeof(lists[0]); ++idx) {
-      hrc_write_expr_split(env, ofile,
-                           lists[idx].iter, lists[idx].type);
+    for (idx = 0; idx < sizeof(lists) / sizeof(lists[0]); ++idx) {
+      hrc_write_expr_split(env, ofile, lists[idx].iter, lists[idx].type);
     }
   }
   /* COMPASSION */
-  hrc_write_spec_pair_list(env, ofile,
-                           HrcNode_get_compassion_exprs_iter(hrcNode),
-                           "COMPASSION\n");
+  hrc_write_spec_pair_list(
+      env, ofile, HrcNode_get_compassion_exprs_iter(hrcNode), "COMPASSION\n");
 
   /* Writes specifications (INVARSPEC CTLSPEC LTLSPEC PSLSPEC
      COMPUTE) */
@@ -347,9 +301,7 @@ static void hrc_write_module_instance(FILE * ofile,
     /* Avoids to print the module multiple times */
     assoc_key = find_assoc(printed_module_map, child_module_name);
     if (Nil == assoc_key) {
-      hrc_write_module_instance(ofile,
-                                child,
-                                printed_module_map,
+      hrc_write_module_instance(ofile, child, printed_module_map,
                                 append_suffix);
     }
   } /* end loop on children */
@@ -367,17 +319,15 @@ static void hrc_write_module_instance(FILE * ofile,
   \se printed_module_map is changed in the recursive
   calls of the the function.
 */
-static void hrc_write_declare_module_variables(FILE * ofile,
-                                               HrcNode_ptr child,
-                                               st_table* printed_module_map,
-                                               boolean append_suffix)
-{
+static void hrc_write_declare_module_variables(FILE *ofile, HrcNode_ptr child,
+                                               st_table *printed_module_map,
+                                               boolean append_suffix) {
   node_ptr instance_name;
   node_ptr child_module_name;
   SymbTable_ptr st = HrcNode_get_symbol_table(child);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   child_module_name = HrcNode_get_name(child);
 
@@ -392,8 +342,7 @@ static void hrc_write_declare_module_variables(FILE * ofile,
   }
 
   /* Prints actual parameters */
-  hrc_write_parameters(env, ofile,
-                       HrcNode_get_actual_parameters_iter(child));
+  hrc_write_parameters(env, ofile, HrcNode_get_actual_parameters_iter(child));
 
   fprintf(ofile, ";\n");
 }
@@ -408,14 +357,13 @@ static void hrc_write_declare_module_variables(FILE * ofile,
   The parameter list is printed enclosed by brackets, every parameter
   is separated by colon.
 */
-static void hrc_write_parameters(const NuSMVEnv_ptr env, FILE* ofile,
-                                 Oiter parameters_iter)
-{
+static void hrc_write_parameters(const NuSMVEnv_ptr env, FILE *ofile,
+                                 Oiter parameters_iter) {
   boolean first_parameter, has_parameters;
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-  has_parameters = ! Oiter_is_end(parameters_iter);
+  has_parameters = !Oiter_is_end(parameters_iter);
 
   if (has_parameters) {
     fprintf(ofile, "(");
@@ -424,8 +372,8 @@ static void hrc_write_parameters(const NuSMVEnv_ptr env, FILE* ofile,
   first_parameter = true;
 
   /* Loops all parameters list and print them */
-  for(; ! Oiter_is_end(parameters_iter);
-      parameters_iter = Oiter_next(parameters_iter)) {
+  for (; !Oiter_is_end(parameters_iter);
+       parameters_iter = Oiter_next(parameters_iter)) {
     node_ptr parameter;
     node_ptr parameter_name;
     node_ptr parameter_type;
@@ -437,11 +385,10 @@ static void hrc_write_parameters(const NuSMVEnv_ptr env, FILE* ofile,
     parameter_name = car(parameter);
     nusmv_assert(Nil != parameter_name);
 
-    if (! first_parameter) {
+    if (!first_parameter) {
       fprintf(ofile, ", ");
     }
     print_node(wffprint, ofile, parameter_name);
-
 
     parameter_type = cdr(parameter);
 
@@ -459,7 +406,6 @@ static void hrc_write_parameters(const NuSMVEnv_ptr env, FILE* ofile,
   }
 
   return;
-
 }
 
 /*!
@@ -469,25 +415,27 @@ static void hrc_write_parameters(const NuSMVEnv_ptr env, FILE* ofile,
   hrcNode.
   The sections printed are VAR, IVAR and FROZENVAR.
 */
-static void hrc_write_print_vars(const NuSMVEnv_ptr env,
-                                 FILE* out, HrcNode_ptr hrcNode)
-{
+static void hrc_write_print_vars(const NuSMVEnv_ptr env, FILE *out,
+                                 HrcNode_ptr hrcNode) {
 
-  if (! Oiter_is_end(HrcNode_get_state_variables_iter(hrcNode))) {
+  if (!Oiter_is_end(HrcNode_get_state_variables_iter(hrcNode))) {
     fprintf(out, "VAR\n");
-    hrc_write_print_var_list(env, out, HrcNode_get_state_variables_iter(hrcNode));
+    hrc_write_print_var_list(env, out,
+                             HrcNode_get_state_variables_iter(hrcNode));
     fprintf(out, "\n");
   }
 
-  if (! Oiter_is_end(HrcNode_get_input_variables_iter(hrcNode))) {
+  if (!Oiter_is_end(HrcNode_get_input_variables_iter(hrcNode))) {
     fprintf(out, "IVAR\n");
-    hrc_write_print_var_list(env, out, HrcNode_get_input_variables_iter(hrcNode));
+    hrc_write_print_var_list(env, out,
+                             HrcNode_get_input_variables_iter(hrcNode));
     fprintf(out, "\n");
   }
 
-  if (! Oiter_is_end(HrcNode_get_frozen_variables_iter(hrcNode))) {
+  if (!Oiter_is_end(HrcNode_get_frozen_variables_iter(hrcNode))) {
     fprintf(out, "FROZENVAR\n");
-    hrc_write_print_var_list(env, out, HrcNode_get_frozen_variables_iter(hrcNode));
+    hrc_write_print_var_list(env, out,
+                             HrcNode_get_frozen_variables_iter(hrcNode));
     fprintf(out, "\n");
   }
 }
@@ -497,17 +445,14 @@ static void hrc_write_print_vars(const NuSMVEnv_ptr env,
 
 
 */
-static void hrc_write_print_var_list(const NuSMVEnv_ptr env,
-                                     FILE* out, Oiter var_iter)
-{
+static void hrc_write_print_var_list(const NuSMVEnv_ptr env, FILE *out,
+                                     Oiter var_iter) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
-
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   /* Visit the list printing each variable */
-  for(; ! Oiter_is_end(var_iter); var_iter = Oiter_next(var_iter)) {
+  for (; !Oiter_is_end(var_iter); var_iter = Oiter_next(var_iter)) {
     node_ptr variable_node;
     node_ptr variable_name;
     node_ptr variable_type;
@@ -537,24 +482,22 @@ static void hrc_write_print_var_list(const NuSMVEnv_ptr env,
   Writes DEFINE declarations in SMV format on a
   file.
 */
-static void hrc_write_print_defines(FILE* out, HrcNode_ptr hrcNode)
-{
+static void hrc_write_print_defines(FILE *out, HrcNode_ptr hrcNode) {
   Oiter define_iter;
   boolean has_define;
   SymbTable_ptr st = HrcNode_get_symbol_table(hrcNode);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   define_iter = HrcNode_get_defines_iter(hrcNode);
-  has_define = ! Oiter_is_end(define_iter);
+  has_define = !Oiter_is_end(define_iter);
   if (has_define) {
     fprintf(out, "DEFINE\n");
   }
 
   /* Visit the list printing each define statement */
-  for(; ! Oiter_is_end(define_iter); define_iter = Oiter_next(define_iter)) {
+  for (; !Oiter_is_end(define_iter); define_iter = Oiter_next(define_iter)) {
     node_ptr define_node;
     node_ptr define_name;
     node_ptr define_body;
@@ -587,24 +530,23 @@ static void hrc_write_print_defines(FILE* out, HrcNode_ptr hrcNode)
 
   Writes the ARRAY DEFINE declarations contained in hrcNode.
 */
-static void hrc_write_print_array_defines(FILE* out, HrcNode_ptr hrcNode)
-{
+static void hrc_write_print_array_defines(FILE *out, HrcNode_ptr hrcNode) {
   Oiter array_define_iter;
   boolean has_array_define;
   SymbTable_ptr st = HrcNode_get_symbol_table(hrcNode);
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(st));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   array_define_iter = HrcNode_get_array_defines_iter(hrcNode);
-  has_array_define = ! Oiter_is_end(array_define_iter);
+  has_array_define = !Oiter_is_end(array_define_iter);
   if (has_array_define) {
     fprintf(out, "MDEFINE\n");
   }
 
   /* Visit the list printing each array define statement */
-  for(; ! Oiter_is_end(array_define_iter);
-      array_define_iter = Oiter_next(array_define_iter)) {
+  for (; !Oiter_is_end(array_define_iter);
+       array_define_iter = Oiter_next(array_define_iter)) {
     node_ptr array_define_node;
     node_ptr array_define_name;
     node_ptr array_define_body;
@@ -640,14 +582,13 @@ static void hrc_write_print_array_defines(FILE* out, HrcNode_ptr hrcNode)
 
   Returns true if at least one expression was printed.
 */
-static void hrc_write_expr_split(const NuSMVEnv_ptr env,
-                                 FILE* out, Oiter iter, const char* s)
-{
+static void hrc_write_expr_split(const NuSMVEnv_ptr env, FILE *out, Oiter iter,
+                                 const char *s) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
-  if (! Oiter_is_end(iter)) {
-    for(; ! Oiter_is_end(iter); iter = Oiter_next(iter)) {
+  if (!Oiter_is_end(iter)) {
+    for (; !Oiter_is_end(iter); iter = Oiter_next(iter)) {
       node_ptr elem = NODE_PTR(Oiter_element(iter));
 
       fprintf(out, "%s ", s);
@@ -666,29 +607,27 @@ static void hrc_write_expr_split(const NuSMVEnv_ptr env,
   Writes a specification list prefixed by a given
   string in SMV format on a file.
 */
-static void hrc_write_spec_split(const NuSMVEnv_ptr env,
-                                 FILE* out, Oiter iter, const char* s)
-{
-  if (! Oiter_is_end(iter)) {
-    for(; ! Oiter_is_end(iter); iter = Oiter_next(iter)) {
+static void hrc_write_spec_split(const NuSMVEnv_ptr env, FILE *out, Oiter iter,
+                                 const char *s) {
+  if (!Oiter_is_end(iter)) {
+    for (; !Oiter_is_end(iter); iter = Oiter_next(iter)) {
       const MasterPrinter_ptr wffprint =
-        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+          MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
       node_ptr spec = NODE_PTR(Oiter_element(iter));
       node_ptr expr = car(spec);
       node_ptr name = cdr(spec);
 
-      nusmv_assert((SPEC == node_get_type(spec)) ||
-                   (LTLSPEC == node_get_type(spec)) ||
-                   (INVARSPEC == node_get_type(spec)) ||
-                   (PSLSPEC == node_get_type(spec)) ||
-                   (COMPUTE == node_get_type(spec)));
+      nusmv_assert(
+          (SPEC == node_get_type(spec)) || (LTLSPEC == node_get_type(spec)) ||
+          (INVARSPEC == node_get_type(spec)) ||
+          (PSLSPEC == node_get_type(spec)) || (COMPUTE == node_get_type(spec)));
 
       fprintf(out, "%s ", s);
 
       /* Support for property Names: Old property structure is in car(n),
          property name is in cdr(n).  */
-      if (Nil != name){
+      if (Nil != name) {
         fprintf(out, "NAME ");
         print_node(wffprint, out, name);
         fprintf(out, " := ");
@@ -711,24 +650,17 @@ static void hrc_write_spec_split(const NuSMVEnv_ptr env,
 
   Writes all the specifications of a module instance.
 */
-static void hrc_write_specifications(const NuSMVEnv_ptr env,
-                                     FILE* out,
-                                     HrcNode_ptr hrcNode)
-{
-  hrc_write_spec_split(env, out,
-                       HrcNode_get_ctl_properties_iter(hrcNode),
+static void hrc_write_specifications(const NuSMVEnv_ptr env, FILE *out,
+                                     HrcNode_ptr hrcNode) {
+  hrc_write_spec_split(env, out, HrcNode_get_ctl_properties_iter(hrcNode),
                        "CTLSPEC\n");
-  hrc_write_spec_split(env, out,
-                       HrcNode_get_ltl_properties_iter(hrcNode),
+  hrc_write_spec_split(env, out, HrcNode_get_ltl_properties_iter(hrcNode),
                        "LTLSPEC\n");
-  hrc_write_spec_split(env, out,
-                       HrcNode_get_compute_properties_iter(hrcNode),
+  hrc_write_spec_split(env, out, HrcNode_get_compute_properties_iter(hrcNode),
                        "COMPUTE\n");
-  hrc_write_spec_split(env, out,
-                       HrcNode_get_invar_properties_iter(hrcNode),
+  hrc_write_spec_split(env, out, HrcNode_get_invar_properties_iter(hrcNode),
                        "INVARSPEC\n");
-  hrc_write_spec_split(env, out,
-                       HrcNode_get_psl_properties_iter(hrcNode),
+  hrc_write_spec_split(env, out, HrcNode_get_psl_properties_iter(hrcNode),
                        "PSLSPEC\n");
 }
 
@@ -740,22 +672,18 @@ static void hrc_write_specifications(const NuSMVEnv_ptr env,
 
   Function returns true if at least an assign was written
 */
-static boolean hrc_write_assign_list(const NuSMVEnv_ptr env,
-                                     FILE* out,
-                                     int assign_node_type,
-                                     Oiter assign_iter)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+static boolean hrc_write_assign_list(const NuSMVEnv_ptr env, FILE *out,
+                                     int assign_node_type, Oiter assign_iter) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   boolean has_assign;
 
-  has_assign = ! Oiter_is_end(assign_iter);
+  has_assign = !Oiter_is_end(assign_iter);
 
   if (has_assign) {
     fprintf(out, "ASSIGN\n");
   }
 
-  for(; ! Oiter_is_end(assign_iter); assign_iter = Oiter_next(assign_iter)) {
+  for (; !Oiter_is_end(assign_iter); assign_iter = Oiter_next(assign_iter)) {
     node_ptr assign_expression;
     node_ptr assign_lhs_name;
     node_ptr assign_lhs_node;
@@ -777,7 +705,8 @@ static boolean hrc_write_assign_list(const NuSMVEnv_ptr env,
     if (assign_node_type < 0) {
       assign_lhs_node = assign_lhs_name;
     } else {
-      assign_lhs_node = find_node(nodemgr, assign_node_type, assign_lhs_name, Nil);
+      assign_lhs_node =
+          find_node(nodemgr, assign_node_type, assign_lhs_name, Nil);
     }
 
     /* Get assign right expression */
@@ -791,7 +720,6 @@ static boolean hrc_write_assign_list(const NuSMVEnv_ptr env,
     fprintf(out, "\n");
   }
 
-
   return has_assign;
 }
 
@@ -800,11 +728,10 @@ static boolean hrc_write_assign_list(const NuSMVEnv_ptr env,
 
   Prints an assignement statement
 */
-static void hrc_write_print_assign(const NuSMVEnv_ptr env,
-                                   FILE * out, node_ptr lhs, node_ptr rhs)
-{
+static void hrc_write_print_assign(const NuSMVEnv_ptr env, FILE *out,
+                                   node_ptr lhs, node_ptr rhs) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
   print_node(wffprint, out, lhs);
   fprintf(out, " := ");
@@ -819,19 +746,15 @@ static void hrc_write_print_assign(const NuSMVEnv_ptr env,
   Writes a list of specification that contains
   pairs in SMV format.
 */
-static void hrc_write_spec_pair_list(const NuSMVEnv_ptr env,
-                                     FILE* out,
-                                     Oiter iter,
-                                     const char* section_name)
-{
+static void hrc_write_spec_pair_list(const NuSMVEnv_ptr env, FILE *out,
+                                     Oiter iter, const char *section_name) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   /* Visit the list printing each statement */
-  if (! Oiter_is_end(iter)) {
-    for(; ! Oiter_is_end(iter); iter = Oiter_next(iter)) {
+  if (!Oiter_is_end(iter)) {
+    for (; !Oiter_is_end(iter); iter = Oiter_next(iter)) {
       node_ptr pair;
 
       pair = NODE_PTR(Oiter_element(iter));
@@ -859,17 +782,16 @@ static void hrc_write_spec_pair_list(const NuSMVEnv_ptr env,
 
   Function returns true if at least a constant was printed.
 */
-static boolean hrc_write_constants(const NuSMVEnv_ptr env,
-                                   FILE *out, Oiter constants_iter)
-{
+static boolean hrc_write_constants(const NuSMVEnv_ptr env, FILE *out,
+                                   Oiter constants_iter) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   boolean first;
 
   first = true;
 
-  for(; ! Oiter_is_end(constants_iter);
-      constants_iter = Oiter_next(constants_iter)) {
+  for (; !Oiter_is_end(constants_iter);
+       constants_iter = Oiter_next(constants_iter)) {
     node_ptr constant;
     constant = NODE_PTR(Oiter_element(constants_iter));
 
@@ -884,11 +806,11 @@ static boolean hrc_write_constants(const NuSMVEnv_ptr env,
     first = false;
   }
 
-  if (! first) {
+  if (!first) {
     fprintf(out, ";\n");
   }
 
-  return (! first);
+  return (!first);
 }
 
 /*!
@@ -901,13 +823,12 @@ static boolean hrc_write_constants(const NuSMVEnv_ptr env,
   The printer manages the following types: BOOLEAN, INTEGER, REAL,
   UNSIGNED_WORD, SIGNED_WORD, SCALAR, WORD_ARRAY and  ARRAY_TYPE.
 */
-static void print_variable_type(const NuSMVEnv_ptr env,
-                                FILE* out, node_ptr node)
-{
+static void print_variable_type(const NuSMVEnv_ptr env, FILE *out,
+                                node_ptr node) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
   int node_type;
 
   nusmv_assert(Nil != node);
@@ -977,7 +898,8 @@ static void print_variable_type(const NuSMVEnv_ptr env,
 
     break;
   default:
-    StreamMgr_print_error(streams,  "Type %d not supported by hrc emitter.\n", node_type);
+    StreamMgr_print_error(streams, "Type %d not supported by hrc emitter.\n",
+                          node_type);
   }
 
   return;
@@ -993,13 +915,11 @@ static void print_variable_type(const NuSMVEnv_ptr env,
 
   \sa print_variable_type
 */
-static void print_scalar_type(const NuSMVEnv_ptr env,
-                              FILE* out, node_ptr node)
-{
+static void print_scalar_type(const NuSMVEnv_ptr env, FILE *out,
+                              node_ptr node) {
   const MasterPrinter_ptr wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   int node_type;
   node_ptr reversed_literals;
@@ -1025,11 +945,10 @@ static void print_scalar_type(const NuSMVEnv_ptr env,
     literal = car(iterator);
     nusmv_assert(Nil != literal);
 
-    if (! first_literal) {
+    if (!first_literal) {
       fprintf(out, ", ");
     }
     print_node(wffprint, out, literal);
-
 
     first_literal = false;
     iterator = cdr(iterator);

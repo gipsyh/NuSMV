@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -33,7 +33,6 @@
   \todo: Missing description
 
 */
-
 
 #ifndef __NUSMV_CORE_TRACE_EXEC_TRACE_EXEC_H__
 #define __NUSMV_CORE_TRACE_EXEC_TRACE_EXEC_H__
@@ -68,15 +67,13 @@
   \sa optional
 */
 
-typedef enum
-{
+typedef enum {
   EXEC_NONE, /* undefined or unknown execution engine */
   EXEC_BDD,  /* BDD based re-execution engine */
   EXEC_SAT,  /* SAT based re-execution engine */
 
   EXEC_RESERVED,
 } execEngine;
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */

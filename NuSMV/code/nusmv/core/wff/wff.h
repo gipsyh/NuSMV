@@ -22,7 +22,7 @@
    or email to <nusmv-users@fbk.eu>.
    Please report bugs to <nusmv-users@fbk.eu>.
 
-   To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+   To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +34,14 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_WFF_WFF_H__
 #define __NUSMV_CORE_WFF_WFF_H__
 
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/node/node.h"
 #include "nusmv/core/compile/symb_table/SymbTable.h"
-#include "nusmv/core/wff/wffRewrite.h"
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/wff/ExprMgr.h"
+#include "nusmv/core/wff/wffRewrite.h"
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -58,7 +56,7 @@
 /*!
   \brief Initializes the wff package
 
-  
+
 
   \sa wff_pkg_quit
 */
@@ -67,12 +65,11 @@ void wff_pkg_init(const NuSMVEnv_ptr env);
 /*!
   \brief Deinitializes the wff package
 
-  
+
 
   \sa wff_pkg_init
 */
 void wff_pkg_quit(const NuSMVEnv_ptr env);
-
 
 /* Package top-level exported functions */
 
@@ -89,7 +86,7 @@ int Wff_get_depth(const NuSMVEnv_ptr env, node_ptr ltl_wff);
 /*!
   \brief Makes a <i>truth</i> WFF
 
-  
+
 
   \se node hash may change
 */
@@ -98,7 +95,7 @@ node_ptr Wff_make_truth(NodeMgr_ptr nodemgr);
 /*!
   \brief Makes a <i>false</i> WFF
 
-  
+
 
   \se node hash may change
 */
@@ -107,183 +104,164 @@ node_ptr Wff_make_falsity(NodeMgr_ptr nodemgr);
 /*!
   \brief Makes a <i>not</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_not(NodeMgr_ptr nodemgr,
-                             node_ptr arg);
+node_ptr Wff_make_not(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes an <i>and</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_and(NodeMgr_ptr nodemgr,
-                             node_ptr arg1, node_ptr arg2);
+node_ptr Wff_make_and(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /*!
   \brief Makes an <i>or</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_or(NodeMgr_ptr nodemgr,
-                            node_ptr arg1, node_ptr arg2);
+node_ptr Wff_make_or(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /*!
   \brief Makes an <i>implies</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_implies(NodeMgr_ptr nodemgr,
-                                 node_ptr arg1, node_ptr arg2);
+node_ptr Wff_make_implies(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /*!
   \brief Makes an <i>iff</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_iff(NodeMgr_ptr nodemgr,
-                             node_ptr arg1, node_ptr arg2);
+node_ptr Wff_make_iff(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /*!
   \brief Makes a <i>next</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_next(NodeMgr_ptr nodemgr,
-                              node_ptr arg);
+node_ptr Wff_make_next(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Applies <i>op_next</i> x times
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_opnext_times(NodeMgr_ptr nodemgr,
-                                      node_ptr arg, int x);
+node_ptr Wff_make_opnext_times(NodeMgr_ptr nodemgr, node_ptr arg, int x);
 
 /*!
   \brief Makes an <i>op_next</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_opnext(NodeMgr_ptr nodemgr,
-                                node_ptr arg);
+node_ptr Wff_make_opnext(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes an <i>op_next</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_opprec(NodeMgr_ptr nodemgr,
-                                node_ptr arg);
+node_ptr Wff_make_opprec(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes an <i>op_next</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_opnotprecnot(NodeMgr_ptr nodemgr,
-                                      node_ptr arg);
+node_ptr Wff_make_opnotprecnot(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes a <i>globally</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_globally(NodeMgr_ptr nodemgr,
-                                  node_ptr arg);
+node_ptr Wff_make_globally(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes a <i>historically</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_historically(NodeMgr_ptr nodemgr,
-                                      node_ptr arg);
+node_ptr Wff_make_historically(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes an <i>eventually</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_eventually(NodeMgr_ptr nodemgr,
-                                    node_ptr arg);
+node_ptr Wff_make_eventually(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes an <i>once</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_once(NodeMgr_ptr nodemgr,
-                              node_ptr arg);
+node_ptr Wff_make_once(NodeMgr_ptr nodemgr, node_ptr arg);
 
 /*!
   \brief Makes an <i>until</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_until(NodeMgr_ptr nodemgr,
-                               node_ptr arg1, node_ptr arg2);
+node_ptr Wff_make_until(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /*!
   \brief Makes an <i>since</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_since(NodeMgr_ptr nodemgr,
-                               node_ptr arg1, node_ptr arg2);
+node_ptr Wff_make_since(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /*!
   \brief Makes a <i>releases</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_releases(NodeMgr_ptr nodemgr,
-                                  node_ptr arg1, node_ptr arg2);
+node_ptr Wff_make_releases(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /*!
   \brief Makes a <i>triggered</i> WFF
 
-  
+
 
   \se node hash may change
 */
-node_ptr Wff_make_triggered(NodeMgr_ptr nodemgr,
-                                   node_ptr arg1, node_ptr arg2);
-
+node_ptr Wff_make_triggered(NodeMgr_ptr nodemgr, node_ptr arg1, node_ptr arg2);
 
 /* Queries *******************************************************************/
 
@@ -296,10 +274,7 @@ node_ptr Wff_make_triggered(NodeMgr_ptr nodemgr,
 
   The allowance of next is controlled by a flag.
 */
-boolean Wff_is_propositional(SymbTable_ptr symb_table,
-                                    node_ptr wff,
-                                    node_ptr context,
-                                    boolean is_next_allowed);
-
+boolean Wff_is_propositional(SymbTable_ptr symb_table, node_ptr wff,
+                             node_ptr context, boolean is_next_allowed);
 
 #endif /* __NUSMV_CORE_WFF_WFF_H__ */

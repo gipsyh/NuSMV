@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -39,8 +39,8 @@
 #include "nusmv/core/trace/exec/BDDPartialTraceExecutor.h"
 #include "nusmv/core/trace/exec/BDDPartialTraceExecutor_private.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/opt/opt.h"
+#include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/trace/Trace_private.h"
@@ -59,7 +59,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'BDDPartialTraceExecutor_private.h' for class 'BDDPartialTraceExecutor' definition. */
+/* See 'BDDPartialTraceExecutor_private.h' for class 'BDDPartialTraceExecutor'
+ * definition. */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -69,36 +70,30 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void bdd_partial_trace_executor_finalize(Object_ptr object,
-                                                void* dummy);
+static void bdd_partial_trace_executor_finalize(Object_ptr object, void *dummy);
 
 static Trace_ptr
 bdd_partial_trace_executor_execute(const PartialTraceExecutor_ptr self,
                                    const Trace_ptr trace,
-                                   const NodeList_ptr language,
-                                   int* n_steps);
+                                   const NodeList_ptr language, int *n_steps);
 
-static Trace_ptr
-bdd_partial_trace_executor_generate(const BDDPartialTraceExecutor_ptr self,
-                                    const BddStates goal_states,
-                                    node_ptr fwd_image, int length,
-                                    const NodeList_ptr language,
-                                    const char* trace_name);
+static Trace_ptr bdd_partial_trace_executor_generate(
+    const BDDPartialTraceExecutor_ptr self, const BddStates goal_states,
+    node_ptr fwd_image, int length, const NodeList_ptr language,
+    const char *trace_name);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-BDDPartialTraceExecutor_ptr BDDPartialTraceExecutor_create(const BddFsm_ptr fsm,
-                                                           const BddEnc_ptr enc)
-{
+BDDPartialTraceExecutor_ptr
+BDDPartialTraceExecutor_create(const BddFsm_ptr fsm, const BddEnc_ptr enc) {
   BDDPartialTraceExecutor_ptr self = ALLOC(BDDPartialTraceExecutor, 1);
   BDD_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
@@ -106,13 +101,11 @@ BDDPartialTraceExecutor_ptr BDDPartialTraceExecutor_create(const BddFsm_ptr fsm,
   return self;
 }
 
-void BDDPartialTraceExecutor_destroy(BDDPartialTraceExecutor_ptr self)
-{
+void BDDPartialTraceExecutor_destroy(BDDPartialTraceExecutor_ptr self) {
   BDD_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
@@ -120,8 +113,7 @@ void BDDPartialTraceExecutor_destroy(BDDPartialTraceExecutor_ptr self)
 
 void bdd_partial_trace_executor_init(BDDPartialTraceExecutor_ptr self,
                                      const BddFsm_ptr fsm,
-                                     const BddEnc_ptr enc)
-{
+                                     const BddEnc_ptr enc) {
   /* base class initialization */
   partial_trace_executor_init(PARTIAL_TRACE_EXECUTOR(self),
                               EnvObject_get_environment(ENV_OBJECT(enc)));
@@ -137,15 +129,12 @@ void bdd_partial_trace_executor_init(BDDPartialTraceExecutor_ptr self,
   OVERRIDE(PartialTraceExecutor, execute) = bdd_partial_trace_executor_execute;
 }
 
-void bdd_partial_trace_executor_deinit(BDDPartialTraceExecutor_ptr self)
-{
+void bdd_partial_trace_executor_deinit(BDDPartialTraceExecutor_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   partial_trace_executor_deinit(PARTIAL_TRACE_EXECUTOR(self));
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -156,14 +145,13 @@ void bdd_partial_trace_executor_deinit(BDDPartialTraceExecutor_ptr self)
 
   Called by the class destructor
 */
-static void bdd_partial_trace_executor_finalize(Object_ptr object, void* dummy)
-{
+static void bdd_partial_trace_executor_finalize(Object_ptr object,
+                                                void *dummy) {
   BDDPartialTraceExecutor_ptr self = BDD_PARTIAL_TRACE_EXECUTOR(object);
 
   bdd_partial_trace_executor_deinit(self);
   FREE(self);
 }
-
 
 /*!
   \brief Executes a trace on the fsm given at construction time
@@ -183,17 +171,14 @@ static void bdd_partial_trace_executor_finalize(Object_ptr object, void* dummy)
   \se None
 */
 
-static Trace_ptr
-bdd_partial_trace_executor_execute
-(const PartialTraceExecutor_ptr partial_executor, const Trace_ptr trace,
- const NodeList_ptr language, int* n_steps)
-{
+static Trace_ptr bdd_partial_trace_executor_execute(
+    const PartialTraceExecutor_ptr partial_executor, const Trace_ptr trace,
+    const NodeList_ptr language, int *n_steps) {
   /* local references to self */
-  const BDDPartialTraceExecutor_ptr self = \
-    BDD_PARTIAL_TRACE_EXECUTOR(partial_executor);
+  const BDDPartialTraceExecutor_ptr self =
+      BDD_PARTIAL_TRACE_EXECUTOR(partial_executor);
 
-  const BaseTraceExecutor_ptr executor = \
-    BASE_TRACE_EXECUTOR(partial_executor);
+  const BaseTraceExecutor_ptr executor = BASE_TRACE_EXECUTOR(partial_executor);
 
   Trace_ptr res = TRACE(NULL); /* failure */
 
@@ -206,11 +191,11 @@ bdd_partial_trace_executor_execute
   TraceIter step = TRACE_END_ITER;
   NuSMVEnv_ptr env;
 
-  BddStates fwd_image = (BddStates) NULL;
+  BddStates fwd_image = (BddStates)NULL;
   node_ptr path = Nil; /* forward constrained images will be used
                           later to compute the complete trace */
 
-  const char* trace_description = "BDD Execution";
+  const char *trace_description = "BDD Execution";
 
   /* 0- Check prerequisites */
   BDD_PARTIAL_TRACE_EXECUTOR_CHECK_INSTANCE(self);
@@ -225,8 +210,8 @@ bdd_partial_trace_executor_execute
   step = trace_first_iter(trace);
   nusmv_assert(TRACE_END_ITER != step);
 
-  trace_states = TraceUtils_fetch_as_bdd(trace, step,
-                                         TRACE_ITER_SF_SYMBOLS, self->enc);
+  trace_states =
+      TraceUtils_fetch_as_bdd(trace, step, TRACE_ITER_SF_SYMBOLS, self->enc);
 
   /* 1- Check Start State */
   {
@@ -246,14 +231,14 @@ bdd_partial_trace_executor_execute
       boolean terminate = false;
       path = cons(nodemgr, NODE_PTR(bdd_dup(source_states)), Nil);
 
-      ++ count;
+      ++count;
 
       /* 2- Check Consecutive States are related by transition relation */
       do {
         BddStates last_state; /* (unshifted) next state */
         BddStates next_state; /* next state constraints */
 
-        BddInputs next_input; /* next input constraints */
+        BddInputs next_input;            /* next input constraints */
         BddStatesInputsNexts next_combo; /* state-input-next constraints */
 
         BddStatesInputsNexts constraints;
@@ -261,17 +246,15 @@ bdd_partial_trace_executor_execute
         step = TraceIter_get_next(step);
         if (TRACE_END_ITER != step) {
 
-          next_input = \
-            TraceUtils_fetch_as_bdd(trace, step, TRACE_ITER_I_SYMBOLS,
-                                    self->enc);
-          next_combo = \
-            TraceUtils_fetch_as_bdd(trace, step, TRACE_ITER_COMBINATORIAL,
-                                    self->enc);
-          last_state = \
-            TraceUtils_fetch_as_bdd(trace, step, TRACE_ITER_SF_SYMBOLS,
-                                    self->enc);
+          next_input = TraceUtils_fetch_as_bdd(trace, step,
+                                               TRACE_ITER_I_SYMBOLS, self->enc);
+          next_combo = TraceUtils_fetch_as_bdd(
+              trace, step, TRACE_ITER_COMBINATORIAL, self->enc);
+          last_state = TraceUtils_fetch_as_bdd(
+              trace, step, TRACE_ITER_SF_SYMBOLS, self->enc);
 
-          next_state = BddEnc_state_var_to_next_state_var(self->enc, last_state);
+          next_state =
+              BddEnc_state_var_to_next_state_var(self->enc, last_state);
 
           if (0 < BaseTraceExecutor_get_verbosity(executor)) {
             fprintf(BaseTraceExecutor_get_output_stream(executor),
@@ -283,19 +266,17 @@ bdd_partial_trace_executor_execute
           constraints = bdd_and(dd, next_input, next_combo);
           bdd_and_accumulate(dd, &constraints, next_state);
 
-          fwd_image =
-            BddFsm_get_sins_constrained_forward_image(self->fsm, source_states,
-                                                      constraints);
+          fwd_image = BddFsm_get_sins_constrained_forward_image(
+              self->fsm, source_states, constraints);
 
-           /* test whether the constrained fwd image is not empty */
+          /* test whether the constrained fwd image is not empty */
           if (!bdd_is_false(dd, fwd_image)) {
             if (0 < BaseTraceExecutor_get_verbosity(executor)) {
               fprintf(BaseTraceExecutor_get_output_stream(executor), "done\n");
             }
             path = cons(nodemgr, NODE_PTR(fwd_image), path);
-            ++ count;
-          }
-          else {
+            ++count;
+          } else {
             if (0 < BaseTraceExecutor_get_verbosity(executor)) {
               fprintf(BaseTraceExecutor_get_output_stream(executor),
                       "failed!\n");
@@ -322,7 +303,7 @@ bdd_partial_trace_executor_execute
           terminate = true;
         }
       } while (!terminate); /* loop on state/input pairs */
-    } /* if has initial state */
+    }                       /* if has initial state */
 
     else {
       fprintf(BaseTraceExecutor_get_error_stream(executor),
@@ -333,17 +314,13 @@ bdd_partial_trace_executor_execute
     /* 3- If last state could be reached a complete trace exists */
     if (success) {
       if (0 < count) {
-        res = \
-          bdd_partial_trace_executor_generate(self, fwd_image, path,
-                                              count, language,
-                                              trace_description);
+        res = bdd_partial_trace_executor_generate(self, fwd_image, path, count,
+                                                  language, trace_description);
       }
 
       else { /* generates a complete state of trace of length 0 */
-        res = \
-          bdd_partial_trace_executor_generate(self, source_states,
-                                              Nil, 0, language,
-                                              trace_description);
+        res = bdd_partial_trace_executor_generate(self, source_states, Nil, 0,
+                                                  language, trace_description);
       }
 
       nusmv_assert(TRACE(NULL) != res);
@@ -380,7 +357,9 @@ bdd_partial_trace_executor_execute
             "-- Trace could not be completed.\n");
   }
 
-  if (NIL(int) != n_steps) { *n_steps = count; }
+  if (NIL(int) != n_steps) {
+    *n_steps = count;
+  }
   return res;
 }
 
@@ -392,19 +371,16 @@ bdd_partial_trace_executor_execute
 
   \se None
 */
-static Trace_ptr
-bdd_partial_trace_executor_generate(const BDDPartialTraceExecutor_ptr self,
-                                    const BddStates goal_states,
-                                    node_ptr reachable, int length,
-                                    const NodeList_ptr language,
-                                    const char* trace_name)
-{
+static Trace_ptr bdd_partial_trace_executor_generate(
+    const BDDPartialTraceExecutor_ptr self, const BddStates goal_states,
+    node_ptr reachable, int length, const NodeList_ptr language,
+    const char *trace_name) {
   Trace_ptr res;
   DDMgr_ptr dd;
   node_ptr path;
   bdd_ptr target;
   NodeMgr_ptr nodemgr;
-  NuSMVEnv_ptr env;\
+  NuSMVEnv_ptr env;
 
   NODE_LIST_CHECK_INSTANCE(language);
 
@@ -413,7 +389,7 @@ bdd_partial_trace_executor_generate(const BDDPartialTraceExecutor_ptr self,
   nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   target = BddEnc_pick_one_state_rand(self->enc, goal_states);
-  path = cons(nodemgr, (node_ptr) target, Nil);
+  path = cons(nodemgr, (node_ptr)target, Nil);
 
   if (Nil != reachable) {
     reachable = cdr(reachable);
@@ -426,7 +402,7 @@ bdd_partial_trace_executor_generate(const BDDPartialTraceExecutor_ptr self,
 
       /* pick source state */
       bwd_image = BddFsm_get_backward_image(self->fsm, target);
-      intersect = bdd_and(dd, bwd_image, (bdd_ptr) car(reachable));
+      intersect = bdd_and(dd, bwd_image, (bdd_ptr)car(reachable));
       nusmv_assert(!bdd_is_false(dd, intersect));
       source = BddEnc_pick_one_state(self->enc, intersect);
       bdd_free(dd, intersect);
@@ -439,20 +415,19 @@ bdd_partial_trace_executor_generate(const BDDPartialTraceExecutor_ptr self,
       bdd_free(dd, inputs);
 
       /* prepend input and source state */
-      path = cons(nodemgr, (node_ptr) input, path);
-      path = cons(nodemgr, (node_ptr) source, path);
+      path = cons(nodemgr, (node_ptr)input, path);
+      path = cons(nodemgr, (node_ptr)source, path);
 
-      -- length;
+      --length;
       target = source;
       reachable = cdr(reachable);
     }
   }
   /* make sure the trace length is correct */
-  nusmv_assert(0 == length &&  Nil == reachable);
+  nusmv_assert(0 == length && Nil == reachable);
 
-  res = \
-    Mc_create_trace_from_bdd_state_input_list(self->enc, language, trace_name,
-                                              TRACE_TYPE_EXECUTION, path);
+  res = Mc_create_trace_from_bdd_state_input_list(
+      self->enc, language, trace_name, TRACE_TYPE_EXECUTION, path);
   /* cleanup */
   walk_dd(dd, bdd_free, path);
   free_list(nodemgr, path);
@@ -461,4 +436,3 @@ bdd_partial_trace_executor_generate(const BDDPartialTraceExecutor_ptr self,
 }
 
 /**AutomaticEnd***************************************************************/
-

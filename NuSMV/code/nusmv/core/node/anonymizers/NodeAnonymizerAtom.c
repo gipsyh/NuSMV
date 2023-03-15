@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,9 +36,8 @@
 
 */
 
-
-#include "nusmv/core/node/anonymizers/NodeAnonymizerAtom.h" 
-#include "nusmv/core/node/anonymizers/NodeAnonymizerAtom_private.h" 
+#include "nusmv/core/node/anonymizers/NodeAnonymizerAtom.h"
+#include "nusmv/core/node/anonymizers/NodeAnonymizerAtom_private.h"
 #include "nusmv/core/parser/symbols.h"
 
 /*---------------------------------------------------------------------------*/
@@ -52,7 +51,8 @@
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-/* See 'NodeAnonymizerAtom_private.h' for class 'NodeAnonymizerAtom' definition. */
+/* See 'NodeAnonymizerAtom_private.h' for class 'NodeAnonymizerAtom' definition.
+ */
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -62,24 +62,21 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void node_anonymizer_atom_finalize(Object_ptr object, void* dummy);
-
+static void node_anonymizer_atom_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
 NodeAnonymizerAtom_ptr NodeAnonymizerAtom_create(NuSMVEnv_ptr env,
-                                                 const char* default_prefix,
-                                                 size_t memoization_threshold)
-{
+                                                 const char *default_prefix,
+                                                 size_t memoization_threshold) {
   NodeAnonymizerAtom_ptr self = ALLOC(NodeAnonymizerAtom, 1);
   NODE_ANONYMIZER_ATOM_CHECK_INSTANCE(self);
 
@@ -87,23 +84,19 @@ NodeAnonymizerAtom_ptr NodeAnonymizerAtom_create(NuSMVEnv_ptr env,
   return self;
 }
 
-void NodeAnonymizerAtom_destroy(NodeAnonymizerAtom_ptr self)
-{
+void NodeAnonymizerAtom_destroy(NodeAnonymizerAtom_ptr self) {
   NODE_ANONYMIZER_ATOM_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void node_anonymizer_atom_init(NodeAnonymizerAtom_ptr self,
-                               NuSMVEnv_ptr env,
-                               const char* default_prefix,
-                               size_t memoization_threshold)
-{
+void node_anonymizer_atom_init(NodeAnonymizerAtom_ptr self, NuSMVEnv_ptr env,
+                               const char *default_prefix,
+                               size_t memoization_threshold) {
   /* base class initialization */
   node_anonymizer_base_init(NODE_ANONYMIZER_BASE(self), env, default_prefix,
                             memoization_threshold);
@@ -115,23 +108,21 @@ void node_anonymizer_atom_init(NodeAnonymizerAtom_ptr self,
   OVERRIDE(NodeAnonymizerBase, is_id) = node_anonymizer_atom_is_id;
 }
 
-void node_anonymizer_atom_deinit(NodeAnonymizerAtom_ptr self)
-{
+void node_anonymizer_atom_deinit(NodeAnonymizerAtom_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   node_anonymizer_base_deinit(NODE_ANONYMIZER_BASE(self));
 }
 
-boolean node_anonymizer_atom_is_id(NodeAnonymizerBase_ptr self,
-                                   node_ptr id)
-{
+boolean node_anonymizer_atom_is_id(NodeAnonymizerBase_ptr self, node_ptr id) {
   boolean retval = false;
 
-  if (id == Nil) { /* just return false */ }
-  else if (ATOM == node_get_type(id)) retval = true;
-  else { /* just return false */ }
+  if (id == Nil) { /* just return false */
+  } else if (ATOM == node_get_type(id))
+    retval = true;
+  else { /* just return false */
+  }
 
   return retval;
 }
@@ -145,15 +136,11 @@ boolean node_anonymizer_atom_is_id(NodeAnonymizerBase_ptr self,
 
   Called by the class destructor
 */
-static void node_anonymizer_atom_finalize(Object_ptr object, void* dummy)
-{
+static void node_anonymizer_atom_finalize(Object_ptr object, void *dummy) {
   NodeAnonymizerAtom_ptr self = NODE_ANONYMIZER_ATOM(object);
 
   node_anonymizer_atom_deinit(self);
   FREE(self);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

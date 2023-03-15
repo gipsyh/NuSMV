@@ -34,16 +34,14 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_PROP_PROP_REWRITER_PRIVATE_H__
 #define __NUSMV_CORE_PROP_PROP_REWRITER_PRIVATE_H__
 
+#include "nusmv/core/prop/Prop.h"
 #include "nusmv/core/prop/Prop_Rewriter.h"
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
 #include "nusmv/core/utils/defs.h"
-#include "nusmv/core/prop/Prop.h"
 
 /*!
   \brief Prop_Rewriter class definition derived from
@@ -54,7 +52,6 @@
   \sa Base class Object
 */
 
-
 /*!
   \brief \todo Missing synopsis
 
@@ -62,8 +59,7 @@
 */
 typedef Prop_ptr (*Prop_Rewriter_rewrite_method)(Prop_Rewriter_ptr);
 
-typedef struct Prop_Rewriter_TAG
-{
+typedef struct Prop_Rewriter_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
@@ -103,8 +99,6 @@ typedef struct Prop_Rewriter_TAG
 
 } Prop_Rewriter;
 
-
-
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
 /* ---------------------------------------------------------------------- */
@@ -117,14 +111,10 @@ typedef struct Prop_Rewriter_TAG
 
   \sa Prop_Rewriter_create
 */
-void prop_rewriter_init(Prop_Rewriter_ptr self,
-                        NuSMVEnv_ptr env,
-                        Prop_ptr original,
-                        WffRewriteMethod method,
-                        WffRewriterExpectedProperty expprop,
-                        FsmType fsm_type,
-                        BddEnc_ptr enc,
-                        SymbLayer_ptr layer);
+void prop_rewriter_init(Prop_Rewriter_ptr self, NuSMVEnv_ptr env,
+                        Prop_ptr original, WffRewriteMethod method,
+                        WffRewriterExpectedProperty expprop, FsmType fsm_type,
+                        BddEnc_ptr enc, SymbLayer_ptr layer);
 
 /*!
   \methodof Prop_Rewriter
@@ -144,8 +134,5 @@ void prop_rewriter_deinit(Prop_Rewriter_ptr self);
   self->fsm_type, plus any other FSM needed for building the target one.
 */
 Prop_ptr prop_rewriter_rewrite(Prop_Rewriter_ptr self);
-
-
-
 
 #endif /* __NUSMV_CORE_PROP_PROP_REWRITER_PRIVATE_H__ */

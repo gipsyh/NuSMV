@@ -34,22 +34,20 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/shell/cmd/cmd.h"
 #include "nusmv/shell/opt/optCmd.h"
 
-#include "nusmv/core/opt/opt.h"
-#include "nusmv/core/opt/OptsHandler.h"
-#include "nusmv/core/cinit/cinit.h"
 #include "nusmv/core/cinit/cinit.h"
 #include "nusmv/core/compile/compile.h"
+#include "nusmv/core/opt/OptsHandler.h"
+#include "nusmv/core/opt/opt.h"
 
-static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv);
-static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char** argv);
+static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char **argv);
+static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char **argv);
 
 /* Adds a command which generates tests for the options handler */
 
@@ -60,7 +58,7 @@ static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char** argv);
 */
 #define TEST_OPTS_HANDLER 0
 #if TEST_OPTS_HANDLER
-static int CommandGenTestOptsHandler(NuSMVEnv_ptr env, int argc, char** argv);
+static int CommandGenTestOptsHandler(NuSMVEnv_ptr env, int argc, char **argv);
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -75,24 +73,22 @@ extern cmp_struct_ptr cmps;
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static boolean opt_input_file_trigger(OptsHandler_ptr opts,
-                                      const char* name,
-                                      const char* value,
-                                      Trigger_Action action,
-                                      void* arg);
+static boolean opt_input_file_trigger(OptsHandler_ptr opts, const char *name,
+                                      const char *value, Trigger_Action action,
+                                      void *arg);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void Opt_Cmd_init(NuSMVEnv_ptr env)
-{
+void Opt_Cmd_init(NuSMVEnv_ptr env) {
 
   Cmd_CommandAdd(env, "set", CommandSetVariable, 0, true);
   Cmd_CommandAdd(env, "unset", CommandUnsetVariable, 0, true);
 
 #if TEST_OPTS_HANDLER
-  Cmd_CommandAdd(env, "_gen_test_opts_handler", CommandGenTestOptsHandler, 0, true);
+  Cmd_CommandAdd(env, "_gen_test_opts_handler", CommandGenTestOptsHandler, 0,
+                 true);
 #endif
 }
 
@@ -109,7 +105,8 @@ void Opt_Cmd_init(NuSMVEnv_ptr env)
    interpreter.
    The "set" command sets a variable to a particular value, and the
    "unset" command removes the definition of a variable.
-   If "set" is given no arguments, it prints the current value of all variables.<p>
+   If "set" is given no arguments, it prints the current value of all
+  variables.<p>
 
    Command options:<p>
    <dl> <dt> -h
@@ -201,14 +198,13 @@ void Opt_Cmd_init(NuSMVEnv_ptr env)
 
   \sa unset
 */
-static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  FILE* outstream = StreamMgr_get_output_stream(streams);
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  FILE *outstream = StreamMgr_get_output_stream(streams);
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
   char *flag_value, *key;
   int c;
@@ -216,7 +212,7 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
 
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch(c) {
+    switch (c) {
     case 'h':
       goto usage;
       break;
@@ -225,14 +221,11 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
     }
   }
   if (argc == 0 || argc > 3) {
-    goto usage ;
-  }
-  else if (argc == 1) {
-    OptsHandler_print_all_options(opts,
-                                  outstream, false);
+    goto usage;
+  } else if (argc == 1) {
+    OptsHandler_print_all_options(opts, outstream, false);
     return 0;
-  }
-  else {
+  } else {
     key = util_strsav(argv[1]);
 
     flag_value = argc == 2 ? util_strsav("") : util_strsav(argv[2]);
@@ -240,53 +233,52 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
 
     if (strcmp(argv[1], "nusmv_stdout") == 0) {
       if (outstream != stdout) {
-        (void) fclose(outstream);
+        (void)fclose(outstream);
       }
       if (strcmp(flag_value, "") == 0) {
         FREE(flag_value);
         flag_value = util_strsav("-");
       }
-      outstream = Cmd_FileOpen(env, flag_value, "w", NIL(char*), 0);
+      outstream = Cmd_FileOpen(env, flag_value, "w", NIL(char *), 0);
       if (outstream == NULL) {
         outstream = stdout;
       }
 #if NUSMV_HAVE_SETVBUF
-# if defined SETVBUF_REVERSED && SETVBUF_REVERSED
-      setvbuf(outstream, _IOLBF, (char*) NULL, 0);
-# else
-      setvbuf(outstream, (char*) NULL, _IOLBF, 0);
-# endif
+#if defined SETVBUF_REVERSED && SETVBUF_REVERSED
+      setvbuf(outstream, _IOLBF, (char *)NULL, 0);
+#else
+      setvbuf(outstream, (char *)NULL, _IOLBF, 0);
+#endif
 #endif
     }
     if (strcmp(argv[1], "nusmv_stderr") == 0) {
       if (errstream != stderr) {
-        (void) fclose(errstream);
+        (void)fclose(errstream);
       }
       if (strcmp(flag_value, "") == 0) {
         FREE(flag_value);
         flag_value = util_strsav("-");
       }
-      errstream = Cmd_FileOpen(env, flag_value, "w", NIL(char*), 0);
+      errstream = Cmd_FileOpen(env, flag_value, "w", NIL(char *), 0);
       if (errstream == NULL) {
         errstream = stderr;
       }
 #if NUSMV_HAVE_SETVBUF
-# if defined SETVBUF_REVERSED && SETVBUF_REVERSED
-      setvbuf(errstream, _IOLBF, (char*) NULL, 0);
-# else
-      setvbuf(errstream, (char*) NULL, _IOLBF, 0);
-# endif
+#if defined SETVBUF_REVERSED && SETVBUF_REVERSED
+      setvbuf(errstream, _IOLBF, (char *)NULL, 0);
+#else
+      setvbuf(errstream, (char *)NULL, _IOLBF, 0);
+#endif
 #endif
     }
     if (strcmp(argv[1], "history") == 0) {
       if (nusmv_historyFile != NIL(FILE)) {
-        (void) fclose(nusmv_historyFile);
+        (void)fclose(nusmv_historyFile);
       }
       if (strcmp(flag_value, "") == 0) {
         nusmv_historyFile = NIL(FILE);
-      }
-      else {
-        nusmv_historyFile = Cmd_FileOpen(env, flag_value, "w", NIL(char*), 0);
+      } else {
+        nusmv_historyFile = Cmd_FileOpen(env, flag_value, "w", NIL(char *), 0);
         if (nusmv_historyFile == NULL) {
           nusmv_historyFile = NIL(FILE);
         }
@@ -297,8 +289,8 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
     /* Add triggers that should only be enabled when using the set
        function (ie: internal uses of the option may do things that
        the user CANNOT!) */
-    OptsHandler_add_option_trigger(opts, INPUT_FILE,
-                                   opt_input_file_trigger, env);
+    OptsHandler_add_option_trigger(opts, INPUT_FILE, opt_input_file_trigger,
+                                   env);
 
     if (OptsHandler_is_option_registered(opts, key)) {
       if (OptsHandler_is_option_public(opts, key)) {
@@ -306,56 +298,53 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
         /* Handle boolean options. These do not need explicitly a flag value. */
         if (!has_param) {
           if (OptsHandler_is_bool_option(opts, key)) {
-            OptsHandler_set_bool_option_value(opts,
-                                              key, true);
-          }
-          else {
-            StreamMgr_print_error(streams,
-                    "Please provide a value for option \"%s\"\n", key);
+            OptsHandler_set_bool_option_value(opts, key, true);
+          } else {
+            StreamMgr_print_error(
+                streams, "Please provide a value for option \"%s\"\n", key);
           }
         }
         /* A value has been provided */
         else {
-          boolean res = OptsHandler_set_option_value(opts,
-                                                     key, flag_value);
+          boolean res = OptsHandler_set_option_value(opts, key, flag_value);
           if (!res) {
             /* If possible values are known, print them */
             if (OptsHandler_is_enum_option(opts, key) ||
                 OptsHandler_is_bool_option(opts, key)) {
               int i, num;
-              char** values;
+              char **values;
 
-              OptsHandler_get_enum_option_values(opts,
-                                                 key, &values, &num);
+              OptsHandler_get_enum_option_values(opts, key, &values, &num);
 
-              StreamMgr_print_error(streams,  "Possible values are: \"");
+              StreamMgr_print_error(streams, "Possible values are: \"");
               for (i = 0; i < num; ++i) {
-                StreamMgr_print_error(streams,  "%s%s", values[i],
-                        (i == (num - 1) ? "" : " "));
+                StreamMgr_print_error(streams, "%s%s", values[i],
+                                      (i == (num - 1) ? "" : " "));
                 FREE(values[i]);
               }
-              StreamMgr_print_error(streams,  "\"\n");
+              StreamMgr_print_error(streams, "\"\n");
               FREE(values);
             } /* Enum possibilities printing */
             else if (OptsHandler_is_int_option(opts, key)) {
-              StreamMgr_print_error(streams,  "The option requires an integer argument\n");
+              StreamMgr_print_error(
+                  streams, "The option requires an integer argument\n");
             }
 
-            StreamMgr_print_error(streams,
-                    "Cannot assign value \"%s\" to option \"%s\"\n",
-                    flag_value, key);
+            StreamMgr_print_error(
+                streams, "Cannot assign value \"%s\" to option \"%s\"\n",
+                flag_value, key);
 
             FREE(flag_value);
             FREE(key);
             return 1;
           } /* Error in setting the new option value */
-        } /* Option value has been provided */
+        }   /* Option value has been provided */
       }
       /* Private option, print an error message */
       else {
-        StreamMgr_print_error(streams,
-                "Option \"%s\" is private. Cannot set value for \"%s\"\n",
-                key, key);
+        StreamMgr_print_error(
+            streams, "Option \"%s\" is private. Cannot set value for \"%s\"\n",
+            key, key);
         FREE(flag_value);
         FREE(key);
         return 1;
@@ -365,7 +354,8 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
     else {
       boolean res;
 
-      StreamMgr_print_output(streams,  "Defining new environment variable \"%s\"\n", key);
+      StreamMgr_print_output(streams,
+                             "Defining new environment variable \"%s\"\n", key);
 
       /* Promote the new variable to boolean if no parameter is given.. */
       if (!has_param) {
@@ -375,8 +365,9 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
 
       res = OptsHandler_register_user_option(opts, key, flag_value);
       if (!res) {
-        StreamMgr_print_error(streams,
-                "Some error occurred while registering option \"%s\"\n", key);
+        StreamMgr_print_error(
+            streams, "Some error occurred while registering option \"%s\"\n",
+            key);
         FREE(flag_value);
         FREE(key);
         return 1;
@@ -387,15 +378,13 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
     FREE(key);
   }
 
-  OptsHandler_remove_option_trigger(opts, INPUT_FILE,
-                                    opt_input_file_trigger);
-
+  OptsHandler_remove_option_trigger(opts, INPUT_FILE, opt_input_file_trigger);
 
   return 0;
 
- usage:
-  (void) StreamMgr_print_output(streams, "usage: set [-h] [name [value]]\n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
+usage:
+  (void)StreamMgr_print_output(streams, "usage: set [-h] [name [value]]\n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
   return 1;
 }
 
@@ -419,12 +408,11 @@ static int CommandSetVariable(NuSMVEnv_ptr env, int argc, char** argv)
 
   \sa set
 */
-static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char** argv)
-{
+static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char **argv) {
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   int i;
   char *key;
@@ -432,7 +420,7 @@ static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char** argv)
 
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "h")) != EOF) {
-    switch(c) {
+    switch (c) {
     case 'h':
       goto usage;
       break;
@@ -452,8 +440,7 @@ static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char** argv)
          remove it! */
       if (OptsHandler_is_user_option(opts, key)) {
         OptsHandler_unregister_option(opts, key);
-      }
-      else {
+      } else {
         /* Unset of boolean options means set it to 0 */
         if (OptsHandler_is_bool_option(opts, key)) {
           OptsHandler_set_bool_option_value(opts, key, false);
@@ -463,19 +450,18 @@ static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char** argv)
           OptsHandler_reset_option_value(opts, key);
         }
       }
-    }
-    else {
-      StreamMgr_print_error(streams,  "Warning: Option \"%s\" is not registered\n", key);
+    } else {
+      StreamMgr_print_error(streams,
+                            "Warning: Option \"%s\" is not registered\n", key);
     }
     FREE(key);
   }
 
   return 0;
 
-
- usage:
-  StreamMgr_print_error(streams,  "usage: unset [-h] variables \n");
-  StreamMgr_print_error(streams,  "   -h \t\tPrints the command usage.\n");
+usage:
+  StreamMgr_print_error(streams, "usage: unset [-h] variables \n");
+  StreamMgr_print_error(streams, "   -h \t\tPrints the command usage.\n");
   return 1;
 }
 
@@ -492,26 +478,29 @@ static int CommandUnsetVariable(NuSMVEnv_ptr env, int argc, char** argv)
 
   \todo Missing description
 */
-static int CommandGenTestOptsHandler(NuSMVEnv_ptr env, int argc, char** argv)
-{
-  char* filename = (char*)NULL;
+static int CommandGenTestOptsHandler(NuSMVEnv_ptr env, int argc, char **argv) {
+  char *filename = (char *)NULL;
   int c;
   int ret = 0;
   boolean unset = false;
-  FILE* out = outstream;
+  FILE *out = outstream;
 
   util_getopt_reset();
   while ((c = util_getopt(argc, argv, "huo:")) != EOF) {
-    switch(c) {
+    switch (c) {
     case 'h':
       goto test_opt_handler_usage;
       break;
     case 'u':
-      if (unset) { goto test_opt_handler_usage; }
+      if (unset) {
+        goto test_opt_handler_usage;
+      }
       unset = true;
       break;
     case 'o':
-      if ((char*)NULL != filename) { goto test_opt_handler_usage; }
+      if ((char *)NULL != filename) {
+        goto test_opt_handler_usage;
+      }
       filename = util_strsav(util_optarg);
       break;
     default:
@@ -519,10 +508,10 @@ static int CommandGenTestOptsHandler(NuSMVEnv_ptr env, int argc, char** argv)
     }
   }
 
-  if ((char*)NULL != filename) {
+  if ((char *)NULL != filename) {
     out = fopen(filename, "w");
-    if ((FILE*)NULL == out) {
-      StreamMgr_print_error(streams,  "Cannot open %s for writing\n", filename);
+    if ((FILE *)NULL == out) {
+      StreamMgr_print_error(streams, "Cannot open %s for writing\n", filename);
       ret = 1;
       goto test_opt_handler_free;
     }
@@ -531,21 +520,23 @@ static int CommandGenTestOptsHandler(NuSMVEnv_ptr env, int argc, char** argv)
   OptsHandler_generate_test(opts, out, unset);
 
   fflush(out);
-  if ((char*)NULL != filename) {
+  if ((char *)NULL != filename) {
     fclose(out);
   }
 
   goto test_opt_handler_free;
 
- test_opt_handler_usage:
+test_opt_handler_usage:
   ret = 1;
-  StreamMgr_print_error(streams,  "usage: _gen_test_opts_handler: [-h] [-u] [-o filename]\n");
-  StreamMgr_print_error(streams,  "       -h      : Show help\n");
-  StreamMgr_print_error(streams,  "       -u      : Generate test of unset command\n");
-  StreamMgr_print_error(streams,  "       -o file : Save output to file\n");
+  StreamMgr_print_error(
+      streams, "usage: _gen_test_opts_handler: [-h] [-u] [-o filename]\n");
+  StreamMgr_print_error(streams, "       -h      : Show help\n");
+  StreamMgr_print_error(streams,
+                        "       -u      : Generate test of unset command\n");
+  StreamMgr_print_error(streams, "       -o file : Save output to file\n");
 
- test_opt_handler_free:
-  if ((char*)NULL != filename) {
+test_opt_handler_free:
+  if ((char *)NULL != filename) {
     FREE(filename);
   }
 
@@ -562,19 +553,19 @@ static int CommandGenTestOptsHandler(NuSMVEnv_ptr env, int argc, char** argv)
 
   Input file check function
 */
-static boolean opt_input_file_trigger(OptsHandler_ptr opts, const char* name,
-                               const char* val, Trigger_Action action,
-                               void* arg)
-{
+static boolean opt_input_file_trigger(OptsHandler_ptr opts, const char *name,
+                                      const char *val, Trigger_Action action,
+                                      void *arg) {
   const NuSMVEnv_ptr env = NUSMV_ENV(arg);
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
 
-  if (ACTION_SET == action && cmp_struct_get_read_model(cmps))  {
-    StreamMgr_print_output(streams,
-                           "***** Warning: a model is already loaded -- input_file not changed.\n");
-    StreamMgr_print_output(streams,
-                           "***** The model should be reset (e.g., using command \"reset\")\n");
+  if (ACTION_SET == action && cmp_struct_get_read_model(cmps)) {
+    StreamMgr_print_output(streams, "***** Warning: a model is already loaded "
+                                    "-- input_file not changed.\n");
+    StreamMgr_print_output(
+        streams,
+        "***** The model should be reset (e.g., using command \"reset\")\n");
     StreamMgr_print_output(streams,
                            "***** before the input_file can be changed.\n");
     return false;

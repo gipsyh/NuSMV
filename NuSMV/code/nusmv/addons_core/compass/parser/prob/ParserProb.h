@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,14 +34,12 @@
 
 */
 
-
-
 #ifndef __NUSMV_ADDONS_CORE_COMPASS_PARSER_PROB_PARSER_PROB_H__
 #define __NUSMV_ADDONS_CORE_COMPASS_PARSER_PROB_PARSER_PROB_H__
 
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/utils/NodeList.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/utils/NodeList.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct ParserProb
@@ -49,56 +47,54 @@
 
   \todo Missing description
 */
-typedef struct ParserProb_TAG* ParserProb_ptr;
+typedef struct ParserProb_TAG *ParserProb_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PARSER_PROB(x) \
-        ((ParserProb_ptr) (x))
+#define PARSER_PROB(x) ((ParserProb_ptr)(x))
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PARSER_PROB_CHECK_INSTANCE(x) \
-        (nusmv_assert(PARSER_PROB(x) != PARSER_PROB(NULL)))
+#define PARSER_PROB_CHECK_INSTANCE(x)                                          \
+  (nusmv_assert(PARSER_PROB(x) != PARSER_PROB(NULL)))
 
 /*!
   \methodof ParserProb
-  \brief 
+  \brief
 
-  
+
 */
 ParserProb_ptr ParserProb_create(const NuSMVEnv_ptr env);
 
 /*!
   \methodof ParserProb
-  \brief 
+  \brief
 
-  
+
 */
 void ParserProb_destroy(ParserProb_ptr self);
 
 /*!
   \methodof ParserProb
-  \brief 
+  \brief
 
-  
+
 */
-void ParserProb_parse_from_file(ParserProb_ptr self, FILE* f);
+void ParserProb_parse_from_file(ParserProb_ptr self, FILE *f);
 
 /*!
   \methodof ParserProb
-  \brief 
+  \brief
 
-  
+
 */
-void
-ParserProb_parse_from_string(ParserProb_ptr self, const char* str);
+void ParserProb_parse_from_string(ParserProb_ptr self, const char *str);
 
 /*!
   \methodof ParserProb
@@ -111,11 +107,10 @@ NodeList_ptr ParserProb_get_prob_list(const ParserProb_ptr self);
 
 /*!
   \methodof ParserProb
-  \brief 
+  \brief
 
-  
+
 */
 void ParserProb_reset(ParserProb_ptr self);
-
 
 #endif /* __NUSMV_ADDONS_CORE_COMPASS_PARSER_PROB_PARSER_PROB_H__ */

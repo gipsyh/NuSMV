@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,37 +36,34 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_TRANS_GENERIC_GENERIC_TRANS_H__
 #define __NUSMV_CORE_TRANS_GENERIC_GENERIC_TRANS_H__
 
-#include "nusmv/core/trans/trans.h" /* for TransType */
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/trans/trans.h" /* for TransType */
 
 /*!
   \struct GenericTrans
   \brief The structure used to represent the transition relation.
 
-  
+
 */
-typedef struct GenericTrans_TAG* GenericTrans_ptr;
+typedef struct GenericTrans_TAG *GenericTrans_ptr;
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define GENERIC_TRANS(x)  \
-        ((GenericTrans_ptr) x)
+#define GENERIC_TRANS(x) ((GenericTrans_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define GENERIC_TRANS_CHECK_INSTANCE(x)  \
-        (nusmv_assert(GENERIC_TRANS(x) != GENERIC_TRANS(NULL)))
-
+#define GENERIC_TRANS_CHECK_INSTANCE(x)                                        \
+  (nusmv_assert(GENERIC_TRANS(x) != GENERIC_TRANS(NULL)))
 
 /* ---------------------------------------------------------------------- */
 /*     Public methods                                                     */
@@ -81,17 +78,16 @@ typedef struct GenericTrans_TAG* GenericTrans_ptr;
 
   \sa Object_destroy
 */
-GenericTrans_ptr
-GenericTrans_create(const NuSMVEnv_ptr env, const TransType trans_type);
+GenericTrans_ptr GenericTrans_create(const NuSMVEnv_ptr env,
+                                     const TransType trans_type);
 
 /*!
   \methodof GenericTrans
   \brief Retrives the type of trans structure.
 
   Returns the type of the transition relation structure passed as
-  the arguments. 
+  the arguments.
 */
 TransType GenericTrans_get_type(const GenericTrans_ptr self);
-
 
 #endif /* __NUSMV_CORE_TRANS_GENERIC_GENERIC_TRANS_H__ */

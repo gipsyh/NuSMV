@@ -34,9 +34,8 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-# include "nusmv-config.h"
+#include "nusmv-config.h"
 #endif
 
 #include "nusmv/core/hrc/HrcNode.h"
@@ -79,19 +78,17 @@
 
 /*! Enable to self check for duplication (debug) in all HrcNode_add_*
  *  methods */
-#define HRC_NODE_CHECK_DUPLICATION  0  /* this is for debug */
-#define HRC_NODE_AVOID_DUPLICATION  1  /* this is for performances */
-
+#define HRC_NODE_CHECK_DUPLICATION 0 /* this is for debug */
+#define HRC_NODE_AVOID_DUPLICATION 1 /* this is for performances */
 
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
-static void hrc_node_finalize(Object_ptr object, void* dummy);
+static void hrc_node_finalize(Object_ptr object, void *dummy);
 
-static Olist_ptr hrc_node_copy_list(NodeMgr_ptr nodemgr,
-                                    Olist_ptr src_list);
+static Olist_ptr hrc_node_copy_list(NodeMgr_ptr nodemgr, Olist_ptr src_list);
 
 static void hrc_node_free_elements_in_list_and_list(NodeMgr_ptr nodemgr,
                                                     Olist_ptr list);
@@ -99,22 +96,19 @@ static void hrc_node_free_elements_in_list_and_list(NodeMgr_ptr nodemgr,
 static void hrc_node_free_list_and_clear_assign_map(HrcNode_ptr self,
                                                     int assign_type);
 
-static assoc_retval hrc_node_free_cons_map_fun(char *key,
-                                               char *data,
-                                               char * arg);
+static assoc_retval hrc_node_free_cons_map_fun(char *key, char *data,
+                                               char *arg);
 static void hrc_node_insert_assign_hash_list(HrcNode_ptr self,
                                              Olist_ptr assign_list,
                                              const int assign_type);
-static void hrc_node_insert_assign_hash(HrcNode_ptr self,
-                                        node_ptr assign,
+static void hrc_node_insert_assign_hash(HrcNode_ptr self, node_ptr assign,
                                         const int assign_type);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-HrcNode_ptr HrcNode_create(const NuSMVEnv_ptr env)
-{
+HrcNode_ptr HrcNode_create(const NuSMVEnv_ptr env) {
   HrcNode_ptr self = ALLOC(HrcNode, 1);
   HRC_NODE_CHECK_INSTANCE(self);
 
@@ -122,15 +116,13 @@ HrcNode_ptr HrcNode_create(const NuSMVEnv_ptr env)
   return self;
 }
 
-void HrcNode_destroy(HrcNode_ptr self)
-{
+void HrcNode_destroy(HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
 }
 
-void HrcNode_destroy_recur(HrcNode_ptr self)
-{
+void HrcNode_destroy_recur(HrcNode_ptr self) {
   Slist_ptr child;
   Siter iter;
 
@@ -138,16 +130,14 @@ void HrcNode_destroy_recur(HrcNode_ptr self)
 
   child = HrcNode_get_child_hrc_nodes(self);
 
-  for (iter = Slist_first(child);
-       false == Siter_is_end(iter);
+  for (iter = Slist_first(child); false == Siter_is_end(iter);
        iter = Siter_next(iter)) {
     HrcNode_destroy_recur((HrcNode_ptr)Siter_element(iter));
   }
   HrcNode_destroy(self);
 }
 
-void HrcNode_cleanup(HrcNode_ptr self)
-{
+void HrcNode_cleanup(HrcNode_ptr self) {
   NuSMVEnv_ptr env;
   NodeMgr_ptr nodemgr;
 
@@ -203,7 +193,7 @@ void HrcNode_cleanup(HrcNode_ptr self)
   FREELIST_AND_SET_TO_NIL(self->compute_props);
   self->compute_props = Olist_create();
 
-  self->undef = (void*)NULL;
+  self->undef = (void *)NULL;
 
   /* here the hrc_node_free_list_and_clear_assign_map is not used so
      we can avoid to pass 3 times through the hashmap, which is
@@ -218,8 +208,7 @@ void HrcNode_cleanup(HrcNode_ptr self)
   /* Free all cons nodes in the map values - do not free the
      assigns_table */
   clear_assoc_and_free_entries_arg(self->assigns_table,
-                                   hrc_node_free_cons_map_fun,
-                                   (char*)nodemgr);
+                                   hrc_node_free_cons_map_fun, (char *)nodemgr);
 
   {
     Slist_ptr child = HrcNode_get_child_hrc_nodes(self);
@@ -227,9 +216,8 @@ void HrcNode_cleanup(HrcNode_ptr self)
 
     child = HrcNode_get_child_hrc_nodes(self);
 
-    for(iter = Slist_first(child);
-        false == Siter_is_end(iter);
-        iter = Siter_next(iter)) {
+    for (iter = Slist_first(child); false == Siter_is_end(iter);
+         iter = Siter_next(iter)) {
       HrcNode_ptr c;
 
       c = (HrcNode_ptr)Siter_element(iter);
@@ -239,77 +227,66 @@ void HrcNode_cleanup(HrcNode_ptr self)
   }
 }
 
-void HrcNode_set_symbol_table(HrcNode_ptr self, SymbTable_ptr st)
-{
+void HrcNode_set_symbol_table(HrcNode_ptr self, SymbTable_ptr st) {
   HRC_NODE_CHECK_INSTANCE(self);
   self->st = st;
 }
 
-SymbTable_ptr HrcNode_get_symbol_table(HrcNode_ptr self)
-{
+SymbTable_ptr HrcNode_get_symbol_table(HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   nusmv_assert(SYMB_TABLE(NULL) != self->st);
   return self->st;
 }
 
-void HrcNode_set_lineno(HrcNode_ptr self, int lineno)
-{
+void HrcNode_set_lineno(HrcNode_ptr self, int lineno) {
   HRC_NODE_CHECK_INSTANCE(self);
   self->lineno = lineno;
 }
 
-int HrcNode_get_lineno(const HrcNode_ptr self)
-{
+int HrcNode_get_lineno(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return self->lineno;
 }
 
-void HrcNode_set_name(HrcNode_ptr self, node_ptr name)
-{
+void HrcNode_set_name(HrcNode_ptr self, node_ptr name) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   self->name = name;
 }
 
-node_ptr HrcNode_get_name(const HrcNode_ptr self)
-{
+node_ptr HrcNode_get_name(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
     return find_atom(nodemgr, self->name);
   }
 }
 
-node_ptr HrcNode_get_crude_name(const HrcNode_ptr self)
-{
+node_ptr HrcNode_get_crude_name(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return self->name;
 }
 
-void HrcNode_set_instance_name(HrcNode_ptr self, node_ptr name)
-{
+void HrcNode_set_instance_name(HrcNode_ptr self, node_ptr name) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   nusmv_assert(Nil == self->instance_name);
   self->instance_name = name;
 }
 
-node_ptr HrcNode_get_instance_name(const HrcNode_ptr self)
-{
+node_ptr HrcNode_get_instance_name(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return self->instance_name;
 }
 
-node_ptr HrcNode_get_flattened_instance_name(const HrcNode_ptr self)
-{
+node_ptr HrcNode_get_flattened_instance_name(const HrcNode_ptr self) {
   NodeMgr_ptr nodemgr;
   node_ptr flattened_name;
   HrcNode_ptr instance_iter;
@@ -344,7 +321,7 @@ node_ptr HrcNode_get_flattened_instance_name(const HrcNode_ptr self)
   */
   flattened_name = Nil;
 
-  while (! Slist_is_empty(variables_chain)) {
+  while (!Slist_is_empty(variables_chain)) {
     node_ptr current_var;
 
     current_var = Slist_pop(variables_chain);
@@ -359,8 +336,8 @@ node_ptr HrcNode_get_flattened_instance_name(const HrcNode_ptr self)
           - CompileFlatten_resolve_name, ecc...: they do not handle
         instance names but only variables.
       */
-      flattened_name = CompileFlatten_concat_contexts(env, flattened_name,
-                                                      find_atom(nodemgr, current_var));
+      flattened_name = CompileFlatten_concat_contexts(
+          env, flattened_name, find_atom(nodemgr, current_var));
     }
   }
 
@@ -369,8 +346,7 @@ node_ptr HrcNode_get_flattened_instance_name(const HrcNode_ptr self)
   return flattened_name;
 }
 
-void HrcNode_set_parent(HrcNode_ptr self, const HrcNode_ptr father)
-{
+void HrcNode_set_parent(HrcNode_ptr self, const HrcNode_ptr father) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   nusmv_assert(HRC_NODE(NULL) == self->parent);
@@ -379,15 +355,13 @@ void HrcNode_set_parent(HrcNode_ptr self, const HrcNode_ptr father)
   return;
 }
 
-HrcNode_ptr HrcNode_get_parent(const HrcNode_ptr self)
-{
+HrcNode_ptr HrcNode_get_parent(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return self->parent;
 }
 
-HrcNode_ptr HrcNode_get_root(const HrcNode_ptr self)
-{
+HrcNode_ptr HrcNode_get_root(const HrcNode_ptr self) {
   HrcNode_ptr res = self;
 
   HRC_NODE_CHECK_INSTANCE(self);
@@ -397,8 +371,7 @@ HrcNode_ptr HrcNode_get_root(const HrcNode_ptr self)
   return res;
 }
 
-void HrcNode_replace_formal_parameters(HrcNode_ptr self, Olist_ptr par)
-{
+void HrcNode_replace_formal_parameters(HrcNode_ptr self, Olist_ptr par) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != par);
 
@@ -407,15 +380,13 @@ void HrcNode_replace_formal_parameters(HrcNode_ptr self, Olist_ptr par)
   self->formal_parameters = par;
 }
 
-Oiter HrcNode_get_formal_parameters_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_formal_parameters_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->formal_parameters);
 }
 
-void HrcNode_add_formal_parameter(HrcNode_ptr self, node_ptr par)
-{
+void HrcNode_add_formal_parameter(HrcNode_ptr self, node_ptr par) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Nil == par || CONS == node_get_type(par));
 #if HRC_NODE_CHECK_DUPLICATION
@@ -425,14 +396,12 @@ void HrcNode_add_formal_parameter(HrcNode_ptr self, node_ptr par)
   Olist_append(self->formal_parameters, par);
 }
 
-int HrcNode_get_formal_parameters_length(HrcNode_ptr self)
-{
+int HrcNode_get_formal_parameters_length(HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->formal_parameters);
 }
 
-void HrcNode_replace_actual_parameters(HrcNode_ptr self, Olist_ptr par)
-{
+void HrcNode_replace_actual_parameters(HrcNode_ptr self, Olist_ptr par) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != par);
 
@@ -441,15 +410,13 @@ void HrcNode_replace_actual_parameters(HrcNode_ptr self, Olist_ptr par)
   self->actual_parameters = par;
 }
 
-Oiter HrcNode_get_actual_parameters_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_actual_parameters_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->actual_parameters);
 }
 
-void HrcNode_add_actual_parameter(HrcNode_ptr self, node_ptr par)
-{
+void HrcNode_add_actual_parameter(HrcNode_ptr self, node_ptr par) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Nil == par || CONS == node_get_type(par));
 #if HRC_NODE_CHECK_DUPLICATION
@@ -459,14 +426,12 @@ void HrcNode_add_actual_parameter(HrcNode_ptr self, node_ptr par)
   Olist_append(self->actual_parameters, par);
 }
 
-int HrcNode_get_actual_parameters_length(HrcNode_ptr self)
-{
+int HrcNode_get_actual_parameters_length(HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->actual_parameters);
 }
 
-void HrcNode_replace_state_variables(HrcNode_ptr self, Olist_ptr vars)
-{
+void HrcNode_replace_state_variables(HrcNode_ptr self, Olist_ptr vars) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != vars);
 
@@ -475,15 +440,13 @@ void HrcNode_replace_state_variables(HrcNode_ptr self, Olist_ptr vars)
   self->state_variables = vars;
 }
 
-Oiter HrcNode_get_state_variables_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_state_variables_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->state_variables);
 }
 
-void HrcNode_add_state_variable(HrcNode_ptr self, node_ptr var)
-{
+void HrcNode_add_state_variable(HrcNode_ptr self, node_ptr var) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Nil == var || CONS == node_get_type(var));
 #if HRC_NODE_CHECK_DUPLICATION
@@ -493,8 +456,7 @@ void HrcNode_add_state_variable(HrcNode_ptr self, node_ptr var)
   Olist_append(self->state_variables, var);
 }
 
-void HrcNode_replace_frozen_functions(HrcNode_ptr self, Olist_ptr functions)
-{
+void HrcNode_replace_frozen_functions(HrcNode_ptr self, Olist_ptr functions) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != functions);
 
@@ -503,8 +465,7 @@ void HrcNode_replace_frozen_functions(HrcNode_ptr self, Olist_ptr functions)
   self->frozen_functions = functions;
 }
 
-void HrcNode_add_frozen_function(HrcNode_ptr self, node_ptr fun)
-{
+void HrcNode_add_frozen_function(HrcNode_ptr self, node_ptr fun) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Nil == fun || CONS == node_get_type(fun));
 #if HRC_NODE_CHECK_DUPLICATION
@@ -514,15 +475,13 @@ void HrcNode_add_frozen_function(HrcNode_ptr self, node_ptr fun)
   Olist_append(self->frozen_functions, fun);
 }
 
-Oiter HrcNode_get_frozen_functions_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_frozen_functions_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->frozen_functions);
 }
 
-void HrcNode_replace_input_variables(HrcNode_ptr self, Olist_ptr vars)
-{
+void HrcNode_replace_input_variables(HrcNode_ptr self, Olist_ptr vars) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != vars);
 
@@ -531,15 +490,13 @@ void HrcNode_replace_input_variables(HrcNode_ptr self, Olist_ptr vars)
   self->input_variables = vars;
 }
 
-Oiter HrcNode_get_input_variables_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_input_variables_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->input_variables);
 }
 
-void HrcNode_add_input_variable(HrcNode_ptr self, node_ptr var)
-{
+void HrcNode_add_input_variable(HrcNode_ptr self, node_ptr var) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Nil == var || CONS == node_get_type(var));
 #if HRC_NODE_CHECK_DUPLICATION
@@ -549,8 +506,7 @@ void HrcNode_add_input_variable(HrcNode_ptr self, node_ptr var)
   Olist_append(self->input_variables, var);
 }
 
-void HrcNode_replace_frozen_variables(HrcNode_ptr self, Olist_ptr vars)
-{
+void HrcNode_replace_frozen_variables(HrcNode_ptr self, Olist_ptr vars) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != vars);
 
@@ -559,15 +515,13 @@ void HrcNode_replace_frozen_variables(HrcNode_ptr self, Olist_ptr vars)
   self->frozen_variables = vars;
 }
 
-Oiter HrcNode_get_frozen_variables_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_frozen_variables_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->frozen_variables);
 }
 
-void HrcNode_add_frozen_variable(HrcNode_ptr self, node_ptr var)
-{
+void HrcNode_add_frozen_variable(HrcNode_ptr self, node_ptr var) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Nil == var || CONS == node_get_type(var));
 #if HRC_NODE_CHECK_DUPLICATION
@@ -577,8 +531,7 @@ void HrcNode_add_frozen_variable(HrcNode_ptr self, node_ptr var)
   Olist_append(self->frozen_variables, var);
 }
 
-void HrcNode_replace_defines(HrcNode_ptr self, Olist_ptr defs)
-{
+void HrcNode_replace_defines(HrcNode_ptr self, Olist_ptr defs) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != defs);
 
@@ -587,15 +540,13 @@ void HrcNode_replace_defines(HrcNode_ptr self, Olist_ptr defs)
   self->defines = defs;
 }
 
-Oiter HrcNode_get_defines_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_defines_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->defines);
 }
 
-void HrcNode_add_define(HrcNode_ptr self, node_ptr def)
-{
+void HrcNode_add_define(HrcNode_ptr self, node_ptr def) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(CONS == node_get_type(def));
 #if HRC_NODE_CHECK_DUPLICATION
@@ -605,8 +556,7 @@ void HrcNode_add_define(HrcNode_ptr self, node_ptr def)
   Olist_append(self->defines, def);
 }
 
-void HrcNode_replace_array_defines(HrcNode_ptr self, Olist_ptr mdefs)
-{
+void HrcNode_replace_array_defines(HrcNode_ptr self, Olist_ptr mdefs) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != mdefs);
 
@@ -615,15 +565,13 @@ void HrcNode_replace_array_defines(HrcNode_ptr self, Olist_ptr mdefs)
   self->array_defines = mdefs;
 }
 
-Oiter HrcNode_get_array_defines_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_array_defines_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->array_defines);
 }
 
-void HrcNode_add_array_define(HrcNode_ptr self, node_ptr mdef)
-{
+void HrcNode_add_array_define(HrcNode_ptr self, node_ptr mdef) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_CHECK_DUPLICATION
   nusmv_assert(!Olist_contains(self->array_defines, mdef));
@@ -632,8 +580,7 @@ void HrcNode_add_array_define(HrcNode_ptr self, node_ptr mdef)
   Olist_append(self->array_defines, mdef);
 }
 
-void HrcNode_replace_init_exprs(HrcNode_ptr self, Olist_ptr exprs)
-{
+void HrcNode_replace_init_exprs(HrcNode_ptr self, Olist_ptr exprs) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != exprs);
 
@@ -642,15 +589,13 @@ void HrcNode_replace_init_exprs(HrcNode_ptr self, Olist_ptr exprs)
   self->init_expr = exprs;
 }
 
-Oiter HrcNode_get_init_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_init_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->init_expr);
 }
 
-void HrcNode_add_init_expr(HrcNode_ptr self, node_ptr expr)
-{
+void HrcNode_add_init_expr(HrcNode_ptr self, node_ptr expr) {
   HRC_NODE_CHECK_INSTANCE(self);
 
 #if HRC_NODE_AVOID_DUPLICATION
@@ -662,8 +607,7 @@ void HrcNode_add_init_expr(HrcNode_ptr self, node_ptr expr)
 #endif
 }
 
-void HrcNode_replace_init_assign_exprs(HrcNode_ptr self, Olist_ptr assigns)
-{
+void HrcNode_replace_init_assign_exprs(HrcNode_ptr self, Olist_ptr assigns) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != assigns);
 
@@ -677,15 +621,13 @@ void HrcNode_replace_init_assign_exprs(HrcNode_ptr self, Olist_ptr assigns)
   self->init_assign = assigns;
 }
 
-Oiter HrcNode_get_init_assign_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_init_assign_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->init_assign);
 }
 
-void HrcNode_add_init_assign_expr(HrcNode_ptr self, node_ptr assign)
-{
+void HrcNode_add_init_assign_expr(HrcNode_ptr self, node_ptr assign) {
   HRC_NODE_CHECK_INSTANCE(self);
 
 #if HRC_NODE_AVOID_DUPLICATION
@@ -700,8 +642,7 @@ void HrcNode_add_init_assign_expr(HrcNode_ptr self, node_ptr assign)
 #endif
 }
 
-void HrcNode_replace_invar_exprs(HrcNode_ptr self, Olist_ptr exprs)
-{
+void HrcNode_replace_invar_exprs(HrcNode_ptr self, Olist_ptr exprs) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != exprs);
 
@@ -710,15 +651,13 @@ void HrcNode_replace_invar_exprs(HrcNode_ptr self, Olist_ptr exprs)
   self->invar_expr = exprs;
 }
 
-Oiter HrcNode_get_invar_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_invar_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->invar_expr);
 }
 
-void HrcNode_add_invar_expr(HrcNode_ptr self, node_ptr expr)
-{
+void HrcNode_add_invar_expr(HrcNode_ptr self, node_ptr expr) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->invar_expr, expr)) {
@@ -729,8 +668,7 @@ void HrcNode_add_invar_expr(HrcNode_ptr self, node_ptr expr)
 #endif
 }
 
-void HrcNode_replace_invar_assign_exprs(HrcNode_ptr self, Olist_ptr assigns)
-{
+void HrcNode_replace_invar_assign_exprs(HrcNode_ptr self, Olist_ptr assigns) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != assigns);
 
@@ -743,15 +681,13 @@ void HrcNode_replace_invar_assign_exprs(HrcNode_ptr self, Olist_ptr assigns)
   self->invar_assign = assigns;
 }
 
-Oiter HrcNode_get_invar_assign_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_invar_assign_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->invar_assign);
 }
 
-void HrcNode_add_invar_assign_expr(HrcNode_ptr self, node_ptr assign)
-{
+void HrcNode_add_invar_assign_expr(HrcNode_ptr self, node_ptr assign) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->invar_assign, assign)) {
@@ -766,29 +702,29 @@ void HrcNode_add_invar_assign_expr(HrcNode_ptr self, node_ptr assign)
 }
 
 boolean HrcNode_can_declare_assign(HrcNode_ptr self, node_ptr symbol,
-                                   int assign_type)
-{
+                                   int assign_type) {
   node_ptr ass = find_assoc(self->assigns_table, symbol);
 
   if (Nil != ass) {
     /* Both INIT and NEXT have been already declared */
-    if (Nil != cdr(ass)) return false;
+    if (Nil != cdr(ass))
+      return false;
 
     /* An assignment has been already declared, cannon declare an
        INVAR assignment in any case, or the already declared
        assignment is an INVAR one */
-    if ((INVAR == assign_type) ||
-        (NODE_FROM_INT(INVAR) == car(ass))) return false;
+    if ((INVAR == assign_type) || (NODE_FROM_INT(INVAR) == car(ass)))
+      return false;
 
     /* Assignment of assign_type already declared. */
-    if (car(ass) == NODE_FROM_INT(assign_type)) return false;
+    if (car(ass) == NODE_FROM_INT(assign_type))
+      return false;
   }
 
   return true;
 }
 
-void HrcNode_replace_trans_exprs(HrcNode_ptr self, Olist_ptr exprs)
-{
+void HrcNode_replace_trans_exprs(HrcNode_ptr self, Olist_ptr exprs) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != exprs);
 
@@ -797,15 +733,13 @@ void HrcNode_replace_trans_exprs(HrcNode_ptr self, Olist_ptr exprs)
   self->next_expr = exprs;
 }
 
-Oiter HrcNode_get_trans_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_trans_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->next_expr);
 }
 
-void HrcNode_add_trans_expr(HrcNode_ptr self, node_ptr expr)
-{
+void HrcNode_add_trans_expr(HrcNode_ptr self, node_ptr expr) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->next_expr, expr)) {
@@ -816,8 +750,7 @@ void HrcNode_add_trans_expr(HrcNode_ptr self, node_ptr expr)
 #endif
 }
 
-void HrcNode_replace_next_assign_exprs(HrcNode_ptr self, Olist_ptr assigns)
-{
+void HrcNode_replace_next_assign_exprs(HrcNode_ptr self, Olist_ptr assigns) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != assigns);
 
@@ -830,15 +763,13 @@ void HrcNode_replace_next_assign_exprs(HrcNode_ptr self, Olist_ptr assigns)
   self->next_assign = assigns;
 }
 
-Oiter HrcNode_get_next_assign_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_next_assign_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->next_assign);
 }
 
-void HrcNode_add_next_assign_expr(HrcNode_ptr self, node_ptr assign)
-{
+void HrcNode_add_next_assign_expr(HrcNode_ptr self, node_ptr assign) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->next_assign, assign)) {
@@ -852,8 +783,7 @@ void HrcNode_add_next_assign_expr(HrcNode_ptr self, node_ptr assign)
 #endif
 }
 
-void HrcNode_replace_justice_exprs(HrcNode_ptr self, Olist_ptr justices)
-{
+void HrcNode_replace_justice_exprs(HrcNode_ptr self, Olist_ptr justices) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != justices);
 
@@ -862,15 +792,13 @@ void HrcNode_replace_justice_exprs(HrcNode_ptr self, Olist_ptr justices)
   self->justice = justices;
 }
 
-Oiter HrcNode_get_justice_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_justice_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->justice);
 }
 
-void HrcNode_add_justice_expr(HrcNode_ptr self, node_ptr justice)
-{
+void HrcNode_add_justice_expr(HrcNode_ptr self, node_ptr justice) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->justice, justice)) {
@@ -881,8 +809,7 @@ void HrcNode_add_justice_expr(HrcNode_ptr self, node_ptr justice)
 #endif
 }
 
-void HrcNode_replace_compassion_exprs(HrcNode_ptr self, Olist_ptr compassions)
-{
+void HrcNode_replace_compassion_exprs(HrcNode_ptr self, Olist_ptr compassions) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != compassions);
 
@@ -891,15 +818,13 @@ void HrcNode_replace_compassion_exprs(HrcNode_ptr self, Olist_ptr compassions)
   self->compassion = compassions;
 }
 
-Oiter HrcNode_get_compassion_exprs_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_compassion_exprs_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->compassion);
 }
 
-void HrcNode_add_compassion_expr(HrcNode_ptr self, node_ptr compassion)
-{
+void HrcNode_add_compassion_expr(HrcNode_ptr self, node_ptr compassion) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->compassion, compassion)) {
@@ -910,8 +835,7 @@ void HrcNode_add_compassion_expr(HrcNode_ptr self, node_ptr compassion)
 #endif
 }
 
-void HrcNode_replace_constants(HrcNode_ptr self, Olist_ptr constants)
-{
+void HrcNode_replace_constants(HrcNode_ptr self, Olist_ptr constants) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != constants);
 
@@ -919,15 +843,13 @@ void HrcNode_replace_constants(HrcNode_ptr self, Olist_ptr constants)
   self->constants = constants;
 }
 
-Oiter HrcNode_get_constants_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_constants_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->constants);
 }
 
-void HrcNode_add_constants(HrcNode_ptr self, node_ptr constant)
-{
+void HrcNode_add_constants(HrcNode_ptr self, node_ptr constant) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   while (Nil != constant) {
@@ -944,8 +866,7 @@ void HrcNode_add_constants(HrcNode_ptr self, node_ptr constant)
   }
 }
 
-void HrcNode_replace_ctl_properties(HrcNode_ptr self, Olist_ptr ctls)
-{
+void HrcNode_replace_ctl_properties(HrcNode_ptr self, Olist_ptr ctls) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != ctls);
 
@@ -954,15 +875,13 @@ void HrcNode_replace_ctl_properties(HrcNode_ptr self, Olist_ptr ctls)
   self->ctl_props = ctls;
 }
 
-Oiter HrcNode_get_ctl_properties_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_ctl_properties_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->ctl_props);
 }
 
-void HrcNode_add_ctl_property_expr(HrcNode_ptr self, node_ptr ctl)
-{
+void HrcNode_add_ctl_property_expr(HrcNode_ptr self, node_ptr ctl) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->ctl_props, ctl)) {
@@ -973,8 +892,7 @@ void HrcNode_add_ctl_property_expr(HrcNode_ptr self, node_ptr ctl)
 #endif
 }
 
-void HrcNode_replace_ltl_properties(HrcNode_ptr self, Olist_ptr ltls)
-{
+void HrcNode_replace_ltl_properties(HrcNode_ptr self, Olist_ptr ltls) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != ltls);
 
@@ -983,15 +901,13 @@ void HrcNode_replace_ltl_properties(HrcNode_ptr self, Olist_ptr ltls)
   self->ltl_props = ltls;
 }
 
-Oiter HrcNode_get_ltl_properties_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_ltl_properties_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->ltl_props);
 }
 
-void HrcNode_add_ltl_property_expr(HrcNode_ptr self, node_ptr ltl)
-{
+void HrcNode_add_ltl_property_expr(HrcNode_ptr self, node_ptr ltl) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Nil == ltl || LTLSPEC == node_get_type(ltl));
 
@@ -1004,8 +920,7 @@ void HrcNode_add_ltl_property_expr(HrcNode_ptr self, node_ptr ltl)
 #endif
 }
 
-void HrcNode_replace_psl_properties(HrcNode_ptr self, Olist_ptr psls)
-{
+void HrcNode_replace_psl_properties(HrcNode_ptr self, Olist_ptr psls) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != psls);
 
@@ -1014,15 +929,13 @@ void HrcNode_replace_psl_properties(HrcNode_ptr self, Olist_ptr psls)
   self->psl_props = psls;
 }
 
-Oiter HrcNode_get_psl_properties_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_psl_properties_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->psl_props);
 }
 
-void HrcNode_add_psl_property_expr(HrcNode_ptr self, node_ptr psl)
-{
+void HrcNode_add_psl_property_expr(HrcNode_ptr self, node_ptr psl) {
   HRC_NODE_CHECK_INSTANCE(self);
 
 #if HRC_NODE_AVOID_DUPLICATION
@@ -1034,8 +947,7 @@ void HrcNode_add_psl_property_expr(HrcNode_ptr self, node_ptr psl)
 #endif
 }
 
-void HrcNode_replace_invar_properties(HrcNode_ptr self, Olist_ptr invars)
-{
+void HrcNode_replace_invar_properties(HrcNode_ptr self, Olist_ptr invars) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != invars);
 
@@ -1044,15 +956,13 @@ void HrcNode_replace_invar_properties(HrcNode_ptr self, Olist_ptr invars)
   self->invar_props = invars;
 }
 
-Oiter HrcNode_get_invar_properties_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_invar_properties_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->invar_props);
 }
 
-void HrcNode_add_invar_property_expr(HrcNode_ptr self, node_ptr invar)
-{
+void HrcNode_add_invar_property_expr(HrcNode_ptr self, node_ptr invar) {
   HRC_NODE_CHECK_INSTANCE(self);
 #if HRC_NODE_AVOID_DUPLICATION
   if (!Olist_contains(self->invar_props, invar)) {
@@ -1063,8 +973,7 @@ void HrcNode_add_invar_property_expr(HrcNode_ptr self, node_ptr invar)
 #endif
 }
 
-void HrcNode_replace_compute_properties(HrcNode_ptr self, Olist_ptr computes)
-{
+void HrcNode_replace_compute_properties(HrcNode_ptr self, Olist_ptr computes) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(OLIST(NULL) != computes);
 
@@ -1073,15 +982,13 @@ void HrcNode_replace_compute_properties(HrcNode_ptr self, Olist_ptr computes)
   self->compute_props = computes;
 }
 
-Oiter HrcNode_get_compute_properties_iter(const HrcNode_ptr self)
-{
+Oiter HrcNode_get_compute_properties_iter(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Olist_first(self->compute_props);
 }
 
-void HrcNode_add_compute_property_expr(HrcNode_ptr self, node_ptr compute)
-{
+void HrcNode_add_compute_property_expr(HrcNode_ptr self, node_ptr compute) {
   HRC_NODE_CHECK_INSTANCE(self);
 
 #if HRC_NODE_AVOID_DUPLICATION
@@ -1093,8 +1000,7 @@ void HrcNode_add_compute_property_expr(HrcNode_ptr self, node_ptr compute)
 #endif
 }
 
-void HrcNode_set_child_hrc_nodes(HrcNode_ptr self, Slist_ptr list)
-{
+void HrcNode_set_child_hrc_nodes(HrcNode_ptr self, Slist_ptr list) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(Slist_is_empty(self->childs));
 
@@ -1102,9 +1008,8 @@ void HrcNode_set_child_hrc_nodes(HrcNode_ptr self, Slist_ptr list)
 
   {
     Siter iter;
-    for(iter = Slist_first(list);
-        (false == Siter_is_end(iter));
-        iter = Siter_next(iter)) {
+    for (iter = Slist_first(list); (false == Siter_is_end(iter));
+         iter = Siter_next(iter)) {
       nusmv_assert(HrcNode_get_parent(HRC_NODE(Siter_element(iter))) == self);
     }
   }
@@ -1123,15 +1028,13 @@ void HrcNode_set_child_hrc_nodes(HrcNode_ptr self, Slist_ptr list)
 */
 
 /* Get the local list of child nodes for current node */
-Slist_ptr HrcNode_get_child_hrc_nodes(const HrcNode_ptr self)
-{
+Slist_ptr HrcNode_get_child_hrc_nodes(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return self->childs;
 }
 
-void HrcNode_add_child_hrc_node(HrcNode_ptr self, HrcNode_ptr node)
-{
+void HrcNode_add_child_hrc_node(HrcNode_ptr self, HrcNode_ptr node) {
   HRC_NODE_CHECK_INSTANCE(self);
   nusmv_assert(HrcNode_get_parent(node) == self);
 
@@ -1139,29 +1042,28 @@ void HrcNode_add_child_hrc_node(HrcNode_ptr self, HrcNode_ptr node)
 }
 
 HrcNode_ptr HrcNode_find_hrc_node_by_mod_type(const HrcNode_ptr self,
-                                              const node_ptr mod_type)
-{
+                                              const node_ptr mod_type) {
   HRC_NODE_CHECK_INSTANCE(self);
 
-  if (HrcNode_get_name(self) == mod_type) return self;
+  if (HrcNode_get_name(self) == mod_type)
+    return self;
   else {
     Siter iter;
     HrcNode_ptr r = HRC_NODE(NULL);
-    for (iter = Slist_first(self->childs);
-         false == Siter_is_end(iter);
+    for (iter = Slist_first(self->childs); false == Siter_is_end(iter);
          iter = Siter_next(iter)) {
 
       r = HrcNode_find_hrc_node_by_mod_type((HrcNode_ptr)Siter_element(iter),
                                             mod_type);
-      if (HRC_NODE(NULL) != r) break;
+      if (HRC_NODE(NULL) != r)
+        break;
     }
     return r;
   }
 }
 
 Olist_ptr HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
-                                             const node_ptr mod_type)
-{
+                                             const node_ptr mod_type) {
   Olist_ptr res = Olist_create();
 
   HRC_NODE_CHECK_INSTANCE(self);
@@ -1169,14 +1071,12 @@ Olist_ptr HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
   if (HrcNode_get_name(self) == mod_type) {
     Olist_append(res, self);
     /* nodes cannot contain modules of their same types, so it can exit */
-  }
-  else {
+  } else {
     /* inductive step */
     Siter iter;
     SLIST_FOREACH(self->childs, iter) {
-      Olist_ptr child_list =
-        HrcNode_find_hrc_nodes_by_mod_type((HrcNode_ptr) Siter_element(iter),
-                                           mod_type);
+      Olist_ptr child_list = HrcNode_find_hrc_nodes_by_mod_type(
+          (HrcNode_ptr)Siter_element(iter), mod_type);
       Olist_move_all(child_list, res);
       Olist_destroy(child_list);
     }
@@ -1186,8 +1086,7 @@ Olist_ptr HrcNode_find_hrc_nodes_by_mod_type(const HrcNode_ptr self,
 }
 
 HrcNode_ptr HrcNode_find_hrc_node_by_instance_name(const HrcNode_ptr self,
-                                                   node_ptr name)
-{
+                                                   node_ptr name) {
   NuSMVEnv_ptr env;
   MasterNormalizer_ptr normalizer;
 
@@ -1199,37 +1098,33 @@ HrcNode_ptr HrcNode_find_hrc_node_by_instance_name(const HrcNode_ptr self,
   if (MasterNormalizer_normalize_node(normalizer, self->instance_name) ==
       MasterNormalizer_normalize_node(normalizer, name)) {
     return self;
-  }
-  else {
+  } else {
     Siter iter;
     HrcNode_ptr r = HRC_NODE(NULL);
-    for (iter = Slist_first(self->childs);
-         false == Siter_is_end(iter);
+    for (iter = Slist_first(self->childs); false == Siter_is_end(iter);
          iter = Siter_next(iter)) {
-      r = HrcNode_find_hrc_node_by_instance_name((HrcNode_ptr)Siter_element(iter),
-                                                 name);
-      if (HRC_NODE(NULL) != r) break;
+      r = HrcNode_find_hrc_node_by_instance_name(
+          (HrcNode_ptr)Siter_element(iter), name);
+      if (HRC_NODE(NULL) != r)
+        break;
     }
     return r;
   }
 }
 
-boolean HrcNode_is_root(const HrcNode_ptr self)
-{
+boolean HrcNode_is_root(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return (HRC_NODE(NULL) == self->parent);
 }
 
-boolean HrcNode_is_leaf(const HrcNode_ptr self)
-{
+boolean HrcNode_is_leaf(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return Slist_is_empty(self->childs);
 }
 
-HrcNode_ptr HrcNode_copy(const HrcNode_ptr self)
-{
+HrcNode_ptr HrcNode_copy(const HrcNode_ptr self) {
   HrcNode_ptr hrc_copy;
   NuSMVEnv_ptr env;
   NodeMgr_ptr nodemgr;
@@ -1262,17 +1157,20 @@ HrcNode_ptr HrcNode_copy(const HrcNode_ptr self)
   hrc_copy->compute_props = Olist_copy(self->compute_props);
 
   /* List that must be deep copied, copying also list elements */
-  hrc_copy->formal_parameters = hrc_node_copy_list(nodemgr,
-                                                   self->formal_parameters);
-  hrc_copy->actual_parameters = hrc_node_copy_list(nodemgr,
-                                                   self->actual_parameters);
-  hrc_copy->state_variables = hrc_node_copy_list(nodemgr, self->state_variables);
-  hrc_copy->input_variables = hrc_node_copy_list(nodemgr, self->input_variables);
-  hrc_copy->frozen_variables = hrc_node_copy_list(nodemgr,
-                                                  self->frozen_variables);
-  hrc_copy->frozen_functions = hrc_node_copy_list(nodemgr,
-                                                  self->frozen_functions);
-  hrc_copy->state_functions = hrc_node_copy_list(nodemgr, self->state_functions);
+  hrc_copy->formal_parameters =
+      hrc_node_copy_list(nodemgr, self->formal_parameters);
+  hrc_copy->actual_parameters =
+      hrc_node_copy_list(nodemgr, self->actual_parameters);
+  hrc_copy->state_variables =
+      hrc_node_copy_list(nodemgr, self->state_variables);
+  hrc_copy->input_variables =
+      hrc_node_copy_list(nodemgr, self->input_variables);
+  hrc_copy->frozen_variables =
+      hrc_node_copy_list(nodemgr, self->frozen_variables);
+  hrc_copy->frozen_functions =
+      hrc_node_copy_list(nodemgr, self->frozen_functions);
+  hrc_copy->state_functions =
+      hrc_node_copy_list(nodemgr, self->state_functions);
 
   hrc_copy->defines = hrc_node_copy_list(nodemgr, self->defines);
   hrc_copy->array_defines = hrc_node_copy_list(nodemgr, self->array_defines);
@@ -1303,8 +1201,7 @@ HrcNode_ptr HrcNode_copy(const HrcNode_ptr self)
 }
 
 HrcNode_ptr HrcNode_copy_rename(const HrcNode_ptr self,
-                                node_ptr new_module_name)
-{
+                                node_ptr new_module_name) {
   HrcNode_ptr hrc_copy;
 
   hrc_copy = HrcNode_copy(self);
@@ -1314,22 +1211,19 @@ HrcNode_ptr HrcNode_copy_rename(const HrcNode_ptr self,
   return hrc_copy;
 }
 
-void* HrcNode_get_undef(const HrcNode_ptr self)
-{
+void *HrcNode_get_undef(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   return self->undef;
 }
 
-void HrcNode_set_undef(const HrcNode_ptr self, void* undef)
-{
+void HrcNode_set_undef(const HrcNode_ptr self, void *undef) {
   HRC_NODE_CHECK_INSTANCE(self);
 
   self->undef = undef;
 }
 
-HrcNode_ptr HrcNode_recursive_copy(const HrcNode_ptr self)
-{
+HrcNode_ptr HrcNode_recursive_copy(const HrcNode_ptr self) {
   HrcNode_ptr hrc_copy;
   Slist_ptr children;
   Siter iter;
@@ -1358,13 +1252,12 @@ HrcNode_ptr HrcNode_recursive_copy(const HrcNode_ptr self)
   return hrc_copy;
 }
 
-node_ptr HrcNode_find_var_all(HrcNode_ptr self, node_ptr var_name)
-{
+node_ptr HrcNode_find_var_all(HrcNode_ptr self, node_ptr var_name) {
   node_ptr res = Nil;
 
   int types[] = {VAR, FROZENVAR, VAR};
   int i;
-  for (i=0; i<sizeof(types)/sizeof(types[0]); ++i) {
+  for (i = 0; i < sizeof(types) / sizeof(types[0]); ++i) {
     res = HrcNode_find_var(self, var_name, types[i]);
     if (Nil != res) {
       break;
@@ -1374,8 +1267,7 @@ node_ptr HrcNode_find_var_all(HrcNode_ptr self, node_ptr var_name)
   return res;
 }
 
-node_ptr HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type)
-{
+node_ptr HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type) {
   NuSMVEnv_ptr env;
   MasterNormalizer_ptr normalizer;
   ErrorMgr_ptr errmgr;
@@ -1411,7 +1303,7 @@ node_ptr HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type)
   /* Search normalizing node name! */
   normalized_var_name = MasterNormalizer_normalize_node(normalizer, var_name);
 
-  for (; ! Oiter_is_end(iter); iter = Oiter_next(iter)) {
+  for (; !Oiter_is_end(iter); iter = Oiter_next(iter)) {
     node_ptr var, var_name;
 
     var = NODE_PTR(Oiter_element(iter));
@@ -1420,8 +1312,8 @@ node_ptr HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type)
     nusmv_assert(Nil != car(var));
     var_name = car(var);
 
-    if  (MasterNormalizer_normalize_node(normalizer, var_name) ==
-         normalized_var_name) {
+    if (MasterNormalizer_normalize_node(normalizer, var_name) ==
+        normalized_var_name) {
       found_var = var;
       break;
     }
@@ -1432,8 +1324,7 @@ node_ptr HrcNode_find_var(HrcNode_ptr self, node_ptr var_name, int type)
   return found_var;
 }
 
-node_ptr HrcNode_find_formal_parameter(HrcNode_ptr self, node_ptr par_name)
-{
+node_ptr HrcNode_find_formal_parameter(HrcNode_ptr self, node_ptr par_name) {
   NuSMVEnv_ptr env;
   MasterNormalizer_ptr normalizer;
   ErrorMgr_ptr errmgr;
@@ -1458,8 +1349,8 @@ node_ptr HrcNode_find_formal_parameter(HrcNode_ptr self, node_ptr par_name)
     nusmv_assert(Nil != par);
     nusmv_assert(Nil != car(par));
 
-    if  (MasterNormalizer_normalize_node(normalizer, car(par)) ==
-         normalized_name) {
+    if (MasterNormalizer_normalize_node(normalizer, car(par)) ==
+        normalized_name) {
       found_par = par;
       break;
     }
@@ -1470,8 +1361,7 @@ node_ptr HrcNode_find_formal_parameter(HrcNode_ptr self, node_ptr par_name)
   return found_par;
 }
 
-node_ptr HrcNode_find_define(HrcNode_ptr self, node_ptr def_name)
-{
+node_ptr HrcNode_find_define(HrcNode_ptr self, node_ptr def_name) {
   NuSMVEnv_ptr env;
   MasterNormalizer_ptr normalizer;
   ErrorMgr_ptr errmgr;
@@ -1496,8 +1386,8 @@ node_ptr HrcNode_find_define(HrcNode_ptr self, node_ptr def_name)
     nusmv_assert(Nil != def);
     nusmv_assert(Nil != car(def));
 
-    if  (MasterNormalizer_normalize_node(normalizer, car(def)) ==
-         normalized_name) {
+    if (MasterNormalizer_normalize_node(normalizer, car(def)) ==
+        normalized_name) {
       found_def = def;
       break;
     }
@@ -1508,14 +1398,12 @@ node_ptr HrcNode_find_define(HrcNode_ptr self, node_ptr def_name)
   return found_def;
 }
 
-void HrcNode_link_nodes(HrcNode_ptr self, HrcNode_ptr child)
-{
+void HrcNode_link_nodes(HrcNode_ptr self, HrcNode_ptr child) {
   HrcNode_set_parent(child, self);
   HrcNode_add_child_hrc_node(self, child);
 }
 
-void HrcNode_unlink_nodes(HrcNode_ptr self, HrcNode_ptr child)
-{
+void HrcNode_unlink_nodes(HrcNode_ptr self, HrcNode_ptr child) {
   boolean status;
 
   child->parent = NULL;
@@ -1530,119 +1418,92 @@ void HrcNode_unlink_nodes(HrcNode_ptr self, HrcNode_ptr child)
   nusmv_assert(status);
 }
 
-void HrcNode_remove_state_variable(HrcNode_ptr self,
-                                   node_ptr var)
-{
+void HrcNode_remove_state_variable(HrcNode_ptr self, node_ptr var) {
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
-  NodeMgr_ptr const nodemgr =
-     NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   nusmv_assert(CONS == node_get_type(var));
 
   Olist_remove(self->state_variables, var);
 }
 
-void HrcNode_remove_frozen_variable(HrcNode_ptr self,
-                                    node_ptr var)
-{
+void HrcNode_remove_frozen_variable(HrcNode_ptr self, node_ptr var) {
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
-  NodeMgr_ptr const nodemgr =
-     NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   nusmv_assert(CONS == node_get_type(var));
 
   Olist_remove(self->frozen_variables, var);
 }
 
-void HrcNode_remove_input_variable(HrcNode_ptr self,
-                                   node_ptr var)
-{
+void HrcNode_remove_input_variable(HrcNode_ptr self, node_ptr var) {
   NuSMVEnv_ptr const env = EnvObject_get_environment(ENV_OBJECT(self));
-  NodeMgr_ptr const nodemgr =
-     NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   nusmv_assert(CONS == node_get_type(var));
 
   Olist_remove(self->input_variables, var);
 }
 
-int HrcNode_get_vars_num(const HrcNode_ptr self)
-{
+int HrcNode_get_vars_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
-  return
-    HrcNode_get_state_vars_num(self) +
-    HrcNode_get_input_vars_num(self) +
-    HrcNode_get_frozen_vars_num(self);
+  return HrcNode_get_state_vars_num(self) + HrcNode_get_input_vars_num(self) +
+         HrcNode_get_frozen_vars_num(self);
 }
 
-int HrcNode_get_state_vars_num(const HrcNode_ptr self)
-{
+int HrcNode_get_state_vars_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->state_variables);
 }
 
-int HrcNode_get_frozen_vars_num(const HrcNode_ptr self)
-{
+int HrcNode_get_frozen_vars_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->frozen_variables);
 }
 
-int HrcNode_get_input_vars_num(const HrcNode_ptr self)
-{
+int HrcNode_get_input_vars_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->input_variables);
 }
 
-int HrcNode_get_constants_num(const HrcNode_ptr self)
-{
+int HrcNode_get_constants_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->constants);
 }
 
-int HrcNode_get_defines_num(const HrcNode_ptr self)
-{
+int HrcNode_get_defines_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->defines);
 }
 
-int HrcNode_get_array_defines_num(const HrcNode_ptr self)
-{
+int HrcNode_get_array_defines_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->array_defines);
 }
 
-int HrcNode_get_parameters_num(const HrcNode_ptr self)
-{
+int HrcNode_get_parameters_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
   return Olist_get_size(self->formal_parameters);
 }
 
-int HrcNode_get_functions_num(const HrcNode_ptr self)
-{
+int HrcNode_get_functions_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
-  return
-    Olist_get_size(self->state_functions) +
-    Olist_get_size(self->frozen_functions);
+  return Olist_get_size(self->state_functions) +
+         Olist_get_size(self->frozen_functions);
 }
 
-int HrcNode_get_symbols_num(const HrcNode_ptr self)
-{
+int HrcNode_get_symbols_num(const HrcNode_ptr self) {
   HRC_NODE_CHECK_INSTANCE(self);
-  return
-    HrcNode_get_vars_num(self) +
-    HrcNode_get_constants_num(self) +
-    HrcNode_get_defines_num(self) +
-    HrcNode_get_array_defines_num(self) +
-    HrcNode_get_parameters_num(self) +
-    HrcNode_get_functions_num(self);
+  return HrcNode_get_vars_num(self) + HrcNode_get_constants_num(self) +
+         HrcNode_get_defines_num(self) + HrcNode_get_array_defines_num(self) +
+         HrcNode_get_parameters_num(self) + HrcNode_get_functions_num(self);
 }
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void hrc_node_init(HrcNode_ptr self, const NuSMVEnv_ptr env)
-{
+void hrc_node_init(HrcNode_ptr self, const NuSMVEnv_ptr env) {
   env_object_init(ENV_OBJECT(self), env);
 
   /* members initialization */
@@ -1675,17 +1536,15 @@ void hrc_node_init(HrcNode_ptr self, const NuSMVEnv_ptr env)
   self->psl_props = Olist_create();
   self->compute_props = Olist_create();
   self->childs = Slist_create();
-  self->undef = (void*)NULL;
+  self->undef = (void *)NULL;
   self->assigns_table = new_assoc();
 
   OVERRIDE(Object, finalize) = hrc_node_finalize;
 }
 
-void hrc_node_deinit(HrcNode_ptr self)
-{
+void hrc_node_deinit(HrcNode_ptr self) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   /* members deinitialization */
   self->st = SYMB_TABLE(NULL);
@@ -1724,8 +1583,7 @@ void hrc_node_deinit(HrcNode_ptr self)
 
   /* Free all cons nodes in the map values */
   clear_assoc_and_free_entries_arg(self->assigns_table,
-                                   hrc_node_free_cons_map_fun,
-                                   (char*)nodemgr);
+                                   hrc_node_free_cons_map_fun, (char *)nodemgr);
   free_assoc(self->assigns_table);
 
   /* It is the responsibility of the creator to destroy the childrens. */
@@ -1733,13 +1591,12 @@ void hrc_node_deinit(HrcNode_ptr self)
   self->childs = SLIST(Nil);
   /* It is the responsibility of the creator to free this area before
      calling this function */
-  if (self->undef != (void*)NULL) {
-    self->undef = (void*)NULL;
+  if (self->undef != (void *)NULL) {
+    self->undef = (void *)NULL;
   }
 
   env_object_deinit(ENV_OBJECT(self));
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -1752,8 +1609,7 @@ void hrc_node_deinit(HrcNode_ptr self)
 
   \sa HrcNod_edestroy
 */
-static void hrc_node_finalize(Object_ptr object, void* dummy)
-{
+static void hrc_node_finalize(Object_ptr object, void *dummy) {
   HrcNode_ptr self = HRC_NODE(object);
 
   hrc_node_deinit(self);
@@ -1772,8 +1628,7 @@ static void hrc_node_finalize(Object_ptr object, void* dummy)
   New node are used to create cons elements. The copy preserves order of
   elements.
 */
-static Olist_ptr hrc_node_copy_list(NodeMgr_ptr nodemgr, Olist_ptr src_list)
-{
+static Olist_ptr hrc_node_copy_list(NodeMgr_ptr nodemgr, Olist_ptr src_list) {
   Oiter iter;
   Olist_ptr new_list;
 
@@ -1783,8 +1638,8 @@ static Olist_ptr hrc_node_copy_list(NodeMgr_ptr nodemgr, Olist_ptr src_list)
     node_ptr new_element;
 
     /* copy the new element and append to the list */
-    new_element = new_node(nodemgr, node_get_type(element), car(element),
-                           cdr(element));
+    new_element =
+        new_node(nodemgr, node_get_type(element), car(element), cdr(element));
     Olist_append(new_list, new_element);
   }
 
@@ -1799,8 +1654,7 @@ static Olist_ptr hrc_node_copy_list(NodeMgr_ptr nodemgr, Olist_ptr src_list)
   \se Elements contained in list are freed.
 */
 static void hrc_node_free_elements_in_list_and_list(NodeMgr_ptr nodemgr,
-                                                    Olist_ptr list)
-{
+                                                    Olist_ptr list) {
   Oiter iter;
   OLIST_FOREACH(list, iter) {
     node_ptr element = NODE_PTR(Oiter_element(iter));
@@ -1822,13 +1676,11 @@ static void hrc_node_free_elements_in_list_and_list(NodeMgr_ptr nodemgr,
                       freed and set to Nil into the HrcNode
 */
 static void hrc_node_free_list_and_clear_assign_map(HrcNode_ptr self,
-                                                    int assign_type)
-{
+                                                    int assign_type) {
   Olist_ptr old_list;
   Oiter iter;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   switch (assign_type) {
   case SMALLINIT:
@@ -1837,11 +1689,11 @@ static void hrc_node_free_list_and_clear_assign_map(HrcNode_ptr self,
     break;
   case NEXT:
     old_list = self->next_assign;
-    self->next_assign =  Olist_create();
+    self->next_assign = Olist_create();
     break;
   case INVAR:
     old_list = self->invar_assign;
-    self->invar_assign =  Olist_create();
+    self->invar_assign = Olist_create();
     break;
   default:
     error_unreachable_code();
@@ -1878,8 +1730,7 @@ static void hrc_node_free_list_and_clear_assign_map(HrcNode_ptr self,
     /* Otherwise it must be in the right part, which will be set to
        Nil */
     else {
-      nusmv_assert(Nil != cdr(tmp) &&
-                   NODE_FROM_INT(assign_type) == cdr(tmp));
+      nusmv_assert(Nil != cdr(tmp) && NODE_FROM_INT(assign_type) == cdr(tmp));
       setcdr(tmp, Nil);
     }
 
@@ -1896,13 +1747,11 @@ static void hrc_node_free_list_and_clear_assign_map(HrcNode_ptr self,
 
   Function for freeing cons nodes into a map
 */
-static assoc_retval hrc_node_free_cons_map_fun(char *key,
-                                               char *data,
-                                               char *arg)
-{
+static assoc_retval hrc_node_free_cons_map_fun(char *key, char *data,
+                                               char *arg) {
   const NodeMgr_ptr nodemgr = NODE_MGR(arg);
 
-  if ((char*)NULL != data) {
+  if ((char *)NULL != data) {
     free_node(nodemgr, NODE_PTR(data));
   }
   return ASSOC_DELETE;
@@ -1915,8 +1764,7 @@ static assoc_retval hrc_node_free_cons_map_fun(char *key,
 */
 static void hrc_node_insert_assign_hash_list(HrcNode_ptr self,
                                              Olist_ptr assign_list,
-                                             const int assign_type)
-{
+                                             const int assign_type) {
   Oiter iter;
 
   HRC_NODE_CHECK_INSTANCE(self);
@@ -1933,23 +1781,19 @@ static void hrc_node_insert_assign_hash_list(HrcNode_ptr self,
 
   \todo Missing description
 */
-static void hrc_node_insert_assign_hash(HrcNode_ptr self,
-                                        node_ptr assign,
-                                        const int assign_type)
-{
+static void hrc_node_insert_assign_hash(HrcNode_ptr self, node_ptr assign,
+                                        const int assign_type) {
   node_ptr ass;
 
   ass = find_assoc(self->assigns_table, car(assign));
 
   if (Nil == ass) {
     const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-    const NodeMgr_ptr nodemgr =
-      NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+    const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
     insert_assoc(self->assigns_table, car(assign),
                  cons(nodemgr, NODE_FROM_INT(assign_type), Nil));
-  }
-  else {
+  } else {
     /* We can have both SMALLINIT and NEXT, but not INVAR and
        INIT/NEXT nor 2 INVAR assigns */
     switch (assign_type) {

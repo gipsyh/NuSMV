@@ -63,18 +63,18 @@
    is stored in the list <tt>fairness_constraints_bdd</tt> to be
    then used in the model checking phase.
    </ul>
-   \[1\] R. K. Ranjan and A. Aziz and B. Plessier and C. Pixley and R. K. Brayton,
-   "Efficient BDD Algorithms for FSM Synthesis and Verification,
+   \[1\] R. K. Ranjan and A. Aziz and B. Plessier and C. Pixley and R. K.
+  Brayton, "Efficient BDD Algorithms for FSM Synthesis and Verification,
    IEEE/ACM Proceedings International Workshop on Logic Synthesis,
    Lake Tahoe (NV), May 1995.</li>
 
 
 */
 
-#include "nusmv/core/compile/compile.h"
-#include "nusmv/core/compile/symb_table/ResolveSymbol.h"
-#include "nusmv/core/compile/compileInt.h"
 #include "nusmv/core/compile/compileUtil.h"
+#include "nusmv/core/compile/compile.h"
+#include "nusmv/core/compile/compileInt.h"
+#include "nusmv/core/compile/symb_table/ResolveSymbol.h"
 #include "nusmv/core/node/NodeMgr.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/parser/symbols.h"
@@ -102,8 +102,6 @@ typedef enum {
   Input_Instantiation_Mode
 } Instantiation_Vars_Mode_Type;
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -125,45 +123,36 @@ static node_ptr compile_remove_ltl_bop_recurse(NodeMgr_ptr nodemgr,
 /*---------------------------------------------------------------------------*/
 
 node_ptr sym_intern_from_ustring(const NuSMVEnv_ptr env,
-                                 const string_ptr _string)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+                                 const string_ptr _string) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
-  return NodeMgr_find_node(nodemgr, ATOM, (node_ptr) _string, Nil);
+  return NodeMgr_find_node(nodemgr, ATOM, (node_ptr)_string, Nil);
 }
 
-
-node_ptr sym_intern(const NuSMVEnv_ptr env, const char* s)
-{
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+node_ptr sym_intern(const NuSMVEnv_ptr env, const char *s) {
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   UStringMgr_ptr strings = USTRING_MGR(NuSMVEnv_get_value(env, ENV_STRING_MGR));
 
-  return find_node(nodemgr, ATOM,
-                   (node_ptr) UStringMgr_find_string(strings, s), Nil);
+  return find_node(nodemgr, ATOM, (node_ptr)UStringMgr_find_string(strings, s),
+                   Nil);
 }
 
-
 node_ptr Compile_Util_symbol_from_expr(NuSMVEnv_ptr const env,
-                                       node_ptr const expr,
-                                       const char* prefix,
-                                       const char* suffix)
-{
-  NodeMgr_ptr const nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+                                       node_ptr const expr, const char *prefix,
+                                       const char *suffix) {
+  NodeMgr_ptr const nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
   MasterPrinter_ptr const wffprint =
-    MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
-  char* result_name;
-  char* expr_string;
+      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+  char *result_name;
+  char *expr_string;
   size_t result_size;
   node_ptr result_var;
   boolean add_quotes = false;
 
   NUSMV_ENV_CHECK_INSTANCE(env);
   nusmv_assert(NULL != expr);
-  nusmv_assert((char*)NULL != prefix);
-  nusmv_assert((char*)NULL != suffix);
+  nusmv_assert((char *)NULL != prefix);
+  nusmv_assert((char *)NULL != suffix);
 
   expr_string = sprint_node(wffprint, expr);
 
@@ -173,7 +162,7 @@ node_ptr Compile_Util_symbol_from_expr(NuSMVEnv_ptr const env,
   if ((0 != strcmp("", prefix) || 0 != strcmp("", suffix)) &&
       '"' == expr_string[0]) {
     size_t expr_string_len;
-    char* tmp;
+    char *tmp;
 
     /* remove the quotes */
     expr_string_len = strlen(expr_string);
@@ -189,8 +178,8 @@ node_ptr Compile_Util_symbol_from_expr(NuSMVEnv_ptr const env,
   result_name = ALLOC(char, result_size);
 
   {
-    int c = snprintf(result_name, result_size, "%s%s%s",
-                     prefix, expr_string, suffix);
+    int c = snprintf(result_name, result_size, "%s%s%s", prefix, expr_string,
+                     suffix);
     SNPRINTF_CHECK(c, result_size);
   }
 
@@ -208,22 +197,22 @@ node_ptr Compile_Util_symbol_from_expr(NuSMVEnv_ptr const env,
   return result_var;
 }
 
-boolean sym_names_are_equal(const NuSMVEnv_ptr env,
-                            node_ptr name1, node_ptr name2)
-{
-  if (name1 == name2) return true;
+boolean sym_names_are_equal(const NuSMVEnv_ptr env, node_ptr name1,
+                            node_ptr name2) {
+  if (name1 == name2)
+    return true;
   if ((Nil == name1 && Nil != name2) || (Nil != name1 && Nil == name2)) {
     return false;
   }
 
-  if (node_get_type(name1) != node_get_type(name2)) return false;
+  if (node_get_type(name1) != node_get_type(name2))
+    return false;
 
   switch (node_get_type(name1)) {
   case ATOM:
     return (car(name1) == car(name2) ||
-            (0 == strcmp(UStringMgr_get_string_text((string_ptr) car(name1)),
-                         UStringMgr_get_string_text((string_ptr) car(name2))))
-            );
+            (0 == strcmp(UStringMgr_get_string_text((string_ptr)car(name1)),
+                         UStringMgr_get_string_text((string_ptr)car(name2)))));
 
   case DOT:
     return (sym_names_are_equal(env, car(name1), car(name2)) &
@@ -231,13 +220,12 @@ boolean sym_names_are_equal(const NuSMVEnv_ptr env,
 
   default:
     ErrorMgr_internal_error(
-                            ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER)),
-                            "Invalid case %d in sym_names_are_equal", node_get_type(name1));
+        ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER)),
+        "Invalid case %d in sym_names_are_equal", node_get_type(name1));
   }
 
   error_unreachable_code();
 }
-
 
 /*!
   \brief Private macros for the sake of readability of the function
@@ -253,9 +241,8 @@ boolean sym_names_are_equal(const NuSMVEnv_ptr env,
 
   \todo Missing description
 */
-#define IS_AND_DISTRIB_OP(prop)                 \
-  ((OP_GLOBAL == node_get_type(prop)) ||        \
-   (AG == node_get_type(prop)) ||               \
+#define IS_AND_DISTRIB_OP(prop)                                                \
+  ((OP_GLOBAL == node_get_type(prop)) || (AG == node_get_type(prop)) ||        \
    (OP_HISTORICAL == node_get_type(prop)))
 
 /* F a, EF a, O a */
@@ -265,9 +252,8 @@ boolean sym_names_are_equal(const NuSMVEnv_ptr env,
 
   \todo Missing description
 */
-#define IS_OR_DISTRIB_OP(prop)                  \
-  ((OP_FUTURE == node_get_type(prop)) ||        \
-   (EF == node_get_type(prop))        ||        \
+#define IS_OR_DISTRIB_OP(prop)                                                 \
+  ((OP_FUTURE == node_get_type(prop)) || (EF == node_get_type(prop)) ||        \
    (OP_ONCE == node_get_type(prop)))
 
 /*
@@ -281,9 +267,8 @@ boolean sym_names_are_equal(const NuSMVEnv_ptr env,
 
   \todo Missing description
 */
-#define ARE_AND_DISTRIB_OPS(prop1, prop2)               \
-  (IS_AND_DISTRIB_OP(prop1) &&                          \
-   IS_AND_DISTRIB_OP(prop2) &&                          \
+#define ARE_AND_DISTRIB_OPS(prop1, prop2)                                      \
+  (IS_AND_DISTRIB_OP(prop1) && IS_AND_DISTRIB_OP(prop2) &&                     \
    node_get_type(prop1) == node_get_type(prop2))
 
 /*
@@ -297,16 +282,14 @@ boolean sym_names_are_equal(const NuSMVEnv_ptr env,
 
   \todo Missing description
 */
-#define ARE_OR_DISTRIB_OPS(prop1, prop2)                \
-  (IS_OR_DISTRIB_OP(prop1) &&                           \
-   IS_OR_DISTRIB_OP(prop2) &&                           \
+#define ARE_OR_DISTRIB_OPS(prop1, prop2)                                       \
+  (IS_OR_DISTRIB_OP(prop1) && IS_OR_DISTRIB_OP(prop2) &&                       \
    node_get_type(prop1) == node_get_type(prop2))
 
 node_ptr Compile_pop_distrib_ops(const NuSMVEnv_ptr env, node_ptr prop) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr result;
 
@@ -315,25 +298,22 @@ node_ptr Compile_pop_distrib_ops(const NuSMVEnv_ptr env, node_ptr prop) {
   if (opt_verbose_level_gt(opts, 6)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     const MasterPrinter_ptr wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
     if (prop == result) {
       Logger_log(logger, "-- No simplification occured\n");
-    }
-    else {
-      Logger_nlog(logger, wffprint,
-                  "-- The simplified formula is: \"%N\"\n", result);
+    } else {
+      Logger_nlog(logger, wffprint, "-- The simplified formula is: \"%N\"\n",
+                  result);
     }
   }
   return result;
 }
 
-
 node_ptr Compile_remove_ltl_bop(const NuSMVEnv_ptr env, node_ptr prop) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_ptr result;
 
@@ -342,25 +322,21 @@ node_ptr Compile_remove_ltl_bop(const NuSMVEnv_ptr env, node_ptr prop) {
   if (opt_verbose_level_gt(opts, 6)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     const MasterPrinter_ptr wffprint =
-      MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
+        MASTER_PRINTER(NuSMVEnv_get_value(env, ENV_WFF_PRINTER));
 
     if (prop == result) {
       Logger_log(logger, "-- No bounded operators have been rewritten\n");
-    }
-    else {
-      Logger_nlog(logger, wffprint,
-                  "-- The rewritten formula is: \"%N\"\n", result);
+    } else {
+      Logger_nlog(logger, wffprint, "-- The rewritten formula is: \"%N\"\n",
+                  result);
     }
   }
   return result;
 }
 
-
-Set_t
-Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
-                                         const NodeList_ptr vars,
-                                         const NodeList_ptr vars_order)
-{
+Set_t Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
+                                               const NodeList_ptr vars,
+                                               const NodeList_ptr vars_order) {
   Set_t res;
   ListIter_ptr iter;
 
@@ -372,12 +348,12 @@ Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
     ResolveSymbol_ptr rs;
     node_ptr name;
 
-    rs = SymbTable_resolve_symbol(st,
-                                  NodeList_get_elem_at(vars_order, iter), Nil);
+    rs = SymbTable_resolve_symbol(st, NodeList_get_elem_at(vars_order, iter),
+                                  Nil);
     name = ResolveSymbol_get_resolved_name(rs);
 
     if (NodeList_belongs_to(vars, name)) {
-      res = Set_AddMember(res, (Set_Element_t) name);
+      res = Set_AddMember(res, (Set_Element_t)name);
     }
   }
 
@@ -386,8 +362,7 @@ Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
     ResolveSymbol_ptr rs;
     node_ptr name;
 
-    rs = SymbTable_resolve_symbol(st,
-                                  NodeList_get_elem_at(vars, iter), Nil);
+    rs = SymbTable_resolve_symbol(st, NodeList_get_elem_at(vars, iter), Nil);
     name = ResolveSymbol_get_resolved_name(rs);
 
     res = Set_AddMember(res, name);
@@ -400,7 +375,6 @@ Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -411,9 +385,9 @@ Compile_make_sorted_vars_list_from_order(const SymbTable_ptr st,
 
 */
 static node_ptr compile_pop_distrib_ops_recurse(NodeMgr_ptr nodemgr,
-                                                node_ptr prop)
-{
-  if ((node_ptr) NULL == prop) return (node_ptr) NULL;
+                                                node_ptr prop) {
+  if ((node_ptr)NULL == prop)
+    return (node_ptr)NULL;
 
   /* Base cases */
   switch (node_get_type(prop)) {
@@ -427,7 +401,8 @@ static node_ptr compile_pop_distrib_ops_recurse(NodeMgr_ptr nodemgr,
   case ARRAY:
   case NUMBER:
   case NUMBER_UNSIGNED_WORD:
-  case UWCONST: case SWCONST:
+  case UWCONST:
+  case SWCONST:
   case NUMBER_SIGNED_WORD:
   case NUMBER_FRAC:
   case NUMBER_REAL:
@@ -436,9 +411,11 @@ static node_ptr compile_pop_distrib_ops_recurse(NodeMgr_ptr nodemgr,
     return prop;
 
   case CONTEXT:
-    return find_node(nodemgr, CONTEXT, car(prop), compile_pop_distrib_ops_recurse(nodemgr, cdr(prop)));
+    return find_node(nodemgr, CONTEXT, car(prop),
+                     compile_pop_distrib_ops_recurse(nodemgr, cdr(prop)));
 
-  default: break;
+  default:
+    break;
   }
 
   /* 1) <OP> <OP> a :-> <OP> a */
@@ -448,17 +425,19 @@ static node_ptr compile_pop_distrib_ops_recurse(NodeMgr_ptr nodemgr,
   }
 
   /* 2) (<OP> a) * (<OP> b) :-> <OP> (a * b); */
-  if (AND == node_get_type(prop) ||
-      OR == node_get_type(prop)) {
+  if (AND == node_get_type(prop) || OR == node_get_type(prop)) {
     node_ptr l = compile_pop_distrib_ops_recurse(nodemgr, car(prop));
     node_ptr r = compile_pop_distrib_ops_recurse(nodemgr, cdr(prop));
 
     if ((ARE_AND_DISTRIB_OPS(l, r) && AND == node_get_type(prop)) ||
         (ARE_OR_DISTRIB_OPS(l, r) && OR == node_get_type(prop))) {
-      return compile_pop_distrib_ops_recurse(nodemgr, find_node(nodemgr, node_get_type(l),
-                                                                find_node(nodemgr, node_get_type(prop), car(l), car(r)), Nil));
-    }
-    else return find_node(nodemgr, node_get_type(prop), l, r);
+      return compile_pop_distrib_ops_recurse(
+          nodemgr,
+          find_node(nodemgr, node_get_type(l),
+                    find_node(nodemgr, node_get_type(prop), car(l), car(r)),
+                    Nil));
+    } else
+      return find_node(nodemgr, node_get_type(prop), l, r);
   }
 
   /* 3) (<OP> (a * <OP> b))   :-> <OP> (a * b);
@@ -471,28 +450,27 @@ static node_ptr compile_pop_distrib_ops_recurse(NodeMgr_ptr nodemgr,
       node_ptr l = compile_pop_distrib_ops_recurse(nodemgr, car(car(prop)));
       node_ptr r = compile_pop_distrib_ops_recurse(nodemgr, cdr(car(prop)));
 
-      if ( ((AND == op) && ARE_AND_DISTRIB_OPS(prop, l) &&
-            ARE_AND_DISTRIB_OPS(prop, r))
-           ||
-           ((OR == op) && ARE_OR_DISTRIB_OPS(prop, l) &&
-            ARE_OR_DISTRIB_OPS(prop, r)) ) { /* 5 */
+      if (((AND == op) && ARE_AND_DISTRIB_OPS(prop, l) &&
+           ARE_AND_DISTRIB_OPS(prop, r)) ||
+          ((OR == op) && ARE_OR_DISTRIB_OPS(prop, l) &&
+           ARE_OR_DISTRIB_OPS(prop, r))) { /* 5 */
 
-        return compile_pop_distrib_ops_recurse(nodemgr, find_node(nodemgr, node_get_type(prop),
-                                                                  find_node(nodemgr, op, car(l), car(r)), Nil));
+        return compile_pop_distrib_ops_recurse(
+            nodemgr, find_node(nodemgr, node_get_type(prop),
+                               find_node(nodemgr, op, car(l), car(r)), Nil));
+      } else if (((AND == op) && ARE_AND_DISTRIB_OPS(prop, l)) ||
+                 ((OR == op) && ARE_OR_DISTRIB_OPS(prop, l))) { /* 4 */
+        return compile_pop_distrib_ops_recurse(
+            nodemgr, find_node(nodemgr, node_get_type(prop),
+                               find_node(nodemgr, op, car(l), r), Nil));
+      } else if (((AND == op) && ARE_AND_DISTRIB_OPS(prop, r)) ||
+                 ((OR == op) && ARE_OR_DISTRIB_OPS(prop, r))) { /* 3 */
+        return compile_pop_distrib_ops_recurse(
+            nodemgr, find_node(nodemgr, node_get_type(prop),
+                               find_node(nodemgr, op, l, car(r)), Nil));
       }
-      else if ( ((AND == op) && ARE_AND_DISTRIB_OPS(prop, l))
-                ||
-                ((OR == op) && ARE_OR_DISTRIB_OPS(prop, l)) ) { /* 4 */
-        return compile_pop_distrib_ops_recurse(nodemgr, find_node(nodemgr, node_get_type(prop),
-                                                                  find_node(nodemgr, op, car(l), r), Nil));
-      }
-      else if ( ((AND == op) && ARE_AND_DISTRIB_OPS(prop, r))
-                ||
-                ((OR == op) && ARE_OR_DISTRIB_OPS(prop, r)) ) { /* 3 */
-        return compile_pop_distrib_ops_recurse(nodemgr, find_node(nodemgr, node_get_type(prop),
-                                                                  find_node(nodemgr, op, l, car(r)), Nil));
-      }
-      return find_node(nodemgr, node_get_type(prop), find_node(nodemgr, op, l, r), Nil);
+      return find_node(nodemgr, node_get_type(prop),
+                       find_node(nodemgr, op, l, r), Nil);
     }
   }
 
@@ -502,17 +480,15 @@ static node_ptr compile_pop_distrib_ops_recurse(NodeMgr_ptr nodemgr,
                    compile_pop_distrib_ops_recurse(nodemgr, cdr(prop)));
 }
 
-
-
 /*!
   \brief
 
 
 */
 static node_ptr compile_remove_ltl_bop_recurse(NodeMgr_ptr nodemgr,
-                                               node_ptr prop)
-{
-  if ((node_ptr) NULL == prop) return (node_ptr) NULL;
+                                               node_ptr prop) {
+  if ((node_ptr)NULL == prop)
+    return (node_ptr)NULL;
 
   /* Base cases */
   switch (node_get_type(prop)) {
@@ -526,7 +502,8 @@ static node_ptr compile_remove_ltl_bop_recurse(NodeMgr_ptr nodemgr,
   case ARRAY:
   case NUMBER:
   case NUMBER_UNSIGNED_WORD:
-  case UWCONST: case SWCONST:
+  case UWCONST:
+  case SWCONST:
   case NUMBER_SIGNED_WORD:
   case NUMBER_FRAC:
   case NUMBER_REAL:
@@ -535,7 +512,8 @@ static node_ptr compile_remove_ltl_bop_recurse(NodeMgr_ptr nodemgr,
     return prop;
 
   case CONTEXT:
-    return find_node(nodemgr, CONTEXT, car(prop), compile_remove_ltl_bop_recurse(nodemgr, cdr(prop)));
+    return find_node(nodemgr, CONTEXT, car(prop),
+                     compile_remove_ltl_bop_recurse(nodemgr, cdr(prop)));
   case OP_GLOBAL:
   case OP_FUTURE:
   case OP_ONCE:
@@ -559,9 +537,13 @@ static node_ptr compile_remove_ltl_bop_recurse(NodeMgr_ptr nodemgr,
       nusmv_assert(t1 <= t2);
 
       OP = ((OP_FUTURE == node_get_type(prop)) ||
-            (OP_ONCE == node_get_type(prop))) ? OR : AND;
+            (OP_ONCE == node_get_type(prop)))
+               ? OR
+               : AND;
       TOP = ((OP_FUTURE == node_get_type(prop)) ||
-             (OP_GLOBAL == node_get_type(prop))) ? OP_NEXT : OP_PREC;
+             (OP_GLOBAL == node_get_type(prop)))
+                ? OP_NEXT
+                : OP_PREC;
 
       for (j = t2 - t1; j > 0; j--) {
         /* C OP TOP acc */

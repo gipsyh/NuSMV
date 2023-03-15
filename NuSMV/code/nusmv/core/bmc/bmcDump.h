@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_DUMP_H__
 #define __NUSMV_CORE_BMC_BMC_DUMP_H__
 
@@ -42,9 +41,8 @@
 
 #include "nusmv/core/enc/be/BeEnc.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/prop/Prop.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -55,15 +53,15 @@
 /*---------------------------------------------------------------------------*/
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
-typedef enum { 
-  BMC_DUMP_NONE, 
-  BMC_DUMP_DIMACS, 
-  BMC_DUMP_DA_VINCI, 
-  BMC_DUMP_GDL 
+typedef enum {
+  BMC_DUMP_NONE,
+  BMC_DUMP_DIMACS,
+  BMC_DUMP_DA_VINCI,
+  BMC_DUMP_GDL
 } Bmc_DumpType;
 
 /*---------------------------------------------------------------------------*/
@@ -78,7 +76,6 @@ typedef enum {
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -88,62 +85,50 @@ typedef enum {
 /*!
   \brief Dumps a cnf in different formats
 
-  
+
 
   \se None
 */
-void 
-Bmc_Dump_WriteProblem(const BeEnc_ptr be_enc, 
-                const Be_Cnf_ptr cnf, 
-                Prop_ptr prop, 
-                const int k, const int loop, 
-                const Bmc_DumpType dump_type,
-                const char* dump_fname_template);
+void Bmc_Dump_WriteProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                           Prop_ptr prop, const int k, const int loop,
+                           const Bmc_DumpType dump_type,
+                           const char *dump_fname_template);
 
 /*!
   \brief Opens a new file named filename, than dumps the given
   invar problem in DIMACS format
 
-  
+
 */
-int 
-Bmc_Dump_DimacsInvarProblemFilename(const BeEnc_ptr be_enc, 
-                      const Be_Cnf_ptr cnf, 
-                      const char* filename);
+int Bmc_Dump_DimacsInvarProblemFilename(const BeEnc_ptr be_enc,
+                                        const Be_Cnf_ptr cnf,
+                                        const char *filename);
 
 /*!
   \brief Opens a new file named filename, than dumps the given
   LTL problem in DIMACS format
 
-  
+
 */
-int 
-Bmc_Dump_DimacsProblemFilename(const BeEnc_ptr be_enc, 
-                     const Be_Cnf_ptr cnf,
-                     const char* filename,  
-                     const int k);
+int Bmc_Dump_DimacsProblemFilename(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                                   const char *filename, const int k);
 
 /*!
   \brief Dumps the given invar problem in the given file
 
   dimacsfile must be writable
 */
-void 
-Bmc_Dump_DimacsInvarProblem(const BeEnc_ptr be_enc, 
-                  const Be_Cnf_ptr cnf,
-                  FILE* dimacsfile);
+void Bmc_Dump_DimacsInvarProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                                 FILE *dimacsfile);
 
 /*!
   \brief Dumps the given LTL problem in the given file
 
   dimacsfile must be writable
 */
-void 
-Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc, 
-                 const Be_Cnf_ptr cnf,
-                 const int k, FILE* dimacsfile); 
+void Bmc_Dump_DimacsProblem(const BeEnc_ptr be_enc, const Be_Cnf_ptr cnf,
+                            const int k, FILE *dimacsfile);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_BMC_BMC_DUMP_H__ */
-

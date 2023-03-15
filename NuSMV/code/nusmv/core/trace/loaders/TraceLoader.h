@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -53,7 +53,7 @@
 
   \todo Missing description
 */
-typedef struct TraceLoader_TAG* TraceLoader_ptr;
+typedef struct TraceLoader_TAG *TraceLoader_ptr;
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -68,16 +68,15 @@ typedef struct TraceLoader_TAG* TraceLoader_ptr;
 
   \todo Missing description
 */
-#define TRACE_LOADER(x) \
-         ((TraceLoader_ptr) x)
+#define TRACE_LOADER(x) ((TraceLoader_ptr)x)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_LOADER_CHECK_INSTANCE(x) \
-         (nusmv_assert(TRACE_LOADER(x) != TRACE_LOADER(NULL)))
+#define TRACE_LOADER_CHECK_INSTANCE(x)                                         \
+  (nusmv_assert(TRACE_LOADER(x) != TRACE_LOADER(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -89,21 +88,20 @@ typedef struct TraceLoader_TAG* TraceLoader_ptr;
   \methodof TraceLoader
   \brief Action associated with the Class TraceLoader.
 
-  
+
 */
-VIRTUAL Trace_ptr
-TraceLoader_load_trace(const TraceLoader_ptr self, SymbTable_ptr st,
-                       NodeList_ptr symbols);
+VIRTUAL Trace_ptr TraceLoader_load_trace(const TraceLoader_ptr self,
+                                         SymbTable_ptr st,
+                                         NodeList_ptr symbols);
 
 /*!
   \methodof TraceLoader
   \brief Returns a short description of the loader.
 
-  
+
 */
-char* TraceLoader_get_desc(const TraceLoader_ptr self);
+char *TraceLoader_get_desc(const TraceLoader_ptr self);
 
 /**AutomaticEnd***************************************************************/
 
 #endif /* __NUSMV_CORE_TRACE_LOADERS_TRACE_LOADER_H__ */
-

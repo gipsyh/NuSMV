@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,10 +34,8 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_PROP_PROP_PRIVATE_H__
 #define __NUSMV_CORE_PROP_PROP_PRIVATE_H__
-
 
 #if HAVE_CONFIG_H
 #include "nusmv-config.h"
@@ -48,7 +46,6 @@
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief Prop class definition derived from
@@ -85,7 +82,6 @@
   \sa Base class Object
 */
 
-
 /* Those are the types of the virtual methods. They can be used for
    type casts in subclasses. */
 
@@ -101,7 +97,7 @@ typedef Expr_ptr (*Prop_get_expr_method)(const Prop_ptr);
 
   \todo Missing description
 */
-typedef const char* (*Prop_get_type_as_string_method)(const Prop_ptr);
+typedef const char *(*Prop_get_type_as_string_method)(const Prop_ptr);
 
 /*!
   \brief \todo Missing synopsis
@@ -119,35 +115,35 @@ typedef void (*Prop_verify_method)(Prop_ptr);
 */
 typedef Prop_ptr (*Prop_convert_to_invar_method)(Prop_ptr);
 
-typedef void (*Prop_set_environment_fsms_method)(const NuSMVEnv_ptr env, Prop_ptr);
+typedef void (*Prop_set_environment_fsms_method)(const NuSMVEnv_ptr env,
+                                                 Prop_ptr);
 
 /* The class itself. */
-typedef struct Prop_TAG
-{
+typedef struct Prop_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-  unsigned int index;  /* Progressive number */
-  Expr_ptr     prop;   /* property formula (s-expression) */
+  unsigned int index; /* Progressive number */
+  Expr_ptr prop;      /* property formula (s-expression) */
 
   /* AM -> Support for property name */
   node_ptr name;
 
-  Set_t        cone;   /* The cone of influence */
-  Prop_Type    type;   /* type of specification */
-  Prop_Status  status; /* verification status */
-  int          number; /* The result of a quantitative spec */
-  int          trace;  /* the counterexample number (if any) */
+  Set_t cone;         /* The cone of influence */
+  Prop_Type type;     /* type of specification */
+  Prop_Status status; /* verification status */
+  int number;         /* The result of a quantitative spec */
+  int trace;          /* the counterexample number (if any) */
 
-  FsmBuilder_ptr fsm_mgr;  /* Used to produce FSMs from cone */
+  FsmBuilder_ptr fsm_mgr; /* Used to produce FSMs from cone */
 
-  SexpFsm_ptr     scalar_fsm; /* the scalar FSM */
-  BoolSexpFsm_ptr bool_fsm;   /* The scalar FSM converted in Boolean */
-  BddFsm_ptr      bdd_fsm;    /* The BDD FSM */
-  BeFsm_ptr       be_fsm;     /* The BE FSM */
+  SexpFsm_ptr scalar_fsm;   /* the scalar FSM */
+  BoolSexpFsm_ptr bool_fsm; /* The scalar FSM converted in Boolean */
+  BddFsm_ptr bdd_fsm;       /* The BDD FSM */
+  BeFsm_ptr be_fsm;         /* The BE FSM */
 
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
@@ -172,8 +168,6 @@ typedef struct Prop_TAG
   Prop_set_environment_fsms_method set_environment_fsms;
 
 } Prop;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
@@ -208,7 +202,7 @@ Expr_ptr prop_get_expr(const Prop_ptr self);
   \methodof Prop
   \todo
 */
-const char* prop_get_type_as_string(const Prop_ptr self);
+const char *prop_get_type_as_string(const Prop_ptr self);
 
 /*!
   \methodof Prop
@@ -254,14 +248,12 @@ void prop_set_bool_sexp_fsm(Prop_ptr self, BoolSexpFsm_ptr fsm,
   \methodof Prop
   \todo
 */
-void prop_set_bdd_fsm(Prop_ptr self, BddFsm_ptr fsm,
-                      const boolean duplicate);
+void prop_set_bdd_fsm(Prop_ptr self, BddFsm_ptr fsm, const boolean duplicate);
 /*!
   \methodof Prop
   \todo
 */
-void prop_set_be_fsm(Prop_ptr self, BeFsm_ptr fsm,
-                     const boolean duplicate);
+void prop_set_be_fsm(Prop_ptr self, BeFsm_ptr fsm, const boolean duplicate);
 
 /*!
   \brief Sets the Prop fsms from the given environment
@@ -277,6 +269,5 @@ void prop_set_environment_fsms(const NuSMVEnv_ptr env, Prop_ptr prop);
   Convert self to an invar, if possible
 */
 Prop_ptr prop_convert_to_invar(Prop_ptr self);
-
 
 #endif /* __NUSMV_CORE_PROP_PROP_PRIVATE_H__ */

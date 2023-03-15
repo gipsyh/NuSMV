@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -36,24 +36,21 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_STREAM_MGR_H__
 #define __NUSMV_CORE_UTILS_STREAM_MGR_H__
 
-
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/utils/OStream.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct StreamMgr
   \brief Definition of the public accessor for class StreamMgr
 
-  
+
 */
-typedef struct StreamMgr_TAG*  StreamMgr_ptr;
+typedef struct StreamMgr_TAG *StreamMgr_ptr;
 
 /*!
   \brief To cast and check instances of class StreamMgr
@@ -61,18 +58,15 @@ typedef struct StreamMgr_TAG*  StreamMgr_ptr;
   These macros must be used respectively to cast and to check
   instances of class StreamMgr
 */
-#define STREAM_MGR(self) \
-         ((StreamMgr_ptr) self)
+#define STREAM_MGR(self) ((StreamMgr_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define STREAM_MGR_CHECK_INSTANCE(self) \
-         (nusmv_assert(STREAM_MGR(self) != STREAM_MGR(NULL)))
-
-
+#define STREAM_MGR_CHECK_INSTANCE(self)                                        \
+  (nusmv_assert(STREAM_MGR(self) != STREAM_MGR(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -93,9 +87,9 @@ typedef struct StreamMgr_TAG*  StreamMgr_ptr;
 void Stream_init(NuSMVEnv_ptr env);
 
 /*!
-  \brief 
+  \brief
 
-  
+
 */
 void Stream_quit(NuSMVEnv_ptr env);
 
@@ -125,7 +119,7 @@ void StreamMgr_destroy(StreamMgr_ptr self);
 
   Setter for the error stream
 */
-void StreamMgr_set_error_stream(StreamMgr_ptr self, FILE* err);
+void StreamMgr_set_error_stream(StreamMgr_ptr self, FILE *err);
 
 /*!
   \methodof StreamMgr
@@ -133,7 +127,7 @@ void StreamMgr_set_error_stream(StreamMgr_ptr self, FILE* err);
 
   Setter for the output stream
 */
-void StreamMgr_set_output_stream(StreamMgr_ptr self, FILE* out);
+void StreamMgr_set_output_stream(StreamMgr_ptr self, FILE *out);
 
 /*!
   \methodof StreamMgr
@@ -141,7 +135,7 @@ void StreamMgr_set_output_stream(StreamMgr_ptr self, FILE* out);
 
   Setter for the input stream
 */
-void StreamMgr_set_input_stream(StreamMgr_ptr self, FILE* in);
+void StreamMgr_set_input_stream(StreamMgr_ptr self, FILE *in);
 
 /*!
   \methodof StreamMgr
@@ -150,7 +144,7 @@ void StreamMgr_set_input_stream(StreamMgr_ptr self, FILE* in);
   Useful for avoiding OStream_set_stream to close the
   stream. The old stream is returned
 */
-FILE* StreamMgr_reset_output_stream(StreamMgr_ptr self);
+FILE *StreamMgr_reset_output_stream(StreamMgr_ptr self);
 
 /*!
   \methodof StreamMgr
@@ -159,7 +153,7 @@ FILE* StreamMgr_reset_output_stream(StreamMgr_ptr self);
   Useful for avoiding OStream_set_stream to close the
   stream. The old stream is returned
 */
-FILE* StreamMgr_reset_error_stream(StreamMgr_ptr self);
+FILE *StreamMgr_reset_error_stream(StreamMgr_ptr self);
 
 /*!
   \methodof StreamMgr
@@ -167,7 +161,7 @@ FILE* StreamMgr_reset_error_stream(StreamMgr_ptr self);
 
   Getter for the error stream
 */
-FILE* StreamMgr_get_error_stream(const StreamMgr_ptr self);
+FILE *StreamMgr_get_error_stream(const StreamMgr_ptr self);
 
 /*!
   \methodof StreamMgr
@@ -175,7 +169,7 @@ FILE* StreamMgr_get_error_stream(const StreamMgr_ptr self);
 
   Getter for the output stream
 */
-FILE* StreamMgr_get_output_stream(const StreamMgr_ptr self);
+FILE *StreamMgr_get_output_stream(const StreamMgr_ptr self);
 
 /*!
   \methodof StreamMgr
@@ -184,8 +178,7 @@ FILE* StreamMgr_get_output_stream(const StreamMgr_ptr self);
   Getter for the error internal OStream instance.
                       Should not be changed from the caller
 */
-OStream_ptr
-StreamMgr_get_error_ostream(const StreamMgr_ptr self);
+OStream_ptr StreamMgr_get_error_ostream(const StreamMgr_ptr self);
 
 /*!
   \methodof StreamMgr
@@ -194,8 +187,7 @@ StreamMgr_get_error_ostream(const StreamMgr_ptr self);
   Getter for the output internal OStream instance.
                       Should not be changed from the caller
 */
-OStream_ptr
-StreamMgr_get_output_ostream(const StreamMgr_ptr self);
+OStream_ptr StreamMgr_get_output_ostream(const StreamMgr_ptr self);
 
 /*!
   \methodof StreamMgr
@@ -203,7 +195,7 @@ StreamMgr_get_output_ostream(const StreamMgr_ptr self);
 
   Getter for the input stream
 */
-FILE* StreamMgr_get_input_stream(const StreamMgr_ptr self);
+FILE *StreamMgr_get_input_stream(const StreamMgr_ptr self);
 
 /*!
   \methodof StreamMgr
@@ -212,8 +204,7 @@ FILE* StreamMgr_get_input_stream(const StreamMgr_ptr self);
   Prints on the output stream. If the stream is NULL,
                       does not print anything
 */
-void StreamMgr_print_output(const StreamMgr_ptr self,
-                                   const char* format, ...);
+void StreamMgr_print_output(const StreamMgr_ptr self, const char *format, ...);
 
 /*!
   \methodof StreamMgr
@@ -224,8 +215,8 @@ void StreamMgr_print_output(const StreamMgr_ptr self,
                       supports node_ptr's too. Use format '%N' for nodes
 */
 void StreamMgr_nprint_output(const StreamMgr_ptr self,
-                                    const MasterPrinter_ptr printer,
-                                    const char* format, ...);
+                             const MasterPrinter_ptr printer,
+                             const char *format, ...);
 
 /*!
   \methodof StreamMgr
@@ -234,8 +225,7 @@ void StreamMgr_nprint_output(const StreamMgr_ptr self,
   Prints on the output stream. If the stream is NULL,
                       does not print anything
 */
-void StreamMgr_print_error(const StreamMgr_ptr self,
-                                  const char* format, ...);
+void StreamMgr_print_error(const StreamMgr_ptr self, const char *format, ...);
 
 /*!
   \methodof StreamMgr
@@ -246,8 +236,8 @@ void StreamMgr_print_error(const StreamMgr_ptr self,
                       supports node_ptr's too. Use format '%N' for nodes
 */
 void StreamMgr_nprint_error(const StreamMgr_ptr self,
-                                   const MasterPrinter_ptr printer,
-                                   const char* format, ...);
+                            const MasterPrinter_ptr printer, const char *format,
+                            ...);
 
 /*!
   \methodof StreamMgr
@@ -298,9 +288,6 @@ void StreamMgr_reset_indent_size(StreamMgr_ptr self);
 */
 void StreamMgr_set_indent_size(StreamMgr_ptr self, int n);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_UTILS_STREAM_MGR_H__ */

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,12 +34,11 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/hrc/dumpers/HrcDumperDebug.h"
 #include "nusmv/core/hrc/dumpers/HrcDumperDebug_private.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -62,23 +61,19 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void hrc_dumper_debug_finalize(Object_ptr object, void* dummy);
-
+static void hrc_dumper_debug_finalize(Object_ptr object, void *dummy);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-HrcDumperDebug_ptr HrcDumperDebug_create(const NuSMVEnv_ptr env,
-                                         FILE* fout)
-{
+HrcDumperDebug_ptr HrcDumperDebug_create(const NuSMVEnv_ptr env, FILE *fout) {
   HrcDumperDebug_ptr self = ALLOC(HrcDumperDebug, 1);
   HRC_DUMPER_DEBUG_CHECK_INSTANCE(self);
 
@@ -86,15 +81,12 @@ HrcDumperDebug_ptr HrcDumperDebug_create(const NuSMVEnv_ptr env,
   return self;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void hrc_dumper_debug_init(HrcDumperDebug_ptr self,
-                           const NuSMVEnv_ptr env,
-                           FILE* fout)
-{
+void hrc_dumper_debug_init(HrcDumperDebug_ptr self, const NuSMVEnv_ptr env,
+                           FILE *fout) {
   /* base class initialization */
   hrc_dumper_init(HRC_DUMPER(self), env, fout);
 
@@ -105,24 +97,20 @@ void hrc_dumper_debug_init(HrcDumperDebug_ptr self,
   OVERRIDE(HrcDumper, dump_snippet) = hrc_dumper_debug_dump_snippet;
 }
 
-void hrc_dumper_debug_deinit(HrcDumperDebug_ptr self)
-{
+void hrc_dumper_debug_deinit(HrcDumperDebug_ptr self) {
   /* members deinitialization */
-
 
   /* base class deinitialization */
   hrc_dumper_deinit(HRC_DUMPER(self));
 }
 
-void hrc_dumper_debug_dump_snippet(HrcDumper_ptr self,
-                                   HrcDumperSnippet snippet,
-                                   const HrcDumperInfo* info)
-{
+void hrc_dumper_debug_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
+                                   const HrcDumperInfo *info) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  const char* desc;
+  const char *desc;
 
   switch (snippet) {
   case HDS_HRC_TOP:
@@ -460,7 +448,6 @@ void hrc_dumper_debug_dump_snippet(HrcDumper_ptr self,
   }
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
@@ -470,15 +457,11 @@ void hrc_dumper_debug_dump_snippet(HrcDumper_ptr self,
 
   Called by the class destructor
 */
-static void hrc_dumper_debug_finalize(Object_ptr object, void* dummy)
-{
+static void hrc_dumper_debug_finalize(Object_ptr object, void *dummy) {
   HrcDumperDebug_ptr self = HRC_DUMPER_DEBUG(object);
 
   hrc_dumper_debug_deinit(self);
   FREE(self);
 }
 
-
-
 /**AutomaticEnd***************************************************************/
-

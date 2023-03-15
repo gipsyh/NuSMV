@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,12 +37,12 @@
 #ifndef __NUSMV_CORE_TRACE_PLUGINS_TRACE_PLUGIN_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_PLUGINS_TRACE_PLUGIN_PRIVATE_H__
 
-#include "nusmv/core/trace/plugins/TracePlugin.h"
 #include "nusmv/core/trace/TraceOpt.h"
+#include "nusmv/core/trace/plugins/TracePlugin.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/object_private.h"
+#include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
 #include "nusmv/core/node/anonymizers/NodeAnonymizerST.h"
@@ -63,11 +63,10 @@
                specialized.
 */
 
-typedef struct TracePlugin_TAG
-{
+typedef struct TracePlugin_TAG {
   INHERITS_FROM(Object);
 
-  char* desc; /* Short description of the plugin */
+  char *desc; /* Short description of the plugin */
 
   /* current trace */
   Trace_ptr trace;
@@ -93,8 +92,8 @@ typedef struct TracePlugin_TAG
 
   VIRTUAL void (*print_list)(const TracePlugin_ptr self, node_ptr list);
 
-  VIRTUAL void (*print_assignment)(const TracePlugin_ptr self,
-                                   node_ptr symbol, node_ptr val);
+  VIRTUAL void (*print_assignment)(const TracePlugin_ptr self, node_ptr symbol,
+                                   node_ptr val);
 } TracePlugin;
 
 /**AutomaticStart*************************************************************/
@@ -103,86 +102,80 @@ typedef struct TracePlugin_TAG
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
 
-
 /* protected methods */
 
 /*!
   \methodof TracePlugin
-  \brief 
+  \brief
 
-  
+
 */
-VIRTUAL void
-TracePlugin_print_symbol(const TracePlugin_ptr self, node_ptr symb);
+VIRTUAL void TracePlugin_print_symbol(const TracePlugin_ptr self,
+                                      node_ptr symb);
 
 /*!
   \methodof TracePlugin
-  \brief 
+  \brief
 
-  
+
 */
-VIRTUAL void
-TracePlugin_print_list(const TracePlugin_ptr self, node_ptr list);
+VIRTUAL void TracePlugin_print_list(const TracePlugin_ptr self, node_ptr list);
 
 /*!
   \methodof TracePlugin
-  \brief 
+  \brief
 
-  
+
 */
-VIRTUAL void
-TracePlugin_print_assignment(const TracePlugin_ptr self,
-                             node_ptr symb, node_ptr val);
+VIRTUAL void TracePlugin_print_assignment(const TracePlugin_ptr self,
+                                          node_ptr symb, node_ptr val);
 
 /*!
   \methodof TracePlugin
   \brief Check that node is printable
 
-  
+
 */
-boolean trace_plugin_is_visible_symbol(TracePlugin_ptr self,
-                                              node_ptr symb);
+boolean trace_plugin_is_visible_symbol(TracePlugin_ptr self, node_ptr symb);
 
 /*!
   \methodof TracePlugin
-  \brief 
+  \brief
 
-  
+
 */
-void trace_plugin_print_symbol(const TracePlugin_ptr self,
-                                      node_ptr symbol);
+void trace_plugin_print_symbol(const TracePlugin_ptr self, node_ptr symbol);
 
 /*!
   \methodof TracePlugin
-  \brief 
+  \brief
 
-  
+
 */
-void trace_plugin_print_list(const TracePlugin_ptr self,
-                                    node_ptr list);
+void trace_plugin_print_list(const TracePlugin_ptr self, node_ptr list);
 
 /*!
   \methodof TracePlugin
-  \brief 
+  \brief
 
-  
+
 */
-void trace_plugin_print_assignment(const TracePlugin_ptr self,
-                                          node_ptr symb, node_ptr val);
+void trace_plugin_print_assignment(const TracePlugin_ptr self, node_ptr symb,
+                                   node_ptr val);
 
 /*!
   \methodof TracePlugin
   \brief This function initializes the plugin class.
 
-  
+
 */
-void trace_plugin_init(TracePlugin_ptr self, char* desc);
+void trace_plugin_init(TracePlugin_ptr self, char *desc);
 
 /*!
   \methodof TracePlugin
   \brief This function de-initializes the plugin class.
 
-  
+
 */
 void trace_plugin_deinit(TracePlugin_ptr self);
 

@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_DOT_H__
 #define __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_DOT_H__
-
 
 #include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
 #include "nusmv/core/utils/defs.h"
@@ -47,9 +44,9 @@
   \struct NodeAnonymizerDot
   \brief Definition of the public accessor for class NodeAnonymizerDot
 
-  
+
 */
-typedef struct NodeAnonymizerDot_TAG*  NodeAnonymizerDot_ptr;
+typedef struct NodeAnonymizerDot_TAG *NodeAnonymizerDot_ptr;
 
 /*!
   \brief To cast and check instances of class NodeAnonymizerDot
@@ -57,18 +54,15 @@ typedef struct NodeAnonymizerDot_TAG*  NodeAnonymizerDot_ptr;
   These macros must be used respectively to cast and to check
   instances of class NodeAnonymizerDot
 */
-#define NODE_ANONYMIZER_DOT(self) \
-         ((NodeAnonymizerDot_ptr) self)
+#define NODE_ANONYMIZER_DOT(self) ((NodeAnonymizerDot_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self) \
-         (nusmv_assert(NODE_ANONYMIZER_DOT(self) != NODE_ANONYMIZER_DOT(NULL)))
-
-
+#define NODE_ANONYMIZER_DOT_CHECK_INSTANCE(self)                               \
+  (nusmv_assert(NODE_ANONYMIZER_DOT(self) != NODE_ANONYMIZER_DOT(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,8 +79,8 @@ typedef struct NodeAnonymizerDot_TAG*  NodeAnonymizerDot_ptr;
   \sa NodeAnonymizerDot_destroy
 */
 NodeAnonymizerDot_ptr NodeAnonymizerDot_create(NuSMVEnv_ptr env,
-                                                      const char* default_prefix,
-                                                      size_t memoization_threshold);
+                                               const char *default_prefix,
+                                               size_t memoization_threshold);
 
 /*!
   \methodof NodeAnonymizerDot
@@ -98,9 +92,6 @@ NodeAnonymizerDot_ptr NodeAnonymizerDot_create(NuSMVEnv_ptr env,
 */
 void NodeAnonymizerDot_destroy(NodeAnonymizerDot_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_DOT_H__ */

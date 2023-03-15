@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -56,18 +56,17 @@
   \brief SatMinisat Class
 
    This class defines a prototype for a generic SatMinisat. This
-  class is virtual and must be specialized. 
+  class is virtual and must be specialized.
 */
 
-typedef struct SatMinisat_TAG
-{
+typedef struct SatMinisat_TAG {
   INHERITS_FROM(SatIncSolver);
 
   MiniSat_ptr minisatSolver; /* actual instance of minisat */
-  /* All input variables are represented by the  internal ones inside the 
+  /* All input variables are represented by the  internal ones inside the
      SatMinisat. Bellow two hash table perform the convertion in both ways */
-  hash_ptr cnfVar2minisatVar;/* converts CNF variable to internal variable */
-  hash_ptr minisatVar2cnfVar;/* converts internal variable into CNF variable */
+  hash_ptr cnfVar2minisatVar; /* converts CNF variable to internal variable */
+  hash_ptr minisatVar2cnfVar; /* converts internal variable into CNF variable */
 
   /* contains set of conflicting assumptions after using
      SatMinisat_solve_permanent_group_assume */
@@ -76,7 +75,7 @@ typedef struct SatMinisat_TAG
   /* A clause and its current maximum length. This was added here in
      order to replace a statically allocated, fixed-size array and
      length indicator in sat_minisat_add. */
-  int* minisatClause;
+  int *minisatClause;
 
   unsigned int minisatClauseSize;
 
@@ -93,7 +92,7 @@ typedef struct SatMinisat_TAG
   \todo
 */
 void sat_minisat_init(SatMinisat_ptr self, const NuSMVEnv_ptr env,
-                      const char* name, boolean enable_proof_logging);
+                      const char *name, boolean enable_proof_logging);
 /*!
   \methodof SatMinisat
   \todo
@@ -104,8 +103,7 @@ void sat_minisat_deinit(SatMinisat_ptr self);
   \methodof SatMinisat
   \todo
 */
-int sat_minisat_cnfLiteral2minisatLiteral(SatMinisat_ptr self,
-                                          int cnfLitaral);
+int sat_minisat_cnfLiteral2minisatLiteral(SatMinisat_ptr self, int cnfLitaral);
 /*!
   \methodof SatMinisat
   \todo
@@ -118,8 +116,7 @@ int sat_minisat_minisatLiteral2cnfLiteral(SatMinisat_ptr self,
   \methodof SatMinisat
   \todo
 */
-void sat_minisat_add(const SatSolver_ptr self,
-                     const Be_Cnf_ptr cnfProb,
+void sat_minisat_add(const SatSolver_ptr self, const Be_Cnf_ptr cnfProb,
                      SatSolverGroup group);
 
 /*!
@@ -127,8 +124,7 @@ void sat_minisat_add(const SatSolver_ptr self,
   \todo
 */
 void sat_minisat_set_polarity(const SatSolver_ptr self,
-                              const Be_Cnf_ptr cnfProb,
-                              int polarity,
+                              const Be_Cnf_ptr cnfProb, int polarity,
                               SatSolverGroup group);
 
 /*!
@@ -154,7 +150,9 @@ SatSolverResult sat_minisat_solve_all_groups(const SatSolver_ptr self);
   \methodof SatMinisat
   \todo
 */
-SatSolverResult sat_minisat_solve_permanent_group_assume(const SatSolver_ptr self, Slist_ptr assumption);
+SatSolverResult
+sat_minisat_solve_permanent_group_assume(const SatSolver_ptr self,
+                                         Slist_ptr assumption);
 
 Slist_ptr sat_minisat_get_conflicts(const SatSolver_ptr);
 
@@ -169,39 +167,34 @@ Slist_ptr sat_minisat_make_model(const SatSolver_ptr self);
   \methodof SatMinisat
   \todo
 */
-SatSolverGroup 
-sat_minisat_create_group(const SatIncSolver_ptr self);
+SatSolverGroup sat_minisat_create_group(const SatIncSolver_ptr self);
 
 /*!
   \methodof SatMinisat
   \todo
 */
-void
-sat_minisat_destroy_group(const SatIncSolver_ptr self,
-                          SatSolverGroup group);
+void sat_minisat_destroy_group(const SatIncSolver_ptr self,
+                               SatSolverGroup group);
 
 /*!
   \methodof SatMinisat
   \todo
 */
-void
-sat_minisat_move_to_permanent_and_destroy_group(const SatIncSolver_ptr self,
-SatSolverGroup group);
+void sat_minisat_move_to_permanent_and_destroy_group(
+    const SatIncSolver_ptr self, SatSolverGroup group);
 /*!
   \methodof SatMinisat
   \todo
 */
-SatSolverResult
-sat_minisat_solve_groups(const SatIncSolver_ptr self,
-                         const Olist_ptr groups);
+SatSolverResult sat_minisat_solve_groups(const SatIncSolver_ptr self,
+                                         const Olist_ptr groups);
 
 /*!
   \methodof SatMinisat
   \todo
 */
-SatSolverResult
-sat_minisat_solve_without_groups(const SatIncSolver_ptr self,
-                                 const Olist_ptr groups);
+SatSolverResult sat_minisat_solve_without_groups(const SatIncSolver_ptr self,
+                                                 const Olist_ptr groups);
 
 /* the assumptions/conflict interface of MiniSat */
 /*!
@@ -214,7 +207,7 @@ Slist_ptr sat_minisat_make_conflicts(const SatMinisat_ptr self);
   \methodof SatMinisat
   \todo
 */
-int* sat_minisat_get_minisatClause(const SatMinisat_ptr self);
+int *sat_minisat_get_minisatClause(const SatMinisat_ptr self);
 /*!
   \methodof SatMinisat
   \todo
@@ -242,7 +235,7 @@ void sat_minisat_set_polarity_mode(SatSolver_ptr self, int mode);
   \methodof SatMinisat
   \todo
 */
-int  sat_minisat_get_polarity_mode(const SatSolver_ptr self);
+int sat_minisat_get_polarity_mode(const SatSolver_ptr self);
 
 int sat_minisat_get_cnf_var(const SatSolver_ptr solver, int var);
 

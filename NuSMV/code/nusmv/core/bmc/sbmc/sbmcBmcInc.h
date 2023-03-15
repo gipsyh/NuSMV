@@ -22,7 +22,7 @@
   email to <nusmv-users@fbk.eu>.  Please report bugs to
   <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to  <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to  <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -30,42 +30,36 @@
   \author Tommi Junttila, Marco Roveri
   \brief High level functionalities for Incrememntal SBMC
 
-  User-commands directly use function defined in this module. 
+  User-commands directly use function defined in this module.
   This is the highest level in the Incrememntal SBMC API architecture.
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_BMC_INC_H__
 #define __NUSMV_CORE_BMC_SBMC_SBMC_BMC_INC_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/prop/Prop.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -82,11 +76,9 @@
 
   \sa optional
 */
-int Sbmc_zigzag_incr(NuSMVEnv_ptr env,
-                            Prop_ptr ltlprop,
-                            const int max_k,
-                            const int opt_do_virtual_unrolling,
-                            const int opt_do_completeness_check);
+int Sbmc_zigzag_incr(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int max_k,
+                     const int opt_do_virtual_unrolling,
+                     const int opt_do_completeness_check);
 
 /*!
   \brief High level function that performs incremental
@@ -99,14 +91,10 @@ int Sbmc_zigzag_incr(NuSMVEnv_ptr env,
 
   \sa optional
 */
-int Sbmc_zigzag_incr_assume(NuSMVEnv_ptr env,
-                                   Prop_ptr ltlprop,
-                                   const int max_k,
-                                   const int opt_do_virtual_unrolling,
-                                   const int opt_do_completeness_check,
-                                   Slist_ptr assumptions,
-                                   Slist_ptr* conflict);
-
+int Sbmc_zigzag_incr_assume(NuSMVEnv_ptr env, Prop_ptr ltlprop, const int max_k,
+                            const int opt_do_virtual_unrolling,
+                            const int opt_do_completeness_check,
+                            Slist_ptr assumptions, Slist_ptr *conflict);
 
 /**AutomaticEnd***************************************************************/
 

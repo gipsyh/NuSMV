@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_IWFF_CORE_PRIVATE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_IWFF_CORE_PRIVATE_H__
-
 
 #include "nusmv/core/node/printers/PrinterIWffCore.h"
 
@@ -50,18 +47,16 @@
 
 #include "nusmv/core/utils/utils.h"
 
-
 /*!
   \brief PrinterIWffCore class definition derived from class
   PrinterWffCore
 
-  
+
 
   \sa Base class PrinterIWffCore
 */
 
-typedef struct PrinterIWffCore_TAG
-{
+typedef struct PrinterIWffCore_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(PrinterWffCore);
 
@@ -69,13 +64,11 @@ typedef struct PrinterIWffCore_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } PrinterIWffCore;
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only        */
@@ -89,9 +82,8 @@ typedef struct PrinterIWffCore_TAG
 
   \sa PrinterIWffCore_create
 */
-void
-printer_iwff_core_init(PrinterIWffCore_ptr self, const NuSMVEnv_ptr env,
-                       const char* name, int low, size_t num);
+void printer_iwff_core_init(PrinterIWffCore_ptr self, const NuSMVEnv_ptr env,
+                            const char *name, int low, size_t num);
 
 /*!
   \methodof PrinterIWffCore
@@ -101,18 +93,16 @@ printer_iwff_core_init(PrinterIWffCore_ptr self, const NuSMVEnv_ptr env,
 
   \sa PrinterIWffCore_destroy
 */
-void
-printer_iwff_core_deinit(PrinterIWffCore_ptr self);
+void printer_iwff_core_deinit(PrinterIWffCore_ptr self);
 
 /*!
   \methodof PrinterIWffCore
   \brief Virtual menthod that prints the given node
   (only indentantion capable nodes are handled here)
 
-  
+
 */
-int
-printer_iwff_core_print_node(PrinterBase_ptr self, node_ptr n,
-                            int priority);
+int printer_iwff_core_print_node(PrinterBase_ptr self, node_ptr n,
+                                 int priority);
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_PRINTER_IWFF_CORE_PRIVATE_H__ */

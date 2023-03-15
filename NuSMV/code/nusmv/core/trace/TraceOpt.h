@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,18 +37,18 @@
 #ifndef __NUSMV_CORE_TRACE_TRACE_OPT_H__
 #define __NUSMV_CORE_TRACE_TRACE_OPT_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/opt/opt.h"
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/utils/OStream.h"
+#include "nusmv/core/utils/StreamMgr.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \struct TraceOpt
   \brief Definition of the public accessor for class TraceOpt
 
-  
+
 */
-typedef struct TraceOpt_TAG*  TraceOpt_ptr;
+typedef struct TraceOpt_TAG *TraceOpt_ptr;
 
 /*!
   \brief To cast and check instances of class TraceOpt
@@ -56,18 +56,15 @@ typedef struct TraceOpt_TAG*  TraceOpt_ptr;
   These macros must be used respectively to cast and to check
   instances of class TraceOpt
 */
-#define TRACE_OPT(self) \
-         ((TraceOpt_ptr) self)
+#define TRACE_OPT(self) ((TraceOpt_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define TRACE_OPT_CHECK_INSTANCE(self) \
-         (nusmv_assert(TRACE_OPT(self) != TRACE_OPT(NULL)))
-
-
+#define TRACE_OPT_CHECK_INSTANCE(self)                                         \
+  (nusmv_assert(TRACE_OPT(self) != TRACE_OPT(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -103,8 +100,7 @@ TraceOpt_ptr TraceOpt_create_from_env(const NuSMVEnv_ptr env);
 
   \sa TraceOpt_destroy
 */
-void TraceOpt_update_from_env(TraceOpt_ptr self,
-                                     const NuSMVEnv_ptr env);
+void TraceOpt_update_from_env(TraceOpt_ptr self, const NuSMVEnv_ptr env);
 
 /*!
   \methodof TraceOpt
@@ -154,8 +150,7 @@ boolean TraceOpt_show_defines(TraceOpt_ptr self);
 
   \sa TraceOpt_show_defines
 */
-void TraceOpt_set_show_defines(TraceOpt_ptr self,
-                                      boolean show_defines);
+void TraceOpt_set_show_defines(TraceOpt_ptr self, boolean show_defines);
 
 /*!
   \methodof TraceOpt
@@ -175,8 +170,7 @@ boolean TraceOpt_show_defines_with_next(TraceOpt_ptr self);
 
   \sa TraceOpt_show_defines_with_next
 */
-void TraceOpt_set_show_defines_with_next(TraceOpt_ptr self,
-                                                boolean show_next);
+void TraceOpt_set_show_defines_with_next(TraceOpt_ptr self, boolean show_next);
 
 /*!
   \methodof TraceOpt
@@ -186,7 +180,7 @@ void TraceOpt_set_show_defines_with_next(TraceOpt_ptr self,
 
   \sa TraceOpt_set_hiding_prefix
 */
-const char* TraceOpt_hiding_prefix(TraceOpt_ptr self);
+const char *TraceOpt_hiding_prefix(TraceOpt_ptr self);
 
 /*!
   \methodof TraceOpt
@@ -196,8 +190,7 @@ const char* TraceOpt_hiding_prefix(TraceOpt_ptr self);
 
   \sa TraceOpt_hiding_prefix
 */
-void TraceOpt_set_hiding_prefix(TraceOpt_ptr self,
-                                       const char* hiding_prefix);
+void TraceOpt_set_hiding_prefix(TraceOpt_ptr self, const char *hiding_prefix);
 
 #if NUSMV_HAVE_REGEX_H
 
@@ -209,7 +202,7 @@ void TraceOpt_set_hiding_prefix(TraceOpt_ptr self,
 
   \sa TraceOpt_regexp
 */
-regex_t* TraceOpt_regexp(TraceOpt_ptr self);
+regex_t *TraceOpt_regexp(TraceOpt_ptr self);
 #endif
 
 /*!
@@ -270,10 +263,8 @@ OStream_ptr TraceOpt_output_stream(TraceOpt_ptr self);
 
   \sa TraceOpt_output_stream
 */
-void TraceOpt_set_output_stream(TraceOpt_ptr self, FILE* out);
+void TraceOpt_set_output_stream(TraceOpt_ptr self, FILE *out);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_TRACE_TRACE_OPT_H__ */

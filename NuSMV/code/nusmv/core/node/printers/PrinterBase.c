@@ -35,18 +35,17 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/node/printers/PrinterBase.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/node/printers/PrinterBase_private.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 
 #include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/node/printers/MasterPrinter_private.h"
 
 #include "nusmv/core/node/MasterNodeWalker.h"
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -69,26 +68,23 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void printer_base_finalize(Object_ptr object, void* dummy);
+static void printer_base_finalize(Object_ptr object, void *dummy);
 
-static int
-printer_base_print_node(PrinterBase_ptr self, node_ptr n, int priority);
-
+static int printer_base_print_node(PrinterBase_ptr self, node_ptr n,
+                                   int priority);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-PrinterBase_ptr
-PrinterBase_create(const NuSMVEnv_ptr env, const char* name, int low, size_t num)
-{
+PrinterBase_ptr PrinterBase_create(const NuSMVEnv_ptr env, const char *name,
+                                   int low, size_t num) {
   PrinterBase_ptr self = ALLOC(PrinterBase, 1);
   PRINTER_BASE_CHECK_INSTANCE(self);
 
@@ -96,25 +92,21 @@ PrinterBase_create(const NuSMVEnv_ptr env, const char* name, int low, size_t num
   return self;
 }
 
-
-VIRTUAL int
-PrinterBase_print_node(PrinterBase_ptr self, node_ptr n, int priority)
-{
+VIRTUAL int PrinterBase_print_node(PrinterBase_ptr self, node_ptr n,
+                                   int priority) {
   PRINTER_BASE_CHECK_INSTANCE(self);
 
   n = node_walker_run_transformation_chain(NODE_WALKER(self), n);
   return self->print_node(self, n, priority);
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
 void printer_base_init(PrinterBase_ptr self, const NuSMVEnv_ptr env,
-                       const char* name, int low, size_t num,
-                       boolean can_handle_null)
-{
+                       const char *name, int low, size_t num,
+                       boolean can_handle_null) {
   /* base class initialization */
   node_walker_init(NODE_WALKER(self), env, name, low, num, can_handle_null);
 
@@ -123,30 +115,25 @@ void printer_base_init(PrinterBase_ptr self, const NuSMVEnv_ptr env,
   OVERRIDE(PrinterBase, print_node) = printer_base_print_node;
 }
 
-void printer_base_deinit(PrinterBase_ptr self)
-{
+void printer_base_deinit(PrinterBase_ptr self) {
   /* base class initialization */
   node_walker_deinit(NODE_WALKER(self));
 }
 
-
-int printer_base_throw_print_node(PrinterBase_ptr self, node_ptr n, int prior)
-{
+int printer_base_throw_print_node(PrinterBase_ptr self, node_ptr n, int prior) {
   if (NodeWalker_can_handle(NODE_WALKER(self), n)) {
     /* checks if self can handle the node without need of re-throw
        to the master */
     return PrinterBase_print_node(self, n, prior);
   }
-  return master_printer_print_node(
-           MASTER_PRINTER(NODE_WALKER(self)->master), n, prior);
+  return master_printer_print_node(MASTER_PRINTER(NODE_WALKER(self)->master), n,
+                                   prior);
 }
 
-int printer_base_print_string(PrinterBase_ptr self, const char* str)
-{
-  return MasterPrinter_print_string(
-      MASTER_PRINTER(NODE_WALKER(self)->master), str);
+int printer_base_print_string(PrinterBase_ptr self, const char *str) {
+  return MasterPrinter_print_string(MASTER_PRINTER(NODE_WALKER(self)->master),
+                                    str);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -157,8 +144,7 @@ int printer_base_print_string(PrinterBase_ptr self, const char* str)
 
   Called by the class destructor
 */
-static void printer_base_finalize(Object_ptr object, void* dummy)
-{
+static void printer_base_finalize(Object_ptr object, void *dummy) {
   PrinterBase_ptr self = PRINTER_BASE(object);
 
   printer_base_deinit(self);
@@ -171,15 +157,14 @@ static void printer_base_finalize(Object_ptr object, void* dummy)
   This is a pure virtual method, to be implemented by derived
   class, and cannot be called
 */
-static int
-printer_base_print_node(PrinterBase_ptr self, node_ptr n, int priority)
-{
+static int printer_base_print_node(PrinterBase_ptr self, node_ptr n,
+                                   int priority) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
-  ErrorMgr_internal_error(errmgr, "PrinterBase: Pure virtual method print_node " \
-                 "not implemented\n");
+  ErrorMgr_internal_error(errmgr, "PrinterBase: Pure virtual method print_node "
+                                  "not implemented\n");
   return 0;
 }
 

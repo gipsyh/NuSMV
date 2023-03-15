@@ -35,12 +35,11 @@
 
 */
 
-
-#include "nusmv/core/node/printers/MasterPrinter.h"
 #include "nusmv/core/utils/NodeGraph.h"
+#include "nusmv/core/node/printers/MasterPrinter.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -54,8 +53,7 @@
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-typedef struct NodeGraph_TAG
-{
+typedef struct NodeGraph_TAG {
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
@@ -66,8 +64,6 @@ typedef struct NodeGraph_TAG
 
 } NodeGraph;
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
@@ -75,7 +71,6 @@ typedef struct NodeGraph_TAG
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -86,13 +81,11 @@ typedef struct NodeGraph_TAG
 static void node_graph_init(NodeGraph_ptr self);
 static void node_graph_deinit(NodeGraph_ptr self);
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-NodeGraph_ptr NodeGraph_create()
-{
+NodeGraph_ptr NodeGraph_create() {
   NodeGraph_ptr self = ALLOC(NodeGraph, 1);
   NODE_GRAPH_CHECK_INSTANCE(self);
 
@@ -100,8 +93,7 @@ NodeGraph_ptr NodeGraph_create()
   return self;
 }
 
-void NodeGraph_destroy(NodeGraph_ptr self)
-{
+void NodeGraph_destroy(NodeGraph_ptr self) {
   NODE_GRAPH_CHECK_INSTANCE(self);
 
   node_graph_deinit(self);
@@ -109,8 +101,7 @@ void NodeGraph_destroy(NodeGraph_ptr self)
 }
 
 void NodeGraph_add_children(NodeGraph_ptr self, node_ptr var,
-                            const Set_t children)
-{
+                            const Set_t children) {
   Set_Iterator_t iter;
   Set_t down;
 
@@ -119,41 +110,39 @@ void NodeGraph_add_children(NodeGraph_ptr self, node_ptr var,
   self->graph_nodes = Set_AddMember(self->graph_nodes, var);
   self->graph_nodes = Set_Union(self->graph_nodes, children);
 
-  down = (Set_t) find_assoc(self->graph_to, var);
-  if ((Set_t) NULL == down) {
+  down = (Set_t)find_assoc(self->graph_to, var);
+  if ((Set_t)NULL == down) {
     down = Set_MakeEmpty();
   }
 
   SET_FOREACH(children, iter) {
     node_ptr child = Set_GetMember(children, iter);
-    Set_t up = (Set_t) find_assoc(self->graph_from, child);
-    if ((Set_t) NULL == up) up = Set_MakeEmpty();
+    Set_t up = (Set_t)find_assoc(self->graph_from, child);
+    if ((Set_t)NULL == up)
+      up = Set_MakeEmpty();
 
     if (child != var) { /* self-loops are ignored */
       down = Set_AddMember(down, child);
       up = Set_AddMember(up, var);
     }
-    insert_assoc(self->graph_from, child, (Set_Element_t) up);
+    insert_assoc(self->graph_from, child, (Set_Element_t)up);
   }
 
-  insert_assoc(self->graph_to, var, (Set_Element_t) down);
+  insert_assoc(self->graph_to, var, (Set_Element_t)down);
 }
 
-void NodeGraph_remove_nodes(NodeGraph_ptr self, const Set_t nodes)
-{
+void NodeGraph_remove_nodes(NodeGraph_ptr self, const Set_t nodes) {
   NODE_GRAPH_CHECK_INSTANCE(self);
   self->graph_removed = Set_Union(self->graph_removed, nodes);
 }
 
-void NodeGraph_clear_removed_nodes(NodeGraph_ptr self)
-{
+void NodeGraph_clear_removed_nodes(NodeGraph_ptr self) {
   NODE_GRAPH_CHECK_INSTANCE(self);
   Set_ReleaseSet(self->graph_removed);
   self->graph_removed = Set_MakeEmpty();
 }
 
-boolean NodeGraph_is_empty(const NodeGraph_ptr self)
-{
+boolean NodeGraph_is_empty(const NodeGraph_ptr self) {
   int diff;
 
   NODE_GRAPH_CHECK_INSTANCE(self);
@@ -164,23 +153,23 @@ boolean NodeGraph_is_empty(const NodeGraph_ptr self)
   return diff == 0;
 }
 
-Set_t NodeGraph_get_leaves(const NodeGraph_ptr self)
-{
+Set_t NodeGraph_get_leaves(const NodeGraph_ptr self) {
   Set_t res;
   Set_Iterator_t iter;
 
   NODE_GRAPH_CHECK_INSTANCE(self);
 
   res = Set_MakeEmpty();
-  if (NodeGraph_is_empty(self)) return res;
+  if (NodeGraph_is_empty(self))
+    return res;
 
   SET_FOREACH(self->graph_nodes, iter) {
     node_ptr var = Set_GetMember(self->graph_nodes, iter);
 
     if (!Set_IsMember(self->graph_removed, var)) {
-      Set_t set_to = (Set_t) find_assoc(self->graph_to, var);
+      Set_t set_to = (Set_t)find_assoc(self->graph_to, var);
       if (Set_Contains(self->graph_removed, set_to)) {
-        res = Set_AddMember(res, (Set_Element_t) var);
+        res = Set_AddMember(res, (Set_Element_t)var);
       }
     }
   }
@@ -188,25 +177,25 @@ Set_t NodeGraph_get_leaves(const NodeGraph_ptr self)
   return res;
 }
 
-Set_t NodeGraph_get_parents(const NodeGraph_ptr self, node_ptr child)
-{
+Set_t NodeGraph_get_parents(const NodeGraph_ptr self, node_ptr child) {
   Set_t parents;
 
   NODE_GRAPH_CHECK_INSTANCE(self);
 
-  parents = (Set_t) find_assoc(self->graph_from, child);
+  parents = (Set_t)find_assoc(self->graph_from, child);
 
-  if ((Set_t) NULL == parents) return Set_MakeEmpty();
+  if ((Set_t)NULL == parents)
+    return Set_MakeEmpty();
 
   parents = Set_Copy(parents);
-  if (Set_IsEmpty(self->graph_removed)) return parents; /* optimization */
-  else return Set_Difference(parents, self->graph_removed);
+  if (Set_IsEmpty(self->graph_removed))
+    return parents; /* optimization */
+  else
+    return Set_Difference(parents, self->graph_removed);
 }
 
-void NodeGraph_print(const NodeGraph_ptr self,
-                     MasterPrinter_ptr printer,
-                     FILE* out)
-{
+void NodeGraph_print(const NodeGraph_ptr self, MasterPrinter_ptr printer,
+                     FILE *out) {
   Set_Iterator_t iter;
 
   NODE_GRAPH_CHECK_INSTANCE(self);
@@ -215,7 +204,7 @@ void NodeGraph_print(const NodeGraph_ptr self,
     node_ptr var = Set_GetMember(self->graph_nodes, iter);
 
     if (!Set_IsMember(self->graph_removed, var)) {
-      Set_t set_to = (Set_t) find_assoc(self->graph_to, var);
+      Set_t set_to = (Set_t)find_assoc(self->graph_to, var);
       Set_t set_rem = Set_Difference(Set_Copy(set_to), self->graph_removed);
       print_node(printer, out, var);
       fprintf(out, " ==> ");
@@ -231,11 +220,9 @@ void NodeGraph_print(const NodeGraph_ptr self,
   fprintf(out, "\n");
 }
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -247,10 +234,11 @@ void NodeGraph_print(const NodeGraph_ptr self,
 
 */
 
-static assoc_retval node_graph_assoc_free_set(char* key, char* data, char* arg)
-{
-  Set_t set = (Set_t) data;
-  if ((Set_t) NULL != set) Set_ReleaseSet(set);
+static assoc_retval node_graph_assoc_free_set(char *key, char *data,
+                                              char *arg) {
+  Set_t set = (Set_t)data;
+  if ((Set_t)NULL != set)
+    Set_ReleaseSet(set);
   return ASSOC_DELETE;
 }
 
@@ -261,8 +249,7 @@ static assoc_retval node_graph_assoc_free_set(char* key, char* data, char* arg)
 
   \sa NodeGraph_create
 */
-static void node_graph_init(NodeGraph_ptr self)
-{
+static void node_graph_init(NodeGraph_ptr self) {
   /* members initialization */
   self->graph_to = new_assoc();
   self->graph_from = new_assoc();
@@ -277,8 +264,7 @@ static void node_graph_init(NodeGraph_ptr self)
 
   \sa NodeGraph_destroy
 */
-static void node_graph_deinit(NodeGraph_ptr self)
-{
+static void node_graph_deinit(NodeGraph_ptr self) {
   /* members deinitialization */
   Set_ReleaseSet(self->graph_nodes);
   Set_ReleaseSet(self->graph_removed);
@@ -289,7 +275,5 @@ static void node_graph_deinit(NodeGraph_ptr self)
   clear_assoc_and_free_entries(self->graph_to, node_graph_assoc_free_set);
   free_assoc(self->graph_to);
 }
-
-
 
 /**AutomaticEnd***************************************************************/

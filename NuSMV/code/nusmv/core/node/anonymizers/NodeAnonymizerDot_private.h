@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,29 +34,24 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_DOT_PRIVATE_H__
 #define __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_DOT_PRIVATE_H__
 
-
-#include "nusmv/core/node/anonymizers/NodeAnonymizerDot.h"
 #include "nusmv/core/node/anonymizers/NodeAnonymizerBase.h"
 #include "nusmv/core/node/anonymizers/NodeAnonymizerBase_private.h"
+#include "nusmv/core/node/anonymizers/NodeAnonymizerDot.h"
 #include "nusmv/core/utils/defs.h"
-
 
 /*!
   \brief NodeAnonymizerDot class definition derived from
                class NodeAnonymizerBase
 
-  
+
 
   \sa Base class NodeAnonymizerBase
 */
 
-typedef struct NodeAnonymizerDot_TAG
-{
+typedef struct NodeAnonymizerDot_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(NodeAnonymizerBase);
 
@@ -64,14 +59,11 @@ typedef struct NodeAnonymizerDot_TAG
   /*                  Private members                   */
   /* -------------------------------------------------- */
 
-
   /* -------------------------------------------------- */
   /*                  Virtual methods                   */
   /* -------------------------------------------------- */
 
 } NodeAnonymizerDot;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -85,10 +77,9 @@ typedef struct NodeAnonymizerDot_TAG
 
   \sa NodeAnonymizerDot_create
 */
-void node_anonymizer_dot_init(NodeAnonymizerDot_ptr self,
-                                       NuSMVEnv_ptr env,
-                                       const char* default_prefix,
-                                       size_t memoization_threshold);
+void node_anonymizer_dot_init(NodeAnonymizerDot_ptr self, NuSMVEnv_ptr env,
+                              const char *default_prefix,
+                              size_t memoization_threshold);
 
 /*!
   \methodof NodeAnonymizerDot
@@ -107,7 +98,6 @@ void node_anonymizer_dot_deinit(NodeAnonymizerDot_ptr self);
   Here we assume that id is wellformed, we could add debug
   checks
 */
-boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self,
-                                         node_ptr id);
+boolean node_anonymizer_dot_is_id(NodeAnonymizerBase_ptr self, node_ptr id);
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_DOT_PRIVATE_H__ */

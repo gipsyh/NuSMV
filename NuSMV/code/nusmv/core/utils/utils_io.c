@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,38 +34,33 @@
 
 */
 
-
-
-#include "nusmv/core/utils/StreamMgr.h"
 #include "nusmv/core/node/printers/MasterPrinter.h"
+#include "nusmv/core/utils/StreamMgr.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 
 #include "cudd/util.h"
-#include "nusmv/core/utils/utils.h"
-#include "nusmv/core/node/node.h"
-#include "nusmv/core/utils/assoc.h"
+#include "nusmv/core/compile/compile.h"
 #include "nusmv/core/dd/dd.h"
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/parser/symbols.h"
 #include "nusmv/core/rbc/rbc.h"
 #include "nusmv/core/set/set.h"
-#include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/utils/utils_io.h"
+#include "nusmv/core/utils/assoc.h"
 #include "nusmv/core/utils/error.h"
-#include "nusmv/core/compile/compile.h"
+#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/utils/utils_io.h"
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-int UtilsIO_get_param_len(const char* fmt,
-                          enum var_type* type,
-                          enum var_modifier* mod)
-{
+int UtilsIO_get_param_len(const char *fmt, enum var_type *type,
+                          enum var_modifier *mod) {
   int i = 1;
   boolean done = false;
 
@@ -83,24 +78,40 @@ int UtilsIO_get_param_len(const char* fmt,
     case 'x':
     case 'X':
     case 'd':
-    case 'i': *type = VAR_INT; done = true; break;
+    case 'i':
+      *type = VAR_INT;
+      done = true;
+      break;
 
     case 'G':
     case 'g':
     case 'F':
     case 'f':
     case 'E':
-    case 'e': *type = VAR_DOUBLE; done = true; break;
+    case 'e':
+      *type = VAR_DOUBLE;
+      done = true;
+      break;
 
-    case 'c': *type = VAR_CHAR; done = true; break;
+    case 'c':
+      *type = VAR_CHAR;
+      done = true;
+      break;
 
-    case 's': *type = VAR_STRING; done = true; break;
+    case 's':
+      *type = VAR_STRING;
+      done = true;
+      break;
 
-    case 'p': *type = VAR_POINTER; done = true; break;
+    case 'p':
+      *type = VAR_POINTER;
+      done = true;
+      break;
 
       /* Length modifiers (also in man fprintf) */
     case 'h':
-      if (MOD_SHORT == *mod) *mod = MOD_SHORT_SHORT;
+      if (MOD_SHORT == *mod)
+        *mod = MOD_SHORT_SHORT;
       else {
         nusmv_assert(MOD_NONE == *mod);
         *mod = MOD_SHORT;
@@ -108,7 +119,8 @@ int UtilsIO_get_param_len(const char* fmt,
       break;
 
     case 'l':
-      if (MOD_LONG == *mod) *mod = MOD_LONG_LONG;
+      if (MOD_LONG == *mod)
+        *mod = MOD_LONG_LONG;
       else {
         nusmv_assert(MOD_NONE == *mod);
         *mod = MOD_LONG;
@@ -129,12 +141,15 @@ int UtilsIO_get_param_len(const char* fmt,
     case 'N': /* N should be trapped by callers */
 
     case 'n':
-    case 'j': error_unreachable_code();
+    case 'j':
+      error_unreachable_code();
 
       /* Error trapping */
-    case '\0': error_unreachable_code();
+    case '\0':
+      error_unreachable_code();
 
-    default: /* None */ break;
+    default: /* None */
+      break;
     }
 
     ++i;
@@ -143,16 +158,14 @@ int UtilsIO_get_param_len(const char* fmt,
   return i;
 }
 
-int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer,
-                           char* output, size_t size,
-                           const char* fmt, va_list args)
-{
+int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer, char *output,
+                           size_t size, const char *fmt, va_list args) {
   int res = 0;
   size_t i = 0;
   char buf[32];
 
   MASTER_PRINTER_CHECK_INSTANCE(printer);
-  nusmv_assert((const char*)NULL != fmt);
+  nusmv_assert((const char *)NULL != fmt);
 
   output[0] = '\0';
 
@@ -166,10 +179,9 @@ int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer,
 
         res += 2;
         i += 2;
-      }
-      else if (fmt[i + 1] == 'N') {
+      } else if (fmt[i + 1] == 'N') {
         node_ptr node = va_arg(args, node_ptr);
-        char* str = sprint_node(printer, node);
+        char *str = sprint_node(printer, node);
 
         if (res < size) {
           output = strncat(output, str, size - res - 1);
@@ -178,12 +190,11 @@ int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer,
         res += strlen(str);
         FREE(str);
         i += 2;
-      }
-      else {
+      } else {
         enum var_type type;
         enum var_modifier mod;
         int read, wrote;
-        char* tmp = ALLOC(char, size);
+        char *tmp = ALLOC(char, size);
         nusmv_assert(NULL != tmp);
 
         read = UtilsIO_get_param_len(fmt + i, &type, &mod);
@@ -193,58 +204,82 @@ int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer,
         switch (type) {
 
         case VAR_INT:
-          switch(mod) {
+          switch (mod) {
           case MOD_NONE:
           case MOD_SHORT:
-          case MOD_SHORT_SHORT: wrote = snprintf(tmp, size, buf, va_arg(args, int)); break;
-          case MOD_SIZE_T: wrote = snprintf(tmp, size, buf, va_arg(args, size_t)); break;
-          case MOD_LONG: wrote = snprintf(tmp, size, buf, va_arg(args, long int)); break;
-          case MOD_LONG_LONG: wrote = snprintf(tmp, size, buf, va_arg(args, long long int)); break;
+          case MOD_SHORT_SHORT:
+            wrote = snprintf(tmp, size, buf, va_arg(args, int));
+            break;
+          case MOD_SIZE_T:
+            wrote = snprintf(tmp, size, buf, va_arg(args, size_t));
+            break;
+          case MOD_LONG:
+            wrote = snprintf(tmp, size, buf, va_arg(args, long int));
+            break;
+          case MOD_LONG_LONG:
+            wrote = snprintf(tmp, size, buf, va_arg(args, long long int));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
           break; /* case VAR_INT */
 
         case VAR_CHAR:
-          switch(mod) {
-          case MOD_NONE: wrote = snprintf(tmp, size, buf, va_arg(args, int)); break;
+          switch (mod) {
+          case MOD_NONE:
+            wrote = snprintf(tmp, size, buf, va_arg(args, int));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
           break; /* case VAR_CHAR */
 
         case VAR_STRING:
-          switch(mod) {
-          case MOD_NONE: wrote = snprintf(tmp, size, buf, va_arg(args, char*)); break;
+          switch (mod) {
+          case MOD_NONE:
+            wrote = snprintf(tmp, size, buf, va_arg(args, char *));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
-          break;  /* case VAR_STRING */
+          break; /* case VAR_STRING */
 
         case VAR_POINTER:
-          switch(mod) {
-          case MOD_NONE: wrote = snprintf(tmp, size, buf, va_arg(args, void*)); break;
+          switch (mod) {
+          case MOD_NONE:
+            wrote = snprintf(tmp, size, buf, va_arg(args, void *));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
-          break;  /* case VAR_POINTER */
+          break; /* case VAR_POINTER */
 
         case VAR_DOUBLE:
-          switch(mod) {
-          case MOD_NONE: wrote = snprintf(tmp, size, buf, va_arg(args, double)); break;
-          case MOD_LONG_DOUBLE: wrote = snprintf(tmp, size, buf, va_arg(args, long double)); break;
+          switch (mod) {
+          case MOD_NONE:
+            wrote = snprintf(tmp, size, buf, va_arg(args, double));
+            break;
+          case MOD_LONG_DOUBLE:
+            wrote = snprintf(tmp, size, buf, va_arg(args, long double));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
           break; /* case VAR_DOUBLE */
 
           /* Errors */
-        default: error_unreachable_code();
+        default:
+          error_unreachable_code();
         }
 
         if (res < size) {
@@ -273,30 +308,27 @@ int UtilsIO_node_vsnprintf(const MasterPrinter_ptr printer,
   return res;
 }
 
-int UtilsIO_node_vfprintf(const MasterPrinter_ptr printer,
-                          FILE* output, const char* fmt, va_list args)
-{
+int UtilsIO_node_vfprintf(const MasterPrinter_ptr printer, FILE *output,
+                          const char *fmt, va_list args) {
   int res = 0;
   size_t i = 0;
   char buf[32];
 
   MASTER_PRINTER_CHECK_INSTANCE(printer);
-  nusmv_assert((const char*)NULL != fmt);
+  nusmv_assert((const char *)NULL != fmt);
 
   while (fmt[i] != '\0') {
     if (fmt[i] == '%') {
       if (fmt[i + 1] == '%') {
         res += fprintf(output, "%%");
         i += 2;
-      }
-      else if (fmt[i + 1] == 'N') {
+      } else if (fmt[i + 1] == 'N') {
         node_ptr node = va_arg(args, node_ptr);
-        char* str = sprint_node(printer, node);
+        char *str = sprint_node(printer, node);
         res += fprintf(output, "%s", str);
         FREE(str);
         i += 2;
-      }
-      else {
+      } else {
         enum var_type type;
         enum var_modifier mod;
         int read;
@@ -308,58 +340,82 @@ int UtilsIO_node_vfprintf(const MasterPrinter_ptr printer,
         switch (type) {
 
         case VAR_INT:
-          switch(mod) {
+          switch (mod) {
           case MOD_NONE:
           case MOD_SHORT:
-          case MOD_SHORT_SHORT: res += fprintf(output, buf, va_arg(args, int)); break;
-          case MOD_SIZE_T: res += fprintf(output, buf, va_arg(args, size_t)); break;
-          case MOD_LONG: res += fprintf(output, buf, va_arg(args, long int)); break;
-          case MOD_LONG_LONG: res += fprintf(output, buf, va_arg(args, long long int)); break;
+          case MOD_SHORT_SHORT:
+            res += fprintf(output, buf, va_arg(args, int));
+            break;
+          case MOD_SIZE_T:
+            res += fprintf(output, buf, va_arg(args, size_t));
+            break;
+          case MOD_LONG:
+            res += fprintf(output, buf, va_arg(args, long int));
+            break;
+          case MOD_LONG_LONG:
+            res += fprintf(output, buf, va_arg(args, long long int));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
           break; /* case VAR_INT */
 
         case VAR_CHAR:
-          switch(mod) {
-          case MOD_NONE: res += fprintf(output, buf, va_arg(args, int)); break;
+          switch (mod) {
+          case MOD_NONE:
+            res += fprintf(output, buf, va_arg(args, int));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
           break; /* case VAR_CHAR */
 
         case VAR_STRING:
-          switch(mod) {
-          case MOD_NONE: res += fprintf(output, buf, va_arg(args, char*)); break;
+          switch (mod) {
+          case MOD_NONE:
+            res += fprintf(output, buf, va_arg(args, char *));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
-          break;  /* case VAR_STRING */
+          break; /* case VAR_STRING */
 
         case VAR_POINTER:
-          switch(mod) {
-          case MOD_NONE: res += fprintf(output, buf, va_arg(args, void*)); break;
+          switch (mod) {
+          case MOD_NONE:
+            res += fprintf(output, buf, va_arg(args, void *));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
-          break;  /* case VAR_POINTER */
+          break; /* case VAR_POINTER */
 
         case VAR_DOUBLE:
-          switch(mod) {
-          case MOD_NONE: res += fprintf(output, buf, va_arg(args, double)); break;
-          case MOD_LONG_DOUBLE: res += fprintf(output, buf, va_arg(args, long double)); break;
+          switch (mod) {
+          case MOD_NONE:
+            res += fprintf(output, buf, va_arg(args, double));
+            break;
+          case MOD_LONG_DOUBLE:
+            res += fprintf(output, buf, va_arg(args, long double));
+            break;
 
             /* The rest is an error (or unhandled feature) */
-          default: error_unreachable_code();
+          default:
+            error_unreachable_code();
           }
           break; /* case VAR_DOUBLE */
 
           /* Errors */
-        default: error_unreachable_code();
+        default:
+          error_unreachable_code();
         }
 
         i += read;
@@ -374,9 +430,8 @@ int UtilsIO_node_vfprintf(const MasterPrinter_ptr printer,
   return res;
 }
 
-int UtilsIO_node_fprintf(const MasterPrinter_ptr printer,
-                         FILE* output, const char* fmt, ...)
-{
+int UtilsIO_node_fprintf(const MasterPrinter_ptr printer, FILE *output,
+                         const char *fmt, ...) {
   int res;
   va_list args;
 
@@ -389,10 +444,8 @@ int UtilsIO_node_fprintf(const MasterPrinter_ptr printer,
   return res;
 }
 
-int UtilsIO_node_snprintf(const MasterPrinter_ptr printer,
-                          char* output, size_t size,
-                          const char* fmt, ...)
-{
+int UtilsIO_node_snprintf(const MasterPrinter_ptr printer, char *output,
+                          size_t size, const char *fmt, ...) {
   int res;
   va_list args;
 
@@ -404,7 +457,6 @@ int UtilsIO_node_snprintf(const MasterPrinter_ptr printer,
 
   return res;
 }
-
 
 #if 0
 /*

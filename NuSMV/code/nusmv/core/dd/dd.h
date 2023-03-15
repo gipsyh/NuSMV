@@ -1,28 +1,28 @@
 /* ---------------------------------------------------------------------------
 
 
-  This file is part of the ``dd'' package of NuSMV version 2. 
-  Copyright (C) 1998-2001 by CMU and FBK-irst. 
+  This file is part of the ``dd'' package of NuSMV version 2.
+  Copyright (C) 1998-2001 by CMU and FBK-irst.
 
-  NuSMV version 2 is free software; you can redistribute it and/or 
-  modify it under the terms of the GNU Lesser General Public 
-  License as published by the Free Software Foundation; either 
+  NuSMV version 2 is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
 
-  NuSMV version 2 is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+  NuSMV version 2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public 
-  License along with this library; if not, write to the Free Software 
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
 
   For more information on NuSMV see <http://nusmv.fbk.eu>
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -39,18 +39,17 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_DD_DD_H__
 #define __NUSMV_CORE_DD_DD_H__
 
+#include "cudd/cudd.h"
+#include "nusmv/core/cinit/NuSMVEnv.h"
 #include "nusmv/core/dd/DDMgr.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/opt/OptsHandler.h"
 #include "nusmv/core/utils/array.h"
 #include "nusmv/core/utils/avl.h"
-#include "nusmv/core/node/node.h"
-#include "cudd/cudd.h"
-#include "nusmv/core/opt/OptsHandler.h"
-#include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -62,9 +61,9 @@
 
   \todo Missing description
 */
-typedef struct DdNode * add_ptr;
-typedef struct DdNode * bdd_ptr;
-typedef struct DdNode * dd_ptr; /* represents both add_ptr and bdd_ptr */
+typedef struct DdNode *add_ptr;
+typedef struct DdNode *bdd_ptr;
+typedef struct DdNode *dd_ptr; /* represents both add_ptr and bdd_ptr */
 
 /*!
   \struct MtrNode
@@ -86,14 +85,14 @@ typedef Cudd_ReorderingType dd_reorderingtype;
 
   \todo Missing description
 */
-typedef void (*VPFDD)(DDMgr_ptr , bdd_ptr);
+typedef void (*VPFDD)(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-typedef node_ptr (*NPFDD)(DDMgr_ptr , bdd_ptr);
+typedef node_ptr (*NPFDD)(DDMgr_ptr, bdd_ptr);
 typedef void (*VPFCVT)(CUDD_VALUE_TYPE);
 typedef void (*VPFDDCVT)(DDMgr_ptr, CUDD_VALUE_TYPE);
 typedef node_ptr (*NPFCVT)(CUDD_VALUE_TYPE);
@@ -103,8 +102,8 @@ typedef node_ptr (*NPFCVT)(CUDD_VALUE_TYPE);
 
   \todo Missing description
 */
-typedef add_ptr (*FP_A_DA)(DDMgr_ptr , add_ptr);
-typedef add_ptr (*FP_A_DAA)(DDMgr_ptr , add_ptr, add_ptr);
+typedef add_ptr (*FP_A_DA)(DDMgr_ptr, add_ptr);
+typedef add_ptr (*FP_A_DAA)(DDMgr_ptr, add_ptr, add_ptr);
 
 typedef node_ptr (*NPFNNE)(node_ptr, node_ptr, const NuSMVEnv_ptr);
 
@@ -118,7 +117,7 @@ typedef DdGen dd_gen;
 /*!
   \brief The possible actions to control dynamic var reordering
 
-  
+
 */
 
 typedef enum DdDynVarOrderAction_TAG {
@@ -127,8 +126,8 @@ typedef enum DdDynVarOrderAction_TAG {
   DD_DYN_VAR_ORDER_ACTION_FORCE
 } DdDynVarOrderAction;
 
-DdDynVarOrderAction Dd_action_str_to_enum(char* action);
-char* Dd_action_enum_to_str(DdDynVarOrderAction action);
+DdDynVarOrderAction Dd_action_str_to_enum(char *action);
+char *Dd_action_enum_to_str(DdDynVarOrderAction action);
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -140,7 +139,7 @@ char* Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define MAX_VAR_INDEX            CUDD_MAXINDEX
+#define MAX_VAR_INDEX CUDD_MAXINDEX
 #endif
 
 /* initial size of the unique tables */
@@ -150,7 +149,7 @@ char* Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define UNIQUE_SLOTS             CUDD_UNIQUE_SLOTS
+#define UNIQUE_SLOTS CUDD_UNIQUE_SLOTS
 
 /* initial size of the cache */
 
@@ -159,7 +158,7 @@ char* Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define CACHE_SLOTS              CUDD_CACHE_SLOTS
+#define CACHE_SLOTS CUDD_CACHE_SLOTS
 
 /* use value currently stored in the manager. */
 
@@ -168,7 +167,7 @@ char* Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define REORDER_SAME             CUDD_REORDER_SAME
+#define REORDER_SAME CUDD_REORDER_SAME
 /* no reardering at all */
 
 /*!
@@ -176,161 +175,163 @@ char* Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define REORDER_NONE             CUDD_REORDER_NONE
+#define REORDER_NONE CUDD_REORDER_NONE
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_RANDOM           CUDD_REORDER_RANDOM
+#define REORDER_RANDOM CUDD_REORDER_RANDOM
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_RANDOM_PIVOT     CUDD_REORDER_RANDOM_PIVOT
+#define REORDER_RANDOM_PIVOT CUDD_REORDER_RANDOM_PIVOT
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_SIFT             CUDD_REORDER_SIFT
+#define REORDER_SIFT CUDD_REORDER_SIFT
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_SIFT_CONV        CUDD_REORDER_SIFT_CONVERGE
+#define REORDER_SIFT_CONV CUDD_REORDER_SIFT_CONVERGE
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_SYMM_SIFT        CUDD_REORDER_SYMM_SIFT
+#define REORDER_SYMM_SIFT CUDD_REORDER_SYMM_SIFT
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_SYMM_SIFT_CONV   CUDD_REORDER_SYMM_SIFT_CONV
+#define REORDER_SYMM_SIFT_CONV CUDD_REORDER_SYMM_SIFT_CONV
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_WINDOW2          CUDD_REORDER_WINDOW2
+#define REORDER_WINDOW2 CUDD_REORDER_WINDOW2
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_WINDOW3          CUDD_REORDER_WINDOW3
+#define REORDER_WINDOW3 CUDD_REORDER_WINDOW3
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_WINDOW4          CUDD_REORDER_WINDOW4
+#define REORDER_WINDOW4 CUDD_REORDER_WINDOW4
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_WINDOW2_CONV     CUDD_REORDER_WINDOW2_CONV
+#define REORDER_WINDOW2_CONV CUDD_REORDER_WINDOW2_CONV
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_WINDOW3_CONV     CUDD_REORDER_WINDOW3_CONV
+#define REORDER_WINDOW3_CONV CUDD_REORDER_WINDOW3_CONV
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_WINDOW4_CONV     CUDD_REORDER_WINDOW4_CONV
+#define REORDER_WINDOW4_CONV CUDD_REORDER_WINDOW4_CONV
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_GROUP_SIFT       CUDD_REORDER_GROUP_SIFT
+#define REORDER_GROUP_SIFT CUDD_REORDER_GROUP_SIFT
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_GROUP_SIFT_CONV  CUDD_REORDER_GROUP_SIFT_CONV
+#define REORDER_GROUP_SIFT_CONV CUDD_REORDER_GROUP_SIFT_CONV
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_ANNEALING        CUDD_REORDER_ANNEALING
+#define REORDER_ANNEALING CUDD_REORDER_ANNEALING
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_GENETIC          CUDD_REORDER_GENETIC
+#define REORDER_GENETIC CUDD_REORDER_GENETIC
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_LINEAR           CUDD_REORDER_LINEAR
+#define REORDER_LINEAR CUDD_REORDER_LINEAR
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_LINEAR_CONV      CUDD_REORDER_LINEAR_CONVERGE
+#define REORDER_LINEAR_CONV CUDD_REORDER_LINEAR_CONVERGE
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define REORDER_EXACT            CUDD_REORDER_EXACT
+#define REORDER_EXACT CUDD_REORDER_EXACT
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_REORDER          REORDER_SIFT /* The default value in the CUDD package */
+#define DEFAULT_REORDER REORDER_SIFT /* The default value in the CUDD package  \
+                                      */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define DEFAULT_MINSIZE          10 /* 10 = whatever (Verbatim from file cuddTable.c) */
+#define DEFAULT_MINSIZE 10 /* 10 = whatever (Verbatim from file cuddTable.c)   \
+                            */
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define ADD_FOREACH_NODE(manager, f, gen, node) \
+#define ADD_FOREACH_NODE(manager, f, gen, node)                                \
   Cudd_ForeachNode(DDMgr_get_dd_manager(manager), f, gen, node)
 
 /*!
@@ -338,7 +339,7 @@ char* Dd_action_enum_to_str(DdDynVarOrderAction action);
 
   \todo Missing description
 */
-#define BDD_FOREACH_NODE(manager, f, gen, node) \
+#define BDD_FOREACH_NODE(manager, f, gen, node)                                \
   ADD_FOREACH_NODE(manager, f, gen, node)
 
 /*---------------------------------------------------------------------------*/
@@ -368,12 +369,10 @@ void Dd_quit(NuSMVEnv_ptr env);
   \brief Enable, disable or force to happen the dynamic var
   reordering
 
-  
+
 */
-int Dd_dynamic_var_ordering(NuSMVEnv_ptr env,
-                                   DDMgr_ptr dd,
-                                   int dynOrderingMethod,
-                                   DdDynVarOrderAction action);
+int Dd_dynamic_var_ordering(NuSMVEnv_ptr env, DDMgr_ptr dd,
+                            int dynOrderingMethod, DdDynVarOrderAction action);
 
 /*!
   \brief Prints the user flags of the cudd package so the user can
@@ -382,9 +381,8 @@ int Dd_dynamic_var_ordering(NuSMVEnv_ptr env,
   The user can control the cudd package by setting the
   flags printed by this function
 */
-int Dd_set_bdd_parameters(NuSMVEnv_ptr env,
-                                 DDMgr_ptr dd_manager,
-                                 boolean showAfter);
+int Dd_set_bdd_parameters(NuSMVEnv_ptr env, DDMgr_ptr dd_manager,
+                          boolean showAfter);
 
 /*!
   \brief Applies function <code>f</code> to the list of BDD/ADD <code>l</code>.
@@ -395,7 +393,7 @@ int Dd_set_bdd_parameters(NuSMVEnv_ptr env,
 
   \sa map walk walk_dd
 */
-node_ptr map_dd(DDMgr_ptr , NPFDD, node_ptr);
+node_ptr map_dd(DDMgr_ptr, NPFDD, node_ptr);
 
 /*!
   \brief Applies function <code>f</code> to the list of BDD/ADD <code>l</code>.
@@ -406,7 +404,7 @@ node_ptr map_dd(DDMgr_ptr , NPFDD, node_ptr);
 
   \sa map walk map_dd
 */
-void     walk_dd(DDMgr_ptr , VPFDD, node_ptr);
+void walk_dd(DDMgr_ptr, VPFDD, node_ptr);
 
 /*!
   \brief Builds a group of variables that should stay adjacent
@@ -420,7 +418,7 @@ void     walk_dd(DDMgr_ptr , VPFDD, node_ptr);
 
   \se Modifies the variable tree.
 */
-dd_block* dd_new_var_block(DDMgr_ptr , int, int);
+dd_block *dd_new_var_block(DDMgr_ptr, int, int);
 
 /*!
   \brief Dissolves a group previously created by dd_new_var_block
@@ -431,7 +429,7 @@ dd_block* dd_new_var_block(DDMgr_ptr , int, int);
 
   \se Modifies the variable tree.
 */
-int      dd_free_var_block(DDMgr_ptr , dd_block*);
+int dd_free_var_block(DDMgr_ptr, dd_block *);
 
 /*!
   \brief Returns the index of the variable currently in the i-th
@@ -441,7 +439,7 @@ int      dd_free_var_block(DDMgr_ptr , dd_block*);
   position of the order. If the index is MAX_VAR_INDEX, returns
   MAX_VAR_INDEX; otherwise, if the index is out of bounds fails.
 */
-int      dd_get_index_at_level(DDMgr_ptr , int);
+int dd_get_index_at_level(DDMgr_ptr, int);
 
 /*!
   \brief Returns the current position of the i-th variable in the
@@ -455,14 +453,14 @@ int      dd_get_index_at_level(DDMgr_ptr , int);
 
   \sa Cudd_ReadInvPerm Cudd_ReadPermZdd
 */
-int      dd_get_level_at_index(DDMgr_ptr , int);
+int dd_get_level_at_index(DDMgr_ptr, int);
 
 /*!
   \brief Returns the number of BDD variables in existance.
 
   Returns the number of BDD variables in existance.
 */
-int      dd_get_size(DDMgr_ptr );
+int dd_get_size(DDMgr_ptr);
 
 /*!
   \brief Reorders variables according to given permutation.
@@ -476,7 +474,7 @@ int      dd_get_size(DDMgr_ptr );
   \se Changes the variable order for all diagrams and clears
   the cache.
 */
-int      dd_set_order(DDMgr_ptr , int *permutation);
+int dd_set_order(DDMgr_ptr, int *permutation);
 
 /*!
   \brief Enables automatic dynamic reordering of BDDs and ADDs.
@@ -488,7 +486,7 @@ int      dd_set_order(DDMgr_ptr , int *permutation);
 
   \sa dd_autodyn_disable dd_reordering_status
 */
-void     dd_autodyn_enable(DDMgr_ptr , dd_reorderingtype);
+void dd_autodyn_enable(DDMgr_ptr, dd_reorderingtype);
 
 /*!
   \brief Disables automatic dynamic reordering of BDD and ADD.
@@ -497,7 +495,7 @@ void     dd_autodyn_enable(DDMgr_ptr , dd_reorderingtype);
 
   \sa dd_autodyn_enable dd_reordering_status
 */
-void     dd_autodyn_disable(DDMgr_ptr );
+void dd_autodyn_disable(DDMgr_ptr);
 
 /*!
   \brief Reports the status of automatic dynamic reordering of BDDs
@@ -513,7 +511,7 @@ void     dd_autodyn_disable(DDMgr_ptr );
 
   \sa dd_autodyn_disable dd_autodyn_enable
 */
-int      dd_reordering_status(DDMgr_ptr , dd_reorderingtype *);
+int dd_reordering_status(DDMgr_ptr, dd_reorderingtype *);
 
 /*!
   \brief Main dynamic reordering routine.
@@ -544,14 +542,14 @@ int      dd_reordering_status(DDMgr_ptr , dd_reorderingtype *);
   <li> <tt>heuristics</tt> method used for reordering;
   <li> <tt>minsize</tt> bound below which no reordering occurs;
   </ul>
-  
+
 
   \se Changes the variable order for all diagrams and clears
   the cache.
 
   \sa Cudd_ReduceHeap
 */
-int      dd_reorder(DDMgr_ptr , int, int);
+int dd_reorder(DDMgr_ptr, int, int);
 
 /*!
   \brief Returns the number of times reordering has occurred.
@@ -565,14 +563,14 @@ int      dd_reorder(DDMgr_ptr , int, int);
   specified as reordering method. The calls to Cudd_ShuffleHeap are
   not counted.
 */
-int      dd_get_reorderings(DDMgr_ptr );
+int dd_get_reorderings(DDMgr_ptr);
 
 /*!
   \brief Gets the internal reordering method used.
 
   Returns the internal reordering method used.
 */
-dd_reorderingtype dd_get_ordering_method(DDMgr_ptr );
+dd_reorderingtype dd_get_ordering_method(DDMgr_ptr);
 
 /*!
   \brief Converts a string to a dynamic ordering method type.
@@ -580,7 +578,7 @@ dd_reorderingtype dd_get_ordering_method(DDMgr_ptr );
   Converts a string to a dynamic ordering method type. If string
   is not "sift" or "window", then returns REORDER_.
 */
-int      StringConvertToDynOrderType(char *string);
+int StringConvertToDynOrderType(char *string);
 
 /*!
   \brief Converts a dynamic ordering method type to a string.
@@ -588,7 +586,7 @@ int      StringConvertToDynOrderType(char *string);
   Converts a dynamic ordering method type to a string.  This
   string must NOT be freed by the caller.
 */
-char *   DynOrderTypeConvertToString(int method);
+char *DynOrderTypeConvertToString(int method);
 
 /*!
   \brief Checks the unique table for nodes with non-zero reference
@@ -602,7 +600,7 @@ char *   DynOrderTypeConvertToString(int method);
   manager.  Returns the number of nodes with non-zero reference count.
   (Except for the cases mentioned above.)
 */
-int      dd_checkzeroref(DDMgr_ptr );
+int dd_checkzeroref(DDMgr_ptr);
 
 /*!
   \brief Sets the internal parameters of the package to the given values.
@@ -613,14 +611,14 @@ int      dd_checkzeroref(DDMgr_ptr );
   values. Some basic type checking is done. It returns 1 if everything is
   correct and 0 otherwise.
 */
-int      dd_set_parameters(DDMgr_ptr , OptsHandler_ptr, FILE *);
+int dd_set_parameters(DDMgr_ptr, OptsHandler_ptr, FILE *);
 
 /*!
   \brief Prints out statistic and setting of the DD manager.
 
   Prints out statistics and settings for a CUDD manager.
 */
-int      dd_print_stats(NuSMVEnv_ptr, DDMgr_ptr , FILE *);
+int dd_print_stats(NuSMVEnv_ptr, DDMgr_ptr, FILE *);
 
 /*!
   \brief Prints a disjoint sum of products.
@@ -631,7 +629,7 @@ int      dd_print_stats(NuSMVEnv_ptr, DDMgr_ptr , FILE *);
   background value. Uses the standard output.  Returns 1 if successful;
   0 otherwise.
 */
-int      dd_printminterm(DDMgr_ptr , dd_ptr);
+int dd_printminterm(DDMgr_ptr, dd_ptr);
 
 /*!
   \brief Writes a dot file representing the argument DDs.
@@ -657,11 +655,11 @@ int      dd_printminterm(DDMgr_ptr , dd_ptr);
 
   The dot options are chosen so that the drawing fits on a letter-size
   sheet.
-  
+
 
   \sa dd_dump_davinci
 */
-int      dd_dump_dot(DDMgr_ptr , int, dd_ptr *, const char **, const char **, FILE *);
+int dd_dump_dot(DDMgr_ptr, int, dd_ptr *, const char **, const char **, FILE *);
 
 /*!
   \brief Writes a daVnci file representing the argument DDs.
@@ -672,7 +670,8 @@ int      dd_dump_dot(DDMgr_ptr , int, dd_ptr *, const char **, const char **, FI
 
   \sa dd_dump_davinci
 */
-int      dd_dump_davinci(DDMgr_ptr , int, dd_ptr *, const char **, const char **, FILE *);
+int dd_dump_davinci(DDMgr_ptr, int, dd_ptr *, const char **, const char **,
+                    FILE *);
 
 /*!
   \brief Converts an ADD to a BDD.
@@ -683,7 +682,7 @@ int      dd_dump_davinci(DDMgr_ptr , int, dd_ptr *, const char **, const char **
 
   \sa bdd_to_add bdd_to_01_add
 */
-bdd_ptr  add_to_bdd(DDMgr_ptr , add_ptr);
+bdd_ptr add_to_bdd(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Converts an ADD to a BDD according to a strict threshold
@@ -695,7 +694,7 @@ bdd_ptr  add_to_bdd(DDMgr_ptr , add_ptr);
 
   \sa add_to_bdd_threshold add_to_bdd bdd_to_01_add
 */
-bdd_ptr  add_to_bdd_strict_threshold(DDMgr_ptr , add_ptr, int);
+bdd_ptr add_to_bdd_strict_threshold(DDMgr_ptr, add_ptr, int);
 
 /*!
   \brief Converts a BDD to a FALSE-TRUE ADD.
@@ -705,7 +704,7 @@ bdd_ptr  add_to_bdd_strict_threshold(DDMgr_ptr , add_ptr, int);
 
   \sa add_to_bdd bdd_to_01_add
 */
-add_ptr  bdd_to_add(DDMgr_ptr , bdd_ptr);
+add_ptr bdd_to_add(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Converts a BDD to a 0-1 ADD.
@@ -715,7 +714,7 @@ add_ptr  bdd_to_add(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_to_add
 */
-add_ptr  bdd_to_01_add(DDMgr_ptr , bdd_ptr);
+add_ptr bdd_to_01_add(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Abstracts away variables from an ADD.
@@ -723,8 +722,7 @@ add_ptr  bdd_to_01_add(DDMgr_ptr , bdd_ptr);
   Abstracts away variables from an ADD, summing up the values
                       of the merged branches.
 */
-add_ptr  add_exist_abstract(DDMgr_ptr dd, add_ptr a, bdd_ptr b);
-
+add_ptr add_exist_abstract(DDMgr_ptr dd, add_ptr a, bdd_ptr b);
 
 /* ADD Interface **************************************************************/
 
@@ -735,7 +733,7 @@ add_ptr  add_exist_abstract(DDMgr_ptr dd, add_ptr a, bdd_ptr b);
 
   \sa add_false
 */
-add_ptr  add_true(DDMgr_ptr );
+add_ptr add_true(DDMgr_ptr);
 
 /*!
   \brief Returns the then child of an internal node.
@@ -749,7 +747,7 @@ add_ptr  add_true(DDMgr_ptr );
 
   \sa add_else
 */
-add_ptr  add_then(DDMgr_ptr , add_ptr);
+add_ptr add_then(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Returns the else child of an internal node.
@@ -763,7 +761,7 @@ add_ptr  add_then(DDMgr_ptr , add_ptr);
 
   \sa add_else
 */
-add_ptr  add_else(DDMgr_ptr , add_ptr);
+add_ptr add_else(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Returns the index of the node.
@@ -772,7 +770,7 @@ add_ptr  add_else(DDMgr_ptr , add_ptr);
 
   \se None
 */
-int      add_index(DDMgr_ptr , add_ptr);
+int add_index(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Reads the constant FALSE ADD of the manager.
@@ -781,7 +779,7 @@ int      add_index(DDMgr_ptr , add_ptr);
 
   \sa add_true
 */
-add_ptr  add_false(DDMgr_ptr );
+add_ptr add_false(DDMgr_ptr);
 
 /*!
   \brief Check if the ADD is true.
@@ -790,7 +788,7 @@ add_ptr  add_false(DDMgr_ptr );
 
   \sa add_true
 */
-int      add_is_true(DDMgr_ptr , add_ptr);
+int add_is_true(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Check if the ADD is false.
@@ -799,7 +797,7 @@ int      add_is_true(DDMgr_ptr , add_ptr);
 
   \sa add_false
 */
-int      add_is_false(DDMgr_ptr , add_ptr);
+int add_is_false(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Reads the constant one ADD of the manager.
@@ -808,7 +806,7 @@ int      add_is_false(DDMgr_ptr , add_ptr);
 
   \sa add_false
 */
-add_ptr  add_one(DDMgr_ptr );
+add_ptr add_one(DDMgr_ptr);
 
 /*!
   \brief Reads the constant zero ADD of the manager.
@@ -817,7 +815,7 @@ add_ptr  add_one(DDMgr_ptr );
 
   \sa add_true
 */
-add_ptr  add_zero(DDMgr_ptr );
+add_ptr add_zero(DDMgr_ptr);
 
 /*!
   \brief Check if the ADD is one.
@@ -826,7 +824,7 @@ add_ptr  add_zero(DDMgr_ptr );
 
   \sa add_true
 */
-int      add_is_one(DDMgr_ptr , add_ptr);
+int add_is_one(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Check if the ADD is zero.
@@ -835,7 +833,7 @@ int      add_is_one(DDMgr_ptr , add_ptr);
 
   \sa add_false
 */
-int      add_is_zero(DDMgr_ptr , add_ptr);
+int add_is_zero(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Reference an ADD node.
@@ -846,7 +844,7 @@ int      add_is_zero(DDMgr_ptr , add_ptr);
 
   \sa add_deref add_free
 */
-void     add_ref(add_ptr);
+void add_ref(add_ptr);
 
 /*!
   \brief Dereference an ADD node.
@@ -857,7 +855,7 @@ void     add_ref(add_ptr);
 
   \sa add_ref add_free
 */
-void     add_deref(add_ptr);
+void add_deref(add_ptr);
 
 /*!
   \brief Creates a copy of an ADD node.
@@ -868,7 +866,7 @@ void     add_deref(add_ptr);
 
   \sa add_ref add_free add_deref
 */
-add_ptr  add_dup(add_ptr);
+add_ptr add_dup(add_ptr);
 
 /*!
   \brief Dereference an ADD node. If it dies, recursively decreases
@@ -881,7 +879,7 @@ add_ptr  add_dup(add_ptr);
   \se The reference count of the node is decremented by one,
   and if the node dies a recursive dereferencing is applied to its children.
 */
-void     add_free(DDMgr_ptr , add_ptr);
+void add_free(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Returns the ADD variable with index <code>index</code>.
@@ -895,7 +893,7 @@ void     add_free(DDMgr_ptr , add_ptr);
 
   \sa add_new_var_at_level
 */
-add_ptr  add_new_var_with_index(DDMgr_ptr , int);
+add_ptr add_new_var_with_index(DDMgr_ptr, int);
 
 /*!
   \brief Checks the unique table of the DdManager for the
@@ -908,7 +906,7 @@ add_ptr  add_new_var_with_index(DDMgr_ptr , int);
   to.  Returns a pointer to the new node if successful; a failure
   occurs if memory is exhausted or if reordering took place.
 */
-add_ptr  add_build(DDMgr_ptr , int, add_ptr , add_ptr);
+add_ptr add_build(DDMgr_ptr, int, add_ptr, add_ptr);
 
 /*!
   \brief Returns a new ADD variable at a specified level.
@@ -921,7 +919,7 @@ add_ptr  add_build(DDMgr_ptr , int, add_ptr , add_ptr);
 
   \sa add_new_var_with_index
 */
-add_ptr  add_new_var_at_level(DDMgr_ptr , int);
+add_ptr add_new_var_at_level(DDMgr_ptr, int);
 
 /*!
   \brief Returns 1 if the ADD node is a constant node.
@@ -929,7 +927,7 @@ add_ptr  add_new_var_at_level(DDMgr_ptr , int);
   Returns 1 if the ADD node is a constant node (rather than an
   internal node). All constant nodes have the same index (MAX_VAR_INDEX).
 */
-int      add_isleaf(add_ptr);
+int add_isleaf(add_ptr);
 
 /*!
   \brief Creates an returns an ADD for constant leaf_node.
@@ -940,7 +938,7 @@ int      add_isleaf(add_ptr);
 
   \se The reference count of the node is incremented by one unit.
 */
-add_ptr  add_leaf(DDMgr_ptr , node_ptr);
+add_ptr add_leaf(DDMgr_ptr, node_ptr);
 
 /*!
   \brief Returns the value of a constant node.
@@ -948,7 +946,7 @@ add_ptr  add_leaf(DDMgr_ptr , node_ptr);
   Returns the value of a constant node. If <code>Leaf</code>
   is an internal node, a failure occurs.
 */
-node_ptr add_get_leaf(DDMgr_ptr , add_ptr);
+node_ptr add_get_leaf(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Applies AND to the corresponding discriminants of f and g.
@@ -960,7 +958,7 @@ node_ptr add_get_leaf(DDMgr_ptr , add_ptr);
 
   \sa add_or add_xor add_not
 */
-add_ptr  add_and(DDMgr_ptr , add_ptr, add_ptr);
+add_ptr add_and(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Applies AND to the corresponding discriminants of f and g.
@@ -973,7 +971,7 @@ add_ptr  add_and(DDMgr_ptr , add_ptr, add_ptr);
 
   \sa add_and
 */
-void     add_and_accumulate(DDMgr_ptr , add_ptr *, add_ptr);
+void add_and_accumulate(DDMgr_ptr, add_ptr *, add_ptr);
 
 /*!
   \brief Applies OR to the corresponding discriminants of f and g.
@@ -985,7 +983,7 @@ void     add_and_accumulate(DDMgr_ptr , add_ptr *, add_ptr);
 
   \sa add_and add_xor add_not add_imply
 */
-add_ptr  add_or(DDMgr_ptr , add_ptr, add_ptr);
+add_ptr add_or(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Applies OR to the corresponding discriminants of f and g.
@@ -998,7 +996,7 @@ add_ptr  add_or(DDMgr_ptr , add_ptr, add_ptr);
 
   \sa add_and
 */
-void     add_or_accumulate(DDMgr_ptr , add_ptr *, add_ptr);
+void add_or_accumulate(DDMgr_ptr, add_ptr *, add_ptr);
 
 /*!
   \brief Applies NOT to the corresponding discriminant of f.
@@ -1010,7 +1008,7 @@ void     add_or_accumulate(DDMgr_ptr , add_ptr *, add_ptr);
 
   \sa add_and add_xor add_or add_imply
 */
-add_ptr  add_not(DDMgr_ptr , add_ptr);
+add_ptr add_not(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Applies IMPLY to the corresponding discriminants of f and g.
@@ -1022,7 +1020,7 @@ add_ptr  add_not(DDMgr_ptr , add_ptr);
 
   \sa add_and add_xor add_or add_not
 */
-add_ptr  add_implies(DDMgr_ptr , add_ptr, add_ptr);
+add_ptr add_implies(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Applies IFF to the corresponding discriminants of f and g.
@@ -1034,7 +1032,7 @@ add_ptr  add_implies(DDMgr_ptr , add_ptr, add_ptr);
 
   \sa add_and add_xor add_or add_not
 */
-add_ptr  add_iff(DDMgr_ptr , add_ptr, add_ptr);
+add_ptr add_iff(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Applies XOR to the corresponding discriminants of f and g.
@@ -1046,7 +1044,7 @@ add_ptr  add_iff(DDMgr_ptr , add_ptr, add_ptr);
 
   \sa add_or add_and add_not add_imply
 */
-add_ptr  add_xor(DDMgr_ptr , add_ptr, add_ptr);
+add_ptr add_xor(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Applies XNOR to the corresponding discriminants of f and g.
@@ -1058,7 +1056,7 @@ add_ptr  add_xor(DDMgr_ptr , add_ptr, add_ptr);
 
   \sa add_xor add_or add_and add_not add_imply
 */
-add_ptr  add_xnor(DDMgr_ptr , add_ptr, add_ptr);
+add_ptr add_xnor(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Applies binary op to the corresponding discriminants of f and g.
@@ -1066,7 +1064,7 @@ add_ptr  add_xnor(DDMgr_ptr , add_ptr, add_ptr);
   Returns a pointer to the result if successful; a failure is
   generated otherwise.
 */
-add_ptr  add_apply(DDMgr_ptr , NPFNNE, add_ptr, add_ptr);
+add_ptr add_apply(DDMgr_ptr, NPFNNE, add_ptr, add_ptr);
 
 /*!
   \brief Applies unary op to the corresponding discriminant of f
@@ -1078,7 +1076,7 @@ add_ptr  add_apply(DDMgr_ptr , NPFNNE, add_ptr, add_ptr);
   to provide a binary op, which is actually unary and applies to
   the first operand only.
 */
-add_ptr  add_monadic_apply(DDMgr_ptr , NPFNNE/*NPFCVT*/, add_ptr);
+add_ptr add_monadic_apply(DDMgr_ptr, NPFNNE /*NPFCVT*/, add_ptr);
 
 /*!
   \brief Implements ITE(f,g,h).
@@ -1087,7 +1085,7 @@ add_ptr  add_monadic_apply(DDMgr_ptr , NPFNNE/*NPFCVT*/, add_ptr);
   a FALSE-TRUE ADD.  Returns a pointer to the resulting ADD if
   successful; a failure is generated otherwise.
 */
-add_ptr  add_ifthenelse(DDMgr_ptr , add_ptr, add_ptr, add_ptr);
+add_ptr add_ifthenelse(DDMgr_ptr, add_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Computes the difference between two ADD cubes.
@@ -1099,7 +1097,7 @@ add_ptr  add_ifthenelse(DDMgr_ptr , add_ptr, add_ptr, add_ptr);
 
   \sa bdd_cube_diff
 */
-add_ptr  add_cube_diff(DDMgr_ptr , add_ptr , add_ptr);
+add_ptr add_cube_diff(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief ADD restrict according to Coudert and Madre's algorithm (ICCAD90).
@@ -1110,7 +1108,7 @@ add_ptr  add_cube_diff(DDMgr_ptr , add_ptr , add_ptr);
   If application of restrict results in an ADD larger than the input
   ADD, the input ADD is returned.
 */
-add_ptr  add_simplify_assuming(DDMgr_ptr , add_ptr, add_ptr);
+add_ptr add_simplify_assuming(DDMgr_ptr, add_ptr, add_ptr);
 
 /*!
   \brief Permutes the variables of an ADD.
@@ -1124,7 +1122,7 @@ add_ptr  add_simplify_assuming(DDMgr_ptr , add_ptr, add_ptr);
 
   \sa bdd_permute
 */
-add_ptr  add_permute(DDMgr_ptr , add_ptr, int *);
+add_ptr add_permute(DDMgr_ptr, add_ptr, int *);
 
 /*!
   \brief Finds the variables on which an ADD depends on.
@@ -1135,7 +1133,7 @@ add_ptr  add_permute(DDMgr_ptr , add_ptr, int *);
 
   \sa bdd_support
 */
-add_ptr  add_support(DDMgr_ptr , add_ptr);
+add_ptr add_support(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Applies a generic function to constant nodes.
@@ -1143,7 +1141,7 @@ add_ptr  add_support(DDMgr_ptr , add_ptr);
   Applies a generic function <tt>VPFDDCVT op</tt> to the
   constants nodes of <tt>f</tt>.
 */
-void     add_walkleaves(DDMgr_ptr , VPFDDCVT, add_ptr);
+void add_walkleaves(DDMgr_ptr, VPFDDCVT, add_ptr);
 
 /*!
   \brief Counts the number of ADD nodes in an ADD.
@@ -1153,7 +1151,7 @@ void     add_walkleaves(DDMgr_ptr , VPFDDCVT, add_ptr);
 
   \sa add_count_minterm
 */
-int      add_size(DDMgr_ptr , add_ptr);
+int add_size(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Counts the number of ADD minterms of an ADD.
@@ -1166,7 +1164,7 @@ int      add_size(DDMgr_ptr , add_ptr);
 
   \sa bdd_size bdd_count_minterm
 */
-double   add_count_minterm(DDMgr_ptr , add_ptr, int);
+double add_count_minterm(DDMgr_ptr, add_ptr, int);
 
 /*!
   \brief Returns the number of nodes in the unique table.
@@ -1174,7 +1172,7 @@ double   add_count_minterm(DDMgr_ptr , add_ptr, int);
   Returns the total number of nodes currently in the unique
   table, including the dead nodes.
 */
-int      get_dd_nodes_allocated(DDMgr_ptr );
+int get_dd_nodes_allocated(DDMgr_ptr);
 
 /*!
   \brief Given the result of add_if_then it returns the leaf corresponding.
@@ -1188,7 +1186,7 @@ int      get_dd_nodes_allocated(DDMgr_ptr );
 
   \sa add_if_then
 */
-node_ptr add_value(DDMgr_ptr , add_ptr);
+node_ptr add_value(DDMgr_ptr, add_ptr);
 
 /*!
   \brief Given a minterm, it returns an ADD indicating the rules
@@ -1199,8 +1197,7 @@ node_ptr add_value(DDMgr_ptr , add_ptr);
 
   \sa add_value
 */
-add_ptr  add_if_then(DDMgr_ptr , add_ptr, add_ptr);
-
+add_ptr add_if_then(DDMgr_ptr, add_ptr, add_ptr);
 
 /* BDD Interface **************************************************************/
 
@@ -1210,7 +1207,7 @@ add_ptr  add_if_then(DDMgr_ptr , add_ptr, add_ptr);
   Returns 1 if the BDD node is a constant node (rather than an
   internal node). All constant nodes have the same index (MAX_VAR_INDEX).
 */
-int      bdd_isleaf(bdd_ptr);
+int bdd_isleaf(bdd_ptr);
 
 /*!
   \brief Reference an BDD node.
@@ -1221,7 +1218,7 @@ int      bdd_isleaf(bdd_ptr);
 
   \sa bdd_deref bdd_free
 */
-void     bdd_ref(bdd_ptr);
+void bdd_ref(bdd_ptr);
 
 /*!
   \brief Dereference an BDD node.
@@ -1232,7 +1229,7 @@ void     bdd_ref(bdd_ptr);
 
   \sa bdd_ref bdd_free
 */
-void     bdd_deref(bdd_ptr);
+void bdd_deref(bdd_ptr);
 
 /*!
   \brief Creates a copy of an BDD node.
@@ -1243,7 +1240,7 @@ void     bdd_deref(bdd_ptr);
 
   \sa bdd_ref bdd_free bdd_deref
 */
-bdd_ptr  bdd_dup(bdd_ptr);
+bdd_ptr bdd_dup(bdd_ptr);
 
 /*!
   \brief Reads the constant TRUE BDD of the manager.
@@ -1252,7 +1249,7 @@ bdd_ptr  bdd_dup(bdd_ptr);
 
   \sa bdd_false
 */
-bdd_ptr  bdd_true(DDMgr_ptr );
+bdd_ptr bdd_true(DDMgr_ptr);
 
 /*!
   \brief Reads the constant FALSE BDD of the manager.
@@ -1261,7 +1258,7 @@ bdd_ptr  bdd_true(DDMgr_ptr );
 
   \sa bdd_true
 */
-bdd_ptr  bdd_false(DDMgr_ptr );
+bdd_ptr bdd_false(DDMgr_ptr);
 
 /*!
   \brief Check if the BDD is TRUE.
@@ -1270,7 +1267,7 @@ bdd_ptr  bdd_false(DDMgr_ptr );
 
   \sa bdd_true
 */
-int      bdd_is_true(DDMgr_ptr , bdd_ptr);
+int bdd_is_true(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Check if the BDD is false.
@@ -1279,7 +1276,7 @@ int      bdd_is_true(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_false
 */
-int      bdd_is_false(DDMgr_ptr , bdd_ptr);
+int bdd_is_false(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Check if the BDD is not true.
@@ -1288,7 +1285,7 @@ int      bdd_is_false(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_true
 */
-int      bdd_isnot_true(DDMgr_ptr , bdd_ptr);
+int bdd_isnot_true(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Check if the BDD is not false.
@@ -1297,7 +1294,7 @@ int      bdd_isnot_true(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_false
 */
-int      bdd_isnot_false(DDMgr_ptr , bdd_ptr);
+int bdd_isnot_false(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Dereference an BDD node. If it dies, recursively decreases
@@ -1310,7 +1307,7 @@ int      bdd_isnot_false(DDMgr_ptr , bdd_ptr);
   \se The reference count of the node is decremented by one,
   and if the node dies a recursive dereferencing is applied to its children.
 */
-void     bdd_free(DDMgr_ptr , bdd_ptr);
+void bdd_free(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Applies NOT to the corresponding discriminant of f.
@@ -1321,7 +1318,7 @@ void     bdd_free(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_and bdd_xor bdd_or bdd_imply
 */
-bdd_ptr  bdd_not(DDMgr_ptr , bdd_ptr);
+bdd_ptr bdd_not(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Applies AND to the corresponding discriminants of f and g.
@@ -1332,7 +1329,7 @@ bdd_ptr  bdd_not(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_or bdd_xor bdd_not
 */
-bdd_ptr  bdd_and(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_and(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Applies AND to the corresponding discriminants of f and g.
@@ -1345,7 +1342,7 @@ bdd_ptr  bdd_and(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_and
 */
-void     bdd_and_accumulate(DDMgr_ptr , bdd_ptr *, bdd_ptr);
+void bdd_and_accumulate(DDMgr_ptr, bdd_ptr *, bdd_ptr);
 
 /*!
   \brief Applies OR to the corresponding discriminants of f and g.
@@ -1356,7 +1353,7 @@ void     bdd_and_accumulate(DDMgr_ptr , bdd_ptr *, bdd_ptr);
 
   \sa bdd_and bdd_xor bdd_not
 */
-bdd_ptr  bdd_or(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_or(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Applies OR to the corresponding discriminants of f and g.
@@ -1369,7 +1366,7 @@ bdd_ptr  bdd_or(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_and
 */
-void     bdd_or_accumulate(DDMgr_ptr , bdd_ptr *, bdd_ptr);
+void bdd_or_accumulate(DDMgr_ptr, bdd_ptr *, bdd_ptr);
 
 /*!
   \brief Applies XOR to the corresponding discriminants of f and g.
@@ -1380,7 +1377,7 @@ void     bdd_or_accumulate(DDMgr_ptr , bdd_ptr *, bdd_ptr);
 
   \sa bdd_or bdd_imply bdd_not
 */
-bdd_ptr  bdd_xor(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_xor(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Applies IFF to the corresponding discriminants of f and g.
@@ -1391,7 +1388,7 @@ bdd_ptr  bdd_xor(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_or bdd_xor bdd_not
 */
-bdd_ptr  bdd_iff(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_iff(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Applies IMPLY to the corresponding discriminants of f and g.
@@ -1402,7 +1399,7 @@ bdd_ptr  bdd_iff(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_or bdd_xor bdd_not
 */
-bdd_ptr  bdd_imply(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_imply(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Existentially abstracts all the variables in cube from fn.
@@ -1413,7 +1410,7 @@ bdd_ptr  bdd_imply(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_forall
 */
-bdd_ptr  bdd_forsome(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_forsome(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Universally abstracts all the variables in cube from f.
@@ -1424,7 +1421,7 @@ bdd_ptr  bdd_forsome(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_forsome
 */
-bdd_ptr  bdd_forall(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_forall(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Permutes the variables of a BDD.
@@ -1438,7 +1435,7 @@ bdd_ptr  bdd_forall(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_permute
 */
-bdd_ptr  bdd_permute(DDMgr_ptr , bdd_ptr, int *);
+bdd_ptr bdd_permute(DDMgr_ptr, bdd_ptr, int *);
 
 /*!
   \brief Takes the AND of two BDDs and simultaneously abstracts the
@@ -1451,7 +1448,7 @@ bdd_ptr  bdd_permute(DDMgr_ptr , bdd_ptr, int *);
 
   \sa bdd_and bdd_forsome
 */
-bdd_ptr  bdd_and_abstract(DDMgr_ptr , bdd_ptr, bdd_ptr, bdd_ptr);
+bdd_ptr bdd_and_abstract(DDMgr_ptr, bdd_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief BDD restrict according to Coudert and Madre's algorithm
@@ -1463,7 +1460,7 @@ bdd_ptr  bdd_and_abstract(DDMgr_ptr , bdd_ptr, bdd_ptr, bdd_ptr);
   If application of restrict results in an BDD larger than the input
   BDD, the input BDD is returned.
 */
-bdd_ptr  bdd_simplify_assuming(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_simplify_assuming(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Restrict operator as described in Coudert et al. ICCAD90.
@@ -1475,7 +1472,7 @@ bdd_ptr  bdd_simplify_assuming(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_simplify_assuming
 */
-bdd_ptr  bdd_minimize(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_minimize(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Computes f constrain c.
@@ -1496,7 +1493,7 @@ bdd_ptr  bdd_minimize(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_minimize bdd_simplify_assuming
 */
-bdd_ptr  bdd_cofactor(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_cofactor(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Return a minimum size BDD between bounds.
@@ -1505,7 +1502,7 @@ bdd_ptr  bdd_cofactor(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_minimize bdd_simplify_assuming bdd_cofactor
 */
-bdd_ptr  bdd_between(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_between(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Determines whether f is less than or equal to g.
@@ -1515,7 +1512,7 @@ bdd_ptr  bdd_between(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \se None
 */
-int      bdd_entailed(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
+int bdd_entailed(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
 
 /*!
   \brief Determines whether an intersection between
@@ -1527,7 +1524,7 @@ int      bdd_entailed(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
 
   \se None
 */
-int      bdd_intersected(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
+int bdd_intersected(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
 
 /*!
   \brief Returns the then child of a bdd node.
@@ -1538,7 +1535,7 @@ int      bdd_intersected(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
 
   \se None
 */
-bdd_ptr  bdd_then(DDMgr_ptr , bdd_ptr);
+bdd_ptr bdd_then(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Returns the else child of a bdd node.
@@ -1549,7 +1546,7 @@ bdd_ptr  bdd_then(DDMgr_ptr , bdd_ptr);
 
   \se None
 */
-bdd_ptr  bdd_else(DDMgr_ptr , bdd_ptr);
+bdd_ptr bdd_else(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Implements ITE(i,t,e).
@@ -1560,7 +1557,7 @@ bdd_ptr  bdd_else(DDMgr_ptr , bdd_ptr);
 
   \se None
 */
-bdd_ptr  bdd_ite(DDMgr_ptr , bdd_ptr, bdd_ptr, bdd_ptr);
+bdd_ptr bdd_ite(DDMgr_ptr, bdd_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Returns 1 if the BDD pointer is complemented.
@@ -1569,7 +1566,7 @@ bdd_ptr  bdd_ite(DDMgr_ptr , bdd_ptr, bdd_ptr, bdd_ptr);
 
   \se None
 */
-int      bdd_iscomplement(DDMgr_ptr , bdd_ptr);
+int bdd_iscomplement(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Finds the current position of variable index in the
@@ -1580,7 +1577,7 @@ int      bdd_iscomplement(DDMgr_ptr , bdd_ptr);
 
   \se None
 */
-int      bdd_readperm(DDMgr_ptr , bdd_ptr);
+int bdd_readperm(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Returns the index of the node.
@@ -1589,7 +1586,7 @@ int      bdd_readperm(DDMgr_ptr , bdd_ptr);
 
   \se None
 */
-int      bdd_index(DDMgr_ptr , bdd_ptr);
+int bdd_index(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Picks one on-set minterm deterministically from the given BDD.
@@ -1601,7 +1598,7 @@ int      bdd_index(DDMgr_ptr , bdd_ptr);
   run out of memory; or the function fn may be the constant 0. The
   result is referenced.
 */
-bdd_ptr  bdd_pick_one_minterm(DDMgr_ptr , bdd_ptr, bdd_ptr *, int);
+bdd_ptr bdd_pick_one_minterm(DDMgr_ptr, bdd_ptr, bdd_ptr *, int);
 
 /*!
   \brief Picks one on-set minterm randomly from the given DD.
@@ -1612,7 +1609,7 @@ bdd_ptr  bdd_pick_one_minterm(DDMgr_ptr , bdd_ptr, bdd_ptr *, int);
   are two reasons why the procedure may fail: It may run out of
   memory; or the function f may be the constant 0.
 */
-bdd_ptr  bdd_pick_one_minterm_rand(DDMgr_ptr , bdd_ptr, bdd_ptr *, int);
+bdd_ptr bdd_pick_one_minterm_rand(DDMgr_ptr, bdd_ptr, bdd_ptr *, int);
 
 /*!
   \brief Returns the array of All Possible Minterms
@@ -1627,7 +1624,7 @@ bdd_ptr  bdd_pick_one_minterm_rand(DDMgr_ptr , bdd_ptr, bdd_ptr *, int);
 
   \sa bdd_pick_one_minterm_rand bdd_pick_one_minterm
 */
-int      bdd_pick_all_terms(DDMgr_ptr , bdd_ptr,  bdd_ptr *, int, bdd_ptr *, int);
+int bdd_pick_all_terms(DDMgr_ptr, bdd_ptr, bdd_ptr *, int, bdd_ptr *, int);
 
 /*!
   \brief Finds the variables on which an BDD depends on.
@@ -1638,7 +1635,7 @@ int      bdd_pick_all_terms(DDMgr_ptr , bdd_ptr,  bdd_ptr *, int, bdd_ptr *, int
 
   \sa add_support
 */
-bdd_ptr  bdd_support(DDMgr_ptr , bdd_ptr);
+bdd_ptr bdd_support(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Counts the number of BDD nodes in an BDD.
@@ -1648,7 +1645,7 @@ bdd_ptr  bdd_support(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_count_minterm
 */
-int      bdd_size(DDMgr_ptr , bdd_ptr);
+int bdd_size(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Counts the number of BDD minterms of an BDD.
@@ -1661,7 +1658,7 @@ int      bdd_size(DDMgr_ptr , bdd_ptr);
 
   \sa bdd_size bdd_count_minterm
 */
-double   bdd_count_minterm(DDMgr_ptr , bdd_ptr, int);
+double bdd_count_minterm(DDMgr_ptr, bdd_ptr, int);
 
 /*!
   \brief Returns the BDD variable with index <code>index</code>.
@@ -1673,7 +1670,7 @@ double   bdd_count_minterm(DDMgr_ptr , bdd_ptr, int);
 
   \sa bdd_new_var_at_level add_new_var_at_level
 */
-bdd_ptr  bdd_new_var_with_index(DDMgr_ptr , int);
+bdd_ptr bdd_new_var_with_index(DDMgr_ptr, int);
 
 /*!
   \brief Finds a satisfying path in the BDD d.
@@ -1682,7 +1679,7 @@ bdd_ptr  bdd_new_var_with_index(DDMgr_ptr , int);
   not include all variabales. It only need ot include the levels needed to
   satify the BDD.
 */
-bdd_ptr bdd_get_one_sparse_sat(DDMgr_ptr , bdd_ptr);
+bdd_ptr bdd_get_one_sparse_sat(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Computes the difference between two BDD cubes.
@@ -1694,7 +1691,7 @@ bdd_ptr bdd_get_one_sparse_sat(DDMgr_ptr , bdd_ptr);
 
   \sa add_cube_diff
 */
-bdd_ptr  bdd_cube_diff(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_cube_diff(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Computes the union between two BDD cubes.
@@ -1706,7 +1703,7 @@ bdd_ptr  bdd_cube_diff(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_cube_intersection,bdd_and
 */
-bdd_ptr  bdd_cube_union(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_cube_union(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Computes the intersection between two BDD cubes.
@@ -1718,16 +1715,16 @@ bdd_ptr  bdd_cube_union(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \sa bdd_cube_union,bdd_cube_diff
 */
-bdd_ptr  bdd_cube_intersection(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_cube_intersection(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Returns the index of the lowest variable in the BDD a.
 
   Returns the index of the lowest variable in the
   BDD, i.e. the variable in BDD a with the highest position in the
-  ordering. 
+  ordering.
 */
-int      bdd_get_lowest_index(DDMgr_ptr , bdd_ptr);
+int bdd_get_lowest_index(DDMgr_ptr, bdd_ptr);
 
 /*!
   \brief Finds a largest cube in a BDD.
@@ -1737,7 +1734,7 @@ int      bdd_get_lowest_index(DDMgr_ptr , bdd_ptr);
 
   \se The number of literals of the cube is returned in length.
 */
-bdd_ptr  bdd_largest_cube(DDMgr_ptr , bdd_ptr, int *);
+bdd_ptr bdd_largest_cube(DDMgr_ptr, bdd_ptr, int *);
 
 /*!
   \brief Finds a prime implicant for a BDD.
@@ -1747,7 +1744,7 @@ bdd_ptr  bdd_largest_cube(DDMgr_ptr , bdd_ptr, int *);
 
   \se None
 */
-bdd_ptr  bdd_compute_prime_low(DDMgr_ptr , bdd_ptr, bdd_ptr);
+bdd_ptr bdd_compute_prime_low(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Finds a set of prime implicants for a BDD.
@@ -1757,7 +1754,7 @@ bdd_ptr  bdd_compute_prime_low(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \se None
 */
-array_t * bdd_compute_primes_low(DDMgr_ptr , bdd_ptr, bdd_ptr);
+array_t *bdd_compute_primes_low(DDMgr_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Finds a set of prime implicants for a BDD.
@@ -1766,7 +1763,7 @@ array_t * bdd_compute_primes_low(DDMgr_ptr , bdd_ptr, bdd_ptr);
 
   \se None
 */
-array_t * bdd_compute_primes(DDMgr_ptr dd, bdd_ptr b);
+array_t *bdd_compute_primes(DDMgr_ptr dd, bdd_ptr b);
 
 /*!
   \brief Expands cube to a prime implicant of f.
@@ -1777,7 +1774,7 @@ array_t * bdd_compute_primes(DDMgr_ptr dd, bdd_ptr b);
 
   \se None
 */
-bdd_ptr  bdd_make_prime(DDMgr_ptr dd, bdd_ptr cube, bdd_ptr b);
+bdd_ptr bdd_make_prime(DDMgr_ptr dd, bdd_ptr cube, bdd_ptr b);
 
 /*!
   \brief Finds the essential variables of a DD.
@@ -1790,7 +1787,7 @@ bdd_ptr  bdd_make_prime(DDMgr_ptr dd, bdd_ptr cube, bdd_ptr b);
 
   \se None
 */
-bdd_ptr  bdd_compute_essentials(DDMgr_ptr dd, bdd_ptr b);
+bdd_ptr bdd_compute_essentials(DDMgr_ptr dd, bdd_ptr b);
 
 /*!
   \brief Writes a blif file representing the argument BDDs.
@@ -1809,7 +1806,8 @@ bdd_ptr  bdd_compute_essentials(DDMgr_ptr dd, bdd_ptr b);
 
   \sa bdd_DumpBlifBody dd_dump_dot
 */
-int      bdd_DumpBlif(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames, char **onames, char *mname, FILE *fp);
+int bdd_DumpBlif(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames, char **onames,
+                 char *mname, FILE *fp);
 
 /*!
   \brief Writes a blif body representing the argument BDDs.
@@ -1830,7 +1828,8 @@ int      bdd_DumpBlif(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames, char **ona
 
   \sa bdd_DumpBlif dd_dump_dot
 */
-int      bdd_DumpBlifBody(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames, char **onames, FILE *fp);
+int bdd_DumpBlifBody(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames,
+                     char **onames, FILE *fp);
 
 /*!
   \brief Determines whether f is less than or equal to g.
@@ -1840,7 +1839,7 @@ int      bdd_DumpBlifBody(DDMgr_ptr dd, int n, bdd_ptr *f, char **inames, char *
 
   \se None
 */
-int      bdd_leq(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
+int bdd_leq(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
 
 /*!
   \brief Swaps two sets of variables of the same size (x and y) in
@@ -1854,7 +1853,8 @@ int      bdd_leq(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g);
 
   \se None
 */
-bdd_ptr  bdd_swap_variables(DDMgr_ptr dd, bdd_ptr f, bdd_ptr *x_varlist, bdd_ptr *y_varlist, int n);
+bdd_ptr bdd_swap_variables(DDMgr_ptr dd, bdd_ptr f, bdd_ptr *x_varlist,
+                           bdd_ptr *y_varlist, int n);
 
 /*!
   \brief Substitutes g for x_v in the BDD for f.
@@ -1868,7 +1868,7 @@ bdd_ptr  bdd_swap_variables(DDMgr_ptr dd, bdd_ptr f, bdd_ptr *x_varlist, bdd_ptr
 
   \se None
 */
-bdd_ptr  bdd_compose(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g, int v);
+bdd_ptr bdd_compose(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g, int v);
 
 /*!
   \brief Returns the reference count of a node.
@@ -1878,7 +1878,7 @@ bdd_ptr  bdd_compose(DDMgr_ptr dd, bdd_ptr f, bdd_ptr g, int v);
 
   \se None
 */
-int      bdd_ref_count(DDMgr_ptr dd, bdd_ptr n);
+int bdd_ref_count(DDMgr_ptr dd, bdd_ptr n);
 
 /*!
   \brief Computes the value of a function with given variable values.
@@ -1889,8 +1889,6 @@ int      bdd_ref_count(DDMgr_ptr dd, bdd_ptr n);
 
   \se None
 */
-int      calculate_bdd_value(DDMgr_ptr mgr, bdd_ptr f, int* values);
-
-
+int calculate_bdd_value(DDMgr_ptr mgr, bdd_ptr f, int *values);
 
 #endif /* __NUSMV_CORE_DD_DD_H__ */

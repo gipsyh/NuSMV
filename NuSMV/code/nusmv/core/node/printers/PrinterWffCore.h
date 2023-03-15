@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_H__
 #define __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_H__
-
 
 #include "nusmv/core/node/printers/PrinterBase.h"
 #include "nusmv/core/utils/utils.h"
@@ -49,7 +46,7 @@
 
 
 */
-typedef struct PrinterWffCore_TAG*  PrinterWffCore_ptr;
+typedef struct PrinterWffCore_TAG *PrinterWffCore_ptr;
 
 /*!
   \brief To cast and check instances of class PrinterWffCore
@@ -57,18 +54,15 @@ typedef struct PrinterWffCore_TAG*  PrinterWffCore_ptr;
   These macros must be used respectively to cast and to check
   instances of class PrinterWffCore
 */
-#define PRINTER_WFF_CORE(self) \
-         ((PrinterWffCore_ptr) self)
+#define PRINTER_WFF_CORE(self) ((PrinterWffCore_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define PRINTER_WFF_CORE_CHECK_INSTANCE(self) \
-         (nusmv_assert(PRINTER_WFF_CORE(self) != PRINTER_WFF_CORE(NULL)))
-
-
+#define PRINTER_WFF_CORE_CHECK_INSTANCE(self)                                  \
+  (nusmv_assert(PRINTER_WFF_CORE(self) != PRINTER_WFF_CORE(NULL)))
 
 /**AutomaticStart*************************************************************/
 
@@ -85,11 +79,8 @@ typedef struct PrinterWffCore_TAG*  PrinterWffCore_ptr;
   \sa PrinterWffCore_destroy
 */
 PrinterWffCore_ptr PrinterWffCore_create(const NuSMVEnv_ptr env,
-                                         const char* name);
-
+                                         const char *name);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_NODE_PRINTERS_PRINTER_WFF_CORE_H__ */

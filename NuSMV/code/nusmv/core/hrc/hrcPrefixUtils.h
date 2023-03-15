@@ -34,39 +34,33 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_HRC_HRC_PREFIX_UTILS_H__
 #define __NUSMV_CORE_HRC_HRC_PREFIX_UTILS_H__
 
-#include "nusmv/core/set/set.h"
-#include "nusmv/core/node/node.h"
-#include "nusmv/core/hrc/hrc.h"
 #include "nusmv/core/cinit/NuSMVEnv.h"
+#include "nusmv/core/hrc/hrc.h"
+#include "nusmv/core/node/node.h"
+#include "nusmv/core/set/set.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -83,16 +77,14 @@
 
   The returned set must be destroyed by the caller.
 */
-Set_t hrc_prefix_utils_get_prefix_symbols(Set_t symbol_set,
-                                                 node_ptr prefix);
+Set_t hrc_prefix_utils_get_prefix_symbols(Set_t symbol_set, node_ptr prefix);
 
 /*!
   \brief Returns true if subprefix is contained in prefix.
 
 
 */
-boolean
-hrc_prefix_utils_is_subprefix(node_ptr subprefix, node_ptr prefix);
+boolean hrc_prefix_utils_is_subprefix(node_ptr subprefix, node_ptr prefix);
 
 /*!
   \brief Build the expression prefixed by context.
@@ -103,9 +95,8 @@ hrc_prefix_utils_is_subprefix(node_ptr subprefix, node_ptr prefix);
   DOT(context, expression). We need to recursively visit expression
   to build a correct DOT tree.
 */
-node_ptr
-hrc_prefix_utils_add_context(NodeMgr_ptr nodemgr,
-                             node_ptr context, node_ptr expression);
+node_ptr hrc_prefix_utils_add_context(NodeMgr_ptr nodemgr, node_ptr context,
+                                      node_ptr expression);
 
 /*!
   \brief Get the first subcontext of the given symbol.
@@ -126,8 +117,7 @@ node_ptr hrc_prefix_utils_get_first_subcontext(node_ptr symbol);
   If context is not
 */
 node_ptr hrc_prefix_utils_remove_context(NodeMgr_ptr nodemgr,
-                                                node_ptr identifier,
-                                                node_ptr context);
+                                         node_ptr identifier, node_ptr context);
 
 /*!
   \brief Creates a new name for the module instance.
@@ -136,18 +126,14 @@ node_ptr hrc_prefix_utils_remove_context(NodeMgr_ptr nodemgr,
 
   The generated module name is <module_name>_<module_instance_flattened_name>
 */
-node_ptr
-hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
-                                    node_ptr instance_name);
+node_ptr hrc_prefix_utils_assign_module_name(HrcNode_ptr instance,
+                                             node_ptr instance_name);
 
-node_ptr hrc_prefix_utils_concat_context(const NuSMVEnv_ptr env,
-                                         node_ptr ctx1,
+node_ptr hrc_prefix_utils_concat_context(const NuSMVEnv_ptr env, node_ptr ctx1,
                                          node_ptr ctx2);
 
 node_ptr hrc_prefix_utils_contextualize_expr(const NuSMVEnv_ptr env,
-                                               node_ptr expr,
-                                               node_ptr context);
-
+                                             node_ptr expr, node_ptr context);
 
 /**AutomaticEnd***************************************************************/
 

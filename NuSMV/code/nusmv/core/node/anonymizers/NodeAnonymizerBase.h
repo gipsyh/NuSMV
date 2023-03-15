@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,24 +34,21 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_BASE_H__
 #define __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_BASE_H__
 
-
-#include "nusmv/core/utils/EnvObject.h"
-#include "nusmv/core/utils/defs.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/utils/BiMap.h"
+#include "nusmv/core/utils/EnvObject.h"
+#include "nusmv/core/utils/defs.h"
 
 /*!
   \struct NodeAnonymizerBase
   \brief Definition of the public accessor for class NodeAnonymizerBase
 
-  
+
 */
-typedef struct NodeAnonymizerBase_TAG*  NodeAnonymizerBase_ptr;
+typedef struct NodeAnonymizerBase_TAG *NodeAnonymizerBase_ptr;
 
 /*!
   \brief To cast and check instances of class NodeAnonymizerBase
@@ -59,16 +56,15 @@ typedef struct NodeAnonymizerBase_TAG*  NodeAnonymizerBase_ptr;
   These macros must be used respectively to cast and to check
   instances of class NodeAnonymizerBase
 */
-#define NODE_ANONYMIZER_BASE(self) \
-         ((NodeAnonymizerBase_ptr) self)
+#define NODE_ANONYMIZER_BASE(self) ((NodeAnonymizerBase_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self) \
-         (nusmv_assert(NODE_ANONYMIZER_BASE(self) != NODE_ANONYMIZER_BASE(NULL)))
+#define NODE_ANONYMIZER_BASE_CHECK_INSTANCE(self)                              \
+  (nusmv_assert(NODE_ANONYMIZER_BASE(self) != NODE_ANONYMIZER_BASE(NULL)))
 
 /*!
   \brief The encoding of the printed map:
@@ -76,7 +72,7 @@ typedef struct NodeAnonymizerBase_TAG*  NodeAnonymizerBase_ptr;
   NODE_ANONYMIZER_DOT_STR       is the dot
   NODE_ANONYMIZER_SEPARATOR_STR is the separator between the children of the dot
 
-  
+
 */
 #define NODE_ANONYMIZER_DELIMITER_STR ":"
 
@@ -115,7 +111,6 @@ typedef struct NodeAnonymizerBase_TAG*  NodeAnonymizerBase_ptr;
 */
 #define NODE_ANONYMIZER_SEPARATOR_CHAR ','
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -133,7 +128,6 @@ typedef struct NodeAnonymizerBase_TAG*  NodeAnonymizerBase_ptr;
 */
 void NodeAnonymizerBase_destroy(NodeAnonymizerBase_ptr self);
 
-
 /* Miscellaneous **************************************************************/
 
 /*!
@@ -146,21 +140,19 @@ void NodeAnonymizerBase_destroy(NodeAnonymizerBase_ptr self);
   @param id     must not be in the map and must be an identifier
   @param prefix must not be NULL
 */
-int NodeAnonymizerBase_map(NodeAnonymizerBase_ptr self,
-                                  node_ptr id,
-                                  const char* prefix);
+int NodeAnonymizerBase_map(NodeAnonymizerBase_ptr self, node_ptr id,
+                           const char *prefix);
 
 /*!
   \methodof NodeAnonymizerBase
   \brief Insert a mapping
 
-  
+
   @param original  must be an id and not in the map
   @param anonymous must be an id and not in the map back
 */
-int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self,
-                                        node_ptr original,
-                                        node_ptr anonymous);
+int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self, node_ptr original,
+                                 node_ptr anonymous);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -169,7 +161,7 @@ int NodeAnonymizerBase_force_map(NodeAnonymizerBase_ptr self,
   expr is not normalized
 */
 node_ptr NodeAnonymizerBase_map_expr(NodeAnonymizerBase_ptr self,
-                                            node_ptr expr);
+                                     node_ptr expr);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -180,16 +172,15 @@ node_ptr NodeAnonymizerBase_map_expr(NodeAnonymizerBase_ptr self,
   @return the anonymized expression or NULL if an error occurred
 */
 node_ptr NodeAnonymizerBase_map_back(NodeAnonymizerBase_ptr self,
-                                            node_ptr expr);
+                                     node_ptr expr);
 
 /*!
   \methodof NodeAnonymizerBase
   \brief Print the map on the given string
 
-  
+
 */
-int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self,
-                                        FILE* stream);
+int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self, FILE *stream);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -200,13 +191,13 @@ int NodeAnonymizerBase_print_map(NodeAnonymizerBase_ptr self,
 
   id       := [A-Za-z_][A-Za-z0-9_\$#-]*
   dot_expr := (id | . | ,)+
-  
+
   dot_expr:dot_expr
 
-  
+
 */
 int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
-                                                   FILE* stream);
+                                            FILE *stream);
 
 /*!
   \brief Reads a map from a bimap, and merge it into self
@@ -216,28 +207,27 @@ int NodeAnonymizerBase_read_map_from_stream(NodeAnonymizerBase_ptr self,
   id or if an anonymous id is already used in self
 */
 int NodeAnonymizer_read_map_from_bimap(NodeAnonymizerBase_ptr self,
-                                              BiMap_ptr map);
+                                       BiMap_ptr map);
 
 /*!
   \methodof NodeAnonymizerBase
   \brief Returns the size of the mapping
 
-  
+
 */
 size_t NodeAnonymizerBase_get_map_size(NodeAnonymizerBase_ptr self);
-
 
 /* Queries *******************************************************************/
 
 /*!
   \methodof NodeAnonymizerBase
   \brief True if id is already in the map as an original identifier
-  
+
 
   id must be an id
 */
 boolean NodeAnonymizerBase_is_id_original(NodeAnonymizerBase_ptr self,
-                                                 node_ptr id);
+                                          node_ptr id);
 
 /*!
   \methodof NodeAnonymizerBase
@@ -247,19 +237,16 @@ boolean NodeAnonymizerBase_is_id_original(NodeAnonymizerBase_ptr self,
   id must be an id
 */
 boolean NodeAnonymizerBase_is_id_anonymous(NodeAnonymizerBase_ptr self,
-                                                  node_ptr id);
+                                           node_ptr id);
 
 /*!
   \methodof NodeAnonymizerBase
   \brief True if the map is empty
 
-  
+
 */
 boolean NodeAnonymizerBase_is_map_empty(NodeAnonymizerBase_ptr self);
 
-
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_NODE_ANONYMIZERS_NODE_ANONYMIZER_BASE_H__ */

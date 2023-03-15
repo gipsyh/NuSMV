@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -44,7 +44,6 @@
 #define __NUSMV_CORE_BMC_SBMC_SBMC_NODE_STACK_H__
 
 #include "nusmv/core/node/node.h" /*For node_ptr*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -72,7 +71,7 @@ struct nodeStack {
   /**Number of slots occupied*/
   unsigned first_free;
   /**The table*/
-  node_ptr *table; 
+  node_ptr *table;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -82,8 +81,6 @@ struct nodeStack {
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
-
 
 /**AutomaticStart*************************************************************/
 

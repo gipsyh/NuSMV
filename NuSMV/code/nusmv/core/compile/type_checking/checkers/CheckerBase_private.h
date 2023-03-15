@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,21 +34,17 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_PRIVATE_H__
 #define __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_PRIVATE_H__
-
 
 #include "nusmv/core/compile/type_checking/checkers/CheckerBase.h"
 #include "nusmv/core/compile/type_checking/checkers/checkersInt.h"
 
-#include "nusmv/core/node/NodeWalker_private.h"
 #include "nusmv/core/compile/type_checking/TypeChecker.h"
 #include "nusmv/core/compile/type_checking/TypeChecker_private.h"
+#include "nusmv/core/node/NodeWalker_private.h"
 
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief Short way of calling type_checking_check_expression
@@ -59,23 +55,22 @@
 */
 
 /* WARNING [MD] This macro should take self as parameter */
-#define _THROW(exp, ctx)                                                  \
-   (NodeWalker_can_handle(NODE_WALKER(self), exp) ?                       \
-    CHECKER_BASE(self)->check_expr(self, exp, ctx) :                      \
-   type_checker_check_expression(TYPE_CHECKER(NODE_WALKER(self)->master), \
-                                 exp, ctx))
+#define _THROW(exp, ctx)                                                       \
+  (NodeWalker_can_handle(NODE_WALKER(self), exp)                               \
+       ? CHECKER_BASE(self)->check_expr(self, exp, ctx)                        \
+       : type_checker_check_expression(                                        \
+             TYPE_CHECKER(NODE_WALKER(self)->master), exp, ctx))
 
 /*!
   \brief CheckerBase class definition derived from
                class node.NodeWalker
 
-  
+
 
   \sa Base class Object
 */
 
-typedef struct CheckerBase_TAG
-{
+typedef struct CheckerBase_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(NodeWalker);
 
@@ -90,8 +85,6 @@ typedef struct CheckerBase_TAG
   SymbType_ptr (*check_expr)(CheckerBase_ptr self, node_ptr exp, node_ptr ctx);
 
 } CheckerBase;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -111,9 +104,8 @@ typedef struct CheckerBase_TAG
 
   \sa NodeWalker_destroy
 */
-CheckerBase_ptr CheckerBase_create(const NuSMVEnv_ptr env,
-                                          const char* name,
-                                          int low, size_t num);
+CheckerBase_ptr CheckerBase_create(const NuSMVEnv_ptr env, const char *name,
+                                   int low, size_t num);
 
 /*!
   \methodof CheckerBase
@@ -123,9 +115,8 @@ CheckerBase_ptr CheckerBase_create(const NuSMVEnv_ptr env,
 
   \sa CheckerBase_create
 */
-void
-checker_base_init(CheckerBase_ptr self, const NuSMVEnv_ptr env,
-                  const char* name, int low, size_t num);
+void checker_base_init(CheckerBase_ptr self, const NuSMVEnv_ptr env,
+                       const char *name, int low, size_t num);
 
 /*!
   \methodof CheckerBase
@@ -146,10 +137,9 @@ void checker_base_deinit(CheckerBase_ptr self);
   throw the macro _VIOLATION that casts its arguments and improves
   readability (at least as main tentative idea)
 */
-VIRTUAL boolean
-checker_base_manage_violation(CheckerBase_ptr self,
-                              TypeSystemViolation violation,
-                              node_ptr expression);
+VIRTUAL boolean checker_base_manage_violation(CheckerBase_ptr self,
+                                              TypeSystemViolation violation,
+                                              node_ptr expression);
 
 /*!
   \methodof CheckerBase
@@ -157,9 +147,8 @@ checker_base_manage_violation(CheckerBase_ptr self,
 
   \todo Missing description
 */
-void
-checker_base_print_type(CheckerBase_ptr self, FILE* output_stream,
-                        node_ptr expression, node_ptr context);
+void checker_base_print_type(CheckerBase_ptr self, FILE *output_stream,
+                             node_ptr expression, node_ptr context);
 
-
-#endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_PRIVATE_H__ */
+#endif /* __NUSMV_CORE_COMPILE_TYPE_CHECKING_CHECKERS_CHECKER_BASE_PRIVATE_H__ \
+        */

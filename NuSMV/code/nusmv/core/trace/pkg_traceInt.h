@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,9 +37,9 @@
 #ifndef __NUSMV_CORE_TRACE_PKG_TRACE_INT_H__
 #define __NUSMV_CORE_TRACE_PKG_TRACE_INT_H__
 
+#include "nusmv/core/node/node.h"
 #include "nusmv/core/utils/utils.h" /* For extern */
 #include "nusmv/core/utils/utils_io.h"
-#include "nusmv/core/node/node.h"
 
 #include "nusmv/core/trace/TraceMgr.h"
 #include "nusmv/core/trace/TraceXml.h"
@@ -74,7 +74,6 @@ extern cmp_struct_ptr cmps;
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 

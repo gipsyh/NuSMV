@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -38,7 +38,6 @@
 
 */
 
-
 #include "nusmv/core/dag/dag.h"
 #include "nusmv/core/dag/dagInt.h"
 
@@ -47,7 +46,6 @@
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -59,7 +57,6 @@
   \todo Missing description
 */
 typedef struct EnData EnData_t;
-
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -80,18 +77,15 @@ typedef struct EnData EnData_t;
 *****************************************************************************
 */
 
-
 struct EnData {
-  int           fatherNum;
-  int           dfs2Visit;
-  Dag_Vertex_t* enDualNode;
+  int fatherNum;
+  int dfs2Visit;
+  Dag_Vertex_t *enDualNode;
 };
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
@@ -106,32 +100,32 @@ struct EnData {
 
   \se none
 */
-#define SignedEdge(E,S) (Dag_Vertex_t *) (((nusmv_ptrint)(EnDualNode(E))&(~DAG_ANNOTATION_BIT))|S)
+#define SignedEdge(E, S)                                                       \
+  (Dag_Vertex_t *)(((nusmv_ptrint)(EnDualNode(E)) & (~DAG_ANNOTATION_BIT)) | S)
 
 /*!
   \brief Select a particular field of the struct associated via gRef
                to each node
 
-  
+
 
   \se none
 */
-#define FatherNum(N)  ((EnData_t*)((N)->gRef))->fatherNum
+#define FatherNum(N) ((EnData_t *)((N)->gRef))->fatherNum
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define EnDualNode(N) ((EnData_t*)((N)->gRef))->enDualNode
+#define EnDualNode(N) ((EnData_t *)((N)->gRef))->enDualNode
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define Dfs2Visit(N)  ((EnData_t*)((N)->gRef))->dfs2Visit
-
+#define Dfs2Visit(N) ((EnData_t *)((N)->gRef))->dfs2Visit
 
 /**AutomaticStart*************************************************************/
 
@@ -139,23 +133,22 @@ struct EnData {
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static Dag_Vertex_t* DFS1(Dag_Vertex_t* v, nusmv_ptrint vBit);
-static void          DFS2(Dag_Vertex_t* v, nusmv_ptrint vBit, lsList sons,
-			  int father_symbol);
+static Dag_Vertex_t *DFS1(Dag_Vertex_t *v, nusmv_ptrint vBit);
+static void DFS2(Dag_Vertex_t *v, nusmv_ptrint vBit, lsList sons,
+                 int father_symbol);
 
-static lsList getEnnarySons(Dag_Vertex_t* v,nusmv_ptrint sign);
-static int Compare( Dag_Vertex_t* v,lsList list,nusmv_ptrint vBit);
+static lsList getEnnarySons(Dag_Vertex_t *v, nusmv_ptrint sign);
+static int Compare(Dag_Vertex_t *v, lsList list, nusmv_ptrint vBit);
 
-static int  SetupSet(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign);
-static void doNothingAndReturnVoid(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign) {};
+static int SetupSet(Dag_Vertex_t *f, char *visData, nusmv_ptrint sign);
+static void doNothingAndReturnVoid(Dag_Vertex_t *f, char *visData,
+                                   nusmv_ptrint sign){};
 
 /**AutomaticEnd***************************************************************/
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of external functions                                          */
 /*---------------------------------------------------------------------------*/
-
 
 /*!
   \brief Constructs an ennary dag corrispondig to an arbitrary binary dag
@@ -166,37 +159,32 @@ static void doNothingAndReturnVoid(Dag_Vertex_t* f, char * visData, nusmv_ptrint
                <li> dfsRoot, the dag vertex of the binary dag to transform into
                     ennary dag
                </ul>
-               
+
 
   \se none
 */
 
+Dag_Vertex_t *Dag_Ennarize(Dag_Vertex_t *dfsRoot) {
+  Dag_Vertex_t *enRoot = NIL(Dag_Vertex_t);
 
-Dag_Vertex_t*
-Dag_Ennarize (Dag_Vertex_t* dfsRoot)
-{
- Dag_Vertex_t* enRoot = NIL(Dag_Vertex_t);
+  if (dfsRoot != NIL(Dag_Vertex_t)) {
 
- if (dfsRoot != NIL(Dag_Vertex_t)) {
+    Dag_DfsFunctions_t setupDFS;
 
-     Dag_DfsFunctions_t setupDFS;
+    setupDFS.FirstVisit = setupDFS.BackVisit = setupDFS.LastVisit =
+        doNothingAndReturnVoid;
+    setupDFS.Set = SetupSet;
 
-     setupDFS.FirstVisit =
-     setupDFS.BackVisit  =
-     setupDFS.LastVisit  = doNothingAndReturnVoid;
-     setupDFS.Set        = SetupSet;
+    Dag_Dfs(dfsRoot, &dag_DfsClean, NIL(char));
+    Dag_Dfs(dfsRoot, &setupDFS, NIL(char));
 
-     Dag_Dfs(dfsRoot, &dag_DfsClean, NIL(char));
-     Dag_Dfs(dfsRoot, &setupDFS,     NIL(char));
+    ++(Dag_VertexGetRef(dfsRoot)->dag->dfsCode);
 
-     ++(Dag_VertexGetRef(dfsRoot) -> dag -> dfsCode);
+    enRoot = DFS1(Dag_VertexGetRef(dfsRoot), Dag_VertexIsSet(dfsRoot));
+  }
 
-     enRoot = DFS1(Dag_VertexGetRef(dfsRoot),  Dag_VertexIsSet(dfsRoot));
- }
-
- return enRoot;
-}/* End of Rbc_Ennarize. */
-
+  return enRoot;
+} /* End of Rbc_Ennarize. */
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -214,38 +202,34 @@ Dag_Ennarize (Dag_Vertex_t* dfsRoot)
   \se none
 */
 
-
-static Dag_Vertex_t*
-DFS1(Dag_Vertex_t* v, nusmv_ptrint vBit)
-{
+static Dag_Vertex_t *DFS1(Dag_Vertex_t *v, nusmv_ptrint vBit) {
   lsGen gen;
   lsList sonsList;
-  Dag_Vertex_t * vSon;
+  Dag_Vertex_t *vSon;
 
-  if ( (v -> visit != v -> dag -> dfsCode)) {
+  if ((v->visit != v->dag->dfsCode)) {
 
-      lsList enSonsList = lsCreate();
-      v -> visit = v -> dag -> dfsCode;
+    lsList enSonsList = lsCreate();
+    v->visit = v->dag->dfsCode;
 
-      if ((sonsList = getEnnarySons(v,vBit)) != (lsList) NULL) {
+    if ((sonsList = getEnnarySons(v, vBit)) != (lsList)NULL) {
 
-          gen = lsStart(sonsList);
+      gen = lsStart(sonsList);
 
-          while (lsNext(gen, (lsGeneric*) &vSon, LS_NH) == LS_OK) {
-              Dag_Vertex_t* enSon = DFS1(Dag_VertexGetRef(vSon), Dag_VertexIsSet(vSon));
-              (void) lsNewEnd(enSonsList, (lsGeneric) enSon, LS_NH);
-          }
-          lsFinish(gen);
+      while (lsNext(gen, (lsGeneric *)&vSon, LS_NH) == LS_OK) {
+        Dag_Vertex_t *enSon =
+            DFS1(Dag_VertexGetRef(vSon), Dag_VertexIsSet(vSon));
+        (void)lsNewEnd(enSonsList, (lsGeneric)enSon, LS_NH);
       }
+      lsFinish(gen);
+    }
 
-      EnDualNode(v) = Dag_VertexLookup(v->dag, v->symbol, v->data, enSonsList);
+    EnDualNode(v) = Dag_VertexLookup(v->dag, v->symbol, v->data, enSonsList);
   }
 
- return SignedEdge(v,vBit);
+  return SignedEdge(v, vBit);
 
 } /* End of DFS1. */
-
-
 
 /*!
   \brief Finds all sons of a node and returns the list containing them.
@@ -259,27 +243,23 @@ DFS1(Dag_Vertex_t* v, nusmv_ptrint vBit)
   \se None
 */
 
-static lsList
-getEnnarySons(Dag_Vertex_t * v, nusmv_ptrint sign)
-{
-    lsList sons = (lsList) NULL;
-    lsGen gen;
-    Dag_Vertex_t * vSon;
+static lsList getEnnarySons(Dag_Vertex_t *v, nusmv_ptrint sign) {
+  lsList sons = (lsList)NULL;
+  lsGen gen;
+  Dag_Vertex_t *vSon;
 
-    if (v -> outList != (lsList) NULL) {
-        sons = lsCreate();
-        gen = lsStart(v -> outList);
+  if (v->outList != (lsList)NULL) {
+    sons = lsCreate();
+    gen = lsStart(v->outList);
 
-        while (lsNext(gen, (lsGeneric*) &vSon, LS_NH) == LS_OK)
-            DFS2(Dag_VertexGetRef(vSon), Dag_VertexIsSet(vSon),sons,v->symbol);
+    while (lsNext(gen, (lsGeneric *)&vSon, LS_NH) == LS_OK)
+      DFS2(Dag_VertexGetRef(vSon), Dag_VertexIsSet(vSon), sons, v->symbol);
 
-        lsFinish(gen);
-    }
+    lsFinish(gen);
+  }
 
-    return sons;
-}/* End of getEnnarySons. */
-
-
+  return sons;
+} /* End of getEnnarySons. */
 
 /*!
   \brief Performs a generic (recursive) DFS on the dag.
@@ -296,42 +276,42 @@ getEnnarySons(Dag_Vertex_t * v, nusmv_ptrint sign)
   \se None
 */
 
-static void
-DFS2( Dag_Vertex_t * v, nusmv_ptrint vBit, lsList sons, int father_symbol)
-{
- lsGen           gen;
- Dag_Vertex_t * vSon;
+static void DFS2(Dag_Vertex_t *v, nusmv_ptrint vBit, lsList sons,
+                 int father_symbol) {
+  lsGen gen;
+  Dag_Vertex_t *vSon;
 
- if (vBit!=0                    || /* edge is negated */
-     v->symbol != father_symbol || /* symbol changes moving to the son */
-     FatherNum(v)>1) {             /* the node has more than one father */
+  if (vBit != 0 ||                  /* edge is negated */
+      v->symbol != father_symbol || /* symbol changes moving to the son */
+      FatherNum(v) > 1) {           /* the node has more than one father */
 
-     Dfs2Visit(v) = (v -> dag -> dfsCode);
+    Dfs2Visit(v) = (v->dag->dfsCode);
 
-     if (!Compare (v,sons,vBit))
-         (void) lsNewEnd(sons, (lsGeneric)(((nusmv_ptrint)(v)&(~DAG_ANNOTATION_BIT))|vBit), LS_NH);
-     return;
- }
+    if (!Compare(v, sons, vBit))
+      (void)lsNewEnd(
+          sons, (lsGeneric)(((nusmv_ptrint)(v) & (~DAG_ANNOTATION_BIT)) | vBit),
+          LS_NH);
+    return;
+  }
 
- if ( (Dfs2Visit(v) != v -> dag -> dfsCode)) {
+  if ((Dfs2Visit(v) != v->dag->dfsCode)) {
 
-     Dfs2Visit(v) = (v -> dag -> dfsCode);
+    Dfs2Visit(v) = (v->dag->dfsCode);
 
-     /* Visit each son (if any). */
-     if (v -> outList != (lsList) NULL) {
+    /* Visit each son (if any). */
+    if (v->outList != (lsList)NULL) {
 
-         gen = lsStart(v -> outList);
-         while (lsNext(gen, (lsGeneric*) &vSon, LS_NH) == LS_OK)
-             DFS2(Dag_VertexGetRef(vSon), Dag_VertexIsSet(vSon),sons,v->symbol);
+      gen = lsStart(v->outList);
+      while (lsNext(gen, (lsGeneric *)&vSon, LS_NH) == LS_OK)
+        DFS2(Dag_VertexGetRef(vSon), Dag_VertexIsSet(vSon), sons, v->symbol);
 
-         lsFinish(gen);
-     }
- }
+      lsFinish(gen);
+    }
+  }
 
-return;
+  return;
 
 } /* End of DFS2. */
-
 
 /*!
   \brief Checks if an element belongs to a list.
@@ -346,24 +326,20 @@ return;
   \se None
 */
 
+static int Compare(Dag_Vertex_t *v, lsList list, nusmv_ptrint vBit) {
+  lsGen gen;
+  Dag_Vertex_t *h;
 
-static int
-Compare(Dag_Vertex_t* v, lsList list, nusmv_ptrint vBit)
-{
-    lsGen gen;
-    Dag_Vertex_t* h;
+  gen = lsStart(list);
+  while (lsNext(gen, (lsGeneric *)&h, LS_NH) == LS_OK)
+    if ((lsGeneric)(((nusmv_ptrint)(v) & (~DAG_ANNOTATION_BIT)) | vBit) ==
+        (lsGeneric)(((nusmv_ptrint)(h) & (~DAG_ANNOTATION_BIT)) |
+                    Dag_VertexIsSet(h)))
+      return (1);
 
-    gen = lsStart(list);
-    while (lsNext(gen, (lsGeneric*) &h, LS_NH) == LS_OK)
-        if ((lsGeneric)(((nusmv_ptrint)(v)&(~DAG_ANNOTATION_BIT))|vBit)==(lsGeneric)(((nusmv_ptrint)(h)&(~DAG_ANNOTATION_BIT))|Dag_VertexIsSet(h)) )
-            return (1);
-
-    lsFinish(gen);
-    return (0);
-}/* End of Compare. */
-
-
-
+  lsFinish(gen);
+  return (0);
+} /* End of Compare. */
 
 /*!
   \brief Dfs Set for ennarization.
@@ -373,18 +349,14 @@ Compare(Dag_Vertex_t* v, lsList list, nusmv_ptrint vBit)
   \se None
 */
 
+static int SetupSet(Dag_Vertex_t *f, char *visData, nusmv_ptrint sign) {
+  if (f->gRef == (char *)NULL) {
+    f->iRef = 0;
+    f->gRef = (char *)ALLOC(EnData_t, 1);
+    FatherNum(f) = 0;
+  }
 
-static int SetupSet(Dag_Vertex_t* f, char * visData, nusmv_ptrint sign)
-{
- if (f->gRef == (char*)NULL) {
-     f->iRef = 0;
-     f->gRef = (char *)ALLOC(EnData_t,1);
-     FatherNum(f) = 0;
- }
+  FatherNum(f)++;
 
- FatherNum(f)++;
-
- return (0);
-}/* End of SetupSet. */
-
-
+  return (0);
+} /* End of SetupSet. */

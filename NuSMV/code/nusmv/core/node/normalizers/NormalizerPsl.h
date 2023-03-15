@@ -22,7 +22,7 @@
    or email to <nusmv-users@fbk.eu>.
    Please report bugs to <nusmv-users@fbk.eu>.
 
-   To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+   To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,11 +34,8 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_PSL_H__
 #define __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_PSL_H__
-
 
 #include "nusmv/core/node/normalizers/NormalizerBase.h"
 #include "nusmv/core/utils/utils.h"
@@ -47,9 +44,9 @@
   \struct NormalizerPsl
   \brief Definition of the public accessor for class NormalizerPsl
 
-  
+
 */
-typedef struct NormalizerPsl_TAG*  NormalizerPsl_ptr;
+typedef struct NormalizerPsl_TAG *NormalizerPsl_ptr;
 
 /*!
   \brief To cast and check instances of class NormalizerPsl
@@ -57,18 +54,15 @@ typedef struct NormalizerPsl_TAG*  NormalizerPsl_ptr;
   These macros must be used respectively to cast and to check
    instances of class NormalizerPsl
 */
-#define NORMALIZER_PSL(self)                    \
-  ((NormalizerPsl_ptr) self)
+#define NORMALIZER_PSL(self) ((NormalizerPsl_ptr)self)
 
 /*!
   \brief \todo Missing synopsis
 
   \todo Missing description
 */
-#define NORMALIZER_PSL_CHECK_INSTANCE(self)                     \
+#define NORMALIZER_PSL_CHECK_INSTANCE(self)                                    \
   (nusmv_assert(NORMALIZER_PSL(self) != NORMALIZER_PSL(NULL)))
-
-
 
 /**AutomaticStart*************************************************************/
 
@@ -85,11 +79,8 @@ typedef struct NormalizerPsl_TAG*  NormalizerPsl_ptr;
   \sa NormalizerPsl_destroy
 */
 NormalizerPsl_ptr NormalizerPsl_create(const NuSMVEnv_ptr env,
-                                              const char* name);
-
+                                       const char *name);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __NUSMV_CORE_NODE_NORMALIZERS_NORMALIZER_PSL_H__ */

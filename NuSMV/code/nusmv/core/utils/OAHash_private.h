@@ -22,7 +22,7 @@
    or email to <nusmv-users@fbk.eu>.
    Please report bugs to <nusmv-users@fbk.eu>.
 
-   To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+   To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,15 +34,11 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_UTILS_OAHASH_PRIVATE_H__
 #define __NUSMV_CORE_UTILS_OAHASH_PRIVATE_H__
 
-
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/OAHash.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /**AutomaticStart*************************************************************/
 
@@ -64,18 +60,17 @@ typedef struct OAEntry_TAG {
   size_t hash; /* This is for performances, if key_eq_fun is fast
                   (e.g. pointers equality) can be removed, sparing 64
                   bits for each entry*/
-  void* key;
-  void* value;
+  void *key;
+  void *value;
 } OAEntry;
 
 /*!
   \brief OAHash class definition
 
-  
+
 */
 
-typedef struct OAHash_TAG
-{
+typedef struct OAHash_TAG {
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
@@ -84,17 +79,17 @@ typedef struct OAHash_TAG
   size_t used;
   size_t mask;
 
-  OAEntry* table;
+  OAEntry *table;
   OAEntry small_table[OA_HASH_MINSIZE];
 
   /* The argument passed to key_eq_fun, key_hash_fun and
      free_entry_fun */
-  void* custom_arg;
+  void *custom_arg;
 
   /* In the OAHash, this value is equal to custom_arg. However, having
      it adds the possibility to class extending the OAHash to have a
      custom value. */
-  void* free_fun_arg;
+  void *free_fun_arg;
 
   /* Function to check keys equality. Parameters are key1, key2 and
      the custom argument */
@@ -110,8 +105,6 @@ typedef struct OAHash_TAG
 
 } OAHash;
 
-
-
 /*---------------------------------------------------------------------------*/
 /* Function prototypes                                                       */
 /*---------------------------------------------------------------------------*/
@@ -120,11 +113,9 @@ typedef struct OAHash_TAG
   \methodof OAHash
   \todo
 */
-void oa_hash_init(OAHash_ptr self,
-                  OA_HASH_EQ_FUN key_eq_fun,
+void oa_hash_init(OAHash_ptr self, OA_HASH_EQ_FUN key_eq_fun,
                   OA_HASH_HASH_FUN key_hash_fun,
-                  OA_HASH_FREE_FUN free_entry_fun,
-                  void* custom_arg);
+                  OA_HASH_FREE_FUN free_entry_fun, void *custom_arg);
 
 /*!
   \methodof OAHash
@@ -133,7 +124,5 @@ void oa_hash_init(OAHash_ptr self,
 void oa_hash_deinit(OAHash_ptr self);
 
 /**AutomaticEnd***************************************************************/
-
-
 
 #endif /* __OA_HASH_H__ */

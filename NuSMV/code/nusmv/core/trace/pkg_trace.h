@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,13 +37,11 @@
 #ifndef __NUSMV_CORE_TRACE_PKG_TRACE_H__
 #define __NUSMV_CORE_TRACE_PKG_TRACE_H__
 
+#include "nusmv/core/cinit/NuSMVEnv.h"
 #include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/trace/TraceMgr.h"
 #include "nusmv/core/trace/exec/traceExec.h"
-#include "nusmv/core/cinit/NuSMVEnv.h"
 /* #include "trace/exec/TraceExecInfo.h" */
-
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -64,7 +62,7 @@
 /*!
   \brief Initializes the Trace Package.
 
-  TraceMgr get initialized. 
+  TraceMgr get initialized.
 
   \sa TracePkg_quit
 */
@@ -73,7 +71,7 @@ void TracePkg_init(NuSMVEnv_ptr env);
 /*!
   \brief Quits the Trace package.
 
-  
+
 
   \sa TracePkg_init
 */
@@ -87,7 +85,7 @@ void TracePkg_quit(NuSMVEnv_ptr env);
 
   \todo Missing description
 */
-int TracePkg_test_package(FILE* out, FILE* err);
+int TracePkg_test_package(FILE *out, FILE *err);
 #endif
 
 /* Filtering services for external packags */
@@ -103,9 +101,8 @@ int TracePkg_test_package(FILE* out, FILE* err);
 
   \sa TraceMgr_is_visible_symbol
 */
-NodeList_ptr
-TracePkg_get_filtered_symbols(TraceMgr_ptr gtm,
-                              const NodeList_ptr symbols);
+NodeList_ptr TracePkg_get_filtered_symbols(TraceMgr_ptr gtm,
+                                           const NodeList_ptr symbols);
 
 /* Trace Manager */
 
@@ -122,8 +119,7 @@ int TracePkg_get_default_trace_plugin(TraceMgr_ptr gtm);
 
   Returns true upon success, false otherwise
 */
-boolean TracePkg_set_default_trace_plugin(TraceMgr_ptr gtm,
-                                                 int dp);
+boolean TracePkg_set_default_trace_plugin(TraceMgr_ptr gtm, int dp);
 
 /* Trace execution */
 
@@ -136,10 +132,8 @@ boolean TracePkg_set_default_trace_plugin(TraceMgr_ptr gtm,
 
   \se None
 */
-int
-Trace_execute_trace(const NuSMVEnv_ptr env,
-                    const Trace_ptr trace,
-                    const CompleteTraceExecutor_ptr exec_info);
+int Trace_execute_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
+                        const CompleteTraceExecutor_ptr exec_info);
 
 /*!
   \brief Partial trace re-execution and fill-in
@@ -156,11 +150,9 @@ Trace_execute_trace(const NuSMVEnv_ptr env,
 
   \se None
 */
-int
-Trace_execute_partial_trace(const NuSMVEnv_ptr env,
-                            const Trace_ptr trace,
-                            const PartialTraceExecutor_ptr exec_info,
-                            const NodeList_ptr language);
+int Trace_execute_partial_trace(const NuSMVEnv_ptr env, const Trace_ptr trace,
+                                const PartialTraceExecutor_ptr exec_info,
+                                const NodeList_ptr language);
 
 /* Custom value fetch functions */
 
@@ -174,10 +166,9 @@ Trace_execute_partial_trace(const NuSMVEnv_ptr env,
 
                Remarks: returned bdd is referenced
 */
-bdd_ptr
-TraceUtils_fetch_as_bdd(Trace_ptr trace, TraceIter step,
-                        TraceIteratorType iter_type,
-                        BddEnc_ptr bdd_enc);
+bdd_ptr TraceUtils_fetch_as_bdd(Trace_ptr trace, TraceIter step,
+                                TraceIteratorType iter_type,
+                                BddEnc_ptr bdd_enc);
 
 /*!
   \brief Extracts assignments in (trace, step) to a set of symbols
@@ -187,10 +178,9 @@ TraceUtils_fetch_as_bdd(Trace_ptr trace, TraceIter step,
                according to \"iter_type\". Refer to documentation of
                the TraceIteratorType for possible sets.
 */
-be_ptr
-TraceUtils_fetch_as_be(Trace_ptr trace, TraceIter step,
-                       TraceIteratorType iter_type,
-                       BeEnc_ptr be_enc, BddEnc_ptr bdd_enc);
+be_ptr TraceUtils_fetch_as_be(Trace_ptr trace, TraceIter step,
+                              TraceIteratorType iter_type, BeEnc_ptr be_enc,
+                              BddEnc_ptr bdd_enc);
 
 /*!
   \brief Extracts assignments in (trace, step) to a set of symbols
@@ -204,9 +194,8 @@ TraceUtils_fetch_as_be(Trace_ptr trace, TraceIter step,
 
   \sa TraceUtils_fetch_as_big_and
 */
-Expr_ptr
-TraceUtils_fetch_as_sexp(Trace_ptr trace, TraceIter step,
-                         TraceIteratorType iter_type);
+Expr_ptr TraceUtils_fetch_as_sexp(Trace_ptr trace, TraceIter step,
+                                  TraceIteratorType iter_type);
 
 /*!
   \brief Extracts assignments in (trace, step) to a set of symbols
@@ -216,9 +205,8 @@ TraceUtils_fetch_as_sexp(Trace_ptr trace, TraceIter step,
 
   \sa TraceUtils_fetch_as_sexp
 */
-Expr_ptr
-TraceUtils_fetch_as_big_and(Trace_ptr trace, TraceIter step,
-                            TraceIteratorType iter_type);
+Expr_ptr TraceUtils_fetch_as_big_and(Trace_ptr trace, TraceIter step,
+                                     TraceIteratorType iter_type);
 
 /*!
   \brief Force the evaluation of the defines of the trace
@@ -233,11 +221,9 @@ void Trace_Eval_evaluate_defines(Trace_ptr trace);
   In case of error, NULL is returned. The trace will be
   stored in the tracemgr, that has the ownership
 */
-Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env,
-                                     SexpFsm_ptr sexp_fsm,
-                                     const char* filename,
-                                     boolean halt_if_undef,
-                                     boolean halt_if_wrong_section);
+Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env, SexpFsm_ptr sexp_fsm,
+                              const char *filename, boolean halt_if_undef,
+                              boolean halt_if_wrong_section);
 
 /*!
   \brief Executes traces stored in the Trace Manager
@@ -245,12 +231,9 @@ Trace_ptr TracePkg_read_trace(NuSMVEnv_ptr env,
   if trace_no equals to zero, all the traces will be
   executed
 */
-int TracePkg_execute_traces(NuSMVEnv_ptr env,
-                                   TraceMgr_ptr trace_mgr,
-                                   FILE* output_stream,
-                                   char* engine,
-                                   int verbosity,
-                                   int trace_no);
+int TracePkg_execute_traces(NuSMVEnv_ptr env, TraceMgr_ptr trace_mgr,
+                            FILE *output_stream, char *engine, int verbosity,
+                            int trace_no);
 
 /*!
   \brief Executes traces stored in the Trace Manager
@@ -258,13 +241,10 @@ int TracePkg_execute_traces(NuSMVEnv_ptr env,
   if trace_no equals to zero, all the traces will be
   executed
 */
-int TracePkg_execute_partial_traces(NuSMVEnv_ptr env,
-                                           TraceMgr_ptr trace_mgr,
-                                           FILE* output_stream,
-                                           char* engine,
-                                           int verbosity,
-                                           int trace_no);
-           
+int TracePkg_execute_partial_traces(NuSMVEnv_ptr env, TraceMgr_ptr trace_mgr,
+                                    FILE *output_stream, char *engine,
+                                    int verbosity, int trace_no);
+
 /**AutomaticEnd***************************************************************/
 
 #endif /* __TRACE__H  */

@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_UTILS_PORTABILITY_H__
 #define __NUSMV_CORE_UTILS_PORTABILITY_H__
 
@@ -49,21 +48,21 @@
 /*---------------------------------------------------------------------------*/
 
 #if !NUSMV_HAVE_MALLOC
-# undef malloc
-# undef realloc
-# if NUSMV_HAVE_MALLOC_H
-#  include <malloc.h>
-# elif NUSMV_HAVE_STDLIB_H
-#  include <stdlib.h>
-# endif
+#undef malloc
+#undef realloc
+#if NUSMV_HAVE_MALLOC_H
+#include <malloc.h>
+#elif NUSMV_HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 
-# ifndef malloc
-void* malloc(size_t);
-# endif /* ifndef malloc */
+#ifndef malloc
+void *malloc(size_t);
+#endif /* ifndef malloc */
 
-# ifndef realloc
-void* realloc(void*, size_t);
-# endif /* ifndef realloc */
+#ifndef realloc
+void *realloc(void *, size_t);
+#endif /* ifndef realloc */
 #endif /* if not NUSMV_HAVE_MALLOC */
 
 #if NUSMV_HAVE_ERRNO_H
@@ -105,13 +104,12 @@ extern int errno;
 #endif
 
 #if defined(_MSC_VER)
-#define __func__  __FUNCTION__
+#define __func__ __FUNCTION__
 #endif
 
 /* strtoull not available within MSVC */
-#if ! NUSMV_HAVE_STRTOULL && defined(_MSC_VER)
-# define strtoull                               \
-  _strtoui64
+#if !NUSMV_HAVE_STRTOULL && defined(_MSC_VER)
+#define strtoull _strtoui64
 #endif
 
 /* for compilers which are not compliant with C99 but have "long long"
@@ -130,7 +128,7 @@ Another possibility is (~0ULL) */
 
   \todo Missing description
 */
-#define ULLONG_MAX ((unsigned long long) -1)
+#define ULLONG_MAX ((unsigned long long)-1)
 #endif
 
 #ifndef LLONG_MAX
@@ -151,7 +149,7 @@ Another possibility is (~0ULL) */
 
   \todo Missing description
 */
-#define LLONG_MIN (- LLONG_MAX - 1)
+#define LLONG_MIN (-LLONG_MAX - 1)
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -165,7 +163,5 @@ Another possibility is (~0ULL) */
 /*---------------------------------------------------------------------------*/
 /* Functions declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
-
 
 #endif /* ifndef __NUSMV_CORE_UTILS_PORTABILITY_H__ */

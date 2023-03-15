@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,13 +34,12 @@
 
 */
 
-
-#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/hrc/dumpers/HrcDumper.h"
 #include "nusmv/core/hrc/dumpers/HrcDumper_private.h"
 #include "nusmv/core/parser/symbols.h"
-#include "nusmv/core/utils/utils.h"
+#include "nusmv/core/utils/ErrorMgr.h"
 #include "nusmv/core/utils/error.h"
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -70,26 +69,21 @@
 */
 #define HRC_DEFAULT_INDENT_SIZE 4
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* Static function prototypes                                                */
 /*---------------------------------------------------------------------------*/
 
-static void hrc_dumper_finalize(Object_ptr object, void* dummy);
+static void hrc_dumper_finalize(Object_ptr object, void *dummy);
 
-static void
-hrc_dumper_dump_scalar_type(HrcDumper_ptr self, node_ptr node);
-
+static void hrc_dumper_dump_scalar_type(HrcDumper_ptr self, node_ptr node);
 
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-HrcDumper_ptr HrcDumper_create(const NuSMVEnv_ptr env,
-                               FILE* fout)
-{
+HrcDumper_ptr HrcDumper_create(const NuSMVEnv_ptr env, FILE *fout) {
   HrcDumper_ptr self = ALLOC(HrcDumper, 1);
   HRC_DUMPER_CHECK_INSTANCE(self);
 
@@ -97,8 +91,7 @@ HrcDumper_ptr HrcDumper_create(const NuSMVEnv_ptr env,
   return self;
 }
 
-void HrcDumper_destroy(HrcDumper_ptr self)
-{
+void HrcDumper_destroy(HrcDumper_ptr self) {
   HRC_DUMPER_CHECK_INSTANCE(self);
 
   Object_destroy(OBJECT(self), NULL);
@@ -106,45 +99,38 @@ void HrcDumper_destroy(HrcDumper_ptr self)
 
 VIRTUAL void HrcDumper_dump_snippet(HrcDumper_ptr self,
                                     HrcDumperSnippet snippet,
-                                    const HrcDumperInfo* info)
-{
+                                    const HrcDumperInfo *info) {
   HRC_DUMPER_CHECK_INSTANCE(self);
   self->dump_snippet(self, snippet, info);
 }
 
-void HrcDumper_enable_indentation(HrcDumper_ptr self, boolean flag)
-{
+void HrcDumper_enable_indentation(HrcDumper_ptr self, boolean flag) {
   HRC_DUMPER_CHECK_INSTANCE(self);
   self->use_indentation = flag;
 }
 
-void HrcDumper_inc_indent(HrcDumper_ptr self)
-{
+void HrcDumper_inc_indent(HrcDumper_ptr self) {
   HRC_DUMPER_CHECK_INSTANCE(self);
   nusmv_assert(self->indent >= 0);
   self->indent += 1;
 }
 
-void HrcDumper_dec_indent(HrcDumper_ptr self)
-{
+void HrcDumper_dec_indent(HrcDumper_ptr self) {
   HRC_DUMPER_CHECK_INSTANCE(self);
   nusmv_assert(self->indent > 0);
   self->indent -= 1;
 }
 
-void HrcDumper_enable_mod_suffix(HrcDumper_ptr self, boolean flag)
-{
+void HrcDumper_enable_mod_suffix(HrcDumper_ptr self, boolean flag) {
   HRC_DUMPER_CHECK_INSTANCE(self);
   self->use_mod_suffix = flag;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void hrc_dumper_init(HrcDumper_ptr self, const NuSMVEnv_ptr env, FILE* fout)
-{
+void hrc_dumper_init(HrcDumper_ptr self, const NuSMVEnv_ptr env, FILE *fout) {
   /* base class initialization */
   env_object_init(ENV_OBJECT(self), env);
 
@@ -166,13 +152,12 @@ void hrc_dumper_init(HrcDumper_ptr self, const NuSMVEnv_ptr env, FILE* fout)
   OVERRIDE(HrcDumper, dump_node) = hrc_dumper_dump_node;
 }
 
-void hrc_dumper_deinit(HrcDumper_ptr self)
-{
+void hrc_dumper_deinit(HrcDumper_ptr self) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const StreamMgr_ptr streams =
-    STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
-  FILE* outstream = StreamMgr_get_output_stream(streams);
-  FILE* errstream = StreamMgr_get_error_stream(streams);
+      STREAM_MGR(NuSMVEnv_get_value(env, ENV_STREAM_MANAGER));
+  FILE *outstream = StreamMgr_get_output_stream(streams);
+  FILE *errstream = StreamMgr_get_error_stream(streams);
 
   /* members deinitialization */
   if (self->fout && self->fout != errstream && self->fout != outstream) {
@@ -183,13 +168,11 @@ void hrc_dumper_deinit(HrcDumper_ptr self)
   env_object_deinit(ENV_OBJECT(self));
 }
 
-void hrc_dumper_dump_snippet(HrcDumper_ptr self,
-                             HrcDumperSnippet snippet,
-                             const HrcDumperInfo* info)
-{
+void hrc_dumper_dump_snippet(HrcDumper_ptr self, HrcDumperSnippet snippet,
+                             const HrcDumperInfo *info) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   switch (snippet) {
   case HDS_HRC_TOP:
@@ -562,44 +545,38 @@ void hrc_dumper_dump_snippet(HrcDumper_ptr self,
   }
 }
 
-void hrc_dumper_dump_comment(HrcDumper_ptr self, const char* msg)
-{
+void hrc_dumper_dump_comment(HrcDumper_ptr self, const char *msg) {
   error_unreachable_code_msg("TBI");
 }
 
-void hrc_dumper_dump_header(HrcDumper_ptr self, const char* msg)
-{
+void hrc_dumper_dump_header(HrcDumper_ptr self, const char *msg) {
   error_unreachable_code_msg("TBI");
 }
 
-void hrc_dumper_dump_node(HrcDumper_ptr self, node_ptr node)
-{
+void hrc_dumper_dump_node(HrcDumper_ptr self, node_ptr node) {
   print_node(self->printer, self->fout, node);
 }
 
-void hrc_dumper_dump_indent(HrcDumper_ptr self)
-{
+void hrc_dumper_dump_indent(HrcDumper_ptr self) {
   if (self->use_indentation & self->indent_pending) {
     const size_t spaces = self->indent * self->indent_size;
     size_t i;
-    for (i=0; i<spaces; ++i) {
+    for (i = 0; i < spaces; ++i) {
       fprintf(self->fout, " ");
     }
     self->indent_pending = false;
   }
 }
 
-void hrc_dumper_nl(HrcDumper_ptr self)
-{
+void hrc_dumper_nl(HrcDumper_ptr self) {
   fprintf(self->fout, "\n");
   self->indent_pending = true;
 }
 
-void hrc_dumper_dump_var_type(HrcDumper_ptr self, node_ptr node)
-{
+void hrc_dumper_dump_var_type(HrcDumper_ptr self, node_ptr node) {
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
   const ErrorMgr_ptr errmgr =
-    ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
+      ERROR_MGR(NuSMVEnv_get_value(env, ENV_ERROR_MANAGER));
 
   int node_type = node_get_type(node);
 
@@ -639,14 +616,14 @@ void hrc_dumper_dump_var_type(HrcDumper_ptr self, node_ptr node)
     _HRC_DUMP_STR("]");
 
     _HRC_DUMP_STR(" of ");
-    
+
     /* recursively prints the array type */
     hrc_dumper_dump_var_type(self, cdr(node));
     break;
 
   case INTARRAY_TYPE:
     _HRC_DUMP_STR("array integer of ");
-    
+
     /* recursively prints the array type */
     hrc_dumper_dump_var_type(self, car(node));
     break;
@@ -663,33 +640,32 @@ void hrc_dumper_dump_var_type(HrcDumper_ptr self, node_ptr node)
     hrc_dumper_dump_var_type(self, cdr(node));
     break;
 
-  case NFUNCTION_TYPE:
-    {
-      node_ptr iter;
-      boolean is_first = true;
-      NODE_CONS_LIST_FOREACH(car(node), iter) {
-        node_ptr elem = Node_conslist_get(iter);
+  case NFUNCTION_TYPE: {
+    node_ptr iter;
+    boolean is_first = true;
+    NODE_CONS_LIST_FOREACH(car(node), iter) {
+      node_ptr elem = Node_conslist_get(iter);
 
-        if (! is_first) {
-          _HRC_DUMP_STR(" * ");
-        }
-        is_first = false;
-
-        hrc_dumper_dump_var_type(self, elem);
+      if (!is_first) {
+        _HRC_DUMP_STR(" * ");
       }
+      is_first = false;
 
-      _HRC_DUMP_STR(" -> ");
-      hrc_dumper_dump_var_type(self, cdr(node));
-      break;
+      hrc_dumper_dump_var_type(self, elem);
     }
 
+    _HRC_DUMP_STR(" -> ");
+    hrc_dumper_dump_var_type(self, cdr(node));
+    break;
+  }
+
   default:
-    ErrorMgr_internal_error(errmgr, "Type %d not supported by hrc emitter.\n", node_type);
+    ErrorMgr_internal_error(errmgr, "Type %d not supported by hrc emitter.\n",
+                            node_type);
   }
 
   return;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
@@ -700,8 +676,7 @@ void hrc_dumper_dump_var_type(HrcDumper_ptr self, node_ptr node)
 
   Called by the class destructor
 */
-static void hrc_dumper_finalize(Object_ptr object, void* dummy)
-{
+static void hrc_dumper_finalize(Object_ptr object, void *dummy) {
   HrcDumper_ptr self = HRC_DUMPER(object);
 
   hrc_dumper_deinit(self);
@@ -718,15 +693,13 @@ static void hrc_dumper_finalize(Object_ptr object, void* dummy)
 
   \sa hrc_dumper_dump_var_type
 */
-static void hrc_dumper_dump_scalar_type(HrcDumper_ptr self, node_ptr node)
-{
+static void hrc_dumper_dump_scalar_type(HrcDumper_ptr self, node_ptr node) {
   int node_type;
   node_ptr reversed_literals;
   node_ptr iterator;
   boolean first_literal;
   const NuSMVEnv_ptr env = EnvObject_get_environment(ENV_OBJECT(self));
-  const NodeMgr_ptr nodemgr =
-    NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
+  const NodeMgr_ptr nodemgr = NODE_MGR(NuSMVEnv_get_value(env, ENV_NODE_MGR));
 
   node_type = node_get_type(node);
   nusmv_assert(SCALAR == node_type);
@@ -745,7 +718,7 @@ static void hrc_dumper_dump_scalar_type(HrcDumper_ptr self, node_ptr node)
     literal = car(iterator);
     nusmv_assert(Nil != literal);
 
-    if (! first_literal) {
+    if (!first_literal) {
       _HRC_DUMP_STR(", ");
     }
     _HRC_DUMP_NODE(literal);
@@ -758,7 +731,5 @@ static void hrc_dumper_dump_scalar_type(HrcDumper_ptr self, node_ptr node)
 
   free_list(nodemgr, reversed_literals);
 }
-
-
 
 /**AutomaticEnd***************************************************************/

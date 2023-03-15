@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,14 +34,11 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_BMC_CHECK_H__
 #define __NUSMV_CORE_BMC_BMC_CHECK_H__
 
-
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/node/node.h"
-
+#include "nusmv/core/utils/utils.h"
 
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
@@ -54,7 +51,7 @@
 
   \todo Missing description
 */
-typedef int (*BMC_PF_MATCH)(const NuSMVEnv_ptr, node_ptr,  int, void*);
+typedef int (*BMC_PF_MATCH)(const NuSMVEnv_ptr, node_ptr, int, void *);
 
 /* answer function in case of match: */
 
@@ -63,8 +60,7 @@ typedef int (*BMC_PF_MATCH)(const NuSMVEnv_ptr, node_ptr,  int, void*);
 
   \todo Missing description
 */
-typedef void (*BMC_PF_MATCH_ANSWER)(const NuSMVEnv_ptr, node_ptr, int, void*);
-
+typedef void (*BMC_PF_MATCH_ANSWER)(const NuSMVEnv_ptr, node_ptr, int, void *);
 
 /**AutomaticStart*************************************************************/
 
@@ -77,13 +73,12 @@ typedef void (*BMC_PF_MATCH_ANSWER)(const NuSMVEnv_ptr, node_ptr, int, void*);
   'bmc_check_wff_list' for searching of propositional wff only.
   Returns a new list of wffs which contains legal wffs only
 
-  
+
 
   \sa bmc_check_wff_list
 */
-node_ptr
-Bmc_CheckFairnessListForPropositionalFormulae(const NuSMVEnv_ptr env,
-                                              node_ptr wffList);
+node_ptr Bmc_CheckFairnessListForPropositionalFormulae(const NuSMVEnv_ptr env,
+                                                       node_ptr wffList);
 
 /*!
   \brief For each element belonging to a given list of wffs,
@@ -142,15 +137,12 @@ Bmc_CheckFairnessListForPropositionalFormulae(const NuSMVEnv_ptr env,
   \se Given aiMatchedIndexes array changes if at least one
   match has found out
 */
-int
-Bmc_WffListMatchProperty(const NuSMVEnv_ptr env,
-                         node_ptr wffList, BMC_PF_MATCH pCheck,
-                         void* pCheckOptArgument, int iMaxMatches,
-                         unsigned int* aiMatchedIndexes,
-                         BMC_PF_MATCH_ANSWER pAnswer,
-                         void* pAnswerOptArgument);
+int Bmc_WffListMatchProperty(const NuSMVEnv_ptr env, node_ptr wffList,
+                             BMC_PF_MATCH pCheck, void *pCheckOptArgument,
+                             int iMaxMatches, unsigned int *aiMatchedIndexes,
+                             BMC_PF_MATCH_ANSWER pAnswer,
+                             void *pAnswerOptArgument);
 
 /**AutomaticEnd***************************************************************/
 
-#endif  /* __NUSMV_CORE_BMC_BMC_CHECK_H__ */
-
+#endif /* __NUSMV_CORE_BMC_BMC_CHECK_H__ */

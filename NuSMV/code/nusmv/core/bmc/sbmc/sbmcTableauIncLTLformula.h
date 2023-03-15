@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,7 +34,6 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_BMC_SBMC_SBMC_TABLEAU_INC_LTLFORMULA_H__
 #define __NUSMV_CORE_BMC_SBMC_SBMC_TABLEAU_INC_LTLFORMULA_H__
 
@@ -43,7 +42,6 @@
 #include "nusmv/core/be/be.h"
 #include "nusmv/core/node/node.h"
 #include "nusmv/core/utils/utils.h"
-
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -64,7 +62,6 @@
 /*---------------------------------------------------------------------------*/
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
-
 
 /**AutomaticStart*************************************************************/
 
@@ -99,21 +96,19 @@
     <li> [[Gf]]_E^d <=> [[f]]_E^d & [[Gf]]_L^min(d+1,pd(f)) </li>
     <li> [[Gf]]_E^d => [[Gf]]_E^d+1 </li>
     <li> [[Gf]]_E^pd(Gf) => <<Gf>>_E </li>
-    <li> [[fUg]]_E^d <=> [[g]]_E^d | ([[f]]_E^d  & [[fUg]]_L^min(d+1,pd(fUg))) </li>
-    <li> [[fRg]]_E^d <=> [[g]]_E^d & ([[f]]_E^d  | [[fRg]]_L^min(d+1,pd(fUg))) </li>
-    <li> [[Xf]]_E^d <=> [[f]]_L^min(d+1,pd(f)) </li>
-    <li> [[Hf]]_E^d+1 => [[Hf]]_E^d </li>
-    <li> [[Of]]_E^d => [[Of]]_E^d+1 </li>
+    <li> [[fUg]]_E^d <=> [[g]]_E^d | ([[f]]_E^d  & [[fUg]]_L^min(d+1,pd(fUg)))
+  </li> <li> [[fRg]]_E^d <=> [[g]]_E^d & ([[f]]_E^d  |
+  [[fRg]]_L^min(d+1,pd(fUg))) </li> <li> [[Xf]]_E^d <=> [[f]]_L^min(d+1,pd(f))
+  </li> <li> [[Hf]]_E^d+1 => [[Hf]]_E^d </li> <li> [[Of]]_E^d => [[Of]]_E^d+1
+  </li>
   </ul>
-  
+
 
   \se None
 */
-lsList sbmc_unroll_base(const BeEnc_ptr be_enc,
-                               const node_ptr ltlspec,
-                               const hash_ptr info_map,
-                               const be_ptr be_LoopExists,
-                               const int do_optimization);
+lsList sbmc_unroll_base(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                        const hash_ptr info_map, const be_ptr be_LoopExists,
+                        const int do_optimization);
 
 /*!
   \brief Create the k-invariant constraints for
@@ -125,13 +120,10 @@ lsList sbmc_unroll_base(const BeEnc_ptr be_enc,
 
   \se None
 */
-lsList sbmc_unroll_invariant_propositional(const BeEnc_ptr be_enc,
-                                                  const node_ptr ltlspec,
-                                                  const unsigned int i_model,
-                                                  const hash_ptr info_map,
-                                                  const be_ptr be_InLoop_i,
-                                                  const be_ptr be_l_i,
-                                                  const int do_optimization);
+lsList sbmc_unroll_invariant_propositional(
+    const BeEnc_ptr be_enc, const node_ptr ltlspec, const unsigned int i_model,
+    const hash_ptr info_map, const be_ptr be_InLoop_i, const be_ptr be_l_i,
+    const int do_optimization);
 
 /*!
   \brief Create the k-invariant constraints for propositional and
@@ -143,15 +135,13 @@ lsList sbmc_unroll_invariant_propositional(const BeEnc_ptr be_enc,
 
   \se None
 */
-lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
-                                      const node_ptr ltlspec,
-                                      const unsigned int i_model,
-                                      const hash_ptr info_map,
-                                      const be_ptr be_InLoop_i,
-                                      const be_ptr be_l_i,
-                                      const be_ptr be_LastState_i,
-                                      const be_ptr be_LoopExists,
-                                      const int do_optimization);
+lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                               const unsigned int i_model,
+                               const hash_ptr info_map,
+                               const be_ptr be_InLoop_i, const be_ptr be_l_i,
+                               const be_ptr be_LastState_i,
+                               const be_ptr be_LoopExists,
+                               const int do_optimization);
 
 /*!
   \brief Create the k-invariant constraints at time i.
@@ -161,26 +151,23 @@ lsList sbmc_unroll_invariant_f(const BeEnc_ptr be_enc,
 
   \se None
 */
-lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc,
-                                      const node_ptr ltlspec,
-                                      const unsigned int i_model,
-                                      const hash_ptr info_map,
-                                      const be_ptr be_InLoop_i,
-                                      const be_ptr be_l_i,
-                                      const int do_optimization);
+lsList sbmc_unroll_invariant_p(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                               const unsigned int i_model,
+                               const hash_ptr info_map,
+                               const be_ptr be_InLoop_i, const be_ptr be_l_i,
+                               const int do_optimization);
 
 /*!
   \brief Create the formula specific k-dependent constraints.
 
   Create the formula specific k-dependent constraints.
-  Return a list of be_ptrs for the created constraints. 
+  Return a list of be_ptrs for the created constraints.
 
   \se None
 */
-lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
-                                     const node_ptr ltlspec,
-                                     const unsigned int k_model,
-                                     const hash_ptr info_map);
+lsList sbmc_formula_dependent(const BeEnc_ptr be_enc, const node_ptr ltlspec,
+                              const unsigned int k_model,
+                              const hash_ptr info_map);
 
 /*!
   \brief Unroll future and past fragment from
@@ -191,15 +178,12 @@ lsList sbmc_formula_dependent(const BeEnc_ptr be_enc,
 
   \se None
 */
-lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc,
-                                    const node_ptr bltlspec,
-                                    const int previous_k,
-                                    const int new_k,
-                                    const state_vars_struct *state_vars,
-                                    array_t * InLoop_array,
-                                    const hash_ptr info_map,
-                                    const be_ptr be_LoopExists,
-                                    const int opt_do_optimization);
+lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc, const node_ptr bltlspec,
+                             const int previous_k, const int new_k,
+                             const state_vars_struct *state_vars,
+                             array_t *InLoop_array, const hash_ptr info_map,
+                             const be_ptr be_LoopExists,
+                             const int opt_do_optimization);
 
 /*!
   \brief required
@@ -214,13 +198,10 @@ lsList sbmc_unroll_invariant(const BeEnc_ptr be_enc,
 
   \se None
 */
-lsList sbmc_dependent(const BeEnc_ptr be_enc,
-                             const node_ptr bltlspec,
-                             const int k,
-                             const state_vars_struct *state_vars,
-                             array_t *InLoop_array,
-                             const be_ptr be_LoopExists,
-                             const hash_ptr info_map);
+lsList sbmc_dependent(const BeEnc_ptr be_enc, const node_ptr bltlspec,
+                      const int k, const state_vars_struct *state_vars,
+                      array_t *InLoop_array, const be_ptr be_LoopExists,
+                      const hash_ptr info_map);
 
 /**AutomaticEnd***************************************************************/
 

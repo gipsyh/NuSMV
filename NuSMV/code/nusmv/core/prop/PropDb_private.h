@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,8 +34,6 @@
 
 */
 
-
-
 #ifndef __NUSMV_CORE_PROP_PROP_DB_PRIVATE_H__
 #define __NUSMV_CORE_PROP_PROP_DB_PRIVATE_H__
 
@@ -43,14 +41,14 @@
 #include "nusmv-config.h"
 #endif
 
-#include "nusmv/core/prop/PropDb.h"
 #include "nusmv/core/prop/Prop.h"
+#include "nusmv/core/prop/PropDb.h"
 
 #include "nusmv/core/utils/object.h"
 #include "nusmv/core/utils/object_private.h"
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/utils/array.h"
+#include "nusmv/core/utils/utils.h"
 
 #include "nusmv/core/utils/EnvObject.h"
 #include "nusmv/core/utils/EnvObject_private.h"
@@ -59,11 +57,10 @@
   \brief PropDb class definition derived from
                class Object
 
-  
+
 
   \sa Base class Object
 */
-
 
 /* Those are the types of the virtual methods. They can be used for
    type casts in subclasses. */
@@ -73,10 +70,8 @@
 
   \todo Missing description
 */
-typedef int (*PropDb_prop_create_and_add_method)(PropDb_ptr, \
-                                                 SymbTable_ptr, \
-                                                 node_ptr, \
-                                                 Prop_Type);
+typedef int (*PropDb_prop_create_and_add_method)(PropDb_ptr, SymbTable_ptr,
+                                                 node_ptr, Prop_Type);
 
 /*!
   \brief \todo Missing synopsis
@@ -86,15 +81,14 @@ typedef int (*PropDb_prop_create_and_add_method)(PropDb_ptr, \
 typedef void (*PropDb_verify_all_method)(const PropDb_ptr);
 
 /* The class itself. */
-typedef struct PropDb_TAG
-{
+typedef struct PropDb_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(EnvObject);
 
   /* -------------------------------------------------- */
   /*                  Private members                   */
   /* -------------------------------------------------- */
-  array_t* prop_database; /* contained properties */
+  array_t *prop_database; /* contained properties */
 
   PropDb_PrintFmt print_fmt; /* print format */
 
@@ -106,8 +100,6 @@ typedef struct PropDb_TAG
   /* void (*)(const PropDb_ptr) */
   PropDb_verify_all_method verify_all;
 } PropDb;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -140,12 +132,10 @@ void prop_db_deinit(PropDb_ptr self);
   Given a formula and its type, a property is
   created and stored in the DB of properties. It returns either -1 in
   case of failure, or the index of the inserted property.
-  
+
 */
-int prop_db_prop_create_and_add(PropDb_ptr self,
-                                       SymbTable_ptr symb_table,
-                                       node_ptr spec,
-                                       Prop_Type type);
+int prop_db_prop_create_and_add(PropDb_ptr self, SymbTable_ptr symb_table,
+                                node_ptr spec, Prop_Type type);
 
 /*!
   \methodof PropDb
@@ -156,6 +146,5 @@ int prop_db_prop_create_and_add(PropDb_ptr self,
   the order CTL/COMPUTE/LTL/INVAR.
 */
 void prop_db_verify_all(const PropDb_ptr self);
-
 
 #endif /* __NUSMV_CORE_PROP_PROP_DB_PRIVATE_H__ */

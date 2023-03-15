@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,10 +34,9 @@
 
 */
 
-
 #if HAVE_CONFIG_H
-#include "nusmv/core/utils/Logger.h"
 #include "nusmv-config.h"
+#include "nusmv/core/utils/Logger.h"
 #endif
 
 #include "nusmv/addons_core/addonsCore.h"
@@ -51,16 +50,13 @@
 /* Constant declarations                                                     */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Type declarations                                                         */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Structure declarations                                                    */
 /*---------------------------------------------------------------------------*/
-
 
 /*---------------------------------------------------------------------------*/
 /* Variable declarations                                                     */
@@ -70,7 +66,6 @@
 /* Macro declarations                                                        */
 /*---------------------------------------------------------------------------*/
 
-
 /**AutomaticStart*************************************************************/
 
 /*---------------------------------------------------------------------------*/
@@ -79,45 +74,41 @@
 
 /**AutomaticEnd***************************************************************/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of exported functions                                          */
 /*---------------------------------------------------------------------------*/
 
-void AddonsCore_Init(NuSMVEnv_ptr env)
-{
+void AddonsCore_Init(NuSMVEnv_ptr env) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 2)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Initializing core addons...\n");
   }
 #if NUSMV_HAVE_COMPASS
-   Compass_init(env);
+  Compass_init(env);
 #endif
 }
 
-void AddonsCore_Reset(NuSMVEnv_ptr env)
-{
+void AddonsCore_Reset(NuSMVEnv_ptr env) {
   /*-------- DE-INITIALIZATION ------------ */
 #if NUSMV_HAVE_COMPASS
-   Compass_reset(env);
+  Compass_reset(env);
 #endif
   /*-------- INITIALIZATION ------------ */
 }
 
-void AddonsCore_Quit(NuSMVEnv_ptr env)
-{
+void AddonsCore_Quit(NuSMVEnv_ptr env) {
   const OptsHandler_ptr opts =
-    OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
+      OPTS_HANDLER(NuSMVEnv_get_value(env, ENV_OPTS_HANDLER));
 
   if (opt_verbose_level_gt(opts, 2)) {
     Logger_ptr logger = LOGGER(NuSMVEnv_get_value(env, ENV_LOGGER));
     Logger_log(logger, "Quitting core addons...\n");
   }
 #if NUSMV_HAVE_COMPASS
-   Compass_quit(env);
+  Compass_quit(env);
 #endif
 }
 
@@ -125,10 +116,6 @@ void AddonsCore_Quit(NuSMVEnv_ptr env)
 /* Definition of internal functions                                          */
 /*---------------------------------------------------------------------------*/
 
-
 /*---------------------------------------------------------------------------*/
 /* Definition of static functions                                            */
 /*---------------------------------------------------------------------------*/
-
-
-

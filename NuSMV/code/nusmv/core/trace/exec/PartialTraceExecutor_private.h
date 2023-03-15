@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -37,24 +37,22 @@
 #ifndef __NUSMV_CORE_TRACE_EXEC_PARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 #define __NUSMV_CORE_TRACE_EXEC_PARTIAL_TRACE_EXECUTOR_PRIVATE_H__
 
-#include "nusmv/core/trace/exec/PartialTraceExecutor.h"
 #include "nusmv/core/trace/exec/BaseTraceExecutor.h"
 #include "nusmv/core/trace/exec/BaseTraceExecutor_private.h"
+#include "nusmv/core/trace/exec/PartialTraceExecutor.h"
 
 #include "nusmv/core/utils/utils.h"
-
 
 /*!
   \brief PartialTraceExecutor class definition derived from
                class TraceExecutor
 
-  
+
 
   \sa Base class TraceExecutor
 */
 
-typedef struct PartialTraceExecutor_TAG
-{
+typedef struct PartialTraceExecutor_TAG {
   /* this MUST stay on the top */
   INHERITS_FROM(BaseTraceExecutor);
 
@@ -70,13 +68,11 @@ typedef struct PartialTraceExecutor_TAG
    given language iff trace was succesfully completed. The number of
    performed steps is stored in *n_steps, if non-NULL (-1 if no
    initial feasible state exists) */
-  VIRTUAL Trace_ptr
-  (*execute)(const PartialTraceExecutor_ptr self, const Trace_ptr trace,
-             NodeList_ptr language, int* n_steps);
+  VIRTUAL Trace_ptr (*execute)(const PartialTraceExecutor_ptr self,
+                               const Trace_ptr trace, NodeList_ptr language,
+                               int *n_steps);
 
 } PartialTraceExecutor;
-
-
 
 /* ---------------------------------------------------------------------- */
 /* Private methods to be used by derivated and friend classes only         */
@@ -91,7 +87,7 @@ typedef struct PartialTraceExecutor_TAG
   \sa PartialTraceExecutor_create
 */
 void partial_trace_executor_init(PartialTraceExecutor_ptr self,
-                                        const NuSMVEnv_ptr env);
+                                 const NuSMVEnv_ptr env);
 
 /*!
   \methodof PartialTraceExecutor

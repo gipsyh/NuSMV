@@ -22,7 +22,7 @@
   or email to <nusmv-users@fbk.eu>.
   Please report bugs to <nusmv-users@fbk.eu>.
 
-  To contact the NuSMV development board, email to <nusmv@fbk.eu>. 
+  To contact the NuSMV development board, email to <nusmv@fbk.eu>.
 
 -----------------------------------------------------------------------------*/
 
@@ -34,21 +34,20 @@
 
 */
 
-
 #ifndef __NUSMV_CORE_MC_MC_H__
 #define __NUSMV_CORE_MC_MC_H__
 
-#include "nusmv/core/utils/utils.h"
 #include "nusmv/core/dd/dd.h"
-#include "nusmv/core/prop/Prop.h"
 #include "nusmv/core/fsm/bdd/BddFsm.h"
-#include "nusmv/core/trace/Trace.h"
 #include "nusmv/core/opt/opt.h"
+#include "nusmv/core/prop/Prop.h"
+#include "nusmv/core/trace/Trace.h"
+#include "nusmv/core/utils/utils.h"
 
 /*!
   \brief Options for top level function of check_invar command
 
-  
+
 
   \sa See the documentation of the single types
 */
@@ -61,10 +60,9 @@ typedef struct McCheckInvarOpts_TAG {
   int bmc_length;
 } McCheckInvarOpts;
 
-void McCheckInvarOpts_init(McCheckInvarOpts* options,
-                           NuSMVEnv_ptr env);
-void McCheckInvarOpts_init_invalid(McCheckInvarOpts* options);
-boolean McCheckInvarOpts_is_valid(McCheckInvarOpts* options);
+void McCheckInvarOpts_init(McCheckInvarOpts *options, NuSMVEnv_ptr env);
+void McCheckInvarOpts_init_invalid(McCheckInvarOpts *options);
+boolean McCheckInvarOpts_is_valid(McCheckInvarOpts *options);
 
 /*!
   \brief \todo Missing synopsis
@@ -78,7 +76,7 @@ boolean McCheckInvarOpts_is_valid(McCheckInvarOpts* options);
 /*---------------------------------------------------------------------------*/
 
 /*!
-  \brief Verifies that M,s0 |= alpha 
+  \brief Verifies that M,s0 |= alpha
 
   Verifies that M,s0 |= alpha using the fair CTL model checking.
 */
@@ -103,7 +101,7 @@ void Mc_CheckAGOnlySpec(NuSMVEnv_ptr env, Prop_ptr prop);
   \brief Verifies that M,s0 |= AG alpha
 
   Verifies that M,s0 |= AG alpha, with alpha propositional.
-   Uses strategy read from the option variable. 
+   Uses strategy read from the option variable.
 
   \sa check_ctlspec check_ltlspec Mc_CheckInvar_With_Strategy
 */
@@ -111,7 +109,7 @@ void Mc_CheckInvar(NuSMVEnv_ptr env, Prop_ptr prop);
 
 /*!
   \brief Verifies that M,s0 |= AG alpha WITHOUT print results or
-                counterexamples 
+                counterexamples
 
   Verifies that M,s0 |= AG alpha, with alpha propositional.
    Uses strategy read from the option variable.
@@ -120,13 +118,11 @@ void Mc_CheckInvar(NuSMVEnv_ptr env, Prop_ptr prop);
    trace is stored (and must be released by caller) in trace
    parameter location.
 
-   The result of model checking is stored in the given property. 
+   The result of model checking is stored in the given property.
 
   \sa check_ctlspec check_ltlspec Mc_CheckInvar_With_Strategy
 */
-void Mc_CheckInvarSilently(NuSMVEnv_ptr env,
-                                  Prop_ptr prop,
-                                  Trace_ptr* trace);
+void Mc_CheckInvarSilently(NuSMVEnv_ptr env, Prop_ptr prop, Trace_ptr *trace);
 
 /*!
   \brief Verifies that M,s0 |= AG alpha with the specified strategy
@@ -139,16 +135,13 @@ void Mc_CheckInvarSilently(NuSMVEnv_ptr env,
    parameter location.
 
    The result of model checking is stored in the given property.
-   
+
 
   \sa check_ctlspec check_ltlspec Mc_CheckInvar
 */
-void
-Mc_CheckInvar_With_Strategy(NuSMVEnv_ptr env,
-                            Prop_ptr prop,
-                            Check_Strategy strategy,
-                            Trace_ptr* trace,
-                            boolean silent);
+void Mc_CheckInvar_With_Strategy(NuSMVEnv_ptr env, Prop_ptr prop,
+                                 Check_Strategy strategy, Trace_ptr *trace,
+                                 boolean silent);
 
 /*!
   \brief Verifies that M,s0 |= AG alpha with the specified strategy
@@ -158,21 +151,18 @@ Mc_CheckInvar_With_Strategy(NuSMVEnv_ptr env,
 
    If opt_counter_examples is setted and trace is not null, then a
    trace is stored (and must be released by caller) in trace
-   parameter location. A trace is created for variables and defines in 'symbols'.
-   If trace is not required 'symbols' can be NULL.
+   parameter location. A trace is created for variables and defines in
+  'symbols'. If trace is not required 'symbols' can be NULL.
 
    The result of model checking is stored in the given property.
-   
+
 
   \sa check_ctlspec check_ltlspec Mc_CheckInvar
 */
-void
-Mc_CheckInvar_With_Strategy_And_Symbols(NuSMVEnv_ptr env,
-                                        Prop_ptr prop,
-                                        Check_Strategy strategy,
-                                        Trace_ptr* trace,
-                                        boolean silent,
-                                        NodeList_ptr symbols);
+void Mc_CheckInvar_With_Strategy_And_Symbols(NuSMVEnv_ptr env, Prop_ptr prop,
+                                             Check_Strategy strategy,
+                                             Trace_ptr *trace, boolean silent,
+                                             NodeList_ptr symbols);
 
 /*!
   \brief Compute quantitative characteristics on the model.
@@ -186,7 +176,7 @@ void Mc_CheckCompute(NuSMVEnv_ptr env, Prop_ptr prop);
 
   The parameters are:
   - prop is the PSL property to be checked
-  
+
 
   \se None
 */
@@ -216,17 +206,15 @@ int Mc_check_psl_property(NuSMVEnv_ptr env, Prop_ptr prop);
 
   If <tt>verbose</tt> is true, then some information on the set of
   initial states is printed out too. <tt> verbose</tt> is ignored for
-  forward Emerson-Lei.  
+  forward Emerson-Lei.
 
   \se None
 
   \sa mc_check_language_emptiness_el_bwd,
   mc_check_language_emptiness_el_fwd
 */
-void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env,
-                                      const BddFsm_ptr fsm,
-                                      boolean allinit,
-                                      boolean verbose);
+void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env, const BddFsm_ptr fsm,
+                               boolean allinit, boolean verbose);
 /* mcTrace.c */
 
 /*!
@@ -235,19 +223,18 @@ void Mc_CheckLanguageEmptiness(NuSMVEnv_ptr env,
   Creates a trace out of a < S (i, S)* >  bdd list.
                 The built trace is non-volatile. For more control over
                 the built trace, please see
-                Mc_fill_trace_from_bdd_state_input_list 
+                Mc_fill_trace_from_bdd_state_input_list
 
   \se none
 
   \sa Trace_create, Bmc_create_trace_from_cnf_model,
                 Mc_fill_trace_from_bdd_state_input_list
 */
-Trace_ptr
-Mc_create_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
-                                          const NodeList_ptr symbols,
-                                          const char* desc,
-                                          const TraceType type,
-                                          node_ptr path);
+Trace_ptr Mc_create_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
+                                                    const NodeList_ptr symbols,
+                                                    const char *desc,
+                                                    const TraceType type,
+                                                    node_ptr path);
 
 /*!
   \brief Fills the given trace out of a < S (i, S)* >  bdd list
@@ -260,32 +247,29 @@ Mc_create_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
 
   \sa Trace_create, Bmc_fill_trace_from_cnf_model
 */
-Trace_ptr
-Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
-                                        Trace_ptr trace,
-                                        node_ptr path);
+Trace_ptr Mc_fill_trace_from_bdd_state_input_list(const BddEnc_ptr bdd_enc,
+                                                  Trace_ptr trace,
+                                                  node_ptr path);
 
 /*!
   \brief Populates a trace step with state assignments
 
-  
+
 
   \se none
 */
-void
-Mc_trace_step_put_state_from_bdd(Trace_ptr trace, TraceIter step,
-                                 BddEnc_ptr bdd_enc, bdd_ptr bdd);
+void Mc_trace_step_put_state_from_bdd(Trace_ptr trace, TraceIter step,
+                                      BddEnc_ptr bdd_enc, bdd_ptr bdd);
 
 /*!
   \brief Populates a trace step with input assignments
 
-  
+
 
   \se none
 */
-void
-Mc_trace_step_put_input_from_bdd(Trace_ptr trace, TraceIter step,
-                                 BddEnc_ptr bdd_enc, bdd_ptr bdd);
+void Mc_trace_step_put_input_from_bdd(Trace_ptr trace, TraceIter step,
+                                      BddEnc_ptr bdd_enc, bdd_ptr bdd);
 
 /*!
   \brief Prints out a CTL specification
@@ -405,7 +389,7 @@ BddStates abu(BddFsm_ptr, BddStates, BddStates, int, int);
 
   \sa maxu
 */
-int       minu(BddFsm_ptr, bdd_ptr, bdd_ptr);
+int minu(BddFsm_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief This function computes the maximum length of the
@@ -422,7 +406,7 @@ int       minu(BddFsm_ptr, bdd_ptr, bdd_ptr);
 
   \sa minu
 */
-int       maxu(BddFsm_ptr, bdd_ptr, bdd_ptr);
+int maxu(BddFsm_ptr, bdd_ptr, bdd_ptr);
 
 /*!
   \brief Counterexamples and witnesses generator.
@@ -435,8 +419,7 @@ int       maxu(BddFsm_ptr, bdd_ptr, bdd_ptr);
   \sa explain_recur ex_explain eu_explain eg_explain
    ebg_explain ebu_explain
 */
-node_ptr explain(BddFsm_ptr, BddEnc_ptr, node_ptr,
-                        node_ptr, node_ptr);
+node_ptr explain(BddFsm_ptr, BddEnc_ptr, node_ptr, node_ptr, node_ptr);
 
 /*!
   \brief Compile a CTL formula into BDD and performs
@@ -447,8 +430,7 @@ node_ptr explain(BddFsm_ptr, BddEnc_ptr, node_ptr,
 
   \sa eval_compute
 */
-bdd_ptr
-eval_ctl_spec(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
+bdd_ptr eval_ctl_spec(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
 
 /*!
   \brief This function takes a list of formulas, and
@@ -458,8 +440,7 @@ eval_ctl_spec(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
   and return as output the list of the corresponding BDDs, obtained by
   evaluating each formula in the given context.
 */
-node_ptr
-eval_formula_list(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
+node_ptr eval_formula_list(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
 
 /*!
   \brief Computes shortest and longest length of the path
@@ -471,8 +452,7 @@ eval_formula_list(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
 
   \sa eval_ctl_spec
 */
-int
-eval_compute(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
+int eval_compute(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
 
 /*!
   \brief Frees a list of BDD as generated by eval_formula_list
@@ -481,7 +461,7 @@ eval_compute(BddFsm_ptr, BddEnc_ptr enc, node_ptr, node_ptr);
 
   \sa eval_formula_list
 */
-void     free_formula_list(DDMgr_ptr , node_ptr);
+void free_formula_list(DDMgr_ptr, node_ptr);
 
 /* directly called by commands */
 
@@ -495,11 +475,9 @@ int Mc_check_psl_spec(const NuSMVEnv_ptr env, const int prop_no);
 /*!
   \brief Performs model checking of invariants
 
-  
+
 */
-int Mc_check_invar(NuSMVEnv_ptr env,
-                          Prop_ptr prop,
-                          McCheckInvarOpts* options);
+int Mc_check_invar(NuSMVEnv_ptr env, Prop_ptr prop, McCheckInvarOpts *options);
 
 /* Called by SA */
 
